@@ -172,6 +172,7 @@ const C = {
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
   ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
+  ROUTE_FREEZE_LIST: 'FREEZE_LIST',        //冻结列表
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',

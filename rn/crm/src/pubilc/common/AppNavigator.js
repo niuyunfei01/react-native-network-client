@@ -375,6 +375,11 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpenseInfo').default}
         />
+
+        <Stack.Screen name={Config.ROUTE_FREEZE_LIST} options={{headerTitle: ""}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
+        />
+
         <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedAccountFill').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}}
