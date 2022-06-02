@@ -48,7 +48,7 @@ class SeparatedExpenseInfo extends PureComponent {
     const url = `/v1/new_api/bill/freeze_list/${global.currStoreId}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       this.setState({
-        list: res.lists
+        list: res
       })
     })
   }
