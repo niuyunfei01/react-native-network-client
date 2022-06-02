@@ -1,23 +1,23 @@
 import React, {PureComponent} from "react";
 import {
     FlatList,
-    KeyboardAvoidingView,
     Modal,
     StyleSheet,
     Pressable,
     Text,
     TextInput,
+    Platform,
     View
 } from 'react-native'
 import Config from "../../common/config";
-import {showError, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {showError, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
-import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
 
 const height = Dimensions.get("window").height;
-export default class NewBottomMadal extends PureComponent {
+
+export default class MultiSpecsModal extends PureComponent {
 
     state = {
         editGood: {},
@@ -58,13 +58,18 @@ export default class NewBottomMadal extends PureComponent {
         })
     }
 
+    saveRef = (ref, index) => {
+        if (index === 0)
+            this.priceRef = ref
+    }
+
     renderItem = (item) => {
         const {product_id, sku_name, left_since_last_stat, supply_price, strict_providing} = item.item
         const {index} = item
         const {editGood} = this.state
         const price = undefined === editGood[product_id] ? parseFloat(supply_price / 100).toFixed(2) : editGood[product_id].apply_price
         const amount = undefined === editGood[product_id] ? left_since_last_stat : editGood[product_id].actualNum
-        const autoFocus = index === 0
+
         return (
             <View style={styles.itemWrap}>
                 <Text style={styles.skuName}>
@@ -81,7 +86,7 @@ export default class NewBottomMadal extends PureComponent {
                     </View>
                     <View style={styles.row}>
                         <TextInput value={price}
-                                   autoFocus={autoFocus}
+                                   ref={ref => this.saveRef(ref, index)}
                                    returnKeyType={'done'}
                                    style={styles.textInput}
                                    keyboardType={'numeric'}
@@ -169,12 +174,16 @@ export default class NewBottomMadal extends PureComponent {
     getItemLayout = (data, index) => ({
         length: 120, offset: 120 * index, index
     })
+    onShow = () => {
+        this.priceRef && this.priceRef.focus()
+    }
 
     render() {
         const {onClose, visible} = this.props
         const {data} = this.state
         return (
-            <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}>
+            <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}
+                   onShow={this.onShow}>
                 <View style={styles.container}>
                     <View style={styles.visibleArea}>
                         <View style={styles.btn}>
@@ -193,7 +202,7 @@ export default class NewBottomMadal extends PureComponent {
                                   renderItem={(item) => this.renderItem(item)}
                                   initialNumToRender={4}
                                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
-                                  keyExtractor={(index) => `${index}`}
+                                  keyExtractor={(item) => item.id}
                         />
                     </View>
                 </View>
@@ -204,7 +213,7 @@ export default class NewBottomMadal extends PureComponent {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
+        justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-end',
         backgroundColor: 'rgba(0,0,0,0.25)'
     },
     visibleArea: {
