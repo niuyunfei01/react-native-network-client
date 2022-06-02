@@ -180,7 +180,6 @@ class StoreGoodsSearch extends Component {
 
   renderRow = (product, idx) => {
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-    const onOpen = (product.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (product.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
                          modalType={this.state.modalType}
@@ -188,7 +187,6 @@ class StoreGoodsSearch extends Component {
                          fnProviding={onStrict}
                          opBar={<View style={[styles.row_center, {
                            flex: 1,
-                           padding: 5,
                            backgroundColor: colors.white,
                            borderTopWidth: pxToDp(1),
                            borderColor: colors.colorDDD
@@ -214,7 +212,7 @@ class StoreGoodsSearch extends Component {
                            {onStrict ?
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                                 <Text style={{color: colors.color333}}>MyTextInput </Text>
+                                 <Text style={{color: colors.color333}}>报价/库存 </Text>
                                </TouchableOpacity> :
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price', product)}>
@@ -316,7 +314,7 @@ class StoreGoodsSearch extends Component {
                   <View>
                     <LoadMore
                         loadMoreType={'scroll'}
-                        renderList={this.renderList}
+                        renderList={this.renderList()}
                         onRefresh={() => this.onRefresh()}
                         onLoadMore={() => this.onLoadMore()}
                         isLastPage={isLastPage}
@@ -389,8 +387,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
-    flex: 1},
+    flex: 1
+  },
   toOnlineBtn: {
+    padding:8,
     borderRightWidth: pxToDp(1),
     borderColor: colors.colorDDD,
     justifyContent: 'center',

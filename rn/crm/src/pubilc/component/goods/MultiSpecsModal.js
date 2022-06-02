@@ -77,11 +77,8 @@ export default class MultiSpecsModal extends PureComponent {
                 </Text>
                 <View style={styles.rowWrap}>
                     <View style={styles.row}>
-                        <Text style={styles.textBold}>
-                            价格
-                        </Text>
                         <Text style={styles.text}>
-                            （报价）
+                            价格（报价）
                         </Text>
                     </View>
                     <View style={styles.row}>
@@ -91,9 +88,9 @@ export default class MultiSpecsModal extends PureComponent {
                                    style={styles.textInput}
                                    keyboardType={'numeric'}
                                    placeholder={'请输入价格'}
-                                   placeholderTextColor={'grey'}
+                                   placeholderTextColor={styles.placeholderTextColor}
                                    onChangeText={price => this.onChangeText(product_id, amount, left_since_last_stat, price, supply_price, strict_providing, 'price')}/>
-                        <Text style={styles.textBold}>
+                        <Text style={styles.text}>
                             元
                         </Text>
                     </View>
@@ -101,7 +98,7 @@ export default class MultiSpecsModal extends PureComponent {
                 <If condition={strict_providing === '1'}>
                     <View style={styles.rowWrap}>
                         <View style={styles.row}>
-                            <Text style={styles.textBold}>
+                            <Text style={styles.text}>
                                 库存
                             </Text>
                             <Text style={styles.inventoryHistory} onPress={() => this.inventoryHistory(product_id)}>
@@ -118,9 +115,9 @@ export default class MultiSpecsModal extends PureComponent {
                                        style={styles.textInput}
                                        keyboardType={'numeric'}
                                        placeholder={'请输入库存数量'}
-                                       placeholderTextColor={'grey'}
+                                       placeholderTextColor={styles.placeholderTextColor}
                                        onChangeText={amount => this.onChangeText(product_id, amount, left_since_last_stat, price, supply_price, strict_providing, 'amount')}/>
-                            <Text style={styles.textBold}>
+                            <Text style={styles.text}>
                                 件
                             </Text>
                         </View>
@@ -228,36 +225,51 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "space-between",
         padding: 8,
-        borderBottomColor: 'gray',
+        borderBottomColor: '#EEEEEE',
         borderBottomWidth: 1
     },
     cancelBtn: {
-        fontWeight: 'bold', color: '#000000'
+        fontWeight: '400', color: '#666666', fontSize: 16, lineHeight: 22
     },
     doneStyle: {
-        fontWeight: 'bold', color: 'green'
+        fontWeight: '400', color: '#59B26A', fontSize: 16, lineHeight: 22
     },
     textInput: {
-        padding: 4, width: 120, borderWidth: 1, borderColor: 'grey', textAlign: 'right'
+        padding: 4, width: 120, borderWidth: 1, borderColor: '#979797', borderRadius: 4, marginRight: 4
     },
-    textBold: {paddingTop: 4, paddingBottom: 4, fontWeight: 'bold', color: '#000000'},
-    text: {paddingTop: 4, paddingBottom: 4},
+    placeholderTextColor: {
+        fontSize: 12, fontWeight: '400', color: '#999999', lineHeight: 17
+    },
+    text: {paddingTop: 4, paddingBottom: 4, fontSize: 14, fontWeight: '400', color: '#666666', lineHeight: 20},
     clearBtn: {
-        color: 'green', borderColor: 'grey', borderWidth: 1, marginRight: 4
+        color: '#59B26A',
+        borderColor: '#979797',
+        borderWidth: 1,
+        marginRight: 4,
+        borderRadius: 4,
+        fontSize: 14,
+        padding: 4,
+        lineHeight: 17
     },
     itemWrap: {
-        padding: 8, borderBottomColor: 'gray', borderBottomWidth: 1, height: 120, justifyContent: 'center'
+        padding: 8, borderBottomColor: '#EEEEEE', borderBottomWidth: 1, height: 120, justifyContent: 'center'
     },
     skuName: {
-        paddingBottom: 4, paddingLeft: 4, paddingRight: 4
+        marginTop: 12,
+        paddingLeft: 4,
+        paddingRight: 4,
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#333333',
+        lineHeight: 17
     },
     rowWrap: {
-        flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 4, paddingLeft: 4, paddingRight: 4
+        flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12, paddingLeft: 4, paddingRight: 4
     },
     row: {
         flexDirection: 'row', alignItems: 'center'
     },
     inventoryHistory: {
-        color: 'green', marginLeft: 4
+        color: '#59B26A', marginLeft: 4, fontSize: 12, lineHeight: 17, fontWeight: '400'
     }
 })
