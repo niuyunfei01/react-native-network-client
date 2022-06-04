@@ -379,6 +379,7 @@ class GoodStoreDetailScene extends PureComponent {
                             currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
                             onClose={() => this.setState({modalType: ''})}
                             spId={Number(sp.id)} applyingPrice={applyingPrice} storePro={sp}
+                            navigation={this.props.navigation}
                             beforePrice={Number(sp.supply_price)}/>}
       </View></Provider>
     );

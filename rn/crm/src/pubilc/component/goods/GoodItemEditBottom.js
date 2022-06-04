@@ -98,84 +98,6 @@ class GoodItemEditBottom extends React.Component {
     })
   }
 
-  onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate, proId, itemPrice) => {
-    let root = this.props.storePro && this.props.storePro.skus !== undefined
-    let pid = 0
-    if (proId === 0) {
-      pid = this.state.pid
-    } else {
-      pid = proId
-    }
-    if (this.state.setPrice !== '' && this.state.setPrice >= 0) {
-      const applyPrice = this.state.setPrice * 100;
-      let price = 0
-      if (itemPrice) {
-        price = itemPrice * 100
-      } else {
-        price = applyPrice
-      }
-      const params = {
-        store_id: storeId,
-        product_id: pid,
-        apply_price: price,
-        before_price: beforePrice,
-        remark: '',
-        auto_on_sale: 0,
-        autoOnline: 0,
-        access_token: accessToken,
-      }
-      this.setState({onSubmitting: true})
-      HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-        if (!root) {
-          this.resetModal()
-        }
-        doneProdUpdate(pid, {}, {applying_price: applyPrice})
-        ToastShort('提交成功, 请等待审核')
-      }, (res) => {
-        this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
-      })
-    }
-  }
-
-  handleSubmit(nowStock, beforeStock, pId) {
-    let root = this.props.storePro && this.props.storePro.skus !== undefined
-    const self = this
-    let pid = this.state.pid
-    if (pId) {
-      pid = pId
-    }
-    let remainNum = this.state.remainNum
-    let totalRemain = this.state.totalRemain
-    if (beforeStock) {
-      totalRemain = Number(beforeStock)
-      remainNum = String(beforeStock)
-    }
-    let actualNum = self.state.setPriceAddInventory
-    if (nowStock) {
-      actualNum = nowStock
-    }
-    const api = `api_products/inventory_check?access_token=${self.props.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      storeId: self.props.storeId,
-      productId: pid,
-      remainNum: remainNum,
-      orderUse: this.state.orderUse,
-      totalRemain: totalRemain,
-      actualNum: actualNum,
-      differenceType: 2,
-      remark: '快速盘点'
-    }).then(res => {
-      if (!root) {
-        this.resetModal()
-      }
-      ToastShort(`#${self.state.pid} 实际库存 ${self.state.setPriceAddInventory}`)
-    }).catch(e => {
-      if (e.obj == 'THEORY_NUM_CHANGED') {
-        self.fetchData()
-      }
-    })
-  }
-
   fetchData() {
     const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
@@ -206,7 +128,6 @@ class GoodItemEditBottom extends React.Component {
       storePro,
       vendor_id
     } = this.props;
-
     return modalType ? <View>
 
       <BottomModal title={'上  架'} actionText={'确认上架'}
