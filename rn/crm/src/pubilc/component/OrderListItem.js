@@ -335,7 +335,7 @@ class OrderListItem extends React.PureComponent {
             <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.color333, marginLeft: 10}}># </Text>
             <Text style={{fontSize: 24, fontWeight: 'bold', color: colors.color333}}>{item.platform_dayId} </Text>
             <Text
-              style={{fontSize: 14, fontWeight: 'bold', color: colors.color333, marginLeft: 10}}>总#{item.dayId} </Text>
+              style={{fontSize: 14, color: colors.color333, marginLeft: 10}}>总#{item.dayId} </Text>
             <If condition={Number(item.orderStatus) === 5}>
               <Text style={{
                 fontSize: 20,
@@ -395,10 +395,10 @@ class OrderListItem extends React.PureComponent {
                 {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </Text>
             </View>
           </View>
-          <FontAwesome5 onPress={() => {
+          <FontAwesome5 solid={false} onPress={() => {
             native.dialNumber(item.mobile)
-          }} name={"phone-alt"}
-                        style={{width: width * 0.14, fontSize: 25, color: colors.main_color}}/>
+          }} name={'phone-alt'}
+                        style={{width: width * 0.125, fontSize: 25, color: colors.main_color}}/>
           <Entypo onPress={() => {
             let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
             this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
@@ -530,7 +530,8 @@ class OrderListItem extends React.PureComponent {
                     }])
                   }}
                   buttonStyle={{
-                    borderRadius: pxToDp(10),
+                    borderRadius: 2,
+                    paddingVertical: 7,
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
                     borderWidth: 1
@@ -546,7 +547,8 @@ class OrderListItem extends React.PureComponent {
                     this.onAinSend(item.id, item.store_id)
                   }}
                   buttonStyle={{
-                    borderRadius: pxToDp(10),
+                    borderRadius: 2,
+                    paddingVertical: 7,
                     backgroundColor: colors.white,
                     borderColor: colors.main_color,
                     borderWidth: 1
@@ -561,7 +563,8 @@ class OrderListItem extends React.PureComponent {
                     this.onCallThirdShips(item.id, item.store_id)
                   }}
                   buttonStyle={{
-                    borderRadius: pxToDp(10),
+                    borderRadius: 2,
+                    paddingVertical: 7,
                     backgroundColor: colors.main_color,
                   }}
                   titleStyle={{
@@ -579,7 +582,8 @@ class OrderListItem extends React.PureComponent {
                     })
                   }}
                   buttonStyle={{
-                    borderRadius: pxToDp(10),
+                    borderRadius: 2,
+                    paddingVertical: 7,
                     backgroundColor: colors.main_color,
                     marginRight: 10
                   }}
