@@ -1126,7 +1126,7 @@ class OrderListItem extends React.PureComponent {
     return (
       <View>
         <For each="log" index="i" of={list}>
-          <View style={{
+          <View key={i} style={{
             flexDirection: 'row',
             paddingTop: pxToDp(15),
             paddingBottom: pxToDp(15),

@@ -16,6 +16,7 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
 
 const height = Dimensions.get("window").height;
+let checkStatus = true
 
 export default class MultiSpecsModal extends PureComponent {
 
@@ -27,9 +28,6 @@ export default class MultiSpecsModal extends PureComponent {
     }
     onChangeText = (product_id, amount, totalRemain, price, before_price, strict_providing, type) => {
         const amountLength = amount.length, priceLength = price.split('.')[0].length
-        if (amountLength <= 0 || priceLength <= 0) {
-            showError('数据不可为空', 1);
-        }
         if ('amount' === type && amountLength > 4)
             amount = '9999'
         if ('price' === type && priceLength > 4)
@@ -84,7 +82,6 @@ export default class MultiSpecsModal extends PureComponent {
                     <View style={styles.row}>
                         <TextInput value={price}
                                    ref={ref => this.saveRef(ref, index)}
-                                   returnKeyType={'done'}
                                    style={styles.textInput}
                                    keyboardType={'numeric'}
                                    placeholder={'请输入价格'}
@@ -111,7 +108,6 @@ export default class MultiSpecsModal extends PureComponent {
                                 清零
                             </Text>
                             <TextInput value={amount}
-                                       returnKeyType={'done'}
                                        style={styles.textInput}
                                        keyboardType={'numeric'}
                                        placeholder={'请输入库存数量'}
@@ -133,18 +129,25 @@ export default class MultiSpecsModal extends PureComponent {
         const prices = [], inventory = []
         Object.keys(editGood).map((key) => {
             const obj = editGood[key]
-            let apply_price = obj.apply_price
-            if (obj.apply_price.indexOf('.') !== -1) {
-                apply_price = (parseFloat(obj.apply_price)) * 100
+            if (obj.apply_price.length <= 0) {
+                showError('金额不可为空', 1);
+                checkStatus = false
+                return
             }
+            obj.apply_price = parseFloat(obj.apply_price) * 100
             prices.push({
                 product_id: parseInt(obj.product_id),
-                apply_price: `${apply_price}`,
+                apply_price: `${obj.apply_price}`,
                 before_price: obj.before_price,
                 remark: '',
                 auto_on_sale: 0
             })
-            if ('1' === obj.strict_providing)
+            if ('1' === obj.strict_providing) {
+                if (obj.actualNum.length <= 0) {
+                    checkStatus = false
+                    showError('库存不可为空', 1);
+                    return
+                }
                 inventory.push({
                     productId: obj.product_id,
                     actualNum: obj.actualNum,
@@ -153,17 +156,20 @@ export default class MultiSpecsModal extends PureComponent {
                     differenceType: 2,
                     skipCheckChange: false
                 })
+            }
         })
+        if (!checkStatus)
+            return
         const url = `/api_products/batch_update_store_price_inventory?access_token=${accessToken}&&store_id=${storeId}&&vendor_id=${vendor_id}`
         let params = {prices: prices}
         if (inventory.length > 0)
             params = {...params, inventorys: inventory}
         if (prices.length > 0)
-            HttpUtils.post.bind(this.props)(url, params).then(res => {
-                showSuccess('提交成功, 价格修改请等待审核', 3)
+            HttpUtils.post.bind(this.props)(url, params).then(() => {
+                showSuccess('已完成', 3)
 
             }).catch(e => {
-                showError(e.reason)
+                showError(e.reason, 1)
             })
         onClose()
     }
