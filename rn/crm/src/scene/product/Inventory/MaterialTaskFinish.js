@@ -226,7 +226,7 @@ class MaterialTaskFinish extends React.Component {
             </ModalSelector>
           </View>
           <For each='explain' index='explainIdx' of={item.explains}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}} key={explainIdx}>
               <Text style={{fontSize: 12}}>{explain.user.nickname}：{explain.label} </Text>
               <Text style={{fontSize: 12}}>{explain.created} </Text>
             </View>
