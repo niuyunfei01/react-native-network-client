@@ -346,7 +346,7 @@ class SeetingDeliveryInfo extends PureComponent {
             </View>
             <View style={styles.areaWrap}>
               <View style={styles.shipWrap}>
-                <Text style={styles.shipText}>NewBottomModal </Text>
+                <Text style={styles.shipText}>配送方式 </Text>
               </View>
               <For index="idx" each='item' of={menus}>
                 <View style={styles.itemWrap} key={idx}>
