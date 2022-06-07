@@ -234,6 +234,12 @@ class SeetingDeliveryInfo extends PureComponent {
     })
   }
 
+  convertShowText=(length)=>{
+    if(length===0)
+      return '没有勾选'
+    return `勾选${length}方`
+  }
+
   render() {
     const {
       menus,
@@ -334,13 +340,13 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333}}>{time_interval}</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>您勾选两方配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟 </Text>
+                <Text style={{color: '#DD2525', marginTop: 10}}>您{this.convertShowText(ship_ways.length)}配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟 </Text>
               </View>
 
             </View>
             <View style={styles.areaWrap}>
               <View style={styles.shipWrap}>
-                <Text style={styles.shipText}>配送方式 </Text>
+                <Text style={styles.shipText}>NewBottomModal </Text>
               </View>
               <For index="idx" each='item' of={menus}>
                 <View style={styles.itemWrap} key={idx}>
