@@ -4,7 +4,7 @@ import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {Icon, List} from '@ant-design/react-native';
+import {List} from '@ant-design/react-native';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
@@ -13,6 +13,7 @@ import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -34,24 +35,24 @@ class SeparatedExpense extends PureComponent {
     let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
     if (wsbShowBtn) {
       navigation.setOptions(
-          {
-            headerRight: (() => (
-                    <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                      <View style={{
-                        width: pxToDp(96),
-                        height: pxToDp(46),
-                        backgroundColor: colors.main_color,
-                        marginRight: 8,
-                        borderRadius: 10,
-                        justifyContent: "center",
-                        alignItems: "center"
-                      }}>
-                        <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-                      </View>
-                    </TouchableOpacity>
-                )
+        {
+          headerRight: (() => (
+              <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                <View style={{
+                  width: pxToDp(96),
+                  height: pxToDp(46),
+                  backgroundColor: colors.main_color,
+                  marginRight: 8,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}>
+                  <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+                </View>
+              </TouchableOpacity>
             )
-          }
+          )
+        }
       );
     }
     let date = new Date();
@@ -135,14 +136,23 @@ class SeparatedExpense extends PureComponent {
         <List
           style={{width: "100%"}}
           renderHeader={() => {
-            return <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: "100%",
-                height: 40,
-                backgroundColor: "#fff"
-              }}>
+            return <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: "100%",
+              backgroundColor: colors.white,
+              borderBottomWidth: pxToDp(1),
+              borderColor: '#ccc',
+              paddingVertical: pxToDp(25),
+              paddingHorizontal: pxToDp(30),
+              zIndex: 999,
+            }}>
+              <Text style={{
+                color: colors.title_color,
+                flex: 1,
+                fontSize: 16,
+                fontWeight: "bold",
+              }}> 请选择月份 </Text>
               <PopPicker
                 datePicker={datePicker}
                 transitionName="rmc-picker-popup-slide-fade"
@@ -156,36 +166,12 @@ class SeparatedExpense extends PureComponent {
                 onChange={this.onChange}
               >
                 <Text style={{
-                  height: 40,
-                  width: "100%",
-                  alignItems: 'center',
-                  flexDirection: "row",
-                  justifyContent: 'space-between',
-                  paddingLeft: '5%',
-                  paddingRight: '3%',
-                  marginTop: 12,
-                }}>
-                  <View style={{
-                    width: pxToDp(220),
-                    height: pxToDp(50),
-                    backgroundColor: colors.white,
-                    marginLeft: 10,
-                    borderRadius: 5,
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    // borderWidth: pxToDp(1)
-                  }}>
-                    <Text
-                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text>
-                    <Text style={{color: colors.color333}}><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text>
-                  </View>
-                </Text>
+                  color: colors.title_color,
+                  fontSize: 16,
+                  fontWeight: 'bold'
+                }}> {this.state.start_day} </Text>
               </PopPicker>
-              <View style={{width: pxToDp(120)}}><Text
-                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day} </Text>
-              </View>
+              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
             </View>
           }}>
           {records && records.map((item, id) => {
