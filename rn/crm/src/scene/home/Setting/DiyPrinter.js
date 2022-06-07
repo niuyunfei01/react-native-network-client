@@ -241,7 +241,7 @@ class DiyPrinter extends PureComponent {
               }}>商品价格 </Text>
               <Switch style={{
                 fontSize: 16,
-              }} onValueChange={() => {
+              }} onChange={() => {
                 this.setState({
                   show_product_price: !this.state.show_product_price
                 })
@@ -271,7 +271,7 @@ class DiyPrinter extends PureComponent {
               }}>商品优惠信息 </Text>
               <Switch style={{
                 fontSize: 16,
-              }} onValueChange={() => {
+              }} onChange={() => {
                 this.setState({
                   show_product_discounts: !this.state.show_product_discounts
                 })
@@ -302,7 +302,7 @@ class DiyPrinter extends PureComponent {
               }}>配送距离 </Text>
               <Switch style={{
                 fontSize: 16,
-              }} onValueChange={() => {
+              }} onChange={() => {
                 this.setState({
                   show_distribution_distance: !this.state.show_distribution_distance
                 })
@@ -333,7 +333,7 @@ class DiyPrinter extends PureComponent {
               }}>显示货号（暂仅显示美团货号） </Text>
               <Switch style={{
                 fontSize: 16,
-              }} onValueChange={() => {
+              }} onChange={() => {
                 this.setState({
                   show_goods_code: !this.state.show_goods_code
                 })
