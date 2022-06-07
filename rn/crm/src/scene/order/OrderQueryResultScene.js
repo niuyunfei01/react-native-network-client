@@ -279,7 +279,14 @@ class OrderQueryResultScene extends PureComponent {
             }}
           />
           <Text style={styles.description}> 下单日期 </Text>
-          <TouchableOpacity style={{
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              dateBtn: 1,
+              date: dayjs().format('YYYY-MM-DD')
+            }, () => {
+              this.onRefresh()
+            })
+          }}  style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 1 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -287,20 +294,20 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 1,
-                date: dayjs().format('YYYY-MM-DD')
-              }, () => {
-                this.onRefresh()
-              })
-            }} style={{
+            <Text style={{
               fontSize: 12,
               color: dateBtn === 1 ? colors.white : colors.fontBlack,
             }}>今天</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={{
+          <TouchableOpacity  onPress={() => {
+            this.setState({
+              dateBtn: 2,
+              date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
+            }, () => {
+              this.onRefresh()
+            })
+          }}  style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 2 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -308,20 +315,18 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 2,
-                date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
-              }, () => {
-                this.onRefresh()
-              })
-            }} style={{
+            <Text style={{
               fontSize: 12,
               color: dateBtn === 2 ? colors.white : colors.fontBlack,
             }}>昨天</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={{
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              dateBtn: 3,
+              showDatePicker: !showDatePicker
+            })
+          }}  style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 3 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -329,12 +334,7 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 3,
-                showDatePicker: !showDatePicker
-              })
-            }} style={{
+            <Text  style={{
               fontSize: 12,
               color: dateBtn === 3 ? colors.white : colors.fontBlack,
             }}>自定义</Text>
@@ -344,7 +344,13 @@ class OrderQueryResultScene extends PureComponent {
         <View style={styles.rowWrap}>
           <Text style={styles.description}> 平台筛选 </Text>
           <For index='i' each='info' of={platform}>
-            <TouchableOpacity key={i} style={{
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                platformBtn: info.id,
+              }, () => {
+                this.onRefresh()
+              })
+            }} key={i} style={{
               borderRadius: 2,
               backgroundColor: platformBtn === info.id ? colors.main_color : colors.white,
               marginLeft: pxToDp(15),
@@ -352,13 +358,7 @@ class OrderQueryResultScene extends PureComponent {
               justifyContent: 'center',
               padding: pxToDp(10),
             }}>
-              <Text onPress={() => {
-                this.setState({
-                  platformBtn: info.id,
-                }, () => {
-                  this.onRefresh()
-                })
-              }} style={{
+              <Text  style={{
                 fontSize: 12,
                 color: platformBtn === info.id ? colors.white : colors.fontBlack,
               }}>{info.label} </Text>
@@ -373,8 +373,8 @@ class OrderQueryResultScene extends PureComponent {
               const backgroundColor=selectStatus.id === item.id ? colors.main_color : colors.white
               const color=selectStatus.id === item.id ? colors.white : colors.fontBlack
               return(
-                  <TouchableOpacity key={index} style={[styles.btnWrap,{backgroundColor:backgroundColor }]}>
-                    <Text onPress={() => this.selectItem(item)} style={{fontSize: 12, color: color}}>
+                  <TouchableOpacity key={index} onPress={() => this.selectItem(item)} style={[styles.btnWrap,{backgroundColor:backgroundColor }]}>
+                    <Text  style={{fontSize: 12, color: color}}>
                       {item.label}
                     </Text>
                   </TouchableOpacity>

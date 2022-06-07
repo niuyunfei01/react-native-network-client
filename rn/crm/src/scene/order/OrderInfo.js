@@ -922,7 +922,7 @@ class OrderInfo extends Component {
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
           <TouchableOpacity onPress={() => {
-            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
+            if (this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
           }}>
@@ -941,7 +941,7 @@ class OrderInfo extends Component {
             }}>
               <Text style={{color: colors.color333}}>
                 <Text style={{color: colors.color333}}> {this.state.deliverie_desc}  </Text>
-                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                {this.state.deliverie_status !== '待呼叫配送' ?
                   <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
               </Text>
             </Text>
