@@ -11,6 +11,7 @@ import {hideModal, showError, ToastShort} from "../../../pubilc/util/ToastUtils"
 import Dialog from "../../common/component/Dialog";
 import JbbText from "../../common/component/JbbText";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import Cts from "../../../pubilc/common/Cts";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -47,6 +48,7 @@ class DistributionanalysisScene extends PureComponent {
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
+      filterPlatform: 0,
       showLeftDateModal: false,
       showRightDateModal: false,
       startNewDateValue: "",
@@ -77,9 +79,9 @@ class DistributionanalysisScene extends PureComponent {
   getDistributionAnalysisData(startTime, endTime) {
 
     const {accessToken} = this.props.global;
-    const {currStoreId} = this.state;
+    const {currStoreId, filterPlatform} = this.state;
     ToastShort("查询中");
-    const api = `/v1/new_api/analysis/delivery/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/delivery/${currStoreId}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         DistributionanalysisData: res.data.statistic,
@@ -106,6 +108,13 @@ class DistributionanalysisScene extends PureComponent {
     }).catch((reason => {
       showError(reason.desc)
     }))
+  }
+
+  setFilterPlatform = (pl) => {
+    this.setState({filterPlatform: pl}, () => {
+      let {startTimeSaveValue, endTimeSaveValue} = this.state
+      this.getDistributionAnalysisData(startTimeSaveValue, endTimeSaveValue)
+    })
   }
 
   setLeftDateStatus(type) {
@@ -228,45 +237,56 @@ class DistributionanalysisScene extends PureComponent {
               tintColor='gray'
             />
           }
-          style={{backgroundColor: colors.main_back}}
-        >
+          style={{backgroundColor: colors.main_back}}>
+          <View style={[styles.cell_box_header, {marginTop: 5}]}>
+            <For index='i' each='info' of={Cts.PLAT_ARRAY}>
+              <TouchableOpacity key={i} style={[{
+                backgroundColor: this.state.filterPlatform === info.id ? colors.main_color : colors.white,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: pxToDp(20),
+              }, this.state.filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]} onPress={() => this.setFilterPlatform(info.id)}>
+                <Text style={{ fontSize: 12, color: this.state.filterPlatform === info.id ? colors.white : colors.fontBlack}}>{info.label}</Text>
+              </TouchableOpacity>
+            </For>
+          </View>
           <View style={[styles.cell_box_header]}>
             {this.state.dateStatus === 0 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(0)
                 }}>今天 </Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(0)
                 }}>今天 </Text>
               </View>}
             {this.state.dateStatus === 1 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(1)
                 }}>近7天 </Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(1)
                 }}>近7天 </Text>
               </View>}
             {this.state.dateStatus === 2 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(2)
                 }}>本月</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(2)
                 }}>本月</Text>
               </View>}
             {this.state.dateStatus === 3 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(3)
                 }}>自定义</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(3)
                 }}>自定义</Text>
@@ -661,7 +681,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly"
   },
   cell_box_header: {
-    marginTop: 5,
     marginHorizontal: 10,
     borderRadius: pxToDp(10),
     backgroundColor: colors.white,
@@ -712,17 +731,16 @@ const styles = StyleSheet.create({
   cell_rowTitleText_today: {
     fontSize: pxToDp(28),
     color: colors.white,
-    marginVertical: pxToDp(10),
     paddingHorizontal: pxToDp(40),
     backgroundColor: colors.main_color,
-    paddingVertical: pxToDp(15),
+    paddingVertical: pxToDp(25),
     borderRadius: pxToDp(10)
   },
   cell_rowTitleText_today1: {
     fontSize: pxToDp(26),
     color: colors.title_color,
-    marginVertical: pxToDp(10),
-    padding: pxToDp(15)
+    paddingVertical: pxToDp(25),
+    paddingHorizontal: pxToDp(15)
   },
   cell_rowTitleText1: {
     fontSize: pxToDp(40),

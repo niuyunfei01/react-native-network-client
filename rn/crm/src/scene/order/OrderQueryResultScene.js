@@ -77,13 +77,7 @@ class OrderQueryResultScene extends PureComponent {
       end: false,
       dateBtn: 1,
       platformBtn: 0,
-      platform: [
-        {label: '全部', id: 0},
-        {label: '美团外卖', id: 3},
-        {label: '饿了么', id: 4},
-        {label: '京东', id: 6},
-        {label: '其它', id: -1},
-      ],
+      platform: Cts.PLAT_ARRAY,
       selectStatus:STATUS_FILTER[0]
     };
     navigation.setOptions({headerTitle: title})

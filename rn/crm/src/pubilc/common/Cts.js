@@ -176,4 +176,11 @@ export default {
   GOODS_SEARCH_PAGE_NUM: 50,
 
   CODE_ACCESS_DENIED: 10001,
+  PLAT_ARRAY:  [
+    {label: '全部', id: 0},
+    {label: '美团外卖', id: 3},
+    {label: '饿了么', id: 4},
+    {label: '京东', id: 6},
+    {label: '其它', id: -1},
+  ]
 }
