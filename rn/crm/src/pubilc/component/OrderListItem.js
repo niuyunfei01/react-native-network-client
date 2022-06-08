@@ -341,7 +341,8 @@ class OrderListItem extends React.PureComponent {
                 fontSize: 20,
                 fontWeight: 'bold',
                 color: "#F21F1F",
-                marginLeft: width * 0.17
+                position: 'absolute',
+                left: width * 0.46
               }}>订单已取消 </Text>
             </If>
           </View>
