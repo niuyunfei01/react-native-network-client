@@ -205,25 +205,29 @@ class OrderQueryResultScene extends PureComponent {
     );
   }
 
-  onSearch = (keywords,isSearch) => {
-    const{isLoading,date,platformBtn,selectStatus,query,orders}=this.state
+  onSearch = (keywords, isSearch) => {
+    const{isLoading,date,platformBtn,selectStatus,query,orders,type}=this.state
     if (isLoading) {
           return
     }
-      showModal("加载中...")
-      this.setState({isLoading: true})
-      let params = {
+    showModal("加载中...")
+    this.setState({isLoading: true})
+    if(type === 'additional'||type==='search'){
+      this.fetchOrders(query)
+      return;
+    }
+    let params = {
           search_date:date,
           platform:platformBtn,
           order_status:selectStatus.id,
           search_from:'app',
           page:query.page,
           limit:query.limit
-      }
+    }
     if(keywords.length>0)
         params={...params,keywords:keywords}
-      const url = `/v1/new_api/orders/order_all_list`;
-      HttpUtils.get.bind(this.props)(url, params).then(res => {
+    const url = `/v1/new_api/orders/order_all_list`;
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
           hideModal()
           if (res.length < query.limit) {
               this.setState({
@@ -241,6 +245,49 @@ class OrderQueryResultScene extends PureComponent {
       })
   };
 
+  fetchOrders = (query) => {
+    const {accessToken, currStoreId} = this.props.global;
+    const {currVendorId} = tool.vendor(this.props.global);
+    const params = {
+      vendor_id: currVendorId,
+      offset: (query.page - 1) * query.limit,
+      limit: query.limit,
+      use_v2: 1
+    }
+    let url = `/api/orders.json?access_token=${accessToken}`;
+    if (this.state.type === 'search') {
+      const {term, max_past_day} = this.props.route.params
+      params.max_past_day = max_past_day || query.maxPastDays;
+      params.search = encodeURIComponent(term);
+      if ("invalid:" === term) {
+        params.status = Cts.ORDER_STATUS_INVALID
+      }
+    } else if (this.state.type === 'additional') {
+      params.store_id = currStoreId;
+      url = `/api/get_three_day_delivery_order?access_token=${accessToken}`;
+    } else {
+      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
+      params.status = Cts.ORDER_STATUS_DONE;
+    }
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+
+      hideModal()
+      if (tool.length(res.orders) < this.state.query.limit) {
+        this.setState({
+          end: true,
+        })
+      }
+      let orders = this.state.orders.concat(res.orders)
+      this.setState({
+        orders: orders,
+        isLoading: false,
+      })
+    }, (res) => {
+      this.setState({isLoading: false})
+      showError(res.reason)
+    })
+
+  }
   selectItem=(item)=>{
     this.setState({
       selectStatus: item,
