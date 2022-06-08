@@ -5,7 +5,7 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import EmptyData from "../common/component/EmptyData";
 import colors from "../../pubilc/styles/colors";
-import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import native from "../../pubilc/util/native";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
@@ -13,11 +13,10 @@ import {MixpanelInstance} from '../../pubilc/util/analytics';
 import DeviceInfo from "react-native-device-info";
 import {Button, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-
-import DateTimePicker from "react-native-modal-datetime-picker";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
+import dayjs from "dayjs";
 
 
 function mapStateToProps(state) {
@@ -53,6 +52,7 @@ class OrderTransferThird extends Component {
       logistics_error: [],
       not_exist: [],
       if_reship: if_reship,
+      isLoading: true,
       showDateModal: false,
       dateValue: new Date(),
       mealTime: '',
@@ -82,6 +82,12 @@ class OrderTransferThird extends Component {
       merchant_reship_tip: '',
       showContentModal: false,
       remark: '',
+      datePickerType: 'today',
+      datePickerList: [],
+      datePickerOther: [],
+      callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD'),
+      callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`,
+      dateArray: []
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -89,6 +95,7 @@ class OrderTransferThird extends Component {
 
   fetchThirdWays() {
     const version_code = DeviceInfo.getBuildNumber();
+    this.state.isLoading = true;
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
@@ -127,7 +134,8 @@ class OrderTransferThird extends Component {
         weight_step: res.weight_step,
         logistics_error: res.error_ways,
         is_merchant_ship: res.is_merchant_ship,
-        merchant_reship_tip: res.merchant_reship_tip
+        merchant_reship_tip: res.merchant_reship_tip,
+        isLoading: false,
       })
 
       let params = {
@@ -140,6 +148,9 @@ class OrderTransferThird extends Component {
       this.mixpanel.track("ship.list_to_call", params);
     }).catch(() => {
       hideModal();
+      this.setState({
+        isLoading: false,
+      })
     })
   }
 
@@ -232,7 +243,8 @@ class OrderTransferThird extends Component {
         vendor_id,
         total_selected_ship,
         logisticFeeMap,
-        addressId
+        addressId,
+        weight
       } = this.state;
       HttpUtils.post.bind(self.props.navigation)(api, {
         orderId: orderId,
@@ -242,7 +254,8 @@ class OrderTransferThird extends Component {
         mealTime: mealTime,
         logisticFeeMap,
         address_id: addressId,
-        remark: this.state.remark
+        remark: this.state.remark,
+        weight: weight
       }).then(res => {
         hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
@@ -354,18 +367,6 @@ class OrderTransferThird extends Component {
     }
   }
 
-  onConfirm() {
-    this.setState({
-      showDateModal: false
-    })
-    let time = this.state.dateValue
-    let str = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
-    this.setState({
-      mealTime: str
-    })
-    showSuccess("设置成功！")
-  }
-
   onRequestClose() {
     this.setState({
       showDateModal: false,
@@ -388,6 +389,48 @@ class OrderTransferThird extends Component {
     })
   }
 
+  timeSlot(step, isNow) {
+    let date = new Date()
+    let timeArr = []
+    let slotNum = 24 * 60 / step
+    if (!isNow) {
+      date.setHours(0, 0, 0, 0)
+    } else {
+      slotNum = (24 - date.getHours()) * 60 / step - Math.ceil(date.getMinutes() / 10)
+      date.setHours(date.getHours(), date.getMinutes() - date.getMinutes() % 10 + 10, 0, 0)
+    }
+    for (let f = 0; f < slotNum; f++) {
+      let time = new Date(Number(date.getTime()) + Number(step * 60 * 1000 * f))
+      let hour = '', sec = '';
+      time.getHours() < 10 ? hour = '0' + time.getHours() : hour = time.getHours()
+      time.getMinutes() < 10 ? sec = '0' + time.getMinutes() : sec = time.getMinutes()
+      timeArr.push({label: hour + ':' + sec})
+      if (isNow && timeArr.findIndex((item) => item.label === '立即发单')) {
+        timeArr.unshift({label: '立即发单'})
+      }
+    }
+    return timeArr
+  }
+
+  createDatePickerArray = () => {
+    Date.prototype.addDays = function(days) {
+      let dat = new Date(this.valueOf())
+      dat.setDate(dat.getDate() + days);
+      return dat;
+    }
+
+    function getDates(startDate, stopDate) {
+      let dateArray = new Array();
+      let currentDate = startDate;
+      while (currentDate <= stopDate) {
+        dateArray.push(dayjs(currentDate).format('YYYY-MM-DD'))
+        currentDate = currentDate.addDays(1);
+      }
+      return dateArray;
+    }
+
+    return getDates(new Date(), (new Date()).addDays(2))
+  }
 
   render() {
     let {allow_edit_ship_rule, store_id, vendor_id} = this.state
@@ -397,7 +440,7 @@ class OrderTransferThird extends Component {
 
         <ScrollView style={{flex: 1}}>
           {this.renderContent()}
-          {!tool.length(this.state.logistics) > 0 ?
+          {!tool.length(this.state.logistics) > 0 && !this.state.isLoading ?
             <EmptyData containerStyle={{marginBottom: 40}} placeholder={'无可用配送方式'}/> : this.renderList()}
           {this.renderErrorList()}
           {this.renderNoList()}
@@ -465,7 +508,7 @@ class OrderTransferThird extends Component {
               paddingHorizontal: 6,
               margin: 10,
               marginVertical: 4,
-            }}>
+            }} key={i}>
 
             <View style={{
               flexDirection: 'row',
@@ -584,7 +627,11 @@ class OrderTransferThird extends Component {
                   }}>
                   已优惠
                 </Text>
-                <Text style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red}}> {info.coupons_amount} </Text>
+                <Text style={{
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  color: colors.warn_red
+                }}> {info.coupons_amount} </Text>
               </View>
               : null}
           </View>
@@ -731,7 +778,7 @@ class OrderTransferThird extends Component {
         }}>
 
           <TouchableOpacity onPress={() => {
-            this.setState({showDateModal: true})
+            this.setState({showDateModal: true, datePickerList: this.timeSlot(10, true)})
           }} style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -836,6 +883,113 @@ class OrderTransferThird extends Component {
     )
   }
 
+  renderDatePicker() {
+    let {datePickerType, datePickerList, dateArray, datePickerOther, callDelivery_Day, callDelivery_Time} = this.state
+    let mealtime = callDelivery_Day + ' ' + callDelivery_Time
+    return (
+        <View>
+          <View style={styles.datePickerHead}>
+            <Text style={styles.callTime}>呼叫时间</Text>
+            <Text style={styles.sureBtn} onPress={() => {
+              this.setState({dateValue: mealtime, mealTime: mealtime, showDateModal: false})
+            }}>确定</Text>
+          </View>
+          <Text style={styles.dateMsg}>(选择预约时间后最终配送价格可能有变)</Text>
+          <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
+            <View style={{flexDirection: "column", justifyContent: "space-around", flex: 1}}>
+              <TouchableOpacity style={datePickerType === 'today' ? styles.datePickerActive : styles.datePicker}
+                                onPress={() => {
+                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                                  this.setState({datePickerType: 'today', callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD')})
+                                }}><Text
+                  style={datePickerType === 'today' ? styles.dateTextActive : styles.dateText}>今天</Text></TouchableOpacity>
+              <TouchableOpacity style={datePickerType === 'tomorrow' ? styles.datePickerActive : styles.datePicker}
+                                onPress={() => {
+                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                                  this.setState({datePickerType: 'tomorrow', callDelivery_Day: this.createDatePickerArray()[1], datePickerOther: this.timeSlot(10, false)})
+                                }}><Text
+                  style={datePickerType === 'tomorrow' ? styles.dateTextActive : styles.dateText}>明天</Text></TouchableOpacity>
+              <TouchableOpacity
+                  style={datePickerType === 'after-tomorrow' ? styles.datePickerActive : styles.datePicker}
+                  onPress={() => {
+                    this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                    this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: this.createDatePickerArray()[2], datePickerOther: this.timeSlot(10, false)})
+                  }}><Text
+                  style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>后天</Text></TouchableOpacity>
+            </View>
+            <View style={{flex: 3, height: 250}}>
+              <ScrollView
+                style={{flex: 1}}
+                ref={(scrollView) => {
+                  this._scrollView = scrollView
+                }}
+                showsVerticalScrollIndicator={false}
+                directionalLockEnabled={!false}
+                scrollEventThrottle={16}
+                bounces={false}
+                onMomentumScrollEnd={(e) => {
+                  let offsetY = e.nativeEvent.contentOffset.y;
+                  let contentSizeHeight = e.nativeEvent.contentSize.height;
+                  let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
+                  if (offsetY + oriageScrollHeight >= contentSizeHeight) {
+                    if (datePickerType === 'today') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.setState({datePickerType: 'tomorrow', callDelivery_Day: this.createDatePickerArray()[1], datePickerOther: this.timeSlot(10, false)})
+                    } else if (datePickerType === 'tomorrow') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.createDatePickerArray()
+                      this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: this.createDatePickerArray()[2], datePickerOther: this.timeSlot(10, false)})
+                    }
+                  }
+                }}
+              >
+                <For of={datePickerType === 'today' ? datePickerList : datePickerOther} index="idx" each='item'>
+                  <TouchableOpacity
+                      key={idx}
+                      style={item.isChosed ? styles.datePickerItemActive : styles.datePickerItem}
+                      onPress={() => {
+                        let datePickerListCopy = datePickerType === 'today' ? datePickerList : datePickerOther
+                        datePickerListCopy.forEach(checkedItem => {
+                          checkedItem.isChosed = false
+                        })
+                        datePickerListCopy[idx].isChosed = true
+                        if (datePickerType === 'today') {
+                          this.setState({
+                            datePickerList: datePickerListCopy
+                          })
+                        } else {
+                          this.setState({
+                            datePickerOther: datePickerListCopy
+                          })
+                        }
+                        if (item.label !== '立即发单') {
+                          this.setState({callDelivery_Time: item.label})
+                        } else {
+                          this.setState({
+                            callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`
+                          }, () => {
+                          })
+                        }
+                      }}>
+                    <Text style={item.isChosed ? styles.dateTextActive : styles.dateText}>{item.label}</Text>
+                    <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
+                      {item.isChosed ?
+                          <View style={styles.datePickerIcon}>
+                            <Entypo name='check' style={{
+                              fontSize: pxToDp(25),
+                              color: colors.white,
+                            }}/></View> :
+                          <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
+                    </View>
+                  </TouchableOpacity>
+                </For>
+              </ScrollView>
+            </View>
+          </View>
+        </View>
+    )
+  }
+
   renderModal() {
     let {reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
@@ -913,39 +1067,10 @@ class OrderTransferThird extends Component {
           </View>
         </JbbModal>
 
-        <DateTimePicker
-          cancelTextIOS={'取消'}
-          confirmTextIOS={'确定'}
-          customHeaderIOS={() => {
-            return (<View>
-              <Text style={{
-                fontSize: pxToDp(30),
-                textAlign: 'center',
-                lineHeight: pxToDp(40),
-                paddingTop: pxToDp(20)
-              }}>呼叫时间</Text>
-              <Text style={{
-                fontSize: pxToDp(30),
-                textAlign: 'center',
-                color: '#F32B2B',
-                lineHeight: pxToDp(40),
-                paddingTop: pxToDp(20)
-              }}>选择预约时间后最终配送价格可能有变</Text>
-            </View>)
-          }}
-          date={new Date()}
-          mode='datetime'
-          isVisible={this.state.showDateModal}
-          onConfirm={(value) => {
-            this.setState({dateValue: value, showDateModal: false})
-          }
-          }
-          onCancel={() => {
-            this.setState({
-              showDateModal: false,
-            });
-          }}
-        />
+        <JbbModal onClose={() => this.setState({showDateModal: false})} visible={this.state.showDateModal}
+                  modal_type={'bottom'}>
+          {this.renderDatePicker()}
+        </JbbModal>
 
         <JbbModal onClose={() => this.closeDialog()} visible={is_mobile_visiable} modal_type={'center'}>
           <View>
@@ -1184,6 +1309,50 @@ const styles = StyleSheet.create({
     // paddingHorizontal: pxToDp(20),
     margin: pxToDp(10),
   },
+  datePicker: {
+    backgroundColor: colors.colorEEE,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10
+  },
+  datePickerActive: {
+    backgroundColor: colors.white,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10
+  },
+  dateTextActive: {color: colors.main_color, fontWeight: "bold"},
+  dateText: {color: colors.title_color, fontWeight: "bold"},
+  datePickerHead: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.colorEEE,
+    paddingBottom: 15
+  },
+  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.title_color},
+  sureBtn: {fontSize: pxToDp(32), color: colors.main_color},
+  dateMsg: {fontWeight: "bold", fontSize: pxToDp(22), color: '#DA0000', marginVertical: 10},
+  datePickerItem: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 5},
+  datePickerItemActive: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 5
+  },
+  datePickerIcon: {
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    backgroundColor: colors.main_color,
+    justifyContent: "center",
+    alignItems: 'center',
+  }
 });
 
 export default connect(mapStateToProps)(OrderTransferThird)

@@ -35,14 +35,14 @@ export function hideModal() {
   WModal.hide()
 }
 
-export function showSuccess(content) {
+export function showSuccess(content,position=WToast.position.CENTER) {
   WModal.hide()
   const toastOpts = {
     data: content,
     textColor: '#ffffff',
     backgroundColor: '#444444',
     duration: WToast.duration.SHORT, //1.SHORT 2.LONG
-    position: WToast.position.CENTER, // 1.TOP 2.CENTER 3.BOTTOM
+    position: position, // 1.TOP 2.CENTER 3.BOTTOM
     icon: <Icon name={'success'} style={[styles.toastIcon]}/>
   }
   WToast.show(toastOpts)
@@ -51,14 +51,14 @@ export function showSuccess(content) {
   }, WToast.duration.LONG);
 }
 
-export function showError(content) {
+export function showError(content,position=WToast.position.CENTER) {
   WModal.hide()
   const toastOpts = {
     data: content,
     textColor: '#ffffff',
     backgroundColor: '#444444',
     duration: WToast.duration.LONG, //1.SHORT 2.LONG
-    position: WToast.position.CENTER, // 1.TOP 2.CENTER 3.BOTTOM
+    position: position, // 1.TOP 2.CENTER 3.BOTTOM
     icon: <Icon name={'warn'} style={[styles.toastIcon]}/>
   }
   WToast.show(toastOpts)

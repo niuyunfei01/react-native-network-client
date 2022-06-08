@@ -12,6 +12,7 @@ class JbbModal extends React.Component {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
     modal_type: PropTypes.string,
+    modalStyle: PropTypes.object,
   }
   static defaultProps = {
     visible: true
@@ -21,6 +22,7 @@ class JbbModal extends React.Component {
     return <Modal hardwareAccelerated={true}
                   onRequestClose={this.props.onClose}
                   maskClosable transparent={true}
+                  animationType="fade"
                   visible={this.props.visible}>
 
       <TouchableOpacity onPress={this.props.onClose} style={[{
@@ -48,9 +50,9 @@ class JbbModal extends React.Component {
           padding: pxToDp(30),
           paddingBottom: pxToDp(50)
         }]}>
-          <ScrollView style={{
+          <ScrollView style={[{
             padding: 10,
-          }}>
+          },this.props.modalStyle]}>
             {this.props.children}
           </ScrollView>
         </TouchableHighlight>

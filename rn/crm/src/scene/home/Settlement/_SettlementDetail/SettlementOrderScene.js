@@ -117,12 +117,15 @@ class SettlementOrderScene extends PureComponent {
       <View>
         <View style={styles.dropdown}/>
         {products && tool.objectMap(products, (ite, index) => {
+          const money=tool.toFixed(ite.num * ite.supply_price)
           return (
             <View key={index} style={styles.dropdownRow}>
               <View style={styles.dropdownRowItem}>
                 <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
                 <Text style={styles.goodsNum}>X{ite.num} </Text>
-                <Text style={styles.goodsPrice}>￥{tool.toFixed(ite.num * ite.supply_price)} </Text>
+                <If condition={money>0}>
+                  <Text style={styles.goodsPrice}>￥{money} </Text>
+                </If>
               </View>
             </View>
           )
@@ -190,7 +193,7 @@ class SettlementOrderScene extends PureComponent {
         data={this.props.refundList}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
-          let {orderTime, dayId, id} = item
+          let {orderTime, dayId, refundNum,refundAmount,id} = item
           if (!this.state.pageMounted) {
             this.props.orderList[index].down = true
             this.setState({pageMounted: true})
@@ -201,6 +204,8 @@ class SettlementOrderScene extends PureComponent {
                 <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                   <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
                 </TouchableOpacity>
+                <Text style={{color: colors.color333}}>商品数量:{refundNum} </Text>
+                <Text style={{color: colors.color333}}>金额:{tool.toFixed(refundAmount)} </Text>
                 <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refundList', item)}>
                   {self.renderDropdownImage(item)}
                 </TouchableOpacity>

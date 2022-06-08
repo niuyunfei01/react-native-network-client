@@ -84,6 +84,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
+        <Stack.Screen name={Config.ROUTE_BIND_SHUNFENG} options={{headerTitle: '绑定顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/BindShunfeng').default}/>
+        <Stack.Screen name={Config.ROUTE_REGISTER_SHUNFENG} options={{headerTitle: '注册顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/RegisterShunfeng').default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
@@ -98,6 +102,10 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_SEETING_PREFERENCE_DELIVERY} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../../scene/home/Delivery/PreferenceBillingSetting").default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_SEETING_MININUM_DELIVERY} options={{headerTitle: '保底配送'}}
+                      getComponent={() => require("../../scene/home/Delivery/SeetingMiniNumDelivery").default}
         />
 
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
@@ -119,6 +127,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Setting/GuideScene").default}/>
         <Stack.Screen name={Config.DIY_PRINTER} options={{headerTitle: '小票设置'}}
                       getComponent={() => require("../../scene/home/Setting/DiyPrinter").default}/>
+        <Stack.Screen name={Config.DIY_PRINTER_ITEM}
+                      getComponent={() => require("../../scene/home/Setting/DiyPrinterItem").default}/>
         <Stack.Screen name={Config.ROUTE_RECEIPT} options={{headerTitle: '小票'}}
                       getComponent={() => require("../../scene/home/Setting/ReceiptScene").default}/>
         <Stack.Screen name={Config.ROUTE_REMARK} options={{headerTitle: '自定义备注'}}
@@ -365,6 +375,11 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpenseInfo').default}
         />
+
+        <Stack.Screen name={Config.ROUTE_FREEZE_LIST} options={{headerTitle: ""}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
+        />
+
         <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedAccountFill').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}}

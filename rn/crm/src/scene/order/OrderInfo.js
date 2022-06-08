@@ -701,6 +701,8 @@ class OrderInfo extends Component {
             borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
+            justifyContent: "center",
+            alignItems: "center"
           }}>
             <Text style={{
               fontWeight: 'bold',
@@ -920,7 +922,7 @@ class OrderInfo extends Component {
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
           <TouchableOpacity onPress={() => {
-            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
+            if (this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
           }}>
@@ -939,7 +941,7 @@ class OrderInfo extends Component {
             }}>
               <Text style={{color: colors.color333}}>
                 <Text style={{color: colors.color333}}> {this.state.deliverie_desc}  </Text>
-                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                {this.state.deliverie_status !== '待呼叫配送' ?
                   <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
               </Text>
             </Text>
@@ -1058,7 +1060,7 @@ class OrderInfo extends Component {
               <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
                                 onPress={() => {
                                   native.dialNumber(order.backup_phones[idx])
-                                }}>
+                                }} key={idx}>
                 <Text style={{fontSize: 12, width: pxToDp(120), marginTop: pxToDp(5)}}>备用电话</Text>
                 <Text style={{fontSize: 12, color: colors.main_color}}>{phone} </Text>
                 <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
@@ -1183,6 +1185,21 @@ class OrderInfo extends Component {
 
   onChangeAcount = (text) => {
     this.setState({addMoneyNum: text})
+  }
+
+  cancelPlanDelivery = (order_id, planId) => {
+    showModal("请求中 ")
+    tool.debounces(() => {
+      let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
+      HttpUtils.get(api).then(success => {
+        hideModal()
+        showSuccess(`取消预约成功`)
+        this.fetchData()
+      }).catch((reason) => {
+        hideModal()
+        showError(`${reason.reason}`)
+      })
+    }, 300)
   }
 
   renderGoods() {
@@ -1665,7 +1682,7 @@ class OrderInfo extends Component {
                   color: log.lists[0].desc_color,
                   fontSize: 10,
                   marginTop: pxToDp(10)
-                }}>{log.lists[0].desc}  </Text>
+                }}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
             </View>
           </View>
         </For>
@@ -1736,14 +1753,26 @@ class OrderInfo extends Component {
                           color: info.content_color,
                           fontSize: 12,
                           fontWeight: 'bold'
-                        }}>{info.status_content} - {info.fee} 元 </Text>
+                        }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={{flex: 1}}></View>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                       </TouchableOpacity>
                       <View
-                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
+                        style={{marginVertical: 12, flexDirection: 'row'}}>
+                        <Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 商品重量-{info.weight}kg </Text>
+                        <If condition={info.fee_tip > 0}><Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 小费：{info.fee_tip}元 </Text></If>
+                      </View>
+
+                      <View
+                        style={{fontSize: 12, marginBottom: 12, flexDirection: 'row'}}>
+                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                         {/*{info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {*/}
                         {/*  native.dialNumber(info.driver_phone)*/}
                         {/*}}>*/}
@@ -1785,6 +1814,31 @@ class OrderInfo extends Component {
                                                                      fontSize: 12,
                                                                      fontWeight: 'bold'
                                                                    }}
+                        /> : null}
+                        {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
+                                                                        onPress={() => {
+                                                                          this.setState({showDeliveryModal: false})
+                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+                                                                            text: '确定',
+                                                                            onPress: () => {
+                                                                              this.cancelPlanDelivery(this.state.order_id, info.plan_id)
+                                                                            }
+                                                                          }])
+                                                                        }}
+                                                                        buttonStyle={{
+                                                                          backgroundColor: colors.white,
+                                                                          borderWidth: pxToDp(2),
+                                                                          width: pxToDp(150),
+                                                                          borderColor: colors.fontBlack,
+                                                                          borderRadius: pxToDp(10),
+                                                                          padding: pxToDp(14),
+                                                                          marginRight: pxToDp(15)
+                                                                        }}
+                                                                        titleStyle={{
+                                                                          color: colors.fontBlack,
+                                                                          fontSize: 12,
+                                                                          fontWeight: 'bold'
+                                                                        }}
                         /> : null}
                         {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                       onPress={() => {

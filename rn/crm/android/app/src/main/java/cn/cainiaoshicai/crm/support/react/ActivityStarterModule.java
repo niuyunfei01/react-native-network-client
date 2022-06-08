@@ -33,6 +33,8 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.xdandroid.hellodaemon.IntentWrapper;
 import com.xdandroid.hellodaemon.IntentWrapperReImpl;
 
@@ -43,6 +45,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainOrdersActivity;
@@ -278,7 +281,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 ok = true;
             } catch (Exception e) {
                 e.printStackTrace();
-                msg = "异常:"+e.getMessage();
+                msg = "异常:" + e.getMessage();
             }
         }
 
@@ -286,6 +289,32 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             callback.invoke(ok, TextUtils.isEmpty(msg) ? "请到系统设置中处理" : msg);
         }
     }
+
+    @ReactMethod
+    void xunfeiIdentily(final Callback callback) {
+        Activity activity = this.getReactApplicationContext().getCurrentActivity();
+
+        boolean ok = false;
+        String msg = "";
+        if (activity != null) {
+            try {
+
+                // 初始化合成对象
+                SpeechUtility.createUtility(activity, SpeechConstant.APPID + "=58b571b2");
+//                SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
+                AudioUtils.getInstance().init(activity);
+                ok = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg = "异常:" + e.getMessage();
+            }
+        }
+
+        if (callback != null) {
+            callback.invoke(ok, TextUtils.isEmpty(msg) ? "科大讯飞注册失败" : msg);
+        }
+    }
+
 
     @ReactMethod
     void isRunInBg(final Callback callback) {
@@ -308,7 +337,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                msg = "异常:"+e.getMessage();
+                msg = "异常:" + e.getMessage();
             }
         }
 
@@ -339,7 +368,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
                 ok = true;
             }
-            callback.invoke(ok, currentMusicVolume, isRinger , maxVolume, minVolume, ok ? "ok" : "无法判断");
+            callback.invoke(ok, currentMusicVolume, isRinger, maxVolume, minVolume, ok ? "ok" : "无法判断");
         }
     }
 
@@ -494,9 +523,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void playWarningSound() {
-        try{
+        try {
             GlobalCtx.app().getSoundManager().play_warning_order();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -527,7 +556,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updatePidApplyPrice(int pid, int applyPrice, @Nonnull final Callback callback)  {
+    void updatePidApplyPrice(int pid, int applyPrice, @Nonnull final Callback callback) {
         boolean updated = GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
         callback.invoke(updated, "");
     }

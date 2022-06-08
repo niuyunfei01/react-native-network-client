@@ -101,7 +101,8 @@ public class AudioUtils {
 
     public boolean speakText(String content) {
         if (mySynthesizer == null) {
-            CrashReportHelper.handleUncaughtException(null, new Exception("mySynthesizer is null"));
+            Log.d("xf","没有初始化");
+//            CrashReportHelper.handleUncaughtException(null, new Exception("mySynthesizer is null"));
             return false;
         }
 

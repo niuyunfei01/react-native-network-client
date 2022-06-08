@@ -191,7 +191,7 @@ class StoreClose extends PureComponent {
               borderRadius: pxToDp(20),
               borderColor: colors.white
             }}>
-              <Cell customStyle={{height: pxToDp(90), justifyContent: "center"}}
+              <Cell key={index} customStyle={{height: pxToDp(90), justifyContent: "center"}}
                     onPress={() => {
                       let menus = [...this.state.timeOptions]
                       menus.forEach(item => {

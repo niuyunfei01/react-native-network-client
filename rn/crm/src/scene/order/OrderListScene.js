@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-native'
+import ReactNative, {Alert, Dimensions, Platform, StatusBar} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -22,7 +22,7 @@ import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
 import {showError} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {Badge, Button} from "react-native-elements";
+import {Badge, Button, Image} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 
 let width = Dimensions.get("window").width;
@@ -120,6 +120,7 @@ const initState = {
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
+  isadditional: ''
 };
 
 class OrderListScene extends Component {
@@ -177,10 +178,15 @@ class OrderListScene extends Component {
           ])
         }
       })
+
+      native.xunfeiIdentily((resp) => {
+        console.log(resp, 'kedaxunfei');
+      })
+
     }
   }
 
-  getActivity() {
+  getActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
@@ -204,7 +210,7 @@ class OrderListScene extends Component {
     })
   }
 
-  closeActivity() {
+  closeActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/close_user_refer_ad?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
@@ -216,7 +222,7 @@ class OrderListScene extends Component {
     });
   }
 
-  getVendor() {
+  getVendor = () => {
     let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     this.setState({
       is_service_mgr: is_service_mgr,
@@ -227,7 +233,7 @@ class OrderListScene extends Component {
     this.clearStoreCache()
   }
 
-  getstore() {
+  getstore = () => {
     this.setState({
       show_button: false,
     })
@@ -259,7 +265,7 @@ class OrderListScene extends Component {
     }
   }
 
-  clearStoreCache() {
+  clearStoreCache = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props.navigation)(api).then(res => {
@@ -289,7 +295,7 @@ class OrderListScene extends Component {
   }
 
 
-  onRefresh(status) {
+  onRefresh = (status) => {
     tool.debounces(() => {
       if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
         GlobalUtil.setOrderFresh(1)
@@ -318,14 +324,15 @@ class OrderListScene extends Component {
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
-        orderNum: res.totals
+        orderNum: res.totals,
+        isadditional: res.delvery_reship_count !== undefined && Number(res.delvery_reship_count) === 1
       })
     })
 
 
   }
 
-  fetchOrders(queryType, setList = 1) {
+  fetchOrders = (queryType, setList = 1) => {
     this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
@@ -394,7 +401,7 @@ class OrderListScene extends Component {
 
   }
 
-  onPress(route, params) {
+  onPress = (route, params) => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
@@ -474,7 +481,7 @@ class OrderListScene extends Component {
     );
   }
 
-  renderTabsHead() {
+  renderTabsHead = () => {
     return (
       <View style={styles.tabsHeader}>
         <View style={styles.tabsHeader1}>
@@ -487,7 +494,7 @@ class OrderListScene extends Component {
               this.onRefresh(this.state.categoryLabels[0].status)
             })
           }}
-                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 处理中 </Text>
+                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
           <Text onPress={() => {
             this.setState({
               showTabs: false,
@@ -497,19 +504,19 @@ class OrderListScene extends Component {
               this.onRefresh(7)
             })
           }}
-                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 预订单 </Text>
+                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
           <Text onPress={() => {
             const {navigation} = this.props
             navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
           }}
-                style={this.state.orderStatus === 0 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 全部订单 </Text>
+                style={styles.tabsHeader3}> 全部订单 </Text>
         </View>
-        <View style={{flex: 1}}></View>
+
         <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
-        }} style={{width: 0.2 * width, flexDirection: 'row'}}>
+        }} style={{width: 0.15 * width, flexDirection: 'row'}}>
           <View style={{flex: 1}}></View>
-          <Entypo name={"magnifying-glass"} style={{fontSize: 18}}/>
+          <Entypo name={"magnifying-glass"} style={{fontSize: 24, color: colors.color666}}/>
         </TouchableOpacity>
         <ModalDropdown
           dropdownStyle={{
@@ -548,9 +555,9 @@ class OrderListScene extends Component {
         >
           <View style={{
             marginRight: pxToDp(20),
-            marginLeft: pxToDp(20),
+            marginLeft: 18,
           }}>
-            <Entypo name={"menu"} style={{fontSize: 20}}/>
+            <Entypo name={"menu"} style={{fontSize: 26, color: colors.color666}}/>
           </View>
         </ModalDropdown>
       </View>
@@ -558,7 +565,7 @@ class OrderListScene extends Component {
   }
 
 
-  renderStatusTabs() {
+  renderStatusTabs = () => {
     const tabwidth = 1 / this.state.categoryLabels.length;
     if (!tool.length(this.state.categoryLabels) > 0) {
       return null;
@@ -567,32 +574,40 @@ class OrderListScene extends Component {
       <View style={{flex: 1}}>
         <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
           <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity onPress={() => {
-              this.onRefresh(tab.status)
-            }}
-                              style={{
-                                width: tabwidth * width,
-                                alignItems: 'center',
-                                position: 'relative',
-                                borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
-                                borderBottomColor: colors.main_color,
-                              }}>
-              <Text style={{
-                color: this.state.orderStatus === tab.status ? 'green' : 'black',
-                lineHeight: 40
-              }}> {tab.tabname} </Text>
-              <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
-                <Badge
-                  status="error"
-                  value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                  containerStyle={{
-                    position: 'absolute',
-                    top: 5,
-                    right: this.state.categoryLabels.length > 4 ? 0 : 5
-                  }}/>
 
+            <TouchableOpacity
+              key={i}
+              style={{width: tabwidth * width, alignItems: "center"}}
+              onPress={() => {
+                this.onRefresh(tab.status)
+              }}>
+              <View style={{
+                borderColor: colors.main_color,
+                // borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
+                height: 38,
+                justifyContent: 'center',
+              }}>
+                <Text style={{
+                  color: colors.color333,
+                  fontSize: 14,
+                  fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"
+                }}>{tab.tabname} </Text>
+                <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
+                  <Badge
+                    status="error"
+                    value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
+                    containerStyle={{
+                      position: 'absolute',
+                      top: 1,
+                      right: -15
+                    }}/>
+                </If>
+              </View>
+              <If condition={this.state.orderStatus === tab.status}>
+                <View style={{height: 2, width: 24, backgroundColor: colors.main_color}}></View>
               </If>
             </TouchableOpacity>
+
           </For>
 
         </View>
@@ -601,7 +616,7 @@ class OrderListScene extends Component {
     )
   }
 
-  renderContent(orders) {
+  renderContent = (orders) => {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
         <FlatList
@@ -649,7 +664,7 @@ class OrderListScene extends Component {
     );
   }
 
-  listmore() {
+  listmore = () => {
     if (this.state.query.isAdd) {
       this.fetchOrders(this.state.orderStatus, 0);
     }
@@ -668,13 +683,13 @@ class OrderListScene extends Component {
     return item.id.toString();
   }
 
-  showSortSelect() {
+  showSortSelect = () => {
     let items = []
     let that = this;
     let sort = that.state.sort;
     for (let i in this.state.sortData) {
       const sorts = that.state.sortData[i]
-      items.push(<RadioItem style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {
@@ -691,7 +706,7 @@ class OrderListScene extends Component {
   }
 
 
-  renderItem(order) {
+  renderItem = (order) => {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
@@ -707,7 +722,7 @@ class OrderListScene extends Component {
     );
   }
 
-  renderNoOrder() {
+  renderNoOrder = () => {
     return (
       <View style={{
         alignItems: 'center',
@@ -744,7 +759,7 @@ class OrderListScene extends Component {
   }
 
 
-  onPressActivity() {
+  onPressActivity = () => {
     const {currStoreId} = this.props.global;
     this.onPress(Config.ROUTE_WEB, {url: this.state.activityUrl, title: '老带新活动'})
     this.mixpanel.track("act_user_ref_ad_click", {
@@ -754,50 +769,78 @@ class OrderListScene extends Component {
     });
   }
 
-  rendertopImg() {
+  rendertopImg = () => {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={{
-          paddingBottom: pxToDp(20),
-          paddingLeft: '3%',
-          paddingRight: '3%',
-        }}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-          <Text
+      <View>
+        <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
+          <TouchableOpacity
             onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
+            }}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '100%',
+              backgroundColor: '#EEDEE0',
+              height: 40
+            }}>
+            <Text style={{
+              color: colors.color666,
+              fontSize: 12,
+              paddingLeft: 13,
+              flex: 1
+            }}>存在正在补送的订单 </Text>
+            <Button onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
+            }}
+                    title={'查看'}
+                    buttonStyle={{
+                      backgroundColor: colors.red,
+                      borderRadius: 6,
+                      marginRight: 13,
+                      paddingVertical: 3,
+                      paddingHorizontal: 4,
+                    }}
+                    titleStyle={{
+                      fontSize: 12,
+                      color: colors.white,
+                    }}>
+            </Button>
+          </TouchableOpacity>
+        </If>
+        <If
+          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+          <TouchableOpacity onPress={() => {
+            this.onPressActivity()
+          }} style={{
+            paddingBottom: pxToDp(20),
+            paddingLeft: '3%',
+            paddingRight: '3%',
+          }}>
+            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+            <Entypo onPress={() => {
               this.setState({
                 showimg: false
               }, () => this.closeActivity())
-            }}
-            style={{
+            }} name='cross' style={{
+              fontSize: 25,
               position: 'absolute',
-              right: '1%',
-              width: pxToDp(40),
-              height: pxToDp(40),
-              borderRadius: pxToDp(20),
-              backgroundColor: colors.fontColor,
-              textAlign: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.listTitleColor,
-              textAlignVertical: 'center',
-              ...Platform.select({
-                ios: {
-                  lineHeight: 30,
-                },
-                android: {}
-              }),
-            }}>❌</Text>
-        </TouchableOpacity>
-      </If>
+              color: colors.white,
+              right: 12,
+              top: -1,
+            }}/>
+          </TouchableOpacity>
+        </If>
+
+      </View>
     )
   }
 
-  renderbottomImg() {
+  renderbottomImg = () => {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+      <If
+        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
@@ -894,35 +937,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flexWrap: "nowrap",
     backgroundColor: colors.white,
-    marginTop: pxToDp(5),
+    paddingVertical: 8,
     width: width
   },
   tabsHeader1: {
-    backgroundColor: colors.white,
-    width: 0.66 * width,
+    backgroundColor: colors.f7,
+    width: 0.75 * width,
     padding: pxToDp(8),
     paddingLeft: pxToDp(0),
     borderRadius: pxToDp(15),
-    borderWidth: pxToDp(1),
-    borderColor: colors.main_color,
     flexDirection: 'row',
-    marginLeft: pxToDp(10)
+    marginLeft: 10,
   },
   tabsHeader2: {
-    width: 0.2 * width,
+    width: 0.24 * width,
     justifyContent: 'center',
+    paddingVertical: pxToDp(10),
+    alignItems: 'center',
+    borderRadius: pxToDp(18),
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: "center",
+    marginLeft: pxToDp(10),
+    color: colors.main_color,
+    backgroundColor: colors.white
+  },
+  tabsHeader3: {
+    width: 0.24 * width,
+    justifyContent: 'center',
+    fontWeight: 'bold',
     paddingVertical: pxToDp(10),
     alignItems: 'center',
     borderRadius: pxToDp(18),
     fontSize: pxToDp(26),
     textAlign: "center",
     marginLeft: pxToDp(10),
-    color: colors.white,
-    backgroundColor: colors.main_color
-  },
-  tabsHeader3: {
     color: colors.title_color,
-    backgroundColor: colors.white,
   },
   sortModal: {
     width: 0,
@@ -946,9 +996,9 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10)
   },
   image: {
-    width: '100%',
-    height: pxToDp(200),
-    borderRadius: pxToDp(15)
+    // width: '100%',
+    height: 70,
+    borderRadius: 10
   },
   right_btn: {
     fontSize: pxToDp(25),

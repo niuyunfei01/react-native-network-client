@@ -91,7 +91,7 @@ class SearchBar extends Component {
     this.focus = this.focus.bind(this)
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any) {
     this.setState({text: nextProps.text})
   }
 
@@ -148,7 +148,7 @@ class SearchBar extends Component {
         <View style={styles.searchOuter}>
           <View style={styles.searchInner}>
             {this.props.prefix}
-            <Icon name="search"/>
+
             <TextInput
               ref="searchInput"
               style={styles.searchInput}
@@ -162,6 +162,7 @@ class SearchBar extends Component {
               returnKeyType="search"
               underlineColorAndroid='transparent'
             />
+            <Icon name="search"/>
             {text ? (
               <Text onPress={this.clearHandle}>
                 <Icon name="clear" style={styles.clearIcon}/>

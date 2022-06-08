@@ -59,6 +59,7 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.rnnewrelic.NewRelicPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
@@ -318,9 +319,8 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
 
-        // 初始化合成对象
-        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
-        AudioUtils.getInstance().init(getApplicationContext());
+//        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
+//        AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
 
@@ -1296,6 +1296,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new BleManagerPackage(),
                     new JPushPackage(),
                     new NewRelicPackage(),
+                    new LinearGradientPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage()
             );

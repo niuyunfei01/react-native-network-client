@@ -97,8 +97,10 @@ class BottomModal extends React.Component {
                   backgroundColor: colors.white,
                   width: width * 0.40,
                   marginRight: 10,
+                  borderWidth: 1,
+                  borderColor: colors.color666,
                 }, this.props.closeBtnStyle]}
-                        titleStyle={[{color: colors.color333}, this.props.closeBtnTitleStyle]}
+                        titleStyle={[{color: colors.color666,}, this.props.closeBtnTitleStyle]}
                         title={this.props.closeText}
                         onPress={this.props.onPressClose}></Button>
               </If>

@@ -31,7 +31,6 @@ import _ from "lodash";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import BottomModal from "../../../pubilc/component/BottomModal";
-import DeviceInfo from "react-native-device-info";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
 
@@ -63,6 +62,7 @@ class SettingScene extends PureComponent {
       switch_val: false,
       enable_notify: true,
       hide_good_titles: false,
+      show_good_remake: true,
       invoice_serial_set: '',
       ship_order_list_set: '',
       use_real_weight: false,
@@ -160,6 +160,7 @@ class SettingScene extends PureComponent {
         use_real_weight: Number(store_info.use_real_weight) === 1,
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
+        show_good_remake: Boolean(store_info.show_remark_to_rider),
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
@@ -212,7 +213,6 @@ class SettingScene extends PureComponent {
     })
   }
 
-
   save_invoice_serial_set = (invoice_serial_set) => {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_invoice_serial_setting/${currStoreId}?access_token=${accessToken}`
@@ -224,6 +224,7 @@ class SettingScene extends PureComponent {
       });
     })
   }
+
   save_auto_pack_done = (auto_pack_done) => {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_auto_pack_done/${currStoreId}?access_token=${accessToken}`
@@ -247,6 +248,19 @@ class SettingScene extends PureComponent {
       });
     })
   }
+
+  save_show_good_remake=(show_good_remake)=>{
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `/v1/new_api/stores/set_switch_remark_show_rider/${currStoreId}?access_token=${accessToken}`
+    const parameter={show_remark_to_rider:show_good_remake?1:0}
+    HttpUtils.get.bind(this.props)(api, parameter).then(() => {
+      this.setState({
+        show_good_remake : show_good_remake
+      }, () => {
+        ToastShort("设置成功");
+      });
+    }).catch(e=>ToastShort(e.reason))
+  }
   save_ship_order_list_set = (ship_order_list_set) => {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_ship_order_list/${currStoreId}?access_token=${accessToken}`
@@ -258,6 +272,7 @@ class SettingScene extends PureComponent {
       });
     })
   }
+
   save_use_real_weight = (use_real_weight) => {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_prod_real_weight/${currStoreId}?access_token=${accessToken}`
@@ -269,7 +284,6 @@ class SettingScene extends PureComponent {
       });
     })
   }
-
 
   onReadProtocol = () => {
     const {navigation} = this.props;
@@ -285,11 +299,12 @@ class SettingScene extends PureComponent {
 
   render() {
     const {dispatch} = this.props
+    const {show_good_remake,isRefreshing,show_orderlist_ext_store,hide_good_titles,ship_order_list_set}=this.state
     return (
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={this.state.isRefreshing}
+            refreshing={isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />}
@@ -305,7 +320,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选 </Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.show_orderlist_ext_store}
+              <Switch value={show_orderlist_ext_store}
                       onValueChange={(val) => {
                         this.setState({
                           show_orderlist_ext_store: val,
@@ -324,10 +339,23 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息 </Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.hide_good_titles}
+              <Switch value={hide_good_titles}
                       onValueChange={(val) => {
                         this.save_hide_good_titles(val)
                       }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+
+        <CellsTitle style={styles.cell_title}>开启后骑手可以看到顾客下单的备注</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>对骑手展示订单备注</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={show_good_remake}
+                      onValueChange={(val) => this.save_show_good_remake(val)}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -340,7 +368,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>配送版订单列表 </Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.ship_order_list_set}
+              <Switch value={ship_order_list_set}
                       onValueChange={(val) => {
                         this.save_ship_order_list_set(val)
                       }}/>
@@ -392,25 +420,23 @@ class SettingScene extends PureComponent {
           </Cells>
         </If>
 
-        <If condition={DeviceInfo.getBrand() === 'vivo'}>
-          <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.recommend}
-                        onValueChange={(recommend) => {
-                          this.setState({
-                              recommend
-                            },
-                            () => GlobalUtil.setRecommend(recommend))
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </If>
+        <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.recommend}
+                      onValueChange={(recommend) => {
+                        this.setState({
+                            recommend
+                          },
+                          () => GlobalUtil.setRecommend(recommend))
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
 
         {this.renderServers()}
         <Cells style={[styles.cell_box, {marginTop: 20}]}>
@@ -668,7 +694,7 @@ class SettingScene extends PureComponent {
               flexWrap: "wrap",
             }}>
               <For each="item" index='idx' of={this.state.funds_threshold_mapping}>
-                <Button title={item === -1 ? '不通知' : "≤" + item + '元'}
+                <Button  key={idx} title={item === -1 ? '不通知' : "≤" + item + '元'}
                         onPress={() => {
                           this.setState({
                             funds_thresholds: item,

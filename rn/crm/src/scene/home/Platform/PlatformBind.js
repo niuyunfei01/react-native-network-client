@@ -59,7 +59,7 @@ class PlatformBind extends React.Component {
           name: '美团',
           alias: 'mt',
           avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png`,
-          subtitle: '',
+          subtitle: '建议餐饮、甜品、蛋糕类客户选择',
           enable: true,
         },
         {
@@ -73,7 +73,7 @@ class PlatformBind extends React.Component {
           name: '美团闪购',
           alias: 'sg',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/3.png',
-          subtitle: '建议有管理商品需求的零售类客户选择',
+          subtitle: '建议非餐饮类客户选择',
           enable: false,
         },
         {
