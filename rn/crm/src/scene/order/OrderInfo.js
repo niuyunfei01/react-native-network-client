@@ -58,6 +58,7 @@ import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const numeral = require('numeral');
+const {InteractionManager} = ReactNative;
 
 function mapStateToProps(state) {
   return {
@@ -160,17 +161,17 @@ class OrderInfo extends Component {
     this.fetchOrder(order_id);
   }
 
-  fetchData() {
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
+  }
+
+  fetchData = () => {
     this.fetchOrder(this.state.order_id)
   }
 
-  closeModal() {
-    this.setState({
-      modalTip: false
-    })
-  }
-
-  fetchOrder(order_id) {
+  fetchOrder = (order_id) => {
     if (!order_id || this.state.isFetching) {
       return false;
     }
@@ -210,15 +211,7 @@ class OrderInfo extends Component {
     })
   }
 
-  _extract_edited_items(items) {
-    const edits = {};
-    (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
-      edits[item.id] = item;
-    });
-    return edits;
-  }
-
-  fetchShipData() {
+  fetchShipData = () => {
     const api = `/v1/new_api/orders/third_ship_deliverie/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
@@ -230,21 +223,7 @@ class OrderInfo extends Component {
     })
   }
 
-
-  logOrderViewed() {
-    let {id, orderStatus} = this.state.order;
-    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
-      let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
-      HttpUtils.post.bind(this.props)(url).then(res => {
-      }, () => {
-        // ToastLong(res.desc);
-      }).catch(() => {
-        ToastLong("记录订单访问次数错误！");
-      })
-    }
-  }
-
-  fetchDeliveryList() {
+  fetchDeliveryList = () => {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
@@ -254,8 +233,7 @@ class OrderInfo extends Component {
     })
   }
 
-
-  fetchThirdWays() {
+  fetchThirdWays = () => {
     let {orderStatus} = this.state.order;
     if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${this.state.order_id}?select=1&access_token=${this.props.global.accessToken}`;
@@ -265,10 +243,59 @@ class OrderInfo extends Component {
     }
   }
 
-  setHeader() {
+  navigateToOrderOperation = () => {
+    this.props.navigation.navigate('OrderOperation', {
+      ActionSheet: this.state.ActionSheet,
+      order: this.state.order,
+      orderId: this.props.route.params.orderId
+    });
+  }
+
+  closeModal = () => {
+    this.setState({
+      modalTip: false
+    })
+  }
+
+  _extract_edited_items = (items) => {
+    const edits = {};
+    (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
+      edits[item.id] = item;
+    });
+    return edits;
+  }
+
+  logOrderViewed = () => {
+    let {id, orderStatus} = this.state.order;
+    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+      let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
+      HttpUtils.post.bind(this.props)(url).then(res => {
+        console.log('log_view_order: =>', res)
+      }).catch(() => {
+        ToastLong("记录订单访问次数错误！");
+      })
+    }
+  }
+
+  setHeader = () => {
     let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
     let {wsb_store_account} = this.props.global.config.vendor
 
+    const moreOperationsStyles = {
+      ...Platform.select({
+        ios: {
+          marginTop: pxToDp(25),
+        },
+        android: {}
+      }),
+      marginRight: pxToDp(20),
+      height: pxToDp(60),
+      width: pxToDp(60),
+      fontSize: pxToDp(30),
+      color: colors.color666,
+      textAlign: 'center',
+      textAlignVertical: 'center',
+    }
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
@@ -276,16 +303,10 @@ class OrderInfo extends Component {
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_RECEIVE_QR, label: '收款码'},
       {key: MENU_CALL_STAFF, label: '联系门店'},
-      // {key: MENU_SET_INVALID, label: '置为无效'},
-      // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
-    // if (is_service_mgr || this._fnViewFullFin()) {
-    //   as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
-    // }
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
-
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
@@ -296,26 +317,18 @@ class OrderInfo extends Component {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-
-
     if (order && order.fn_scan_items) {
       as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
     }
-
-
     if (order && order.fn_scan_ready) {
       as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
     }
-
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
-
-
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
     }
-
     if (order && order.fn_coupon_redeem_good) {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
@@ -324,40 +337,20 @@ class OrderInfo extends Component {
     navigation.setOptions({
       headerTitle: '订单详情',
       headerRight: () => (
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{fontSize: pxToDp(30), marginRight: pxToDp(20)}}
+        <View style={Styles.flexRowAlignCenter}>
+          <Text style={Styles.printText}
                 onPress={() => {
                   this.onPrint()
                 }}>打印</Text>
 
-          <TouchableOpacity onPress={() => { //跳转订单操作页面
-            this.props.navigation.navigate('OrderOperation', {
-              ActionSheet: this.state.ActionSheet,
-              order: this.state.order,
-              orderId: this.props.route.params.orderId
-            });
-          }}>
-            <Entypo name='dots-three-horizontal' style={{
-              ...Platform.select({
-                ios: {
-                  marginTop: pxToDp(25),
-                },
-                android: {}
-              }),
-              marginRight: pxToDp(20),
-              height: pxToDp(60),
-              width: pxToDp(60),
-              fontSize: pxToDp(30),
-              color: colors.color666,
-              textAlign: 'center',
-              textAlignVertical: 'center',
-            }}/>
+          <TouchableOpacity onPress={() => this.navigateToOrderOperation()}>
+            <Entypo name='dots-three-horizontal' style={moreOperationsStyles}/>
           </TouchableOpacity>
         </View>),
     });
   }
 
-  onPrint() {
+  onPrint = () => {
     const order = this.state.order
     if (order.printer_sn) {
       this.setState({showPrinterChooser: true})
@@ -366,15 +359,14 @@ class OrderInfo extends Component {
     }
   }
 
-  _hidePrinterChooser() {
+  _hidePrinterChooser = () => {
     this.setState({showPrinterChooser: false})
   }
 
-
-  _doCloudPrint() {
+  _doCloudPrint = () => {
     const {dispatch, global} = this.props;
     this._hidePrinterChooser()
-    dispatch(printInCloud(global.accessToken, this.state.order.id, (ok, msg, data) => {
+    dispatch(printInCloud(global.accessToken, this.state.order.id, (ok, msg) => {
       if (ok) {
         ToastShort("已发送到打印机");
       } else {
@@ -384,13 +376,13 @@ class OrderInfo extends Component {
     }))
   }
 
-  _cloudPrinterSN() {
+  _cloudPrinterSN = () => {
     const order = this.state.order;
     const printerName = order.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
-  _doBluetoothPrint() {
+  _doBluetoothPrint = () => {
     this._hidePrinterChooser()
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth().then(() => {
@@ -401,7 +393,6 @@ class OrderInfo extends Component {
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
         if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-
           });
         }
       });
@@ -451,27 +442,26 @@ class OrderInfo extends Component {
 
   }
 
-  _doSunMiPint() {
+  _doSunMiPint = () => {
     const {order} = this.state;
     native.printSmPrinter(order, (ok, msg) => {
     });
     this._hidePrinterChooser();
   }
 
-
-  _dispatchToInvalidate() {
+  _dispatchToInvalidate = () => {
     const {dispatch} = this.props;
     dispatch(clearLocalOrder(this.state.order_id));
     this.fetchData();
   }
 
-  _fnProvidingOnway() {
+  _fnProvidingOnway = () => {
     const {global} = this.props;
     const storeId = this.state.order.store_id;
     return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
 
-  _orderChangeLogQuery() {
+  _orderChangeLogQuery = () => {
     const {dispatch, global} = this.props;
     dispatch(orderChangeLog(this.state.order_id, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
@@ -482,17 +472,16 @@ class OrderInfo extends Component {
     }));
   }
 
-
-  _doProcessRemind(remind) {
+  _doProcessRemind = (remind) => {
     const {order} = this.state;
-    const {dispatch, navigation, global} = this.props;
+    const {dispatch, global} = this.props;
     const remindType = parseInt(remind.type);
     if (remindType === Cts.TASK_TYPE_REFUND_BY_USER || remindType === Cts.TASK_TYPE_AFS_SERVICE_BY_USER) {
-      navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+      this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
-      navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+      this.onPress(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_DELIVERY_FAILED) {
-      navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
+      this.onPress(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
       this.setState({onSubmitting: true});
       showModal('处理中')
@@ -517,152 +506,141 @@ class OrderInfo extends Component {
     }
   }
 
-  renderPrinter() {
+  copyToClipboard = (val) => {
+    Clipboard.setString(val)
+    ToastLong('已复制到剪切板')
+  }
 
+  showQrcodeFlag = () => {
+    this.setState({
+      showQrcode: !this.state.showQrcode
+    })
+  }
+
+  deliveryModalFlag = () => {
+    if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
+      this.setState({showDeliveryModal: true})
+    }
+  }
+
+  noRiderTipsFlag = () => {
+    this.setState({
+      modalTip: true
+    })
+  }
+
+  renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
     const task_types = this.props.global.config.task_types || {};
-
+    let {order = {}, modalTip} = this.state;
+    const menus = [
+      {
+        type: 'default',
+        label: this._cloudPrinterSN(),
+        onPress: this._doCloudPrint.bind(this)
+      }, {
+        type: 'default',
+        label: '蓝牙打印',
+        onPress: this._doBluetoothPrint.bind(this)
+      }, {
+        type: 'default',
+        label: '商米打印',
+        onPress: this._doSunMiPint.bind(this)
+      }
+    ]
+    const printAction = [
+      {
+        type: 'default',
+        label: '取消',
+        onPress: this._hidePrinterChooser.bind(this)
+      }
+    ]
     return (
-      <View>
-        <Tips navigation={this.props.navigation} orderId={this.state.order.id}
-              storeId={this.state.order.store_id} key={this.state.order.id} modalTip={this.state.modalTip}
-              onItemClick={() => this.closeModal()}></Tips>
-        <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
-                      processRemind={this._doProcessRemind.bind(this)}/>
-        <ActionSheet
-          visible={this.state.showPrinterChooser}
-          onRequestClose={() => this._hidePrinterChooser()}
-          menus={[
-            {
-              type: 'default',
-              label: this._cloudPrinterSN(),
-              onPress: this._doCloudPrint.bind(this),
-            }, {
-              type: 'default',
-              label: '蓝牙打印',
-              onPress: this._doBluetoothPrint.bind(this),
-            }, {
-              type: 'default',
-              label: '商米打印',
-              onPress: this._doSunMiPint.bind(this),
-            }
-          ]}
-          actions={[
-            {
-              type: 'default',
-              label: '取消',
-              onPress: this._hidePrinterChooser.bind(this),
-            }
-          ]}
-        />
-      </View>)
+        <View>
+          <Tips navigation={this.props.navigation} orderId={order.id}
+                storeId={order.store_id} key={order.id} modalTip={modalTip}
+                onItemClick={() => this.closeModal()}/>
+          <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
+                        processRemind={this._doProcessRemind.bind(this)}/>
+          <ActionSheet
+              visible={this.state.showPrinterChooser}
+              onRequestClose={() => this._hidePrinterChooser()}
+              menus={menus}
+              actions={printAction}
+          />
+        </View>)
   }
 
-
-  renderHeader() {
+  renderHeader = () => {
     let {order} = this.state;
     return (
-      <View style={{
-        borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(10),
-        backgroundColor: colors.white,
-      }}>
-        <View style={{
-          backgroundColor: "#28A077",
-          borderTopLeftRadius: pxToDp(20),
-          borderTopRightRadius: pxToDp(20),
-          padding: pxToDp(30),
-          paddingBottom: pxToDp(20),
-        }}>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={{
-              color: order.status_show === '订单已取消' ? '#F76969' : colors.white,
-              textDecorationLine: order.status_show === '订单已取消' ? 'line-through' : "none",
-              fontSize: 20,
-            }}>{order.status_show}  </Text>
-            <View style={{flex: 1}}></View>
-            <Text style={{
-              color: colors.white,
-              fontSize: 16,
-              width: pxToEm(300),
-              textAlign: 'right'
-            }}>{order.show_seq}  </Text>
+      <View style={Styles.headerBody}>
+        <View style={Styles.headerBodyTitle}>
+          <View style={Styles.flexRow}>
+            <Text style={order.status_show === '订单已取消' ? Styles.orderStatus : Styles.orderStatusShow}>{order.status_show}  </Text>
+            <View style={styles.flex1}/>
+            <Text style={Styles.orderSeq}>{order.show_seq}  </Text>
           </View>
-          <View style={{flexDirection: 'row', marginTop: 8}}>
-            <Text style={{color: colors.white, fontSize: 12, marginTop: pxToDp(2)}}>预计送达时间</Text>
-            <Text style={{color: colors.white, fontSize: 12, marginLeft: pxToDp(10)}}>{order.expectTime} </Text>
+          <View style={Styles.orderExpectTime}>
+            <Text style={Styles.orderExpectTimeLabel}>预计送达时间</Text>
+            <Text style={Styles.orderExpectTimeContent}>{order.expectTime} </Text>
           </View>
         </View>
-        <View style={{padding: pxToDp(20)}}>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={{fontSize: 12, width: pxToDp(110)}}>下单时间 </Text>
-            <Text style={{fontSize: 12}}>{order.orderTime}  </Text>
-            <View style={{flex: 1}}></View>
-            <Text style={{fontSize: 12}}>{order.show_store_name}  </Text>
+        <View style={styles.p20}>
+          <View style={Styles.flexRow}>
+            <Text style={Styles.orderCreateTime}>下单时间 </Text>
+            <Text style={Styles.f12}>{order.orderTime}  </Text>
+            <View style={styles.flex1}></View>
+            <Text style={Styles.f12}>{order.show_store_name}  </Text>
           </View>
           <TouchableOpacity onPress={() => {
-            Clipboard.setString(order.id)
-            ToastLong('已复制到剪切板')
-          }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(110)}}>订单号 </Text>
-            <Text style={{fontSize: 12}}>{order.id}  </Text>
-            <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>复制 </Text>
+            this.copyToClipboard(order.id)
+          }} style={Styles.flexRowMT15}>
+            <Text style={Styles.f12w110}>订单号 </Text>
+            <Text style={Styles.f12}>{order.id}  </Text>
+            <Text style={Styles.copyText}>复制 </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            Clipboard.setString(order.platform_oid)
-            ToastLong('已复制到剪切板')
-          }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(110)}}>平台单号 </Text>
-            <Text style={{fontSize: 12}}>{order.platform_oid} </Text>
-            <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>复制 </Text>
+          <TouchableOpacity onPress={() => this.copyToClipboard(order.platform_oid)} style={Styles.flexRowMT15}>
+            <Text style={Styles.f12w110}>平台单号 </Text>
+            <Text style={Styles.f12}>{order.platform_oid} </Text>
+            <Text style={Styles.copyText}>复制 </Text>
           </TouchableOpacity>
-          {tool.length(order.remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>客户备注 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", width: pxToDp(440)}}>{order.remark}  </Text>
+          {tool.length(order.remark) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>客户备注 </Text>
+              <Text style={Styles.remarkTxt}>{order.remark}  </Text>
             </View>
-            {/*<View style={{flexDirection: 'row'}}>*/}
-            {/*  <View style={{width: pxToDp(110)}}></View>*/}
-            {/*  <View>*/}
-            {/*    <Text style={{marginTop: pxToDp(15), fontSize: 12,}}>缺货时电话与我沟通，收餐人隐私号</Text>*/}
-            {/*    <Text style={{marginTop: pxToDp(15), fontSize: 12,}}>*/}
-            {/*      <Text style={{color: colors.main_color, fontSize: 12}}>13078855098_0125 </Text>*/}
-            {/*      <Text style={{color:colors.color333}}>,手机号</Text>*/}
-            {/*      <Text style={{color: colors.main_color, fontSize: 12}}>187****6997 </Text>*/}
-            {/*    </Text>*/}
-            {/*  </View>*/}
-            {/*</View>*/}
           </View> : null}
 
-          {tool.length(order.store_remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>商户备注 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.store_remark}  </Text>
+          {tool.length(order.store_remark) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>商户备注 </Text>
+              <Text style={Styles.orderRemark}>{order.store_remark}  </Text>
             </View>
           </View> : null}
-          {tool.length(order.giver_phone) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>订购人电话 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.giver_phone}  </Text>
+          {tool.length(order.giver_phone) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>订购人电话 </Text>
+              <Text style={Styles.orderRemark}>{order.giver_phone}  </Text>
             </View>
           </View> : null}
-          {tool.length(order.invoice) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>发票抬头 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.invoice}  </Text>
+          {tool.length(order.invoice) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>发票抬头 </Text>
+              <Text style={Styles.orderRemark}>{order.invoice}  </Text>
             </View>
           </View> : null}
-          {tool.length(order.taxer_id) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>税号 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.taxer_id}  </Text>
+          {tool.length(order.taxer_id) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>税号 </Text>
+              <Text style={Styles.orderRemark}>{order.taxer_id}  </Text>
             </View>
           </View> : null}
-          {tool.length(order.greeting) > 0 ? <View style={{marginTop: pxToDp(15)}}>
-            <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>祝福语 </Text>
-              <Text style={{fontSize: 12,}}>{order.greeting}  </Text>
+          {tool.length(order.greeting) > 0 ? <View style={Styles.MT15}>
+            <View style={Styles.flexRow}>
+              <Text style={Styles.f12w110}>祝福语 </Text>
+              <Text style={Styles.f12}>{order.greeting}  </Text>
             </View>
           </View> : null}
         </View>
@@ -670,7 +648,143 @@ class OrderInfo extends Component {
     )
   }
 
-  onConfirmAddTip() {
+  renderDelivery() {
+    return (
+        <View style={Styles.deliveryBody}>
+          {this.state.order.pickType === '1' ? <TouchableOpacity onPress={() => this.showQrcodeFlag()} style={Styles.flexRow}>
+            <Text style={Styles.qrcodeLabel}>取货码：{this.state.qrcode} </Text>
+            <MaterialCommunityIcons name={'focus-field'}
+                                    style={Styles.qrcodeIcon}/>
+          </TouchableOpacity> : null}
+
+          {this.state.order.pickType === '1' ?
+              <View style={Styles.qrcodeContent}>
+                <QRCode
+                    value={this.state.qrcode}
+                    color="black"
+                    size={150}
+                />
+              </View> : null}
+          <If condition={this.state.order.pickType !== '1'}>
+            <TouchableOpacity onPress={() => this.deliveryModalFlag()}>
+              <Text style={Styles.deliveryStatusText}>{this.state.deliverie_status} </Text>
+              <Text style={Styles.deliveryStatusInfo}>
+                <Text style={Styles.color333}> {this.state.deliverie_desc}  </Text>
+                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                    <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+              </Text>
+            </TouchableOpacity>
+
+            {this.state.order.platform === '6' ?
+                <View style={Styles.platformQR}>
+                  <QRCode
+                      value={this.state.order.platform_oid}
+                      color="black"
+                      size={150}
+                  />
+                  <Text style={Styles.platformText}>{this.state.order.platform_oid} </Text>
+                </View> : null}
+
+            {this.renderDeliveryInfo()}
+
+            <If condition={this.state.show_no_rider_tips}>
+              <TouchableOpacity onPress={() => this.noRiderTipsFlag()} style={Styles.noRiderTips}>
+                <View style={Styles.noRiderTipsHeader}>
+                  <Entypo name='help-with-circle' style={Styles.questionIcon}/>
+                  <Text style={Styles.noRiderTipsLabel}>长时间没有骑手接单怎么办？</Text>
+                </View>
+              </TouchableOpacity>
+            </If>
+          </If>
+        </View>
+    )
+  }
+
+  renderDeliveryInfo = () => {
+    return (<View style={styles.flex1}>
+      <For each="item" index="i" of={this.state.logistics}>
+        <If condition={item.is_show === 1}>
+          <View key={i} style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+            <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
+            <View style={Styles.driverName}>
+              {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
+                  <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
+                    <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
+                    <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
+                  </TouchableOpacity> : null
+              }
+            </View>
+            <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
+              <View style={Styles.deliveryInfoBtnBox}>
+                {item.can_complaint ? <Button title={'投诉骑手'}
+                                              onPress={() => this.onPress(Config.ROUTE_COMPLAIN, {id: item.id})}
+                                              buttonStyle={Styles.deliveryInfoBtnWhite}
+                                              titleStyle={Styles.deliveryInfoBtnTextGray}
+                /> : null}
+                {item.show_trace ? <Button title={'联系骑手'}
+                                           onPress={() => this.dialPhone(item.driver_phone)}
+                                           buttonStyle={Styles.deliveryInfoBtnGreen}
+                                           titleStyle={Styles.deliveryInfoBtnTextWhite}
+                /> : null}
+                {item.can_add_tip ?
+                    <Button title={'加小费'}
+                            onPress={() => {
+                              this.addTip(item.id)
+                            }}
+                            buttonStyle={Styles.deliveryInfoBtnGreen}
+                            titleStyle={Styles.deliveryInfoBtnTextWhite}
+                    />
+                    : null}
+                {item.can_cancel ? <Button title={'取消配送'}
+                                           onPress={() => this.cancelDelivery(item.id)}
+                                           buttonStyle={Styles.deliveryInfoBtnWhite}
+                                           titleStyle={Styles.deliveryInfoBtnTextGray}
+                /> : null}
+              </View>
+            </If>
+          </View>
+        </If>
+      </For>
+    </View>)
+  }
+
+  renderClient = () => {
+    let {order} = this.state;
+    return (
+        <View style={Styles.clientHeader}>
+          <View style={Styles.flexRow}>
+            <Text style={Styles.clientLabel}>姓名</Text>
+            <Text style={Styles.clientNameValue}>{order.userName} </Text>
+            <Text style={Styles.clientOrderTimes}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
+            <Text onPress={() => this.onPress(Config.ROUTE_ORDER_EDIT, {order: order})} style={Styles.clientChangeInfoTitle}>修改订单</Text>
+          </View>
+          <View style={Styles.flexRowMT15}>
+            <Text style={Styles.clientLabel}>地址</Text>
+            <View style={Styles.clientAddress}>
+              <Text style={Styles.f12}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
+              <Text style={Styles.clientCatMap} onPress={() => this.clientCatMap(order.id)}>查看地图</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.mobile)}>
+            <Text style={Styles.clientLabel}>电话</Text>
+            <Text style={Styles.clientPhone}>{order.mobileReadable} </Text>
+            <Text style={Styles.clientPhoneCall}>拨打</Text>
+          </TouchableOpacity>
+
+          <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
+            <For each="phone" index="idx" of={order.backup_phones_readable}>
+              <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.backup_phones[idx])} key={idx}>
+                <Text style={Styles.clientLabel}>备用电话</Text>
+                <Text style={Styles.clientPhone}>{phone} </Text>
+                <Text style={Styles.clientPhoneCall}>拨打</Text>
+              </TouchableOpacity>
+            </For>
+          </If>
+        </View>
+    )
+  }
+
+  onConfirmAddTip = () => {
     let token = this.props.global.accessToken
     const {dispatch} = this.props;
     let {shipId, addMoneyNum} = this.state
@@ -690,393 +804,92 @@ class OrderInfo extends Component {
     }
   }
 
-  renderDeliveryInfo() {
-    const {navigation} = this.props;
+  dialPhone = (val) => {
+    native.dialNumber(val)
+  }
+
+  addTip = (val) => {
+    this.setState({
+      addTipModal: true,
+      modalTip: false,
+      showDeliveryModal: false,
+      shipId: val
+    })
+  }
+
+  cancelDelivery = (val) => {
     let token = this.props.global.accessToken
-    return (<View style={{flex: 1}}>
-      <For each="item" index="i" of={this.state.logistics}>
-        <If condition={item.is_show === 1}>
-          <View key={i} style={{
-            borderBottomColor: colors.fontColor,
-            borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
-            paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
-            marginTop: pxToDp(20),
-            justifyContent: "center",
-            alignItems: "center"
-          }}>
-            <Text style={{
-              fontWeight: 'bold',
-              fontSize: 14
-            }}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
-            <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
-                <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-                  native.dialNumber(item.driver_phone)
-                }}>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: colors.fontColor,
-                      // marginLeft: pxToDp(30),
-                      marginTop: pxToDp(3)
-                    }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: colors.main_color,
-                      marginLeft: pxToDp(30)
-                    }}>{item.driver_phone} </Text>
-                  {/*<Text*/}
-                  {/*  style={{*/}
-                  {/*    fontSize: 12,*/}
-                  {/*    color: colors.main_color,*/}
-                  {/*    marginLeft: pxToDp(10),*/}
-                  {/*    marginTop: pxToDp(3)*/}
-                  {/*  }}>拨打</Text>*/}
-
-                </TouchableOpacity> : null
+    const api = `/api/pre_cancel_order?access_token=${token}`;
+    let params = {}
+    if (val !== undefined) {
+      params = {
+        delivery_id: val,
+        order_id: this.state.order.id
+      }
+    } else {
+      params = {
+        delivery_id: 0,
+        order_id: this.state.order.id
+      }
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      if (res.deduct_fee < 0) {
+        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
+          text: '确定', onPress: () => {
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                {
+                  order: this.state.order,
+                  ship_id: val,
+                  onCancelled: (ok, reason) => {
+                    this.fetchData()
+                  }
+                });
+          }
+        }, {'text': '取消'}]);
+      } else if (res.deduct_fee == 0) {
+        navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: this.state.order,
+              ship_id: val,
+              onCancelled: (ok, reason) => {
+                this.fetchData()
               }
-            </View>
-            <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                paddingTop: pxToDp(20),
-              }}>
-                {item.can_complaint ? <Button title={'投诉骑手'}
-                                              onPress={() => {
-                                                navigation.navigate(Config.ROUTE_COMPLAIN, {id: item.id})
-                                              }}
-                                              buttonStyle={{
-                                                backgroundColor: colors.white,
-                                                borderWidth: pxToDp(1),
-                                                width: pxToDp(150),
-                                                borderColor: colors.fontColor,
-                                                borderRadius: pxToDp(10),
-                                                padding: pxToDp(15),
-                                                marginRight: pxToDp(15)
-                                              }}
-
-                                              titleStyle={{
-                                                color: colors.fontColor,
-                                                fontSize: 12,
-                                              }}
-                /> : null}
-                {item.show_trace ? <Button title={'联系骑手'}
-                                           onPress={() => {
-                                             native.dialNumber(item.driver_phone)
-                                           }}
-                                           buttonStyle={{
-                                             backgroundColor: colors.main_color,
-                                             width: pxToDp(150),
-                                             borderRadius: pxToDp(10),
-                                             padding: pxToDp(14),
-                                             marginRight: pxToDp(15)
-                                           }}
-
-                                           titleStyle={{
-                                             color: colors.white,
-                                             fontSize: 12,
-                                             fontWeight: 'bold'
-                                           }}
-                /> : null}
-                {item.can_add_tip ?
-                  <Button title={'加小费'}
-                          onPress={() => {
-                            this.setState({
-                              addTipModal: true,
-                              modalTip: false,
-                              showDeliveryModal: false,
-                              shipId: item.id
-                            })
-                          }}
-                          buttonStyle={{
-                            backgroundColor: colors.main_color,
-                            width: pxToDp(150),
-                            borderRadius: pxToDp(10),
-                            padding: pxToDp(15),
-                            marginRight: pxToDp(15)
-                          }}
-                          titleStyle={{
-                            color: colors.white,
-                            fontSize: 12,
-                          }}
-                  />
-                  : null}
-                {item.can_cancel ? <Button title={'取消配送'}
-                                           onPress={() => {
-                                             const api = `/api/pre_cancel_order?access_token=${token}`;
-                                             let params = {}
-                                             if (item.id !== undefined) {
-                                               params = {
-                                                 delivery_id: item.id,
-                                                 order_id: this.state.order.id
-                                               }
-                                             } else {
-                                               params = {
-                                                 delivery_id: 0,
-                                                 order_id: this.state.order.id
-                                               }
-                                             }
-                                             HttpUtils.get.bind(this.props)(api, params).then(res => {
-                                               if (res.deduct_fee < 0) {
-                                                 Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
-                                                   text: '确定', onPress: () => {
-                                                     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                                       {
-                                                         order: this.state.order,
-                                                         ship_id: item.id,
-                                                         onCancelled: (ok, reason) => {
-                                                           this.fetchData()
-                                                         }
-                                                       });
-                                                   }
-                                                 }, {'text': '取消'}]);
-                                               } else if (res.deduct_fee == 0) {
-                                                 navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                                   {
-                                                     order: this.state.order,
-                                                     ship_id: item.id,
-                                                     onCancelled: (ok, reason) => {
-                                                       this.fetchData()
-                                                     }
-                                                   });
-                                               } else {
-                                                 this.setState({
-                                                   toastContext: res.deduct_fee
-                                                 }, () => {
-                                                   Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
-                                                     text: '确定', onPress: () => {
-                                                       navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                                         {
-                                                           order: this.state.order,
-                                                           ship_id: item.id,
-                                                           onCancelled: (ok, reason) => {
-                                                             this.fetchData()
-                                                           }
-                                                         });
-                                                     }
-                                                   }, {'text': '取消'}]);
-                                                 })
-                                               }
-                                             }).catch(e => {
-                                               showError(`${e.reason}`)
-                                             })
-                                           }}
-                                           buttonStyle={{
-                                             backgroundColor: colors.fontColor,
-                                             borderWidth: pxToDp(1),
-                                             width: pxToDp(150),
-                                             borderColor: colors.fontColor,
-                                             borderRadius: pxToDp(10),
-                                             padding: pxToDp(15),
-                                           }}
-
-                                           titleStyle={{
-                                             color: colors.white,
-                                             fontSize: 12,
-                                           }}
-                /> : null}
-              </View>
-            </If>
-          </View>
-        </If>
-      </For>
-    </View>)
-  }
-
-  renderDelivery() {
-
-    return (
-      <View style={{
-        borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(30),
-        padding: pxToDp(20),
-        backgroundColor: colors.white,
-        marginTop: pxToDp(20),
-      }}>
-
-        {this.state.order.pickType === '1' ? <TouchableOpacity onPress={() => {
-          this.setState({
-            showQrcode: !this.state.showQrcode
-          })
-        }} style={{flexDirection: 'row'}}>
-          <Text style={{
-            fontSize: 12,
-            color: colors.main_color,
-            marginLeft: pxToDp(12),
-            marginRight: pxToDp(20)
-          }}>取货码：{this.state.qrcode} </Text>
-          <MaterialCommunityIcons name={'focus-field'}
-                                  style={{color: colors.main_color, fontSize: 14}}></MaterialCommunityIcons>
-        </TouchableOpacity> : null}
-
-        {this.state.order.pickType === '1' ?
-          <View
-            style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)}}>
-            <QRCode
-              value={this.state.qrcode}
-              color="black"
-              size={150}
-            />
-          </View> : null}
-        <If condition={this.state.order.pickType !== '1'}>
-          <TouchableOpacity onPress={() => {
-            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
-              this.setState({showDeliveryModal: true})
+            });
+      } else {
+        this.setState({
+          toastContext: res.deduct_fee
+        }, () => {
+          Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
+            text: '确定', onPress: () => {
+              this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                  {
+                    order: this.state.order,
+                    ship_id: val,
+                    onCancelled: (ok, reason) => {
+                      this.fetchData()
+                    }
+                  });
             }
-          }}>
-            <Text style={{
-              textAlign: "center",
-              fontSize: 21,
-              color: colors.main_color,
-              marginTop: pxToDp(30),
-              fontWeight: "bold"
-            }}>{this.state.deliverie_status} </Text>
-
-            <Text style={{
-              textAlign: 'center',
-              fontWeight: "bold",
-              marginTop: pxToDp(25)
-            }}>
-              <Text style={{color: colors.color333}}>
-                <Text style={{color: colors.color333}}> {this.state.deliverie_desc}  </Text>
-                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
-                  <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
-              </Text>
-            </Text>
-          </TouchableOpacity>
-
-          {this.state.order.platform === '6' ?
-            <View
-              style={{justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)}}>
-              <QRCode
-                value={this.state.order.platform_oid}
-                color="black"
-                size={150}
-              />
-              <Text style={{
-                fontSize: 14,
-                marginTop: pxToDp(20)
-              }}>{this.state.order.platform_oid} </Text>
-            </View> : null}
-
-          {this.renderDeliveryInfo()}
-
-          <If condition={this.state.show_no_rider_tips}>
-            <TouchableOpacity onPress={() => {
-              this.setState({
-                modalTip: true,
-
-              })
-
-            }} style={{marginTop: pxToDp(20)}}>
-              <View style={{
-                backgroundColor: "#EAFFEE",
-                flexDirection: 'row',
-                borderRadius: pxToDp(20),
-                marginTop: pxToDp(20),
-                padding: pxToDp(15)
-              }}>
-                <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
-                <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          {/*    <View style={{*/}
-          {/*  backgroundColor: "#EAFFEE",*/}
-          {/*  flexDirection: 'row',*/}
-          {/*  borderRadius: pxToDp(20),*/}
-          {/*  marginTop: pxToDp(20),*/}
-          {/*  padding: pxToDp(15)*/}
-          {/*}}>*/}
-          {/*  <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>*/}
-          {/*  <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>*/}
-          {/*</View> : null}*/}
-        </If>
-      </View>
-    )
+          }, {'text': '取消'}]);
+        })
+      }
+    }).catch(e => {
+      showError(`${e.reason}`)
+    })
   }
 
-  renderClient() {
-    let {order} = this.state;
-    return (
-      <View style={{
-        borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(20),
-        padding: pxToDp(20),
-        backgroundColor: colors.white,
-        marginTop: pxToDp(20),
-      }}>
-        <View>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>姓名</Text>
-            <Text style={{fontSize: 14, fontWeight: 'bold'}}>{order.userName} </Text>
-            <Text
-              style={{
-                fontSize: 10,
-                color: colors.white,
-                backgroundColor: "#FFB454",
-                padding: pxToDp(5),
-                marginRight: pxToDp(30),
-                marginLeft: pxToDp(30),
-              }}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
-            <Text onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
-            }} style={{fontSize: 10, color: colors.main_color, marginTop: pxToDp(5)}}>修改订单</Text>
-          </View>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>地址</Text>
-            <View style={{flexDirection: 'row', width: Dimensions.get("window").width * 0.6}}>
-              <Text style={{
-                fontSize: 12,
-              }}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
-              <Text style={{
-                fontSize: 12,
-                color: colors.main_color,
-                marginTop: "auto",
-                marginBottom: "auto",
-                marginLeft: pxToDp(15),
-              }} onPress={() => {
-                let orderId = order.id;
-                const accessToken = this.props.global.accessToken
-                let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
-                const uri = Config.serverUrl(path);
-                this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-              }}>查看地图</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
-                            onPress={() => {
-                              native.dialNumber(order.mobile)
-                            }}>
-            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>电话</Text>
-            <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable} </Text>
-            <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
-          </TouchableOpacity>
-
-          <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
-            <For each="phone" index="idx" of={order.backup_phones_readable}>
-              <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
-                                onPress={() => {
-                                  native.dialNumber(order.backup_phones[idx])
-                                }} key={idx}>
-                <Text style={{fontSize: 12, width: pxToDp(120), marginTop: pxToDp(5)}}>备用电话</Text>
-                <Text style={{fontSize: 12, color: colors.main_color}}>{phone} </Text>
-                <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
-              </TouchableOpacity>
-            </For>
-          </If>
-        </View>
-      </View>
-    )
+  clientCatMap = (id) => {
+    const accessToken = this.props.global.accessToken
+    let path = '/AmapTrack.html?orderId=' + id + "&access_token=" + accessToken;
+    const uri = Config.serverUrl(path);
+    this.onPress(Config.ROUTE_WEB, {url: uri});
   }
 
-  _onItemRowNumberChanged(item, newNum) {
+  _onItemRowNumberChanged = (item, newNum) => {
     this._recordEdition({...item, num: newNum});
   }
 
-  _recordEdition(item) {
+  _recordEdition = (item) => {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
     } else {
@@ -1084,7 +897,7 @@ class OrderInfo extends Component {
     }
   }
 
-  total_goods_num(items) {
+  total_goods_num = (items) => {
     let num = 0
     items.forEach((item) => {
       num += parseInt(item.num);
@@ -1092,7 +905,7 @@ class OrderInfo extends Component {
     return num
   }
 
-  _totalEditingCents() {
+  _totalEditingCents = () => {
     const {order} = this.state;
     const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
@@ -1117,7 +930,7 @@ class OrderInfo extends Component {
     }
   }
 
-  _onToProvide() {
+  _onToProvide = () => {
     const {order, navigation} = this.props;
     if (order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
@@ -1127,7 +940,7 @@ class OrderInfo extends Component {
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
 
-  _doRefund() {
+  _doRefund = () => {
     const {order} = this.state;
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
@@ -1139,7 +952,11 @@ class OrderInfo extends Component {
     })
   }
 
-  _doSaveItemsEdit() {
+  _doUpdate = () => {
+    this.setState({isEditing: true, showGoodsList: false})
+  }
+
+  _doSaveItemsEdit = () => {
 
     const {dispatch, global} = this.props;
     const items = {
@@ -1170,7 +987,11 @@ class OrderInfo extends Component {
     }));
   }
 
-  _doAddItem(item) {
+  _doCancel = () => {
+    this.setState({isEditing: false,})
+  }
+
+  _doAddItem = (item) => {
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
       if (item.num > 0) {
@@ -1202,7 +1023,15 @@ class OrderInfo extends Component {
     }, 300)
   }
 
-  renderGoods() {
+  showGoodsListFlag = () => {
+    this.setState({showGoodsList: !this.state.showGoodsList})
+  }
+
+  showLogChangeList = () => {
+    this.setState({showChangeLogList: !this.state.showChangeLogList})
+  }
+
+  renderGoods = () => {
     const {order, is_service_mgr} = this.state;
     const _items = order.items || {};
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
@@ -1216,111 +1045,42 @@ class OrderInfo extends Component {
     }
 
     return (
-      <View style={{
-        borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(20),
-        padding: pxToDp(20),
-        backgroundColor: colors.white,
-        marginTop: pxToDp(20),
-      }}>
-        <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-          this.setState({showGoodsList: !this.state.showGoodsList})
-        }}>
-          <Text style={{
-            fontSize: 12,
-            marginTop: pxToDp(10),
-            width: pxToEm(240),
-            // marginLeft: pxToDp(30)
-          }}>共{this.total_goods_num(_items)}件商品</Text>
-          <View style={{flex: 1}}></View>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            width: pxToDp(310),
-          }}>
-            <Button
-              onPress={() => {
-                this._doRefund()
-              }}
+      <View style={Styles.goodsBody}>
+        <TouchableOpacity style={Styles.flexRow} onPress={() => this.showGoodsListFlag()}>
+          <Text style={Styles.goodsTotal}>共{this.total_goods_num(_items)}件商品</Text>
+          <View style={styles.flex1}/>
+          <View style={Styles.goodsTitle}>
+            <Button onPress={() => this._doRefund()}
               title={'退款申请'}
-              buttonStyle={{
-                backgroundColor: colors.fontColor,
-                borderWidth: pxToDp(1),
-                borderColor: colors.fontColor,
-                borderRadius: pxToDp(10),
-                padding: pxToDp(12),
-                marginLeft: 0,
-                marginRight: 0,
-              }}
-              titleStyle={{
-                color: colors.white,
-                fontSize: 12
-              }}
+              buttonStyle={Styles.goodsButtonRefund}
+              titleStyle={Styles.goodsButtonTitle}
             />
-
             {!this.state.isEditing ?
               <Button
                 title={'修改商品'}
                 disabled={!order._op_edit_goods}
-                onPress={() => {
-                  this.setState({isEditing: true, showGoodsList: false})
-                }}
-                buttonStyle={{
-                  backgroundColor: colors.main_color,
-                  borderRadius: pxToDp(10),
-                  padding: pxToDp(12),
-                  marginLeft: 0,
-                  marginRight: 0,
-                }}
-
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 12
-                }}
+                onPress={() => this._doUpdate()}
+                buttonStyle={Styles.goodsButtonUpdate}
+                titleStyle={Styles.goodsButtonTitle}
               /> : null}
             {this.state.isEditing ? <Button
               title={'修改'}
               disabled={!order._op_edit_goods}
-              onPress={() => {
-                this._doSaveItemsEdit()
-              }}
-              buttonStyle={{
-                backgroundColor: colors.main_color,
-                borderRadius: pxToDp(10),
-                padding: pxToDp(12),
-                marginLeft: 0,
-                marginRight: 0,
-              }}
-              titleStyle={{
-                color: colors.white,
-                fontSize: 12
-              }}
+              onPress={() => this._doSaveItemsEdit()}
+              buttonStyle={Styles.goodsButtonUpdate}
+              titleStyle={Styles.goodsButtonTitle}
             /> : null}
-
             {this.state.isEditing ? <Button
               title={'取消'}
               disabled={!order._op_edit_goods}
-              onPress={() => {
-                this.setState({isEditing: false,})
-              }}
-              buttonStyle={{
-                backgroundColor: colors.main_color,
-                borderRadius: pxToDp(10),
-                padding: pxToDp(12),
-                marginLeft: 0,
-                marginRight: 0,
-              }}
-              titleStyle={{
-                color: colors.white,
-                fontSize: 12
-              }}
+              onPress={() => this._doCancel()}
+              buttonStyle={Styles.goodsButtonUpdate}
+              titleStyle={Styles.goodsButtonTitle}
             /> : null}
-
-
           </View>
           {this.state.showGoodsList ?
-            <Entypo name='chevron-thin-right' style={{fontSize: 16, marginTop: pxToDp(6)}}/> :
-            <Entypo name='chevron-thin-up' style={{fontSize: 16, marginTop: pxToDp(6)}}/>}
+            <Entypo name='chevron-thin-right' style={Styles.showGoodsList}/> :
+            <Entypo name='chevron-thin-up' style={Styles.showGoodsList}/>}
         </TouchableOpacity>
 
         {!this.state.showGoodsList ? tool.objectMap(_items, (item, idx) => {
@@ -1359,15 +1119,11 @@ class OrderInfo extends Component {
         }) : null}
 
         {order.is_fn_price_controlled ?
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
+          <View style={[styles.moneyLabel, styles.moneyRow]}>
+            <View style={styles.moneyLeft}>
+              <Text style={styles.moneyListTitle}>供货价小计</Text>
             </View>
-            <View style={{flex: 1}}/>
+            <View style={styles.flex1}/>
             {/*直营店显示外卖价，管理员显示保底价，非直营店根据模式显示*/}
             <Text style={styles.moneyListNum}>
               {/*直接显示保底价总计*/}
@@ -1377,174 +1133,90 @@ class OrderInfo extends Component {
           : null}
         {/*管理员 和 直营店 可看*/}
         <If condition={is_service_mgr || !order.is_fn_price_controlled || order.is_fn_show_wm_price}>
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+          <View style={[styles.moneyLabel, styles.moneyRow]}>
+            <View style={styles.moneyLeft}>
               <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToEm(20), flex: 1}}>含平台扣费、优惠等</Text>
+              <Text style={styles.moneyRightTitle}>含平台扣费、优惠等</Text>
             </View>
-            <View style={{flex: 1}}/>
+            <View style={styles.flex1}/>
             <Text style={styles.moneyListNum}>
               {numeral(order.orderMoney).format('0.00')}
             </Text>
           </View>
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow]}>
+          <View style={[styles.moneyLabel, styles.moneyRow]}>
             <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>配送费</Text>
-            <View style={{flex: 1}}/>
+            <View style={styles.flex1}/>
             <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')} </Text>
           </View>
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow]}>
+          <View style={[styles.moneyLabel, styles.moneyRow]}>
             <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o' color={colors.color777}/></TouchableOpacity>
             </View>
-            <View style={{flex: 1}}/>
+            <View style={styles.flex1}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')} </Text>
           </View>
           <If condition={order.bill && order.bill.total_income_from_platform}>
-            <View style={[{
-              marginTop: pxToDp(12),
-              flexDirection: 'row',
-              alignContent: 'center',
-            }, styles.moneyRow]}>
-              <Text
-                style={[styles.moneyListTitle, {width: pxToDp(480)}]}>{order.bill.total_income_from_platform[0]} </Text>
-              <View style={{flex: 1}}/>
+            <View style={[styles.moneyLabel, styles.moneyRow]}>
+              <Text style={[styles.moneyListTitle, styles.w480]}>{order.bill.total_income_from_platform[0]} </Text>
+              <View style={styles.flex1}/>
               <Text style={styles.moneyListNum}>{order.bill.total_income_from_platform[1]} </Text>
             </View>
           </If>
         </If>
 
         {order.additional_to_pay != '0' ?
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-            alignItems: 'center'
-          }]}>
-            <View style={{
-              width: pxToDp(480),
-              flexDirection: 'row',
-            }}>
-              <Text style={{
-                flex: 1,
-                fontSize: pxToDp(26),
-                color: colors.color333,
-              }}>需加收/退款</Text>
-              {/*<TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>*/}
-              {/*  <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>*/}
-              {/*    <Text style={{color: colors.color333}}>收款码</Text>*/}
-              {/*    <Icons name='qrcode'/>*/}
-              {/*  </Text>*/}
-              {/*</TouchableOpacity>*/}
-              {/*{(order.additional_to_pay != 0) &&*/}
-              {/*<Text style={{*/}
-              {/*  fontSize: pxToDp(26),*/}
-              {/*  color: colors.main_color,*/}
-              {/*}}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}*/}
+          <View style={Styles.additional}>
+            <View style={Styles.additional}>
+              <Text style={Styles.additionalText}>需加收/退款</Text>
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={{
-              fontSize: pxToDp(26),
-              color: colors.color777
-            }}>
+            <View style={styles.flex1}/>
+            <Text style={Styles.additionalTextNum}>
               {numeral(order.additional_to_pay / 100).format('+0.00')}
             </Text>
           </View>
           : null}
         {/*管理员可看*/}
         <If condition={is_service_mgr || !order.is_fn_price_controlled}>
-          <View style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            marginBottom: pxToDp(12),
-            alignItems: 'center'
-          }}>
-            <View style={{
-              width: pxToDp(480),
-              flexDirection: 'row',
-            }}>
-              <Text style={{
-                flex: 1,
-                fontSize: pxToDp(26),
-                color: colors.color333
-              }}>商品原价</Text>
+          <View style={Styles.fn_price}>
+            <View style={[styles.w480, Styles.flexRow]}>
+              <Text style={Styles.product_price}>商品原价</Text>
               {totalMoneyEdit !== 0 &&
               <View>
                 <Text
-                  style={[{
-                    backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct,
-                    color: colors.white,
-                    fontSize: pxToDp(22),
-                    borderRadius: pxToDp(5),
-                    alignSelf: 'center',
-                    paddingLeft: 5,
-                    paddingRight: 5,
-                    paddingTop: 2,
-                    paddingBottom: 2
-                  }]}>
+                  style={totalMoneyEdit > 0 ? Styles.editStatusAdd : Styles.editStatusDeduct}>
                   {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
                 </Text>
-                <Text style={[{
-                  textDecorationLine: 'line-through',
-                  fontSize: pxToDp(26),
-                  color: colors.color777,
-                }]}>
+                <Text style={Styles.totalGoodsPrice}>
                   {numeral(order.total_goods_price / 100).format('0.00')}
                 </Text>
               </View>}
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={{
-              fontSize: pxToDp(26),
-              color: colors.color777,
-            }}>
+            <View style={styles.flex1}/>
+            <Text style={Styles.totalGoodsPriceBottom}>
               {numeral(finalTotal).format('0.00')}
             </Text>
           </View>
         </If>
-        <View style={{borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)}}></View>
+        <View style={Styles.borderLine}/>
         {tool.length(worker_nickname) > 0 ?
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
-            <Text style={{fontSize: 12, width: pxToDp(140)}}>分拣人姓名</Text>
-            <Text style={{fontSize: 12}}>{worker_nickname} </Text>
+          <View style={[styles.moneyLabel, styles.moneyRow]}>
+            <Text style={Styles.f12w140}>分拣人姓名</Text>
+            <Text style={Styles.f12}>{worker_nickname} </Text>
           </View>
           : null}
 
         {order.time_ready ?
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
-            <Text style={{fontSize: 12, width: pxToDp(140)}}>分拣时间</Text>
-            <Text style={{fontSize: 12}}>{order.time_ready} </Text>
+          <View style={[styles.moneyLabel, styles.moneyRow, {marginTop: pxToDp(12)}]}>
+            <Text style={Styles.f12w140}>分拣时间</Text>
+            <Text style={Styles.f12}>{order.time_ready} </Text>
           </View>
           : null}
 
         {order.pack_operator ?
-          <View style={[{
-            marginTop: pxToDp(12),
-            flexDirection: 'row',
-            alignContent: 'center',
-          }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
-            <Text style={{fontSize: 12, width: pxToDp(140)}}>记录人</Text>
-            <Text style={{fontSize: 12}}>{order.pack_operator.nickname} </Text>
+          <View style={[styles.moneyLabel, styles.moneyRow, {marginTop: pxToDp(12)}]}>
+            <Text style={Styles.f12w140}>记录人</Text>
+            <Text style={Styles.f12}>{order.pack_operator.nickname} </Text>
           </View>
           : null}
 
@@ -1560,129 +1232,66 @@ class OrderInfo extends Component {
     )
   }
 
-  renderChangeLog() {
+  renderChangeLog = () => {
     return (
-      <View style={{
-        marginBottom: pxToDp(100),
-        borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(20),
-        padding: pxToDp(20),
-        backgroundColor: colors.white,
-        marginTop: pxToDp(20),
-      }}>
-        <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-          this.setState({showChangeLogList: !this.state.showChangeLogList})
-        }}>
-          <Text style={{fontSize: 12}}>修改记录</Text>
-          <View style={{flex: 1}}></View>
+      <View style={Styles.logHeader}>
+        <TouchableOpacity style={Styles.flexRow} onPress={() => this.showLogChangeList()}>
+          <Text style={Styles.f12}>修改记录</Text>
+          <View style={styles.flex1}/>
           {this.state.showChangeLogList ?
-            <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
-            <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
+            <Entypo name='chevron-thin-right' style={Styles.f14}/> :
+            <Entypo name='chevron-thin-up' style={Styles.f14}/>}
         </TouchableOpacity>
         {this.renderChangeLogList()}
       </View>
     )
   }
 
-  renderChangeLogList() {
+  renderChangeLogList = () => {
     if (!this.state.showChangeLogList && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
           <View key={index}
-                style={{
-                  width: '100%',
-                  paddingHorizontal: pxToDp(30),
-                  backgroundColor: '#fff',
-                  minHeight: pxToDp(180)
-                }}>
-            <View style={{
-              flex: 1,
-              borderBottomWidth: pxToDp(1),
-              borderColor: "#bfbfbf",
-              minHeight: pxToDp(150),
-              justifyContent: 'center'
-            }}>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={{
-                  color: '#59B26A',
-                  fontSize: pxToEm(26),
-                  overflow: 'hidden',
-                  height: pxToDp(35)
-                }}>{item.updated_name} </Text>
-                <Text style={{
-                  flex: 1,
-                  color: '#59B26A',
-                  fontSize: pxToEm(26),
-                  overflow: 'hidden',
-                  height: pxToDp(35),
-                  marginLeft: pxToDp(24)
-                }}>{item.modified} </Text>
+                style={Styles.logChangeListContain}>
+            <View style={Styles.logChangeListContent}>
+              <View style={Styles.flexRow}>
+                <Text style={Styles.logChangeListTitle}>{item.updated_name} </Text>
+                <Text style={Styles.logChangeListLabel}>{item.modified} </Text>
               </View>
-              <View style={{marginTop: pxToDp(20), width: '100%', height: 'auto', marginBottom: pxToDp(20)}}>
+              <View style={Styles.logChangeListInfo}>
                 <Text selectable={true}
-                      style={{fontSize: pxToEm(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what} </Text>
+                      style={Styles.logChangeListInfoText}>{item.what} </Text>
               </View>
             </View>
           </View>
         )
       })
     } else if (this.state.orderChangeLogs.length === 0 && !this.state.showChangeLogList) {
-      return <View style={{
-        alignItems: 'center'
-      }}>
-        <Text style={{textAlign: "center", marginTop: pxToDp(30)}}>没有相应的记录</Text>
+      return <View style={Styles.logNone}>
+        <Text style={Styles.logNoneText}>没有相应的记录</Text>
       </View>
     }
   }
 
-  renderDeliveryStatus(list) {
+  renderDeliveryStatus = (list) => {
     return (
       <View>
         <For each="log" index="i" of={list}>
-          <View style={{
-            flexDirection: 'row',
-            paddingTop: pxToDp(15),
-            paddingBottom: pxToDp(15),
-          }}>
-            <View style={{width: 30}}>
-              <View style={{
-                width: pxToDp(30),
-                height: pxToDp(30),
-                backgroundColor: log.status_color,
-                borderRadius: pxToDp(15)
-              }}>
-                {i !== 0 ? <View style={{
-                  width: pxToDp(5),
-                  height: pxToDp(45),
-                  backgroundColor: log.status_color,
-                  position: 'absolute',
-                  bottom: pxToDp(28),
-                  left: pxToDp(13)
-                }}></View> : null}
-
-                {i !== list.length - 1 ? <View style={{
-                    width: pxToDp(5),
-                    height: pxToDp(45),
-                    backgroundColor: log.status_color,
-                    position: 'absolute',
-                    top: pxToDp(28),
-                    left: pxToDp(13)
-                  }}></View>
-                  : null}
+          <View style={Styles.deliveryStatusHeader}>
+            <View style={Styles.deliveryStatusHeaderTop}>
+              <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
+                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
+                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
               </View>
             </View>
-            <View style={{width: '90%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={{color: log.status_desc_color, fontSize: 12}}>{log.status_desc}  </Text>
-                <View style={{flex: 1}}></View>
-                <Text style={{color: log.lists[0].content_color, fontSize: 12}}>{log.lists[0].content}  </Text>
+            <View style={Styles.deliveryStatusHeaderBottom}>
+              <View style={Styles.flexRow}>
+                <Text style={[{color: log.status_desc_color}, Styles.f12]}>{log.status_desc}  </Text>
+                <View style={styles.flex1}/>
+                <Text style={[{color: log.lists[0].content_color}, Styles.f12]}>{log.lists[0].content}  </Text>
               </View>
               <Text
-                style={{
-                  color: log.lists[0].desc_color,
-                  fontSize: 10,
-                  marginTop: pxToDp(10)
-                }}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
+                style={[{color: log.lists[0].desc_color}, Styles.deliveryStatusExtNum]}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
             </View>
           </View>
         </For>
@@ -1692,7 +1301,6 @@ class OrderInfo extends Component {
 
   renderDeliveryModal() {
     let {navigation} = this.props;
-
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
       height = 400;
@@ -1702,10 +1310,9 @@ class OrderInfo extends Component {
              onRequestClose={() => this.setState({showDeliveryModal: false})}
              transparent={true}>
         <View style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
-          <TouchableOpacity style={{flex: 1}} onPress={() => {
+          <TouchableOpacity style={styles.flex1} onPress={() => {
             this.setState({showDeliveryModal: false})
-          }}></TouchableOpacity>
-
+          }}/>
           <View style={{
             backgroundColor: colors.white,
             height: height,
@@ -1717,7 +1324,7 @@ class OrderInfo extends Component {
                 navigation.navigate(Config.ROUTE_STORE_STATUS)
                 this.setState({showDeliveryModal: false})
               }} style={{color: colors.main_color, marginTop: pxToDp(20), marginLeft: pxToDp(20)}}>呼叫配送规则</Text>
-              <View style={{flex: 1}}></View>
+              <View style={styles.flex1}/>
               <TouchableOpacity onPress={() => {
                 this.setState({showDeliveryModal: false})
               }}>
@@ -1754,7 +1361,7 @@ class OrderInfo extends Component {
                           fontSize: 12,
                           fontWeight: 'bold'
                         }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
-                        <View style={{flex: 1}}></View>
+                        <View style={styles.flex1}/>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                       </TouchableOpacity>
@@ -2038,14 +1645,14 @@ class OrderInfo extends Component {
               }
             </View>
             <View style={Styles.btn1}>
-              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+              <View style={styles.flex1}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
                                                         onPress={() => {
                                                           this.setState({
                                                             addTipModal: false
                                                           })
                                                         }}><Text
                 style={Styles.btnText2}>取消</Text></TouchableOpacity></View>
-              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+              <View style={styles.flex1}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
                                                         onPress={() => {
                                                           this.onConfirmAddTip()
                                                         }}><Text
@@ -2264,7 +1871,7 @@ class ItemRow extends PureComponent {
       }, {flex: 1, textAlign: 'right'}]}>X{item.num} </Text>}
 
       {isEditing && !isPromotion &&
-      <View style={[{flex: 1}]}>
+      <View style={styles.flex1}>
         <InputNumber
           styles={inputNumberStyles}
           min={0}
@@ -2315,7 +1922,7 @@ class OrderReminds extends PureComponent {
           <Text style={{color: colors.color333}}>{taskType ? taskType.name : '待办'} </Text>
           <Text style={{marginLeft: pxToDp(20),}}>{tool.shortTimeDesc(remind.created)} </Text>
 
-          <View style={{flex: 1}}/>
+          <View style={styles.flex1}/>
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
           <Text style={{color: colors.color333}}>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)} </Text>}
           {status === Cts.TASK_STATUS_WAITING &&
@@ -2415,5 +2022,399 @@ const Styles = StyleSheet.create({
     borderColor: colors.title_color,
     width: "30%", textAlign: 'center',
     paddingVertical: pxToDp(5)
-  }
+  },
+  flexRow: {
+    flexDirection: 'row'
+  },
+  flexRowMT15: {
+    flexDirection: 'row',
+    marginTop: pxToDp(15)
+  },
+  flexRowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  color333: {
+    color: colors.color333
+  },
+  printText: {
+    fontSize: pxToDp(30),
+    marginRight: pxToDp(20)
+  },
+  headerBody: {
+    borderRadius: pxToDp(20),
+    paddingBottom: pxToDp(10),
+    backgroundColor: colors.white,
+  },
+  headerBodyTitle: {
+    backgroundColor: "#28A077",
+    borderTopLeftRadius: pxToDp(20),
+    borderTopRightRadius: pxToDp(20),
+    padding: pxToDp(30),
+    paddingBottom: pxToDp(20),
+  },
+  orderStatus: {
+    color: '#F76969',
+    textDecorationLine: 'line-through',
+    fontSize: 20
+  },
+  orderStatusShow: {
+    color: colors.white,
+    textDecorationLine: 'none',
+    fontSize: 20
+  },
+  orderSeq: {
+    color: colors.white,
+    fontSize: 16,
+    width: pxToEm(300),
+    textAlign: 'right'
+  },
+  orderExpectTime: {
+    flexDirection: 'row',
+    marginTop: 8
+  },
+  orderExpectTimeLabel: {
+    color: colors.white,
+    fontSize: 12,
+    marginTop: pxToDp(2)
+  },
+  orderExpectTimeContent: {
+    color: colors.white,
+    fontSize: 12,
+    marginLeft: pxToDp(10)
+  },
+  f12: {
+    fontSize: 12
+  },
+  f14: {
+    fontSize: 14
+  },
+  f12w110: {
+    fontSize: 12,
+    width: pxToDp(110)
+  },
+  f12w140: {
+    fontSize: 12,
+    width: pxToDp(140)
+  },
+  orderCreateTime: {
+    fontSize: 12,
+    width: pxToDp(110)
+  },
+  copyText: {
+    fontSize: 12,
+    color: colors.main_color,
+    marginLeft: pxToDp(30)
+  },
+  MT15: {
+    marginTop: pxToDp(15)
+  },
+  remarkTxt: {
+    fontSize: 12,
+    color: "#F76969",
+    width: pxToDp(440)
+  },
+  orderRemark: {
+    fontSize: 12,
+    color: "#F76969",
+    flex: 1
+  },
+  deliveryInfo: {
+    borderBottomColor: colors.fontColor,
+    borderBottomWidth: 0,
+    paddingBottom: 0,
+    marginTop: pxToDp(20),
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  deliveryInfoOn: {
+    borderBottomColor: colors.fontColor,
+    borderBottomWidth: 1,
+    paddingBottom: 20,
+    marginTop: pxToDp(20),
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  fwf14: {
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+  driverName: {
+    flexDirection: 'row',
+    marginTop: pxToDp(20)
+  },
+  driverInfo: {
+    fontSize: 12,
+    color: colors.fontColor,
+    marginTop: pxToDp(3)
+  },
+  driverPhone: {
+    fontSize: 12,
+    color: colors.main_color,
+    marginLeft: pxToDp(30)
+  },
+  deliveryInfoBtnBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingTop: pxToDp(20),
+  },
+  deliveryInfoBtnWhite: {
+    backgroundColor: colors.white,
+    borderWidth: pxToDp(1),
+    width: pxToDp(150),
+    borderColor: colors.fontColor,
+    borderRadius: pxToDp(10),
+    padding: pxToDp(15),
+    marginRight: pxToDp(15)
+  },
+  deliveryInfoBtnTextGray: {
+    color: colors.fontColor,
+    fontSize: 12,
+    fontWeight: 'bold'
+  },
+  deliveryInfoBtnTextWhite: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: 'bold'
+  },
+  deliveryInfoBtnGreen: {
+    backgroundColor: colors.main_color,
+    width: pxToDp(150),
+    borderRadius: pxToDp(10),
+    padding: pxToDp(14),
+    marginRight: pxToDp(15)
+  },
+  deliveryBody: {
+    borderRadius: pxToDp(20),
+    paddingBottom: pxToDp(30),
+    padding: pxToDp(20),
+    backgroundColor: colors.white,
+    marginTop: pxToDp(20),
+  },
+  deliveryStatusText: {
+    textAlign: "center",
+    fontSize: 21,
+    color: colors.main_color,
+    marginTop: pxToDp(30),
+    fontWeight: "bold"
+  },
+  deliveryStatusInfo: {
+    textAlign: 'center',
+    fontWeight: "bold",
+    marginTop: pxToDp(25)
+  },
+  qrcodeLabel: {
+    fontSize: 12,
+    color: colors.main_color,
+    marginLeft: pxToDp(12),
+    marginRight: pxToDp(20)
+  },
+  qrcodeIcon: {color: colors.main_color, fontSize: 14},
+  qrcodeContent: {flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop:pxToDp(30)},
+  platformQR: {justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)},
+  platformText: {
+    fontSize: 14,
+    marginTop: pxToDp(20)
+  },
+  noRiderTips: {marginTop: pxToDp(20)},
+  noRiderTipsHeader: {
+    backgroundColor: "#EAFFEE",
+    flexDirection: 'row',
+    borderRadius: pxToDp(20),
+    marginTop: pxToDp(20),
+    padding: pxToDp(15)
+  },
+  questionIcon: {fontSize: 14, color: colors.main_color},
+  noRiderTipsLabel: {fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)},
+  clientHeader: {
+    borderRadius: pxToDp(20),
+    paddingBottom: pxToDp(20),
+    padding: pxToDp(20),
+    backgroundColor: colors.white,
+    marginTop: pxToDp(20),
+  },
+  clientLabel: {fontSize: 12, width: pxToDp(80)},
+  clientNameValue: {fontSize: 14},
+  clientOrderTimes: {
+    fontSize: 10,
+    color: colors.white,
+    backgroundColor: "#FFB454",
+    padding: pxToDp(5),
+    marginRight: pxToDp(30),
+    marginLeft: pxToDp(30),
+  },
+  clientChangeInfoTitle: {fontSize: 10, color: colors.main_color, marginTop: pxToDp(5)},
+  clientAddress: {flexDirection: 'row', width: Dimensions.get("window").width * 0.6},
+  clientCatMap: {
+    fontSize: 10,
+    color: colors.main_color,
+    marginTop: "auto",
+    marginBottom: "auto",
+    marginLeft: pxToDp(15),
+  },
+  mobileBody: {flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)},
+  clientPhone: {fontSize: 12, color: colors.main_color},
+  clientPhoneCall: {fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)},
+  goodsBody: {
+    borderRadius: pxToDp(20),
+    paddingBottom: pxToDp(20),
+    padding: pxToDp(20),
+    backgroundColor: colors.white,
+    marginTop: pxToDp(20),
+  },
+  goodsTotal: {
+    fontSize: 12,
+    marginTop: pxToDp(10),
+    width: pxToEm(240)
+  },
+  goodsTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: pxToDp(310),
+  },
+  goodsButtonRefund: {
+    backgroundColor: colors.fontColor,
+    borderWidth: pxToDp(1),
+    borderColor: colors.fontColor,
+    borderRadius: pxToDp(10),
+    padding: pxToDp(12),
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  goodsButtonTitle: {
+    color: colors.white,
+    fontSize: 12
+  },
+  goodsButtonUpdate: {
+    backgroundColor: colors.main_color,
+    borderRadius: pxToDp(10),
+    padding: pxToDp(12),
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  showGoodsList: {fontSize: 16, marginTop: pxToDp(6)},
+  additional: {
+    marginTop: pxToDp(12),
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignItems: 'center'
+  },
+  additionalText: {
+    flex: 1,
+    fontSize: pxToDp(26),
+    color: colors.color333,
+  },
+  additionalTextNum: {
+    fontSize: pxToDp(26),
+    color: colors.color777
+  },
+  fn_price: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    marginBottom: pxToDp(12),
+    alignItems: 'center'
+  },
+  product_price: {
+    flex: 1,
+    fontSize: pxToDp(26),
+    color: colors.color333
+  },
+  editStatusAdd: {
+    backgroundColor: colors.editStatusAdd,
+    color: colors.white,
+    fontSize: pxToDp(22),
+    borderRadius: pxToDp(5),
+    alignSelf: 'center',
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 2,
+    paddingBottom: 2
+  },
+  editStatusDeduct: {
+    backgroundColor: colors.editStatusDeduct,
+    color: colors.white,
+    fontSize: pxToDp(22),
+    borderRadius: pxToDp(5),
+    alignSelf: 'center',
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 2,
+    paddingBottom: 2
+  },
+  totalGoodsPrice: {
+    textDecorationLine: 'line-through',
+    fontSize: pxToDp(26),
+    color: colors.color777,
+  },
+  totalGoodsPriceBottom: {
+    fontSize: pxToDp(26),
+    color: colors.color777,
+  },
+  borderLine: {borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)},
+  logHeader: {
+    marginBottom: pxToDp(100),
+    borderRadius: pxToDp(20),
+    paddingBottom: pxToDp(20),
+    padding: pxToDp(20),
+    backgroundColor: colors.white,
+    marginTop: pxToDp(20),
+  },
+  logChangeListContain: {
+    width: '100%',
+    paddingHorizontal: pxToDp(30),
+    backgroundColor: '#fff',
+    minHeight: pxToDp(180)
+  },
+  logChangeListContent: {
+    flex: 1,
+    borderBottomWidth: pxToDp(1),
+    borderColor: "#bfbfbf",
+    minHeight: pxToDp(150),
+    justifyContent: 'center'
+  },
+  logChangeListTitle: {
+    color: '#59B26A',
+    fontSize: pxToEm(26),
+    overflow: 'hidden',
+    height: pxToDp(35)
+  },
+  logChangeListLabel: {
+    flex: 1,
+    color: '#59B26A',
+    fontSize: pxToEm(26),
+    overflow: 'hidden',
+    height: pxToDp(35),
+    marginLeft: pxToDp(24)
+  },
+  logChangeListInfo: {marginTop: pxToDp(20), width: '100%', height: 'auto', marginBottom: pxToDp(20)},
+  logChangeListInfoText: {fontSize: pxToEm(24), height: 'auto', lineHeight: pxToDp(28)},
+  logNone: {alignItems: 'center'},
+  logNoneText: {textAlign: "center", marginTop: pxToDp(30)},
+  deliveryStatusHeader: {
+    flexDirection: 'row',
+    paddingVertical: pxToDp(15)
+  },
+  deliveryStatusHeaderTop: {
+    width: 30
+  },
+  deliveryStatusHeaderBottom: {
+    width: '90%'
+  },
+  deliveryStatusExtNum: {
+    fontSize: 10,
+    marginTop: pxToDp(10)
+  },
+  deliveryStatusTitle: {
+    width: pxToDp(30),
+    height: pxToDp(30),
+    borderRadius: pxToDp(15)
+  },
+  deliveryStatusContent: {
+    width: pxToDp(5),
+    height: pxToDp(45),
+    position: 'absolute',
+    bottom: pxToDp(28),
+    left: pxToDp(13)
+  },
+
 });
