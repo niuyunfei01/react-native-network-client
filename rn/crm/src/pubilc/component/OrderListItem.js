@@ -350,7 +350,7 @@ class OrderListItem extends React.PureComponent {
 
         <If condition={item.pickType !== "1"}>
           <View style={{flexDirection: 'row', marginTop: item.is_right_once ? 10 : 50, marginLeft: 26}}>
-            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预定 </Text>
+            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预计 </Text>
             <Text style={{fontWeight: "bold", fontSize: 14, color: "#FF8854"}}> {item.humanExpectTime} </Text>
             <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 前送达 </Text>
           </View>
@@ -454,7 +454,7 @@ class OrderListItem extends React.PureComponent {
           <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>平台单号 </Text>
           <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>{item.platform_oid} </Text>
           <Text onPress={() => {
-            Clipboard.setString(item.id)
+            Clipboard.setString(item.platform_oid)
             ToastLong('已复制到剪切板')
           }} style={{
             fontSize: 14,

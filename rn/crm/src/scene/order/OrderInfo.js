@@ -248,8 +248,8 @@ class OrderInfo extends Component {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
-        delivery_list: res.delivery_lists,
-        is_merchant_add_tip: res.is_merchant_add_tip
+        delivery_list: res.delivery_lists !== undefined && Array.isArray(res.delivery_lists) ? res.delivery_lists : [],
+        is_merchant_add_tip: res.is_merchant_add_tip !== undefined ? Boolean(res.is_merchant_add_tip) : false
       })
     })
   }
