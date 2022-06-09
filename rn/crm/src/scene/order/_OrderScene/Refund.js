@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import styles from "../OrderStyles";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -46,7 +47,7 @@ class Refund extends React.Component {
   renderProducts(products) {
     return (
       <For each="product" index="idx" of={products}>
-        <View key={`prod_${idx}`} style={{flex: 1}}>
+        <View key={`prod_${idx}`}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{color: colors.color333}}>{product.product_name} </Text>
             <Text style={{color: colors.color333}}>x{product.num} </Text>
@@ -69,7 +70,7 @@ class Refund extends React.Component {
     return (
       <View style={{paddingTop: pxToDp(10)}}>
         <For each="item" index="idx" of={this.state.refunds}>
-          <View key={idx} style={{width: pxToDp(700)}}>
+          <View key={idx} style={{width: pxToDp(700),}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{color: colors.color333}}>退款商品：</Text>
               <View style={{flex: 1}}>

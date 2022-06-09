@@ -246,6 +246,7 @@ class GoodStoreDetailScene extends PureComponent {
     }
 
     const onSale = (store_prod || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    const onStrict = (store_prod || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     const {accessToken} = this.props.global;
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
@@ -320,21 +321,25 @@ class GoodStoreDetailScene extends PureComponent {
               marginBottom: 10
             }}>
               <View style={{flexDirection: "row"}}>
-                <TouchableOpacity style={this.state.activity === 'offer' ? styles.tabActivity : styles.tab}
+                <TouchableOpacity style={[this.state.activity === 'offer' ? styles.tabActivity : styles.tab]}
                                   onPress={() => this.setState({activity: 'offer'})}>
                   <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>报价</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
-                                  onPress={() => this.setState({activity: 'inventory_num'})}>
-                  <Text
-                    style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                {
+                  onStrict && <>
+                  <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                                    onPress={() => this.setState({activity: 'inventory_num'})}>
+                    <Text
+                        style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                   style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
                   onPress={() => this.setState({activity: 'inventory_attribute'})}>
                   <Text
-                    style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
-                </TouchableOpacity>
+                  style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
+                  </TouchableOpacity></>
+                }
+
               </View>
               {this.renderRuleStatusTab()}
             </View>
@@ -368,12 +373,13 @@ class GoodStoreDetailScene extends PureComponent {
         }
 
         {sp && product.id && this.state.vendorId != 68 &&
-        <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
+        <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)} skuName={product.sku_name}
                             strictProviding={this.state.fnProviding} accessToken={accessToken}
                             storeId={Number(sp.store_id)}
                             currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
                             onClose={() => this.setState({modalType: ''})}
                             spId={Number(sp.id)} applyingPrice={applyingPrice} storePro={sp}
+                            navigation={this.props.navigation}
                             beforePrice={Number(sp.supply_price)}/>}
       </View></Provider>
     );
@@ -460,16 +466,16 @@ class GoodStoreDetailScene extends PureComponent {
     if (store_prod && store_prod.skus !== undefined) {
       return (
         <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
-            <Text style={{color: colors.color333, fontSize: 12}}>{product.name} </Text>
+          <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center", marginBottom: 5}}>
+            <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
             <Text
               style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
           </View>
           <For each="info" index="i" of={store_prod.skus}>
             <View
-              style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
+              style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center", marginVertical: 5}}
               key={i}>
-              <Text style={{color: colors.color333, fontSize: 12}}>{product.name}[{info.sku_name}] </Text>
+              <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name}[{info.sku_name}] </Text>
               <Text
                 style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
             </View>
@@ -479,8 +485,8 @@ class GoodStoreDetailScene extends PureComponent {
     } else {
       return (
         <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-            <Text style={{color: colors.color333, fontSize: 12}}>{product.name} </Text>
+            <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
+              <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name} </Text>
             <Text
               style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
           </View>
@@ -500,12 +506,12 @@ class GoodStoreDetailScene extends PureComponent {
         paddingTop: 20,
         paddingBottom: 10
       }}>
-        <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
-          <Text style={{color: colors.color333, fontSize: 12}}>{product.name} </Text>
+        <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center", marginBottom: 5}}>
+          <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
           <View style={typeof store_prod.applying_price !== "undefined" && {
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-around",
+            justifyContent: "space-around", flex: 1
           }}>
             <If condition={activity && activity === 'offer'}>
               <Text
@@ -520,7 +526,7 @@ class GoodStoreDetailScene extends PureComponent {
               <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.stock_str}`} </Text>
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-              <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.shelf_no}`} </Text>
+              <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`} </Text>
             </If>
           </View>
         </View>
@@ -529,7 +535,7 @@ class GoodStoreDetailScene extends PureComponent {
             <View
               style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
               key={i}>
-              <Text style={{color: colors.color333, fontSize: 12}}>{product.name}[{info.sku_name}] </Text>
+              <Text style={{color: colors.color333, fontSize: 12, width: '80%'}}>{product.name}[{info.sku_name}] </Text>
               <If condition={activity === 'offer'}>
                 <Text
                   style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
@@ -544,7 +550,7 @@ class GoodStoreDetailScene extends PureComponent {
                 <Text style={{color: colors.color333, fontSize: 12}}>{`${info.stock_str}`} </Text>
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-                <Text style={{color: colors.color333, fontSize: 12}}>{`${info.shelf_no}`} </Text>
+                <Text style={{color: colors.color333, fontSize: 12}}>{`${info.shelf_no ? info.shelf_no : '无'}`} </Text>
               </If>
             </View>
           </For>

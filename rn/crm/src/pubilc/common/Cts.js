@@ -81,6 +81,7 @@ export default {
   STORE_PROD_ON_SALE: 1,//上架
   STORE_PROD_OFF_SALE: 3,//下架
   STORE_PROD_SOLD_OUT: 2,//缺货
+  STORE_PROD_STOCK: 1,//开进销存
 
   STORE_SELF_PROVIDED: 1,//门店自采
   STORE_COMMON_PROVIDED: 0,//总部供货
@@ -175,4 +176,11 @@ export default {
   GOODS_SEARCH_PAGE_NUM: 50,
 
   CODE_ACCESS_DENIED: 10001,
+  PLAT_ARRAY:  [
+    {label: '全部', id: 0},
+    {label: '美团外卖', id: 3},
+    {label: '饿了么', id: 4},
+    {label: '京东', id: 6},
+    {label: '其它', id: -1},
+  ]
 }

@@ -14,7 +14,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../../pubilc/util/ToastUtils";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import tool from "../../../pubilc/util/tool";
@@ -25,6 +25,8 @@ import CommonStyle from "../../../pubilc/util/CommonStyles";
 import JbbText from "../../common/component/JbbText";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -47,6 +49,7 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
+
 class DeliveryList extends PureComponent {
   constructor(props) {
     super(props)
@@ -60,11 +63,38 @@ class DeliveryList extends PureComponent {
       phone: '',
       uuCode: '',
       count_down: -1,
-      msg: [
-        '阿里旗下开放即时配送平台',
-        '为饿了么平台的商户提供即时配送'
-      ],
+      msg: [],
+      show_unbind_all: false,
+      unbind_id: 0,
+      unbind_name: "",
+      unbind_url: null,
+      show_modal: false,
+      modal_msg: ""
     }
+
+    const {navigation} = props;
+    navigation.setOptions(
+      {
+        headerRight: (() => (
+            <TouchableOpacity
+              style={{
+                marginRight: 10,
+              }}
+              onPress={() => {
+                this.setState({
+                  show_unbind_all: !this.state.show_unbind_all,
+                  unbind_url: null,
+                  unbind_name: "",
+                  show_type: 2,
+                  unbind_id: 0
+                })
+              }}
+            >
+              <Text style={{fontSize: 14, color: colors.color333}}>解绑</Text>
+            </TouchableOpacity>)
+        )
+      }
+    );
   }
 
   UNSAFE_componentWillMount() {
@@ -109,6 +139,10 @@ class DeliveryList extends PureComponent {
         height: 40,
       }}>
         <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+          if (this.state.show_unbind_all) {
+            ToastShort("暂不支持解绑外送帮账户");
+            return;
+          }
           this.setState({
             show_type: 1,
           })
@@ -192,13 +226,10 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  bind(type) {
-    showModal("请求中...")
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
-      hideModal()
-      if (res.alert === 0) {
+
+  handleGrandAuth = (res) => {
+    switch (res.alert) {
+      case 0:
         if (res.route === 'BindDeliveryUU') {
           this.setState({
             uuVisible: true
@@ -206,26 +237,30 @@ class DeliveryList extends PureComponent {
           return null;
         }
         this.onPress(res.route, {url: res.auth_url})
-      } else if (res.alert === 2) {
-        Alert.alert('绑定' + res.name, res.alert_msg, [
-          {text: '取消', style: 'cancel'},
-          {
-            text: '去绑定', onPress: () => {
+        break
+      case 1:
 
-              if (res.route === 'BindDelivery') {
-                this.onPress(res.route, {id: res.type, name: res.name});
-                return null;
-              }
+        break
+      case 2:
+        this.onPress('BindShunfeng', {res: res})
 
-              this.onPress(res.route, {url: res.auth_url});
-            }
-          },
-        ])
-      } else if (res.alert === 3) {
+        break
+      case 3:
         this.onPress(res.route, {url: res.auth_url});
-      } else {
-        ToastLong(res.alert_msg)
-      }
+        break
+      default:
+        ToastShort(res.alert_msg)
+        break
+    }
+  }
+
+  bind = (type) => {
+    showModal("请求中...")
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
+      hideModal()
+      this.handleGrandAuth(res)
     }).catch(() => {
       hideModal()
     })
@@ -236,25 +271,21 @@ class DeliveryList extends PureComponent {
     let {phone, uuCode} = this.state
     let {currVendorId} = tool.vendor(this.props.global);
     if (!tool.length(phone) > 0 || !tool.length(uuCode) > 0) {
-      ToastLong('请输入手机号或者验证码')
+      ToastShort('请输入手机号或者验证码')
       return null;
     }
-    showModal("加载中");
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.post.bind(this.props)(api, {
       user_mobile: phone,
       validate_code: uuCode,
       store_id: currStoreId
     }).then(res => {
-      hideModal()
       this.fetchData()
-      showSuccess('授权绑定成功')
       this.setState({
         uuVisible: false
-      })
+      }, () => ToastShort(res.desc))
     }).catch((reason) => {
-      hideModal()
-      showError(reason)
+      ToastShort(reason.desc)
     })
   }
 
@@ -263,17 +294,35 @@ class DeliveryList extends PureComponent {
     let {phone, count_down} = this.state
     let {currVendorId} = tool.vendor(this.props.global);
     if (count_down <= 0) {
-      showModal("加载中");
       HttpUtils.get.bind(this.props)(`/uupt/message_authentication/${phone}`, {
         access_token: accessToken,
         vendorId: currVendorId
       }).then(res => {
-        hideModal()
+        ToastShort(res.desc)
       }).catch((reason) => {
-        hideModal()
-        showError(reason)
+        ToastShort(reason.desc)
       })
     }
+  }
+
+  unbind() {
+    let {accessToken, currStoreId} = this.props.global
+    let {currVendorId} = tool.vendor(this.props.global);
+    HttpUtils.post.bind(this.props)(`/v1/new_api/delivery/unbind_store_delivery?vendorId=${currVendorId}&access_token=${accessToken}`, {
+      store_id: currStoreId,
+      delivery_type: this.state.unbind_id
+    }).then(res => {
+      this.setState({
+        show_modal: true,
+        modal_msg: res.msg,
+        unbind_url: res.unauth_url
+      })
+    }).catch((reason) => {
+      this.setState({
+        show_modal: true,
+        modal_msg: reason.desc
+      })
+    })
   }
 
   getCountdown() {
@@ -305,19 +354,6 @@ class DeliveryList extends PureComponent {
     this.setState({uuVisible: false})
   }
 
-  _onChangePhone(value) {
-    this.setState({
-      phone: value
-    })
-  }
-
-  _onChangeCode(code) {
-    this.setState({
-      uuCode: code
-    })
-  }
-
-
   renderItem(info) {
     return (
       <View style={{
@@ -330,17 +366,39 @@ class DeliveryList extends PureComponent {
         borderTopColor: colors.colorDDD,
         backgroundColor: colors.white
       }}>
+        <If condition={this.state.show_unbind_all}>
+          <View style={{marginLeft: 6}}>
+            <If condition={info.id === undefined}>
+              <View style={{backgroundColor: colors.fontColor, borderRadius: 11}}>
+                <FontAwesome5 name={'circle'} style={{}}
+                              color={colors.fontColor} size={22}/>
+              </View>
+            </If>
+
+            <If condition={info.id !== undefined}>
+              {info.v2_type === this.state.unbind_id ?
+                <FontAwesome5 name={'check-circle'} color={colors.main_color} size={22}/> :
+                <FontAwesome5 name={'circle'} color={colors.color333} size={22}/>}
+            </If>
+          </View>
+        </If>
         <Image style={[style.img]} source={{uri: info.img}}/>
         <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
           <View style={{
             flexDirection: "row",
-            justifyContent: "space-between",
+            // justifyContent: "space-between",
             marginRight: pxToDp(20)
           }}>
             <Text style={{
               fontSize: pxToDp(28),
               color: colors.listTitleColor
             }}>{info.name} </Text>
+            <If condition={this.state.show_unbind_all && info.id === undefined}>
+              <Text style={{
+                fontSize: pxToDp(28),
+                color: colors.red
+              }}>(未绑定)</Text>
+            </If>
           </View>
           <View style={{marginTop: pxToDp(10)}}>
             {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
@@ -348,12 +406,12 @@ class DeliveryList extends PureComponent {
         </View>
 
 
-        <If condition={!tool.length(info.id) > 0}>
+        <If condition={!tool.length(info.id) > 0 && !this.state.show_unbind_all}>
           {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
             <Text style={[style.status_err]}>去授权</Text>}
         </If>
 
-        <If condition={tool.length(info.id) > 0}>
+        <If condition={tool.length(info.id) > 0 && !this.state.show_unbind_all}>
           <View style={{
             width: pxToDp(120),
             marginRight: pxToDp(30),
@@ -385,7 +443,7 @@ class DeliveryList extends PureComponent {
         </If>
 
 
-        <If condition={info.platform === '9'}>
+        <If condition={info.platform === '9' && !this.state.show_unbind_all}>
           <View style={{
             width: pxToDp(120),
             marginRight: pxToDp(30),
@@ -439,6 +497,15 @@ class DeliveryList extends PureComponent {
             marginRight: pxToDp(10),
           }}
           onPress={() => {
+            if (this.state.show_unbind_all) {
+              if (info.id !== undefined) {
+                this.setState({
+                  unbind_id: info.v2_type,
+                  unbind_name: info.name,
+                })
+              }
+              return;
+            }
             if (tool.length(info.id) > 0) {
               this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
             } else {
@@ -472,7 +539,52 @@ class DeliveryList extends PureComponent {
         <View style={{flex: 1}}>
           {this.renderHeader()}
           {this.renderList(this.state.show_type)}
+          <If condition={this.state.show_unbind_all}>
+            {this.rendenBtn()}
+          </If>
         </View>
+        {this.renderModal()}
+      </View>
+    )
+  }
+
+  renderModal() {
+    return (
+      <View>
+        <BottomModal
+          title={'提示'}
+          visible={this.state.show_modal}
+          actionText={'确定'}
+          btnStyle={{
+            backgroundColor: colors.main_color
+          }}
+          onPress={() => {
+            if (this.state.unbind_url !== null && this.state.unbind_url !== undefined) {
+              this.setState({
+                show_modal: false,
+                show_unbind_all: false,
+              }, () => {
+                this.onPress(config.ROUTE_WEB, {url: this.state.unbind_url})
+              })
+
+            } else {
+              this.setState({
+                show_modal: false,
+                show_unbind_all: false,
+              }, () => {
+                this.fetchData()
+              })
+            }
+          }}
+          onClose={() => {
+            this.setState({
+              show_modal: false,
+            })
+          }}>
+          <View style={{padding: 20, justifyContent: "center", alignItems: "center"}}>
+            <Text style={{fontSize: 16, color: colors.color333}}>{this.state.modal_msg} </Text>
+          </View>
+        </BottomModal>
         <BottomModal
           title={'绑定UU跑腿'}
           actionText={'授权并登录'}
@@ -496,7 +608,9 @@ class DeliveryList extends PureComponent {
                   style={CommonStyle.inputH35}
                   clearButtonMode={true}
                   onChangeText={(value) => {
-                    this._onChangePhone(value)
+                    this.setState({
+                      phone: value
+                    })
                   }}
                   keyboardType="numeric"
                   placeholder="请输入手机号"
@@ -514,7 +628,9 @@ class DeliveryList extends PureComponent {
                   <Input
                     value={this.state.uuCode}
                     onChangeText={(code) => {
-                      this._onChangeCode(code)
+                      this.setState({
+                        uuCode: code
+                      })
                     }}
                     editable={true}
                     underlineColorAndroid={"transparent"}
@@ -543,6 +659,38 @@ class DeliveryList extends PureComponent {
       </View>
     )
   }
+
+  rendenBtn() {
+    return (
+      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+        <Button title={'确认'}
+                onPress={() => {
+                  if (this.state.unbind_id !== 0) {
+                    Alert.alert('提醒', '确定要解绑' + this.state.unbind_name + '[自有账户]吗？', [
+                      {
+                        text: '确定',
+                        onPress: () => {
+                          this.unbind();
+                        },
+                      }, {
+                        text: '取消'
+                      }
+                    ])
+                  }
+                }}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: this.state.unbind_id !== 0 ? colors.main_color : colors.fontColor,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
+    )
+  }
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeliveryList)

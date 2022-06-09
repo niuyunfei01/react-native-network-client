@@ -33,13 +33,15 @@ export function apiUrl(path) {
 }
 
 export function staticUrl(path) {
-  let isFullUrl = path.indexOf("http");
-  if (isFullUrl === -1) {
-    return serverUrl(path, true);
-  } else if (path) {
-    return path.replace("http://", "https://");
-  } else {
-    return path;
+  if (path !== null) {
+    let isFullUrl = path.indexOf("http");
+    if (isFullUrl === -1) {
+      return serverUrl(path, true);
+    } else if (path) {
+      return path.replace("http://", "https://");
+    } else {
+      return path;
+    }
   }
 }
 
@@ -121,6 +123,8 @@ const C = {
   ROUTE_COMPLAIN: 'Complain',
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
+  ROUTE_ORDER_ADDRESS_BOOK: 'OrderAddressBook',
+  ROUTE_ORDER_RECEIVING_INFO: 'OrderReceivingInfo',
 
 
   ROUTE_STORE: 'Store',
@@ -152,6 +156,7 @@ const C = {
   ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
+  ROUTE_BIND_PAY: 'BindPay',
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
@@ -167,10 +172,13 @@ const C = {
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
   ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
+  ROUTE_FREEZE_LIST: 'FREEZE_LIST',        //冻结列表
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
+  ROUTE_BIND_SHUNFENG:'BindShunfeng',
+  ROUTE_REGISTER_SHUNFENG:'RegisterShunfeng',
   ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
@@ -178,12 +186,14 @@ const C = {
   ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
   ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
   DIY_PRINTER: 'Diyprinter',              //小票设置
+  DIY_PRINTER_ITEM: 'DiyprinterItem',              //小票详情设置
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
   ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
   ROUTE_SEETING_PREFERENCE_DELIVERY: 'PreferenceBillingSetting',   //偏好发单设置
+  ROUTE_SEETING_MININUM_DELIVERY: 'SeetingMiniNumDelivery',   //保底配送
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_COMMODITY_PRICING: 'GoodsCommodityPricing',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',

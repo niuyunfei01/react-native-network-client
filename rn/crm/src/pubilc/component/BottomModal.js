@@ -8,6 +8,7 @@ import {Button} from "react-native-elements";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 const width = Dimensions.get("window").width;
+const height = Dimensions.get("window").height;
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -38,13 +39,14 @@ class BottomModal extends React.Component {
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.25)',
+        backgroundColor: 'rgba(0,0,0,0.25)'
       }}>
         <TouchableHighlight style={{
           backgroundColor: colors.white,
           // padding: 10,
           borderRadius: pxToDp(30),
           width: '88%',
+          maxHeight: height * 0.8
         }}>
 
           <ScrollView style={{paddingBottom: 3,}}>
@@ -95,8 +97,10 @@ class BottomModal extends React.Component {
                   backgroundColor: colors.white,
                   width: width * 0.40,
                   marginRight: 10,
+                  borderWidth: 1,
+                  borderColor: colors.color666,
                 }, this.props.closeBtnStyle]}
-                        titleStyle={[{color: colors.color333}, this.props.closeBtnTitleStyle]}
+                        titleStyle={[{color: colors.color666,}, this.props.closeBtnTitleStyle]}
                         title={this.props.closeText}
                         onPress={this.props.onPressClose}></Button>
               </If>

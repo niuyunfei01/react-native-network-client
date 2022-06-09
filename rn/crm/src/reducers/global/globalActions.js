@@ -276,7 +276,7 @@ export function doAuthLogin(access_token, expire, props, callback) {
     }
   }, (res) => {
     if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "您还没有注册，请先注册")
+      callback(false, "账号异常")
     } else {
       callback(false, "获取不到账户相关信息");
     }

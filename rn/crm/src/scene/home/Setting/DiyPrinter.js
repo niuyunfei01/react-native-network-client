@@ -1,23 +1,23 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, Slider, StyleSheet, Text, View} from 'react-native';
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import * as globalActions from "../../../reducers/global/globalActions";
+import {Button, Slider, Switch} from "react-native-elements";
+import Entypo from 'react-native-vector-icons/Entypo';
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import tool from "../../../pubilc/util/tool";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
-import {connect} from "react-redux";
-import Icons from 'react-native-vector-icons/Entypo';
-import {bindActionCreators} from "redux";
-import * as globalActions from "../../../reducers/global/globalActions";
-import {Button} from "react-native-elements";
 
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global}
+  const {global} = state;
+  return {global: global}
 }
+
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -106,8 +106,9 @@ class DiyPrinter extends PureComponent {
         this.setState({
           isRefreshing: false
         })
-      }, () => {
-        this.setState({isRefreshing: false, errorMsg: `操作失败`})
+      }, (err) => {
+        ToastLong("操作失败："+err.desc)
+        this.setState({isRefreshing: false})
       })
     }, 1000)
   }
@@ -122,250 +123,337 @@ class DiyPrinter extends PureComponent {
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{backgroundColor: colors.main_back}}>
-          <Cells style={[styles.cell_box_top]}>
+          } style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
 
-            <Cell customStyle={[styles.cell_row]}
-                  onPress={() => {
-                    this.onPress(Config.ROUTE_RECEIPT);
-                  }}>
-              <CellBody>
-                <Text
-                  style={[styles.cell_body_text]}>用户联 </Text>
-              </CellBody>
-              <CellFooter>
-                <View style={[styles.right_box]}>
-                  <Text style={[styles.right_text]}>预览 </Text>
-                  <Icons name='chevron-thin-right' style={[styles.right_btn]}/>
-                </View>
-              </CellFooter>
-            </Cell>
-          </Cells>
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            marginVertical: 10,
+            padding: 10,
+            paddingBottom: 4,
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_RECEIPT);
+            }}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: 30,
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1
+              }}>用户联 </Text>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color666,
+              }}>预览 </Text>
+              <Entypo name="chevron-thin-right" style={{
+                color: colors.color999,
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
+          </View>
 
 
-          <CellsTitle style={styles.cell_title}>字体设置</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <Text style={{width: '33%'}}>小 </Text>
-              <Text style={{width: '33%', textAlign: 'center'}}>标准 </Text>
-              <Text style={{width: '33%', textAlign: 'right'}}>较大 </Text>
-            </Cell>
-
-            <Cell customStyle={[styles.cell_row]}>
-              <View style={{width: "100%"}}>
-                <Slider
-                  maximumValue={2}
-                  value={this.state.font_size}
-                  step={1}
-                  onSlidingComplete={value => {
-                    this.setState({
-                      font_size: value
-                    })
-                  }}
-                />
-              </View>
-            </Cell>
-          </Cells>
-
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              this.setState({
-                remark_max: !this.state.remark_max
-              })
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            padding: 10,
+            paddingBottom: 4,
+          }}>
+            <View style={{
+              borderBottomWidth: 1,
+              paddingBottom: 2,
+              borderColor: colors.colorCCC
             }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>备注变大 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.remark_max}
-                        onValueChange={(val) => {
-                          this.setState({
-                            remark_max: val
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
+              <Text style={{
+                color: colors.color333,
+                padding: 10,
+                paddingLeft: 8,
+                fontSize: 15,
+                fontWeight: 'bold',
+              }}>字体设置 </Text>
+            </View>
+            <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: 'flex-end', height: 30}}>
+              <Text style={{fontSize: 12, color: colors.color666}}>小 </Text>
+              <Text style={{fontSize: 12, color: colors.color666, textAlign: 'center'}}>标准 </Text>
+              <Text style={{fontSize: 12, color: colors.color666, textAlign: 'right'}}>较大 </Text>
+            </View>
+            <Slider
+              maximumValue={2}
+              value={this.state.font_size}
+              step={1}
+              thumbStyle={{
+                width: 20,
+                height: 20,
+                backgroundColor: colors.main_color
+              }}
+              onValueChange={value => {
+                this.setState({
+                  font_size: value
+                })
+              }}
+            />
+          </View>
 
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            padding: 10,
+            paddingBottom: 4,
+            marginVertical: 10,
+          }}>
+            <View style={{
+              borderBottomWidth: 1,
+              paddingBottom: 2,
+              borderColor: colors.colorCCC
+            }}>
+              <Text style={{
+                color: colors.color333,
+                padding: 10,
+                paddingLeft: 8,
+                fontSize: 15,
+                fontWeight: 'bold',
+              }}>信息设置 </Text>
+            </View>
+
+            <TouchableOpacity onPress={() => {
               this.setState({
                 show_product_price: !this.state.show_product_price
               })
-            }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>商品价格 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.show_product_price}
-                        onValueChange={(val) => {
-                          this.setState({
-                            show_product_price: val
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
 
-
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorCCC,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>商品价格 </Text>
+              <Switch style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  show_product_price: !this.state.show_product_price
+                })
+              }}
+                      disabled={true}
+                      value={this.state.show_product_price}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
               this.setState({
                 show_product_discounts: !this.state.show_product_discounts
               })
-            }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>商品优惠信息 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.show_product_discounts}
-                        onValueChange={(val) => {
-                          this.setState({
-                            show_product_discounts: val
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
 
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorCCC,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>商品优惠信息 </Text>
+              <Switch style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  show_product_discounts: !this.state.show_product_discounts
+                })
+              }}
+                      disabled={true}
+                      value={this.state.show_product_discounts}
+              />
+            </TouchableOpacity>
 
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
+            <TouchableOpacity onPress={() => {
               this.setState({
                 show_distribution_distance: !this.state.show_distribution_distance
               })
-            }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>配送距离</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.show_distribution_distance}
-                        onValueChange={(val) => {
-                          this.setState({
-                            show_distribution_distance: val
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
 
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorCCC,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>配送距离 </Text>
+              <Switch style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  show_distribution_distance: !this.state.show_distribution_distance
+                })
+              }}
+                      disabled={true}
+                      value={this.state.show_distribution_distance}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
               this.setState({
                 show_goods_code: !this.state.show_goods_code
               })
+
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorCCC,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>显示货号（暂仅显示美团货号） </Text>
+              <Switch style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  show_goods_code: !this.state.show_goods_code
+                })
+              }}
+                      disabled={true}
+                      value={this.state.show_goods_code}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              this.onPress(Config.DIY_PRINTER_ITEM, {type: 'font'});
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorCCC,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>部分字号设置 </Text>
+              <Entypo name="chevron-thin-right" style={{
+                color: colors.color999,
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              this.onPress(Config.DIY_PRINTER_ITEM, {type: 'privacy'});
+            }}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>敏感信息 </Text>
+              <Entypo name="chevron-thin-right" style={{
+                color: colors.color999,
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
+          </View>
+
+
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            marginBottom: 100,
+            padding: 10,
+            paddingBottom: 4,
+          }}>
+            <View style={{
+              borderBottomWidth: 1,
+              paddingBottom: 2,
+              borderColor: colors.colorCCC
             }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>显示货号（暂仅显示美团货号）</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.show_goods_code}
-                        onValueChange={(val) => {
-                          this.setState({
-                            show_goods_code: val
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
-
-          </Cells>
-
-
-          <CellsTitle style={styles.cell_title}>自定义内容</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              <Text style={{
+                color: colors.color333,
+                padding: 10,
+                paddingLeft: 8,
+                fontSize: 15,
+                fontWeight: 'bold',
+              }}>自定义内容 </Text>
+            </View>
+            <TouchableOpacity onPress={() => {
               this.onPress(Config.ROUTE_REMARK);
-            }}>
-              <CellBody>
-                <Text
-                  style={[styles.cell_body_text]}>定制内容</Text>
-              </CellBody>
-              <CellFooter>
-                <Icons name='chevron-thin-right' style={[styles.right_btn]}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
+            }}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>定制内容 </Text>
+              <Entypo name="chevron-thin-right" style={{
+                color: colors.color999,
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
+          </View>
 
         </ScrollView>
-        <View style={styles.btn_submit}>
-          <Button onPress={() => this.submit()} title={'保存'} titleStyle={{color: colors.white, fontSize: 14}}
-                  buttonStyle={{backgroundColor: colors.main_color, borderWidth: 0}}/>
-        </View>
+        {this.renderBtn()}
       </View>
     );
   }
+
+
+  renderBtn() {
+    return (
+      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+        <Button title={'保存'}
+                onPress={() => {
+                  this.submit()
+                }}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
+    )
+  }
 }
-
-const styles = StyleSheet.create({
-  cell_title: {
-    marginBottom: pxToDp(5),
-    fontSize: pxToDp(26),
-    color: colors.color999,
-  },
-
-  cell_box_top: {
-    marginTop: pxToDp(15),
-    borderTopWidth: pxToDp(1),
-    borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
-  },
-
-  cell_box: {
-    marginTop: 0,
-    borderTopWidth: pxToDp(1),
-    // borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
-  },
-  cell_row: {
-    height: pxToDp(70),
-    justifyContent: 'center',
-    paddingRight: pxToDp(10),
-    borderBottomWidth: 0,
-  },
-  cell_body_text: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color333,
-  },
-  cell_body_comment: {
-    fontSize: pxToDp(24),
-    fontWeight: 'bold',
-    color: colors.color999,
-  },
-  body_status: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.main_color,
-  },
-  status_err: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(15),
-    padding: pxToDp(3),
-    color: colors.f7,
-  },
-  printer_status_error: {
-    color: '#f44040',
-  },
-  right_box: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    height: pxToDp(60),
-    paddingTop: pxToDp(10),
-    width: pxToDp(100)
-  },
-  right_btn: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(8),
-    marginLeft: pxToDp(10),
-  },
-
-  right_text: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color999,
-  },
-
-  btn_submit: {
-    marginHorizontal: pxToDp(30),
-    height: pxToDp(65),
-    marginBottom: pxToDp(70),
-  },
-});
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiyPrinter)

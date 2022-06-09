@@ -13,6 +13,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import native from "../../../pubilc/util/native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state
@@ -58,7 +59,7 @@ class PlatformBind extends React.Component {
           name: '美团',
           alias: 'mt',
           avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png`,
-          subtitle: '',
+          subtitle: '建议餐饮、甜品、蛋糕类客户选择',
           enable: true,
         },
         {
@@ -72,7 +73,7 @@ class PlatformBind extends React.Component {
           name: '美团闪购',
           alias: 'sg',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/3.png',
-          subtitle: '建议有管理商品需求的零售类客户选择',
+          subtitle: '建议非餐饮类客户选择',
           enable: false,
         },
         {
@@ -170,6 +171,11 @@ class PlatformBind extends React.Component {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
+            if (item.alias === 'jd') {
+              ToastShort('请联系客服绑定')
+              native.dialNumber(13241729048);
+              return;
+            }
             if (item.enable && item.alias === 'mt') {
               this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
             } else if (item.enable && item.alias === 'ele') {

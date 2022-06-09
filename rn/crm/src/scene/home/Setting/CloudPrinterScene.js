@@ -48,7 +48,9 @@ class CloudPrinterScene extends PureComponent {
       cloud_printer_list: [],
       submit_add: true,
       check_key: true,
-      count_down: -1
+      count_down: -1,
+      inputLabel: '编码(SN)',
+      placeholder: "请输入打印机编码"
     }
   }
 
@@ -267,7 +269,7 @@ class CloudPrinterScene extends PureComponent {
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>编码(SN) </Text>
+                  <Text style={[styles.cell_body_text]}>{this.state.inputLabel} </Text>
                 </CellBody>
                 <CellFooter>
 
@@ -275,7 +277,7 @@ class CloudPrinterScene extends PureComponent {
                          value={this.state.sn}
                          style={[styles.cell_input]}
                          editable={this.state.submit_add}
-                         placeholder="请输入打印机编码"
+                         placeholder={this.state.placeholder}
                          underlineColorAndroid='transparent' //取消安卓下划线
                   />
                 </CellFooter>
@@ -416,6 +418,8 @@ class CloudPrinterScene extends PureComponent {
       printer: cloud_printer.printer,
       check_key: cloud_printer.check_key,
       img: cloud_printer.img,
+      placeholder: cloud_printer.tips,
+      inputLabel: cloud_printer.label,
     });
   }
   renderRrinter = () => {
@@ -428,6 +432,9 @@ class CloudPrinterScene extends PureComponent {
       items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
                             checked={printer === cloud_printer.printer}
                             onChange={event => {
+                              if (cloud_printer.printer === 'mdlj') {
+                                Alert.alert('提示', '绑定美达罗捷打印机请将小票上的MAC地址填入输入框内，如有问题请咨询打印机客服：4006-087-630', [{text: '确定'}])
+                              }
                               if (event.target.checked) {
                                 this.onRrinterSelected(cloud_printer)
                               }

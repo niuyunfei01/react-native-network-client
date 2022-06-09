@@ -55,7 +55,7 @@ class OrderBottom extends PureComponent {
       selectedWay: [],
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count > 0) {
+        if (res && res.count >= 0) {
           this.props.fetchData()
 
           GlobalUtil.setOrderFresh(1)
@@ -170,8 +170,8 @@ class OrderBottom extends PureComponent {
 
         {btn_list && btn_list.btn_ignore_delivery ? <Button title={'忽略配送'}
                                                             onPress={() => {
-                                                              Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                                                                text: '忽略',
+                                                              Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                                                                text: '继续忽略配送',
                                                                 onPress: () => {
                                                                   this.onOverlookDelivery(order.id)
                                                                 }
@@ -222,8 +222,8 @@ class OrderBottom extends PureComponent {
 
         {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
                                                                    onPress={() => {
-                                                                     Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                                                                       text: '忽略',
+                                                                     Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                                                                       text: '继续忽略配送',
                                                                        onPress: () => {
                                                                          this.onOverlookDelivery(order.id)
                                                                        }

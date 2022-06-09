@@ -34,6 +34,16 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class SeetingDelivery extends PureComponent {
   constructor(props) {
     super(props);
@@ -70,6 +80,7 @@ class SeetingDelivery extends PureComponent {
   }
 
   onHeaderRefresh() {
+    this.getDeliveryConf();
   }
 
   onPress(route, params = {}, callback = {}) {
@@ -116,18 +127,18 @@ class SeetingDelivery extends PureComponent {
         isRefreshing: false,
         // menus: response.menus ? response.menus : [],
         ship_ways: response.ship_ways ? response.ship_ways : [],
-        auto_call: response.auto_call && response.auto_call === 1 ? true : false,
-        suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0" ? true : false,
+        auto_call: response.auto_call && response.auto_call === 1,
+        suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0",
         deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
         max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default: response.default ? response.default : '',
-        zs_way: response.zs_way && response.zs_way > 0 ? true : false,
-        show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+        zs_way: response.zs_way && response.zs_way > 0,
+        show_auto_confirm_order: this.props.global.config.vendor.wsb_store_account === '1',
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
         ship_ways_name: ship_ways_name,
-        isShowSettingText: response.is_set_preference_ship,
+        isShowSettingText: JSON.parse(response.preference_ship_config).is_open === 1,
         showSetMeituanBtn: response.platform === '3',
       }, () => {
         this.get_time_interval()
@@ -229,6 +240,7 @@ class SeetingDelivery extends PureComponent {
     }
     return (
       <View style={{flex: 1}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView style={styles.container}
                     refreshControl={
                       <RefreshControl
@@ -401,6 +413,22 @@ class SeetingDelivery extends PureComponent {
                   isShowSettingText ? <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text> :
                     <Text style={{color: colors.color333}}> </Text>
                 }
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY,{
+                  ext_store_id: this.props.route.params.ext_store_id,
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>设置保底配送</Text>
+              </CellBody>
+              <CellFooter>
                 <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>

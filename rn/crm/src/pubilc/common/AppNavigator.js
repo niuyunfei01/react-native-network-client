@@ -84,6 +84,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
+        <Stack.Screen name={Config.ROUTE_BIND_SHUNFENG} options={{headerTitle: '绑定顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/BindShunfeng').default}/>
+        <Stack.Screen name={Config.ROUTE_REGISTER_SHUNFENG} options={{headerTitle: '注册顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/RegisterShunfeng').default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
@@ -98,6 +102,10 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_SEETING_PREFERENCE_DELIVERY} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../../scene/home/Delivery/PreferenceBillingSetting").default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_SEETING_MININUM_DELIVERY} options={{headerTitle: '保底配送'}}
+                      getComponent={() => require("../../scene/home/Delivery/SeetingMiniNumDelivery").default}
         />
 
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
@@ -119,6 +127,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Setting/GuideScene").default}/>
         <Stack.Screen name={Config.DIY_PRINTER} options={{headerTitle: '小票设置'}}
                       getComponent={() => require("../../scene/home/Setting/DiyPrinter").default}/>
+        <Stack.Screen name={Config.DIY_PRINTER_ITEM}
+                      getComponent={() => require("../../scene/home/Setting/DiyPrinterItem").default}/>
         <Stack.Screen name={Config.ROUTE_RECEIPT} options={{headerTitle: '小票'}}
                       getComponent={() => require("../../scene/home/Setting/ReceiptScene").default}/>
         <Stack.Screen name={Config.ROUTE_REMARK} options={{headerTitle: '自定义备注'}}
@@ -186,11 +196,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
         />
+        <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
+                      getComponent={() => require("../../scene/order/OrderAddressBook").default}
+        />
+        <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
+                      getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
+        />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_STORE_ADD}
-                      getComponent={() => require("../../scene/home/Store/StoreAddScene").default}
+
+        <Stack.Screen name={Config.ROUTE_STORE_ADD} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/StoreInfo").default}
                       initialParams={initialRouteParams}/>
+
         <Stack.Screen name={Config.ROUTE_STORE_RATE} options={{headerTitle: '店铺评分'}}
                       getComponent={() => require("../../scene/home/Store/StoreRate").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_RULE} options={{headerTitle: '规则处理'}}
@@ -256,14 +274,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsSoldoutScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '打款记录'}}
+
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
-                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
+        <Stack.Screen name={Config.ROUTE_BIND_PAY} options={{headerTitle: '绑定账号'}}
+                      getComponent={() => require('../../scene/home/Settlement/BindPay').default}
         />
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
+                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
         <Stack.Screen name={Config.ROUTE_SELECT_WORKER} options={{headerTitle: '选择员工'}}
                       getComponent={() => require('../../scene/home/Store/SelectWorkerScene').default}
@@ -352,6 +375,11 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpenseInfo').default}
         />
+
+        <Stack.Screen name={Config.ROUTE_FREEZE_LIST} options={{headerTitle: ""}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
+        />
+
         <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedAccountFill').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}}

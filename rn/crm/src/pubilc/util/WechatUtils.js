@@ -21,6 +21,17 @@ function JumpMiniProgram(path = "/pages/service/index", data = {}) {
   });
 }
 
+function wechatLogin() {
+ return  wechat.sendAuthRequest('snsapi_userinfo', '')
+    .then(responseCode => {
+      //返回code码，通过code获取access_token
+      return responseCode.code
+    })
+    .catch(err => {
+      console.log(err,'err')
+    })
+}
+
 // JumpWeb('测试','测试描述','https://cnsc-pics.cainiaoshicai.cn/platformLogo/1.png','https://www.waisongbang.com')
 function JumpWeb(title, desc, img, url, type = 0) {
   wechat.shareWebpage({
@@ -32,5 +43,5 @@ function JumpWeb(title, desc, img, url, type = 0) {
   });
 }
 
-export {JumpMiniProgram, JumpWeb}
+export {JumpMiniProgram, JumpWeb,wechatLogin}
 
