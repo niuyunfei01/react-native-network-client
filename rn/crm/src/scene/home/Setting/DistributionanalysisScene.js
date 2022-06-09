@@ -11,6 +11,7 @@ import {hideModal, showError, ToastShort} from "../../../pubilc/util/ToastUtils"
 import Dialog from "../../common/component/Dialog";
 import JbbText from "../../common/component/JbbText";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import Cts from "../../../pubilc/common/Cts";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -29,6 +30,20 @@ function mapDispatchToProps(dispatch) {
 
 const Distribution_Analysis = 'distribution_analysis';
 const Profit_AndLoss_Analysis = 0;
+const Styles = StyleSheet.create({
+  cell_rowTitleChecked: {
+    backgroundColor: colors.main_color,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: pxToDp(20)
+  },
+  cell_rowTitleNoChecked: {
+    backgroundColor: colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: pxToDp(20)
+  }
+})
 
 class DistributionanalysisScene extends PureComponent {
 
@@ -47,6 +62,7 @@ class DistributionanalysisScene extends PureComponent {
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
+      filterPlatform: 0,
       showLeftDateModal: false,
       showRightDateModal: false,
       startNewDateValue: "",
@@ -77,9 +93,9 @@ class DistributionanalysisScene extends PureComponent {
   getDistributionAnalysisData(startTime, endTime) {
 
     const {accessToken} = this.props.global;
-    const {currStoreId} = this.state;
+    const {currStoreId, filterPlatform} = this.state;
     ToastShort("查询中");
-    const api = `/v1/new_api/analysis/delivery/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/delivery/${currStoreId}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         DistributionanalysisData: res.data.statistic,
@@ -108,6 +124,13 @@ class DistributionanalysisScene extends PureComponent {
     }))
   }
 
+  setFilterPlatform = (pl) => {
+    this.setState({filterPlatform: pl}, () => {
+      let {startTimeSaveValue, endTimeSaveValue} = this.state
+      this.getDistributionAnalysisData(startTimeSaveValue, endTimeSaveValue)
+    })
+  }
+
   setLeftDateStatus(type) {
     if (type == 3) {
       this.setState({
@@ -119,7 +142,7 @@ class DistributionanalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
       }
       if (type == 1) {
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 6) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 4) * 86400000).setHours(0, 0, 0, 0) / 1000)
       }
       if (type == 2) {
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -147,7 +170,7 @@ class DistributionanalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
       }
       if (type == 1) {
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 6) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 4) * 86400000).setHours(0, 0, 0, 0) / 1000)
       }
       if (type == 2) {
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -159,10 +182,6 @@ class DistributionanalysisScene extends PureComponent {
       dateStatus: type,
     })
   }
-
-  // onHeaderRefresh() {
-  //   this.getDistributionAnalysisData()
-  // }
 
   onRequestClose() {
     this.setState({
@@ -215,6 +234,12 @@ class DistributionanalysisScene extends PureComponent {
 
   renderDistributionAnalysis() {
     const {DistributionanalysisData, tabelTitle, total_delivery, total_fee} = this.state
+    const timeOptions = [
+      {label: '今天', value: 0},
+      {label: '近7天', value: 1},
+      {label: '本月', value: 2},
+      {label: '自定义', value: 3},
+    ]
     let Array = []
     for (let i in DistributionanalysisData) {
       Array.push(DistributionanalysisData[i])
@@ -228,49 +253,22 @@ class DistributionanalysisScene extends PureComponent {
               tintColor='gray'
             />
           }
-          style={{backgroundColor: colors.main_back}}
-        >
+          style={{backgroundColor: colors.main_back}}>
+          <View style={[styles.cell_box_header, {marginBottom: 10, paddingVertical: 10}]}>
+            <For index='i' each='info' of={Cts.PLAT_ARRAY}>
+              <TouchableOpacity key={i} style={[this.state.filterPlatform === info.id ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, this.state.filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]} onPress={() => this.setFilterPlatform(info.id)}>
+                <Text style={{ fontSize: 12, color: this.state.filterPlatform === info.id ? colors.white : colors.fontBlack}}>{info.label}</Text>
+              </TouchableOpacity>
+            </For>
+          </View>
           <View style={[styles.cell_box_header]}>
-            {this.state.dateStatus === 0 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setLeftDateStatus(0)
-                }}>今天 </Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setLeftDateStatus(0)
-                }}>今天 </Text>
-              </View>}
-            {this.state.dateStatus === 1 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setLeftDateStatus(1)
-                }}>近7天 </Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setLeftDateStatus(1)
-                }}>近7天 </Text>
-              </View>}
-            {this.state.dateStatus === 2 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setLeftDateStatus(2)
-                }}>本月</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setLeftDateStatus(2)
-                }}>本月</Text>
-              </View>}
-            {this.state.dateStatus === 3 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setLeftDateStatus(3)
-                }}>自定义</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setLeftDateStatus(3)
-                }}>自定义</Text>
-              </View>}
+            <For index='i' each='info' of={timeOptions}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
+                <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
+                  this.setLeftDateStatus(info.value)
+                }}> {info.label} </Text>
+              </View>
+            </For>
           </View>
 
           <View style={[styles.cell_box]}>
@@ -346,6 +344,12 @@ class DistributionanalysisScene extends PureComponent {
       borderTopWidth: 1 / PixelRatio.get() * 2,
       borderStyle: "dotted"
     };
+    const timeOptions = [
+      {label: '今天', value: 0},
+      {label: '近7天', value: 1},
+      {label: '本月', value: 2},
+      {label: '自定义', value: 3},
+    ]
     const {cardStatus, profitandloss} = this.state
     if (this.state.headerType !== 1) {
       return (
@@ -359,46 +363,13 @@ class DistributionanalysisScene extends PureComponent {
           style={{backgroundColor: colors.main_back}}
         >
           <View style={[styles.cell_box_header]}>
-            {this.state.dateStatus === 0 ?
+            <For index='i' each='info' of={timeOptions}>
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setRightDateStatus(0)
-                }}>今天</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setRightDateStatus(0)
-                }}>今天</Text>
-              </View>}
-            {this.state.dateStatus === 1 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setRightDateStatus(1)
-                }}>近7天</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setRightDateStatus(1)
-                }}>近7天</Text>
-              </View>}
-            {this.state.dateStatus === 2 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setRightDateStatus(2)
-                }}>本月</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setRightDateStatus(2)
-                }}>本月</Text>
-              </View>}
-            {this.state.dateStatus === 3 ?
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                  this.setRightDateStatus(3)
-                }}>自定义</Text>
-              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                  this.setRightDateStatus(3)
-                }}>自定义</Text>
-              </View>}
+                <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
+                  this.setRightDateStatus(info.value)
+                }}> {info.label} </Text>
+              </View>
+            </For>
           </View>
 
           {profitandloss.map(item => {
@@ -518,8 +489,6 @@ class DistributionanalysisScene extends PureComponent {
   }
 
   renderHeaderTab() {
-    let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
-    let endTime = Math.round(new Date().getTime() / 1000)
     let {startTimeSaveValue, endTimeSaveValue} = this.state
     if (this.state.showHeader) {
       return (
@@ -559,17 +528,18 @@ class DistributionanalysisScene extends PureComponent {
     return <View>
 
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
-        this.state.timeType = "start";
+        let self = this
+        self.state.timeType = "start";
         this.setState({
           showDateModal: true
         })
-
       }}>
         <Text style={styles.modalCancelText}>{this.state.startTime ? this.state.startTime : '开始时间'} </Text>
       </TouchableOpacity>
       <View style={styles.modalCancel}><Text style={styles.modalCancelText}>——</Text></View>
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
-        this.state.timeType = "end";
+        let self = this
+        self.state.timeType = "end";
         this.setState({
           showDateModal: true
         })
@@ -591,17 +561,15 @@ class DistributionanalysisScene extends PureComponent {
           </View>)
         }}
         date={new Date()}
-        mode='datetime'
+        mode='date'
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
           let d = new Date(value)
-          let resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate()) + '   '
-          let resTime = resDate + this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
-
+          let resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
           if (this.state.timeType === 'start') {
-            this.setState({startNewDateValue: value, showDateModal: false, startTime: resTime})
+            this.setState({startNewDateValue: resDate, showDateModal: false, startTime: resDate})
           } else if (this.state.timeType === 'end') {
-            this.setState({endNewDateValue: value, showDateModal: false, endTime: resTime})
+            this.setState({endNewDateValue: resDate, showDateModal: false, endTime: resDate})
           }
         }
         }
@@ -626,17 +594,13 @@ class DistributionanalysisScene extends PureComponent {
       showLeftDateModal: false,
       showRightDateModal: false
     })
-
     let startNewDate = this.state.startNewDateValue
     let endNewDate = this.state.endNewDateValue
-    startNewDate = Math.round(new Date(new Date(startNewDate.setHours(0, 0, 0, 0)).getTime()) / 1000);
-    endNewDate = Math.round(new Date(new Date(endNewDate.setHours(0, 0, 0, 0)).getTime() + (24 * 60 * 60 * 1000 - 1)) / 1000);
     if (this.state.analysis_by === Distribution_Analysis && this.state.headerType === 1) {
       this.getDistributionAnalysisData(startNewDate, endNewDate)
     } else {
       this.getProfitAndLossAnalysisData(startNewDate, endNewDate)
     }
-
   }
 
   render() {
@@ -661,7 +625,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly"
   },
   cell_box_header: {
-    marginTop: 5,
     marginHorizontal: 10,
     borderRadius: pxToDp(10),
     backgroundColor: colors.white,
@@ -712,17 +675,16 @@ const styles = StyleSheet.create({
   cell_rowTitleText_today: {
     fontSize: pxToDp(28),
     color: colors.white,
-    marginVertical: pxToDp(10),
     paddingHorizontal: pxToDp(40),
     backgroundColor: colors.main_color,
-    paddingVertical: pxToDp(15),
+    paddingVertical: pxToDp(25),
     borderRadius: pxToDp(10)
   },
   cell_rowTitleText_today1: {
     fontSize: pxToDp(26),
     color: colors.title_color,
-    marginVertical: pxToDp(10),
-    padding: pxToDp(15)
+    paddingVertical: pxToDp(25),
+    paddingHorizontal: pxToDp(15)
   },
   cell_rowTitleText1: {
     fontSize: pxToDp(40),

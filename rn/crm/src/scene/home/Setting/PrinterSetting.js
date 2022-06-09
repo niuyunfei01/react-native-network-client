@@ -274,7 +274,7 @@ class PrinterSetting extends PureComponent {
               <Switch style={{
                 fontSize: 16,
               }} value={this.state.auto_blue_print}
-                      onValueChange={(val) => {
+                      onChange={(val) => {
                         let auto_blue_print = !this.state.auto_blue_print
                         this.setState({auto_blue_print});
                         native.setAutoBluePrint(auto_blue_print)
@@ -515,7 +515,7 @@ class PrinterSetting extends PureComponent {
             <Switch style={{
               fontSize: 16,
             }} value={this.state.master_print_item}
-                    onValueChange={() => {
+                    onChange={() => {
                       this.set_master_print_item()
                     }}/>
           </TouchableOpacity>

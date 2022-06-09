@@ -885,6 +885,13 @@ class OrderInfo extends Component {
     this.onPress(Config.ROUTE_WEB, {url: uri});
   }
 
+  clientCatMap = (id) => {
+    const accessToken = this.props.global.accessToken
+    let path = '/AmapTrack.html?orderId=' + id + "&access_token=" + accessToken;
+    const uri = Config.serverUrl(path);
+    this.onPress(Config.ROUTE_WEB, {url: uri});
+  }
+
   _onItemRowNumberChanged = (item, newNum) => {
     this._recordEdition({...item, num: newNum});
   }
