@@ -350,7 +350,7 @@ class OrderListItem extends React.PureComponent {
 
         <If condition={item.pickType !== "1"}>
           <View style={{flexDirection: 'row', marginTop: item.is_right_once ? 10 : 50, marginLeft: 26}}>
-            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预定 </Text>
+            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预计 </Text>
             <Text style={{fontWeight: "bold", fontSize: 14, color: "#FF8854"}}> {item.humanExpectTime} </Text>
             <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 前送达 </Text>
           </View>
