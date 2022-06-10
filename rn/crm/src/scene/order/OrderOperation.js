@@ -375,6 +375,7 @@ class OrderOperation extends Component {
           {this.state.ActionSheet.map((item, idx) => {
             return (
               <CheckBox
+                key={idx}
                 left
                 title={item.label}
 

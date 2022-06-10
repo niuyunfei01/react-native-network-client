@@ -175,6 +175,7 @@ class GoodItemEditBottom extends React.Component {
                       onClose={this.resetModal}
                       storePro={storePro}
                       storeId={storeId}
+                      productName={productName}
                       accessToken={accessToken}
                       navigation={navigation}
                       vendor_id={vendor_id}/>
