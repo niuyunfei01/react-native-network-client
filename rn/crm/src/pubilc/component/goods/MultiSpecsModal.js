@@ -95,11 +95,11 @@ export default class MultiSpecsModal extends PureComponent {
         const {storePro, productName} = this.props
         const price = undefined === editGood[product_id] ? parseFloat(supply_price / 100).toFixed(2) : editGood[product_id].apply_price
         const amount = undefined === editGood[product_id] ? left_since_last_stat : editGood[product_id].actualNum
-        const specName = (sku_name || storePro.sku_name) ? sku_name || storePro.sku_name : ''
+        const specName = sku_name && `[${sku_name}]` || storePro.sku_name && `[${storePro.sku_name}]`
         return (
             <View style={styles.itemWrap}>
                 <Text style={styles.skuName}>
-                    {productName} [{specName}]
+                    {productName} {specName}
                 </Text>
                 <View style={styles.rowWrap}>
                     <View style={styles.row}>
