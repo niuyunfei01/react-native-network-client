@@ -22,10 +22,37 @@ export default class MultiSpecsModal extends PureComponent {
 
     state = {
         editGood: {},
-        data: this.props.storePro?.skus?.length > 0 && this.props.storePro.skus.sort((a, b) => {
-            return a.sku_name > b.sku_name
-        }) || this.props.storePro.sp?.product_id && [this.props.storePro.sp] || [this.props.storePro] || []
+        data: {}
     }
+
+    componentDidMount() {
+        const {storePro} = this.props
+        if (storePro?.skus?.length > 0 && storePro.sp?.product_id) {
+            const data = [{...storePro.sp}].concat(storePro.skus)
+            this.setState({
+                data: data
+            })
+            return
+        }
+        if (storePro) {
+            const {strict_providing, product_id, left_since_last_stat, sku_name, supply_price, skus, sp} = storePro
+            let data = []
+            data.push({
+                strict_providing: strict_providing && strict_providing || sp.strict_providing,
+                product_id: product_id && product_id || sp.product_id,
+                supply_price: supply_price && supply_price || sp.supply_price,
+                left_since_last_stat: left_since_last_stat && left_since_last_stat || sp.left_since_last_stat,
+                sku_name: sku_name && sku_name || sp?.sku_name && sp.sku_name || '',
+            })
+            if (Array.isArray(skus) && skus.length > 0) {
+                data = data.concat(skus)
+            }
+            this.setState({
+                data: data
+            })
+        }
+    }
+
     onChangeText = (product_id, amount, totalRemain, price, before_price, strict_providing, type) => {
         const amountLength = amount.length, priceLength = price.split('.')[0].length
         if ('amount' === type && amountLength > 4)
@@ -65,13 +92,14 @@ export default class MultiSpecsModal extends PureComponent {
         const {product_id, sku_name, left_since_last_stat, supply_price, strict_providing} = item.item
         const {index} = item
         const {editGood} = this.state
+        const {storePro, productName} = this.props
         const price = undefined === editGood[product_id] ? parseFloat(supply_price / 100).toFixed(2) : editGood[product_id].apply_price
         const amount = undefined === editGood[product_id] ? left_since_last_stat : editGood[product_id].actualNum
-
+        const specName = sku_name && `[${sku_name}]` || storePro.sku_name && `[${storePro.sku_name}]`
         return (
             <View style={styles.itemWrap}>
                 <Text style={styles.skuName}>
-                    {sku_name || this.props.storePro.sku_name}
+                    {productName} {specName}
                 </Text>
                 <View style={styles.rowWrap}>
                     <View style={styles.row}>
@@ -85,14 +113,14 @@ export default class MultiSpecsModal extends PureComponent {
                                    style={styles.textInput}
                                    keyboardType={'numeric'}
                                    placeholder={'请输入价格'}
-                                   placeholderTextColor={styles.placeholderTextColor}
+                                   placeholderTextColor={'#999999'}
                                    onChangeText={price => this.onChangeText(product_id, amount, left_since_last_stat, price, supply_price, strict_providing, 'price')}/>
                         <Text style={styles.text}>
                             元
                         </Text>
                     </View>
                 </View>
-                <If condition={strict_providing === '1'}>
+                <If condition={storePro.strict_providing === '1' || strict_providing === '1'}>
                     <View style={styles.rowWrap}>
                         <View style={styles.row}>
                             <Text style={styles.text}>
@@ -111,7 +139,7 @@ export default class MultiSpecsModal extends PureComponent {
                                        style={styles.textInput}
                                        keyboardType={'numeric'}
                                        placeholder={'请输入库存数量'}
-                                       placeholderTextColor={styles.placeholderTextColor}
+                                       placeholderTextColor={'#999999'}
                                        onChangeText={amount => this.onChangeText(product_id, amount, left_since_last_stat, price, supply_price, strict_providing, 'amount')}/>
                             <Text style={styles.text}>
                                 件
@@ -207,7 +235,7 @@ export default class MultiSpecsModal extends PureComponent {
                                   renderItem={(item) => this.renderItem(item)}
                                   initialNumToRender={4}
                                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
-                                  keyExtractor={(item) => item.id}
+                                  keyExtractor={(item, index) => `${index}`}
                         />
                     </View>
                 </View>
@@ -225,7 +253,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
         padding: 10,
         width: '100%',
-        maxHeight: height * 0.5
+        maxHeight: height * 0.7
     },
     btn: {
         flexDirection: 'row',
@@ -243,9 +271,7 @@ const styles = StyleSheet.create({
     textInput: {
         padding: 4, width: 120, borderWidth: 1, borderColor: '#979797', borderRadius: 4, marginRight: 4
     },
-    placeholderTextColor: {
-        fontSize: 12, fontWeight: '400', color: '#999999', lineHeight: 17
-    },
+
     text: {paddingTop: 4, paddingBottom: 4, fontSize: 14, fontWeight: '400', color: '#666666', lineHeight: 20},
     clearBtn: {
         color: '#59B26A',
