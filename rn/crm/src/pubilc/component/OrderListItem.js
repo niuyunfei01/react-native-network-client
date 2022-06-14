@@ -826,7 +826,7 @@ class OrderListItem extends React.PureComponent {
             <View style={{width: 30}}>
               <View style={[styles.deliveryStatusHeader, {backgroundColor: log.status_color,}]}>
                 {i !== 0 ? <View style={[styles.deliveryStatusTitle, {backgroundColor: log.status_color}]}/> : null}
-                {i !== list.length - 1 ? <View style={[styles.deliveryStatusTitle, {backgroundColor: log.status_color}]}/>
+                {i === list.length - 1 ? <View style={[styles.deliveryStatusTitle, {backgroundColor: log.status_color}]}/>
                   : null}
               </View>
             </View>
@@ -1074,10 +1074,11 @@ const styles = StyleSheet.create({
     color: colors.color333
   },
   driverContent: {fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'},
-  driverText: {width: pxToDp(450)},
+  driverText: {width: pxToDp(600)},
   btnList: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginTop: 15
   },
   onCanceledBtn: {
     backgroundColor: colors.white,
@@ -1128,8 +1129,7 @@ const styles = StyleSheet.create({
   },
   deliveryStatusContent: {
     flexDirection: 'row',
-    paddingTop: pxToDp(15),
-    paddingBottom: pxToDp(15),
+    paddingTop: pxToDp(10)
   },
   deliveryStatusHeader: {
     width: pxToDp(30),

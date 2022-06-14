@@ -1301,7 +1301,7 @@ class OrderInfo extends Component {
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
                 {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
-                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
+                {i === list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
               </View>
             </View>
             <View style={Styles.deliveryStatusHeaderBottom}>
@@ -1740,7 +1740,7 @@ const Styles = StyleSheet.create({
     fontSize: pxToDp(26)
   },
   w450: {
-    width: pxToDp(450)
+    width: pxToDp(600)
   },
   f12w110: {
     fontSize: 12,
@@ -2045,7 +2045,7 @@ const Styles = StyleSheet.create({
   logNoneText: {textAlign: "center", marginTop: pxToDp(30)},
   deliveryStatusHeader: {
     flexDirection: 'row',
-    paddingVertical: pxToDp(15)
+    paddingTop: pxToDp(18)
   },
   deliveryStatusHeaderTop: {
     width: 30
@@ -2093,6 +2093,7 @@ const Styles = StyleSheet.create({
   deliveryModalButton: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginTop: 15
   },
   deliveryModalButtonTextBlack: {
     color: colors.fontBlack,
