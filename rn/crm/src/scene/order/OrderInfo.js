@@ -1300,8 +1300,8 @@ class OrderInfo extends Component {
           <View style={Styles.deliveryStatusHeader}>
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
-                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
-                {i === list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
+                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}
+                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/> : null}
               </View>
             </View>
             <View style={Styles.deliveryStatusHeaderBottom}>
@@ -1740,7 +1740,7 @@ const Styles = StyleSheet.create({
     fontSize: pxToDp(26)
   },
   w450: {
-    width: pxToDp(600)
+    width: pxToDp(450)
   },
   f12w110: {
     fontSize: 12,
@@ -2045,7 +2045,7 @@ const Styles = StyleSheet.create({
   logNoneText: {textAlign: "center", marginTop: pxToDp(30)},
   deliveryStatusHeader: {
     flexDirection: 'row',
-    paddingTop: pxToDp(18)
+    paddingVertical: pxToDp(15)
   },
   deliveryStatusHeaderTop: {
     width: 30
@@ -2062,7 +2062,14 @@ const Styles = StyleSheet.create({
     height: pxToDp(30),
     borderRadius: pxToDp(15)
   },
-  deliveryStatusContent: {
+  deliveryStatusContentTop: {
+    width: pxToDp(5),
+    height: pxToDp(45),
+    position: 'absolute',
+    top: pxToDp(28),
+    left: pxToDp(13)
+  },
+  deliveryStatusContentBottom: {
     width: pxToDp(5),
     height: pxToDp(45),
     position: 'absolute',
@@ -2093,7 +2100,6 @@ const Styles = StyleSheet.create({
   deliveryModalButton: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 15
   },
   deliveryModalButtonTextBlack: {
     color: colors.fontBlack,
