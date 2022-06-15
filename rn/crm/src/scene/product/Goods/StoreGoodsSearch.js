@@ -26,6 +26,7 @@ function mapDispatchToProps(dispatch) {
     dispatch
   };
 }
+let codeType='search'
 
 class StoreGoodsSearch extends Component {
   constructor(props) {
@@ -53,25 +54,27 @@ class StoreGoodsSearch extends Component {
     tool.debounces(() => {
       const term = this.state.searchKeywords ? this.state.searchKeywords : '';
       const {type, limit_store, prod_status} = this.props.route.params;
+      let params;
       if (term) {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
         this.setState({isLoading: true, showLoading})
-        // showModal('加载中')
-        const params = {
+         //showModal('加载中')
+         params = {
           vendor_id: currVendorId,
           tagId: this.state.selectTagId,
           page: this.state.page,
           pageSize: this.state.pageNum,
-          name: term,
           storeId: storeId,
         }
+        if('upc'===codeType)
+          params['upc']=term
+        else params['name']=term
         if (limit_store) {
           params['hideAreaHot'] = 1;
           params['limit_status'] = (prod_status || []).join(",");
         }
-
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
           const totalPage = res.count / res.pageSize
           const isLastPage = res.page >= totalPage
@@ -103,27 +106,8 @@ class StoreGoodsSearch extends Component {
     this.setState({page: page + 1}, () => this.search(true))
   }
 
-  onDoneProdUpdate = (pid, prodFields, spFields) => {
-    const {updatedCallback} = (this.props.route.params || {})
-    updatedCallback && updatedCallback(pid, prodFields, spFields)
-
-    const productIndex = this.state.goods.findIndex(g => g.id === pid);
-    let product = this.state.goods[productIndex]
-    const isRemoved = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
-
-    if (isRemoved) {
-      this.state.goods.splice(productIndex, 1)
-    } else {
-      product = {...product, ...prodFields}
-      product.sp = {...product.sp, ...spFields}
-
-      this.state.goods[productIndex] = product
-    }
-
-    this.setState({goods: this.state.goods})
-  }
-
   onChange = (searchKeywords: any) => {
+    codeType='search'
     const toUpdate = {searchKeywords};
     if (this.state.searchKeywords !== searchKeywords) {
       toUpdate.page = 1
@@ -243,43 +227,12 @@ class StoreGoodsSearch extends Component {
   onClose=()=>{
     this.setState({showScan:false})
   }
-  getProdDetailByUpc = (upc) => {
-    showModal("加载中...")
-    const {accessToken, currStoreId} = this.props.global;
-
-    const {currVendorId} = tool.vendor(this.props.global);
-    const{selectTagId,page,pageNum}=this.state
-    const data = {
-      vendor_id: currVendorId,
-      storeId: currStoreId,
-      tagId: selectTagId,
-      page: page,
-      pageSize: pageNum,
-      status: 'all',
-      upc: upc
-    }
-    const url=`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(url, data).then(res => {
-      hideModal();
-      const totalPage = res.count / res.pageSize
-      const isLastPage = res.page >= totalPage
-      const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
-      this.setState({
-        goods: goods,
-        isLastPage: isLastPage,
-        isLoading: false,
-        showLoading: false,
-        showNone: !res.lists
-      })
-    }).catch(() => {
-      hideModal()
-    })
-  }
 
   onScanSuccess = (code) => {
     if (code) {
+      codeType='upc'
       this.setState({searchKeywords: code});
-      this.getProdDetailByUpc(code)
+      this.search(true)
     }
   }
 

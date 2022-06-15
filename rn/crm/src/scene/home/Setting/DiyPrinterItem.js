@@ -150,7 +150,7 @@ class DiyPrinterItem extends PureComponent {
                   }}>备注放大 </Text>
                   <Switch style={{
                     fontSize: 16,
-                  }} onValueChange={() => {
+                  }} onChange={() => {
                     this.setState({
                       remark_max: !this.state.remark_max
                     })
@@ -187,7 +187,7 @@ class DiyPrinterItem extends PureComponent {
                   }}>商品信息放大 </Text>
                   <Switch style={{
                     fontSize: 16,
-                  }} onValueChange={() => {
+                  }} onChange={() => {
                     this.setState({
                       product_info_max: !this.state.product_info_max
                     })
@@ -229,7 +229,7 @@ class DiyPrinterItem extends PureComponent {
                   }}>店铺名称 </Text>
                   <Switch style={{
                     fontSize: 16,
-                  }} onValueChange={() => {
+                  }} onChange={() => {
                     this.setState({
                       show_store_name: !this.state.show_store_name
                     })
@@ -265,7 +265,7 @@ class DiyPrinterItem extends PureComponent {
                   }}>商品信息 </Text>
                   <Switch style={{
                     fontSize: 16,
-                  }} onValueChange={() => {
+                  }} onChange={() => {
                     this.setState({
                       show_product_info: !this.state.show_product_info
                     })
