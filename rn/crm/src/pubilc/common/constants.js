@@ -9,6 +9,7 @@ export default keyMirror({
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
   CHECK_VERSION_AT: null,
+  BLE_STARTED: null,
 
   SET_CURR_PROFILE: null,
   SET_CURR_STORE: null,

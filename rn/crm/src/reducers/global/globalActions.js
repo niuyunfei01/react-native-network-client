@@ -46,6 +46,7 @@ const {
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
+  BLE_STARTED,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_MIXPANEN_ID,
@@ -68,6 +69,13 @@ export function setCheckVersionAt(checkAt) {
   return {
     type: CHECK_VERSION_AT,
     payload: checkAt
+  }
+}
+
+export function setBleStarted(bleStarted) {
+  return {
+    type: BLE_STARTED,
+    payload: bleStarted
   }
 }
 

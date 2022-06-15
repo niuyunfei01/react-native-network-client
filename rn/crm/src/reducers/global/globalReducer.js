@@ -14,6 +14,7 @@ const {
   SET_CURR_PROFILE,
 
   CHECK_VERSION_AT,
+  BLE_STARTED,
 
   LOGOUT_SUCCESS,
   UPDATE_CFG,
@@ -46,6 +47,7 @@ const initialState = {
   listeners: [],
   printer_id: '',
   mixpanel_id: '',
+  bleStarted: false
 };
 
 /**
@@ -97,6 +99,12 @@ export default function globalReducer(state = initialState, action) {
         lastCheckVersion: action.payload
       };
 
+    case BLE_STARTED:
+      return {
+        ...state,
+        bleStarted: action.payload
+      };
+
     case LOGOUT_SUCCESS:
       return {
         ...state,
@@ -107,7 +115,8 @@ export default function globalReducer(state = initialState, action) {
         refreshToken: '',
         canReadStores: {},
         canReadVendors: {},
-        currentNewProductStoreId: 0
+        currentNewProductStoreId: 0,
+        bleStarted: false
       };
 
     case UPDATE_CFG:
