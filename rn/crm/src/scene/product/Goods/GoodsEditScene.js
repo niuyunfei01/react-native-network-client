@@ -851,7 +851,7 @@ class GoodsEditScene extends PureComponent {
                    onScanSuccess={code => this.onScanSuccess(code)}
                    onScanFail={code => this.onScanFail(code)}/>
           <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
-                maxLength={20} value={this.state.name} onChangeText={this.onNameChanged}
+                value={this.state.name} onChangeText={this.onNameChanged}
                 right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除 </Text> ||
                 <Text/>}/>
           {this.state.showRecommend &&
