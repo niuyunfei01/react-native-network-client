@@ -22,7 +22,7 @@ const {
   UPDATE_EDIT_PRODUCT_STORE_ID,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_MIXPANEN_ID,
+  SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
 } = require('../../pubilc/common/constants').default
@@ -45,7 +45,9 @@ const initialState = {
   currentNewProductStoreId: 0,
   listeners: [],
   printer_id: '',
-  mixpanel_id: '',
+  user_config: {
+    order_list_by: 'expectTime asc',
+  },
 };
 
 /**
@@ -140,8 +142,9 @@ export default function globalReducer(state = initialState, action) {
     case SET_PRINTER_NAME:
       return {...state, printer_name: action.printer_info.name}
 
-    case SET_MIXPANEN_ID:
-      return {...state, mixpanel_id: action.id}
+    case SET_USER_CONFIG:
+      console.log(action.info, 'info')
+      return {...state, user_config: action.info}
 
     case SET_SHOW_EXT_STORE:
       return {...state, show_orderlist_ext_store: action.show}

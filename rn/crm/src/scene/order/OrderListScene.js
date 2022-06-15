@@ -3,9 +3,8 @@ import ReactNative, {Alert, Dimensions, Platform, StatusBar} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
-import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-import {setExtStore} from '../../reducers/global/globalActions'
+import {setExtStore, setUserCfg} from '../../reducers/global/globalActions'
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
@@ -46,10 +45,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchRemind,
-      updateRemind,
-      fetchRemindCount,
-      delayRemind, ...globalActions
+      ...globalActions
     }, dispatch)
   }
 }
@@ -89,7 +85,7 @@ const initState = {
     isAdd: true,
   },
   sortData: [
-    {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
+    {"label": '送达时间正序', 'value': 'expectTime asc'},
     {"label": '下单时间倒序', 'value': 'orderTime desc'},
     {"label": '下单时间正序', 'value': 'orderTime asc'}
   ],
@@ -338,10 +334,10 @@ class OrderListScene extends Component {
       return null;
     }
     const {currVendorId} = tool.vendor(this.props.global);
-    let {currStoreId, accessToken, show_orderlist_ext_store} = this.props.global;
+    let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = "";
-    const order_by = this.state.sort;
+    const order_by = user_config !== undefined && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
     initQueryType = queryType || this.state.orderStatus;
     this.setState({
       orderStatus: initQueryType,
@@ -686,23 +682,32 @@ class OrderListScene extends Component {
   showSortSelect = () => {
     let items = []
     let that = this;
-    let sort = that.state.sort;
+    let {user_config} = this.props.global;
+    let sort = user_config !== undefined && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
     for (let i in this.state.sortData) {
       const sorts = that.state.sortData[i]
       items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {
-                                this.setState({
-                                  showSortModal: false,
-                                  sort: sorts.value
-                                }, () => this.onRefresh(this.state.orderStatus))
+                                this.setOrderBy(sorts.value)
                               }
                             }}><Text style={{color: colors.fontBlack}}>{sorts.label} </Text></RadioItem>)
     }
     return <View style={{marginTop: 12}}>
       {items}
     </View>
+  }
+  setOrderBy = (order_by) => {
+    let {user_config} = this.props.global
+    user_config.order_list_by = order_by
+    this.props.dispatch(setUserCfg(user_config));
+    this.setState({
+      showSortModal: false,
+      sort: order_by
+    }, () => {
+      this.onRefresh(this.state.orderStatus)
+    })
   }
 
 

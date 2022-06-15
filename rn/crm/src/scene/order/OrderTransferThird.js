@@ -93,7 +93,7 @@ class OrderTransferThird extends Component {
     this.mixpanel.track("deliverorder_page_view", {});
   }
 
-  fetchThirdWays() {
+  fetchThirdWays=()=> {
     const version_code = DeviceInfo.getBuildNumber();
     this.state.isLoading = true;
     showModal('加载中')
@@ -155,7 +155,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  priceFn() {// 取最大价格和最小价格
+  priceFn=()=> {// 取最大价格和最小价格
     let logistics = this.state.logistics;
     this.state.logisticFeeMap = [];
     this.state.maxPrice = 0;
@@ -192,7 +192,7 @@ class OrderTransferThird extends Component {
 
   }
 
-  onCallThirdShipRule() {
+  onCallThirdShipRule=()=> {
     let total_selected_ship = this.state.newSelected.length;
     let store_id = this.props.global.currStoreId;
     let vendor_id = this.props.global.config.vendor.id;
@@ -227,7 +227,7 @@ class OrderTransferThird extends Component {
     })
   }
 
-  onCallThirdShip() {
+  onCallThirdShip=()=> {
     tool.debounces(() => {
       const self = this;
       const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
@@ -331,7 +331,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  showAlert(res) {
+  showAlert=(res)=> {
     if (res) {
       Alert.alert('充值成功，是否立即发配送', ``, [
         {text: '取消发单'},
@@ -367,14 +367,14 @@ class OrderTransferThird extends Component {
     }
   }
 
-  onRequestClose() {
+  onRequestClose=()=> {
     this.setState({
       showDateModal: false,
       mealTime: ''
     })
   }
 
-  onPress(route, params = {}) {
+  onPress=(route, params = {})=> {
     if (route === Config.ROUTE_GOODS_COMMENT) {
       native.toUserComments();
       return;
@@ -383,13 +383,13 @@ class OrderTransferThird extends Component {
   }
 
 
-  closeDialog() {
+  closeDialog=(res)=> {
     this.setState({
       is_mobile_visiable: false
     })
   }
 
-  timeSlot(step, isNow) {
+  timeSlot=(step, isNow)=> {
     let date = new Date()
     let timeArr = []
     let slotNum = 24 * 60 / step
@@ -432,7 +432,7 @@ class OrderTransferThird extends Component {
     return getDates(new Date(), (new Date()).addDays(2))
   }
 
-  render() {
+  render=()=>{
     let {allow_edit_ship_rule, store_id, vendor_id} = this.state
     return (
       <View style={{flexGrow: 1}}>
@@ -478,7 +478,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  renderContent() {
+  renderContent=(res)=> {
     let {if_reship, is_merchant_ship, merchant_reship_tip} = this.state
     return (
       <View style={styles.header}>
@@ -494,7 +494,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  renderList() {
+  renderList=()=> {
     const {logistics} = this.state;
     let item = [];
     if (tool.length(logistics) > 0) {
@@ -569,7 +569,7 @@ class OrderTransferThird extends Component {
     )
   }
 
-  renderItem(info, i) {
+  renderItem=(info, i)=> {
     return (
       <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}} onPress={() => {
         if (info.error_msg) {
@@ -658,7 +658,7 @@ class OrderTransferThird extends Component {
     )
   }
 
-  renderNoList() {
+  renderNoList=()=> {
     const {not_exist} = this.state;
     let item = [];
     if (tool.length(not_exist) > 0) {
@@ -702,7 +702,7 @@ class OrderTransferThird extends Component {
     return null;
   }
 
-  renderErrorList() {
+  renderErrorList=()=> {
     const {logistics_error} = this.state;
     if (tool.length(logistics_error) > 0) {
       return (
@@ -764,7 +764,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  renderBtn() {
+  renderBtn=()=> {
     return (
       <View>
 
@@ -883,7 +883,7 @@ class OrderTransferThird extends Component {
     )
   }
 
-  renderDatePicker() {
+  renderDatePicker=()=> {
     let {datePickerType, datePickerList, dateArray, datePickerOther, callDelivery_Day, callDelivery_Time} = this.state
     let mealtime = callDelivery_Day + ' ' + callDelivery_Time
     return (
@@ -990,7 +990,7 @@ class OrderTransferThird extends Component {
     )
   }
 
-  renderModal() {
+  renderModal=()=> {
     let {reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
       <View>

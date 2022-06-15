@@ -75,27 +75,48 @@ class TabHome extends React.Component {
           lazy: true,
           labelStyle: {fontSize: 15}
         }}>
-        <Tab.Screen
-          name="Home"
-          getComponent={() => require("../Remind/RemindScene").default}
-          options={
-            {
-              tabBarLabel: "提醒",
-              tabBarIcon: ({focused}) => (
-                <View style={{position: "relative"}}>
-                  <FontAwesome5 name={'bell'} size={22}
-                                color={focused ? colors.main_color : colors.colorCCC}
-                  />
-                  <Badge
-                    value={remindNum > 99 ? '99+' : remindNum}
-                    status="error"
-                    containerStyle={{position: 'absolute', top: -5, right: -25}}
-                  />
-                </View>
-              )
+        <If condition={storeVendorId !== 68}>
+          <Tab.Screen
+            name="Home"
+            getComponent={() => require("../Remind/RemindScene").default}
+            options={
+              {
+                tabBarLabel: "提醒",
+                tabBarIcon: ({focused}) => (
+                  <View style={{position: "relative"}}>
+                    <FontAwesome5 name={'bell'} size={22}
+                                  color={focused ? colors.main_color : colors.colorCCC}
+                    />
+                    <If condition={remindNum > 0}>
+                      <Badge
+                        value={remindNum > 99 ? '99+' : remindNum}
+                        status="error"
+                        containerStyle={{position: 'absolute', top: -5, right: -25}}
+                      /></If>
+                  </View>
+                )
+              }
             }
-          }
-        />
+          />
+        </If>
+        <If condition={storeVendorId === 68}>
+          <Tab.Screen
+            name="CreateOrder"
+            getComponent={() => require("../order/OrderSettingPack").default}
+            options={
+              {
+                tabBarLabel: "创建",
+                tabBarIcon: ({focused}) => (
+                  <View style={{position: "relative"}}>
+                    <Icon name={"circle-with-plus"}
+                          style={{fontSize: 26, color: focused ? colors.main_color : colors.colorCCC}}/>
+
+                  </View>
+                )
+              }
+            }
+          />
+        </If>
 
         <Tab.Screen
           name="Orders"
