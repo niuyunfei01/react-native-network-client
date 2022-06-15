@@ -49,7 +49,7 @@ const {
   BLE_STARTED,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_MIXPANEN_ID,
+  SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
 } = require('../../pubilc/common/constants').default;
@@ -140,10 +140,10 @@ export function setExtStore(list) {
 }
 
 
-export function set_mixpanel_id(id) {
+export function setUserCfg(info) {
   return {
-    type: SET_MIXPANEN_ID,
-    id: id
+    type: SET_USER_CONFIG,
+    info: info
   }
 }
 
