@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {Text} from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {setUserCfg} from "../../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -22,6 +23,16 @@ class FloatServiceIcon extends React.Component {
   }
 
   render() {
+
+    let {user_config} = this.props.global;
+    let {
+      top,
+      left
+    } = user_config !== undefined && user_config?.coordinate ? user_config?.coordinate : {
+      top: height * 0.65,
+      left: width * 0.82
+    };
+
     if (Number(this.props.global.config.float_kf_icon) !== 1) {
       return null;
     }
@@ -35,8 +46,8 @@ class FloatServiceIcon extends React.Component {
         alignItems: 'center',
         position: 'absolute',
         zIndex: 999,
-        top: height * 0.65,
-        right: 20
+        top: top,
+        left: left
       }}
             ref={(c) => this.floatIcon = c}
             {...this._panResponder.panHandlers}>
@@ -110,6 +121,16 @@ class FloatServiceIcon extends React.Component {
         if (left > width * 0.8) left = width * 0.85;
         if (left < 0) left = 10;
         if (top < 0) top = 10;
+
+        tool.debounces(() => {
+          let {user_config} = this.props.global
+          user_config.coordinate = {
+            top: top, left: left
+          }
+          this.props.dispatch(setUserCfg(user_config));
+        }, 2000)
+
+
         this.floatIcon.setNativeProps({
           style: {top: top, left: left}
         });

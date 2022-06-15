@@ -1,5 +1,5 @@
 import DeviceInfo from 'react-native-device-info';
-import {ToastShort} from './ToastUtils';
+import {ToastLong, ToastShort} from './ToastUtils';
 import native from './native'
 import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../common/config.js";
@@ -99,7 +99,8 @@ class HttpUtils {
 
   static error(response, navigation) {
     if (response.error_code === 10001) {
-      ToastShort('权限错误')
+      ToastShort('登录信息过期,请重新登录')
+      this.logout(navigation)
     } else if (response.error_code === 21327) {
       ToastShort('登录信息过期,请退出重新登录')
       this.logout(navigation)
@@ -109,7 +110,7 @@ class HttpUtils {
       let text = response.reason.toString()
       // native.speakText(text)
 
-      ToastShort(text)
+      ToastLong(text)
     }
   }
 

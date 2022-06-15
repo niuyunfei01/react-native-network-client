@@ -1,22 +1,13 @@
-import ReactNative from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
-import HttpUtils from "../../../pubilc/util/http";
-
-
-const {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Modal,
-  View,
-  Alert,
-
-} = ReactNative;
+import JbbModal from "../../../pubilc/component/JbbModal";
+import Entypo from "react-native-vector-icons/Entypo";
+import {Button} from "react-native-elements";
 
 
 class Tips extends Component {
@@ -24,8 +15,6 @@ class Tips extends Component {
     onItemClick: PropTypes.func,
   }
   state = {
-    addTipDialog: true,
-    addTipMoney: true,
     modalTip: this.props.modalTip,
     storeId: "",
     orderId: ""
@@ -43,9 +32,7 @@ class Tips extends Component {
 
 
   onCallThirdShips() {
-
     this.props.onItemClick();
-
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.orderId,
       storeId: this.props.storeId,
@@ -60,169 +47,116 @@ class Tips extends Component {
     });
   }
 
-  onCallSelf() {
-    const self = this;
-    Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
-      {
-        text: '确定',
-        onPress: () => self.onTransferSelf(),
-      }, {
-        text: '取消'
-      }
-    ])
-  }
-
-  onTransferSelf() {
-    const self = this;
-    const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
-    HttpUtils.get.bind(self.props.navigation)(api, {
-      orderId: this.props.order.id
-    }).then(res => {
-      ToastShort('操作成功');
-      self.props.fetchData()
-    }).catch(e => {
-      self.props.fetchData()
-    })
-  }
-
   render() {
     return (
 
       <View>
-        <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
-               transparent={true} animationType="slide">
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => {
-                              this.props.onItemClick();
-                              this.setState({modalTip: false})
-                            }}>
-          </TouchableOpacity>
-          <View style={styles.cell_row}>
-            <View style={styles.cell_body}>
-              <Text style={{color: colors.color333}}>长时间没有骑手接单怎么办? </Text>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>加小费 </Text>
-              </View>
-              <View style={styles.Item2}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt2}>您开通的配送较少
-                  请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>我自己送 </Text>
-              </View>
+        <JbbModal visible={this.state.modalTip} onClose={() => this.props.onItemClick()} modal_type={'bottom'}
+                  modalStyle={{padding: 0}}
+        >
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center"
+          }}>
+            <TouchableOpacity
+              style={{width: '15%'}}
+              onPress={() => this.props.onItemClick()}>
+            </TouchableOpacity>
 
-              <View style={styles.footBtn}>
+            <Text style={[{
+              textAlign: 'center',
+              color: colors.title_color,
+              fontWeight: "bold",
+              flex: 1,
+              fontSize: 14
+            }]}>长时间没有骑手接单怎么办 </Text>
+            <TouchableOpacity
+              style={[{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                width: '15%'
+              }]}
+              onPress={() => this.props.onItemClick()}>
+              <Entypo name="circle-with-cross"
+                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cell_body}>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>加小费 </Text>
+            </View>
 
-                <TouchableOpacity
-                  onPress={() => {
-                    this.onCallThirdShips()
-                    this.setState({modalTip: false})
-                  }}
-                >
-                  <Text style={styles.btn1}>追加配送 </Text>
-                </TouchableOpacity>
-              </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>您开通的配送较少、 </Text>
+            </View>
 
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>我自己送 </Text>
             </View>
           </View>
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => this.setState({modalTip: false})}>
-          </TouchableOpacity>
-        </Modal>
+          {this.renderBtn()}
+        </JbbModal>
       </View>
 
+    )
+  }
+
+  renderBtn() {
+    return (
+      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+        <Button title={'追加配送'}
+                onPress={() => {
+                  this.onCallThirdShips()
+                }}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  cell_row: {
-    backgroundColor: 'rgba(0,0,0,0.25)',
-  },
   cell_body: {
-    margin: pxToDp(40),
-    padding: pxToDp(20),
-    borderRadius: pxToDp(8),
-    backgroundColor: 'white'
-
-  },
-  footBtn: {
-    marginTop: pxToDp(20),
-    width: '100%',
-    height: pxToDp(80),
-
-    borderTopWidth: pxToDp(1),
-    borderTopColor: '#999999',
-    position: "relative",
-
-  },
-
-  btn1: {
-    lineHeight: pxToDp(80),
-    width: '100%',
-    textAlign: 'center',
-    color: colors.main_color,
-
+    margin: 22,
   },
   Item: {
-    position: "relative",
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 9
   },
   txt: {
-    marginLeft: pxToDp(40),
-    lineHeight: pxToDp(80)
-
-  },
-  txt2: {
-    marginLeft: pxToDp(40),
-
+    fontSize: 12,
+    color: colors.color333,
+    marginLeft: 9,
   },
   circle: {
-    position: "absolute",
-    top: pxToDp(26),
-    width: pxToDp(26),
-    height: pxToDp(26),
-    borderRadius: pxToDp(50),
-    backgroundColor: 'black',
-
-
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.color999,
   },
-  right_btn: {
-    position: "absolute",
-    top: pxToDp(20),
-    right: pxToDp(-100),
-
-    fontSize: pxToDp(50),
-    textAlign: 'center',
-    width: pxToDp(90),
-    height: pxToDp(70),
-    color: colors.color999,
-
-  },
-  right_btn2: {
-    position: "absolute",
-    top: pxToDp(40),
-    right: pxToDp(-100),
-
-    fontSize: pxToDp(50),
-    textAlign: 'center',
-    width: pxToDp(90),
-    height: pxToDp(70),
-    color: colors.color999,
-
-  },
-  cell_title: {
-    marginLeft: pxToDp(40)
-  }
 })
 export default Tips;

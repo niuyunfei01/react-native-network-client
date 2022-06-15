@@ -20,7 +20,7 @@ export default keyMirror({
   SET_PRINTER_ID: null,
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
-  SET_MIXPANEN_ID: null,
+  SET_USER_CONFIG: null,
   SET_SHOW_EXT_STORE: null,
   SET_RECORD_FLAG: null,
 
