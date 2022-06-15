@@ -7,7 +7,7 @@ import Tips from "../../scene/common/component/Tips";
 import {
   Alert,
   Clipboard,
-  Dimensions,
+  Dimensions, InteractionManager,
   Modal,
   ScrollView,
   StyleSheet,
@@ -39,7 +39,6 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import {Button, Image} from "react-native-elements";
 import BottomModal from "./BottomModal";
 import JbbModal from "./JbbModal";
-
 
 let width = Dimensions.get("window").width;
 
@@ -85,6 +84,12 @@ class OrderListItem extends React.PureComponent {
     super(props);
   }
 
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
+  }
+
   fetchShipData = (item) => {
     tool.debounces(() => {
       //保存参数 作为Tips的传参
@@ -111,8 +116,7 @@ class OrderListItem extends React.PureComponent {
     }, 600)
   }
 
-
-  onCallSelf() {
+  onCallSelf = () => {
     Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
       {
         text: '确定',
@@ -137,8 +141,8 @@ class OrderListItem extends React.PureComponent {
     })
   }
 
-  onChangeAcount = (text) => {
-    this.setState({addMoneyNum: text})
+  onChangeAccount = (text) => {
+    this.setState({...this.state, addMoneyNum: text.toString()})
   }
 
   onStopSchedulingTo = () => {
@@ -167,7 +171,6 @@ class OrderListItem extends React.PureComponent {
     })
   }
 
-
   upAddTip = () => {
     let {addMoneyNum, shipId} = this.state;
     const accessToken = this.props.accessToken;
@@ -186,7 +189,6 @@ class OrderListItem extends React.PureComponent {
       this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
     }
   }
-
 
   onOverlookDelivery = (order_id) => {
     const self = this;
@@ -264,16 +266,135 @@ class OrderListItem extends React.PureComponent {
     });
   }
 
+  hideModalTip = () => {
+    this.setState({
+      modalTip: false
+    })
+  }
+
+  openModalTipChangeInfo = (storeId, id) => {
+    this.setState({
+      modalTip: true,
+      addTipModal: false,
+      store_id: storeId,
+      order_id: id
+    })
+  }
+
+  dialNumber = (val) => {
+    native.dialNumber(val)
+  }
+
+  clipBoard = (val) => {
+    Clipboard.setString(val)
+    ToastLong('已复制到剪切板')
+  }
+
+  loseDelivery = (val) => {
+    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+      text: '继续忽略配送',
+      onPress: () => {
+        this.onOverlookDelivery(val)
+      }
+    }])
+  }
+
+  openVeriFicationToShop = () => {
+    this.setState({
+      veriFicationToShop: true
+    })
+  }
+
+  closePickModal = () => {
+    this.setState({
+      veriFicationToShop: false,
+    })
+  }
+
+  closeAddTipModal = () => {
+    this.setState({
+      addTipModal: false
+    })
+  }
+
+  closeDeliveryModal = () => {
+    this.setState({showDeliveryModal: false})
+  }
+
+  onCanceled = (val) => {
+    this.setState({showDeliveryModal: false})
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+        {
+          order: this.state.order,
+          ship_id: val,
+          onCancelled: (ok, reason) => {
+            this.fetchData()
+          }
+        });
+  }
+
+  cancelPlan = (val) => {
+    let {order_id} = this.state
+    this.setState({showDeliveryModal: false})
+    Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+      text: '确定',
+      onPress: () => {
+        this.cancelPlanDelivery(order_id, val)
+      }
+    }])
+  }
+
+  toComplan = (val) => {
+    this.setState({showDeliveryModal: false})
+    this.onPress(Config.ROUTE_COMPLAIN, {id: val})
+  }
+
+  catLocation = (val) => {
+    this.setState({showDeliveryModal: false})
+    const accessToken = this.props.accessToken
+    let path = '/rider_tracks.html?delivery_id=' + val + "&access_token=" + accessToken;
+    const uri = Config.serverUrl(path);
+    this.onPress(Config.ROUTE_WEB, {url: uri});
+  }
+
+  goAddTip = (val) => {
+    this.setState({
+      addTipModal: true,
+      modalTip: false,
+      showDeliveryModal: false,
+      shipId: val
+    })
+  }
+
+  onCallThirdShipsAgain = () => {
+    let {order_id, store_id} = this.state
+    this.setState({showDeliveryModal: false})
+    this.onCallThirdShips(order_id, store_id, 1)
+  }
+
+  onMineSendDelivery = () => {
+    let {order_id, store_id} = this.state
+    this.setState({showDeliveryModal: false})
+    this.onAinSend(order_id, store_id)
+  }
+
+  stopSchecduling = () => {
+    this.setState({showDeliveryModal: false})
+    this.onStopSchedulingTo()
+  }
+
+  callSelfAgain = () => {
+    let {order_id, store_id} = this.state
+    this.setState({showDeliveryModal: false})
+    this.onCallThirdShips(order_id, store_id, 0)
+  }
+
   render() {
     return (
       <View>
         <Tips navigation={this.props.navigation} orderId={this.state.order_id}
               storeId={this.state.store_id} key={this.state.order_id} modalTip={this.state.modalTip}
-              onItemClick={() => {
-                this.setState({
-                  modalTip: false
-                })
-              }}></Tips>
+              onItemClick={() => this.hideModalTip()}/>
         {this.renderItem()}
         {this.renderPickModal()}
         {this.renderDeliveryModal()}
@@ -284,75 +405,36 @@ class OrderListItem extends React.PureComponent {
   renderItemHeader = () => {
     let {item} = this.props;
     return (
-      <View style={{flexDirection: 'column'}}>
+      <View style={styles.flexColumn}>
         <If condition={item.is_right_once}>
-          <View style={{
-            width: 0,
-            height: 0,
-            borderTopWidth: 42,
-            borderTopColor: "#f98754",
-            borderRightWidth: 40,
-            borderRightColor: 'transparent',
-          }}>
-          </View>
-          <Text style={{
-            color: colors.white,
-            position: 'absolute',
-            top: 1,
-            left: 1,
-            fontSize: 18
-          }}>预 </Text>
+          <View style={styles.ItemHeader}/>
+          <Text style={styles.ItemHeaderTitle}>预 </Text>
         </If>
         <If condition={item.pickType === "1"}>
-          <View style={{
-            backgroundColor: "#3CABFF",
-            borderBottomRightRadius: 8,
-            width: 66,
-            height: 19,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-            <Text style={{
-              color: colors.white,
-              fontSize: 14,
-            }}>到店自提 </Text>
+          <View style={styles.pickType1}>
+            <Text style={styles.pickType1Text}>到店自提 </Text>
           </View>
         </If>
 
-        <View style={{
-          position: 'absolute',
-          top: item.pickType !== "1" ? 10 : 24,
-          left: 26,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
+        <View style={[styles.ItemHeaderInfo, {top: item.pickType !== "1" ? 10 : 24}]}>
           <Image source={{uri: item.platformIcon}}
-                 style={{width: 36, height: 36, borderRadius: 18}}/>
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-          }}>
-            <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.color333, marginLeft: 10}}># </Text>
-            <Text style={{fontSize: 24, fontWeight: 'bold', color: colors.color333}}>{item.platform_dayId} </Text>
+                 style={styles.platformIcon}/>
+          <View style={styles.platformId}>
+            <Text style={[styles.platformText, {marginLeft: 10, fontSize: 16}]}># </Text>
+            <Text style={[styles.platformText, {fontSize: 24}]}>{item.platform_dayId} </Text>
             <Text
-              style={{fontSize: 14, color: colors.color333, marginLeft: 10}}>总#{item.dayId} </Text>
+              style={styles.platformDayId}>总#{item.dayId} </Text>
             <If condition={Number(item.orderStatus) === 5}>
-              <Text style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: "#F21F1F",
-                position: 'absolute',
-                left: width * 0.46
-              }}>订单已取消 </Text>
+              <Text style={styles.orderCancelDesc}>订单已取消 </Text>
             </If>
           </View>
         </View>
 
         <If condition={item.pickType !== "1"}>
           <View style={{flexDirection: 'row', marginTop: item.is_right_once ? 10 : 50, marginLeft: 26}}>
-            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预计 </Text>
-            <Text style={{fontWeight: "bold", fontSize: 14, color: "#FF8854"}}> {item.humanExpectTime} </Text>
-            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 前送达 </Text>
+            <Text style={styles.pickTypeText}> 预计 </Text>
+            <Text style={styles.humanExpectTime}> {item.humanExpectTime} </Text>
+            <Text style={styles.pickTypeText}> 前送达 </Text>
           </View>
         </If>
 
@@ -360,53 +442,26 @@ class OrderListItem extends React.PureComponent {
     )
   }
 
-
   renderUser = () => {
     let {item} = this.props;
     return (
-      <View style={{
-        paddingVertical: 10,
-        marginHorizontal: 12,
-        paddingHorizontal: 4,
-        borderBottomWidth: 1,
-        borderColor: colors.colorEEE
-      }}>
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-          <View style={{width: width * 0.65,}}>
-            <Text style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: colors.color333,
-              marginTop: 2,
-              marginBottom: 13
-            }}> {item.userName}-{item.mobileReadable} </Text>
-            <View style={{
-              width: width * 0.18,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.main_color,
-              borderRadius: 2,
-              height: 16,
-            }}>
+      <View style={styles.contentHeader}>
+        <View style={styles.flexRowAlignCenter}>
+          <View style={{width: width * 0.65}}>
+            <Text style={styles.userNameText}> {item.userName}-{item.mobileReadable} </Text>
+            <View style={styles.orderTimeBox}>
               <Text onPress={() => this.onClickTimes(item)}
-                    style={{color: colors.white, fontSize: 10}}>
+                    style={styles.orderTimeText}>
                 {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </Text>
             </View>
           </View>
-          <FontAwesome5 solid={false} onPress={() => {
-            native.dialNumber(item.mobile)
-          }} name={'phone-alt'}
-                        style={{width: width * 0.125, fontSize: 25, color: colors.main_color}}/>
+          <FontAwesome5 solid={false} onPress={() => this.dialNumber(item.mobile)} name={'phone-alt'} style={styles.mobileIcon}/>
           <Entypo onPress={() => {
             let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
-            this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
-          }} name={"location-pin"}
-                  style={{fontSize: 35, color: colors.main_color}}/>
+            this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
+          }} name={"location-pin"} style={styles.locationIcon}/>
         </View>
-        <Text style={{fontSize: 14, color: colors.color666, marginTop: 10}}>
+        <Text style={styles.userAddressText}>
           {item.address}
         </Text>
       </View>
@@ -416,24 +471,18 @@ class OrderListItem extends React.PureComponent {
   renderOrderInfo = () => {
     let {item} = this.props;
     return (
-      <View style={{
-        paddingVertical: 10,
-        marginHorizontal: 12,
-        paddingHorizontal: 4,
-        borderBottomWidth: 1,
-        borderColor: colors.colorEEE
-      }}>
+      <View style={styles.contentHeader}>
         <If condition={item.show_store_name}>
-          <View style={{flexDirection: "row", marginTop: 4}}>
-            <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>店铺名称 </Text>
-            <Text style={{fontSize: 14, color: colors.color333}}>{item.show_store_name}</Text>
+          <View style={styles.orderInfoContent}>
+            <Text style={styles.orderInfoStoreName}>店铺名称 </Text>
+            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name}</Text>
           </View>
         </If>
 
         <If condition={item.orderTimeInList}>
-          <View style={{flexDirection: "row", marginTop: 14}}>
-            <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>下单时间 </Text>
-            <Text style={{fontSize: 14, color: colors.color333}}>{item.orderTimeInList}</Text>
+          <View style={styles.orderTimeList}>
+            <Text style={styles.orderTimeLabel}>下单时间 </Text>
+            <Text style={styles.orderTimeValue}>{item.orderTimeInList}</Text>
           </View>
         </If>
 
@@ -450,30 +499,17 @@ class OrderListItem extends React.PureComponent {
         {/*  }}>复制</Text>*/}
         {/*</View>*/}
 
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 14}}>
-          <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>平台单号 </Text>
-          <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>{item.platform_oid} </Text>
-          <Text onPress={() => {
-            Clipboard.setString(item.platform_oid)
-            ToastLong('已复制到剪切板')
-          }} style={{
-            fontSize: 14,
-            color: colors.main_color,
-            marginRight: 14,
-          }}>复制 </Text>
+        <View style={[{alignItems: 'center'}, styles.orderTimeList]}>
+          <Text style={styles.orderTimeLabel}>平台单号 </Text>
+          <Text style={[{flex: 1}, styles.orderTimeValue]}>{item.platform_oid} </Text>
+          <Text onPress={() => this.clipBoard(item.platform_oid)} style={styles.copyText}>复制 </Text>
         </View>
 
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 14}}>
-          <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>{item.moneyLabel} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, flex: 1, fontWeight: 'bold'}}>¥{item.moneyInList} </Text>
-          <Text style={{
-            fontSize: 14,
-            color: colors.main_color,
-          }}>详情 </Text>
-          <Entypo name='chevron-thin-right' style={{
-            fontSize: 14,
-            color: colors.main_color,
-          }}/>
+        <View style={[{alignItems: 'center'}, styles.orderTimeList]}>
+          <Text style={styles.orderTimeLabel}>{item.moneyLabel} </Text>
+          <Text style={[styles.orderTimeValue, {flex: 1, fontWeight: 'bold'}]}>¥{item.moneyInList} </Text>
+          <Text style={styles.mainText}>详情 </Text>
+          <Entypo name='chevron-thin-right' style={styles.mainText}/>
         </View>
 
       </View>
@@ -485,25 +521,13 @@ class OrderListItem extends React.PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         this.fetchShipData(item)
-      }} style={{
-        paddingVertical: 10,
-        marginHorizontal: 12,
-        paddingHorizontal: 4,
-        borderBottomWidth: 1,
-        borderColor: colors.colorEEE
-      }}>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-          <Text style={{fontSize: 14, color: colors.color333, flex: 1, fontWeight: 'bold'}}>配送状态 </Text>
-          <Text style={{
-            fontSize: 14,
-            color: colors.main_color,
-          }}>查看配送详情 </Text>
-          <Entypo name='chevron-thin-right' style={{
-            fontSize: 14,
-            color: colors.main_color,
-          }}/>
+      }} style={styles.contentHeader}>
+        <View style={[{alignItems: 'center'}, styles.orderInfoContent]}>
+          <Text style={[styles.orderTimeValue, {flex: 1, fontWeight: 'bold'}]}>配送状态 </Text>
+          <Text style={styles.mainText}>查看配送详情 </Text>
+          <Entypo name='chevron-thin-right' style={styles.mainText}/>
         </View>
-        <Text style={{fontSize: 14, color: colors.color666, marginTop: 10}}>
+        <Text style={styles.deliveryShipStatus}>
           {item.shipStatusText}
         </Text>
       </TouchableOpacity>
@@ -513,85 +537,36 @@ class OrderListItem extends React.PureComponent {
   renderButton = () => {
     let {item} = this.props;
     return (
-      <View style={{
-        paddingVertical: 10,
-        marginHorizontal: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-      }}>
+      <View style={styles.btnContent}>
 
         <If condition={Number(item.orderStatus) === 1 && this.props.showBtn}>
           <Button title={'忽略配送'}
-                  onPress={() => {
-                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                      text: '继续忽略配送',
-                      onPress: () => {
-                        this.onOverlookDelivery(item.id)
-                      }
-                    }])
-                  }}
-                  buttonStyle={{
-                    borderRadius: 2,
-                    paddingVertical: 7,
-                    backgroundColor: colors.white,
-                    borderColor: colors.colorCCC,
-                    borderWidth: 1
-                  }}
-                  titleStyle={{
-                    color: colors.colorCCC,
-                    fontSize: 16
-                  }}
+                  onPress={() => this.loseDelivery(item.id)}
+                  buttonStyle={[styles.modalBtn, {borderColor: colors.colorCCC}]}
+                  titleStyle={{color: colors.colorCCC, fontSize: 16}}
           />
           <Button title={'我自己送'}
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
                     this.onAinSend(item.id, item.store_id)
                   }}
-                  buttonStyle={{
-                    borderRadius: 2,
-                    paddingVertical: 7,
-                    backgroundColor: colors.white,
-                    borderColor: colors.main_color,
-                    borderWidth: 1
-                  }}
-                  titleStyle={{
-                    color: colors.main_color,
-                    fontSize: 16
-                  }}
+                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  titleStyle={{color: colors.main_color, fontSize: 16}}
           />
           <Button title={'呼叫配送'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                   }}
-                  buttonStyle={{
-                    borderRadius: 2,
-                    paddingVertical: 7,
-                    backgroundColor: colors.main_color,
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
+                  buttonStyle={styles.callDeliveryBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
         <If condition={item.pickType === "1" && item.orderStatus < 4}>
-          <View style={{flex: 1}}></View>
+          <View style={{flex: 1}}/>
           <Button title={'到店核销'}
-                  onPress={() => {
-                    this.setState({
-                      veriFicationToShop: true
-                    })
-                  }}
-                  buttonStyle={{
-                    borderRadius: 2,
-                    paddingVertical: 7,
-                    backgroundColor: colors.main_color,
-                    marginRight: 10
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
+                  onPress={() => this.openVeriFicationToShop()}
+                  buttonStyle={styles.veriFicationBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
       </View>
@@ -599,24 +574,11 @@ class OrderListItem extends React.PureComponent {
   }
 
   renderItem = () => {
-    let {item, onPress} = this.props;
+    let {item} = this.props;
     return (
-      <TouchableWithoutFeedback onPress={() => {
-        onPress(Config.ROUTE_ORDER, {orderId: item.id})
-      }}>
-        <View style={{
-          flexDirection: "column",
-          backgroundColor: colors.white,
-          marginTop: 10,
-          marginHorizontal: 12,
-          borderRadius: 6,
-        }}>
-          <LinearGradient style={{
-            borderTopRightRadius: 6,
-            borderTopLeftRadius: 6,
-            width: "100%",
-            height: 74,
-          }}
+      <TouchableWithoutFeedback onPress={() => this.onPress(Config.ROUTE_ORDER, {orderId: item.id})}>
+        <View style={styles.ItemContent}>
+          <LinearGradient style={styles.ItemHeaderLinear}
                           start={{x: 0, y: 0}}
                           end={{x: 1, y: 1}}
                           colors={item.pickType === "1" ? ['#F7FFFE', '#D0EDFF'] : ['#FFFAF7', '#FFE4D0']}>
@@ -628,29 +590,9 @@ class OrderListItem extends React.PureComponent {
           {this.renderButton()}
           <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  modalTip: true,
-                  addTipModal: false
-                })
-                this.state.store_id = item.store_id;
-                this.state.order_id = item.id;
-              }} style={{
-              paddingVertical: 10,
-              marginHorizontal: 12,
-              paddingHorizontal: 4,
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}>
-              <Entypo name='help-with-circle' style={{
-                fontSize: 20,
-                color: colors.main_color,
-              }}/>
-              <Text style={{
-                marginLeft: 10,
-                color: colors.color333,
-                lineHeight: pxToDp(40)
-              }}>长时间没有骑手接单怎么办？</Text>
+              onPress={() => this.openModalTipChangeInfo(item.store_id, item.id)} style={styles.noRunMan}>
+              <Entypo name='help-with-circle' style={styles.helpIcon}/>
+              <Text style={styles.helpText}>长时间没有骑手接单怎么办？</Text>
             </TouchableOpacity>
           </If>
         </View>
@@ -660,7 +602,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   renderPickModal = () => {
-    let {item,} = this.props;
+    let {item} = this.props;
     return (
       <BottomModal
         visible={this.state.veriFicationToShop}
@@ -672,34 +614,20 @@ class OrderListItem extends React.PureComponent {
         title={'到店核销'}
         actionText={'确定'}
         closeText={'取消'}
-        onClose={() => {
-          this.setState({
-            veriFicationToShop: false,
-          })
-        }}>
+        onClose={() => this.closePickModal()}>
         <TextInput placeholder={"请输入取货码"}
                    onChangeText={(pickupCode) => {
                      this.setState({pickupCode})
                    }}
                    value={this.state.pickupCode}
                    placeholderTextColor={'#ccc'}
-                   style={{
-                     color: colors.color333,
-                     borderBottomWidth: pxToDp(1),
-                     borderBottomColor: '#999',
-                     fontSize: 16,
-                     height: pxToDp(90),
-                     borderWidth: pxToDp(1),
-                     borderRadius: pxToDp(10),
-                     marginVertical: 20,
-                   }}
+                   style={styles.veriFicationInput}
                    underlineColorAndroid="transparent"/>
       </BottomModal>
     )
   }
 
   renderDeliveryModal = () => {
-    let {navigation} = this.props;
     let {order_id, store_id, delivery_btn, is_merchant_add_tip} = this.state
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
@@ -708,128 +636,82 @@ class OrderListItem extends React.PureComponent {
     return (
       <View>
         <JbbModal
-          visible={this.state.addTipModal} modal_type={'center'} onClose={() => {
-
-          this.setState({
-            addTipModal: false
-          })
-        }}>
+          visible={this.state.addTipModal} modal_type={'center'} onClose={() => this.closeAddTipModal()}>
           <View>
-            <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
-            <Text style={{
-              fontSize: pxToDp(26),
-              color: colors.color333,
-              marginVertical: pxToDp(15)
-            }}>多次添加以累计金额为主，最低一元</Text>
+            <Text style={styles.addTipText}>加小费</Text>
+            <Text style={styles.addTipDesc}>多次添加以累计金额为主，最低一元</Text>
             <If condition={is_merchant_add_tip === 1}>
-              <Text style={{
-                fontSize: pxToDp(22),
-                color: '#F32B2B',
-                marginVertical: pxToDp(10)
-              }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+              <Text style={styles.addTipDesc1}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
             </If>
             <View style={[styles.container1]}>
               <Text style={{fontSize: pxToDp(26)}}>金额</Text>
-              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+              <View style={styles.accountList}>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(1)
+                  this.onChangeAccount(1)
                 }}>1元</Text>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(2)
+                  this.onChangeAccount(2)
                 }}>2元</Text>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(3)
+                  this.onChangeAccount(3)
                 }}>3元</Text>
               </View>
-              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+              <View style={styles.accountList}>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(4)
+                  this.onChangeAccount(4)
                 }}>4元</Text>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(5)
+                  this.onChangeAccount(5)
                 }}>5元</Text>
                 <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAcount(10)
+                  this.onChangeAccount(10)
                 }}>10元</Text>
               </View>
               <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
                 <TextInput
-                  style={{
-                    fontSize: pxToDp(24),
-                    borderWidth: pxToDp(1),
-                    paddingLeft: pxToDp(15),
-                    width: "100%",
-                    height: "40%"
-                  }}
+                  style={styles.addTipInput}
                   placeholder={'请输入其他金额'}
                   value={this.state.addMoneyNum}
                   keyboardType='numeric'
                   onChangeText={(value) =>
-                    this.onChangeAcount(value)
+                    this.onChangeAccount(value)
                   }
                 />
-                <Text style={{
-                  fontSize: pxToDp(26),
-                  position: "absolute",
-                  top: "25%",
-                  right: "5%"
-                }}>元</Text>
+                <Text style={styles.addTipRightIcon}>元</Text>
               </View>
               {
                 (!this.state.ok || this.state.addMoneyNum === 0) &&
-                <View
-                  style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                <View style={styles.addTipReason}>
                   <Entypo name={"help-with-circle"}
-                          style={{
-                            fontSize: pxToDp(35),
-                            color: colors.warn_red,
-                            marginHorizontal: pxToDp(10)
-                          }}></Entypo>
-                  <Text style={{
-                    color: colors.warn_red,
-                    fontWeight: "bold"
-                  }}>{this.state.respReason} </Text>
+                          style={styles.addTipReasonIcon}/>
+                  <Text style={styles.addTipReasonText}>{this.state.respReason} </Text>
                 </View>
               }
             </View>
             <View style={styles.btn1}>
               <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                        onPress={() => {
-                                                          this.setState({
-                                                            addTipModal: false
-                                                          })
-                                                        }}><Text
+                                                        onPress={() => this.closeAddTipModal()}><Text
                 style={styles.btnText2}>取消</Text></TouchableOpacity></View>
               <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                        onPress={() => {
-                                                          this.upAddTip()
-                                                        }}><Text
+                                                        onPress={() => this.upAddTip()}><Text
                 style={styles.btnText}>确定</Text></TouchableOpacity></View>
             </View>
           </View>
         </JbbModal>
+
         <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
-               onRequestClose={() => this.setState({showDeliveryModal: false})}
+               onRequestClose={() => this.closeDeliveryModal()}
                transparent={true}>
           <View style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
-            <TouchableOpacity style={{flex: 1}} onPress={() => {
-              this.setState({showDeliveryModal: false})
-            }}></TouchableOpacity>
-            <View style={{
-              backgroundColor: colors.white,
-              height: height,
-              borderTopLeftRadius: pxToDp(30),
-              borderTopRightRadius: pxToDp(30),
-            }}>
-              <View style={{flexDirection: 'row',}}>
+            <TouchableOpacity style={{flex: 1}} onPress={() => this.closeDeliveryModal()}/>
+            <View style={[styles.deliveryModalContent, {height: height}]}>
+              <View style={{flexDirection: 'row'}}>
                 <Text onPress={() => {
-                  navigation.navigate(Config.ROUTE_STORE_STATUS)
-                  this.setState({showDeliveryModal: false})
-                }} style={{color: colors.main_color, marginTop: pxToDp(20), marginLeft: pxToDp(20)}}>呼叫配送规则</Text>
-                <View style={{flex: 1}}></View>
-                <TouchableOpacity onPress={() => {
-                  this.setState({showDeliveryModal: false})
-                }}>
+                  this.onPress(Config.ROUTE_STORE_STATUS)
+                  this.closeDeliveryModal()
+                }} style={styles.deliveryModalTitle}>呼叫配送规则</Text>
+                <View style={{flex: 1}}/>
+                <TouchableOpacity onPress={() => this.closeDeliveryModal()}>
                   <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>
                 </TouchableOpacity>
               </View>
@@ -840,14 +722,9 @@ class OrderListItem extends React.PureComponent {
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}>
 
-                <View style={{padding: pxToDp(20),}}>
+                <View style={{padding: pxToDp(20)}}>
                   <For each="info" index="i" of={this.state.delivery_list}>
-                    <View key={i} style={{
-                      padding: pxToDp(20),
-                      borderRadius: pxToDp(15),
-                      backgroundColor: "#F3F3F3",
-                      marginBottom: pxToDp(20),
-                    }}>
+                    <View key={i} style={styles.deliveryItem}>
                       <TouchableOpacity onPress={() => {
                         let arr = [...this.state.delivery_list]
                         arr[i].default_show = !arr[i].default_show
@@ -855,265 +732,80 @@ class OrderListItem extends React.PureComponent {
                           delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
-                        <Text style={{
-                          fontSize: 12,
-                          fontWeight: 'bold',
-                          color: info.desc_color ? info.desc_color : 'black'
-                        }}>{info.desc} -</Text>
-                        <Text style={{
-                          color: info.content_color,
-                          fontSize: 12,
-                          fontWeight: 'bold'
-                        }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
-                        <View style={{flex: 1}}></View>
-                        {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
-                          <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
+                        <Text style={[{color: info.desc_color ? info.desc_color : 'black'}, styles.textBold]}>{info.desc} -</Text>
+                        <Text style={[{color: info.content_color}, styles.textBold]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
+                        <View style={{flex: 1}}/>
+                        {!info.default_show ? <Entypo name='chevron-thin-right' style={styles.f14}/> :
+                          <Entypo name='chevron-thin-up' style={styles.f14}/>}
                       </TouchableOpacity>
-                      <View
-                        style={{marginVertical: 12, flexDirection: 'row'}}>
-                        <Text style={{
-                          fontSize: 12,
-                          color: colors.color333
-                        }}> 商品重量-{info.weight}kg </Text>
-                        <If condition={info.fee_tip > 0}><Text style={{
-                          fontSize: 12,
-                          color: colors.color333
-                        }}> 小费：{info.fee_tip}元 </Text></If>
+                      <View style={{marginVertical: 12, flexDirection: 'row'}}>
+                        <Text style={styles.productWeight}> 商品重量-{info.weight}kg </Text>
+                        <If condition={info.fee_tip > 0}><Text style={styles.productWeight}> 小费：{info.fee_tip}元 </Text></If>
                       </View>
 
-                      <View
-                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
-
+                      <View style={styles.driverContent}>
+                        <Text style={styles.driverText}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                       </View>
                       {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
-                      <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                      }}>
+                      <View style={styles.btnList}>
                         {info.btn_lists.can_cancel === 1 ? <Button title={'撤回呼叫'}
-                                                                   onPress={() => {
-                                                                     this.setState({showDeliveryModal: false})
-                                                                     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                                                       {
-                                                                         order: this.state.order,
-                                                                         ship_id: info.ship_id,
-                                                                         onCancelled: (ok, reason) => {
-                                                                           this.fetchData()
-                                                                         }
-                                                                       });
-                                                                   }}
-                                                                   buttonStyle={{
-                                                                     backgroundColor: colors.white,
-                                                                     borderWidth: pxToDp(2),
-                                                                     width: pxToDp(150),
-                                                                     borderColor: colors.fontBlack,
-                                                                     borderRadius: pxToDp(10),
-                                                                     padding: pxToDp(14),
-                                                                     marginRight: pxToDp(15)
-                                                                   }}
-                                                                   titleStyle={{
-                                                                     color: colors.fontBlack,
-                                                                     fontSize: 12,
-                                                                     fontWeight: 'bold'
-                                                                   }}
+                                                                   onPress={() => this.onCanceled(info.ship_id)}
+                                                                   buttonStyle={styles.onCanceledBtn}
+                                                                   titleStyle={styles.btnTitleText}
                         /> : null}
                         {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
-                                                                        onPress={() => {
-                                                                          this.setState({showDeliveryModal: false})
-                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
-                                                                            text: '确定',
-                                                                            onPress: () => {
-                                                                              this.cancelPlanDelivery(order_id, info.plan_id)
-                                                                            }
-                                                                          }])
-                                                                        }}
-                                                                        buttonStyle={{
-                                                                          backgroundColor: colors.white,
-                                                                          borderWidth: pxToDp(2),
-                                                                          width: pxToDp(150),
-                                                                          borderColor: colors.fontBlack,
-                                                                          borderRadius: pxToDp(10),
-                                                                          padding: pxToDp(14),
-                                                                          marginRight: pxToDp(15)
-                                                                        }}
-                                                                        titleStyle={{
-                                                                          color: colors.fontBlack,
-                                                                          fontSize: 12,
-                                                                          fontWeight: 'bold'
-                                                                        }}
+                                                                        onPress={() => this.cancelPlan(info.plan_id)}
+                                                                        buttonStyle={styles.onCanceledBtn}
+                                                                        titleStyle={styles.btnTitleText}
                         /> : null}
                         {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
-                                                                      onPress={() => {
-                                                                        this.setState({showDeliveryModal: false})
-                                                                        navigation.navigate(Config.ROUTE_COMPLAIN, {id: info.ship_id})
-                                                                      }}
-                                                                      buttonStyle={{
-                                                                        backgroundColor: colors.white,
-                                                                        borderWidth: pxToDp(1),
-                                                                        width: pxToDp(150),
-                                                                        borderColor: colors.fontBlack,
-                                                                        borderRadius: pxToDp(10),
-                                                                        padding: pxToDp(15),
-                                                                        marginRight: pxToDp(15)
-                                                                      }}
-                                                                      titleStyle={{
-                                                                        color: colors.fontBlack,
-                                                                        fontSize: 12,
-                                                                      }}
+                                                                      onPress={() => this.toComplan(info.ship_id)}
+                                                                      buttonStyle={styles.onCanceledBtn}
+                                                                      titleStyle={styles.btnTitleText}
                         /> : null}
 
                         {info.btn_lists.can_view_position === 1 ? <Button title={'查看位置'}
                                                                           onPress={() => {
-                                                                            this.setState({showDeliveryModal: false})
-                                                                            const accessToken = this.props.accessToken
-                                                                            let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
-                                                                            const uri = Config.serverUrl(path);
-                                                                            this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+                                                                            this.catLocation(info.ship_id)
                                                                           }}
-                                                                          buttonStyle={{
-                                                                            backgroundColor: colors.white,
-                                                                            borderWidth: pxToDp(1),
-                                                                            width: pxToDp(150),
-                                                                            borderColor: colors.main_color,
-                                                                            borderRadius: pxToDp(10),
-                                                                            padding: pxToDp(15),
-                                                                            marginRight: pxToDp(15)
-                                                                          }}
-
-                                                                          titleStyle={{
-                                                                            color: colors.main_color,
-                                                                            fontSize: 12,
-                                                                          }}
+                                                                          buttonStyle={styles.catLocationBtn}
+                                                                          titleStyle={styles.catLocationText}
                         /> : null}
                         {info.btn_lists.add_tip === 1 ?
                           <Button title={'加小费'}
-                                  onPress={() => {
-                                    this.setState({
-                                      addTipModal: true,
-                                      modalTip: false,
-                                      showDeliveryModal: false,
-                                      shipId: info.ship_id
-                                    })
-                                  }}
-                                  buttonStyle={{
-                                    backgroundColor: colors.main_color,
-                                    width: pxToDp(150),
-                                    borderRadius: pxToDp(10),
-                                    padding: pxToDp(15),
-                                    marginRight: pxToDp(15)
-                                  }}
-                                  titleStyle={{
-                                    color: colors.white,
-                                    fontSize: 12,
-                                  }}
+                                  onPress={() => this.goAddTip(info.ship_id)}
+                                  buttonStyle={styles.addTipBtn}
+                                  titleStyle={styles.addTipBtnText}
                           />
                           : null}
                         {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
-                                                                 onPress={() => {
-                                                                   native.dialNumber(info.driver_phone)
-                                                                 }}
-                                                                 buttonStyle={{
-                                                                   backgroundColor: colors.main_color,
-                                                                   borderWidth: pxToDp(1),
-                                                                   width: pxToDp(150),
-                                                                   borderColor: colors.fontColor,
-                                                                   borderRadius: pxToDp(10),
-                                                                   padding: pxToDp(15),
-                                                                   marginRight: pxToDp(15)
-                                                                 }}
-                                                                 titleStyle={{
-                                                                   color: colors.white,
-                                                                   fontSize: 12,
-                                                                 }}
+                                                                 onPress={() => this.dialNumber(info.driver_phone)}
+                                                                 buttonStyle={styles.addTipBtn}
+                                                                 titleStyle={styles.addTipBtnText}
                         /> : null}
                       </View>
                     </View>
                   </For>
-                  <View style={{
-                    marginHorizontal: 10,
-                    borderBottomLeftRadius: pxToDp(20),
-                    borderBottomRightRadius: pxToDp(20),
-                    backgroundColor: colors.white,
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    marginBottom: pxToDp(10)
-                  }}>
+                  <View style={styles.deliveryModalBottomBtn}>
                     {delivery_btn.if_reship === 1 && <Button title={'补送'}
-                                                             onPress={() => {
-                                                               this.setState({showDeliveryModal: false})
-                                                               this.onCallThirdShips(order_id, store_id, 1)
-                                                             }}
-                                                             buttonStyle={{
-                                                               backgroundColor: colors.main_color,
-                                                               borderWidth: pxToDp(1),
-                                                               width: pxToDp(150),
-                                                               borderColor: colors.fontColor,
-                                                               borderRadius: pxToDp(10),
-                                                               padding: pxToDp(15),
-                                                               marginRight: pxToDp(15)
-                                                             }}
-                                                             titleStyle={{
-                                                               color: colors.white,
-                                                               fontSize: 12,
-                                                             }}
+                                                             onPress={() => this.onCallThirdShipsAgain()}
+                                                             buttonStyle={styles.addTipBtn}
+                                                             titleStyle={styles.addTipBtnText}
                     />}
                     {delivery_btn.self_ship === 1 && <Button title={'我自己送'}
-                                                             onPress={() => {
-                                                               this.setState({showDeliveryModal: false})
-                                                               this.onAinSend(order_id, store_id)
-                                                             }}
-                                                             buttonStyle={{
-                                                               backgroundColor: colors.main_color,
-                                                               borderWidth: pxToDp(1),
-                                                               width: pxToDp(150),
-                                                               borderColor: colors.fontColor,
-                                                               borderRadius: pxToDp(10),
-                                                               padding: pxToDp(15),
-                                                               marginRight: pxToDp(15)
-                                                             }}
-                                                             titleStyle={{
-                                                               color: colors.white,
-                                                               fontSize: 12,
-                                                             }}
+                                                             onPress={() => this.onMineSendDelivery()}
+                                                             buttonStyle={styles.addTipBtn}
+                                                             titleStyle={styles.addTipBtnText}
                     />}
                     {delivery_btn.stop_auto_ship === 1 && <Button title={'暂停调度'}
-                                                                  onPress={() => {
-                                                                    this.setState({showDeliveryModal: false})
-                                                                    this.onStopSchedulingTo()
-                                                                  }}
-                                                                  buttonStyle={{
-                                                                    backgroundColor: colors.main_color,
-                                                                    borderWidth: pxToDp(1),
-                                                                    width: pxToDp(150),
-                                                                    borderColor: colors.fontColor,
-                                                                    borderRadius: pxToDp(10),
-                                                                    padding: pxToDp(15),
-                                                                    marginRight: pxToDp(15)
-                                                                  }}
-                                                                  titleStyle={{
-                                                                    color: colors.white,
-                                                                    fontSize: 12,
-                                                                  }}
+                                                                  onPress={() => this.stopSchecduling()}
+                                                                  buttonStyle={styles.addTipBtn}
+                                                                  titleStyle={styles.addTipBtnText}
                     />}
                     {delivery_btn.call_ship === 1 && <Button title={'追加配送'}
-                                                             onPress={() => {
-                                                               this.setState({showDeliveryModal: false})
-                                                               this.onCallThirdShips(order_id, store_id, 0)
-                                                             }}
-                                                             buttonStyle={{
-                                                               backgroundColor: colors.main_color,
-                                                               borderWidth: pxToDp(1),
-                                                               width: pxToDp(150),
-                                                               borderColor: colors.fontColor,
-                                                               borderRadius: pxToDp(10),
-                                                               padding: pxToDp(15),
-                                                               marginRight: pxToDp(15)
-                                                             }}
-                                                             titleStyle={{
-                                                               color: colors.white,
-                                                               fontSize: 12,
-                                                             }}
+                                                             onPress={() => this.callSelfAgain()}
+                                                             buttonStyle={styles.addTipBtn}
+                                                             titleStyle={styles.addTipBtnText}
                     />}
                   </View>
                 </View>
@@ -1126,40 +818,15 @@ class OrderListItem extends React.PureComponent {
     )
   }
 
-
   renderDeliveryStatus = (list) => {
     return (
       <View>
         <For each="log" index="i" of={list}>
-          <View key={i} style={{
-            flexDirection: 'row',
-            paddingTop: pxToDp(15),
-            paddingBottom: pxToDp(15),
-          }}>
+          <View key={i} style={styles.deliveryStatusContent}>
             <View style={{width: 30}}>
-              <View style={{
-                width: pxToDp(30),
-                height: pxToDp(30),
-                backgroundColor: log.status_color,
-                borderRadius: pxToDp(15)
-              }}>
-                {i !== 0 ? <View style={{
-                  width: pxToDp(5),
-                  height: pxToDp(35),
-                  backgroundColor: log.status_color,
-                  position: 'absolute',
-                  bottom: pxToDp(28),
-                  left: pxToDp(13)
-                }}></View> : null}
-
-                {i !== list.length - 1 ? <View style={{
-                    width: pxToDp(5),
-                    height: pxToDp(35),
-                    backgroundColor: log.status_color,
-                    position: 'absolute',
-                    top: pxToDp(28),
-                    left: pxToDp(13)
-                  }}></View>
+              <View style={[styles.deliveryStatusHeader, {backgroundColor: log.status_color,}]}>
+                {i !== 0 ? <View style={[styles.deliveryStatusTitle, {backgroundColor: log.status_color}]}/> : null}
+                {i !== list.length - 1 ? <View style={[styles.deliveryStatusTitle, {backgroundColor: log.status_color}]}/>
                   : null}
               </View>
             </View>
@@ -1184,10 +851,297 @@ class OrderListItem extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
+  flexColumn: {flexDirection: 'column'},
+  flexRowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   inputStyle: {
     borderWidth: pxToDp(1),
     borderRadius: pxToDp(10),
     paddingLeft: pxToDp(30)
+  },
+  ItemHeader: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 42,
+    borderTopColor: "#f98754",
+    borderRightWidth: 40,
+    borderRightColor: 'transparent',
+  },
+  ItemHeaderTitle: {
+    color: colors.white,
+    position: 'absolute',
+    top: 1,
+    left: 1,
+    fontSize: 18
+  },
+  ItemHeaderInfo: {
+    position: 'absolute',
+    left: 26,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  platformIcon: {width: 36, height: 36, borderRadius: 18},
+  platformId: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  platformText: {fontWeight: 'bold', color: colors.color333},
+  platformDayId: {fontSize: 14, color: colors.color333, marginLeft: 10},
+  orderCancelDesc: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: "#F21F1F",
+    position: 'absolute',
+    left: width * 0.46
+  },
+  pickTypeText: {fontWeight: "bold", fontSize: 14, color: colors.color333},
+  humanExpectTime: {fontWeight: "bold", fontSize: 14, color: "#FF8854"},
+  pickType1: {
+    backgroundColor: "#3CABFF",
+    borderBottomRightRadius: 8,
+    width: 66,
+    height: 19,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pickType1Text: {
+    color: colors.white,
+    fontSize: 14,
+  },
+  contentHeader: {
+    paddingVertical: 10,
+    marginHorizontal: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderColor: colors.colorEEE
+  },
+  orderInfoContent: {flexDirection: "row", marginTop: 4},
+  orderInfoStoreName: {fontSize: 14, color: colors.color333, width: width * 0.24},
+  orderInfoStoreNameText: {fontSize: 14, color: colors.color333},
+  orderTimeList: {flexDirection: "row", marginTop: 14},
+  orderTimeLabel: {fontSize: 14, color: colors.color333, width: width * 0.24},
+  orderTimeValue: {fontSize: 14, color: colors.color333},
+  copyText: {
+    fontSize: 14,
+    color: colors.main_color,
+    marginRight: 14,
+  },
+  mainText: {
+    fontSize: 14,
+    color: colors.main_color,
+  },
+  deliveryShipStatus: {fontSize: 14, color: colors.color666, marginTop: 10},
+  userNameText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.color333,
+    marginTop: 2,
+    marginBottom: 13
+  },
+  orderTimeBox: {
+    width: width * 0.18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.main_color,
+    borderRadius: 2,
+    height: 16,
+  },
+  orderTimeText: {color: colors.white, fontSize: 10},
+  mobileIcon: {width: width * 0.125, fontSize: 25, color: colors.main_color},
+  locationIcon: {fontSize: 35, color: colors.main_color},
+  userAddressText: {fontSize: 14, color: colors.color666, marginTop: 10},
+  btnContent: {
+    paddingVertical: 10,
+    marginHorizontal: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  modalBtn: {
+    borderRadius: 2,
+    paddingVertical: 7,
+    backgroundColor: colors.white,
+    borderWidth: 1
+  },
+  callDeliveryBtn: {
+    borderRadius: 2,
+    paddingVertical: 7,
+    backgroundColor: colors.main_color,
+  },
+  veriFicationBtn: {
+    borderRadius: 2,
+    paddingVertical: 7,
+    backgroundColor: colors.main_color,
+    marginRight: 10
+  },
+  ItemContent: {
+    flexDirection: "column",
+    backgroundColor: colors.white,
+    marginTop: 10,
+    marginHorizontal: 12,
+    borderRadius: 6,
+  },
+  ItemHeaderLinear: {
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6,
+    width: "100%",
+    height: 74,
+  },
+  noRunMan: {
+    paddingVertical: 10,
+    marginHorizontal: 12,
+    paddingHorizontal: 4,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  helpIcon: {
+    fontSize: 20,
+    color: colors.main_color,
+  },
+  helpText: {
+    marginLeft: 10,
+    color: colors.color333,
+    lineHeight: pxToDp(40)
+  },
+  veriFicationInput: {
+    color: colors.color333,
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: '#999',
+    fontSize: 16,
+    height: pxToDp(90),
+    borderWidth: pxToDp(1),
+    borderRadius: pxToDp(10),
+    marginVertical: 20,
+  },
+  addTipText: {fontWeight: "bold", fontSize: pxToDp(32)},
+  addTipDesc: {
+    fontSize: pxToDp(26),
+    color: colors.color333,
+    marginVertical: pxToDp(15)
+  },
+  addTipDesc1: {
+    fontSize: pxToDp(22),
+    color: '#F32B2B',
+    marginVertical: pxToDp(10)
+  },
+  accountList: {flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)},
+  addTipInput: {
+    fontSize: pxToDp(24),
+    borderWidth: pxToDp(1),
+    paddingLeft: pxToDp(15),
+    width: "100%",
+    height: 40
+  },
+  addTipRightIcon: {
+    fontSize: pxToDp(26),
+    position: "absolute",
+    top: 10,
+    right: "5%"
+  },
+  addTipReason: {flexDirection: "row", alignItems: "center", justifyContent: "flex-start", marginTop: 5},
+  addTipReasonIcon: {
+    fontSize: pxToDp(25),
+    color: colors.warn_red,
+    marginHorizontal: pxToDp(10)
+  },
+  addTipReasonText: {
+    fontSize: pxToDp(25),
+    color: colors.warn_red,
+    marginHorizontal: pxToDp(10)
+  },
+  deliveryModalContent: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: pxToDp(30),
+    borderTopRightRadius: pxToDp(30),
+  },
+  deliveryModalTitle: {color: colors.main_color, marginTop: pxToDp(20), marginLeft: pxToDp(20)},
+  deliveryItem: {
+    padding: pxToDp(20),
+    borderRadius: pxToDp(15),
+    backgroundColor: "#F3F3F3",
+    marginBottom: pxToDp(20),
+  },
+  textBold: {
+    fontWeight: "bold",
+    fontSize: 12
+  },
+  f14: {
+    fontSize: 14
+  },
+  productWeight: {
+    fontSize: 12,
+    color: colors.color333
+  },
+  driverContent: {fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'},
+  driverText: {width: pxToDp(450)},
+  btnList: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  onCanceledBtn: {
+    backgroundColor: colors.white,
+    borderWidth: pxToDp(2),
+    width: pxToDp(150),
+    borderColor: colors.fontBlack,
+    borderRadius: pxToDp(10),
+    padding: pxToDp(14),
+    marginRight: pxToDp(15)
+  },
+  catLocationBtn: {
+    backgroundColor: colors.white,
+    borderWidth: pxToDp(1),
+    width: pxToDp(150),
+    borderColor: colors.main_color,
+    borderRadius: pxToDp(10),
+    padding: pxToDp(15),
+    marginRight: pxToDp(15)
+  },
+  catLocationText: {
+    color: colors.main_color,
+    fontSize: 12,
+  },
+  addTipBtn: {
+    backgroundColor: colors.main_color,
+    width: pxToDp(150),
+    borderRadius: pxToDp(10),
+    padding: pxToDp(15),
+    marginRight: pxToDp(15)
+  },
+  addTipBtnText: {
+    color: colors.white,
+    fontSize: 12,
+  },
+  btnTitleText: {
+    color: colors.fontBlack,
+    fontSize: 12,
+    fontWeight: 'bold'
+  },
+  deliveryModalBottomBtn: {
+    marginHorizontal: 10,
+    borderBottomLeftRadius: pxToDp(20),
+    borderBottomRightRadius: pxToDp(20),
+    backgroundColor: colors.white,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginBottom: pxToDp(10)
+  },
+  deliveryStatusContent: {
+    flexDirection: 'row',
+    paddingTop: pxToDp(15),
+    paddingBottom: pxToDp(15),
+  },
+  deliveryStatusHeader: {
+    width: pxToDp(30),
+    height: pxToDp(30),
+    borderRadius: pxToDp(15)
+  },
+  deliveryStatusTitle: {
+    width: pxToDp(5),
+    height: pxToDp(35),
+    position: 'absolute',
+    bottom: pxToDp(28),
+    left: pxToDp(13)
   },
   btn: {
     flexDirection: "row",

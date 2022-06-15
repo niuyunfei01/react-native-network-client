@@ -157,7 +157,7 @@ class OrderQueryResultScene extends PureComponent {
             })
           }}
           refreshing={this.state.isLoading}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item,index)=>`${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           // getItemLayout={this._getItemLayout}
           ListEmptyComponent={() =>
@@ -187,10 +187,6 @@ class OrderQueryResultScene extends PureComponent {
 
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
-
-  _keyExtractor = (item) => {
-    return item.id.toString();
   }
 
   render() {
