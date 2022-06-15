@@ -16,7 +16,7 @@ import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {setPrinterId} from '../../../reducers/global/globalActions';
+import {setBleStarted, setPrinterId} from '../../../reducers/global/globalActions';
 import {Button} from "@ant-design/react-native";
 import BleManager from 'react-native-ble-manager';
 import ESC from "../../../pubilc/util/ble/Ecs"
@@ -213,6 +213,10 @@ class BluePrinterSettings extends PureComponent {
 
     BleManager.start({showAlert: false}).then(() => {
     });
+
+    // eslint-disable-next-line react/prop-types
+    const {dispatch} = this.props
+    dispatch(setBleStarted(true));
 
     bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
     bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);

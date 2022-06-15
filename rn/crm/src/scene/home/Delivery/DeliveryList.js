@@ -21,7 +21,6 @@ import tool from "../../../pubilc/util/tool";
 import Icon from "react-native-vector-icons/Entypo";
 import config from "../../../pubilc/common/config";
 import {Cell, CellBody, Cells, Input} from "../../../weui";
-import CommonStyle from "../../../pubilc/util/CommonStyles";
 import JbbText from "../../common/component/JbbText";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
@@ -29,8 +28,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global};
+  const {global} = state;
+  return {global: global};
 }
 
 const mapDispatchToProps = dispatch => {
@@ -60,8 +59,9 @@ class DeliveryList extends PureComponent {
       master_delivery_bind_list: [],
       master_delivery_unbind_list: [],
       uuVisible: false,
+      gxdVisible: false,
       phone: '',
-      uuCode: '',
+      phone_code: '',
       count_down: -1,
       msg: [],
       show_unbind_all: false,
@@ -97,14 +97,7 @@ class DeliveryList extends PureComponent {
     );
   }
 
-  UNSAFE_componentWillMount() {
-    this.fetchData()
-  }
-
-  componentDidMount() {
-  }
-
-  fetchData() {
+  fetchData = () => {
     showModal("请求中...")
     const {accessToken, currStoreId} = this.props.global
     const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
@@ -122,14 +115,14 @@ class DeliveryList extends PureComponent {
     })
   }
 
-  onPress(route, params = {}, callback = {}) {
+  onPress = (route, params = {}, callback = {}) => {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
   }
 
-  renderHeader() {
+  renderHeader = () => {
     let show_type = this.state.show_type
     return (
       <View style={{
@@ -175,7 +168,7 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  rendermsg(type = []) {
+  rendermsg = (type = []) => {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
@@ -201,7 +194,7 @@ class DeliveryList extends PureComponent {
   }
 
 
-  rendererrormsg(type = []) {
+  rendererrormsg = (type = []) => {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
@@ -236,6 +229,13 @@ class DeliveryList extends PureComponent {
           })
           return null;
         }
+
+        if (res.route === 'GuoXiaoDi') {
+          this.setState({
+            gxdVisible: true
+          })
+          return null;
+        }
         this.onPress(res.route, {url: res.auth_url})
         break
       case 1:
@@ -266,18 +266,18 @@ class DeliveryList extends PureComponent {
     })
   }
 
-  getUUPTAuthorizedToLog() {
+  getUUPTAuthorizedToLog = () => {
     let {accessToken, currStoreId} = this.props.global
-    let {phone, uuCode} = this.state
+    let {phone, phone_code} = this.state
     let {currVendorId} = tool.vendor(this.props.global);
-    if (!tool.length(phone) > 0 || !tool.length(uuCode) > 0) {
+    if (!tool.length(phone) > 0 || !tool.length(phone_code) > 0) {
       ToastShort('请输入手机号或者验证码')
       return null;
     }
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.post.bind(this.props)(api, {
       user_mobile: phone,
-      validate_code: uuCode,
+      validate_code: phone_code,
       store_id: currStoreId
     }).then(res => {
       this.fetchData()
@@ -289,7 +289,7 @@ class DeliveryList extends PureComponent {
     })
   }
 
-  getUUPTPhoneCode() {
+  getUUPTPhoneCode = () => {
     let {accessToken} = this.props.global
     let {phone, count_down} = this.state
     let {currVendorId} = tool.vendor(this.props.global);
@@ -305,7 +305,47 @@ class DeliveryList extends PureComponent {
     }
   }
 
-  unbind() {
+
+  getGxdAuthorizedToLog = () => {
+    let {accessToken, currStoreId} = this.props.global
+    let {phone, phone_code} = this.state
+    let {currVendorId} = tool.vendor(this.props.global);
+    if (!tool.length(phone) > 0 || !tool.length(phone_code) > 0) {
+      ToastShort('请输入手机号或者验证码')
+      return null;
+    }
+    const api = `/v1/new_api/Delivery/get_bind_user?access_token=${accessToken}&vendorId=${currVendorId}`
+    HttpUtils.post.bind(this.props)(api, {
+      store_id: currStoreId,
+      phone: phone,
+      code: phone_code
+    }).then(res => {
+      this.fetchData()
+      this.setState({
+        gxdVisible: false
+      }, () => ToastShort(res.desc))
+    }).catch((reason) => {
+      ToastShort(reason.desc)
+    })
+  }
+
+
+  getGxdPhoneCode = () => {
+    let {accessToken, currStoreId} = this.props.global
+    let {phone, count_down} = this.state
+    if (count_down <= 0) {
+      HttpUtils.post.bind(this.props)(`/v1/new_api/Delivery/get_gxd_code?access_token=${accessToken}`, {
+        store_id: currStoreId,
+        phone: phone
+      }).then(res => {
+        ToastShort(res.desc)
+      }).catch((reason) => {
+        ToastShort(reason.desc)
+      })
+    }
+  }
+
+  unbind = () => {
     let {accessToken, currStoreId} = this.props.global
     let {currVendorId} = tool.vendor(this.props.global);
     HttpUtils.post.bind(this.props)(`/v1/new_api/delivery/unbind_store_delivery?vendorId=${currVendorId}&access_token=${accessToken}`, {
@@ -325,17 +365,17 @@ class DeliveryList extends PureComponent {
     })
   }
 
-  getCountdown() {
+  getCountdown = () => {
     return this.state.count_down;
   }
 
-  setCountdown(count_down) {
+  setCountdown = (count_down) => {
     this.setState({
       count_down: count_down
     });
   }
 
-  startCountDown() {
+  startCountDown = () => {
     this.interval = setInterval(() => {
       this.setState({
         count_down: this.getCountdown() - 1
@@ -350,11 +390,8 @@ class DeliveryList extends PureComponent {
     }, 3200)
   }
 
-  onRequestClose() {
-    this.setState({uuVisible: false})
-  }
 
-  renderItem(info) {
+  renderItem = (info) => {
     return (
       <View style={{
         flexDirection: "row",
@@ -382,7 +419,7 @@ class DeliveryList extends PureComponent {
             </If>
           </View>
         </If>
-        <Image style={[style.img]} source={{uri: info.img}}/>
+        <Image style={[styles.img]} source={{uri: info.img}}/>
         <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
           <View style={{
             flexDirection: "row",
@@ -407,8 +444,8 @@ class DeliveryList extends PureComponent {
 
 
         <If condition={!tool.length(info.id) > 0 && !this.state.show_unbind_all}>
-          {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
-            <Text style={[style.status_err]}>去授权</Text>}
+          {info.bind_type === 'wsb' ? <Text style={[styles.status_err]}>申请开通</Text> :
+            <Text style={[styles.status_err]}>去授权</Text>}
         </If>
 
         <If condition={tool.length(info.id) > 0 && !this.state.show_unbind_all}>
@@ -476,7 +513,7 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  renderList(type = 1) {
+  renderList = (type = 1) => {
     let list = [];
     if (type === 1) {
       list = list.concat(this.state.platform_delivery_unbind_list)
@@ -532,7 +569,7 @@ class DeliveryList extends PureComponent {
   }
 
 
-  render() {
+  render = () => {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
@@ -548,7 +585,7 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  renderModal() {
+  renderModal = () => {
     return (
       <View>
         <BottomModal
@@ -605,7 +642,7 @@ class DeliveryList extends PureComponent {
                   value={this.state.phone}
                   editable={true}
                   underlineColorAndroid={"transparent"}
-                  style={CommonStyle.inputH35}
+                  style={styles.phoneinput}
                   clearButtonMode={true}
                   onChangeText={(value) => {
                     this.setState({
@@ -626,15 +663,14 @@ class DeliveryList extends PureComponent {
                   marginVertical: pxToDp(10)
                 }}>
                   <Input
-                    value={this.state.uuCode}
+                    value={this.state.phone_code}
                     onChangeText={(code) => {
                       this.setState({
-                        uuCode: code
+                        phone_code: code
                       })
                     }}
-                    editable={true}
                     underlineColorAndroid={"transparent"}
-                    style={CommonStyle.inputH35}
+                    style={styles.codeinput}
                     clearButtonMode={true}
                     keyboardType="numeric"
                     placeholder="请输入验证码"
@@ -656,11 +692,83 @@ class DeliveryList extends PureComponent {
             </Cell>
           </Cells>
         </BottomModal>
+        <BottomModal
+          title={'绑定裹小递'}
+          actionText={'授权并登录'}
+          onPress={() => this.getGxdAuthorizedToLog()}
+          visible={this.state.gxdVisible}
+          btnStyle={{
+            backgroundColor: colors.main_color,
+            borderWidth: 0,
+          }}
+          onClose={() => this.setState({
+            gxdVisible: false
+          })}
+        >
+          <Cells style={styles.deliverCellBorder}>
+            <Cell>
+              <CellBody>
+                <Input
+                  value={this.state.phone}
+                  editable={true}
+                  underlineColorAndroid={"transparent"}
+                  style={styles.phoneinput}
+                  clearButtonMode={true}
+                  onChangeText={(value) => {
+                    this.setState({
+                      phone: value
+                    })
+                  }}
+                  keyboardType="numeric"
+                  placeholder="请输入手机号"
+                />
+              </CellBody>
+            </Cell>
+            <Cell>
+              <CellBody>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginVertical: pxToDp(10)
+                }}>
+                  <Input
+                    value={this.state.phone_code}
+                    onChangeText={(code) => {
+                      this.setState({
+                        phone_code: code
+                      })
+                    }}
+                    editable={true}
+                    underlineColorAndroid={"transparent"}
+                    style={styles.codeinput}
+                    clearButtonMode={true}
+                    keyboardType="numeric"
+                    placeholder="请输入验证码"
+                  />
+                  {this.state.count_down > 0 ?
+                    <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
+                      <JbbText style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</JbbText>
+                    </TouchableOpacity> :
+                    <TouchableOpacity onPress={() => {
+                      showSuccess('验证码发送成功！')
+                      this.getGxdPhoneCode()
+                      this.setCountdown(60)
+                      this.startCountDown()
+                    }} style={{marginLeft: pxToDp(20)}}>
+                      <JbbText style={styles.btn_style}>获取验证码</JbbText>
+                    </TouchableOpacity>}
+                </View>
+              </CellBody>
+            </Cell>
+          </Cells>
+        </BottomModal>
+
       </View>
     )
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'确认'}
@@ -697,6 +805,25 @@ export default connect(mapStateToProps, mapDispatchToProps)(DeliveryList)
 
 
 const styles = StyleSheet.create({
+
+  phoneinput: {
+    height: 42,
+    lineHeight: 20,
+    fontSize: 15,
+    marginTop: 0,
+    marginBottom: 0,
+    color: colors.color999,
+    width: 300,
+  },
+  codeinput: {
+    height: 42,
+    lineHeight: 20,
+    fontSize: 15,
+    marginTop: 0,
+    marginBottom: 0,
+    color: colors.color999,
+    width: 160
+  },
   btn_style: {
     height: 35,
     backgroundColor: colors.main_color,
@@ -717,13 +844,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(10),
     borderRadius: pxToDp(10)
   },
-  inputH35: {
-    lineHeight: 20,
-    fontSize: 15,
-    marginTop: 0,
-    marginBottom: 0,
-    borderRadius: pxToDp(10)
-  },
   cell_box: {
     margin: 0,
     padding: 10,
@@ -734,10 +854,6 @@ const styles = StyleSheet.create({
   deliverCellBorder: {
     borderRadius: pxToDp(20)
   },
-});
-
-
-const style = StyleSheet.create({
   header_text: {
     height: 40,
     width: "50%",
@@ -777,4 +893,4 @@ const style = StyleSheet.create({
     color: colors.f7,
   },
 
-})
+});
