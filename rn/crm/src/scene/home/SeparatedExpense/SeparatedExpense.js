@@ -1,5 +1,13 @@
 import React, {PureComponent} from 'react'
-import ReactNative, {ImageBackground, InteractionManager, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import ReactNative, {
+  ImageBackground,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -11,11 +19,13 @@ import Config from "../../../pubilc/common/config";
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
-import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button, Image} from "react-native-elements";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import LinearGradient from "react-native-linear-gradient";
+import JbbModal from "../../../pubilc/component/JbbModal";
+import {InputItem} from "@ant-design/react-native";
 const {StyleSheet} = ReactNative
 
 function mapStateToProps(state) {
@@ -34,11 +44,22 @@ function mapDispatchToProps(dispatch) {
 const WSB_ACCOUNT = 0;
 const THIRD_PARTY_ACCOUNT = 1;
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
     let date = new Date();
     this.state = {
+      isRefreshing: false,
       switchType: WSB_ACCOUNT,
       balanceNum: 0,
       records: [],
@@ -51,10 +72,10 @@ class SeparatedExpense extends PureComponent {
       freeze_show: false,
       freeze_msg: "",
       prompt_msg: '外送帮仅支持充值，如需查看充值记录和账单明细，请登录配送商家版查看',
-      thirdAccountList: [
-        {name: '达达', current_balance: 99.90, color: ['#15D3D0', '#1778D0'], icon: 'https://img.88icon.com/download/jpg/20200810/d5528b8927891b53ce541c6dc3b36fe1_512_512.jpg!88con', iconBg: '', btnTitleColor: '#1778D0'},
-        {name: '顺丰', current_balance: 99.90, color: ['#525F87', '#283048'], icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhVc3LtxcKyMUbd9gOQ0Q_Z1aaTnnEKctQiQ&usqp=CAU', iconBg: '', btnTitleColor: '#283048'}
-      ]
+      thirdAccountList: [],
+      pay_url: '',
+      dadaAccountModal: false,
+      dadaAccountNum: 0
     }
   }
 
@@ -69,6 +90,10 @@ class SeparatedExpense extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
+  }
+
+  onRefresh = () => {
+    this.fetchThirdDeliveryList()
   }
 
   fetchExpenses = () => {
@@ -124,7 +149,15 @@ class SeparatedExpense extends PureComponent {
 
   // 获取三方配送充值列表
   fetchThirdDeliveryList = () => {
-
+    showModal('加载中')
+    const {global} = this.props;
+    const url = `/v1/new_api/delivery/delivery_account_balance/${global.currStoreId}?access_token=${global.accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      hideModal()
+      this.setState({
+        thirdAccountList: res
+      })
+    })
   }
 
   // 切换外送帮钱包 三方配送充值tab
@@ -172,29 +205,106 @@ class SeparatedExpense extends PureComponent {
     });
   }
 
-  toPay = () => {
+  // 顺丰去充值
+  toPay = (row) => {
+    if (row.type == 2) {
+      this.setState({
+        dadaAccountModal: true,
+        type_dada: row.type
+      })
+    } else {
+      showModal('请求中')
+      const {global} = this.props;
+      const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
+      HttpUtils.post.bind(this.props)(url, {
+        store_id: global.currStoreId,
+        delivery_type_v1: row.type,
+        amount: 0
+      }).then(res => {
+        hideModal()
+        if (res.msg && res.msg !== '') {
+          showError(`${res.msg}`)
+        } else {
+          this.setState({
+            pay_url: res.pay_url,
+            switch_type: THIRD_PARTY_ACCOUNT
+          }, () => {
+            ToastLong('即将前往充值...')
+            setTimeout(() => {
+              this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
+            }, 100)
+          })
+        }
+      })
+    }
+  }
 
+  // 达达去充值
+  fetchDeliveryPayUrl = () => {
+    showModal('请求中')
+    let {type_dada, dadaAccountNum} = this.state
+    const {global} = this.props;
+    const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
+    HttpUtils.post.bind(this.props)(url, {
+      store_id: global.currStoreId,
+      delivery_type_v1: type_dada,
+      amount: dadaAccountNum
+    }).then(res => {
+      hideModal()
+      if (res.msg && res.msg !== '') {
+        showError(`${res.msg}`)
+      } else {
+        this.setState({
+          pay_url: res.pay_url,
+          switch_type: THIRD_PARTY_ACCOUNT
+        }, () => {
+          ToastLong('即将前往充值...')
+          setTimeout(() => {
+            this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
+          }, 100)
+        })
+      }
+    })
+  }
+
+  // 去授权
+  toAuthorization = () => {
+    this.onPress(Config.ROUTE_DELIVERY_LIST, {tab: 2})
+  }
+
+  closeAccountModal = () => {
+    this.setState({
+      dadaAccountModal: false,
+      dadaAccountNum: 0
+    })
   }
 
   render() {
     const {switchType} = this.state;
     return (
-      <ScrollView style={Styles.containerContent}>
+        <View style={Styles.containerContent}>
+          <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+          <ScrollView style={Styles.containerContent} refreshControl={
+            <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
+                            tintColor='gray'/>
+          }>
+            {this.renderHeaderType()}
 
-        {this.renderHeaderType()}
+            <If condition={switchType === WSB_ACCOUNT}>
+              <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
+              {this.renderWSBHeader()}
+              {this.renderWSBType()}
+              {this.renderWSBContent()}
+            </If>
 
-        <If condition={switchType === WSB_ACCOUNT}>
-          <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
-          {this.renderWSBHeader()}
-          {this.renderWSBType()}
-          {this.renderWSBContent()}
-        </If>
+            <If condition={switchType === THIRD_PARTY_ACCOUNT}>
+              {this.renderTHIRDContainer()}
+            </If>
 
-        <If condition={switchType === THIRD_PARTY_ACCOUNT}>
-          {this.renderTHIRDContainer()}
-        </If>
+            {this.renderAccountModal()}
 
-      </ScrollView>
+          </ScrollView>
+        </View>
     )
   }
 
@@ -368,21 +478,21 @@ class SeparatedExpense extends PureComponent {
             <LinearGradient style={Styles.THIRDContainerItemLinear}
               start={{x: 0, y: 0}}
               end={{x: 1, y: 1}}
-              colors={info.color}>
+              colors={info.background_color}>
               <View style={Styles.THIRDContainerItemBody}>
                 <View style={Styles.THIRDContainerItemBody}>
-                  <Image source={{uri: info.icon}}
+                  <Image source={{uri: info.img}}
                          style={Styles.THIRDContainerItemIcon}/>
                   <Text style={Styles.THIRDContainerItemName}>{info.name}</Text>
                 </View>
                 <Button buttonStyle={Styles.THIRDContainerBtn}
-                        titleStyle={{color: info.btnTitleColor, fontSize: pxToDp(25), fontWeight: "bold"}}
+                        titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
                         title={'立即充值'}
-                        onPress={() => {this.toPay()}}/>
+                        onPress={() => {this.toPay(info)}}/>
               </View>
               <View style={Styles.THIRDContainerItemBody}>
                 <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
-                <ImageBackground source={{uri: info.iconBg}} style={Styles.THIRDContainerItemIconBg}/>
+                <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
               </View>
             </LinearGradient>
           </For>
@@ -390,18 +500,66 @@ class SeparatedExpense extends PureComponent {
     )
   }
 
+  renderNOTHIRDList = () => {
+    return (
+        <View style={Styles.THIRDContainerNOList}>
+          <Text style={Styles.NoTHIRDListText}>
+            未授权商家自有账号
+          </Text>
+          <Button buttonStyle={Styles.NoTHIRDListBtn}
+                  titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
+                  title={'去授权'}
+                  onPress={() => {this.toAuthorization()}}/>
+        </View>
+    )
+  }
+
   renderTHIRDContainer = () => {
+    const {thirdAccountList} = this.state
     return (
         <View>
           {this.renderTHIRDHeader()}
-          {this.renderTHIRDContentItem()}
+          {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
         </View>
+    )
+  }
+
+  renderAccountModal = () => {
+    return (
+        <JbbModal visible={this.state.dadaAccountModal} onClose={() => this.closeAccountModal()} modal_type={'center'}>
+          <View style={{padding: pxToDp(20)}}>
+            <TouchableOpacity onPress={() => this.closeAccountModal()} style={Styles.flexRowStyle}>
+              <Text style={Styles.modalTitle}>充值金额</Text>
+              <Entypo name="circle-with-cross" style={Styles.closeIcon}/>
+            </TouchableOpacity>
+            <InputItem clear error={this.state.dadaAccountNum <= 0} type="number" value={this.state.dadaAccountNum}
+                       onChange={dadaAccountNum => {this.setState({dadaAccountNum});}}
+                       extra="元"
+                       placeholder="帐户充值金额">
+            </InputItem>
+            <View style={Styles.modalBtnStyle}>
+              <Button buttonStyle={Styles.modalBtnText}
+                      titleStyle={{fontSize: pxToDp(30), color: 'white'}}
+                      title={'取消'}
+                      onPress={() => {this.closeAccountModal()}}/>
+              <Button buttonStyle={Styles.modalBtnText1}
+                      titleStyle={{fontSize: pxToDp(30), color: 'white'}}
+                      title={'确定'}
+                      onPress={() => {
+                        this.closeAccountModal()
+                        this.fetchDeliveryPayUrl()
+                      }}/>
+            </View>
+          </View>
+        </JbbModal>
     )
   }
 
 }
 
 const Styles = StyleSheet.create({
+  flexRowStyle: {flexDirection: 'row', justifyContent: "space-between", alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333},
   flex1: {flex: 1},
   flex3: {flex: 3},
   fontBold: {fontWeight: "bold"},
@@ -585,6 +743,11 @@ const Styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column"
   },
+  THIRDContainerNOList: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1
+  },
   THIRDContainerItemBody: {
     display: "flex",
     flexDirection: "row",
@@ -620,6 +783,52 @@ const Styles = StyleSheet.create({
     color: '#ffffff',
     marginTop: pxToDp(30),
     marginLeft: pxToDp(10)
+  },
+  NoTHIRDListText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: '#999999',
+    marginTop: '30%',
+    marginLeft: '20%'
+  },
+  NoTHIRDListBtn: {
+    width: "96%",
+    height: pxToDp(70),
+    marginTop: '20%',
+    marginLeft: '2%',
+    backgroundColor: '#59B26A',
+    borderRadius: pxToDp(10)
+  },
+  closeIcon: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
+  modalBtnStyle: {
+    flexDirection: 'row',
+    marginTop: 30,
+  },
+  modalBtnText: {
+    height: 40,
+    width: "50%",
+    marginHorizontal: '10%',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: 'gray',
+    lineHeight: 40,
+    borderRadius: pxToDp(10)
+  },
+  modalBtnText1: {
+    height: 40,
+    width: "50%",
+    marginHorizontal: '10%',
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: colors.main_color,
+    color: 'white',
+    lineHeight: 40,
+    borderRadius: pxToDp(10)
   }
 });
 
