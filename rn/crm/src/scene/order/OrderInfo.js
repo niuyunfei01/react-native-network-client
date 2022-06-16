@@ -1300,8 +1300,8 @@ class OrderInfo extends Component {
           <View style={Styles.deliveryStatusHeader}>
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
-                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
-                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContent]}/> : null}
+                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}
+                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/> : null}
               </View>
             </View>
             <View style={Styles.deliveryStatusHeaderBottom}>
@@ -2062,7 +2062,14 @@ const Styles = StyleSheet.create({
     height: pxToDp(30),
     borderRadius: pxToDp(15)
   },
-  deliveryStatusContent: {
+  deliveryStatusContentTop: {
+    width: pxToDp(5),
+    height: pxToDp(45),
+    position: 'absolute',
+    top: pxToDp(28),
+    left: pxToDp(13)
+  },
+  deliveryStatusContentBottom: {
     width: pxToDp(5),
     height: pxToDp(45),
     position: 'absolute',

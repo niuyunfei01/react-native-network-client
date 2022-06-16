@@ -95,7 +95,9 @@ class OrderTransferThird extends Component {
 
   fetchThirdWays=()=> {
     const version_code = DeviceInfo.getBuildNumber();
-    this.state.isLoading = true;
+    this.setState({
+      isLoading: true
+    })
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
@@ -1143,6 +1145,7 @@ class OrderTransferThird extends Component {
                 <Text style={{textAlign: 'right'}}>{this.state.weight_max}千克</Text>
               </View>
             </View>
+            <Text style={{color: colors.warn_color, lineHeight: pxToDp(40)}}>修改商品重量将使配送费发生变化，请在确认重量后修改。</Text>
             <View style={{
               width: '100%',
               flexDirection: 'row',

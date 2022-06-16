@@ -163,12 +163,13 @@ const Styles = StyleSheet.create({
     alignItems: 'center'
   },
   fileImg: {
-    fontSize: pxToDp(45),
+    width: pxToDp(90),
+    height: pxToDp(90),
+    fontSize: pxToDp(90),
     color: colors.color666,
     marginRight: pxToDp(15),
-    borderRadius: 10,
-    borderWidth: pxToDp(1),
-    borderColor: '#999'
+    paddingLeft: pxToDp(15),
+    borderRadius: 10
   },
   ContentText: {
     fontSize: pxToEm(26),

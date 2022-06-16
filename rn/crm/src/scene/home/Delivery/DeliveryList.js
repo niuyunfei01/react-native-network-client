@@ -124,6 +124,11 @@ class DeliveryList extends PureComponent {
 
   renderHeader = () => {
     let show_type = this.state.show_type
+    if (this.props.route.params && this.props.route.params.tab !== undefined) {
+      this.setState({
+        show_type: this.props.route.params.tab
+      })
+    }
     return (
       <View style={{
         width: '100%',

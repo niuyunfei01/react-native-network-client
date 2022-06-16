@@ -230,8 +230,7 @@ class NewProduct extends PureComponent {
       <ScrollView>
         <Left
           title="商品名称"
-          placeholder="输入商品名(不超过20个字)"
-          maxLength={20}
+          placeholder="输入商品名"
           value={this.state.goods_name}
           onChangeText={text => this.setState({goods_name: text})}
         />
