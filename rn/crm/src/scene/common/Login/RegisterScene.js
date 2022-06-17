@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {Alert, Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from '../../../reducers/global/globalActions'
 import pxToDp from '../../../pubilc/util/pxToDp';
@@ -11,6 +11,7 @@ import Config from "../../../pubilc/common/config";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import BottomModal from "../../../pubilc/component/BottomModal";
 
 /**
  * ## Redux boilerplate
@@ -37,20 +38,16 @@ class RegisterScene extends PureComponent {
       reRequestAfterSeconds: 60,
       doingRegister: false,
       checkBox: false,
+      show_auth_modal: false,
     }
     this.mixpanel = MixpanelInstance;
   }
 
   onRegister() {
     if (!this.state.checkBox) {
-      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
-        {text: '拒绝', style: 'cancel'},
-        {
-          text: '同意', onPress: () => {
-          }
-        },
-      ])
-      return false;
+      return this.setState({
+        show_auth_modal: true
+      })
     }
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       ToastShort("手机号有误")
@@ -271,8 +268,27 @@ class RegisterScene extends PureComponent {
             }}/>
 
         </View>
+
+        <BottomModal title={'提示'} actionText={'同意'} closeText={'取消'} onPress={this.closeModal}
+                     visible={this.state.show_auth_modal} onPressClose={this.closeModal}
+                     onClose={this.closeModal} btnStyle={{backgroundColor: colors.main_color}}>
+          <View style={{marginVertical: 10, marginHorizontal: 6}}>
+            <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
+              style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
+            <Text
+              style={{fontSize: 14, color: colors.color333, marginVertical: 6}}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
+          </View>
+        </BottomModal>
+
       </ScrollView>
     )
+  }
+
+  closeModal = () => {
+    this.setState({
+      show_auth_modal: false
+    })
   }
 
   onReadProtocol = () => {

@@ -574,7 +574,7 @@ class DeliveryList extends PureComponent {
   }
 
 
-  render = () => {
+  render() {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
