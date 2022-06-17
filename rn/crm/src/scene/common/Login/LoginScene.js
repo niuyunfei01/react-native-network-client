@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {
-  Alert,
   Dimensions,
   Image,
   ImageBackground,
@@ -35,6 +34,7 @@ import dayjs from "dayjs";
 import {CheckBox} from "react-native-elements";
 import JPush from "jpush-react-native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import BottomModal from "../../../pubilc/component/BottomModal";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 let {height, width} = Dimensions.get('window')
@@ -64,29 +64,21 @@ class LoginScene extends PureComponent {
       doingSign: false,
       doingSignKey: '',
       authorization: false,
+      show_auth_modal: true,
     };
-    this.onLogin = this.onLogin.bind(this);
-    this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
-    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
-    this.queryCommonConfig = this.queryCommonConfig.bind(this);
-    this.doneSelectStore = this.doneSelectStore.bind(this);
 
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("openApp_page_view", {});
-    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-      {text: '拒绝', style: 'cancel'},
-      {text: '同意'},
-    ])
   }
 
-  clearTimeouts() {
+  clearTimeouts = () => {
     this.timeouts.forEach(clearTimeout);
   }
 
-  UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount = () => {
 
     const {dispatch} = this.props;
     dispatch(logout());
@@ -96,15 +88,15 @@ class LoginScene extends PureComponent {
     this.nextParams = params.nextParams;
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     this.clearTimeouts();
   }
 
-  getCountdown() {
+  getCountdown = () => {
     return this.state.reRequestAfterSeconds;
   }
 
-  onRequestSmsCode() {
+  onRequestSmsCode = () => {
 
     if (this.state.mobile && tool.length(this.state.mobile) > 10) {
 
@@ -133,23 +125,16 @@ class LoginScene extends PureComponent {
     }
   }
 
-  onCounterReReqEnd() {
+  onCounterReReqEnd = () => {
     this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
   }
 
-  onLogin() {
+  onLogin = () => {
     const loginType = this.state.loginType;
     if (!this.state.authorization) {
-      Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-        {text: '拒绝', style: 'cancel'},
-        {
-          text: '同意', onPress: () => {
-            // this.setState({authorization: true})
-            // this.onReadProtocol();
-          }
-        },
-      ])
-      return false;
+      return this.setState({
+        show_auth_modal: true
+      })
     }
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
@@ -177,7 +162,7 @@ class LoginScene extends PureComponent {
     }
   }
 
-  queryCommonConfig(uid) {
+  queryCommonConfig = (uid) => {
     let flag = false;
     showModal()
     let {accessToken, currStoreId} = this.props.global;
@@ -199,7 +184,7 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  doneSelectStore(storeId, not_bind = false) {
+  doneSelectStore = (storeId, not_bind = false) => {
     const {dispatch, navigation} = this.props;
     let {accessToken} = this.props.global;
     dispatch(getCommonConfig(accessToken, storeId, () => {
@@ -232,7 +217,7 @@ class LoginScene extends PureComponent {
     }
   }
 
-  _signIn(mobile, password, name) {
+  _signIn = (mobile, password, name) => {
     const {dispatch} = this.props;
     dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
@@ -269,7 +254,7 @@ class LoginScene extends PureComponent {
   }
 
 
-  doSaveUserInfo(token) {
+  doSaveUserInfo = (token) => {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
@@ -469,11 +454,30 @@ class LoginScene extends PureComponent {
             }}>联系客服</Text>
           </View>
         </ImageBackground>
+        <BottomModal title={'提示'} actionText={'同意'} closeText={'取消'} onPress={this.closeModal}
+                     visible={this.state.show_auth_modal} onPressClose={this.closeModal}
+                     onClose={this.closeModal} btnStyle={{backgroundColor: colors.main_color}}>
+
+          <View style={{marginVertical: 10, marginHorizontal: 6}}>
+            <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
+              style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
+            <Text
+              style={{fontSize: 14, color: colors.color333, marginVertical: 6}}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
+          </View>
+        </BottomModal>
       </View>
     )
   }
 
+  closeModal = () => {
+    this.setState({
+      show_auth_modal: false
+    })
+    ToastShort("请手动勾选隐私政策")
+  }
   onReadProtocol = () => {
+    this.closeModal()
     this.mixpanel.track("openApp_privacy_click", {});
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});

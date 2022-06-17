@@ -316,7 +316,7 @@ class OrderSettingScene extends Component {
     });
   }
 
-  render = () => {
+  render() {
     const {
       location_long,
       location_lat,
