@@ -115,6 +115,12 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} options={{headerTitle: '添加蓝牙打印机'}}
                       getComponent={() => require("../../scene/home/Setting/BluePrinterSettings").default}
         />
+
+        <Stack.Screen name={Config.ROUTE_HISTORY_NOTICE} options={{headerTitle: '历史公告'}}
+                      getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
+        <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
+                      getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
+
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
         <Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}

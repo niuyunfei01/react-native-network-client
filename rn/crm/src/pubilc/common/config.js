@@ -183,6 +183,8 @@ const C = {
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
   ROUTE_PUSH: 'PushSetting',                  //推送设置
+  ROUTE_HISTORY_NOTICE: 'HistoryNoticeScene', //  历史公告
+  ROUTE_DETAIL_NOTICE: 'DetailNoticeScene', // 公告详情
   ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
   ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
   DIY_PRINTER: 'Diyprinter',              //小票设置

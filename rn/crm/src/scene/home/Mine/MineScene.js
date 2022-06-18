@@ -1207,6 +1207,17 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
+            activeOpacity={customerOpacity}>
+          <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/inform.png")}
+          />
+          <Text style={[block_styles.block_name]}>公告通知</Text>
+        </TouchableOpacity>
+
         {this.state.show_activity && GlobalUtil.getRecommend() ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
