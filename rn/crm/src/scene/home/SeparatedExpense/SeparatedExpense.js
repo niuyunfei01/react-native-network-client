@@ -27,10 +27,12 @@ import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
 const {StyleSheet} = ReactNative
+import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
+import {getTime} from "../../../pubilc/util/TimeUtil";
 
 function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global}
+  const {global,device} = state;
+  return {global: global,device:device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -54,9 +56,19 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
+const timeObj={
+  deviceInfo:{},
+  currentStoreId:'',
+  currentUserId:'',
+  moduleName:'',
+  componentName:'',
+  method:[]
+}//记录耗时的对象
+
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
+    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
     let date = new Date();
     this.state = {
       isRefreshing: false,
@@ -84,7 +96,40 @@ class SeparatedExpense extends PureComponent {
     this.fetchBalance()
     this.fetchFreeze()
   }
+  componentDidUpdate(prevProps, prevState, snapshot) {
 
+    if(timeObj.method.length>0) {
+      const endTime=getTime()
+      const startTime=timeObj.method[0].startTime
+      timeObj.method.push({
+        interfaceName:"",
+        executeStatus:'success',
+        startTime:startTime,
+        endTime:endTime,methodName:'componentDidUpdate',
+        executeTime:endTime-startTime
+      })
+      const duplicateObj= {...timeObj}
+      timeObj.method=[]
+      calcMs(duplicateObj,this.props.global.accessToken)
+    }
+  }
+
+  componentDidMount() {
+    timeObj.method[0].endTime=getTime()
+    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
+    timeObj.method[0].executeStatus='success'
+    timeObj.method[0].methodName="componentDidMount"
+    timeObj.method[0].interfaceName=""
+    const {deviceInfo} = this.props.device
+    const {currStoreId, currentUser,accessToken,config} = this.props.global;
+    timeObj['deviceInfo']=deviceInfo
+    timeObj.currentStoreId=currStoreId
+    timeObj.currentUserId=currentUser
+    timeObj['moduleName']="我的"
+    timeObj['componentName']="SeparatedExpense"
+    timeObj['is_record_request_monitor']=config.is_record_request_monitor
+    calcMs(timeObj,accessToken)
+  }
   onPress(route, params = {}, callback = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
@@ -96,42 +141,94 @@ class SeparatedExpense extends PureComponent {
     this.fetchThirdDeliveryList()
   }
 
-  fetchExpenses = () => {
+  fetchExpenses() {
     showModal('加载中')
     const {global} = this.props;
     const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      this.setState({
-        records: res.records,
-        by_labels: res.by_labels,
-        data_labels: res.data_labels
-      }, () => {
-        hideModal()
+    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
+      const {obj}=res
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchExpenses',
+        executeTime:res.endTime-res.startTime
       })
-    }, () => {
+      this.setState({
+        records: obj.records,
+        by_labels: obj.by_labels,
+        data_labels: obj.data_labels
+      })
+      hideModal()
+    }, (res) => {
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchExpenses',
+        executeTime:res.endTime-res.startTime
+      })
       hideModal();
+
     })
   }
 
   //获取余额
-  fetchBalance = () => {
+  fetchBalance() {
     const {global} = this.props;
     const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
+    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchBalance',
+        executeTime:res.endTime-res.startTime
+      })
       this.setState({
-        balanceNum: res
+        balanceNum: res.obj
+      })
+    }).catch((res)=>{
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchBalance',
+        executeTime:res.endTime-res.startTime
       })
     })
   }
 
   //获取冻结
-  fetchFreeze = () => {
+  fetchFreeze() {
     const {global} = this.props;
     const url = `/v1/new_api/bill/freeze_info/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
+    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
+      const{obj}=res
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchFreeze',
+        executeTime:res.endTime-res.startTime
+      })
       this.setState({
-        freeze_show: res.show !== undefined && res.show === 1,
-        freeze_msg: res.notice !== undefined ? res.notice : ""
+        freeze_show: obj.show !== undefined && obj.show === 1,
+        freeze_msg: obj.notice !== undefined ? obj.notice : ""
+      })
+    }).catch(error=>{
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:error.executeStatus,
+        startTime:error.startTime,
+        endTime:error.endTime,
+        methodName:'fetchFreeze',
+        executeTime:error.endTime-error.startTime
       })
     })
   }

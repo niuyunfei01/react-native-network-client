@@ -52,6 +52,8 @@ import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import ItemRow from "../../pubilc/component/ItemRow";
 import OrderReminds from "../../pubilc/component/OrderReminds";
+import {calcMs} from "../../pubilc/util/AppMonitorInfo";
+import {getTime} from "../../pubilc/util/TimeUtil";
 
 const numeral = require('numeral');
 const {InteractionManager} = ReactNative;
@@ -61,6 +63,7 @@ function mapStateToProps(state) {
     order: state.order,
     global: state.global,
     store: state.store,
+    device:state.device
   }
 }
 
@@ -114,9 +117,19 @@ const MENU_CANCEL_ORDER = 15; // 取消订单
 const MENU_SET_COMPLETE = 16; // 置为完成
 const MENU_CALL_STAFF = 17; // 联系员工
 
+const timeObj={
+  deviceInfo:{},
+  currentStoreId:'',
+  currentUserId:'',
+  moduleName:'',
+  componentName:'',
+  method:[]
+}//记录耗时的对象
+
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
+    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
@@ -167,8 +180,41 @@ class OrderInfo extends Component {
   fetchData = () => {
     this.fetchOrder(this.state.order_id)
   }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(timeObj.method.length>0) {
+      const endTime=getTime()
+      const startTime=timeObj.method[0].startTime
+      timeObj.method.push({
+        interfaceName:'',
+        executeStatus:'success',
+        startTime:startTime,
+        endTime:endTime,
+        methodName:'componentDidUpdate',
+        executeTime:endTime-startTime
+      })
+      const duplicateObj= {...timeObj}
+      timeObj.method=[]
+      calcMs(duplicateObj,this.props.global.accessToken)
+    }
+  }
 
-  fetchOrder = (order_id) => {
+  componentDidMount() {
+    timeObj.method[0].endTime=getTime()
+    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
+    timeObj.method[0].executeStatus='success'
+    timeObj.method[0].interfaceName=''
+    timeObj.method[0].methodName='componentDidUpdate'
+    const {deviceInfo} = this.props.device
+    const {currStoreId, currentUser,accessToken,config} = this.props.global;
+    timeObj['deviceInfo']=deviceInfo
+    timeObj.currentStoreId=currStoreId
+    timeObj.currentUserId=currentUser
+    timeObj['moduleName']="订单"
+    timeObj['componentName']="OrderInfo"
+    timeObj['is_record_request_monitor']=config.is_record_request_monitor
+    calcMs(timeObj,accessToken)
+  }
+  fetchOrder(order_id) {
     if (!order_id || this.state.isFetching) {
       return false;
     }
@@ -178,14 +224,23 @@ class OrderInfo extends Component {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     const api = `/v1/new_api/orders/order_by_id/${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
+    HttpUtils.get.bind(this.props)(api,{},true).then((res) => {
+      const {obj}=res
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchOrder',
+        executeTime:res.endTime-res.startTime
+      })
       this.setState({
-        order: res,
+        order: obj,
         isFetching: false,
-        itemsEdited: this._extract_edited_items(res.items),
-        pickCodeStatus: parseInt(res.pickType) === 1,
-        allow_merchants_cancel_order: parseInt(res.allow_merchants_cancel_order) === 1,
-        qrcode: tool.length(res.pickup_code) > 0 ? res.pickup_code : '',
+        itemsEdited: this._extract_edited_items(obj.items),
+        pickCodeStatus: parseInt(obj.pickType) === 1,
+        allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
+        qrcode: tool.length(obj.pickup_code) > 0 ? obj.pickup_code : '',
       }, () => {
         this.setHeader()
       });
@@ -199,46 +254,100 @@ class OrderInfo extends Component {
       this.logOrderViewed();
       this.fetchDeliveryList()
       this.fetchThirdWays()
+
     }, ((res) => {
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchOrder',
+        executeTime:res.endTime-res.startTime
+      })
       ToastLong('操作失败：' + res.reason)
       this.setState({isFetching: false})
+
     })).catch((e) => {
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:e.executeStatus,
+        startTime:e.startTime,
+        endTime:e.endTime,
+        methodName:'fetchOrder',
+        executeTime:e.endTime-e.startTime
+      })
       ToastLong('操作失败：' + e.desc)
       this.setState({isFetching: false})
+
     })
   }
 
-  fetchShipData = () => {
+  fetchShipData() {
     const api = `/v1/new_api/orders/third_ship_deliverie/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
-    HttpUtils.get.bind(this.props)(api).then(res => {
-      this.setState({
-        deliverie_status: res.show_status,
-        show_no_rider_tips: res.show_no_rider_tips === 1,
-        deliverie_desc: res.desc,
-        logistics: res.third_deliverie_list
+    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
+      const {obj}=res
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchShipData',
+        executeTime:res.endTime-res.startTime
       })
+      this.setState({
+        deliverie_status: obj.show_status,
+        show_no_rider_tips: obj.show_no_rider_tips === 1,
+        deliverie_desc: obj.desc,
+        logistics: obj.third_deliverie_list
+      })
+
     })
   }
 
-  fetchDeliveryList = () => {
+  fetchDeliveryList() {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
-    HttpUtils.get.bind(this.props)(api).then(res => {
-      this.setState({
-        delivery_list: res.delivery_lists !== undefined && Array.isArray(res.delivery_lists) ? res.delivery_lists : [],
-        is_merchant_add_tip: res.is_merchant_add_tip !== undefined ? Boolean(res.is_merchant_add_tip) : false
+    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
+      const {obj}=res
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchDeliveryList',
+        executeTime:res.endTime-res.startTime
       })
+      this.setState({
+        delivery_list: undefined!== obj?.delivery_lists && Array.isArray(obj.delivery_lists) ? obj.delivery_lists : [],
+        is_merchant_add_tip: undefined!== obj?.is_merchant_add_tip ? Boolean(obj.is_merchant_add_tip) : false
+      })
+
     })
   }
 
-  fetchThirdWays = () => {
+  fetchThirdWays() {
     let {orderStatus} = this.state.order;
     if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${this.state.order_id}?select=1&access_token=${this.props.global.accessToken}`;
-      HttpUtils.get.bind(this.props.navigation)(api).then(() => {
-      }, () => {
+      HttpUtils.get.bind(this.props.navigation)(api,{},true).then((res) => {
+        timeObj.method.push({
+          interfaceName:api,
+          executeStatus:res.executeStatus,
+          startTime:res.startTime,
+          endTime:res.endTime,
+          methodName:'fetchThirdWays',
+          executeTime:res.endTime-res.startTime
+        })
+      }).catch(error=>{
+        timeObj.method.push({
+          interfaceName:api,
+          executeStatus:error.executeStatus,
+          startTime:reerrors.startTime,
+          endTime:error.endTime,
+          methodName:'fetchThirdWays',
+          executeTime:error.endTime-error.startTime
       })
-    }
-  }
+    })
+  }}
 
   navigateToOrderOperation = () => {
     this.props.navigation.navigate('OrderOperation', {
@@ -262,13 +371,30 @@ class OrderInfo extends Component {
     return edits;
   }
 
-  logOrderViewed = () => {
+  logOrderViewed() {
     let {id, orderStatus} = this.state.order;
-    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+    if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
-      HttpUtils.post.bind(this.props)(url).then(res => {
-        console.log('log_view_order: =>', res)
-      }).catch(() => {
+      HttpUtils.post.bind(this.props)(url,{},true).then(res => {
+        timeObj.method.push({
+          interfaceName:url,
+          executeStatus:res.executeStatus,
+          startTime:res.startTime,
+          endTime:res.endTime,
+          methodName:'logOrderViewed',
+          executeTime:res.endTime-res.startTime
+        })
+      }, () => {
+        // ToastLong(res.desc);
+      }).catch((res) => {
+        timeObj.method.push({
+          interfaceName:url,
+          executeStatus:res.executeStatus,
+          startTime:res.startTime,
+          endTime:res.endTime,
+          methodName:'logOrderViewed',
+          executeTime:res.endTime-res.startTime
+        })
         ToastLong("记录订单访问次数错误！");
       })
     }
@@ -700,8 +826,8 @@ class OrderInfo extends Component {
   renderDeliveryInfo = () => {
     return (<View style={styles.flex1}>
       <For each="item" index="i" of={this.state.logistics}>
-        <If condition={item.is_show === 1}>
-          <View key={i} style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+        <If condition={item.is_show === 1} key={i}>
+          <View style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
             <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={Styles.driverName}>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
@@ -1297,7 +1423,7 @@ class OrderInfo extends Component {
     return (
       <View>
         <For each="log" index="i" of={list}>
-          <View style={Styles.deliveryStatusHeader}>
+          <View style={Styles.deliveryStatusHeader} key={i}>
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
                 {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}

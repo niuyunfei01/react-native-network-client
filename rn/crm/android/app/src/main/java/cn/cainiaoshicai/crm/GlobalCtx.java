@@ -72,7 +72,7 @@ import com.uiwjs.alipay.RNAlipayPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
-
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -1298,7 +1298,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new NewRelicPackage(),
                     new LinearGradientPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
-                    new RNAlipayPackage()
+                    new RNAlipayPackage(),
+                    new ClipboardPackage()
             );
         }
     };

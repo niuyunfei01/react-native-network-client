@@ -2,6 +2,7 @@ package com.learnium.RNDeviceInfo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -11,12 +12,15 @@ import android.content.res.Configuration;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
 import android.provider.Settings.Secure;
 import android.webkit.WebSettings;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 
 //import com.google.android.gms.iid.InstanceID;
+import android.provider.Settings;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -24,6 +28,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,7 +46,7 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         super(reactContext);
 
         this.reactContext = reactContext;
-        
+
         WifiManager manager = (WifiManager) reactContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         this.wifiInfo = manager.getConnectionInfo();
     }
@@ -104,6 +109,108 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         String macAddress = wifiInfo.getMacAddress();
         p.resolve(macAddress);
     }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public int getApiLevelSync() {
+        return Build.VERSION.SDK_INT;
+    }
+
+    @ReactMethod
+    public void getApiLevel(Promise p) {
+        p.resolve(getApiLevelSync());
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public String getDeviceSync() {
+        return Build.DEVICE;
+    }
+
+    @ReactMethod
+    public void getDevice(Promise p) {
+        p.resolve(getDeviceSync());
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public String getDeviceNameSync() {
+        try {
+            String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
+            if (bluetoothName != null) {
+                return bluetoothName;
+            }
+
+            if (Build.VERSION.SDK_INT >= 25) {
+                String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
+                if (deviceName != null) {
+                    return deviceName;
+                }
+            }
+        } catch (Exception e) {
+            // same as default unknown return
+        }
+        return "unknown";
+    }
+
+    @ReactMethod
+    public void getDeviceName(Promise p) {
+        p.resolve(getDeviceNameSync());
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public float getFontScaleSync() { return getReactApplicationContext().getResources().getConfiguration().fontScale; }
+    @ReactMethod
+    public void getFontScale(Promise p) { p.resolve(getFontScaleSync()); }
+
+    private long getTotalAvailableBlocks(StatFs dir, Boolean intApiDeprecated) {
+        return (intApiDeprecated ? dir.getAvailableBlocksLong() : dir.getAvailableBlocks());
+    }
+
+    private long getBlockSize(StatFs dir, Boolean intApiDeprecated) {
+        return (intApiDeprecated ? dir.getBlockSizeLong() : dir.getBlockSize());
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public double getFreeDiskStorageSync() {
+        try {
+            StatFs rootDir = new StatFs(Environment.getRootDirectory().getAbsolutePath());
+            StatFs dataDir = new StatFs(Environment.getDataDirectory().getAbsolutePath());
+
+            Boolean intApiDeprecated = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+            long rootAvailableBlocks = getTotalAvailableBlocks(rootDir, intApiDeprecated);
+            long rootBlockSize = getBlockSize(rootDir, intApiDeprecated);
+            double rootFree = BigInteger.valueOf(rootAvailableBlocks).multiply(BigInteger.valueOf(rootBlockSize)).doubleValue();
+
+            long dataAvailableBlocks = getTotalAvailableBlocks(dataDir, intApiDeprecated);
+            long dataBlockSize = getBlockSize(dataDir, intApiDeprecated);
+            double dataFree = BigInteger.valueOf(dataAvailableBlocks).multiply(BigInteger.valueOf(dataBlockSize)).doubleValue();
+
+            return rootFree + dataFree;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+    @ReactMethod
+    public void getFreeDiskStorage(Promise p) { p.resolve(getFreeDiskStorageSync()); }
+
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public double getTotalMemorySync() {
+        ActivityManager actMgr = (ActivityManager) getReactApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
+        if (actMgr != null) {
+            actMgr.getMemoryInfo(memInfo);
+        } else {
+            System.err.println("Unable to getMemoryInfo. ActivityManager was null");
+            return -1;
+        }
+        return (double)memInfo.totalMem;
+    }
+    @ReactMethod
+    public void getTotalMemory(Promise p) { p.resolve(getTotalMemorySync()); }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public double getMaxMemorySync() { return (double)Runtime.getRuntime().maxMemory(); }
+    @ReactMethod
+    public void getMaxMemory(Promise p) { p.resolve(getMaxMemorySync()); }
 
     @Override
     public @Nullable

@@ -263,7 +263,7 @@ class DistributionanalysisScene extends PureComponent {
           </View>
           <View style={[styles.cell_box_header]}>
             <For index='i' each='info' of={timeOptions}>
-              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
+              <View key={i} style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
                 <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
                   this.setLeftDateStatus(info.value)
                 }}> {info.label} </Text>
@@ -364,7 +364,7 @@ class DistributionanalysisScene extends PureComponent {
         >
           <View style={[styles.cell_box_header]}>
             <For index='i' each='info' of={timeOptions}>
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+              <View key={i} style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
                   this.setRightDateStatus(info.value)
                 }}> {info.label} </Text>

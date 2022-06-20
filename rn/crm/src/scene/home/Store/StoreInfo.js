@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {
   Alert,
-  Clipboard,
   InteractionManager,
   Modal,
   ScrollView,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import Clipboard from '@react-native-community/clipboard';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
