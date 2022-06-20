@@ -133,29 +133,29 @@ export default class GlobalUtil {
     StorageUtil._set('user', user)
   }
 
-  static byteConvert=(num)=>{
-    if(num<0)
+  static byteConvert = (num) => {
+    if (num < 0)
       return 'unknown'
-    num/=1024
-    if(num>1){
-      num/=1024
-      if(num>1) {
-        num/=1024
+    num /= 1024
+    if (num > 1) {
+      num /= 1024
+      if (num > 1) {
+        num /= 1024
         return `${parseFloat(num).toFixed(2)}GB`
       }
       return `${parseFloat(num).toFixed(2)}MB`
     }
     return `${parseFloat(num).toFixed(2)}KB`
   }
-  static getDeviceInfo =  () => {
-    const fontScale = DeviceInfo.getFontScaleSync();
-    const freeDiskStorage = DeviceInfo.getFreeDiskStorageSync()
-    const totalMemory = DeviceInfo.getTotalMemorySync();
-    const maxMemory = DeviceInfo.getMaxMemorySync()
-    const apiLevel =  DeviceInfo.getApiLevelSync();
+  static getDeviceInfo = () => {
+    const fontScale = DeviceInfo.getFontScale();
+    const freeDiskStorage = DeviceInfo.getFreeDiskStorage()
+    const totalMemory = DeviceInfo.getTotalMemory();
+    const maxMemory = DeviceInfo.getMaxMemory()
+    const apiLevel = DeviceInfo.getApiLevel();
     const brand = DeviceInfo.getBrand();
-    const device =  DeviceInfo.getDeviceSync();
-    const deviceName =  DeviceInfo.getDeviceNameSync();
+    const device = DeviceInfo.getDevice();
+    const deviceName = DeviceInfo.getDeviceName();
     const systemName = DeviceInfo.getSystemName();
     const systemVersion = DeviceInfo.getSystemVersion();
     const version = DeviceInfo.getVersion();
@@ -173,6 +173,7 @@ export default class GlobalUtil {
       appVersion: version
     }
   }
+
   /**
    Map<String, Object> deviceStatus = Maps.newHashMap();
    deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知

@@ -11,10 +11,11 @@ import {
   View
 } from "react-native";
 
-import {setPlatform,setDeviceInfo} from "./reducers/device/deviceActions";
+import {setDeviceInfo, setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
-  setAccessToken, setBleStarted,
+  setAccessToken,
+  setBleStarted,
   setCheckVersionAt,
   setCurrentStore,
   setUserProfile
@@ -132,12 +133,12 @@ class RootScene extends PureComponent<{}> {
       const {printer_id, bleStarted} = this.store.getState().global
       if (printer_id) {
 
-       if (!bleStarted) {
-         BleManager.start({showAlert: false}).then(() => {
-           console.log("done ble start")
-         });
-         this.store.dispatch(setBleStarted(true));
-       }
+        if (!bleStarted) {
+          BleManager.start({showAlert: false}).then(() => {
+            console.log("done ble start")
+          });
+          this.store.dispatch(setBleStarted(true));
+        }
 
         setTimeout(() => {
           const state = this.store.getState();
@@ -259,7 +260,7 @@ class RootScene extends PureComponent<{}> {
         this.setState({rehydrated: true});
         const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-        const deviceInfo=GlobalUtil.getDeviceInfo()
+        const deviceInfo = GlobalUtil.getDeviceInfo()
         store.dispatch(setDeviceInfo(deviceInfo))
       }.bind(this)
     );
