@@ -171,7 +171,8 @@ class MineScene extends PureComponent {
       order_num_new: '',
       is_mgr: false,
       showRecord: false,
-      wsb_store_account: 0
+      wsb_store_account: 0,
+      have_not_read_advice: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -319,7 +320,8 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
-        showRecord: res.show_questionnaire && res.show_questionnaire
+        showRecord: res.show_questionnaire && res.show_questionnaire,
+        have_not_read_advice: res.have_not_read_advice && res.have_not_read_advice
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
@@ -961,7 +963,8 @@ class MineScene extends PureComponent {
       is_helper,
       is_service_mgr,
       fnPriceControlled,
-      fnProfitControlled
+      fnProfitControlled,
+      have_not_read_advice
     } = this.state
     return (
       <View style={[block_styles.container]}>
@@ -1208,13 +1211,14 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
 
         <TouchableOpacity
-            style={[block_styles.block_box]}
+            style={[block_styles.block_box, {position: "relative"}]}
             onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
             activeOpacity={customerOpacity}>
           <Image
               style={[block_styles.block_img]}
               source={require("../../../img/My/inform.png")}
           />
+          {have_not_read_advice && <View style={{backgroundColor: '#F72D2D', width: 10, height: 10, borderRadius: 10, position: "absolute", top: 15, left: 65}}/>}
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
 

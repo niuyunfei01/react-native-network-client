@@ -49,7 +49,8 @@ class HistoryNoticeScene extends PureComponent {
       page: 1,
       pageSize: 20,
       title: '',
-      detailContent: ''
+      detailContent: '',
+      isLastPage: false
     };
   }
 
@@ -69,16 +70,20 @@ class HistoryNoticeScene extends PureComponent {
     const {accessToken} = this.props.global;
     const api = `/v1/new_api/advice/getHistoryAdvices`
     HttpUtils.get.bind(this.props)(api, {
-      page: 1,
-      pageSize: 20,
+      page: this.state.page,
+      pageSize: this.state.pageSize,
       title: '',
       store_id: '',
       vendor_id: '',
       access_token: accessToken
     }).then((res) => {
       hideModal()
+      let totalPage = res.count / res.pageSize
+      let isLastPage = res.page >= totalPage
+      let lists = res.page == 1 ? res.lists : this.state.historyAdviceList.concat(res.lists)
       this.setState({
-        historyAdviceList: res
+        historyAdviceList: lists,
+        isLastPage: isLastPage
       })
     })
   }
@@ -90,11 +95,29 @@ class HistoryNoticeScene extends PureComponent {
     })
   }
 
+  loadMore = () => {
+    this.setState({
+      page: this.state.page + 1
+    }, () => {
+      this.fetchHistoryAdvicesList()
+    })
+  }
+
   render() {
     return (
         <ScrollView style={Styles.scrollStyle}>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchHistoryAdvicesList.bind(this)}/>
           {this.renderHistoryAdvicesList()}
+          <If condition={!this.state.isLastPage}>
+            <TouchableOpacity style={Styles.loadMore} onPress={() => this.loadMore()}>
+              <Text>加载更多</Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={this.state.isLastPage}>
+            <TouchableOpacity style={Styles.loadMore}>
+              <Text>没有更多了~</Text>
+            </TouchableOpacity>
+          </If>
         </ScrollView>
     );
   }
@@ -120,7 +143,7 @@ class HistoryNoticeScene extends PureComponent {
 
             <View style={Styles.advicesListItem}>
               <If condition={!info.is_read}>
-                <View style={{backgroundColor: '#F72D2D', width: 15, height: 15, borderRadius: 15, position: "absolute", top: 13, left: 85}}/>
+                <View style={{backgroundColor: '#F72D2D', width: 10, height: 10, borderRadius: 10, position: "absolute", top: 18, left: 95}}/>
               </If>
               <Text style={Styles.advicesListItemTime}>{info.created_format} </Text>
               <View style={Styles.advicesListItemBody}>
@@ -187,7 +210,8 @@ const Styles = StyleSheet.create({
     width: '100%',
     borderRadius: pxToDp(10),
     padding: 10
-  }
+  },
+  loadMore: {display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 20}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HistoryNoticeScene);
