@@ -15,7 +15,7 @@ export default class JbbDateRangeDialog extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     const self = this
     this.setState({
       start: nextProps.start,

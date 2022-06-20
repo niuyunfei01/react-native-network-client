@@ -17,11 +17,13 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 import dayjs from "dayjs";
-
+import {calcMs} from "../../pubilc/util/AppMonitorInfo";
+import {getTime} from "../../pubilc/util/TimeUtil";
 
 function mapStateToProps(state) {
   return {
     global: state.global,
+    device:state.device
   }
 }
 
@@ -36,9 +38,20 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
+const timeObj={
+  deviceInfo:{},
+  currentStoreId:'',
+  currentUserId:'',
+  moduleName:'',
+  componentName:'',
+  method:[]
+}//记录耗时的对象
+
+
 class OrderTransferThird extends Component {
   constructor(props: Object) {
     super(props);
+    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
     const if_reship = this.props.route.params.if_reship || 0;
     const headerType = this.props.route.params.headerType || 1;
     this.state = {
@@ -100,8 +113,17 @@ class OrderTransferThird extends Component {
     })
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
-    HttpUtils.get.bind(this.props)(api).then(res => {
+    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
       let deliverys = []
+      const {obj}=res
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchThirdWays',
+        executeTime:res.endTime-res.startTime
+      })
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
@@ -148,14 +170,54 @@ class OrderTransferThird extends Component {
       }
       this.priceFn();
       this.mixpanel.track("ship.list_to_call", params);
-    }).catch(() => {
+    }).catch((res) => {
+      timeObj.method.push({
+        interfaceName:api,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'fetchThirdWays',
+        executeTime:res.endTime-res.startTime
+      })
       hideModal();
       this.setState({
         isLoading: false,
       })
     })
   }
-
+  componentDidMount() {
+    timeObj.method[0].endTime=getTime()
+    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
+    timeObj.method[0].executeStatus='success'
+    timeObj.method[0].interfaceName=""
+    timeObj.method[0].methodName="componentDidMount"
+    const {deviceInfo} = this.props.device
+    const {currStoreId, currentUser,accessToken,config} = this.props.global;
+    timeObj['deviceInfo']=deviceInfo
+    timeObj.currentStoreId=currStoreId
+    timeObj.currentUserId=currentUser
+    timeObj['moduleName']="订单"
+    timeObj['componentName']="OrderTransferThird"
+    timeObj['is_record_request_monitor']=config.is_record_request_monitor
+    calcMs(timeObj,accessToken)
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(timeObj.method.length>0) {
+      const endTime=getTime()
+      const startTime=timeObj.method[0].startTime
+      timeObj.method.push({
+        interfaceName:'',
+        executeStatus:'success',
+        startTime:startTime,
+        endTime:endTime,
+        methodName:'componentDidUpdate',
+        executeTime:endTime-startTime
+      })
+      const duplicateObj= {...timeObj}
+      timeObj.method=[]
+      calcMs(duplicateObj,this.props.global.accessToken)
+    }
+  }
 
   priceFn = () => {// 取最大价格和最小价格
     let logistics = this.state.logistics;

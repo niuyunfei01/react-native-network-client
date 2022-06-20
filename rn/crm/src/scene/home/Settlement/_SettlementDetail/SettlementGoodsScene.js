@@ -14,7 +14,7 @@ class SettlementGoodsScene extends PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({goods_list: nextProps.goodsList})
   }
 

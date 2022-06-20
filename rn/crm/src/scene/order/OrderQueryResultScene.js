@@ -14,6 +14,8 @@ import {hideModal, showError, showModal, ToastShort} from "../../pubilc/util/Toa
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import {SearchBar} from "../../weui";
+import {calcMs} from '../../pubilc/util/AppMonitorInfo'
+import {getTime} from "../../pubilc/util/TimeUtil";
 
 const {
   FlatList,
@@ -25,9 +27,17 @@ const {
 const {PureComponent} = React;
 
 function mapStateToProps(state) {
-  const {remind, global} = state;
-  return {remind: remind, global: global}
+  const {remind, global,device} = state;
+  return {remind: remind, global: global,device:device}
 }
+const timeObj={
+  deviceInfo:{},
+  currentStoreId:'',
+  currentUserId:'',
+  moduleName:'',
+  componentName:'',
+  method:[]
+}//记录耗时的对象
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -49,6 +59,7 @@ const STATUS_FILTER=[
 class OrderQueryResultScene extends PureComponent {
   constructor(props) {
     super(props);
+    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
     const {navigation, route} = this.props
     let title = ''
     let type = 'done'
@@ -184,7 +195,40 @@ class OrderQueryResultScene extends PureComponent {
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
+  componentDidUpdate(prevProps, prevState, snapshot) {
 
+    if(timeObj.method.length>0) {
+      const endTime=getTime()
+      const startTime=timeObj.method[0].startTime
+      timeObj.method.push({
+        interfaceName:'',
+        executeStatus:'success',
+        startTime:startTime,
+        endTime:endTime,
+        methodName:'componentDidUpdate',
+        executeTime:endTime-startTime
+      })
+      const duplicateObj= {...timeObj}
+      timeObj.method=[]
+      calcMs(duplicateObj,this.props.global.accessToken)
+    }
+  }
+  componentDidMount() {
+    timeObj.method[0].endTime=getTime()
+    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
+    timeObj.method[0].executeStatus='success'
+    timeObj.method[0].methodName="componentDidMount"
+    timeObj.method[0].interfaceName=''
+    const {deviceInfo} = this.props.device
+    const {currStoreId, currentUser,accessToken,config} = this.props.global;
+    timeObj['deviceInfo']=deviceInfo
+    timeObj.currentStoreId=currStoreId
+    timeObj.currentUserId=currentUser
+    timeObj['moduleName']="订单"
+    timeObj['componentName']="OrderQueryResultScene"
+    timeObj['is_record_request_monitor']=config.is_record_request_monitor
+    calcMs(timeObj,accessToken)
+  }
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
@@ -204,7 +248,7 @@ class OrderQueryResultScene extends PureComponent {
   onSearch = (keywords, isSearch) => {
     const{isLoading,date,platformBtn,selectStatus,query,orders,type}=this.state
     if (isLoading) {
-          return
+      return
     }
     showModal("加载中...")
     this.setState({isLoading: true})
@@ -213,32 +257,45 @@ class OrderQueryResultScene extends PureComponent {
       return;
     }
     let params = {
-          search_date:date,
-          platform:platformBtn,
-          order_status:selectStatus.id,
-          search_from:'app',
-          page:query.page,
-          limit:query.limit
+      search_date:date,
+      platform:platformBtn,
+      order_status:selectStatus.id,
+      search_from:'app',
+      page:query.page,
+      limit:query.limit
     }
     if(keywords.length>0)
-        params={...params,keywords:keywords}
+      params={...params,keywords:keywords}
     const url = `/v1/new_api/orders/order_all_list`;
-    HttpUtils.get.bind(this.props)(url, params).then(res => {
-          hideModal()
-          if (res.length < query.limit) {
-              this.setState({
-                  end: true,
-              })
-          }
-          //如果是搜索，直接使用接口返回的数据，如果是下拉或者上拉，添加数据
-          this.setState({
-              orders: isSearch?res:orders.concat(res),
-              isLoading: false,
-          })
-      }, (res) => {
-          this.setState({isLoading: false})
-          showError(res.reason)
+    HttpUtils.get.bind(this.props)(url, params,true).then(res => {
+      const {obj}=res
+      hideModal()
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'onSearch',
+        executeTime:res.endTime-res.startTime
       })
+      //如果是搜索，直接使用接口返回的数据，如果是下拉或者上拉，添加数据
+      this.setState({
+        orders: isSearch?obj:orders.concat(obj),
+        isLoading: false,
+        end:obj.length < query.limit
+      })
+    }, (res) => {
+      timeObj.method.push({
+        interfaceName:url,
+        executeStatus:res.executeStatus,
+        startTime:res.startTime,
+        endTime:res.endTime,
+        methodName:'onSearch',
+        executeTime:res.endTime-res.startTime
+      })
+      this.setState({isLoading: false})
+      showError(res.reason)
+    })
   };
 
   fetchOrders = (query) => {
@@ -265,26 +322,43 @@ class OrderQueryResultScene extends PureComponent {
       params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
-    HttpUtils.get.bind(this.props)(url, params).then(res => {
-
+    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
+      timeObj.method.push({
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchOrders',
+        executeTime: res.endTime - res.startTime
+      })
+      const {obj} = res
       hideModal()
-      if (tool.length(res.orders) < this.state.query.limit) {
+      if (tool.length(obj.orders) < this.state.query.limit) {
         this.setState({
           end: true,
         })
       }
-      let orders = this.state.orders.concat(res.orders)
+      let orders = this.state.orders.concat(obj.orders)
       this.setState({
         orders: orders,
         isLoading: false,
       })
+
     }, (res) => {
+      timeObj.method.push({
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchOrders',
+        executeTime: res.endTime - res.startTime
+      })
       this.setState({isLoading: false})
       showError(res.reason)
-    })
 
+    })
   }
-  selectItem=(item)=>{
+    selectItem=(item)=>{
     this.setState({
       selectStatus: item,
     }, () => {

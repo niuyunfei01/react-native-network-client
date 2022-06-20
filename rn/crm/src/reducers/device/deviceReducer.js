@@ -14,13 +14,15 @@
  */
 const {
   SET_PLATFORM,
-  SET_VERSION
+  SET_VERSION,
+  SET_DEVICE_INFO
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
   isMobile: false,
   platform: '',
-  version: null
+  version: null,
+  deviceInfo: null
 }
 
 /**
@@ -49,6 +51,8 @@ export default function deviceReducer(state = initialState, action) {
       const version = action.payload
       return {...state, 'version': version}
     }
+    case SET_DEVICE_INFO:
+      return {...state, deviceInfo: action.deviceInfo}
   }
 
   return state
