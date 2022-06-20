@@ -6,7 +6,6 @@ import {bindActionCreators} from "redux";
 import Tips from "../../scene/common/component/Tips";
 import {
   Alert,
-  Clipboard,
   Dimensions, InteractionManager,
   Modal,
   ScrollView,
@@ -18,6 +17,7 @@ import {
   View
 } from "react-native";
 import {connect} from "react-redux";
+import Clipboard from '@react-native-community/clipboard'
 import {
   addTipMoney,
   addTipMoneyNew,

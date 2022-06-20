@@ -5,6 +5,7 @@ import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../common/config.js";
 import tool from "./tool";
 import stringEx from "./stringEx";
+import {getTime} from "./TimeUtil";
 
 /**
  * React-Native Fatch网络请求工具类
@@ -50,7 +51,7 @@ class HttpUtils {
     return options
   }
 
-  static apiBase(method, url, params, props = this) {
+  static apiBase(method, url, params, props = this,getNetworkDelay=false) {
     let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -70,6 +71,7 @@ class HttpUtils {
       }
     }
     return new Promise((resolve, reject) => {
+      const startTime=getTime()
       fetch(uri, options)
         .then((response) => {
           if (response.ok) {
@@ -83,15 +85,29 @@ class HttpUtils {
             resolve(response)
           } else {
             if (response.ok) {
-              resolve(response.obj)
+              if(getNetworkDelay){
+                const endTime=getTime();
+                resolve({obj:response.obj,startTime:startTime,endTime:endTime,executeStatus:'success'})
+              }
+              else resolve(response.obj)
             } else {
               this.error(response, props.navigation);
-              reject && reject(response)
+              if(getNetworkDelay){
+                const endTime=getTime();
+                reject && reject({...response,startTime:startTime,endTime:endTime,executeStatus:'error'})
+              }
+              else reject && reject(response)
             }
           }
         })
         .catch((error) => {
+
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
+          if(getNetworkDelay){
+            const endTime=getTime();
+            reject && reject({message:error.message,startTime:startTime,endTime:endTime,executeStatus:'error'})
+            return
+          }
           reject && reject(error.message)
         })
     })
@@ -131,14 +147,14 @@ class HttpUtils {
     }
   }
 
-  static get(url, params) {
+  static get(url, params,getNetworkDelay=false) {
     const props = this
-    return HttpUtils.apiBase('GET', url, params, props)
+    return HttpUtils.apiBase('GET', url, params, props,getNetworkDelay)
   }
 
-  static post(url, params) {
+  static post(url, params,getNetworkDelay=false) {
     const props = this
-    return HttpUtils.apiBase('POST', url, params, props)
+    return HttpUtils.apiBase('POST', url, params, props,getNetworkDelay)
   }
 
   static put(url, params) {

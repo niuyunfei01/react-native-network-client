@@ -368,7 +368,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>配送版订单列表 </Text>
             </CellBody>
             <CellFooter>
-              <Switch value={ship_order_list_set}
+              <Switch value={ship_order_list_set?ship_order_list_set:false}
                       onValueChange={(val) => {
                         this.save_ship_order_list_set(val)
                       }}/>

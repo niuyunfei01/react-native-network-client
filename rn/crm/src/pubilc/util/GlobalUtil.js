@@ -133,6 +133,46 @@ export default class GlobalUtil {
     StorageUtil._set('user', user)
   }
 
+  static byteConvert=(num)=>{
+    if(num<0)
+      return 'unknown'
+    num/=1024
+    if(num>1){
+      num/=1024
+      if(num>1) {
+        num/=1024
+        return `${parseFloat(num).toFixed(2)}GB`
+      }
+      return `${parseFloat(num).toFixed(2)}MB`
+    }
+    return `${parseFloat(num).toFixed(2)}KB`
+  }
+  static getDeviceInfo =  () => {
+    const fontScale = DeviceInfo.getFontScaleSync();
+    const freeDiskStorage = DeviceInfo.getFreeDiskStorageSync()
+    const totalMemory = DeviceInfo.getTotalMemorySync();
+    const maxMemory = DeviceInfo.getMaxMemorySync()
+    const apiLevel =  DeviceInfo.getApiLevelSync();
+    const brand = DeviceInfo.getBrand();
+    const device =  DeviceInfo.getDeviceSync();
+    const deviceName =  DeviceInfo.getDeviceNameSync();
+    const systemName = DeviceInfo.getSystemName();
+    const systemVersion = DeviceInfo.getSystemVersion();
+    const version = DeviceInfo.getVersion();
+    return {
+      fontScale: fontScale,
+      freeDiskStorage: this.byteConvert(freeDiskStorage),
+      totalMemory: this.byteConvert(totalMemory),
+      useMaxMemory: this.byteConvert(maxMemory),
+      apiLevel: apiLevel,
+      brand: brand,
+      device: device,
+      deviceName: deviceName,
+      systemName: systemName,
+      systemVersion: systemVersion,
+      appVersion: version
+    }
+  }
   /**
    Map<String, Object> deviceStatus = Maps.newHashMap();
    deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知
