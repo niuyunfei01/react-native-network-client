@@ -173,7 +173,7 @@ class MineScene extends PureComponent {
       showRecord: false,
       wsb_store_account: 0,
       have_not_read_advice: false,
-      show_call_service_modal: true,
+      show_call_service_modal: false,
       is_self_yy: false,
       contacts: '',
     };
