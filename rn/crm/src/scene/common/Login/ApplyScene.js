@@ -556,7 +556,7 @@ class ApplyScene extends PureComponent {
           </View>
 
           <Button
-            title={'下一步'}
+            title={'注册门店'}
             buttonStyle={{
               marginTop: 20,
               backgroundColor: colors.main_color,
@@ -565,7 +565,7 @@ class ApplyScene extends PureComponent {
             }}
             onPress={() => {
               if (this.state.checkBox) {
-                this.mixpanel.track("Phoneinput_next_click", {});
+                this.mixpanel.track("info_signupstore_click", {});
               }
               this.onApply()
             }}/>
