@@ -147,15 +147,15 @@ export default class GlobalUtil {
     }
     return `${parseFloat(num).toFixed(2)}KB`
   }
-  static getDeviceInfo = () => {
-    const fontScale = DeviceInfo.getFontScale();
-    const freeDiskStorage = DeviceInfo.getFreeDiskStorage()
-    const totalMemory = DeviceInfo.getTotalMemory();
-    const maxMemory = DeviceInfo.getMaxMemory()
-    const apiLevel = DeviceInfo.getApiLevel();
+  static getDeviceInfo = async () => {
+    const fontScale =await DeviceInfo.getFontScale();
+    const freeDiskStorage =await DeviceInfo.getFreeDiskStorage()
+    const totalMemory =await DeviceInfo.getTotalMemory();
+    const maxMemory =await DeviceInfo.getMaxMemory()
+    const apiLevel =await DeviceInfo.getApiLevel();
     const brand = DeviceInfo.getBrand();
-    const device = DeviceInfo.getDevice();
-    const deviceName = DeviceInfo.getDeviceName();
+    const device = await DeviceInfo.getDevice();
+    const deviceName = await DeviceInfo.getDeviceName();
     const systemName = DeviceInfo.getSystemName();
     const systemVersion = DeviceInfo.getSystemVersion();
     const version = DeviceInfo.getVersion();

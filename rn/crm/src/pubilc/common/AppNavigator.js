@@ -8,8 +8,9 @@ import Config from "./config";
 import {Dimensions} from "react-native";
 
 let width = Dimensions.get("window").width;
+const Stack = createStackNavigator();
+
 const AppNavigator = (props) => {
-  const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
@@ -450,6 +451,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/Worker/WorkerSchedule').default}/>
         <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
                       getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
+        <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle:'备货'}}
+                      getComponent={()=>require('../../scene/console/StockingTasks').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
