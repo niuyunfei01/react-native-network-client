@@ -260,8 +260,10 @@ class RootScene extends PureComponent<{}> {
         this.setState({rehydrated: true});
         const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-        const deviceInfo = GlobalUtil.getDeviceInfo()
-        store.dispatch(setDeviceInfo(deviceInfo))
+         GlobalUtil.getDeviceInfo().then(deviceInfo=>{
+          store.dispatch(setDeviceInfo(deviceInfo))
+        })
+
       }.bind(this)
     );
   }

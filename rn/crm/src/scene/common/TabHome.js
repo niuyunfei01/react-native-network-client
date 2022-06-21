@@ -15,7 +15,16 @@ function mapStateToProps(state) {
   const {global, remind} = state;
   return {global: global, remind: remind};
 }
+const Tab = createBottomTabNavigator();
 
+const tabBarOptions={
+    activeTintColor: colors.main_color,
+    inactiveTintColor: "#666",
+    style: {backgroundColor: "#ffffff"},
+    animationEnabled: false,
+    lazy: true,
+    labelStyle: {fontSize: 15}
+}
 class TabHome extends React.Component {
   constructor(props) {
     super(props)
@@ -59,7 +68,6 @@ class TabHome extends React.Component {
     if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
-    const Tab = createBottomTabNavigator();
 
     const initialRouteName = this.props.route.params?.initialRouteName ?? 'Login'
     const initTab = initialRouteName === "Tab" && (this.props.route.params?.initTab || "Orders") || initialRouteName
@@ -67,38 +75,12 @@ class TabHome extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName={initTab}
-        tabBarOptions={{
-          activeTintColor: colors.main_color,
-          inactiveTintColor: "#666",
-          style: {backgroundColor: "#ffffff"},
-          animationEnabled: false,
-          lazy: true,
-          labelStyle: {fontSize: 15}
-        }}>
-        <If condition={storeVendorId !== 68}>
-          <Tab.Screen
-            name="Home"
-            getComponent={() => require("../Remind/RemindScene").default}
-            options={
-              {
-                tabBarLabel: "提醒",
-                tabBarIcon: ({focused}) => (
-                  <View style={{position: "relative"}}>
-                    <FontAwesome5 name={'bell'} size={22}
-                                  color={focused ? colors.main_color : colors.colorCCC}
-                    />
-                    <If condition={remindNum > 0}>
-                      <Badge
-                        value={remindNum > 99 ? '99+' : remindNum}
-                        status="error"
-                        containerStyle={{position: 'absolute', top: -5, right: -25}}
-                      /></If>
-                  </View>
-                )
-              }
-            }
-          />
-        </If>
+        tabBarOptions={tabBarOptions}>
+        <If condition={global.simpleStore.fn_stall==='1'}>
+              <Tab.Screen name={'Console'}
+                          getComponent={() => require("../console/ConsoleScene").default}
+                          options={{tabBarLabel:'控制台',tabBarIcon:({focused})=>(<Icon name={'grid'} size={22} color={focused ? colors.main_color : colors.colorCCC}/> )}}/>
+          </If>
         <If condition={storeVendorId === 68}>
           <Tab.Screen
             name="CreateOrder"
