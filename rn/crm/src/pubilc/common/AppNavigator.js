@@ -453,6 +453,9 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle:'备货'}}
                       getComponent={()=>require('../../scene/console/StockingTasks').default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}*/}
+        {/*              getComponent={()=>require('../../scene/order/RetailPriceScene').default}*/}
+        {/*/>*/}
       </Stack.Navigator>
     </NavigationContainer>
   );
