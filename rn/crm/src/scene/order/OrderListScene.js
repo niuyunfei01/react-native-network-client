@@ -209,7 +209,6 @@ class OrderListScene extends Component {
     timeObj['moduleName']="订单"
     timeObj['componentName']="OrderListScene"
     timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    console.log('is_record_request_monitor',config.is_record_request_monitor)
     calcMs(timeObj,accessToken)
   }
   componentDidUpdate(prevProps, prevState, snapshot) {

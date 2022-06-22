@@ -125,47 +125,47 @@ class OrderTransferThird extends Component {
         executeTime:res.endTime-res.startTime
       })
       hideModal();
-      if (tool.length(res.exist) > 0) {
-        for (let i in res.exist) {
+      if (tool.length(obj.exist) > 0) {
+        for (let i in obj.exist) {
           let is_push = false
-          if (res.exist[i].est && !res.exist[i].est.error_msg) {
-            res.exist[i].est.isChosed = false;
+          if (obj.exist[i].est && !obj.exist[i].est.error_msg) {
+            obj.exist[i].est.isChosed = false;
             is_push = true
           } else {
-            delete res.exist[i].est;
+            delete obj.exist[i].est;
           }
-          if (res.exist[i].store_est && !res.exist[i].store_est.error_msg) {
-            res.exist[i].store_est.isChosed = false;
+          if (obj.exist[i].store_est && !obj.exist[i].store_est.error_msg) {
+            obj.exist[i].store_est.isChosed = false;
             is_push = true
           } else {
-            delete res.exist[i].store_est;
+            delete obj.exist[i].store_est;
           }
 
-          if (is_push) deliverys.push(res.exist[i])
+          if (is_push) deliverys.push(obj.exist[i])
         }
       }
       const {currStoreId} = this.props.global;
       let {currVendorId} = tool.vendor(this.props.global);
       this.setState({
         logistics: deliverys,
-        not_exist: res.not_exist,
-        allow_edit_ship_rule: res.allow_edit_ship_rule,
+        not_exist: obj.not_exist,
+        allow_edit_ship_rule: obj.allow_edit_ship_rule,
         store_id: currStoreId,
         vendor_id: currVendorId,
-        weight: res.weight,
-        weight_max: res.weight_max,
-        weight_min: res.weight_min,
-        weight_step: res.weight_step,
-        logistics_error: res.error_ways,
-        is_merchant_ship: res.is_merchant_ship,
-        merchant_reship_tip: res.merchant_reship_tip,
+        weight: obj.weight,
+        weight_max: obj.weight_max,
+        weight_min: obj.weight_min,
+        weight_step: obj.weight_step,
+        logistics_error: obj.error_ways,
+        is_merchant_ship: obj.is_merchant_ship,
+        merchant_reship_tip: obj.merchant_reship_tip,
         isLoading: false,
       })
 
       let params = {
         store_id: currStoreId,
         vendor_id: currVendorId,
-        total_available_ship: res.length,
+        total_available_ship: obj.length,
 
       }
       this.priceFn();
