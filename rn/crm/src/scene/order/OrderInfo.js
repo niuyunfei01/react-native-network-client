@@ -970,7 +970,7 @@ class OrderInfo extends Component {
           }
         }, {'text': '取消'}]);
       } else if (res.deduct_fee == 0) {
-        navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
             {
               order: this.state.order,
               ship_id: val,
