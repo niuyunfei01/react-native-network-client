@@ -22,13 +22,13 @@ function JumpMiniProgram(path = "/pages/service/index", data = {}) {
 }
 
 function wechatLogin() {
- return  wechat.sendAuthRequest('snsapi_userinfo', '')
+  return wechat.sendAuthRequest('snsapi_userinfo', '')
     .then(responseCode => {
       //返回code码，通过code获取access_token
       return responseCode.code
     })
     .catch(err => {
-      console.log(err,'err')
+      console.log(err, 'err')
     })
 }
 
@@ -43,5 +43,5 @@ function JumpWeb(title, desc, img, url, type = 0) {
   });
 }
 
-export {JumpMiniProgram, JumpWeb,wechatLogin}
+export {JumpMiniProgram, JumpWeb, wechatLogin}
 

@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import Cts from "../../common/Cts";
 import BottomModal from "../BottomModal";
 import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
 import {Dialog} from "../../../weui/Dialog";
-import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import MultiSpecsModal from "./MultiSpecsModal";
 
@@ -171,14 +171,15 @@ class GoodItemEditBottom extends React.Component {
         </View>}
       </BottomModal>
 
-      <MultiSpecsModal visible={modalType === 'set_price' || modalType === 'update_apply_price'||modalType === 'set_price_add_inventory'}
-                      onClose={this.resetModal}
-                      storePro={storePro}
-                      storeId={storeId}
-                      productName={productName}
-                      accessToken={accessToken}
-                      navigation={navigation}
-                      vendor_id={vendor_id}/>
+      <MultiSpecsModal
+        visible={modalType === 'set_price' || modalType === 'update_apply_price' || modalType === 'set_price_add_inventory'}
+        onClose={this.resetModal}
+        storePro={storePro}
+        storeId={storeId}
+        productName={productName}
+        accessToken={accessToken}
+        navigation={navigation}
+        vendor_id={vendor_id}/>
       <Dialog onRequestClose={() => {
       }} visible={!!this.state.errorMsg}
               buttons={[{type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''})}]}>

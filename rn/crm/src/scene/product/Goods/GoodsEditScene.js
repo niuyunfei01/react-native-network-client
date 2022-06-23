@@ -1058,7 +1058,7 @@ class GoodsEditScene extends PureComponent {
       }}>
         <View style={{paddingBottom: "10%"}}>
           <List>
-            {list.map((item,index) => {
+            {list.map((item, index) => {
               return (tool.length(item.children) > 0 ? <Item key={index} arrow="horizontal" onPress={() => {
                 this.setState({
                   basic_category_obj: {...item},

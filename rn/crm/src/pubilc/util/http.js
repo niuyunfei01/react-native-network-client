@@ -51,7 +51,7 @@ class HttpUtils {
     return options
   }
 
-  static apiBase(method, url, params, props = this,getNetworkDelay=false) {
+  static apiBase(method, url, params, props = this, getNetworkDelay = false) {
     let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -71,7 +71,7 @@ class HttpUtils {
       }
     }
     return new Promise((resolve, reject) => {
-      const startTime=getTime()
+      const startTime = getTime()
       fetch(uri, options)
         .then((response) => {
           if (response.ok) {
@@ -85,27 +85,25 @@ class HttpUtils {
             resolve(response)
           } else {
             if (response.ok) {
-              if(getNetworkDelay){
-                const endTime=getTime();
-                resolve({obj:response.obj,startTime:startTime,endTime:endTime,executeStatus:'success'})
-              }
-              else resolve(response.obj)
+              if (getNetworkDelay) {
+                const endTime = getTime();
+                resolve({obj: response.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
+              } else resolve(response.obj)
             } else {
               this.error(response, props.navigation);
-              if(getNetworkDelay){
-                const endTime=getTime();
-                reject && reject({...response,startTime:startTime,endTime:endTime,executeStatus:'error'})
-              }
-              else reject && reject(response)
+              if (getNetworkDelay) {
+                const endTime = getTime();
+                reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
+              } else reject && reject(response)
             }
           }
         })
         .catch((error) => {
 
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
-          if(getNetworkDelay){
-            const endTime=getTime();
-            reject && reject({message:error.message,startTime:startTime,endTime:endTime,executeStatus:'error'})
+          if (getNetworkDelay) {
+            const endTime = getTime();
+            reject && reject({message: error.message, startTime: startTime, endTime: endTime, executeStatus: 'error'})
             return
           }
           reject && reject(error.message)
@@ -147,14 +145,14 @@ class HttpUtils {
     }
   }
 
-  static get(url, params,getNetworkDelay=false) {
+  static get(url, params, getNetworkDelay = false) {
     const props = this
-    return HttpUtils.apiBase('GET', url, params, props,getNetworkDelay)
+    return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay)
   }
 
-  static post(url, params,getNetworkDelay=false) {
+  static post(url, params, getNetworkDelay = false) {
     const props = this
-    return HttpUtils.apiBase('POST', url, params, props,getNetworkDelay)
+    return HttpUtils.apiBase('POST', url, params, props, getNetworkDelay)
   }
 
   static put(url, params) {

@@ -15,16 +15,18 @@ function mapStateToProps(state) {
   const {global, remind} = state;
   return {global: global, remind: remind};
 }
+
 const Tab = createBottomTabNavigator();
 
-const tabBarOptions={
-    activeTintColor: colors.main_color,
-    inactiveTintColor: "#666",
-    style: {backgroundColor: "#ffffff"},
-    animationEnabled: false,
-    lazy: true,
-    labelStyle: {fontSize: 15}
+const tabBarOptions = {
+  activeTintColor: colors.main_color,
+  inactiveTintColor: "#666",
+  style: {backgroundColor: "#ffffff"},
+  animationEnabled: false,
+  lazy: true,
+  labelStyle: {fontSize: 15}
 }
+
 class TabHome extends React.Component {
   constructor(props) {
     super(props)
@@ -76,11 +78,14 @@ class TabHome extends React.Component {
       <Tab.Navigator
         initialRouteName={initTab}
         tabBarOptions={tabBarOptions}>
-        <If condition={global.simpleStore.fn_stall==='1'}>
-              <Tab.Screen name={'Console'}
-                          getComponent={() => require("../console/ConsoleScene").default}
-                          options={{tabBarLabel:'控制台',tabBarIcon:({focused})=>(<Icon name={'grid'} size={22} color={focused ? colors.main_color : colors.colorCCC}/> )}}/>
-          </If>
+        <If condition={global.simpleStore.fn_stall === '1'}>
+          <Tab.Screen name={'Console'}
+                      getComponent={() => require("../console/ConsoleScene").default}
+                      options={{tabBarLabel: '控制台',
+                        tabBarIcon: ({focused}) => (
+                          <Icon name={'grid'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>)
+                      }}/>
+        </If>
         <If condition={storeVendorId === 68}>
           <Tab.Screen
             name="CreateOrder"

@@ -77,7 +77,6 @@ export default {
   },
 
 
-
   currentVersion: async function (callback) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.currentVersion(callback);

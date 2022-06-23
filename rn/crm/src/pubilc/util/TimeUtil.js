@@ -1,10 +1,10 @@
-export const getTime=()=>{
+export const getTime = () => {
   return new Date().getTime();
 }
 
-export const getDatetime=(getTime)=>{
-  const time=new Date(getTime+8*3600*1000)
-  return time.toJSON().substring(0,23).replace('T',' ')
+export const getDatetime = (getTime) => {
+  const time = new Date(getTime + 8 * 3600 * 1000)
+  return time.toJSON().substring(0, 23).replace('T', ' ')
 }
 export default class TimeUtil {
   static getWeek(date = new Date()) {

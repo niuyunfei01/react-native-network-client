@@ -125,12 +125,12 @@ const C = {
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
   ROUTE_ORDER_ADDRESS_BOOK: 'OrderAddressBook',
   ROUTE_ORDER_RECEIVING_INFO: 'OrderReceivingInfo',
-  ROUTE_ORDER_RETAIL_PRICE:'RetailPrice',
+  ROUTE_ORDER_RETAIL_PRICE: 'RetailPrice',
 
-  ROUTE_CONSOLE_STOCKING_TASKS:'STOCKING_TASKS',
-  ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT:'StallSettlementScene',//摊位汇总
-  ROUTE_HOME_SETTLEMENT_STALL_DETAIL:'StallDetail',//摊位详情
-  ROUTE_HOME_SETTLEMENT_STALL_DETAILS:'StallDetails',//摊位明细
+  ROUTE_CONSOLE_STOCKING_TASKS: 'STOCKING_TASKS',
+  ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT: 'StallSettlementScene',//摊位汇总
+  ROUTE_HOME_SETTLEMENT_STALL_DETAIL: 'StallDetail',//摊位详情
+  ROUTE_HOME_SETTLEMENT_STALL_DETAILS: 'StallDetails',//摊位明细
 
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
@@ -182,8 +182,8 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
-  ROUTE_BIND_SHUNFENG:'BindShunfeng',
-  ROUTE_REGISTER_SHUNFENG:'RegisterShunfeng',
+  ROUTE_BIND_SHUNFENG: 'BindShunfeng',
+  ROUTE_REGISTER_SHUNFENG: 'RegisterShunfeng',
   ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置

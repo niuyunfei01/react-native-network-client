@@ -11,6 +11,7 @@ import pxToEm from "../util/pxToEm";
 import numeral from "numeral";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../../scene/order/inputNumberStyles";
+
 const {StyleSheet} = ReactNative
 const _editNum = function (edited, item) {
   return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
@@ -51,25 +52,25 @@ class ItemRow extends PureComponent {
     return <View key={idx} style={Styles.ItemRowHeader}>
       <View style={Styles.ItemRowContent}>
         <TouchableOpacity
-            onPress={() => {
-              let {product_id} = item
-              nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId, item: item})
-            }}
+          onPress={() => {
+            let {product_id} = item
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId, item: item})
+          }}
         >
           {
             !!item.product_img ?
-                <Image
-                    style={styles.product_img}
-                    source={{uri: item.product_img}}
-                /> :
-                <FontAwesome5 name={'file-image'} size={45} style={Styles.fileImg}/>
+              <Image
+                style={styles.product_img}
+                source={{uri: item.product_img}}
+              /> :
+              <FontAwesome5 name={'file-image'} size={45} style={Styles.fileImg}/>
           }
         </TouchableOpacity>
         <View>
           <Text style={Styles.ContentText}>
             <If condition={item.shelf_no}>{item.shelf_no} </If>{item.name}
             <Text style={Styles.productIdText}>(#{item.product_id}<If
-                condition={item.tag_code}>[{item.tag_code}]</If>) </Text>
+              condition={item.tag_code}>[{item.tag_code}]</If>) </Text>
           </Text>
 
           <View style={Styles.isMgrContent}>
@@ -109,19 +110,19 @@ class ItemRow extends PureComponent {
       </View>
       {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={Styles.editNum}>
         <Text
-            style={[styles.editStatus, Styles.editStatusDeduct]}>已减{-editNum}件</Text>
+          style={[styles.editStatus, Styles.editStatusDeduct]}>已减{-editNum}件</Text>
         <Text
-            style={[styles.editStatus, Styles.editStatusDeduct]}>退{numeral(-editNum * item.price).format('0.00')} </Text>
+          style={[styles.editStatus, Styles.editStatusDeduct]}>退{numeral(-editNum * item.price).format('0.00')} </Text>
       </View>) : (showEditAdded && <View style={{alignItems: 'flex-end', flex: 1}}>
         <Text style={[styles.editStatus, Styles.editStatusAdd]}>已加{editNum}件</Text>
         <Text
-            style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(editNum * item.normal_price / 100).format('0.00')} </Text>
+          style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(editNum * item.normal_price / 100).format('0.00')} </Text>
       </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end', flex: 1}}>
         <Text style={[styles.editStatus, Styles.editStatusAdd]}>加货{item.num} </Text>
         <Text
-            style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(item.num * item.price).format('0.00')} </Text>
+          style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(item.num * item.price).format('0.00')} </Text>
       </View>}
 
       {isPromotion &&
@@ -133,14 +134,14 @@ class ItemRow extends PureComponent {
       {isEditing && !isPromotion &&
       <View style={styles.flex1}>
         <InputNumber
-            styles={inputNumberStyles}
-            min={0}
-            value={(edited || item).num}
-            style={Styles.isEdtingInput}
-            onChange={(v) => {
-              onInputNumberChange(item, v)
-            }}
-            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+          styles={inputNumberStyles}
+          min={0}
+          value={(edited || item).num}
+          style={Styles.isEdtingInput}
+          onChange={(v) => {
+            onInputNumberChange(item, v)
+          }}
+          keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
         />
       </View>}
     </View>

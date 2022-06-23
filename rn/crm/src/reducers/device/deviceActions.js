@@ -41,9 +41,9 @@ export function setVersion(version) {
   }
 }
 
-export function setDeviceInfo(deviceInfo){
-  return{
-    type:SET_DEVICE_INFO,
-    deviceInfo:deviceInfo
+export function setDeviceInfo(deviceInfo) {
+  return {
+    type: SET_DEVICE_INFO,
+    deviceInfo: deviceInfo
   }
 }

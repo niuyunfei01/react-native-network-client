@@ -2,13 +2,13 @@ import React, {PureComponent} from 'react';
 import {
   Image,
   InteractionManager,
+  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
   TouchableOpacity,
-  Modal,
   View
 } from 'react-native';
 import {connect} from "react-redux";
@@ -17,7 +17,12 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import * as tool from "../../../pubilc/util/tool";
-import {fetchProductDetail, fetchVendorProduct, fetchVendorTags,UpdateWMGoods} from "../../../reducers/product/productActions";
+import {
+  fetchProductDetail,
+  fetchVendorProduct,
+  fetchVendorTags,
+  UpdateWMGoods
+} from "../../../reducers/product/productActions";
 import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../../pubilc/util/http";
@@ -28,7 +33,7 @@ import NoFoundDataView from "../../common/component/NoFoundDataView";
 import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import {hideModal, showModal, showSuccess,showError} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
@@ -59,22 +64,22 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
-const MORE_ITEM=[
+const MORE_ITEM = [
   {
-    value:'1',
-    label:'报价'
+    value: '1',
+    label: '报价'
   },
   {
-    value:'2',
-    label:'库存'
+    value: '2',
+    label: '库存'
   },
   {
-    value:'3',
-    label:'库存属性'
+    value: '3',
+    label: '库存属性'
   },
   {
-    value:'4',
-    label:'摊位关联'
+    value: '4',
+    label: '摊位关联'
   },
   // {
   //   value:'5',
@@ -114,16 +119,16 @@ class GoodStoreDetailScene extends PureComponent {
         value: '',
         label: '更多'
       },
-      selectStall:{
+      selectStall: {
         value: '',
         label: '请选择要关联的摊位'
       },
-      selectedSpecArray:[],
-      selectedSpec:{
+      selectedSpecArray: [],
+      selectedSpec: {
         value: '',
         label: '请选择商品的规格'
       },
-      stallVisible:false
+      stallVisible: false
     };
     GlobalUtil.setGoodsFresh(2)
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
@@ -145,13 +150,13 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   componentDidMount() {
-    const {fn_stall}=this.props.global.simpleStore
-    this.handleAuthItem('fn_stall',fn_stall)
+    const {fn_stall} = this.props.global.simpleStore
+    this.handleAuthItem('fn_stall', fn_stall)
     showModal('加载中')
     const {accessToken} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
       hideModal()
-      this.handleAuthItem('strict_providing',store['strict_providing'])
+      this.handleAuthItem('strict_providing', store['strict_providing'])
       this.setState({
         fn_price_controlled: store['fn_price_controlled'],
         fnProviding: Number(store['strict_providing']) > 0
@@ -162,23 +167,23 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStoreProdWithProd();
   }
 
-  handleAuthItem=(authName,value)=>{
-    const stockIndex=MORE_ITEM.findIndex(item=>item.label==='库存')
-    const  stallIndex=MORE_ITEM.findIndex(item=>item.label==='摊位关联')
+  handleAuthItem = (authName, value) => {
+    const stockIndex = MORE_ITEM.findIndex(item => item.label === '库存')
+    const stallIndex = MORE_ITEM.findIndex(item => item.label === '摊位关联')
     switch (authName) {
       case 'strict_providing':
-        if(value==='0'&&stockIndex!==-1)
-          MORE_ITEM.splice(stockIndex,2)
-        if(value==='1'&&stockIndex===-1) {
+        if (value === '0' && stockIndex !== -1)
+          MORE_ITEM.splice(stockIndex, 2)
+        if (value === '1' && stockIndex === -1) {
           MORE_ITEM.push({value: '2', label: '库存'})
           MORE_ITEM.push({value: '3', label: '库存属性'})
         }
         break
       case 'fn_stall':
-        if(value==='0'&&stallIndex!==-1)
-          MORE_ITEM.splice(stallIndex,1)
-          if(value==='1'&&stallIndex===-1)
-            MORE_ITEM.push({value:'4',label: '摊位关联'})
+        if (value === '0' && stallIndex !== -1)
+          MORE_ITEM.splice(stallIndex, 1)
+        if (value === '1' && stallIndex === -1)
+          MORE_ITEM.push({value: '4', label: '摊位关联'})
         break
     }
   }
@@ -219,29 +224,33 @@ class GoodStoreDetailScene extends PureComponent {
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
     showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      const product=pid===0?params.item:data.p
-      const spec={...product,... data.sp}
-      const selectedSpecArray=[]
-      if(spec?.sku_name!==undefined){
-        selectedSpecArray.push({value:spec.id,label:spec.sku_name?spec.sku_name:spec.name,stallName:spec.stall_name})
+      const product = pid === 0 ? params.item : data.p
+      const spec = {...product, ...data.sp}
+      const selectedSpecArray = []
+      if (spec?.sku_name !== undefined) {
+        selectedSpecArray.push({
+          value: spec.id,
+          label: spec.sku_name ? spec.sku_name : spec.name,
+          stallName: spec.stall_name
+        })
       }
-      if(spec?.skus?.length>0)
-        spec.skus.map(sku=>{
-          selectedSpecArray.push({value:sku.id,label:sku.sku_name,stallName:sku.stall_name})
+      if (spec?.skus?.length > 0)
+        spec.skus.map(sku => {
+          selectedSpecArray.push({value: sku.id, label: sku.sku_name, stallName: sku.stall_name})
         })
       if (pid === 0) {
         this.setState({
           product: params.item,
           store_prod: data.sp,
           isRefreshing: false,
-          selectedSpecArray:selectedSpecArray
+          selectedSpecArray: selectedSpecArray
         })
       } else {
         this.setState({
           product: data.p,
           store_prod: data.sp,
           isRefreshing: false,
-          selectedSpecArray:selectedSpecArray
+          selectedSpecArray: selectedSpecArray
         })
       }
       hideModal()
@@ -289,13 +298,23 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
-  refreshControl=()=>{
-    return(
-        <RefreshControl refreshing={this.state.isRefreshing} onRefresh={ this.onHeaderRefresh} tintColor='gray'/>
+  refreshControl = () => {
+    return (
+      <RefreshControl refreshing={this.state.isRefreshing} onRefresh={this.onHeaderRefresh} tintColor='gray'/>
     )
   }
+
   render() {
-    let {full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id,fn_price_controlled} = this.state;
+    let {
+      full_screen,
+      product,
+      store_prod,
+      selectItem,
+      errorMsg,
+      vendorId,
+      product_id,
+      fn_price_controlled
+    } = this.state;
 
     if (full_screen) {
       if (product_id != 0)
@@ -313,163 +332,173 @@ class GoodStoreDetailScene extends PureComponent {
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
     return (
-        <Provider>
-          <View style={styles.page}>
-            <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
-            <ScrollView refreshControl={this.refreshControl} style={styles.scrollViewWrap}>
-              {
-                product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
-              }
-              <View style={[styles.goods_info, styles.top_line]}>
-                <View style={[styles.goods_view]}>
-                  <If condition={this.state.product_id != 0}>
-                    <Text style={styles.goods_name}> {product.name} <Text
-                        style={styles.goods_id}> (#{product.id}) </Text>
-                    </Text>
-                  </If>
-                  <If condition={this.state.product_id == 0}>
-                    <Text style={styles.goods_name}> {product.name} <Text
-                        style={styles.goods_id}> (#{product.id}) </Text>
-                    </Text>
-                  </If>
-              {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
-                return (
-                  <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
-                );
-              })}
+      <Provider>
+        <View style={styles.page}>
+          <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
+          <ScrollView refreshControl={this.refreshControl} style={styles.scrollViewWrap}>
+            {
+              product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
+            }
+            <View style={[styles.goods_info, styles.top_line]}>
+              <View style={[styles.goods_view]}>
+                <If condition={this.state.product_id != 0}>
+                  <Text style={styles.goods_name}> {product.name} <Text
+                    style={styles.goods_id}> (#{product.id}) </Text>
+                  </Text>
+                </If>
+                <If condition={this.state.product_id == 0}>
+                  <Text style={styles.goods_name}> {product.name} <Text
+                    style={styles.goods_id}> (#{product.id}) </Text>
+                  </Text>
+                </If>
+                {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
+                  return (
+                    <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
+                  );
+                })}
+              </View>
             </View>
-          </View>
-              <If condition={vendorId != 68}>
-                <View style={{margin: 10}}>
-                  <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
-                    <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
-                  </View>
+            <If condition={vendorId != 68}>
+              <View style={{margin: 10}}>
+                <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
+                  <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
+                </View>
+                <View style={{
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  backgroundColor: colors.white,
+                  width: '98%',
+                  borderRadius: pxToDp(10),
+                  marginBottom: 10
+                }}>
                   <View style={{
-                    flexDirection: "column",
+                    paddingLeft: 10,
+                    flexDirection: "row",
                     justifyContent: "space-between",
-                    backgroundColor: colors.white,
-                    width: '98%',
-                    borderRadius: pxToDp(10),
-                    marginBottom: 10
+                    alignItems: "center",
                   }}>
-                    <View style={{ paddingLeft: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
-                      <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
-                      <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
-                        <Text style={{color: colors.color333, fontSize: 12}}>
-                          {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}
-                        </Text>
-                        <Text style={{color: colors.color333, fontSize: 12}}>{this.renderIcon(parseInt(store_prod.status))} </Text>
-                      </View>
+                    <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
+                    <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
+                      <Text style={{color: colors.color333, fontSize: 12}}>
+                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}
+                      </Text>
+                      <Text style={{
+                        color: colors.color333,
+                        fontSize: 12
+                      }}>{this.renderIcon(parseInt(store_prod.status))} </Text>
                     </View>
-                    <View style={{flexDirection: "row"}}>
-                      <TouchableOpacity style={[this.state.activity === 'offer' ? styles.tabActivity : styles.tab]}
-                                        onPress={() => this.setState({activity: 'offer'})}>
-                        <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
-                          报价
+                  </View>
+                  <View style={{flexDirection: "row"}}>
+                    <TouchableOpacity style={[this.state.activity === 'offer' ? styles.tabActivity : styles.tab]}
+                                      onPress={() => this.setState({activity: 'offer'})}>
+                      <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
+                        报价
+                      </Text>
+                    </TouchableOpacity>
+                    <If condition={onStrict}>
+                      <TouchableOpacity
+                        style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                        onPress={() => this.setState({activity: 'inventory_num'})}>
+                        <Text style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
+                          库存数量
                         </Text>
                       </TouchableOpacity>
-                      <If condition={onStrict}>
-                        <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
-                                          onPress={() => this.setState({activity: 'inventory_num'})}>
-                          <Text style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
-                            库存数量
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
-                            onPress={() => this.setState({activity: 'inventory_attribute'})}>
-                          <Text style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
-                            库存属性
-                          </Text>
-                        </TouchableOpacity>
-                      </If>
-                    </View>
-                    {this.renderRuleStatusTab()}
+                      <TouchableOpacity
+                        style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
+                        onPress={() => this.setState({activity: 'inventory_attribute'})}>
+                        <Text
+                          style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
+                          库存属性
+                        </Text>
+                      </TouchableOpacity>
+                    </If>
                   </View>
+                  {this.renderRuleStatusTab()}
                 </View>
-                {this.renderStall()}
-              </If>
-            </ScrollView>
-            <If condition={vendorId != 68}>
-              <View style={styles.bottomWrap}>
-                <If condition={onSale}>
-                  <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
-                    <Text style={styles.bottomText}>下架 </Text>
-                  </TouchableOpacity>
-                </If>
-                <If condition={!onSale}>
-                  <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
-                    <Text style={styles.bottomText}>上架 </Text>
-                  </TouchableOpacity>
-                </If>
-                <If condition={MORE_ITEM.length>1}>
-                  <ModalSelector style={[styles.toOnlineBtn]}
-                                 data={MORE_ITEM}
-                                 skin="customer"
-                                 defaultKey={-999}
-                                 onChange={value=>this.onChange(value,store_prod)}>
-                    <Text style={styles.moreText}>
-                      {selectItem.label}
-                    </Text>
-                  </ModalSelector>
-                </If>
-                <If condition={MORE_ITEM.length<2}>
-                  <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('set_price')}>
-                    <Text style={styles.moreText}>报价 </Text>
-                  </TouchableOpacity>
-                </If>
               </View>
-              {this.renderModalStall()}
+              {this.renderStall()}
             </If>
-            <If condition={sp && product.id && vendorId != 68}>
-              <GoodItemEditBottom modalType={this.state.modalType}
-                                  productName={product.name}
-                                  pid={Number(sp.product_id)}
-                                  skuName={product.sku_name}
-                                  strictProviding={this.state.fnProviding}
-                                  accessToken={accessToken}
-                                  storeId={Number(sp.store_id)}
-                                  currStatus={Number(sp.status)}
-                                  doneProdUpdate={this.onDoneProdUpdate}
-                                  onClose={() => this.setState({modalType: ''})}
-                                  spId={Number(sp.id)}
-                                  applyingPrice={applyingPrice}
-                                  storePro={{...product,... store_prod}}
-                                  navigation={this.props.navigation}
-                                  beforePrice={Number(sp.supply_price)}/>
-            </If>
-          </View>
-        </Provider>
+          </ScrollView>
+          <If condition={vendorId != 68}>
+            <View style={styles.bottomWrap}>
+              <If condition={onSale}>
+                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
+                  <Text style={styles.bottomText}>下架 </Text>
+                </TouchableOpacity>
+              </If>
+              <If condition={!onSale}>
+                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
+                  <Text style={styles.bottomText}>上架 </Text>
+                </TouchableOpacity>
+              </If>
+              <If condition={MORE_ITEM.length > 1}>
+                <ModalSelector style={[styles.toOnlineBtn]}
+                               data={MORE_ITEM}
+                               skin="customer"
+                               defaultKey={-999}
+                               onChange={value => this.onChange(value, store_prod)}>
+                  <Text style={styles.moreText}>
+                    {selectItem.label}
+                  </Text>
+                </ModalSelector>
+              </If>
+              <If condition={MORE_ITEM.length < 2}>
+                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('set_price')}>
+                  <Text style={styles.moreText}>报价 </Text>
+                </TouchableOpacity>
+              </If>
+            </View>
+            {this.renderModalStall()}
+          </If>
+          <If condition={sp && product.id && vendorId != 68}>
+            <GoodItemEditBottom modalType={this.state.modalType}
+                                productName={product.name}
+                                pid={Number(sp.product_id)}
+                                skuName={product.sku_name}
+                                strictProviding={this.state.fnProviding}
+                                accessToken={accessToken}
+                                storeId={Number(sp.store_id)}
+                                currStatus={Number(sp.status)}
+                                doneProdUpdate={this.onDoneProdUpdate}
+                                onClose={() => this.setState({modalType: ''})}
+                                spId={Number(sp.id)}
+                                applyingPrice={applyingPrice}
+                                storePro={{...product, ...store_prod}}
+                                navigation={this.props.navigation}
+                                beforePrice={Number(sp.supply_price)}/>
+          </If>
+        </View>
+      </Provider>
     );
   }
 
-  renderStall=()=>{
-    const{selectedSpecArray}=this.state
-    return(
-        <If condition={selectedSpecArray[0]?.stallName?.length>0}>
-          <View style={styles.stallWrap}>
-            <View style={styles.stallTopWrap}>
-              <Text style={styles.stallTopText}>
-                关联摊位
-              </Text>
+  renderStall = () => {
+    const {selectedSpecArray} = this.state
+    return (
+      <If condition={selectedSpecArray[0]?.stallName?.length > 0}>
+        <View style={styles.stallWrap}>
+          <View style={styles.stallTopWrap}>
+            <Text style={styles.stallTopText}>
+              关联摊位
+            </Text>
 
-            </View>
-            <For each="info" index="i" of={selectedSpecArray}>
-              <View style={styles.modalRowWrap} key={i}>
-                <Text style={styles.stallBottomText}>
-                  {info.stallName}
-                </Text>
-                <Text style={styles.stallBottomText}>
-                  {info.label}
-                </Text>
-              </View>
-            </For>
           </View>
-        </If>
+          <For each="info" index="i" of={selectedSpecArray}>
+            <View style={styles.modalRowWrap} key={i}>
+              <Text style={styles.stallBottomText}>
+                {info.stallName}
+              </Text>
+              <Text style={styles.stallBottomText}>
+                {info.label}
+              </Text>
+            </View>
+          </For>
+        </View>
+      </If>
 
     )
   }
-  onShowStall=()=>{
+  onShowStall = () => {
     this.getStallData()
   }
   getStallData = () => {
@@ -486,84 +515,87 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
-  onChangeStall=(value)=>{
-    this.setState({selectStall:value})
+  onChangeStall = (value) => {
+    this.setState({selectStall: value})
   }
 
-  onChangeSpec=(value)=>{
-    this.setState({selectedSpec:value})
+  onChangeSpec = (value) => {
+    this.setState({selectedSpec: value})
   }
-  submitStallAndSpec=(product_id,stall_id,flag)=>{
-    if(!flag){
+  submitStallAndSpec = (product_id, stall_id, flag) => {
+    if (!flag) {
       showError('请先选择摊位或者规格')
       return
     }
     const {currStoreId, accessToken} = this.props.global;
-    const params = {store_id: currStoreId,product_id:product_id,stall_id:stall_id}
+    const params = {store_id: currStoreId, product_id: product_id, stall_id: stall_id}
     const url = `/api_products/get_stall_by_store_id?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(url,params).then(()=>{
+    HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('绑定成功', 3)
-      this.setState({stallVisible:false})
+      this.setState({stallVisible: false})
     })
   }
-  renderModalStall=()=>{
-    const{stallArray,selectStall,selectedSpec,selectedSpecArray,stallVisible}=this.state
-    const flag=selectStall.value&&(selectedSpecArray.length>1?selectedSpec.value:selectedSpec.label)
-    return(
-        <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'} onShow={this.onShowStall}>
-         <View style={styles.modalWrap}>
-           <View style={styles.modalVisibleAreaWrap}>
-             <View style={styles.modalTitleWrap}>
+  renderModalStall = () => {
+    const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
+    const flag = selectStall.value && (selectedSpecArray.length > 1 ? selectedSpec.value : selectedSpec.label)
+    return (
+      <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
+             onShow={this.onShowStall}>
+        <View style={styles.modalWrap}>
+          <View style={styles.modalVisibleAreaWrap}>
+            <View style={styles.modalTitleWrap}>
               <View/>
               <Text style={styles.modalTitle}>
                 摊位关联
               </Text>
-             <TouchableOpacity style={styles.modalCloseBtnWrap} onPress={()=>this.closeModal()}>
-               <AntDesign name={'closesquareo'} style={styles.modalIcon}/>
-             </TouchableOpacity>
+              <TouchableOpacity style={styles.modalCloseBtnWrap} onPress={() => this.closeModal()}>
+                <AntDesign name={'closesquareo'} style={styles.modalIcon}/>
+              </TouchableOpacity>
             </View>
-             <View style={styles.modalRowWrap}>
-               <Text style={styles.modalRowText}>
-                 摊位
-               </Text>
-               <View style={styles.selectWrap}>
-                 <ModalSelector data={stallArray} onChange={value=>this.onChangeStall(value)} skin={'customer'} defaultKey={-999}>
-                   <Text>
-                     {selectStall.label}
-                   </Text>
-                 </ModalSelector>
-               </View>
-             </View>
-             <If condition={selectedSpecArray.length>1}>
-               <View style={styles.modalRowWrap}>
-                 <Text style={styles.modalRowText}>
-                   规格
-                 </Text>
-                 <View style={styles.selectWrap}>
-                   <ModalSelector data={selectedSpecArray} onChange={value=>this.onChangeSpec(value)} skin={'customer'} defaultKey={-999}>
-                     <Text>
-                       {selectedSpec.label}
-                     </Text>
-                   </ModalSelector>
-                 </View>
-               </View>
-             </If>
+            <View style={styles.modalRowWrap}>
+              <Text style={styles.modalRowText}>
+                摊位
+              </Text>
+              <View style={styles.selectWrap}>
+                <ModalSelector data={stallArray} onChange={value => this.onChangeStall(value)} skin={'customer'}
+                               defaultKey={-999}>
+                  <Text>
+                    {selectStall.label}
+                  </Text>
+                </ModalSelector>
+              </View>
+            </View>
+            <If condition={selectedSpecArray.length > 1}>
+              <View style={styles.modalRowWrap}>
+                <Text style={styles.modalRowText}>
+                  规格
+                </Text>
+                <View style={styles.selectWrap}>
+                  <ModalSelector data={selectedSpecArray} onChange={value => this.onChangeSpec(value)} skin={'customer'}
+                                 defaultKey={-999}>
+                    <Text>
+                      {selectedSpec.label}
+                    </Text>
+                  </ModalSelector>
+                </View>
+              </View>
+            </If>
 
-             <TouchableOpacity style={flag?styles.modalSelectBtn:styles.modalNotSelectBtn}
-                               onPress={()=>this.submitStallAndSpec(selectedSpec.value,selectStall.value,flag)}>
-               <Text style={styles.modalBtnText}>
-                 确定
-               </Text>
-             </TouchableOpacity>
-           </View>
-         </View>
-        </Modal>
+            <TouchableOpacity style={flag ? styles.modalSelectBtn : styles.modalNotSelectBtn}
+                              onPress={() => this.submitStallAndSpec(selectedSpec.value, selectStall.value, flag)}>
+              <Text style={styles.modalBtnText}>
+                确定
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     )
   }
-  closeModal=()=>{
-    this.setState({stallVisible:false})
+  closeModal = () => {
+    this.setState({stallVisible: false})
   }
-  onChange=(selectItem,store_prod)=>{
+  onChange = (selectItem, store_prod) => {
 
     switch (selectItem.value) {
       case '1':
@@ -576,7 +608,7 @@ class GoodStoreDetailScene extends PureComponent {
         this.gotoInventoryProp()
         break
       case '4':
-        this.setState({stallVisible:true})
+        this.setState({stallVisible: true})
         break
       // case '5':
       //   InteractionManager.runAfterInteractions(() => {
@@ -594,18 +626,18 @@ class GoodStoreDetailScene extends PureComponent {
       case Cts.STORE_PROD_OFF_SALE:
         return <FontAwesome name={'cart-arrow-down'} style={styles.iconOffSaleStyle}/>;
       case Cts.STORE_PROD_SOLD_OUT:
-        return(
-            <View style={[styles.prodStatusIcon]}>
-              <Text style={{color: colors.white, fontSize: 12}}>
-                缺
-              </Text>
-            </View>
+        return (
+          <View style={[styles.prodStatusIcon]}>
+            <Text style={{color: colors.white, fontSize: 12}}>
+              缺
+            </Text>
+          </View>
         )
     }
   };
 
   renderImg = (list_img, cover_img) => {
-    let {full_screen,product_id} = this.state;
+    let {full_screen, product_id} = this.state;
     let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
@@ -620,9 +652,9 @@ class GoodStoreDetailScene extends PureComponent {
           );
         });
         return (
-            <Swiper style={wrapper}>
-              {img_list}
-            </Swiper>
+          <Swiper style={wrapper}>
+            {img_list}
+          </Swiper>
         )
       } else {
         return (
@@ -649,7 +681,7 @@ class GoodStoreDetailScene extends PureComponent {
   };
 
   renderRuleStatusTab() {
-    let {activity,product, store_prod, fn_price_controlled} = this.state;
+    let {activity, product, store_prod, fn_price_controlled} = this.state;
     return (
       <View style={{
         flexDirection: "column",
@@ -659,7 +691,11 @@ class GoodStoreDetailScene extends PureComponent {
         paddingBottom: 10
       }}>
         <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center", marginBottom: 5}}>
-          <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
+          <Text style={{
+            color: colors.color333,
+            fontSize: 12,
+            flex: 1
+          }}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
           <View style={typeof store_prod.applying_price !== "undefined" && {
             flexDirection: "row",
             alignItems: "center",
@@ -667,7 +703,10 @@ class GoodStoreDetailScene extends PureComponent {
           }}>
             <If condition={activity && activity === 'offer'}>
               <Text
-                style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text></If>
+                style={{
+                  color: colors.color333,
+                  fontSize: 12
+                }}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text></If>
             <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
               <Text style={{
                 textAlign: 'right',
@@ -678,7 +717,10 @@ class GoodStoreDetailScene extends PureComponent {
               <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.stock_str}`} </Text>
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-              <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`} </Text>
+              <Text style={{
+                color: colors.color333,
+                fontSize: 12
+              }}>{`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`} </Text>
             </If>
           </View>
         </View>
@@ -739,31 +781,67 @@ const full_styles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  page:{flex: 1, flexDirection: "column"},
-  iconOffSaleStyle:{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
-  iconSaleStyle:{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
-  scrollViewWrap:{backgroundColor: colors.main_back, flexDirection: 'column'},
-  stallWrap:{margin:10,backgroundColor:colors.white,borderRadius:8},
-  stallTopWrap:{borderBottomWidth:1,borderBottomColor:colors.colorEEE,borderStyle:'solid'},
-  stallTopText:{paddingTop:12,paddingLeft:12,paddingBottom:12,fontSize:15,fontWeight:'500',color:colors.color333,lineHeight:21},
-  stallBottomText:{padding:4,fontSize:14,fontWeight:'400',color:colors.color333,lineHeight:20},
-  selectWrap:{borderColor:colors.color999,borderWidth:1,borderRadius:4,padding:4,width:160},
-  modalWrap:{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',justifyContent:'flex-end'},
-  modalVisibleAreaWrap:{
+  page: {flex: 1, flexDirection: "column"},
+  iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
+  iconSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
+  scrollViewWrap: {backgroundColor: colors.main_back, flexDirection: 'column'},
+  stallWrap: {margin: 10, backgroundColor: colors.white, borderRadius: 8},
+  stallTopWrap: {borderBottomWidth: 1, borderBottomColor: colors.colorEEE, borderStyle: 'solid'},
+  stallTopText: {
+    paddingTop: 12,
+    paddingLeft: 12,
+    paddingBottom: 12,
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.color333,
+    lineHeight: 21
+  },
+  stallBottomText: {padding: 4, fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20},
+  selectWrap: {borderColor: colors.color999, borderWidth: 1, borderRadius: 4, padding: 4, width: 160},
+  modalWrap: {flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end'},
+  modalVisibleAreaWrap: {
     backgroundColor: colors.white,
     padding: 10,
     width: '100%',
-    justifyContent:'flex-end'
+    justifyContent: 'flex-end'
   },
-  modalCloseBtnWrap:{padding:8},
-  modalTitleWrap:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingTop:8,paddingBottom:8},
-  modalTitle:{fontSize:18,fontWeight:'400',color:colors.color333,lineHeight:25},
-  modalIcon:{fontSize:24,fontWeight:'400',color:colors.color999},
-  modalRowWrap:{flexDirection:'row',justifyContent:'space-around',alignItems:'center',paddingTop:11,paddingBottom:11},
-  modalRowText:{fontSize:14,fontWeight:'400',color:colors.color333,lineHeight:20,width:40},
-  modalNotSelectBtn:{backgroundColor:colors.colorCCC,marginTop:39,marginBottom:8,paddingBottom:7,paddingTop:7,paddingLeft:10,paddingRight:10},
-  modalSelectBtn:{backgroundColor:colors.main_color,marginTop:39,marginBottom:8,paddingBottom:7,paddingTop:7,paddingLeft:10,paddingRight:10},
-  modalBtnText:{color:colors.white,fontSize:16,fontWeight:'400',lineHeight:22,textAlign:'center'},
+  modalCloseBtnWrap: {padding: 8},
+  modalTitleWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 8,
+    paddingBottom: 8
+  },
+  modalTitle: {fontSize: 18, fontWeight: '400', color: colors.color333, lineHeight: 25},
+  modalIcon: {fontSize: 24, fontWeight: '400', color: colors.color999},
+  modalRowWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingTop: 11,
+    paddingBottom: 11
+  },
+  modalRowText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, width: 40},
+  modalNotSelectBtn: {
+    backgroundColor: colors.colorCCC,
+    marginTop: 39,
+    marginBottom: 8,
+    paddingBottom: 7,
+    paddingTop: 7,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  modalSelectBtn: {
+    backgroundColor: colors.main_color,
+    marginTop: 39,
+    marginBottom: 8,
+    paddingBottom: 7,
+    paddingTop: 7,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  modalBtnText: {color: colors.white, fontSize: 16, fontWeight: '400', lineHeight: 22, textAlign: 'center'},
   wrapper: {height: pxToDp(444),},
   goods_img: {
     width: pxToDp(720),
@@ -960,9 +1038,9 @@ const styles = StyleSheet.create({
     borderColor: colors.colorDDD,
     justifyContent: 'center',
     alignItems: 'center',
-    width:'50%'
+    width: '50%'
   },
-  bottomWrap:{
+  bottomWrap: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.white,
@@ -971,16 +1049,25 @@ const styles = StyleSheet.create({
     shadowColor: colors.color000,
     shadowOffset: {width: -4, height: -4},
   },
-  bottomText:{fontSize:16,fontWeight:'400',paddingLeft:16,paddingRight:16,paddingTop:8,paddingBottom:8,color:colors.color333,lineHeight:22},
-  moreText:{
-    fontSize:16,
-    fontWeight:'400',
-    paddingLeft:24,
-    paddingRight:24,
-    paddingTop:8,
-    paddingBottom:8,
-    color:colors.main_color,
-    lineHeight:22,
+  bottomText: {
+    fontSize: 16,
+    fontWeight: '400',
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+    color: colors.color333,
+    lineHeight: 22
+  },
+  moreText: {
+    fontSize: 16,
+    fontWeight: '400',
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 8,
+    paddingBottom: 8,
+    color: colors.main_color,
+    lineHeight: 22,
   },
   columnStart: {
     flexDirection: "column",

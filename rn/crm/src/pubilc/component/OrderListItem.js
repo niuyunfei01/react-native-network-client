@@ -6,7 +6,8 @@ import {bindActionCreators} from "redux";
 import Tips from "../../scene/common/component/Tips";
 import {
   Alert,
-  Dimensions, InteractionManager,
+  Dimensions,
+  InteractionManager,
   Modal,
   ScrollView,
   StyleSheet,
@@ -324,13 +325,13 @@ class OrderListItem extends React.PureComponent {
   onCanceled = (val) => {
     this.setState({showDeliveryModal: false})
     this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-        {
-          order: this.state.order,
-          ship_id: val,
-          onCancelled: (ok, reason) => {
-            this.fetchData()
-          }
-        });
+      {
+        order: this.state.order,
+        ship_id: val,
+        onCancelled: (ok, reason) => {
+          this.fetchData()
+        }
+      });
   }
 
   cancelPlan = (val) => {
@@ -455,7 +456,8 @@ class OrderListItem extends React.PureComponent {
                 {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </Text>
             </View>
           </View>
-          <FontAwesome5 solid={false} onPress={() => this.dialNumber(item.mobile)} name={'phone-alt'} style={styles.mobileIcon}/>
+          <FontAwesome5 solid={false} onPress={() => this.dialNumber(item.mobile)} name={'phone-alt'}
+                        style={styles.mobileIcon}/>
           <Entypo onPress={() => {
             let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
             this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
@@ -732,8 +734,10 @@ class OrderListItem extends React.PureComponent {
                           delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
-                        <Text style={[{color: info.desc_color ? info.desc_color : 'black'}, styles.textBold]}>{info.desc} -</Text>
-                        <Text style={[{color: info.content_color}, styles.textBold]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
+                        <Text
+                          style={[{color: info.desc_color ? info.desc_color : 'black'}, styles.textBold]}>{info.desc} -</Text>
+                        <Text
+                          style={[{color: info.content_color}, styles.textBold]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={{flex: 1}}/>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={styles.f14}/> :
                           <Entypo name='chevron-thin-up' style={styles.f14}/>}
@@ -825,8 +829,10 @@ class OrderListItem extends React.PureComponent {
           <View key={i} style={styles.deliveryStatusContent}>
             <View style={{width: 30}}>
               <View style={[styles.deliveryStatusHeader, {backgroundColor: log.status_color,}]}>
-                {i !== 0 ? <View style={[styles.deliveryStatusTitleBottom, {backgroundColor: log.status_color}]}/> : null}
-                {i !== list.length - 1 ? <View style={[styles.deliveryStatusTitleTop, {backgroundColor: log.status_color}]}/>
+                {i !== 0 ?
+                  <View style={[styles.deliveryStatusTitleBottom, {backgroundColor: log.status_color}]}/> : null}
+                {i !== list.length - 1 ?
+                  <View style={[styles.deliveryStatusTitleTop, {backgroundColor: log.status_color}]}/>
                   : null}
               </View>
             </View>

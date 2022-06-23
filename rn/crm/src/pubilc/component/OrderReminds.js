@@ -8,6 +8,7 @@ import tool from "../util/tool";
 import styles from "../../scene/order/OrderStyles";
 import {Icon} from "../../weui";
 import pxToEm from "../util/pxToEm";
+
 const {StyleSheet} = ReactNative
 
 const Styles = StyleSheet.create({
@@ -74,7 +75,8 @@ class OrderReminds extends PureComponent {
       const status = parseInt(remind.status);
       const quick = parseInt(remind.quick);
 
-      return <View key={remind.id} style={[Styles.orderRemind, {backgroundColor: quick !== Cts.TASK_QUICK_NO ? '#edd9d9' : '#f0f9ef'}]}>
+      return <View key={remind.id}
+                   style={[Styles.orderRemind, {backgroundColor: quick !== Cts.TASK_QUICK_NO ? '#edd9d9' : '#f0f9ef'}]}>
         <View style={Styles.Title}>
           <Text style={Styles.color333}>{taskType ? taskType.name : '待办'} </Text>
           <Text style={Styles.ml20}>{tool.shortTimeDesc(remind.created)} </Text>
@@ -83,8 +85,10 @@ class OrderReminds extends PureComponent {
           <Text style={Styles.color333}>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)} </Text>}
           {status === Cts.TASK_STATUS_WAITING &&
           <TouchableOpacity
-              style={Styles.orderStatus}
-              onPress={() => {processRemind(remind)}}
+            style={Styles.orderStatus}
+            onPress={() => {
+              processRemind(remind)
+            }}
           >
             <Text style={Styles.colorWhite}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'} </Text>
           </TouchableOpacity>
