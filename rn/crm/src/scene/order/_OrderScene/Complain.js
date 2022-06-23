@@ -42,11 +42,15 @@ class Complain extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.fetchData()
   }
 
-  fetchData() {
+  onHeaderRefresh = () => {
+    this.fetchData()
+  }
+
+  fetchData = () => {
     const {accessToken, delivery_id} = this.state
 
     const {goBack} = this.props.navigation;
@@ -74,7 +78,7 @@ class Complain extends React.Component {
     ToastShort("复制成功")
   }
 
-  renderList() {
+  renderList = () => {
     let items = []
     let that = this;
     for (let i in this.state.list) {

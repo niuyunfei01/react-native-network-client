@@ -26,13 +26,14 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
-const {StyleSheet} = ReactNative
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
 
+const {StyleSheet} = ReactNative
+
 function mapStateToProps(state) {
-  const {global,device} = state;
-  return {global: global,device:device}
+  const {global, device} = state;
+  return {global: global, device: device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -56,19 +57,19 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
-  currentUserId:'',
-  moduleName:'',
-  componentName:'',
-  method:[]
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
+  currentUserId: '',
+  moduleName: '',
+  componentName: '',
+  method: []
 }//记录耗时的对象
 
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     let date = new Date();
     this.state = {
       isRefreshing: false,
@@ -96,40 +97,42 @@ class SeparatedExpense extends PureComponent {
     this.fetchBalance()
     this.fetchFreeze()
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
 
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:"",
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: "",
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime, methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
 
   componentDidMount() {
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].methodName="componentDidMount"
-    timeObj.method[0].interfaceName=""
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].methodName = "componentDidMount"
+    timeObj.method[0].interfaceName = ""
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,accessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="我的"
-    timeObj['componentName']="SeparatedExpense"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,accessToken)
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "我的"
+    timeObj['componentName'] = "SeparatedExpense"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, accessToken)
   }
+
   onPress(route, params = {}, callback = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
@@ -145,15 +148,15 @@ class SeparatedExpense extends PureComponent {
     showModal('加载中')
     const {global} = this.props;
     const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
-    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
-      const {obj}=res
+    HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchExpenses',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchExpenses',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
         records: obj.records,
@@ -163,12 +166,12 @@ class SeparatedExpense extends PureComponent {
       hideModal()
     }, (res) => {
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchExpenses',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchExpenses',
+        executeTime: res.endTime - res.startTime
       })
       hideModal();
 
@@ -179,26 +182,26 @@ class SeparatedExpense extends PureComponent {
   fetchBalance() {
     const {global} = this.props;
     const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
+    HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchBalance',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchBalance',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
         balanceNum: res.obj
       })
-    }).catch((res)=>{
+    }).catch((res) => {
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchBalance',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchBalance',
+        executeTime: res.endTime - res.startTime
       })
     })
   }
@@ -207,28 +210,28 @@ class SeparatedExpense extends PureComponent {
   fetchFreeze() {
     const {global} = this.props;
     const url = `/v1/new_api/bill/freeze_info/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url,{},true).then(res => {
-      const{obj}=res
+    HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchFreeze',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchFreeze',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
         freeze_show: obj.show !== undefined && obj.show === 1,
         freeze_msg: obj.notice !== undefined ? obj.notice : ""
       })
-    }).catch(error=>{
+    }).catch(error => {
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:error.executeStatus,
-        startTime:error.startTime,
-        endTime:error.endTime,
-        methodName:'fetchFreeze',
-        executeTime:error.endTime-error.startTime
+        interfaceName: url,
+        executeStatus: error.executeStatus,
+        startTime: error.startTime,
+        endTime: error.endTime,
+        methodName: 'fetchFreeze',
+        executeTime: error.endTime - error.startTime
       })
     })
   }
@@ -379,66 +382,68 @@ class SeparatedExpense extends PureComponent {
   render() {
     const {switchType} = this.state;
     return (
-        <View style={Styles.containerContent}>
-          <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-          <ScrollView style={Styles.containerContent} refreshControl={
-            <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
-                            tintColor='gray'/>
-          }>
-            {this.renderHeaderType()}
+      <View style={Styles.containerContent}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+        <ScrollView style={Styles.containerContent} refreshControl={
+          <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
+                          tintColor='gray'/>
+        }>
+          {this.renderHeaderType()}
 
-            <If condition={switchType === WSB_ACCOUNT}>
-              <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
-              {this.renderWSBHeader()}
-              {this.renderWSBType()}
-              {this.renderWSBContent()}
-            </If>
+          <If condition={switchType === WSB_ACCOUNT}>
+            <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
+            {this.renderWSBHeader()}
+            {this.renderWSBType()}
+            {this.renderWSBContent()}
+          </If>
 
-            <If condition={switchType === THIRD_PARTY_ACCOUNT}>
-              {this.renderTHIRDContainer()}
-            </If>
+          <If condition={switchType === THIRD_PARTY_ACCOUNT}>
+            {this.renderTHIRDContainer()}
+          </If>
 
-            {this.renderAccountModal()}
+          {this.renderAccountModal()}
 
-          </ScrollView>
-        </View>
+        </ScrollView>
+      </View>
     )
   }
 
   renderFreezeMsg = () => {
     const {freeze_msg} = this.state
     return (
-        <TouchableOpacity
-            onPress={() => {
-              this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
-            }}
-            style={Styles.containerHeader}>
-          <Text style={Styles.containerHeaderText}>{freeze_msg} </Text>
-          <Button onPress={() => {this.onPress(Config.ROUTE_FREEZE_LIST)}}
-                  title={'查看'}
-                  buttonStyle={Styles.containerHeaderBtn}
-                  titleStyle={Styles.containerHeaderBtnText}>
-          </Button>
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
+        }}
+        style={Styles.containerHeader}>
+        <Text style={Styles.containerHeaderText}>{freeze_msg} </Text>
+        <Button onPress={() => {
+          this.onPress(Config.ROUTE_FREEZE_LIST)
+        }}
+                title={'查看'}
+                buttonStyle={Styles.containerHeaderBtn}
+                titleStyle={Styles.containerHeaderBtnText}>
+        </Button>
+      </TouchableOpacity>
     )
   }
 
   renderHeaderType = () => {
     let {switchType} = this.state
     return (
-        <View style={Styles.headerType}>
-          <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(0)}>
-            <View style={[switchType === WSB_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-              <Text style={Styles.color333}> 外送帮钱包 </Text>
-            </View>
-          </TouchableOpacity>
+      <View style={Styles.headerType}>
+        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(0)}>
+          <View style={[switchType === WSB_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
+            <Text style={Styles.color333}> 外送帮钱包 </Text>
+          </View>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(1)}>
-            <View style={[switchType === THIRD_PARTY_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-              <Text style={Styles.color333}>三方配送充值</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(1)}>
+          <View style={[switchType === THIRD_PARTY_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
+            <Text style={Styles.color333}>三方配送充值</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -489,14 +494,14 @@ class SeparatedExpense extends PureComponent {
   renderWSBContent = () => {
     const {date, records, records2, choseTab} = this.state;
     const datePicker = (
-        <DatePicker
-            rootNativeProps={{'data-xx': 'yy'}}
-            minDate={new Date(2015, 8, 15, 10, 30, 0)}
-            maxDate={new Date()}
-            defaultDate={date}
-            mode="month"
-            locale={zh_CN}
-        />
+      <DatePicker
+        rootNativeProps={{'data-xx': 'yy'}}
+        minDate={new Date(2015, 8, 15, 10, 30, 0)}
+        maxDate={new Date()}
+        defaultDate={date}
+        mode="month"
+        locale={zh_CN}
+      />
     );
 
     return (
@@ -505,16 +510,16 @@ class SeparatedExpense extends PureComponent {
         <View style={Styles.expensesHeader}>
           <Text style={Styles.selectMonthLabel}> 请选择月份 </Text>
           <PopPicker
-              datePicker={datePicker}
-              transitionName="rmc-picker-popup-slide-fade"
-              maskTransitionName="rmc-picker-popup-fade"
-              styles={styles}
-              title={'选择日期'}
-              okText={'确认'}
-              dismissText={'取消'}
-              date={date}
-              onDismiss={this.onDismiss}
-              onChange={this.onChange}
+            datePicker={datePicker}
+            transitionName="rmc-picker-popup-slide-fade"
+            maskTransitionName="rmc-picker-popup-fade"
+            styles={styles}
+            title={'选择日期'}
+            okText={'确认'}
+            dismissText={'取消'}
+            date={date}
+            onDismiss={this.onDismiss}
+            onChange={this.onChange}
           >
             <Text style={Styles.selectMonthText}> {this.state.start_day} </Text>
           </PopPicker>
@@ -527,7 +532,8 @@ class SeparatedExpense extends PureComponent {
               <View style={Styles.recordsBody}>
                 <Text style={Styles.recordsItemTime}>{item.day} </Text>
                 <View style={Styles.flex1}/>
-                <Text style={Styles.recordsItemBalanced}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
+                <Text
+                  style={Styles.recordsItemBalanced}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
                 </Text>
                 <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
               </View>
@@ -560,95 +566,103 @@ class SeparatedExpense extends PureComponent {
   renderTHIRDHeader = () => {
     const {prompt_msg} = this.state
     return (
-        <View style={Styles.THIRDHeader}>
-          <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18} />
-          <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
-        </View>
+      <View style={Styles.THIRDHeader}>
+        <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
+        <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
+      </View>
     )
   }
 
   renderTHIRDContentItem = () => {
     const {thirdAccountList} = this.state
     return (
-        <View style={Styles.THIRDContainerList}>
-          <For index='i' each='info' of={thirdAccountList}>
-            <LinearGradient style={Styles.THIRDContainerItemLinear}
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 1}}
-              colors={info.background_color}>
+      <View style={Styles.THIRDContainerList}>
+        <For index='i' each='info' of={thirdAccountList}>
+          <LinearGradient style={Styles.THIRDContainerItemLinear}
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 1}}
+                          colors={info.background_color}>
+            <View style={Styles.THIRDContainerItemBody}>
               <View style={Styles.THIRDContainerItemBody}>
-                <View style={Styles.THIRDContainerItemBody}>
-                  <Image source={{uri: info.img}}
-                         style={Styles.THIRDContainerItemIcon}/>
-                  <Text style={Styles.THIRDContainerItemName}>{info.name}</Text>
-                </View>
-                <Button buttonStyle={Styles.THIRDContainerBtn}
-                        titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
-                        title={'立即充值'}
-                        onPress={() => {this.toPay(info)}}/>
+                <Image source={{uri: info.img}}
+                       style={Styles.THIRDContainerItemIcon}/>
+                <Text style={Styles.THIRDContainerItemName}>{info.name}</Text>
               </View>
-              <View style={Styles.THIRDContainerItemBody}>
-                <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
-                <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
-              </View>
-            </LinearGradient>
-          </For>
-        </View>
+              <Button buttonStyle={Styles.THIRDContainerBtn}
+                      titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
+                      title={'立即充值'}
+                      onPress={() => {
+                        this.toPay(info)
+                      }}/>
+            </View>
+            <View style={Styles.THIRDContainerItemBody}>
+              <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
+              <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
+            </View>
+          </LinearGradient>
+        </For>
+      </View>
     )
   }
 
   renderNOTHIRDList = () => {
     return (
-        <View style={Styles.THIRDContainerNOList}>
-          <Text style={Styles.NoTHIRDListText}>
-            未授权商家自有账号
-          </Text>
-          <Button buttonStyle={Styles.NoTHIRDListBtn}
-                  titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
-                  title={'去授权'}
-                  onPress={() => {this.toAuthorization()}}/>
-        </View>
+      <View style={Styles.THIRDContainerNOList}>
+        <Text style={Styles.NoTHIRDListText}>
+          未授权商家自有账号
+        </Text>
+        <Button buttonStyle={Styles.NoTHIRDListBtn}
+                titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
+                title={'去授权'}
+                onPress={() => {
+                  this.toAuthorization()
+                }}/>
+      </View>
     )
   }
 
   renderTHIRDContainer = () => {
     const {thirdAccountList} = this.state
     return (
-        <View>
-          {this.renderTHIRDHeader()}
-          {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
-        </View>
+      <View>
+        {this.renderTHIRDHeader()}
+        {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
+      </View>
     )
   }
 
   renderAccountModal = () => {
     return (
-        <JbbModal visible={this.state.dadaAccountModal} onClose={() => this.closeAccountModal()} modal_type={'center'}>
-          <View style={{padding: pxToDp(20)}}>
-            <TouchableOpacity onPress={() => this.closeAccountModal()} style={Styles.flexRowStyle}>
-              <Text style={Styles.modalTitle}>充值金额</Text>
-              <Entypo name="circle-with-cross" style={Styles.closeIcon}/>
-            </TouchableOpacity>
-            <InputItem clear error={this.state.dadaAccountNum <= 0} type="number" value={this.state.dadaAccountNum}
-                       onChange={dadaAccountNum => {this.setState({dadaAccountNum});}}
-                       extra="元"
-                       placeholder="帐户充值金额">
-            </InputItem>
-            <View style={Styles.modalBtnStyle}>
-              <Button buttonStyle={Styles.modalBtnText}
-                      titleStyle={{fontSize: pxToDp(30), color: 'white'}}
-                      title={'取消'}
-                      onPress={() => {this.closeAccountModal()}}/>
-              <Button buttonStyle={Styles.modalBtnText1}
-                      titleStyle={{fontSize: pxToDp(30), color: 'white'}}
-                      title={'确定'}
-                      onPress={() => {
-                        this.closeAccountModal()
-                        this.fetchDeliveryPayUrl()
-                      }}/>
-            </View>
+      <JbbModal visible={this.state.dadaAccountModal} onClose={() => this.closeAccountModal()} modal_type={'center'}>
+        <View style={{padding: pxToDp(20)}}>
+          <TouchableOpacity onPress={() => this.closeAccountModal()} style={Styles.flexRowStyle}>
+            <Text style={Styles.modalTitle}>充值金额</Text>
+            <Entypo name="circle-with-cross" style={Styles.closeIcon}/>
+          </TouchableOpacity>
+          <InputItem clear error={this.state.dadaAccountNum <= 0} type="number" value={this.state.dadaAccountNum}
+                     onChange={dadaAccountNum => {
+                       this.setState({dadaAccountNum});
+                     }}
+                     extra="元"
+                     placeholder="帐户充值金额">
+          </InputItem>
+          <View style={Styles.modalBtnStyle}>
+            <Button buttonStyle={Styles.modalBtnText}
+                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
+                    title={'取消'}
+                    onPress={() => {
+                      this.closeAccountModal()
+                    }}/>
+            <Button buttonStyle={Styles.modalBtnText1}
+                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
+                    title={'确定'}
+                    onPress={() => {
+                      this.closeAccountModal()
+                      this.fetchDeliveryPayUrl()
+                    }}/>
           </View>
-        </JbbModal>
+        </View>
+      </JbbModal>
     )
   }
 

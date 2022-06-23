@@ -22,10 +22,10 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          ...globalActions
-        },
-        dispatch
+      {
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -105,20 +105,20 @@ class HistoryNoticeScene extends PureComponent {
 
   render() {
     return (
-        <ScrollView style={Styles.scrollStyle}>
-          <FetchView navigation={this.props.navigation} onRefresh={this.fetchHistoryAdvicesList.bind(this)}/>
-          {this.renderHistoryAdvicesList()}
-          <If condition={!this.state.isLastPage}>
-            <TouchableOpacity style={Styles.loadMore} onPress={() => this.loadMore()}>
-              <Text>加载更多</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={this.state.isLastPage}>
-            <TouchableOpacity style={Styles.loadMore}>
-              <Text>没有更多了~</Text>
-            </TouchableOpacity>
-          </If>
-        </ScrollView>
+      <ScrollView style={Styles.scrollStyle}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchHistoryAdvicesList.bind(this)}/>
+        {this.renderHistoryAdvicesList()}
+        <If condition={!this.state.isLastPage}>
+          <TouchableOpacity style={Styles.loadMore} onPress={() => this.loadMore()}>
+            <Text>加载更多</Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={this.state.isLastPage}>
+          <TouchableOpacity style={Styles.loadMore}>
+            <Text>没有更多了~</Text>
+          </TouchableOpacity>
+        </If>
+      </ScrollView>
     );
   }
 
@@ -133,25 +133,34 @@ class HistoryNoticeScene extends PureComponent {
   renderHistoryAdvicesList = () => {
     let {historyAdviceList} = this.state
     return (
-        <For each='info' index="i" of={historyAdviceList}>
-          <TouchableOpacity onPress={() => this.toDetail(info)} style={Styles.advicesListContainer} key={i}>
-            <View style={Styles.advicesListTitle}>
-              <Text style={Styles.advicesListTitleText}>{info.title}</Text>
-              <View style={Styles.flex1}/>
-              <Entypo name={"chevron-thin-right"} style={Styles.advicesListTitleIcon}/>
-            </View>
+      <For each='info' index="i" of={historyAdviceList}>
+        <TouchableOpacity onPress={() => this.toDetail(info)} style={Styles.advicesListContainer} key={i}>
+          <View style={Styles.advicesListTitle}>
+            <Text style={Styles.advicesListTitleText}>{info.title}</Text>
+            <View style={Styles.flex1}/>
+            <Entypo name={"chevron-thin-right"} style={Styles.advicesListTitleIcon}/>
+          </View>
 
-            <View style={Styles.advicesListItem}>
-              <If condition={!info.is_read}>
-                <View style={{backgroundColor: '#F72D2D', width: 10, height: 10, borderRadius: 10, position: "absolute", top: 18, left: 95}}/>
-              </If>
-              <Text style={Styles.advicesListItemTime}>{info.created_format} </Text>
-              <View style={Styles.advicesListItemBody}>
-                <Text style={Styles.advicesListItemContent} numberOfLines={2} ellipsizeMode={'clip'}>{this.cutAdvicesContent(info.content)} </Text>
-              </View>
+          <View style={Styles.advicesListItem}>
+            <If condition={!info.is_read}>
+              <View style={{
+                backgroundColor: '#F72D2D',
+                width: 10,
+                height: 10,
+                borderRadius: 10,
+                position: "absolute",
+                top: 18,
+                left: 95
+              }}/>
+            </If>
+            <Text style={Styles.advicesListItemTime}>{info.created_format} </Text>
+            <View style={Styles.advicesListItemBody}>
+              <Text style={Styles.advicesListItemContent} numberOfLines={2}
+                    ellipsizeMode={'clip'}>{this.cutAdvicesContent(info.content)} </Text>
             </View>
-          </TouchableOpacity>
-        </For>
+          </View>
+        </TouchableOpacity>
+      </For>
     )
   }
 

@@ -69,7 +69,18 @@ class SettlementOrderScene extends PureComponent {
   }
 
   renderHeader() {
-    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount, merchant_add_tip_amount, merchant_add_tip_num, merchant_reship_amount, merchant_reship_num} = this.props
+    const {
+      orderNum,
+      orderAmount,
+      refundNum,
+      refundAmount,
+      otherNum,
+      otherAmount,
+      merchant_add_tip_amount,
+      merchant_add_tip_num,
+      merchant_reship_amount,
+      merchant_reship_num
+    } = this.props
     return (
       <View style={styles.header}>
         <View style={styles.headerItem}>
@@ -89,12 +100,12 @@ class SettlementOrderScene extends PureComponent {
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>补送:{merchant_reship_num}笔</Text>
           <Text
-              style={{color: colors.color333}}>{merchant_reship_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_reship_amount, '', true)} </Text>
+            style={{color: colors.color333}}>{merchant_reship_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_reship_amount, '', true)} </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>小费:{merchant_add_tip_num}笔</Text>
           <Text
-              style={{color: colors.color333}}>{merchant_add_tip_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_add_tip_amount, '', true)} </Text>
+            style={{color: colors.color333}}>{merchant_add_tip_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_add_tip_amount, '', true)} </Text>
         </View>
       </View>
     )
@@ -117,13 +128,13 @@ class SettlementOrderScene extends PureComponent {
       <View>
         <View style={styles.dropdown}/>
         {products && tool.objectMap(products, (ite, index) => {
-          const money=tool.toFixed(ite.num * ite.supply_price)
+          const money = tool.toFixed(ite.num * ite.supply_price)
           return (
             <View key={index} style={styles.dropdownRow}>
               <View style={styles.dropdownRowItem}>
                 <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
                 <Text style={styles.goodsNum}>X{ite.num} </Text>
-                <If condition={money>0}>
+                <If condition={money > 0}>
                   <Text style={styles.goodsPrice}>￥{money} </Text>
                 </If>
               </View>
@@ -138,20 +149,20 @@ class SettlementOrderScene extends PureComponent {
 
   renderReshipDropdownRow(items) {
     return (
-        <View>
-          <View style={styles.dropdown}/>
-          {items && tool.objectMap(items, (ite, index) => {
-            return (
-                <View key={index} style={styles.dropdownRow}>
-                  <View style={styles.dropdownRowItem}>
-                    <Text style={{color: colors.color333}}>{ite.title}</Text>
-                    <Text style={{color: colors.color333}}>承担{ite.bearFee}元</Text>
-                  </View>
-                </View>
-            )
-          })
-          }
-        </View>
+      <View>
+        <View style={styles.dropdown}/>
+        {items && tool.objectMap(items, (ite, index) => {
+          return (
+            <View key={index} style={styles.dropdownRow}>
+              <View style={styles.dropdownRowItem}>
+                <Text style={{color: colors.color333}}>{ite.title}</Text>
+                <Text style={{color: colors.color333}}>承担{ite.bearFee}元</Text>
+              </View>
+            </View>
+          )
+        })
+        }
+      </View>
 
     )
   }
@@ -193,7 +204,7 @@ class SettlementOrderScene extends PureComponent {
         data={this.props.refundList}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
-          let {orderTime, dayId, refundNum,refundAmount,id} = item
+          let {orderTime, dayId, refundNum, refundAmount, id} = item
           if (!this.state.pageMounted) {
             this.props.orderList[index].down = true
             this.setState({pageMounted: true})
@@ -243,32 +254,32 @@ class SettlementOrderScene extends PureComponent {
   renderFreeTipList() {
     const self = this
     return (
-        <FlatList
-            data={this.state.merchant_reship_tip}
-            ListEmptyComponent={<EmptyData/>}
-            renderItem={({item, index}) => {
-              let {orderTime, dayId, id, items} = item
-              if (!this.state.pageMounted) {
-                this.state.merchant_reship_tip[index].down = true
-                this.setState({pageMounted: true})
-              }
-              return (
-                  <View key={index} style={styles.itemRow}>
-                    <View style={styles.item_title}>
-                      <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
-                        <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.toggleDropdown(index, 'merchant_reship_tip', item)}>
-                        {self.renderDropdownImage(item)}
-                      </TouchableOpacity>
-                    </View>
-                    <If condition={item.down}>
-                      {self.renderReshipDropdownRow(items)}
-                    </If>
-                  </View>
-              )
-            }}
-        />
+      <FlatList
+        data={this.state.merchant_reship_tip}
+        ListEmptyComponent={<EmptyData/>}
+        renderItem={({item, index}) => {
+          let {orderTime, dayId, id, items} = item
+          if (!this.state.pageMounted) {
+            this.state.merchant_reship_tip[index].down = true
+            this.setState({pageMounted: true})
+          }
+          return (
+            <View key={index} style={styles.itemRow}>
+              <View style={styles.item_title}>
+                <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
+                  <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toggleDropdown(index, 'merchant_reship_tip', item)}>
+                  {self.renderDropdownImage(item)}
+                </TouchableOpacity>
+              </View>
+              <If condition={item.down}>
+                {self.renderReshipDropdownRow(items)}
+              </If>
+            </View>
+          )
+        }}
+      />
     )
   }
 

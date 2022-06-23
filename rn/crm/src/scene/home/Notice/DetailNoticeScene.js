@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import ReactNative, {ScrollView, View, Text } from "react-native";
+import ReactNative, {ScrollView, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -21,10 +21,10 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          ...globalActions
-        },
-        dispatch
+      {
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -84,7 +84,7 @@ class HistoryNoticeScene extends PureComponent {
             javaScriptEnabled={true}
             domStorageEnabled={true}
             scrollEnabled={false}
-            onMessage={(event)=>{
+            onMessage={(event) => {
               this.setState({height: +event.nativeEvent.data})
             }}
           />

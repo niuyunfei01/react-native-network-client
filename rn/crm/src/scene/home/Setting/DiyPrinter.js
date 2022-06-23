@@ -107,7 +107,7 @@ class DiyPrinter extends PureComponent {
           isRefreshing: false
         })
       }, (err) => {
-        ToastLong("操作失败："+err.desc)
+        ToastLong("操作失败：" + err.desc)
         this.setState({isRefreshing: false})
       })
     }, 1000)

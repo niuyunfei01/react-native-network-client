@@ -1,14 +1,5 @@
 import React, {Component} from "react";
-import {
-  Alert,
-  InteractionManager,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {Alert, InteractionManager, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Clipboard from '@react-native-community/clipboard';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
@@ -519,6 +510,7 @@ class StoreAddScene extends Component {
     });
     return false;
   }
+
   componentDidMount() {
 
     const accessToken = this.props.global.accessToken;
@@ -1207,28 +1199,28 @@ class StoreAddScene extends Component {
                 <View>
                   <Text style={[styles.cell_labeltime]}>营业时间</Text>
                 </View>
-                  <TouchableOpacity
-                    style={[styles.ctimelist]}
-                    onPress={() => {
-                      if (this.state.is_mgr) {
-                        this.setState({
-                          timemodalType: true
-                        })
-                      } else {
-                        ToastLong("您没有权限!");
-                      }
-                    }}>
-                    {this.state.open_time_conf && this.state.open_time_conf.map((item, idx) => {
-                      return (
-                        <Text style={styles.body_text}>
-                          {item.start_time} —— {item.end_time}
-                        </Text>
-                      )
-                    })}
-                    <Text style={[styles.body_texttxt]}>
-                      修改营业时间
-                    </Text>
-                  </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.ctimelist]}
+                  onPress={() => {
+                    if (this.state.is_mgr) {
+                      this.setState({
+                        timemodalType: true
+                      })
+                    } else {
+                      ToastLong("您没有权限!");
+                    }
+                  }}>
+                  {this.state.open_time_conf && this.state.open_time_conf.map((item, idx) => {
+                    return (
+                      <Text style={styles.body_text}>
+                        {item.start_time} —— {item.end_time}
+                      </Text>
+                    )
+                  })}
+                  <Text style={[styles.body_texttxt]}>
+                    修改营业时间
+                  </Text>
+                </TouchableOpacity>
 
               </View>
             </Cells>
@@ -1870,13 +1862,13 @@ const
       // fontWeight: "bold",
       // color: colors.color333
     },
-    cell_labeltime:{
-     flex:1,
+    cell_labeltime: {
+      flex: 1,
       fontSize: pxToDp(26),
       color: colors.color666,
-      margin:pxToDp(30),
+      margin: pxToDp(30),
     },
-    ctimelist:{
+    ctimelist: {
       flex: 3,
       marginRight: pxToDp(30),
     },

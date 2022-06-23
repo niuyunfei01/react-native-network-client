@@ -23,7 +23,7 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 function mapStateToProps(state) {
   return {
     global: state.global,
-    device:state.device
+    device: state.device
   }
 }
 
@@ -38,20 +38,20 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
-  currentUserId:'',
-  moduleName:'',
-  componentName:'',
-  method:[]
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
+  currentUserId: '',
+  moduleName: '',
+  componentName: '',
+  method: []
 }//记录耗时的对象
 
 
 class OrderTransferThird extends Component {
   constructor(props: Object) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     const if_reship = this.props.route.params.if_reship || 0;
     const headerType = this.props.route.params.headerType || 1;
     this.state = {
@@ -113,16 +113,16 @@ class OrderTransferThird extends Component {
     })
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
-    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
+    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       let deliverys = []
-      const {obj}=res
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchThirdWays',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchThirdWays',
+        executeTime: res.endTime - res.startTime
       })
       hideModal();
       if (tool.length(obj.exist) > 0) {
@@ -172,12 +172,12 @@ class OrderTransferThird extends Component {
       this.mixpanel.track("ship.list_to_call", params);
     }).catch((res) => {
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchThirdWays',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchThirdWays',
+        executeTime: res.endTime - res.startTime
       })
       hideModal();
       this.setState({
@@ -185,37 +185,39 @@ class OrderTransferThird extends Component {
       })
     })
   }
+
   componentDidMount() {
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].interfaceName=""
-    timeObj.method[0].methodName="componentDidMount"
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].interfaceName = ""
+    timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,accessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="订单"
-    timeObj['componentName']="OrderTransferThird"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,accessToken)
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "订单"
+    timeObj['componentName'] = "OrderTransferThird"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, accessToken)
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:'',
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,
-        methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: '',
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime,
+        methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
 
@@ -484,7 +486,7 @@ class OrderTransferThird extends Component {
     }
 
     function getDates(startDate, stopDate) {
-      let dateArray = new Array();
+      let dateArray = [];
       let currentDate = startDate;
       while (currentDate <= stopDate) {
         dateArray.push(dayjs(currentDate).format('YYYY-MM-DD'))

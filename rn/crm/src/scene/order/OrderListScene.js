@@ -39,8 +39,8 @@ const {
 } = ReactNative;
 
 function mapStateToProps(state) {
-  const {remind, global,device} = state;
-  return {remind: remind, global: global,device:device}
+  const {remind, global, device} = state;
+  return {remind: remind, global: global, device: device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -119,20 +119,21 @@ const initState = {
   ext_store_name: '所有外卖店铺',
   isadditional: ''
 };
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
   currentUserId: '',
-  moduleName:'',
-  componentName:'',
-  method:[]
+  moduleName: '',
+  componentName: '',
+  method: []
 }
+
 class OrderListScene extends Component {
   state = initState;
 
   constructor(props) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName:'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.mixpanel = MixpanelInstance;
     let {currentUser} = this.props.global;
     if (tool.length(currentUser) > 0) {
@@ -148,7 +149,7 @@ class OrderListScene extends Component {
 
   }
 
-  openAndroidNotification=()=>{
+  openAndroidNotification = () => {
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
         this.setState({show_voice_pop: !enabled})
@@ -194,38 +195,40 @@ class OrderListScene extends Component {
 
     }
   }
+
   componentDidMount() {
     this.openAndroidNotification();
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].interfaceName=""
-    timeObj.method[0].methodName="componentDidMount"
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].interfaceName = ""
+    timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,accessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="订单"
-    timeObj['componentName']="OrderListScene"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,accessToken)
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "订单"
+    timeObj['componentName'] = "OrderListScene"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, accessToken)
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:'',
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,
-        methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: '',
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime,
+        methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
 
@@ -236,15 +239,15 @@ class OrderListScene extends Component {
       storeId: currStoreId,
       pos: 1
     }
-    HttpUtils.post.bind(this.props)(api, data,true).then((res) => {
-      const{obj}=res
+    HttpUtils.post.bind(this.props)(api, data, true).then((res) => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:api,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        executeTime:res.endTime-res.startTime,
-        executeStatus:res.executeStatus,
-        methodName:'getActivity'
+        interfaceName: api,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        executeTime: res.endTime - res.startTime,
+        executeStatus: res.executeStatus,
+        methodName: 'getActivity'
       })
       if (tool.length(obj) > 0) {
         this.setState({
@@ -259,14 +262,14 @@ class OrderListScene extends Component {
           store_id: currStoreId,
         });
       }
-    }).catch(error=>{
+    }).catch(error => {
       timeObj.method.push({
-        interfaceName:api,
-        startTime:error.startTime,
-        endTime:error.endTime,
-        executeTime:error.endTime-error.startTime,
-        executeStatus:error.executeStatus,
-        methodName:'getActivity'
+        interfaceName: api,
+        startTime: error.startTime,
+        endTime: error.endTime,
+        executeTime: error.endTime - error.startTime,
+        executeStatus: error.executeStatus,
+        methodName: 'getActivity'
       })
     })
   }
@@ -383,28 +386,28 @@ class OrderListScene extends Component {
 
     const accessToken = this.props.global.accessToken;
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url, params,true).then(res => {
-      const{obj}=res
+    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:url,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        executeTime:res.endTime-res.startTime,
-        executeStatus:res.executeStatus,
-        methodName:'fetorderNum'
+        interfaceName: url,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        executeTime: res.endTime - res.startTime,
+        executeStatus: res.executeStatus,
+        methodName: 'fetorderNum'
       })
       this.setState({
         orderNum: obj.totals,
         isadditional: obj?.delvery_reship_count !== undefined && Number(obj.delvery_reship_count) === 1
       })
-    }).catch(error=>{
+    }).catch(error => {
       timeObj.method.push({
-        interfaceName:url,
-        startTime:error.startTime,
-        endTime:error.endTime,
-        executeTime:error.endTime-error.startTime,
-        executeStatus:error.executeStatus,
-        methodName:'fetorderNum'
+        interfaceName: url,
+        startTime: error.startTime,
+        endTime: error.endTime,
+        executeTime: error.endTime - error.startTime,
+        executeStatus: error.executeStatus,
+        methodName: 'fetorderNum'
       })
     })
 

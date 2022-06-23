@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactNative, {TouchableOpacity,StyleSheet} from 'react-native'
+import ReactNative, {StyleSheet, TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -27,16 +27,17 @@ const {
 const {PureComponent} = React;
 
 function mapStateToProps(state) {
-  const {remind, global,device} = state;
-  return {remind: remind, global: global,device:device}
+  const {remind, global, device} = state;
+  return {remind: remind, global: global, device: device}
 }
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
-  currentUserId:'',
-  moduleName:'',
-  componentName:'',
-  method:[]
+
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
+  currentUserId: '',
+  moduleName: '',
+  componentName: '',
+  method: []
 }//记录耗时的对象
 
 function mapDispatchToProps(dispatch) {
@@ -50,7 +51,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const STATUS_FILTER=[
+const STATUS_FILTER = [
   {label: '全部订单', id: 0},
   {label: '已取消', id: 5},
   {label: '异常', id: 8}
@@ -59,7 +60,7 @@ const STATUS_FILTER=[
 class OrderQueryResultScene extends PureComponent {
   constructor(props) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     const {navigation, route} = this.props
     let title = ''
     let type = 'done'
@@ -89,14 +90,14 @@ class OrderQueryResultScene extends PureComponent {
       dateBtn: 1,
       platformBtn: 0,
       platform: Cts.PLAT_ARRAY,
-      selectStatus:STATUS_FILTER[0]
+      selectStatus: STATUS_FILTER[0]
     };
     navigation.setOptions({headerTitle: title})
-    this.onSearch('',false)
+    this.onSearch('', false)
     this.renderItem = this.renderItem.bind(this);
   }
 
-  onRefresh=()=> {
+  onRefresh = () => {
     tool.debounces(() => {
       let query = this.state.query;
       query.page = 1;
@@ -105,7 +106,7 @@ class OrderQueryResultScene extends PureComponent {
         query: query,
         orders: []
       }, () => {
-        this.onSearch('',false)
+        this.onSearch('', false)
       })
     }, 600)
   }
@@ -124,7 +125,7 @@ class OrderQueryResultScene extends PureComponent {
     }
     query.page += 1
     this.setState({query}, () => {
-      this.onSearch('',false)
+      this.onSearch('', false)
     })
   }
 
@@ -132,7 +133,7 @@ class OrderQueryResultScene extends PureComponent {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={false}
-                     fetchData={()=>this.onSearch('',false)}
+                     fetchData={() => this.onSearch('', false)}
                      item={item} index={index}
                      accessToken={this.props.global.accessToken}
                      key={index}
@@ -168,7 +169,7 @@ class OrderQueryResultScene extends PureComponent {
             })
           }}
           refreshing={this.state.isLoading}
-          keyExtractor={(item,index)=>`${index}`}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           // getItemLayout={this._getItemLayout}
           ListEmptyComponent={() =>
@@ -195,40 +196,43 @@ class OrderQueryResultScene extends PureComponent {
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
 
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:'',
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,
-        methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: '',
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime,
+        methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
+
   componentDidMount() {
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].methodName="componentDidMount"
-    timeObj.method[0].interfaceName=''
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].methodName = "componentDidMount"
+    timeObj.method[0].interfaceName = ''
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,accessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="订单"
-    timeObj['componentName']="OrderQueryResultScene"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,accessToken)
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "订单"
+    timeObj['componentName'] = "OrderQueryResultScene"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, accessToken)
   }
+
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
@@ -246,52 +250,52 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   onSearch = (keywords, isSearch) => {
-    const{isLoading,date,platformBtn,selectStatus,query,orders,type}=this.state
+    const {isLoading, date, platformBtn, selectStatus, query, orders, type} = this.state
     if (isLoading) {
       return
     }
     showModal("加载中...")
     this.setState({isLoading: true})
-    if(type === 'additional'||type==='search'){
+    if (type === 'additional' || type === 'search') {
       this.fetchOrders(query)
       return;
     }
     let params = {
-      search_date:date,
-      platform:platformBtn,
-      order_status:selectStatus.id,
-      search_from:'app',
-      page:query.page,
-      limit:query.limit
+      search_date: date,
+      platform: platformBtn,
+      order_status: selectStatus.id,
+      search_from: 'app',
+      page: query.page,
+      limit: query.limit
     }
-    if(keywords.length>0)
-      params={...params,keywords:keywords}
+    if (keywords.length > 0)
+      params = {...params, keywords: keywords}
     const url = `/v1/new_api/orders/order_all_list`;
-    HttpUtils.get.bind(this.props)(url, params,true).then(res => {
-      const {obj}=res
+    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
+      const {obj} = res
       hideModal()
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'onSearch',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'onSearch',
+        executeTime: res.endTime - res.startTime
       })
       //如果是搜索，直接使用接口返回的数据，如果是下拉或者上拉，添加数据
       this.setState({
-        orders: isSearch?obj:orders.concat(obj),
+        orders: isSearch ? obj : orders.concat(obj),
         isLoading: false,
-        end:obj.length < query.limit
+        end: obj.length < query.limit
       })
     }, (res) => {
       timeObj.method.push({
-        interfaceName:url,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'onSearch',
-        executeTime:res.endTime-res.startTime
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'onSearch',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({isLoading: false})
       showError(res.reason)
@@ -358,7 +362,7 @@ class OrderQueryResultScene extends PureComponent {
 
     })
   }
-    selectItem=(item)=>{
+  selectItem = (item) => {
     this.setState({
       selectStatus: item,
     }, () => {
@@ -367,10 +371,11 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   renderHeader() {
-    const {selectStatus,date,showDatePicker,dateBtn,platform,platformBtn} = this.state
+    const {selectStatus, date, showDatePicker, dateBtn, platform, platformBtn} = this.state
     return (
       <View>
-        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onBlurSearch={(keywords)=>this.onSearch(keywords,true)} lang={{cancel: '搜索'}}/>
+        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onBlurSearch={(keywords) => this.onSearch(keywords, true)}
+                   lang={{cancel: '搜索'}}/>
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}
@@ -403,7 +408,7 @@ class OrderQueryResultScene extends PureComponent {
             }, () => {
               this.onRefresh()
             })
-          }}  style={{
+          }} style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 1 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -417,14 +422,14 @@ class OrderQueryResultScene extends PureComponent {
             }}>今天</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity  onPress={() => {
+          <TouchableOpacity onPress={() => {
             this.setState({
               dateBtn: 2,
               date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
             }, () => {
               this.onRefresh()
             })
-          }}  style={{
+          }} style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 2 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -443,7 +448,7 @@ class OrderQueryResultScene extends PureComponent {
               dateBtn: 3,
               showDatePicker: !showDatePicker
             })
-          }}  style={{
+          }} style={{
             borderRadius: 2,
             backgroundColor: dateBtn === 3 ? colors.main_color : colors.white,
             marginLeft: pxToDp(15),
@@ -451,7 +456,7 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text  style={{
+            <Text style={{
               fontSize: 12,
               color: dateBtn === 3 ? colors.white : colors.fontBlack,
             }}>自定义</Text>
@@ -475,7 +480,7 @@ class OrderQueryResultScene extends PureComponent {
               justifyContent: 'center',
               padding: pxToDp(10),
             }}>
-              <Text  style={{
+              <Text style={{
                 fontSize: 12,
                 color: platformBtn === info.id ? colors.white : colors.fontBlack,
               }}>{info.label} </Text>
@@ -486,15 +491,16 @@ class OrderQueryResultScene extends PureComponent {
         <View style={styles.rowWrap}>
           <Text style={styles.description}> 状态筛选 </Text>
           {
-            STATUS_FILTER.map((item,index)=>{
-              const backgroundColor=selectStatus.id === item.id ? colors.main_color : colors.white
-              const color=selectStatus.id === item.id ? colors.white : colors.fontBlack
-              return(
-                  <TouchableOpacity key={index} onPress={() => this.selectItem(item)} style={[styles.btnWrap,{backgroundColor:backgroundColor }]}>
-                    <Text  style={{fontSize: 12, color: color}}>
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
+            STATUS_FILTER.map((item, index) => {
+              const backgroundColor = selectStatus.id === item.id ? colors.main_color : colors.white
+              const color = selectStatus.id === item.id ? colors.white : colors.fontBlack
+              return (
+                <TouchableOpacity key={index} onPress={() => this.selectItem(item)}
+                                  style={[styles.btnWrap, {backgroundColor: backgroundColor}]}>
+                  <Text style={{fontSize: 12, color: color}}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
               )
             })
           }
@@ -505,20 +511,20 @@ class OrderQueryResultScene extends PureComponent {
 
 }
 
-const styles=StyleSheet.create({
-  description:{
+const styles = StyleSheet.create({
+  description: {
     fontSize: 14,
     marginTop: pxToDp(3),
     padding: pxToDp(10),
   },
-  rowWrap:{
+  rowWrap: {
     flexDirection: 'row',
     backgroundColor: colors.white,
     padding: pxToDp(20),
     paddingTop: pxToDp(10),
     paddingLeft: 0,
   },
-  btnWrap:{
+  btnWrap: {
     borderRadius: 2,
     marginLeft: pxToDp(15),
     alignItems: 'center',

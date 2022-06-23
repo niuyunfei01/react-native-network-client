@@ -63,7 +63,7 @@ function mapStateToProps(state) {
     order: state.order,
     global: state.global,
     store: state.store,
-    device:state.device
+    device: state.device
   }
 }
 
@@ -117,19 +117,19 @@ const MENU_CANCEL_ORDER = 15; // 取消订单
 const MENU_SET_COMPLETE = 16; // 置为完成
 const MENU_CALL_STAFF = 17; // 联系员工
 
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
-  currentUserId:'',
-  moduleName:'',
-  componentName:'',
-  method:[]
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
+  currentUserId: '',
+  moduleName: '',
+  componentName: '',
+  method: []
 }//记录耗时的对象
 
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
@@ -180,40 +180,42 @@ class OrderInfo extends Component {
   fetchData = () => {
     this.fetchOrder(this.state.order_id)
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:'',
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,
-        methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: '',
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime,
+        methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
 
   componentDidMount() {
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].interfaceName=''
-    timeObj.method[0].methodName='componentDidUpdate'
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].interfaceName = ''
+    timeObj.method[0].methodName = 'componentDidUpdate'
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,accessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="订单"
-    timeObj['componentName']="OrderInfo"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,accessToken)
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "订单"
+    timeObj['componentName'] = "OrderInfo"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, accessToken)
   }
+
   fetchOrder(order_id) {
     if (!order_id || this.state.isFetching) {
       return false;
@@ -224,15 +226,15 @@ class OrderInfo extends Component {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     const api = `/v1/new_api/orders/order_by_id/${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
-    HttpUtils.get.bind(this.props)(api,{},true).then((res) => {
-      const {obj}=res
+    HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchOrder',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchOrder',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
         order: obj,
@@ -257,24 +259,24 @@ class OrderInfo extends Component {
 
     }, ((res) => {
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchOrder',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchOrder',
+        executeTime: res.endTime - res.startTime
       })
       ToastLong('操作失败：' + res.reason)
       this.setState({isFetching: false})
 
     })).catch((e) => {
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:e.executeStatus,
-        startTime:e.startTime,
-        endTime:e.endTime,
-        methodName:'fetchOrder',
-        executeTime:e.endTime-e.startTime
+        interfaceName: api,
+        executeStatus: e.executeStatus,
+        startTime: e.startTime,
+        endTime: e.endTime,
+        methodName: 'fetchOrder',
+        executeTime: e.endTime - e.startTime
       })
       ToastLong('操作失败：' + e.desc)
       this.setState({isFetching: false})
@@ -284,15 +286,15 @@ class OrderInfo extends Component {
 
   fetchShipData() {
     const api = `/v1/new_api/orders/third_ship_deliverie/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
-    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
-      const {obj}=res
+    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchShipData',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchShipData',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
         deliverie_status: obj.show_status,
@@ -306,19 +308,19 @@ class OrderInfo extends Component {
 
   fetchDeliveryList() {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
-    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
-      const {obj}=res
+    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
+      const {obj} = res
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchDeliveryList',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchDeliveryList',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({
-        delivery_list: undefined!== obj?.delivery_lists && Array.isArray(obj.delivery_lists) ? obj.delivery_lists : [],
-        is_merchant_add_tip: undefined!== obj?.is_merchant_add_tip ? Boolean(obj.is_merchant_add_tip) : false
+        delivery_list: undefined !== obj?.delivery_lists && Array.isArray(obj.delivery_lists) ? obj.delivery_lists : [],
+        is_merchant_add_tip: undefined !== obj?.is_merchant_add_tip ? Boolean(obj.is_merchant_add_tip) : false
       })
 
     })
@@ -328,26 +330,27 @@ class OrderInfo extends Component {
     let {orderStatus} = this.state.order;
     if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${this.state.order_id}?select=1&access_token=${this.props.global.accessToken}`;
-      HttpUtils.get.bind(this.props.navigation)(api,{},true).then((res) => {
+      HttpUtils.get.bind(this.props.navigation)(api, {}, true).then((res) => {
         timeObj.method.push({
-          interfaceName:api,
-          executeStatus:res.executeStatus,
-          startTime:res.startTime,
-          endTime:res.endTime,
-          methodName:'fetchThirdWays',
-          executeTime:res.endTime-res.startTime
+          interfaceName: api,
+          executeStatus: res.executeStatus,
+          startTime: res.startTime,
+          endTime: res.endTime,
+          methodName: 'fetchThirdWays',
+          executeTime: res.endTime - res.startTime
         })
-      }).catch(error=>{
+      }).catch(error => {
         timeObj.method.push({
-          interfaceName:api,
-          executeStatus:error.executeStatus,
-          startTime:reerrors.startTime,
-          endTime:error.endTime,
-          methodName:'fetchThirdWays',
-          executeTime:error.endTime-error.startTime
+          interfaceName: api,
+          executeStatus: error.executeStatus,
+          startTime: reerrors.startTime,
+          endTime: error.endTime,
+          methodName: 'fetchThirdWays',
+          executeTime: error.endTime - error.startTime
+        })
       })
-    })
-  }}
+    }
+  }
 
   navigateToOrderOperation = () => {
     this.props.navigation.navigate('OrderOperation', {
@@ -375,25 +378,25 @@ class OrderInfo extends Component {
     let {id, orderStatus} = this.state.order;
     if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
-      HttpUtils.post.bind(this.props)(url,{},true).then(res => {
+      HttpUtils.post.bind(this.props)(url, {}, true).then(res => {
         timeObj.method.push({
-          interfaceName:url,
-          executeStatus:res.executeStatus,
-          startTime:res.startTime,
-          endTime:res.endTime,
-          methodName:'logOrderViewed',
-          executeTime:res.endTime-res.startTime
+          interfaceName: url,
+          executeStatus: res.executeStatus,
+          startTime: res.startTime,
+          endTime: res.endTime,
+          methodName: 'logOrderViewed',
+          executeTime: res.endTime - res.startTime
         })
       }, () => {
         // ToastLong(res.desc);
       }).catch((res) => {
         timeObj.method.push({
-          interfaceName:url,
-          executeStatus:res.executeStatus,
-          startTime:res.startTime,
-          endTime:res.endTime,
-          methodName:'logOrderViewed',
-          executeTime:res.endTime-res.startTime
+          interfaceName: url,
+          executeStatus: res.executeStatus,
+          startTime: res.startTime,
+          endTime: res.endTime,
+          methodName: 'logOrderViewed',
+          executeTime: res.endTime - res.startTime
         })
         ToastLong("记录订单访问次数错误！");
       })
@@ -680,19 +683,19 @@ class OrderInfo extends Component {
       }
     ]
     return (
-        <View>
-          <Tips navigation={this.props.navigation} orderId={order.id}
-                storeId={order.store_id} key={order.id} modalTip={modalTip}
-                onItemClick={() => this.closeModal()}/>
-          <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
-                        processRemind={this._doProcessRemind.bind(this)}/>
-          <ActionSheet
-              visible={this.state.showPrinterChooser}
-              onRequestClose={() => this._hidePrinterChooser()}
-              menus={menus}
-              actions={printAction}
-          />
-        </View>)
+      <View>
+        <Tips navigation={this.props.navigation} orderId={order.id}
+              storeId={order.store_id} key={order.id} modalTip={modalTip}
+              onItemClick={() => this.closeModal()}/>
+        <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
+                      processRemind={this._doProcessRemind.bind(this)}/>
+        <ActionSheet
+          visible={this.state.showPrinterChooser}
+          onRequestClose={() => this._hidePrinterChooser()}
+          menus={menus}
+          actions={printAction}
+        />
+      </View>)
   }
 
   renderHeader = () => {
@@ -701,7 +704,8 @@ class OrderInfo extends Component {
       <View style={Styles.headerBody}>
         <View style={Styles.headerBodyTitle}>
           <View style={Styles.flexRow}>
-            <Text style={order.status_show === '订单已取消' ? Styles.orderStatus : Styles.orderStatusShow}>{order.status_show}  </Text>
+            <Text
+              style={order.status_show === '订单已取消' ? Styles.orderStatus : Styles.orderStatusShow}>{order.status_show}  </Text>
             <View style={styles.flex1}/>
             <Text style={Styles.orderSeq}>{order.show_seq}  </Text>
           </View>
@@ -773,53 +777,54 @@ class OrderInfo extends Component {
 
   renderDelivery() {
     return (
-        <View style={Styles.deliveryBody}>
-          {this.state.order.pickType === '1' ? <TouchableOpacity onPress={() => this.showQrcodeFlag()} style={Styles.flexRow}>
+      <View style={Styles.deliveryBody}>
+        {this.state.order.pickType === '1' ?
+          <TouchableOpacity onPress={() => this.showQrcodeFlag()} style={Styles.flexRow}>
             <Text style={Styles.qrcodeLabel}>取货码：{this.state.qrcode} </Text>
             <MaterialCommunityIcons name={'focus-field'}
                                     style={Styles.qrcodeIcon}/>
           </TouchableOpacity> : null}
 
-          {this.state.order.pickType === '1' ?
-              <View style={Styles.qrcodeContent}>
-                <QRCode
-                    value={this.state.qrcode}
-                    color="black"
-                    size={150}
-                />
-              </View> : null}
-          <If condition={this.state.order.pickType !== '1'}>
-            <TouchableOpacity onPress={() => this.deliveryModalFlag()}>
-              <Text style={Styles.deliveryStatusText}>{this.state.deliverie_status} </Text>
-              <Text style={Styles.deliveryStatusInfo}>
-                <Text style={Styles.color333}> {this.state.deliverie_desc}  </Text>
-                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
-                    <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
-              </Text>
+        {this.state.order.pickType === '1' ?
+          <View style={Styles.qrcodeContent}>
+            <QRCode
+              value={this.state.qrcode}
+              color="black"
+              size={150}
+            />
+          </View> : null}
+        <If condition={this.state.order.pickType !== '1'}>
+          <TouchableOpacity onPress={() => this.deliveryModalFlag()}>
+            <Text style={Styles.deliveryStatusText}>{this.state.deliverie_status} </Text>
+            <Text style={Styles.deliveryStatusInfo}>
+              <Text style={Styles.color333}> {this.state.deliverie_desc}  </Text>
+              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+            </Text>
+          </TouchableOpacity>
+
+          {this.state.order.platform === '6' ?
+            <View style={Styles.platformQR}>
+              <QRCode
+                value={this.state.order.platform_oid}
+                color="black"
+                size={150}
+              />
+              <Text style={Styles.platformText}>{this.state.order.platform_oid} </Text>
+            </View> : null}
+
+          {this.renderDeliveryInfo()}
+
+          <If condition={this.state.show_no_rider_tips}>
+            <TouchableOpacity onPress={() => this.noRiderTipsFlag()} style={Styles.noRiderTips}>
+              <View style={Styles.noRiderTipsHeader}>
+                <Entypo name='help-with-circle' style={Styles.questionIcon}/>
+                <Text style={Styles.noRiderTipsLabel}>长时间没有骑手接单怎么办？</Text>
+              </View>
             </TouchableOpacity>
-
-            {this.state.order.platform === '6' ?
-                <View style={Styles.platformQR}>
-                  <QRCode
-                      value={this.state.order.platform_oid}
-                      color="black"
-                      size={150}
-                  />
-                  <Text style={Styles.platformText}>{this.state.order.platform_oid} </Text>
-                </View> : null}
-
-            {this.renderDeliveryInfo()}
-
-            <If condition={this.state.show_no_rider_tips}>
-              <TouchableOpacity onPress={() => this.noRiderTipsFlag()} style={Styles.noRiderTips}>
-                <View style={Styles.noRiderTipsHeader}>
-                  <Entypo name='help-with-circle' style={Styles.questionIcon}/>
-                  <Text style={Styles.noRiderTipsLabel}>长时间没有骑手接单怎么办？</Text>
-                </View>
-              </TouchableOpacity>
-            </If>
           </If>
-        </View>
+        </If>
+      </View>
     )
   }
 
@@ -831,10 +836,10 @@ class OrderInfo extends Component {
             <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={Styles.driverName}>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
-                  <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
-                    <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
-                    <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
-                  </TouchableOpacity> : null
+                <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
+                  <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
+                  <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
+                </TouchableOpacity> : null
               }
             </View>
             <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
@@ -850,14 +855,14 @@ class OrderInfo extends Component {
                                            titleStyle={Styles.deliveryInfoBtnTextWhite}
                 /> : null}
                 {item.can_add_tip ?
-                    <Button title={'加小费'}
-                            onPress={() => {
-                              this.addTip(item.id)
-                            }}
-                            buttonStyle={Styles.deliveryInfoBtnGreen}
-                            titleStyle={Styles.deliveryInfoBtnTextWhite}
-                    />
-                    : null}
+                  <Button title={'加小费'}
+                          onPress={() => {
+                            this.addTip(item.id)
+                          }}
+                          buttonStyle={Styles.deliveryInfoBtnGreen}
+                          titleStyle={Styles.deliveryInfoBtnTextWhite}
+                  />
+                  : null}
                 {item.can_cancel ? <Button title={'取消配送'}
                                            onPress={() => this.cancelDelivery(item.id)}
                                            buttonStyle={Styles.deliveryInfoBtnWhite}
@@ -874,36 +879,38 @@ class OrderInfo extends Component {
   renderClient = () => {
     let {order} = this.state;
     return (
-        <View style={Styles.clientHeader}>
-          <View style={Styles.flexRow}>
-            <Text style={Styles.clientLabel}>姓名</Text>
-            <Text style={Styles.clientNameValue}>{order.userName} </Text>
-            <Text style={Styles.clientOrderTimes}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
-            <Text onPress={() => this.onPress(Config.ROUTE_ORDER_EDIT, {order: order})} style={Styles.clientChangeInfoTitle}>修改订单</Text>
-          </View>
-          <View style={Styles.flexRowMT15}>
-            <Text style={Styles.clientLabel}>地址</Text>
-            <View style={Styles.clientAddress}>
-              <Text style={Styles.f12}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
-              <Text style={Styles.clientCatMap} onPress={() => this.clientCatMap(order.id)}>查看地图</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.mobile)}>
-            <Text style={Styles.clientLabel}>电话</Text>
-            <Text style={Styles.clientPhone}>{order.mobileReadable} </Text>
-            <Text style={Styles.clientPhoneCall}>拨打</Text>
-          </TouchableOpacity>
-
-          <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
-            <For each="phone" index="idx" of={order.backup_phones_readable}>
-              <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.backup_phones[idx])} key={idx}>
-                <Text style={Styles.clientLabel}>备用电话</Text>
-                <Text style={Styles.clientPhone}>{phone} </Text>
-                <Text style={Styles.clientPhoneCall}>拨打</Text>
-              </TouchableOpacity>
-            </For>
-          </If>
+      <View style={Styles.clientHeader}>
+        <View style={Styles.flexRow}>
+          <Text style={Styles.clientLabel}>姓名</Text>
+          <Text style={Styles.clientNameValue}>{order.userName} </Text>
+          <Text style={Styles.clientOrderTimes}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
+          <Text onPress={() => this.onPress(Config.ROUTE_ORDER_EDIT, {order: order})}
+                style={Styles.clientChangeInfoTitle}>修改订单</Text>
         </View>
+        <View style={Styles.flexRowMT15}>
+          <Text style={Styles.clientLabel}>地址</Text>
+          <View style={Styles.clientAddress}>
+            <Text style={Styles.f12}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
+            <Text style={Styles.clientCatMap} onPress={() => this.clientCatMap(order.id)}>查看地图</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.mobile)}>
+          <Text style={Styles.clientLabel}>电话</Text>
+          <Text style={Styles.clientPhone}>{order.mobileReadable} </Text>
+          <Text style={Styles.clientPhoneCall}>拨打</Text>
+        </TouchableOpacity>
+
+        <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
+          <For each="phone" index="idx" of={order.backup_phones_readable}>
+            <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.backup_phones[idx])}
+                              key={idx}>
+              <Text style={Styles.clientLabel}>备用电话</Text>
+              <Text style={Styles.clientPhone}>{phone} </Text>
+              <Text style={Styles.clientPhoneCall}>拨打</Text>
+            </TouchableOpacity>
+          </For>
+        </If>
+      </View>
     )
   }
 
@@ -960,24 +967,24 @@ class OrderInfo extends Component {
         Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
           text: '确定', onPress: () => {
             this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                {
-                  order: this.state.order,
-                  ship_id: val,
-                  onCancelled: (ok, reason) => {
-                    this.fetchData()
-                  }
-                });
+              {
+                order: this.state.order,
+                ship_id: val,
+                onCancelled: (ok, reason) => {
+                  this.fetchData()
+                }
+              });
           }
         }, {'text': '取消'}]);
       } else if (res.deduct_fee == 0) {
         this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: this.state.order,
-              ship_id: val,
-              onCancelled: (ok, reason) => {
-                this.fetchData()
-              }
-            });
+          {
+            order: this.state.order,
+            ship_id: val,
+            onCancelled: (ok, reason) => {
+              this.fetchData()
+            }
+          });
       } else {
         this.setState({
           toastContext: res.deduct_fee
@@ -985,13 +992,13 @@ class OrderInfo extends Component {
           Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
             text: '确定', onPress: () => {
               this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                  {
-                    order: this.state.order,
-                    ship_id: val,
-                    onCancelled: (ok, reason) => {
-                      this.fetchData()
-                    }
-                  });
+                {
+                  order: this.state.order,
+                  ship_id: val,
+                  onCancelled: (ok, reason) => {
+                    this.fetchData()
+                  }
+                });
             }
           }, {'text': '取消'}]);
         })
@@ -1197,9 +1204,9 @@ class OrderInfo extends Component {
           <View style={styles.flex1}/>
           <View style={Styles.goodsTitle}>
             <Button onPress={() => this._doRefund()}
-              title={'退款申请'}
-              buttonStyle={Styles.goodsButtonRefund}
-              titleStyle={Styles.goodsButtonTitle}
+                    title={'退款申请'}
+                    buttonStyle={Styles.goodsButtonRefund}
+                    titleStyle={Styles.goodsButtonTitle}
             />
             {!this.state.isEditing ?
               <Button
@@ -1297,7 +1304,8 @@ class OrderInfo extends Component {
           <View style={[styles.moneyLabel, styles.moneyRow]}>
             <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o' color={colors.color777}/></TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'
+                                                               color={colors.color777}/></TouchableOpacity>
             </View>
             <View style={styles.flex1}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')} </Text>
@@ -1426,8 +1434,10 @@ class OrderInfo extends Component {
           <View style={Styles.deliveryStatusHeader} key={i}>
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
-                {i !== 0 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}
-                {i !== list.length - 1 ? <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/> : null}
+                {i !== 0 ?
+                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}
+                {i !== list.length - 1 ?
+                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/> : null}
               </View>
             </View>
             <View style={Styles.deliveryStatusHeaderBottom}>
@@ -1481,14 +1491,16 @@ class OrderInfo extends Component {
                     <View key={i} style={Styles.deliveryModalContentInfo}>
                       <TouchableOpacity onPress={() => this.downDeliveryInfo(i)} style={Styles.flexRow}>
                         <Text style={Styles.deliveryModalText}>{info.desc}  </Text>
-                        <Text style={[{color: info.content_color}, Styles.deliveryModalText]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
+                        <Text
+                          style={[{color: info.content_color}, Styles.deliveryModalText]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={styles.flex1}/>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={Styles.f14}/> :
                           <Entypo name='chevron-thin-up' style={Styles.f14}/>}
                       </TouchableOpacity>
                       <View style={Styles.deliveryInfoWeight}>
                         <Text style={[Styles.color333, Styles.f12]}> 商品重量-{info.weight}kg </Text>
-                        <If condition={info.fee_tip > 0}><Text style={[Styles.color333, Styles.f12]}> 小费：{info.fee_tip}元 </Text></If>
+                        <If condition={info.fee_tip > 0}><Text
+                          style={[Styles.color333, Styles.f12]}> 小费：{info.fee_tip}元 </Text></If>
                       </View>
 
                       <View style={Styles.deliveryInfoPhone}>
@@ -1657,12 +1669,12 @@ class OrderInfo extends Component {
             </View>
             <View style={Styles.btn1}>
               <View style={styles.flex1}><TouchableOpacity style={Styles.marginH10}
-                                                        onPress={() => this.closeAddTipModal()}><Text
+                                                           onPress={() => this.closeAddTipModal()}><Text
                 style={Styles.btnText2}>取消</Text></TouchableOpacity></View>
               <View style={styles.flex1}><TouchableOpacity style={Styles.marginH10}
-                                                        onPress={() => {
-                                                          this.onConfirmAddTip()
-                                                        }}><Text
+                                                           onPress={() => {
+                                                             this.onConfirmAddTip()
+                                                           }}><Text
                 style={Styles.btnText}>确定</Text></TouchableOpacity></View>
             </View>
           </View>
@@ -1989,7 +2001,7 @@ const Styles = StyleSheet.create({
     marginRight: pxToDp(20)
   },
   qrcodeIcon: {color: colors.main_color, fontSize: 14},
-  qrcodeContent: {flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop:pxToDp(30)},
+  qrcodeContent: {flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)},
   platformQR: {justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)},
   platformText: {
     fontSize: 14,

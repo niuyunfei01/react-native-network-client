@@ -86,7 +86,7 @@ class OrderReceivingInfo extends Component {
     }, time)
   }
 
-  onCancel () {
+  onCancel() {
     this.setState({searchKeywords: ''});
   }
 
@@ -123,7 +123,18 @@ class OrderReceivingInfo extends Component {
   }
 
   updateAddressBook() {
-    const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, street_block_address, id, type} = this.state
+    const {
+      name,
+      mobile,
+      mobile_suffix,
+      loc_lat,
+      loc_lng,
+      location_lat,
+      location_long,
+      street_block_address,
+      id,
+      type
+    } = this.state
     const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
     let params = {}
     if (loc_lat === undefined || loc_lng === undefined || street_block_address === '') {
@@ -190,47 +201,76 @@ class OrderReceivingInfo extends Component {
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container, {flex: 1}]}>
-          <View style={{backgroundColor: colors.white, width: '96%', marginLeft: '2%', borderRadius: 10, marginTop: 10}}>
+          <View
+            style={{backgroundColor: colors.white, width: '96%', marginLeft: '2%', borderRadius: 10, marginTop: 10}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onPress={this.toSetLocation}>
-              <View style={{backgroundColor: '#FFB44B', width: 31, height: 31, alignItems: "center", justifyContent: "center", borderRadius: 20, margin: 15}}>
+              <View style={{
+                backgroundColor: '#FFB44B',
+                width: 31,
+                height: 31,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 20,
+                margin: 15
+              }}>
                 <Text style={{color: colors.white, fontSize: 16}}>收</Text>
               </View>
               <If condition={type == 'add'}>
                 <Text style={[styles.body_text, {flex: 1}]}>
-                {(location_long !== undefined && location_lat !== undefined)
+                  {(location_long !== undefined && location_lat !== undefined)
                     ? `${location_long}(${location_lat})` : `请选择定位地址`}</Text>
               </If>
               <If condition={type == 'edit'}>
                 <Text style={[styles.body_text, {flex: 1}]}>
-                {((location_long !== undefined && location_lat !== undefined) && street_block_address !== undefined)
-                ? `${location_long}(${location_lat})` : `${this.state.address}`}</Text>
-            </If>
+                  {((location_long !== undefined && location_lat !== undefined) && street_block_address !== undefined)
+                    ? `${location_long}(${location_lat})` : `${this.state.address}`}</Text>
+              </If>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
             </TouchableOpacity>
           </View>
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, marginTop: 10}}>
-            <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderBottomColor: colors.colorEEE,
+              borderBottomWidth: 1
+            }}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>详细地址：</Text>
               <TextInput placeholder="楼号、单元、门牌号等"
                          underlineColorAndroid="transparent"
                          style={{height: 50, color: '#666', width: '70%'}}
                          placeholderTextColor={'#999'}
                          value={this.state.street_block_address}
-                         onChangeText={value => {this.setState({street_block_address: value});}}
+                         onChangeText={value => {
+                           this.setState({street_block_address: value});
+                         }}
               />
             </View>
-            <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderBottomColor: colors.colorEEE,
+              borderBottomWidth: 1
+            }}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 20}}>收货人：</Text>
               <TextInput placeholder="请输入收货人姓名"
                          underlineColorAndroid="transparent"
                          style={{height: 50, color: '#666', width: '80%'}}
                          placeholderTextColor={'#999'}
                          value={this.state.name}
-                         onChangeText={value => {this.setState({name: value});}}
+                         onChangeText={value => {
+                           this.setState({name: value});
+                         }}
               />
             </View>
-            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              borderBottomColor: colors.colorEEE,
+              borderBottomWidth: 1
+            }}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 20}}>手机号：</Text>
               <TextInput placeholder="请输入收货人手机号"
                          maxLength={11}
@@ -247,42 +287,70 @@ class OrderReceivingInfo extends Component {
               <TextInput placeholder="分机号(选填)"
                          maxLength={4}
                          underlineColorAndroid="transparent"
-                         style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, paddingLeft: 20, color: '#666', flex: 2, paddingStart: -10}}
+                         style={{
+                           height: 50,
+                           borderLeftColor: '#ddd',
+                           borderLeftWidth: 1,
+                           paddingLeft: 20,
+                           color: '#666',
+                           flex: 2,
+                           paddingStart: -10
+                         }}
                          placeholderTextColor={'#999'}
                          keyboardType={'numeric'}
                          value={this.state.mobile_suffix}
                          onChangeText={value => {
                            const newText = value.replace(/[^\d]+/, '');
-                           this.setState({mobile_suffix: newText});}
+                           this.setState({mobile_suffix: newText});
+                         }
                          }
                          textAlign='center'
               />
             </View>
             <View style={{flexDirection: "column", padding: 15, position: "relative"}}>
-              <TouchableOpacity style={this.state.inputShow ? styles.inputActivity : styles.inputNormal} onPress={() => {
-                this.setState({
-                  inputShow: !inputShow
-                })
-              }}>
+              <TouchableOpacity style={this.state.inputShow ? styles.inputActivity : styles.inputNormal}
+                                onPress={() => {
+                                  this.setState({
+                                    inputShow: !inputShow
+                                  })
+                                }}>
                 <Text style={{color: colors.white, fontSize: 12}}>智能填写</Text>
               </TouchableOpacity>
               {
                 this.state.inputShow &&
                 <TextArea
-                    maxLength={240}
-                    style={{fontSize: 12, paddingLeft: 10, borderRadius: 5, backgroundColor: '#EEEEEE', marginTop: 10, marginBottom: 20}}
-                    placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
-                    placeholderTextColor={'#bbb'}
-                    onChange={value => {
-                      this.setState({smartText: value});
-                    }}
-                    value={this.state.smartText}
-                    underlineColorAndroid={"transparent"}
+                  maxLength={240}
+                  style={{
+                    fontSize: 12,
+                    paddingLeft: 10,
+                    borderRadius: 5,
+                    backgroundColor: '#EEEEEE',
+                    marginTop: 10,
+                    marginBottom: 20
+                  }}
+                  placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
+                  placeholderTextColor={'#bbb'}
+                  onChange={value => {
+                    this.setState({smartText: value});
+                  }}
+                  value={this.state.smartText}
+                  underlineColorAndroid={"transparent"}
                 />
               }
               {
                 this.state.inputShow &&
-                <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 125, justifyContent: "center", alignItems: "center"}} onPress={() => {
+                <TouchableOpacity style={{
+                  backgroundColor: colors.main_color,
+                  borderRadius: 10,
+                  padding: 10,
+                  width: 100,
+                  marginTop: 10,
+                  position: "absolute",
+                  right: 70,
+                  top: 125,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }} onPress={() => {
                   this.intelligentIdentification()
                 }}>
                   <Text style={{color: colors.white, fontSize: 12}}>智能识别</Text>

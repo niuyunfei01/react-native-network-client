@@ -1,14 +1,5 @@
 import React, {Component} from "react";
-import {
-  Alert,
-  InteractionManager,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {Alert, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Clipboard from '@react-native-community/clipboard';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

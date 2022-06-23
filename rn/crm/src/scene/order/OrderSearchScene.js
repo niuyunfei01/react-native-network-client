@@ -16,8 +16,8 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 
 function mapStateToProps(state) {
-  const {mine, user, global,device} = state;
-  return {mine: mine, user: user, global: global,device: device}
+  const {mine, user, global, device} = state;
+  return {mine: mine, user: user, global: global, device: device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -27,18 +27,19 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-const timeObj={
-  deviceInfo:{},
-  currentStoreId:'',
-  currentUserId:'',
-  moduleName:'',
-  componentName:'',
-  method:[]
+
+const timeObj = {
+  deviceInfo: {},
+  currentStoreId: '',
+  currentUserId: '',
+  moduleName: '',
+  componentName: '',
+  method: []
 }//记录耗时的对象
 class OrderSearchScene extends PureComponent {
   constructor(props: Object) {
     super(props);
-    timeObj.method.push({startTime:getTime(),methodName: 'componentDidMount'})
+    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.state = {
       isRefreshing: false,
       isSearching: false,
@@ -48,37 +49,37 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentDidMount() {
-    timeObj.method[0].endTime=getTime()
-    timeObj.method[0].executeTime=timeObj.method[0].endTime-timeObj.method[0].startTime
-    timeObj.method[0].executeStatus='success'
-    timeObj.method[0].interfaceName=""
-    timeObj.method[0].methodName="componentDidMount"
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].interfaceName = ""
+    timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser,assessToken,config} = this.props.global;
-    timeObj['deviceInfo']=deviceInfo
-    timeObj.currentStoreId=currStoreId
-    timeObj.currentUserId=currentUser
-    timeObj['moduleName']="订单"
-    timeObj['componentName']="OrderSearchScene"
-    timeObj['is_record_request_monitor']=config.is_record_request_monitor
-    calcMs(timeObj,assessToken)
+    const {currStoreId, currentUser, assessToken, config} = this.props.global;
+    timeObj['deviceInfo'] = deviceInfo
+    timeObj.currentStoreId = currStoreId
+    timeObj.currentUserId = currentUser
+    timeObj['moduleName'] = "订单"
+    timeObj['componentName'] = "OrderSearchScene"
+    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    calcMs(timeObj, assessToken)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(timeObj.method.length>0) {
-      const endTime=getTime()
-      const startTime=timeObj.method[0].startTime
+    if (timeObj.method.length > 0) {
+      const endTime = getTime()
+      const startTime = timeObj.method[0].startTime
       timeObj.method.push({
-        interfaceName:'',
-        executeStatus:'success',
-        startTime:startTime,
-        endTime:endTime,
-        methodName:'componentDidUpdate',
-        executeTime:endTime-startTime
+        interfaceName: '',
+        executeStatus: 'success',
+        startTime: startTime,
+        endTime: endTime,
+        methodName: 'componentDidUpdate',
+        executeTime: endTime - startTime
       })
-      const duplicateObj= {...timeObj}
-      timeObj.method=[]
-      calcMs(duplicateObj,this.props.global.accessToken)
+      const duplicateObj = {...timeObj}
+      timeObj.method = []
+      calcMs(duplicateObj, this.props.global.accessToken)
     }
   }
 
@@ -89,14 +90,14 @@ class OrderSearchScene extends PureComponent {
   fetchOrderSearchPrefix() {
     const accessToken = this.props.global.accessToken
     const api = `/api/order_search_prefix?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api,{},true).then(res => {
+    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       timeObj.method.push({
-        interfaceName:api,
-        executeStatus:res.executeStatus,
-        startTime:res.startTime,
-        endTime:res.endTime,
-        methodName:'fetchOrderSearchPrefix',
-        executeTime:res.endTime-res.startTime
+        interfaceName: api,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchOrderSearchPrefix',
+        executeTime: res.endTime - res.startTime
       })
       this.setState({prefix: res.obj, selectPrefix: res.obj[0]})
 
