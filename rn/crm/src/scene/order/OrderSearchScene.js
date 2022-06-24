@@ -55,14 +55,14 @@ class OrderSearchScene extends PureComponent {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, assessToken, config} = this.props.global;
+    const {currStoreId, currentUser, accessToken, config} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
-    calcMs(timeObj, assessToken)
+    calcMs(timeObj, accessToken)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

@@ -1,6 +1,6 @@
 import RNFetchBlob from "rn-fetch-blob";
 
-const {DocumentDir, CacheDir} = RNFetchBlob.fs.dirs
+export const {DocumentDir, CacheDir} = RNFetchBlob.fs.dirs
 export const logFilePath = CacheDir + '/log.txt'
 
 export const appendFile = async (content, filePath) => {

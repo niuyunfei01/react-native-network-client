@@ -80,7 +80,6 @@ class StockingTasks extends PureComponent {
       page: page,
       pageSize: pageSize
     }
-    console.log('params', params)
     const url = `/api_products/stall_supply_lists?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
@@ -88,6 +87,8 @@ class StockingTasks extends PureComponent {
         isLoading: false,
         stockList: isGetMore ? stockList.concat(res.lists) : res.lists
       })
+    }).catch(() => {
+      this.setState({isLoading: false})
     })
   }
 
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
     color: '#59B26A',
     lineHeight: 22
   },
-  notSelectedItemText: {textAlign: 'center', fontSize: 16, fontWeight: '600', lineHeight: 22},
+  notSelectedItemText: {color:colors.color333,textAlign: 'center', fontSize: 16, fontWeight: '600', lineHeight: 22},
   itemWrap: {paddingTop: 10, paddingLeft: 10, paddingRight: 10},
   itemMasterWrap: {
     flexDirection: 'row',
