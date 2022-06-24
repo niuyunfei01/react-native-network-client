@@ -2,13 +2,13 @@ import React, {PureComponent} from 'react';
 import {
   Image,
   InteractionManager,
-  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
   TouchableOpacity,
+  Modal,
   View
 } from 'react-native';
 import {connect} from "react-redux";
@@ -17,12 +17,7 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import * as tool from "../../../pubilc/util/tool";
-import {
-  fetchProductDetail,
-  fetchVendorProduct,
-  fetchVendorTags,
-  UpdateWMGoods
-} from "../../../reducers/product/productActions";
+import {fetchProductDetail, fetchVendorProduct, fetchVendorTags,UpdateWMGoods} from "../../../reducers/product/productActions";
 import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../../pubilc/util/http";
@@ -33,7 +28,7 @@ import NoFoundDataView from "../../common/component/NoFoundDataView";
 import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess,showError} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
@@ -238,6 +233,9 @@ class GoodStoreDetailScene extends PureComponent {
         spec.skus.map(sku => {
           selectedSpecArray.push({value: sku.id, label: sku.sku_name, stallName: sku.stall_name})
         })
+      selectedSpecArray.sort((a,b) => {
+        return a.label > b.label? 1 : -1
+      })
       if (pid === 0) {
         this.setState({
           product: params.item,
@@ -260,7 +258,7 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
-  onHeaderRefresh() {
+  onHeaderRefresh=()=> {
     this.setState({isRefreshing: true});
     this.getStoreProdWithProd();
   }
@@ -303,18 +301,8 @@ class GoodStoreDetailScene extends PureComponent {
       <RefreshControl refreshing={this.state.isRefreshing} onRefresh={this.onHeaderRefresh} tintColor='gray'/>
     )
   }
-
   render() {
-    let {
-      full_screen,
-      product,
-      store_prod,
-      selectItem,
-      errorMsg,
-      vendorId,
-      product_id,
-      fn_price_controlled
-    } = this.state;
+    let { full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id} = this.state;
 
     if (full_screen) {
       if (product_id != 0)
@@ -335,7 +323,7 @@ class GoodStoreDetailScene extends PureComponent {
       <Provider>
         <View style={styles.page}>
           <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
-          <ScrollView refreshControl={this.refreshControl} style={styles.scrollViewWrap}>
+          <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
             {
               product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
             }
@@ -370,22 +358,14 @@ class GoodStoreDetailScene extends PureComponent {
                   width: '98%',
                   borderRadius: pxToDp(10),
                   marginBottom: 10
-                }}>
-                  <View style={{
-                    paddingLeft: 10,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                   }}>
+                  <View style={{ paddingLeft: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
                     <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
                     <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
-                      <Text style={{color: colors.color333, fontSize: 12}}>
+                      <Text style={styles.normalText}>
                         {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}
                       </Text>
-                      <Text style={{
-                        color: colors.color333,
-                        fontSize: 12
-                      }}>{this.renderIcon(parseInt(store_prod.status))} </Text>
+                      <Text style={styles.normalText}>{this.renderIcon(parseInt(store_prod.status))} </Text>
                     </View>
                   </View>
                   <View style={{flexDirection: "row"}}>
@@ -396,8 +376,7 @@ class GoodStoreDetailScene extends PureComponent {
                       </Text>
                     </TouchableOpacity>
                     <If condition={onStrict}>
-                      <TouchableOpacity
-                        style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                      <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
                         onPress={() => this.setState({activity: 'inventory_num'})}>
                         <Text style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
                           库存数量
@@ -406,8 +385,7 @@ class GoodStoreDetailScene extends PureComponent {
                       <TouchableOpacity
                         style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
                         onPress={() => this.setState({activity: 'inventory_attribute'})}>
-                        <Text
-                          style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
+                        <Text style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
                           库存属性
                         </Text>
                       </TouchableOpacity>
@@ -463,7 +441,7 @@ class GoodStoreDetailScene extends PureComponent {
                                 onClose={() => this.setState({modalType: ''})}
                                 spId={Number(sp.id)}
                                 applyingPrice={applyingPrice}
-                                storePro={{...product, ...store_prod}}
+                                storePro={{...product,... store_prod}}
                                 navigation={this.props.navigation}
                                 beforePrice={Number(sp.supply_price)}/>
           </If>
@@ -472,10 +450,10 @@ class GoodStoreDetailScene extends PureComponent {
     );
   }
 
-  renderStall = () => {
-    const {selectedSpecArray} = this.state
-    return (
-      <If condition={selectedSpecArray[0]?.stallName?.length > 0}>
+  renderStall=()=>{
+    const{selectedSpecArray}=this.state
+    return(
+      <If condition={selectedSpecArray[0]?.stallName?.length>0}>
         <View style={styles.stallWrap}>
           <View style={styles.stallTopWrap}>
             <Text style={styles.stallTopText}>
@@ -498,7 +476,7 @@ class GoodStoreDetailScene extends PureComponent {
 
     )
   }
-  onShowStall = () => {
+  onShowStall=()=>{
     this.getStallData()
   }
   getStallData = () => {
@@ -532,7 +510,17 @@ class GoodStoreDetailScene extends PureComponent {
     const url = `/api_products/get_stall_by_store_id?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('绑定成功', 3)
-      this.setState({stallVisible: false})
+      this.setState({
+        stallVisible: false,
+        selectStall: {
+          value: '',
+          label: '请选择要关联的摊位'
+        },
+        selectedSpec: {
+          value: '',
+          label: '请选择商品的规格'
+        },
+      })
     })
   }
   renderModalStall = () => {
@@ -593,7 +581,17 @@ class GoodStoreDetailScene extends PureComponent {
     )
   }
   closeModal = () => {
-    this.setState({stallVisible: false})
+    this.setState({
+      stallVisible: false,
+      selectStall:{
+        value: '',
+        label: '请选择要关联的摊位'
+      },
+      selectedSpec:{
+        value: '',
+        label: '请选择商品的规格'
+      },
+    })
   }
   onChange = (selectItem, store_prod) => {
 
@@ -684,54 +682,50 @@ class GoodStoreDetailScene extends PureComponent {
     let {activity, product, store_prod, fn_price_controlled} = this.state;
     return (
       <View style={{
-        flexDirection: "column",
+       flexDirection: "column",
         backgroundColor: colors.white,
         paddingHorizontal: 20,
         paddingTop: 20,
         paddingBottom: 10
       }}>
         <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center", marginBottom: 5}}>
-          <Text style={{
-            color: colors.color333,
-            fontSize: 12,
-            flex: 1
-          }}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
+          <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>
+            {product.name}{product.sku_name && `[${product.sku_name}]`}
+          </Text>
           <View style={typeof store_prod.applying_price !== "undefined" && {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-around", flex: 1
           }}>
             <If condition={activity && activity === 'offer'}>
-              <Text
-                style={{
-                  color: colors.color333,
-                  fontSize: 12
-                }}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text></If>
+              <Text style={styles.normalText}>
+                {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
+              </Text>
+            </If>
             <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
-              <Text style={{
-                textAlign: 'right',
-                color: colors.orange, fontSize: 12
-              }}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)} </Text>
+              <Text style={{textAlign: 'right', color: colors.orange, fontSize: 12}}>
+                审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}
+              </Text>
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_num'}>
-              <Text style={{color: colors.color333, fontSize: 12}}>{`${store_prod.stock_str}`} </Text>
+              <Text style={styles.normalText}>{`${store_prod.stock_str}`} </Text>
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-              <Text style={{
-                color: colors.color333,
-                fontSize: 12
-              }}>{`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`} </Text>
+              <Text style={styles.normalText}>
+              {`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`}
+              </Text>
             </If>
           </View>
         </View>
         <If condition={store_prod.skus !== undefined}>
           <For each="info" index="i" of={store_prod.skus}>
-            <View
-              style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
               key={i}>
-              <Text style={{color: colors.color333, fontSize: 12, width: '80%'}}>{product.name}[{info.sku_name}] </Text>
+              <Text style={{color: colors.color333, fontSize: 12, width: '80%'}}>
+                {product.name}[{info.sku_name}]
+              </Text>
               <If condition={activity === 'offer'}>
-                <Text style={{color: colors.color333, fontSize: 12}}>
+                <Text style={styles.normalText}>
                   {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`}
                 </Text>
               </If>
@@ -741,12 +735,12 @@ class GoodStoreDetailScene extends PureComponent {
                 </Text>
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_num'}>
-                <Text style={{color: colors.color333, fontSize: 12}}>
+                <Text style={styles.normalText}>
                   {`${info.stock_str}`}
                 </Text>
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-                <Text style={{color: colors.color333, fontSize: 12}}>
+                <Text style={styles.normalText}>
                   {`${info.shelf_no ? info.shelf_no : '无'}`}
                 </Text>
               </If>
@@ -782,6 +776,7 @@ const full_styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   page: {flex: 1, flexDirection: "column"},
+  normalText:{color: colors.color333, fontSize: 12},
   iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
   iconSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
   scrollViewWrap: {backgroundColor: colors.main_back, flexDirection: 'column'},
@@ -797,7 +792,7 @@ const styles = StyleSheet.create({
     lineHeight: 21
   },
   stallBottomText: {padding: 4, fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20},
-  selectWrap: {borderColor: colors.color999, borderWidth: 1, borderRadius: 4, padding: 4, width: 160},
+  selectWrap: {borderColor: colors.color999, borderWidth: 1, borderRadius: 4, padding: 4,flex:5,marginLeft:12,marginRight:16},
   modalWrap: {flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end'},
   modalVisibleAreaWrap: {
     backgroundColor: colors.white,
@@ -820,9 +815,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingTop: 11,
-    paddingBottom: 11
+    paddingBottom: 11,
   },
-  modalRowText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, width: 40},
+  modalRowText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, flex:1,textAlign:'right'},
   modalNotSelectBtn: {
     backgroundColor: colors.colorCCC,
     marginTop: 39,

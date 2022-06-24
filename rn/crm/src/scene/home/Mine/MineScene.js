@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
@@ -632,7 +632,7 @@ class MineScene extends PureComponent {
           </View>
           <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
-              <Icon name="exchange" style={header_styles.change_shop}/>
+              <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
             </View>
           </TouchableOpacity>
@@ -720,7 +720,7 @@ class MineScene extends PureComponent {
                   >
                     预计最低收益: {!isNaN(turnover) && "¥"}
                     {turnover}&nbsp;
-                    <Icon
+                    <FontAwesome
                       name="question-circle"
                       style={{fontSize: pxToEm(30), color: "#00aeff"}}
                     />
@@ -928,6 +928,7 @@ class MineScene extends PureComponent {
       fnProfitControlled,
       have_not_read_advice
     } = this.state
+    const {fn_stall} = this.props.global.simpleStore
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
@@ -1191,7 +1192,17 @@ class MineScene extends PureComponent {
           }}/>}
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
-
+        <If condition={fn_stall==='1'}>
+          <TouchableOpacity
+              style={[block_styles.block_box]}
+              onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
+              activeOpacity={customerOpacity}>
+            <View style={block_styles.iconWrap}>
+              <FontAwesome5 name={'wallet'} size={16} color={colors.white}/>
+            </View>
+            <Text style={[block_styles.block_name]}>摊位结算 </Text>
+          </TouchableOpacity>
+        </If>
         {this.state.show_activity && GlobalUtil.getRecommend() ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
@@ -1790,6 +1801,16 @@ const block_styles = StyleSheet.create({
     borderColor: colors.main_back,
     borderWidth: pxToDp(1),
     alignItems: "center"
+  },
+  iconWrap:{
+    borderRadius:4,
+    marginTop: pxToDp(30),
+    marginBottom: pxToDp(16),
+    width: pxToDp(60),
+    height: pxToDp(60),
+    backgroundColor:'#F5A61B',
+    alignItems:'center',
+    justifyContent:'center'
   },
   block_img: {
     marginTop: pxToDp(30),

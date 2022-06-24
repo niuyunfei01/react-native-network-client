@@ -456,6 +456,12 @@ const AppNavigator = (props) => {
         {/*<Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}*/}
         {/*              getComponent={()=>require('../../scene/order/RetailPriceScene').default}*/}
         {/*/>*/}
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT} options={{headerTitle:'摊位结算'}}
+                      getComponent={()=>require('../../scene/home/stall/StallSettlementScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL} options={{headerTitle:'摊位详情 '}}
+                      getComponent={()=>require('../../scene/home/stall/StallDetailScene').default}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
