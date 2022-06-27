@@ -39,7 +39,7 @@ import Entypo from "react-native-vector-icons/Entypo"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import {Button, Image} from "react-native-elements";
 import BottomModal from "./BottomModal";
-import JbbModal from "./JbbModal";
+import {Input} from "../../weui";
 
 let width = Dimensions.get("window").width;
 
@@ -629,77 +629,99 @@ class OrderListItem extends React.PureComponent {
     )
   }
 
+  renderAddTipModal = () => {
+    let {is_merchant_add_tip} = this.state
+    const tipListTop = [
+      {label: '1元', value: 1},
+      {label: '2元', value: 2},
+      {label: '3元', value: 3}
+    ]
+    const tipListBottom = [
+      {label: '4元', value: 4},
+      {label: '5元', value: 5},
+      {label: '10元', value: 10}
+    ]
+    return (
+        <Modal
+            visible={this.state.addTipModal}
+            onRequestClose={() => this.closeAddTipModal()}
+            animationType={'slide'}
+            transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={[styles.container]}>
+              <TouchableOpacity onPress={() => this.closeAddTipModal()} style={styles.addTipRightIcon}>
+                <Entypo name={"circle-with-cross"}
+                        style={styles.addTipRightIconStyle}/>
+              </TouchableOpacity>
+              <Text style={styles.addTipTitleText}>加小费</Text>
+              <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
+              <If condition={is_merchant_add_tip === 1}>
+                <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+              </If>
+              <View style={[styles.container1]}>
+                <Text style={styles.f26}>金额</Text>
+                <View style={styles.tipSelect}>
+                  <For index='i' each='info' of={tipListTop}>
+                    <Text key={i} style={styles.amountBtn} onPress={() => {
+                      this.onChangeAccount(info.value)
+                    }}>{info.label}</Text>
+                  </For>
+                </View>
+                <View style={styles.tipSelect}>
+                  <For index='i' each='info' of={tipListBottom}>
+                    <Text key={i} style={styles.amountBtn} onPress={() => {
+                      this.onChangeAccount(info.value)
+                    }}>{info.label}</Text>
+                  </For>
+                </View>
+                <View style={styles.addTipInputBox}>
+                  <Input
+                      style={styles.addTipInput}
+                      placeholder={'请输入其他金额'}
+                      defaultValue={`${this.state.addMoneyNum}`}
+                      keyboardType='numeric'
+                      onChangeText={(value) =>
+                          this.onChangeAccount(value)
+                      }
+                  />
+                  <Text style={styles.addTipInputRight}>元</Text>
+                </View>
+                {
+                  (!this.state.ok || this.state.addMoneyNum === 0) &&
+                  <View
+                      style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                    <Entypo name={"help-with-circle"}
+                            style={styles.addTipHelpIcon}/>
+                    <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                  </View>
+                }
+              </View>
+              <View style={styles.btn1}>
+                <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
+                                                             onPress={() => this.closeAddTipModal()}><Text
+                    style={styles.btnText2}>取消</Text></TouchableOpacity></View>
+                <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
+                                                             onPress={() => {
+                                                               this.upAddTip()
+                                                             }}><Text
+                    style={styles.btnText}>确定</Text></TouchableOpacity></View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+    )
+  }
+
   renderDeliveryModal = () => {
-    let {order_id, store_id, delivery_btn, is_merchant_add_tip} = this.state
+    let {delivery_btn} = this.state
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
       height = 400;
     }
     return (
       <View>
-        <JbbModal
-          visible={this.state.addTipModal} modal_type={'center'} onClose={() => this.closeAddTipModal()}>
-          <View>
-            <Text style={styles.addTipText}>加小费</Text>
-            <Text style={styles.addTipDesc}>多次添加以累计金额为主，最低一元</Text>
-            <If condition={is_merchant_add_tip === 1}>
-              <Text style={styles.addTipDesc1}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
-            </If>
-            <View style={[styles.container1]}>
-              <Text style={{fontSize: pxToDp(26)}}>金额</Text>
-              <View style={styles.accountList}>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(1)
-                }}>1元</Text>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(2)
-                }}>2元</Text>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(3)
-                }}>3元</Text>
-              </View>
-              <View style={styles.accountList}>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(4)
-                }}>4元</Text>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(5)
-                }}>5元</Text>
-                <Text style={styles.amountBtn} onPress={() => {
-                  this.onChangeAccount(10)
-                }}>10元</Text>
-              </View>
-              <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
-                <TextInput
-                  style={styles.addTipInput}
-                  placeholder={'请输入其他金额'}
-                  value={this.state.addMoneyNum}
-                  keyboardType='numeric'
-                  onChangeText={(value) =>
-                    this.onChangeAccount(value)
-                  }
-                />
-                <Text style={styles.addTipRightIcon}>元</Text>
-              </View>
-              {
-                (!this.state.ok || this.state.addMoneyNum === 0) &&
-                <View style={styles.addTipReason}>
-                  <Entypo name={"help-with-circle"}
-                          style={styles.addTipReasonIcon}/>
-                  <Text style={styles.addTipReasonText}>{this.state.respReason} </Text>
-                </View>
-              }
-            </View>
-            <View style={styles.btn1}>
-              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                        onPress={() => this.closeAddTipModal()}><Text
-                style={styles.btnText2}>取消</Text></TouchableOpacity></View>
-              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                        onPress={() => this.upAddTip()}><Text
-                style={styles.btnText}>确定</Text></TouchableOpacity></View>
-            </View>
-          </View>
-        </JbbModal>
+        {this.renderAddTipModal()}
 
         <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
                onRequestClose={() => this.closeDeliveryModal()}
@@ -775,7 +797,7 @@ class OrderListItem extends React.PureComponent {
                                                                           buttonStyle={styles.catLocationBtn}
                                                                           titleStyle={styles.catLocationText}
                         /> : null}
-                        {info.btn_lists.add_tip === 1 ?
+                        {info.btn_lists.add_tip === info.btn_lists.add_tip ?
                           <Button title={'加小费'}
                                   onPress={() => this.goAddTip(info.ship_id)}
                                   buttonStyle={styles.addTipBtn}
@@ -1032,20 +1054,45 @@ const styles = StyleSheet.create({
     marginVertical: pxToDp(10)
   },
   accountList: {flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)},
+  addTipRightIcon: {
+    position: "absolute", right: "3%", top: "3%"
+  },
+  addTipRightIconStyle: {fontSize: pxToDp(45), color: colors.color666},
+  addTipTitleText: {fontWeight: "bold", fontSize: pxToDp(32)},
+  addTipTitleDesc: {
+    fontSize: pxToDp(26),
+    color: colors.color333,
+    marginVertical: pxToDp(15)
+  },
+  addTipTitleTextRemind: {
+    fontSize: pxToDp(22),
+    color: '#F32B2B',
+    marginVertical: pxToDp(10)
+  },
+  addTipInputBox: {alignItems: "center", marginTop: pxToDp(30)},
   addTipInput: {
     fontSize: pxToDp(24),
     borderWidth: pxToDp(1),
     paddingLeft: pxToDp(15),
     width: "100%",
-    height: 40
+    height: "40%"
   },
-  addTipRightIcon: {
+  addTipInputRight: {
     fontSize: pxToDp(26),
     position: "absolute",
-    top: 10,
+    top: "25%",
     right: "5%"
   },
-  addTipReason: {flexDirection: "row", alignItems: "center", justifyContent: "flex-start", marginTop: 5},
+  addTipHelpIcon: {
+    fontSize: pxToDp(35),
+    color: colors.warn_red,
+    marginHorizontal: pxToDp(10)
+  },
+  addTipReason: {
+    color: colors.warn_red,
+    fontWeight: "bold"
+  },
+  tipSelect: {flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)},
   addTipReasonIcon: {
     fontSize: pxToDp(25),
     color: colors.warn_red,
@@ -1166,6 +1213,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     marginVertical: pxToDp(15),
     marginBottom: pxToDp(10)
+  },
+  marginH10: {marginHorizontal: pxToDp(10)},
+  flex1: {
+    flex: 1
   },
   btnText: {
     height: 40,
