@@ -355,7 +355,7 @@ class OrderOperation extends Component {
           customHeaderIOS={() => {
             return (<View/>)
           }}
-          date={new Date(this.state.order.expectTime)}
+          date={new Date()}
           mode='datetime'
           isVisible={this.state.isEndVisible}
           onConfirm={(date) => {
