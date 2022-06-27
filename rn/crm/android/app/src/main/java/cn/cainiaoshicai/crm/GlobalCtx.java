@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm;
 
+import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
+import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -28,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
@@ -47,8 +51,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.horcrux.svg.SvgPackage;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.newrelic.agent.android.NewRelic;
@@ -56,10 +58,10 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
+import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.rnnewrelic.NewRelicPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
@@ -72,11 +74,12 @@ import com.uiwjs.alipay.RNAlipayPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
-import com.reactnativecommunity.clipboard.ClipboardPackage;
+
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -145,9 +148,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
-import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
-
 public class GlobalCtx extends Application implements ReactApplication {
 
 
@@ -194,7 +194,7 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     private Config configByServer;
 
-    public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
+    public AtomicReference<WeakReference<StorageItemAdapter>> storageItemAdapterRef = new AtomicReference<>();
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -219,7 +219,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                                 } catch (ServiceException e) {
                                     e.printStackTrace();
                                 }
-                                return null; }
+                                return null;
+                            }
                         }.executeOnNormal();
 
                         return new HashMap<>();
@@ -290,10 +291,73 @@ public class GlobalCtx extends Application implements ReactApplication {
         return fileCache.get();
     }
 
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
+        }
+
+        //如果是debug模式，最优先加载getJSMainModuleName
+        //如果是release模式，优先加载getJSBundleFile
+        //如果getJSBundleFile为null，加载getBundleAssetName
+        @Nullable
+        @Override
+        protected String getJSBundleFile() {
+            String DocumentDir = GlobalCtx.this.getFilesDir().getAbsolutePath();
+            String jsBundleFile = DocumentDir + File.separator + "last.android.bundle";
+            File file = new File(jsBundleFile);
+            if (file.exists() && file.isFile()) {
+                jsBundleFile = file.getAbsolutePath();
+                return jsBundleFile;
+            }
+            return null;
+        }
+
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.asList(
+                    new MainReactPackage(),
+                    new ActivityStarterReactPackage(),
+                    new SplashScreenReactPackage(),
+                    new RNFetchBlobPackage(),
+                    new VectorIconsPackage(),
+                    new AsyncStoragePackage(),
+                    new GeolocationPackage(),
+                    new RNGestureHandlerPackage(),
+                    new RNDateTimePickerPackage(),
+                    new RNCWebViewPackage(),
+                    new PagerViewPackage(),
+                    new RNScreensPackage(),
+                    new SafeAreaContextPackage(),
+                    new ReanimatedPackage(),
+                    new SvgPackage(),
+                    new RNCPickerPackage(),
+                    new RNDeviceInfo(),
+                    new PickerPackage(),
+                    new WeChatPackage(),
+                    new RNCameraPackage(),
+                    new RNSoundPackage(),
+                    new QiniuPackage(),
+                    new UpgradePackage(),
+                    new RNGetRandomValuesPackage(),
+                    new BleManagerPackage(),
+                    new JPushPackage(),
+                    new NewRelicPackage(),
+                    new LinearGradientPackage(),
+                    new com.mixpanel.reactnative.MixpanelReactNativePackage(),
+                    new RNAlipayPackage(),
+                    new ClipboardPackage()
+            );
+        }
+    };
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
+    }
 
     @Override
     public void onCreate() {
-        Log.d(ORDERS_TAG, "[GlobalCtx] onCreate");
         super.onCreate();
 
         MultiDex.install(this);
@@ -330,6 +394,7 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         SoLoader.init(this, /* native exopackage */ false);
         JPushModule.registerActivityLifecycle(this);
+
     }
 
     public void startKeepAlive() {
@@ -824,7 +889,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         ctx.startActivity(i);
     }
 
-    public void toOperationActivity(Activity ctx){
+    public void toOperationActivity(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "Tab");
         Bundle params = new Bundle();
@@ -919,7 +984,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         ctx.startActivity(i);
     }
 
-    public void toStoreProductIndex(Activity ctx, Map<String, String> data){
+    public void toStoreProductIndex(Activity ctx, Map<String, String> data) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodsPriceIndex");
         Bundle params = new Bundle();
@@ -1009,9 +1074,10 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     /**
      * 跳转到开关店页面
+     *
      * @param ctx
      */
-    public void toSetStoreStatusView(Activity ctx){
+    public void toSetStoreStatusView(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "StoreStatus");
         Bundle params = new Bundle();
@@ -1256,57 +1322,9 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
+
     public String getRouteTrace() {
         return TextUtils.join(",", this.rnRouteTrace);
-    }
-
-    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-        @Override
-        public boolean getUseDeveloperSupport() {
-            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-        }
-
-        @Override
-        protected List<ReactPackage> getPackages() {
-            return Arrays.asList(
-                    new MainReactPackage(),
-                    new ActivityStarterReactPackage(),
-                    new SplashScreenReactPackage(),
-                    new RNFetchBlobPackage(),
-                    new VectorIconsPackage(),
-                    new AsyncStoragePackage(),
-                    new GeolocationPackage(),
-                    new RNGestureHandlerPackage(),
-                    new RNDateTimePickerPackage(),
-                    new RNCWebViewPackage(),
-                    new PagerViewPackage(),
-                    new RNScreensPackage(),
-                    new SafeAreaContextPackage(),
-                    new ReanimatedPackage(),
-                    new SvgPackage(),
-                    new RNCPickerPackage(),
-                    new RNDeviceInfo(),
-                    new PickerPackage(),
-                    new WeChatPackage(),
-                    new RNCameraPackage(),
-                    new RNSoundPackage(),
-                    new QiniuPackage(),
-                    new UpgradePackage(),
-                    new RNGetRandomValuesPackage(),
-                    new BleManagerPackage(),
-                    new JPushPackage(),
-                    new NewRelicPackage(),
-                    new LinearGradientPackage(),
-                    new com.mixpanel.reactnative.MixpanelReactNativePackage(),
-                    new RNAlipayPackage(),
-                    new ClipboardPackage()
-            );
-        }
-    };
-
-    @Override
-    public ReactNativeHost getReactNativeHost() {
-        return mReactNativeHost;
     }
 
     static public class ScanStatus {
@@ -1649,9 +1667,9 @@ public class GlobalCtx extends Application implements ReactApplication {
 
 
         public void play_warning_order() {
-            try{
+            try {
                 this.play_single_sound(warn_sound);
-            }catch (Exception e){
+            } catch (Exception e) {
             }
         }
 
