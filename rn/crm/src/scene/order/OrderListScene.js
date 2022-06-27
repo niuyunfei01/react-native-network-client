@@ -24,7 +24,7 @@ import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import {Cell, CellBody, CellFooter} from "../../weui";
-import tool from "../../pubilc/util/tool";
+import tool, {simpleStore} from "../../pubilc/util/tool";
 import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
 import Dialog from "../common/component/Dialog";
@@ -207,6 +207,8 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+    const {global, dispatch} = this.props
+    simpleStore(global, dispatch)
     this.openAndroidNotification();
     this.getNewVersionInfo()
     timeObj.method[0].endTime = getTime()
