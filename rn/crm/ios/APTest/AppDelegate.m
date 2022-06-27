@@ -106,8 +106,10 @@ static void InitializeFlipper(UIApplication *application) {
 {
 #if DEBUG
  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-//  return [NSURL URLWithString:@"http://localhost:8081/index.bundle?platform=ios&dev=true"];
 #else
+  NSURL *bundleFilePath=[[NSBundle mainBundle] URLForResource:@"last.ios" withExtension:@"bundle"];
+  if(bundleFilePath!=NULL)
+    return  bundleFilePath;
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
