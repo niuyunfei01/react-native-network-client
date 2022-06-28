@@ -76,10 +76,10 @@ const MORE_ITEM = [
     value: '4',
     label: '摊位关联'
   },
-  // {
-  //   value:'5',
-  //   label:'零售价格'
-  // },
+  {
+    value:'5',
+    label:'零售价格'
+  },
 ]
 
 class GoodStoreDetailScene extends PureComponent {
@@ -90,6 +90,7 @@ class GoodStoreDetailScene extends PureComponent {
     let {is_service_mgr, is_helper, allow_merchants_edit_prod} = tool.vendor(this.props.global);
     let vendorId = this.props.global.config.vendor.id
     this.state = {
+      ext_stores: [],
       isRefreshing: false,
       isLoading: false,
       isSyncGoods: false,
@@ -150,7 +151,7 @@ class GoodStoreDetailScene extends PureComponent {
     //showModal('加载中')
     const {accessToken} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
-      hideModal()
+      //hideModal()
       this.handleAuthItem('strict_providing', store['strict_providing'])
       this.setState({
         fn_price_controlled: store['fn_price_controlled'],
@@ -168,6 +169,7 @@ class GoodStoreDetailScene extends PureComponent {
   handleAuthItem = (authName, value) => {
     const stockIndex = MORE_ITEM.findIndex(item => item.label === '库存')
     const stallIndex = MORE_ITEM.findIndex(item => item.label === '摊位关联')
+    const retail_price_enabledIndex = MORE_ITEM.findIndex(item=>item.label==='零售价格')
     switch (authName) {
       case 'strict_providing':
         if (value === '0' && stockIndex !== -1)
@@ -183,6 +185,12 @@ class GoodStoreDetailScene extends PureComponent {
         if (value === '1' && stallIndex === -1)
           MORE_ITEM.push({value: '4', label: '摊位关联'})
         break
+      case 'retail_price_enabled':
+        if(value === '0' && retail_price_enabledIndex !==-1)
+          MORE_ITEM.splice(retail_price_enabledIndex,1)
+        if(value === '1'&& retail_price_enabledIndex === -1)
+            MORE_ITEM.push({value: '5', label: '零售价格'})
+        break
     }
   }
 
@@ -191,7 +199,7 @@ class GoodStoreDetailScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {product_id, store_id, vendorId} = this.state;
     HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
-      hideModal()
+      //hideModal()
       if (this.state.allow_merchants_edit_prod) {
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
@@ -226,23 +234,33 @@ class GoodStoreDetailScene extends PureComponent {
     HttpUtils.post.bind(this.props)(url).then((data) => {
       const product = pid === 0 ? params.item : data.p
       const spec = {...product, ...data.sp}
+      this.handleAuthItem('retail_price_enabled', data.vendor.retail_price_enabled)
       const selectedSpecArray = []
       if (spec?.sku_name !== undefined) {
         selectedSpecArray.push({
           value: spec.product_id,
           label: spec.sku_name ? spec.sku_name : spec.name,
-          stallName: spec.stall_name
+          stallName: spec.stall_name,
+          price: spec.supply_price,
+          goodsName: spec.name,
         })
       }
       if (spec?.skus?.length > 0)
         spec.skus.map(sku => {
-          selectedSpecArray.push({value: sku.product_id, label: sku.sku_name, stallName: sku.stall_name})
+          selectedSpecArray.push({
+            value: sku.product_id,
+            label: sku.sku_name,
+            stallName: sku.stall_name,
+            price: sku.supply_price,
+            goodsName: spec.name
+          })
         })
       selectedSpecArray.sort((a,b) => {
         return a.label > b.label? 1 : -1
       })
       if (pid === 0) {
         this.setState({
+          ext_stores: data.ext_stores,
           product: params.item,
           store_prod: data.sp,
           isRefreshing: false,
@@ -250,12 +268,14 @@ class GoodStoreDetailScene extends PureComponent {
         })
       } else {
         this.setState({
+          ext_stores:data.ext_stores,
           product: data.p,
           store_prod: data.sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray
         })
       }
+
       //hideModal()
     }, (res) => {
       //hideModal()
@@ -310,7 +330,7 @@ class GoodStoreDetailScene extends PureComponent {
     )
   }
   render() {
-    let { full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id} = this.state;
+    let {full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id,activity} = this.state;
 
     if (full_screen) {
       if (product_id != 0)
@@ -337,12 +357,12 @@ class GoodStoreDetailScene extends PureComponent {
             }
             <View style={[styles.goods_info, styles.top_line]}>
               <View style={[styles.goods_view]}>
-                <If condition={this.state.product_id != 0}>
+                <If condition={product_id != 0}>
                   <Text style={styles.goods_name}> {product.name} <Text
                     style={styles.goods_id}> (#{product.id}) </Text>
                   </Text>
                 </If>
-                <If condition={this.state.product_id == 0}>
+                <If condition={product_id == 0}>
                   <Text style={styles.goods_name}> {product.name} <Text
                     style={styles.goods_id}> (#{product.id}) </Text>
                   </Text>
@@ -377,23 +397,23 @@ class GoodStoreDetailScene extends PureComponent {
                     </View>
                   </View>
                   <View style={{flexDirection: "row"}}>
-                    <TouchableOpacity style={[this.state.activity === 'offer' ? styles.tabActivity : styles.tab]}
+                    <TouchableOpacity style={[activity === 'offer' ? styles.tabActivity : styles.tab]}
                                       onPress={() => this.setState({activity: 'offer'})}>
-                      <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
+                      <Text style={activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
                         报价
                       </Text>
                     </TouchableOpacity>
                     <If condition={onStrict}>
-                      <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                      <TouchableOpacity style={activity === 'inventory_num' ? styles.tabActivity : styles.tab}
                         onPress={() => this.setState({activity: 'inventory_num'})}>
-                        <Text style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
+                        <Text style={activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
                           库存数量
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
+                        style={activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
                         onPress={() => this.setState({activity: 'inventory_attribute'})}>
-                        <Text style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
+                        <Text style={activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
                           库存属性
                         </Text>
                       </TouchableOpacity>
@@ -486,6 +506,7 @@ class GoodStoreDetailScene extends PureComponent {
 
     )
   }
+
   onShowStall=()=>{
     this.getStallData()
   }
@@ -521,17 +542,7 @@ class GoodStoreDetailScene extends PureComponent {
     HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('绑定成功', 3)
       this.getStoreProdWithProd()
-      this.setState({
-        stallVisible: false,
-        selectStall: {
-          value: '',
-          label: '请选择要关联的摊位'
-        },
-        selectedSpec: {
-          value: '',
-          label: '请选择商品的规格'
-        },
-      })
+      this.closeModal()
     })
   }
   renderModalStall = () => {
@@ -591,6 +602,7 @@ class GoodStoreDetailScene extends PureComponent {
       </Modal>
     )
   }
+
   closeModal = () => {
     this.setState({
       stallVisible: false,
@@ -605,7 +617,7 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
   onChange = (selectItem, store_prod) => {
-
+    const {ext_stores,selectedSpecArray}=this.state
     switch (selectItem.value) {
       case '1':
         this.onOpenModal('set_price')
@@ -619,11 +631,14 @@ class GoodStoreDetailScene extends PureComponent {
       case '4':
         this.setState({stallVisible: true})
         break
-      // case '5':
-      //   InteractionManager.runAfterInteractions(() => {
-      //     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE, {}, {});
-      //   });
-      //   break
+      case '5':
+        InteractionManager.runAfterInteractions(() => {
+          this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE, {
+            ext_stores: ext_stores,
+            selectedSpecArray: selectedSpecArray
+          });
+        });
+        break
     }
 
   }

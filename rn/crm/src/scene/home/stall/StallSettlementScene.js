@@ -157,8 +157,7 @@ class StallSettlementScene extends PureComponent {
 
     onConfirm = (date) => {
         const selectedDate = tool.fullDay(date)
-        this.setState({selectedDate: selectedDate})
-        this.setShowDatePicker(false)
+        this.setState({selectedDate: selectedDate, showDatePicker: false})
         this.navigationOptions()
         this.getAllStallList(selectedDate)
     }
@@ -175,7 +174,7 @@ class StallSettlementScene extends PureComponent {
 
     render() {
         const {showDatePicker, selectedDate, stallInfo} = this.state
-        const {f_total_settle_amount, total_order_num } = stallInfo
+        const {f_total_settle_amount, total_order_num} = stallInfo
         return (
             <>
                 {this.renderHeader(f_total_settle_amount, total_order_num)}

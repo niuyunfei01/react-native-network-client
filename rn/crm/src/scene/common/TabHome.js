@@ -78,6 +78,31 @@ class TabHome extends React.Component {
       <Tab.Navigator
         initialRouteName={initTab}
         tabBarOptions={tabBarOptions}>
+        <If condition={storeVendorId !== 68}>
+          <Tab.Screen
+              name="Home"
+              getComponent={() => require("../Remind/RemindScene").default}
+              options={
+                {
+                  tabBarLabel: "提醒",
+                  tabBarIcon: ({focused}) => (
+                      <View style={{position: "relative"}}>
+                        <FontAwesome5 name={'bell'} size={22}
+                                      color={focused ? colors.main_color : colors.colorCCC}
+                        />
+                        <If condition={remindNum > 0}>
+                          <Badge
+                              value={remindNum > 99 ? '99+' : remindNum}
+                              status="error"
+                              containerStyle={{position: 'absolute', top: -5, right: -25}}
+                          />
+                        </If>
+                      </View>
+                  )
+                }
+              }
+          />
+        </If>
         <If condition={global.simpleStore.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
@@ -120,40 +145,44 @@ class TabHome extends React.Component {
             }
           }
         />
-        {enabledGoodMgr ? <Tab.Screen
-          name="Goods"
-          getComponent={() => require("../product/Goods/StoreGoodsList").default}
-          options={
-            {
-              tabBarLabel: "商品",
-              tabBarIcon: ({focused}) => (
-                <Icon name={"shopping-bag"}
-                      style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
-              ),
-            }
-          }
-        /> : null}
-        {isBlx ?
-          <Tab.Screen
-            name="Operation"
-            getComponent={() => require("../operation/Operation").default}
-            options={{
-              tabBarLabel: "运营",
-              tabBarIcon: ({focused}) => (
-                <View style={{position: "relative"}}>
-                  <FontAwesome5 name={'cloudsmith'} size={22}
-                                color={focused ? colors.main_color : colors.colorCCC}
-                  />
-                  {showFlag ? <Badge
-                    value={'点我'}
-                    status="error"
-                    containerStyle={{position: 'absolute', top: -5, right: -30}}
-                  /> : null}
-                </View>
-              )
-            }
-            }/> : null
-        }
+          <If condition={enabledGoodMgr}>
+              <Tab.Screen
+                  name="Goods"
+                  getComponent={() => require("../product/Goods/StoreGoodsList").default}
+                  options={
+                      {
+                          tabBarLabel: "商品",
+                          tabBarIcon: ({focused}) => (
+                              <Icon name={"shopping-bag"}
+                                    style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
+                          ),
+                      }
+                  }
+              />
+          </If>
+          <If condition={isBlx}>
+              <Tab.Screen
+                  name="Operation"
+                  getComponent={() => require("../operation/Operation").default}
+                  options={{
+                      tabBarLabel: "运营",
+                      tabBarIcon: ({focused}) => (
+                          <View style={{position: "relative"}}>
+                              <FontAwesome5 name={'cloudsmith'} size={22}
+                                            color={focused ? colors.main_color : colors.colorCCC}
+                              />
+                              <If condition={showFlag}>
+                                  <Badge
+                                      value={'点我'}
+                                      status="error"
+                                      containerStyle={{position: 'absolute', top: -5, right: -30}}
+                                  />
+                              </If>
+                          </View>
+                      )
+                  }
+                  }/>
+          </If>
         <Tab.Screen
           name="Mine"
           getComponent={() => require("../home/Mine/MineScene").default}
