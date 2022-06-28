@@ -453,15 +453,17 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
                       getComponent={() => require('../../scene/console/StockingTasks').default}/>
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}*/}
-        {/*              getComponent={()=>require('../../scene/order/RetailPriceScene').default}*/}
-        {/*/>*/}
+        <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}
+                      getComponent={()=>require('../../scene/order/RetailPriceScene').default}
+        />
         <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT} options={{headerTitle:'摊位结算'}}
                       getComponent={()=>require('../../scene/home/stall/StallSettlementScene').default}
         />
         <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL} options={{headerTitle:'摊位详情 '}}
                       getComponent={()=>require('../../scene/home/stall/StallDetailScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle:'打卡'}}
+                      getComponent={()=>require('../../scene/console/SignInScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
