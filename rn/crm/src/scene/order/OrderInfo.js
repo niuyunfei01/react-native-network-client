@@ -644,7 +644,7 @@ class OrderInfo extends Component {
   }
 
   deliveryModalFlag = () => {
-    if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
+    if (this.state.deliverie_status !== '待呼叫配送') {
       this.setState({showDeliveryModal: true})
     }
   }
@@ -798,7 +798,7 @@ class OrderInfo extends Component {
             <Text style={Styles.deliveryStatusText}>{this.state.deliverie_status} </Text>
             <Text style={Styles.deliveryStatusInfo}>
               <Text style={Styles.color333}> {this.state.deliverie_desc}  </Text>
-              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+              {this.state.deliverie_status !== '待呼叫配送' ?
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
             </Text>
           </TouchableOpacity>
