@@ -77,7 +77,6 @@ function FetchView({navigation, onRefresh}) {
 
 const initState = {
   showNewVersionVisible: false,
-  showAdvicesVisible: false,
   newVersionInfo: {},
   downloadFileProgress:'',
   isLoading: false,
