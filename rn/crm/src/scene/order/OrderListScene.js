@@ -9,9 +9,8 @@ import {
   SafeAreaView,
   Alert,
   Dimensions,
-  Modal,
   Platform,
-  StatusBar
+  StatusBar, Modal
 } from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -41,6 +40,7 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 import {bundleFilePath, exists, deleteFile, createFile} from "../../pubilc/util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
 import Cts from "../../pubilc/common/Cts";
+import RemindModal from "../../pubilc/component/remindModal";
 
 const width = Dimensions.get("window").width;
 
@@ -229,7 +229,7 @@ class OrderListScene extends Component {
 
   getNewVersionInfo=()=>{
     const url='/v1/new_api/Version/getBundleUrl'
-    const version=__DEV__?'1':Cts.BUNDLE_VERSION;
+    const version=__DEV__?'5':Cts.BUNDLE_VERSION;
     const params={platform:platform,version:version}
     HttpUtils.get.bind(this.props)(url,params).then(res=>{
       if(parseInt(res.android)>version)
@@ -535,9 +535,9 @@ class OrderListScene extends Component {
     });
   }
 
-
   render() {
-    const {show_orderlist_ext_store, currStoreId} = this.props.global;
+    const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+
     const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress}=this.state
     return (
       <View style={{flex: 1}}>
@@ -588,42 +588,43 @@ class OrderListScene extends Component {
                           })
                         }}/>
 
-        {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
-        <If condition={this.state.show_hint}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
-            </CellBody>
-            <CellFooter>
-              <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
-            </CellFooter>
-          </Cell>
-        </If>
-        <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
-          <View style={styles.modalWrap}>
-            <View style={styles.modalContentWrap}>
-              <View style={{alignItems:'center', justifyContent:'center'}}>
-                <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
+          {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
+          <If condition={this.state.show_hint}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+              </CellBody>
+              <CellFooter>
+                <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
+              </CellFooter>
+            </Cell>
+          </If>
+          <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
+            <View style={styles.modalWrap}>
+              <View style={styles.modalContentWrap}>
+                <View style={{alignItems:'center', justifyContent:'center'}}>
+                  <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
                   {/*<Text style= {styles.modalTitleText}>*/}
                   {/*  体验新版本*/}
                   {/*</Text>*/}
                 </View>
-              <Text style={styles.modalContentText}>
+                <Text style={styles.modalContentText}>
                   {newVersionInfo.info}
-              </Text>
-              <If condition={downloadFileProgress!==''}>
-                <Text style= {styles.modalTitleText}>
-                  下载进度：{downloadFileProgress}
                 </Text>
-              </If>
-              <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
-                <Text style={styles.modalBtnText}>
+                <If condition={downloadFileProgress!==''}>
+                  <Text style= {styles.modalTitleText}>
+                    下载进度：{downloadFileProgress}
+                  </Text>
+                </If>
+                <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
+                  <Text style={styles.modalBtnText}>
                     立即体验
-                </Text>
-              </TouchableOpacity>
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
+          <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
         </View>
     );
   }
@@ -1020,10 +1021,8 @@ const styles = StyleSheet.create({
   modalContentText:{paddingTop:12,paddingBottom:16,marginLeft:20,marginRight:20,lineHeight:25},
   modalBtnWrap:{
     backgroundColor:colors.main_color,
-    borderRadius:8,
     marginLeft:20,
-    marginRight:20,
-    marginBottom:10,
+    marginRight:20
   },
   modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
   cell_row: {
