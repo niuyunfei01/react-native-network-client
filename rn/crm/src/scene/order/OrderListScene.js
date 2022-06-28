@@ -10,7 +10,7 @@ import {
   Alert,
   Dimensions,
   Platform,
-  StatusBar, ScrollView
+  StatusBar, Modal
 } from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -127,9 +127,7 @@ const initState = {
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
-  isadditional: '',
-  advicesInfoArray: {},
-  scrollViewIsBottom: false
+  isadditional: ''
 };
 const timeObj = {
   deviceInfo: {},
@@ -213,7 +211,6 @@ class OrderListScene extends Component {
     const {global, dispatch} = this.props
     simpleStore(global, dispatch)
     this.openAndroidNotification();
-    this.getAdvicesInfo()
     this.getNewVersionInfo()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -239,17 +236,6 @@ class OrderListScene extends Component {
       if(parseInt(res.android)>version)
         this.setState({newVersionInfo:res,showNewVersionVisible:true})
       console.log('res',res)
-    }).catch(error=>{showError(error)})
-  }
-
-  getAdvicesInfo = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const url='/v1/new_api/advice/showPopAdvice'
-    const params={store_id:currStoreId, access_token: accessToken}
-    HttpUtils.get.bind(this.props)(url,params).then(res=>{
-      this.setState({
-        advicesInfoArray: res, showAdvicesVisible: true
-      })
     }).catch(error=>{showError(error)})
   }
 
@@ -346,45 +332,6 @@ class OrderListScene extends Component {
       pos: this.state.activity.pos_name,
       store_id: currStoreId,
     });
-  }
-
-  closeRemindModal = () => {
-    this.setState({
-      showAdvicesVisible: false
-    })
-  }
-
-  closeBundleModal = () => {
-    this.setState({
-      showNewVersionVisible: false
-    })
-  }
-
-  closeAdvicesModal = (val) => {
-    this.setState({
-      showAdvicesVisible: false
-    }, () => {
-      this.clearRecord(val)
-    })
-  }
-
-  clearRecord = (id) => {
-    const {accessToken} = this.props.global;
-    const api = `/v1/new_api/advice/recordAdvice/${id}`
-    HttpUtils.get.bind(this.props)(api, {
-      access_token: accessToken
-    }).then((res) => {
-      console.log('recordAdvice  res =>', res)
-    })
-  }
-
-  toAdvicesDetail = (val) => {
-    this.setState({
-      showAdvicesVisible: false
-    }, () => {
-      this.clearRecord(val.id)
-      this.onPress(Config.ROUTE_DETAIL_NOTICE, {content: val})
-    })
   }
 
   getVendor = () => {
@@ -590,8 +537,9 @@ class OrderListScene extends Component {
   }
 
   render() {
-    const {show_orderlist_ext_store, currStoreId} = this.props.global;
-    const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress, showAdvicesVisible, advicesInfoArray,scrollViewIsBottom}=this.state
+    const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+
+    const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress}=this.state
     return (
       <View style={{flex: 1}}>
         <FloatServiceIcon/>
@@ -641,114 +589,43 @@ class OrderListScene extends Component {
                           })
                         }}/>
 
-        {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
-        <If condition={this.state.show_hint}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
-            </CellBody>
-            <CellFooter>
-              <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
-            </CellFooter>
-          </Cell>
-        </If>
-        <RemindModal visible={showNewVersionVisible} onClose={() => this.closeBundleModal()}>
-          <View style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
-            <TouchableOpacity onPress={() => this.closeBundleModal()}>
-              <Entypo name={'cross'} style={{fontSize: 35, color: colors.fontColor}}/>
-            </TouchableOpacity>
-          </View>
-          <View style={{alignItems:'center', justifyContent:'center'}}>
-            <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
-            {/*<Text style= {styles.modalTitleText}>*/}
-            {/*  体验新版本*/}
-            {/*</Text>*/}
-          </View>
-          <Text style={styles.modalContentText}>
-            {newVersionInfo.info}
-          </Text>
-          <If condition={downloadFileProgress!==''}>
-            <Text style= {styles.modalTitleText}>
-              下载进度：{downloadFileProgress}
-            </Text>
+          {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
+          <If condition={this.state.show_hint}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+              </CellBody>
+              <CellFooter>
+                <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
+              </CellFooter>
+            </Cell>
           </If>
-          <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
-            <Text style={styles.modalBtnText}>
-              立即体验
-            </Text>
-          </TouchableOpacity>
-        </RemindModal>
-        <RemindModal visible={showAdvicesVisible} onClose={() => this.closeRemindModal()}>
-          <View style={{display: "flex", flexDirection: "row",alignItems:'center', justifyContent: "space-between"}}>
-            <Text style= {{fontSize:12,fontWeight:'bold',paddingTop:8,paddingBottom:8,lineHeight:25, flex: 1, marginLeft: '30%'}}>
-              {advicesInfoArray.title}
-            </Text>
-            <TouchableOpacity onPress={() => this.closeRemindModal()}>
-              <Entypo name={'cross'} style={{fontSize: 35, color: colors.fontColor}}/>
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={{height: 200}} onMomentumScrollEnd={(e) => {
-            let self = this
-            let offsetY = e.nativeEvent.contentOffset.y;
-            let contentSizeHeight = e.nativeEvent.contentSize.height;
-            let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
-            if (offsetY + oriageScrollHeight + 1 >= contentSizeHeight){
-              self.setState({
-                scrollViewIsBottom: true
-              })
-            }
-          }} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
-            <Text style={styles.modalContentText}>
-              {advicesInfoArray.content}
-            </Text>
-          </ScrollView>
-          <If condition={advicesInfoArray.type == 4}>
-            <View style={{display: "flex",flexDirection: "row",justifyContent: "space-around",alignItems: "center"}}>
-              <Button title={'取消'}
-                      onPress={() => {
-                        this.closeAdvicesModal(advicesInfoArray.id)
-                      }}
-                      buttonStyle={styles.modalBtnWrapCancel}
-                      titleStyle={styles.modalBtnTextCancel}
-              />
-              <Button title={'同意'}
-                      onPress={() => {
-                        this.closeAdvicesModal(advicesInfoArray.id)
-                      }}
-                      buttonStyle={styles.modalBtnWrap}
-                      titleStyle={styles.modalBtnText}
-              />
+          <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
+            <View style={styles.modalWrap}>
+              <View style={styles.modalContentWrap}>
+                <View style={{alignItems:'center', justifyContent:'center'}}>
+                  <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
+                  {/*<Text style= {styles.modalTitleText}>*/}
+                  {/*  体验新版本*/}
+                  {/*</Text>*/}
+                </View>
+                <Text style={styles.modalContentText}>
+                  {newVersionInfo.info}
+                </Text>
+                <If condition={downloadFileProgress!==''}>
+                  <Text style= {styles.modalTitleText}>
+                    下载进度：{downloadFileProgress}
+                  </Text>
+                </If>
+                <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
+                  <Text style={styles.modalBtnText}>
+                    立即体验
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </If>
-          <If condition={advicesInfoArray.type == 1}>
-            <Button title={'知道了'}
-                    onPress={() => {
-                      this.closeAdvicesModal(advicesInfoArray.id)
-                    }}
-                    buttonStyle={styles.modalBtnWrap}
-                    titleStyle={styles.modalBtnText}
-            />
-          </If>
-          <If condition={advicesInfoArray.type == 2}>
-            <Button title={'查看详情'}
-                    onPress={() => {
-                      this.toAdvicesDetail(advicesInfoArray)
-                    }}
-                    buttonStyle={styles.modalBtnWrap}
-                    titleStyle={styles.modalBtnText}
-            />
-          </If>
-          <If condition={advicesInfoArray.type == 3}>
-            <Button title={'我已阅读'}
-                    onPress={() => {
-                      this.closeAdvicesModal(advicesInfoArray.id)
-                    }}
-                    disabled={!scrollViewIsBottom}
-                    buttonStyle={scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1}
-                    titleStyle={styles.modalBtnText}
-            />
-          </If>
-        </RemindModal>
+          </Modal>
+          <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
         </View>
     );
   }
@@ -1148,20 +1025,7 @@ const styles = StyleSheet.create({
     marginLeft:20,
     marginRight:20
   },
-  modalBtnWrapCancel:{
-    backgroundColor:colors.white,
-    borderWidth: 1,
-    borderColor: colors.color333,
-    marginLeft:20,
-    marginRight:20
-  },
-  modalBtnWrap1:{
-    backgroundColor:colors.fontColor,
-    marginLeft:20,
-    marginRight:20
-  },
   modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
-  modalBtnTextCancel:{color:colors.color333,fontSize:20,padding:12,textAlign:'center'},
   cell_row: {
     marginLeft: 0,
     paddingLeft: pxToDp(20),
