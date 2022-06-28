@@ -564,9 +564,7 @@ class ApplyScene extends PureComponent {
               marginLeft: '6%'
             }}
             onPress={() => {
-              if (this.state.checkBox) {
-                this.mixpanel.track("info_signupstore_click", {});
-              }
+              this.mixpanel.track("info_signupstore_click", {});
               this.onApply()
             }}/>
 
