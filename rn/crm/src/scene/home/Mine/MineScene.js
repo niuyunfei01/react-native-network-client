@@ -1177,19 +1177,11 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box, {position: "relative"}]}
           onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
           activeOpacity={customerOpacity}>
+          {have_not_read_advice && <View style={[block_styles.notice_point]}/>}
           <Image
             style={[block_styles.block_img]}
             source={require("../../../img/My/inform.png")}
           />
-          {have_not_read_advice && <View style={{
-            backgroundColor: '#F72D2D',
-            width: 10,
-            height: 10,
-            borderRadius: 10,
-            position: "absolute",
-            top: 15,
-            left: 65
-          }}/>}
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
         <If condition={fn_stall==='1'}>
