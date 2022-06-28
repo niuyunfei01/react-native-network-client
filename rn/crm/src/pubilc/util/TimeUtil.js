@@ -6,6 +6,12 @@ export const getDatetime = (getTime) => {
   const time = new Date(getTime + 8 * 3600 * 1000)
   return time.toJSON().substring(0, 23).replace('T', ' ')
 }
+export const getSimpleTime = () => {
+  //2022-06-28 12:30:00
+  const time = new Date(getTime() + 8 * 3600 * 1000)
+  return time.toJSON().substring(11, 16)
+}
+
 export default class TimeUtil {
   static getWeek(date = new Date()) {
     const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
