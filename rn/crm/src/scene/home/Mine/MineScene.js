@@ -1184,11 +1184,11 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
-        <If condition={fn_stall==='1'}>
+        <If condition={fn_stall === '1'}>
           <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
-              activeOpacity={customerOpacity}>
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
+            activeOpacity={customerOpacity}>
             <View style={block_styles.iconWrap}>
               <FontAwesome5 name={'wallet'} size={16} color={colors.white}/>
             </View>
@@ -1575,7 +1575,7 @@ class MineScene extends PureComponent {
           }}>运营邀请您领取1000元现金红包</Text>
         </BottomModal>
 
-        <BottomModal title={'标题'} actionText={'拨打电话'} closeText={'我知道了'} onPress={this.callService}
+        <BottomModal title={'提示'} actionText={'拨打电话'} closeText={'我知道了'} onPress={this.callService}
                      onPressClose={this.oncloseCallModal}
                      visible={this.state.show_call_service_modal}
                      btnBottomStyle={{
@@ -1584,8 +1584,9 @@ class MineScene extends PureComponent {
                      }}
                      closeBtnStyle={{
                        borderWidth: 0,
+                       borderRadius: 0,
                        borderRightWidth: 1,
-                       borderRightColor: "#E5E5E5",
+                       borderColor: "#E5E5E5",
                      }}
                      btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
                      closeBtnTitleStyle={{color: colors.color333}}
@@ -1594,7 +1595,7 @@ class MineScene extends PureComponent {
             fontSize: 15,
             color: colors.color333,
             marginHorizontal: 20,
-            marginVertical: 8
+            marginVertical: 8,
           }}>请自主联系您店铺的运营经理，或拨打电话联系 </Text>
         </BottomModal>
       </View>
@@ -1794,15 +1795,15 @@ const block_styles = StyleSheet.create({
     borderWidth: pxToDp(1),
     alignItems: "center"
   },
-  iconWrap:{
-    borderRadius:4,
+  iconWrap: {
+    borderRadius: 4,
     marginTop: pxToDp(30),
     marginBottom: pxToDp(16),
     width: pxToDp(60),
     height: pxToDp(60),
-    backgroundColor:'#F5A61B',
-    alignItems:'center',
-    justifyContent:'center'
+    backgroundColor: '#F5A61B',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   block_img: {
     marginTop: pxToDp(30),
