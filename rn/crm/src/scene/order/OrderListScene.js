@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   Alert,
   Dimensions,
-  Modal,
   Platform,
   StatusBar, ScrollView
 } from 'react-native'
@@ -41,6 +40,7 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 import {bundleFilePath, exists, deleteFile, createFile} from "../../pubilc/util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
 import Cts from "../../pubilc/common/Cts";
+import RemindModal from "../../pubilc/component/remindModal";
 
 const width = Dimensions.get("window").width;
 
@@ -348,6 +348,18 @@ class OrderListScene extends Component {
     });
   }
 
+  closeRemindModal = () => {
+    this.setState({
+      showAdvicesVisible: false
+    })
+  }
+
+  closeBundleModal = () => {
+    this.setState({
+      showNewVersionVisible: false
+    })
+  }
+
   closeAdvicesModal = (val) => {
     this.setState({
       showAdvicesVisible: false
@@ -640,103 +652,103 @@ class OrderListScene extends Component {
             </CellFooter>
           </Cell>
         </If>
-        <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
-          <View style={styles.modalWrap}>
-            <View style={styles.modalContentWrap}>
-              <View style={{alignItems:'center', justifyContent:'center'}}>
-                <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
-                  {/*<Text style= {styles.modalTitleText}>*/}
-                  {/*  体验新版本*/}
-                  {/*</Text>*/}
-                </View>
-              <Text style={styles.modalContentText}>
-                  {newVersionInfo.info}
-              </Text>
-              <If condition={downloadFileProgress!==''}>
-                <Text style= {styles.modalTitleText}>
-                  下载进度：{downloadFileProgress}
-                </Text>
-              </If>
-              <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
-                <Text style={styles.modalBtnText}>
-                    立即体验
-                </Text>
-              </TouchableOpacity>
-              </View>
+        <RemindModal visible={showNewVersionVisible} onClose={() => this.closeBundleModal()}>
+          <View style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
+            <TouchableOpacity onPress={() => this.closeBundleModal()}>
+              <Entypo name={'cross'} style={{fontSize: 35, color: colors.fontColor}}/>
+            </TouchableOpacity>
+          </View>
+          <View style={{alignItems:'center', justifyContent:'center'}}>
+            <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
+            {/*<Text style= {styles.modalTitleText}>*/}
+            {/*  体验新版本*/}
+            {/*</Text>*/}
+          </View>
+          <Text style={styles.modalContentText}>
+            {newVersionInfo.info}
+          </Text>
+          <If condition={downloadFileProgress!==''}>
+            <Text style= {styles.modalTitleText}>
+              下载进度：{downloadFileProgress}
+            </Text>
+          </If>
+          <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
+            <Text style={styles.modalBtnText}>
+              立即体验
+            </Text>
+          </TouchableOpacity>
+        </RemindModal>
+        <RemindModal visible={showAdvicesVisible} onClose={() => this.closeRemindModal()}>
+          <View style={{display: "flex", flexDirection: "row",alignItems:'center', justifyContent: "space-between"}}>
+            <Text style= {{fontSize:12,fontWeight:'bold',paddingTop:8,paddingBottom:8,lineHeight:25, flex: 1, marginLeft: '30%'}}>
+              {advicesInfoArray.title}
+            </Text>
+            <TouchableOpacity onPress={() => this.closeRemindModal()}>
+              <Entypo name={'cross'} style={{fontSize: 35, color: colors.fontColor}}/>
+            </TouchableOpacity>
+          </View>
+          <ScrollView style={{height: 200}} onMomentumScrollEnd={(e) => {
+            let self = this
+            let offsetY = e.nativeEvent.contentOffset.y;
+            let contentSizeHeight = e.nativeEvent.contentSize.height;
+            let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
+            if (offsetY + oriageScrollHeight + 1 >= contentSizeHeight){
+              self.setState({
+                scrollViewIsBottom: true
+              })
+            }
+          }} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
+            <Text style={styles.modalContentText}>
+              {advicesInfoArray.content}
+            </Text>
+          </ScrollView>
+          <If condition={advicesInfoArray.type == 4}>
+            <View style={{display: "flex",flexDirection: "row",justifyContent: "space-around",alignItems: "center"}}>
+              <Button title={'取消'}
+                      onPress={() => {
+                        this.closeAdvicesModal(advicesInfoArray.id)
+                      }}
+                      buttonStyle={styles.modalBtnWrapCancel}
+                      titleStyle={styles.modalBtnTextCancel}
+              />
+              <Button title={'同意'}
+                      onPress={() => {
+                        this.closeAdvicesModal(advicesInfoArray.id)
+                      }}
+                      buttonStyle={styles.modalBtnWrap}
+                      titleStyle={styles.modalBtnText}
+              />
             </View>
-          </Modal>
-          <Modal visible={showAdvicesVisible} transparent={true} hardwareAccelerated={true}>
-            <View style={styles.modalWrap}>
-              <View style={styles.modalContentWrap}>
-                <View style={{alignItems:'center', justifyContent:'center'}}>
-                  <Text style= {{fontSize:12,fontWeight:'bold',paddingTop:8,paddingBottom:8,lineHeight:25}}>
-                    {advicesInfoArray.title}
-                  </Text>
-                </View>
-                <ScrollView style={{height: 200}} onMomentumScrollEnd={(e) => {
-                  let self = this
-                  let offsetY = e.nativeEvent.contentOffset.y;
-                  let contentSizeHeight = e.nativeEvent.contentSize.height;
-                  let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
-                  if (offsetY + oriageScrollHeight + 1 >= contentSizeHeight){
-                    self.setState({
-                      scrollViewIsBottom: true
-                    })
-                  }
-                }} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
-                  <Text style={styles.modalContentText}>
-                    {advicesInfoArray.content}
-                  </Text>
-                </ScrollView>
-                <If condition={advicesInfoArray.type == 4}>
-                  <View style={{display: "flex",flexDirection: "row",justifyContent: "space-around",alignItems: "center"}}>
-                    <Button title={'取消'}
-                            onPress={() => {
-                              this.closeAdvicesModal(advicesInfoArray.id)
-                            }}
-                            buttonStyle={styles.modalBtnWrapCancel}
-                            titleStyle={styles.modalBtnTextCancel}
-                    />
-                    <Button title={'同意'}
-                            onPress={() => {
-                              this.closeAdvicesModal(advicesInfoArray.id)
-                            }}
-                            buttonStyle={styles.modalBtnWrap}
-                            titleStyle={styles.modalBtnText}
-                    />
-                  </View>
-                </If>
-                <If condition={advicesInfoArray.type == 1}>
-                  <Button title={'知道了'}
-                          onPress={() => {
-                            this.closeAdvicesModal(advicesInfoArray.id)
-                          }}
-                          buttonStyle={styles.modalBtnWrap}
-                          titleStyle={styles.modalBtnText}
-                  />
-                </If>
-                <If condition={advicesInfoArray.type == 2}>
-                  <Button title={'查看详情'}
-                          onPress={() => {
-                            this.toAdvicesDetail(advicesInfoArray)
-                          }}
-                          buttonStyle={styles.modalBtnWrap}
-                          titleStyle={styles.modalBtnText}
-                  />
-                </If>
-                <If condition={advicesInfoArray.type == 3}>
-                  <Button title={'我已阅读'}
-                          onPress={() => {
-                            this.closeAdvicesModal(advicesInfoArray.id)
-                          }}
-                          disabled={!scrollViewIsBottom}
-                          buttonStyle={scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1}
-                          titleStyle={styles.modalBtnText}
-                  />
-                </If>
-              </View>
-            </View>
-          </Modal>
+          </If>
+          <If condition={advicesInfoArray.type == 1}>
+            <Button title={'知道了'}
+                    onPress={() => {
+                      this.closeAdvicesModal(advicesInfoArray.id)
+                    }}
+                    buttonStyle={styles.modalBtnWrap}
+                    titleStyle={styles.modalBtnText}
+            />
+          </If>
+          <If condition={advicesInfoArray.type == 2}>
+            <Button title={'查看详情'}
+                    onPress={() => {
+                      this.toAdvicesDetail(advicesInfoArray)
+                    }}
+                    buttonStyle={styles.modalBtnWrap}
+                    titleStyle={styles.modalBtnText}
+            />
+          </If>
+          <If condition={advicesInfoArray.type == 3}>
+            <Button title={'我已阅读'}
+                    onPress={() => {
+                      this.closeAdvicesModal(advicesInfoArray.id)
+                    }}
+                    disabled={!scrollViewIsBottom}
+                    buttonStyle={scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1}
+                    titleStyle={styles.modalBtnText}
+            />
+          </If>
+        </RemindModal>
         </View>
     );
   }
@@ -1134,22 +1146,19 @@ const styles = StyleSheet.create({
   modalBtnWrap:{
     backgroundColor:colors.main_color,
     marginLeft:20,
-    marginRight:20,
-    marginBottom:10,
+    marginRight:20
   },
   modalBtnWrapCancel:{
     backgroundColor:colors.white,
     borderWidth: 1,
     borderColor: colors.color333,
     marginLeft:20,
-    marginRight:20,
-    marginBottom:10,
+    marginRight:20
   },
   modalBtnWrap1:{
     backgroundColor:colors.fontColor,
     marginLeft:20,
-    marginRight:20,
-    marginBottom:10
+    marginRight:20
   },
   modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
   modalBtnTextCancel:{color:colors.color333,fontSize:20,padding:12,textAlign:'center'},
