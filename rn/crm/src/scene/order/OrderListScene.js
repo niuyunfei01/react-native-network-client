@@ -234,7 +234,6 @@ class OrderListScene extends Component {
     HttpUtils.get.bind(this.props)(url,params).then(res=>{
       if(parseInt(res.android)>version)
         this.setState({newVersionInfo:res,showNewVersionVisible:true})
-      console.log('res',res)
     }).catch(error=>{showError(error)})
   }
 

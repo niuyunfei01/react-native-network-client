@@ -111,8 +111,8 @@ class RegisterShunfeng extends PureComponent {
           this.setState({
             imageUrl: uri,
           });
-        }, () => {
-          showError("获取上传图片的地址失败");
+        }, (error) => {
+          showError("获取上传图片的地址失败，原因："+error.error_msg);
         })
       },
       onError: (data) => {
@@ -252,11 +252,12 @@ class RegisterShunfeng extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    this.setState({newImageKey: tool.imageKey(imgName)})
+    const newImageKey = tool.imageKey(imgName)+imgName
+    this.setState({newImageKey: newImageKey })
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {
         filePath: imgPath,
-        upKey: this.state.newImageKey,
+        upKey: newImageKey,
         upToken: res,
         zone: 1
       }
