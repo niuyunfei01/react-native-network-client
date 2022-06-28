@@ -47,12 +47,12 @@ import NextSchedule from "./_Mine/NextSchedule";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
 import JbbText from "../../common/component/JbbText";
-import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
+import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -1306,6 +1306,10 @@ class MineScene extends PureComponent {
         show_call_service_modal: true
       })
     }
+    this.openMiniprogarm()
+  }
+
+  openMiniprogarm = () => {
     let {currVendorId} = tool.vendor(this.props.global)
     let data = {
       v: currVendorId,
@@ -1575,8 +1579,8 @@ class MineScene extends PureComponent {
           }}>运营邀请您领取1000元现金红包</Text>
         </BottomModal>
 
-        <BottomModal title={'提示'} actionText={'拨打电话'} closeText={'我知道了'} onPress={this.callService}
-                     onPressClose={this.oncloseCallModal}
+        <BottomModal title={'提示'} actionText={'其他问题'} closeText={'配送问题'} onPress={this.callService}
+                     onPressClose={() => this.oncloseCallModal(1)}
                      visible={this.state.show_call_service_modal}
                      btnBottomStyle={{
                        borderTopWidth: 1,
@@ -1591,22 +1595,38 @@ class MineScene extends PureComponent {
                      btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
                      closeBtnTitleStyle={{color: colors.color333}}
                      btnTitleStyle={{color: colors.main_color}} onClose={this.oncloseCallModal}>
-          <Text style={{
-            fontSize: 15,
-            color: colors.color333,
+          <View style={{
             marginHorizontal: 20,
-            marginVertical: 8,
-          }}>请自主联系您店铺的运营经理，或拨打电话联系 </Text>
+            marginVertical: 8
+          }}>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}>您的问题是：</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+              marginVertical: 4,
+            }}> 配送问题：请点击配送问题，联系客服</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}> 其他问题：请点击其他问题或通过其他方式联系店铺运营 </Text>
+          </View>
         </BottomModal>
       </View>
     )
   }
 
-  oncloseCallModal = () => {
+  oncloseCallModal = (e = 0) => {
     this.setState({
       show_call_service_modal: false
     })
+    if (e === 1) {
+      this.openMiniprogarm()
+    }
   }
+
 
   callService = () => {
     if (this.state.contacts !== '' && this.state.contacts !== undefined) {
