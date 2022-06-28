@@ -271,7 +271,7 @@ class PrinterSetting extends PureComponent {
                 color: colors.color333,
                 flex: 1,
               }}>自动打印 </Text>
-              <Switch style={{
+              <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} value={this.state.auto_blue_print}
                       onChange={(val) => {
@@ -491,10 +491,9 @@ class PrinterSetting extends PureComponent {
               color: colors.color333,
               flex: 1,
             }}>用户联 </Text>
-            <Switch style={{
+            <Switch color={colors.main_color} color={colors.main_color} style={{
               fontSize: 16,
-            }} disabled={true}
-                    value={this.state.customer_print_item}
+            }} value={this.state.customer_print_item}
             />
           </TouchableOpacity>
 
@@ -512,7 +511,7 @@ class PrinterSetting extends PureComponent {
               color: colors.color333,
               flex: 1,
             }}>商户联 </Text>
-            <Switch style={{
+            <Switch color={colors.main_color} color={colors.main_color} style={{
               fontSize: 16,
             }} value={this.state.master_print_item}
                     onChange={() => {
