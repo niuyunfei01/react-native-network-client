@@ -944,7 +944,7 @@ class OrderListScene extends Component {
               height: 40
           }}>
             <Text style={{color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1}}>
-              存在正在补送的订单
+              存在补送的订单
             </Text>
             <Button onPress={() => {
               this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
