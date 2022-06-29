@@ -147,12 +147,12 @@ class GoodStoreDetailScene extends PureComponent {
 
   componentDidMount() {
     const {fn_stall} = this.props.global.simpleStore
-    this.handleAuthItem('fn_stall', fn_stall)
+    this.handleAuthItem('fn_stall', fn_stall ? fn_stall : '0' )
     //showModal('加载中')
     const {accessToken} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
       //hideModal()
-      this.handleAuthItem('strict_providing', store['strict_providing'])
+      this.handleAuthItem('strict_providing', store.strict_providing ? store.strict_providing : '0')
       this.setState({
         fn_price_controlled: store['fn_price_controlled'],
         fnProviding: Number(store['strict_providing']) > 0
@@ -234,7 +234,8 @@ class GoodStoreDetailScene extends PureComponent {
     HttpUtils.post.bind(this.props)(url).then((data) => {
       const product = pid === 0 ? params.item : data.p
       const spec = {...product, ...data.sp}
-      this.handleAuthItem('retail_price_enabled', data.vendor.retail_price_enabled)
+      const retail_price_enabled = data.vendor?.retail_price_enabled ? data.vendor.retail_price_enabled : '0'
+      this.handleAuthItem('retail_price_enabled', retail_price_enabled)
       const selectedSpecArray = []
       if (spec?.sku_name !== undefined) {
         selectedSpecArray.push({
@@ -331,7 +332,6 @@ class GoodStoreDetailScene extends PureComponent {
   }
   render() {
     let {full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id,activity} = this.state;
-
     if (full_screen) {
       if (product_id != 0)
         return this.renderImg(product.list_img, product.source_img);

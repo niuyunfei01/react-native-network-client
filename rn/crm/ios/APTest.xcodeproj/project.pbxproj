@@ -28,6 +28,8 @@
 		31254CB1BA893C864B8ACDF5 /* libPods-APTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B96CDFAF87787010CC277D47 /* libPods-APTest.a */; };
 		4E24CDB7610244A1BECFCE5C /* antoutline.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED9FEEC2D2C84DFAB80B7E26 /* antoutline.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8452B372286C6561003F2D3D /* Restart.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452B371286C6561003F2D3D /* Restart.m */; };
+		84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B93872286C231A00333FE1 /* RNZipArchive.m */; };
 		AB09017DC9F67EE2B1E01559 /* libPods-APTest-APTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 95980AC83CD700A81F6C30B0 /* libPods-APTest-APTestTests.a */; };
 		ABA1923927E48B89008C4542 /* IQTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA1921527E48B88008C4542 /* IQTextView.m */; };
 		ABA1923A27E48B89008C4542 /* IQToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA1921927E48B88008C4542 /* IQToolbar.m */; };
@@ -114,6 +116,10 @@
 		68931DA816C00616ED0626D0 /* Pods-APTest-tvOSTests.ad-hoc.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-tvOSTests.ad-hoc.xcconfig"; path = "Target Support Files/Pods-APTest-tvOSTests/Pods-APTest-tvOSTests.ad-hoc.xcconfig"; sourceTree = "<group>"; };
 		7B536E10E0C43878352B6C8A /* Pods-APTest-APTestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-APTestTests.release.xcconfig"; path = "Target Support Files/Pods-APTest-APTestTests/Pods-APTest-APTestTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = APTest/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8452B370286C6530003F2D3D /* Restart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Restart.h; sourceTree = "<group>"; };
+		8452B371286C6561003F2D3D /* Restart.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Restart.m; sourceTree = "<group>"; };
+		84B93871286C22D700333FE1 /* RNZipArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZipArchive.h; sourceTree = "<group>"; };
+		84B93872286C231A00333FE1 /* RNZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZipArchive.m; sourceTree = "<group>"; };
 		8B6C1B6E4AF1009E8F53F7F0 /* Pods-APTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest.release.xcconfig"; path = "Target Support Files/Pods-APTest/Pods-APTest.release.xcconfig"; sourceTree = "<group>"; };
 		95980AC83CD700A81F6C30B0 /* libPods-APTest-APTestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-APTest-APTestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		95B39ACEB060C80A0D0917DD /* Pods-APTest.ad-hoc.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest.ad-hoc.xcconfig"; path = "Target Support Files/Pods-APTest/Pods-APTest.ad-hoc.xcconfig"; sourceTree = "<group>"; };
@@ -262,6 +268,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				84B93871286C22D700333FE1 /* RNZipArchive.h */,
+				84B93872286C231A00333FE1 /* RNZipArchive.m */,
+				8452B370286C6530003F2D3D /* Restart.h */,
+				8452B371286C6561003F2D3D /* Restart.m */,
 			);
 			name = APTest;
 			sourceTree = "<group>";
@@ -984,6 +994,7 @@
 				ABA1923B27E48B89008C4542 /* IQTitleBarButtonItem.m in Sources */,
 				088E512B27A0FB08003A173E /* TTSConfig.m in Sources */,
 				ABA1923C27E48B89008C4542 /* IQBarButtonItem.m in Sources */,
+				8452B372286C6561003F2D3D /* Restart.m in Sources */,
 				ABA1923E27E48B89008C4542 /* IQPreviousNextView.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				ABA1924627E48B89008C4542 /* IQUIViewController+Additions.m in Sources */,
@@ -995,6 +1006,7 @@
 				ABA1924327E48B89008C4542 /* IQUITextFieldView+Additions.m in Sources */,
 				ABA1924527E48B89008C4542 /* IQUIView+Hierarchy.m in Sources */,
 				ABA1923927E48B89008C4542 /* IQTextView.m in Sources */,
+				84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1150,11 +1162,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-1";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = APTest/APTest.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 638;
-				DEVELOPMENT_TEAM = YVB38MZTJM;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1173,7 +1185,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
-				PROVISIONING_PROFILE_SPECIFIER = "wsb-app-appstore";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1303,7 +1315,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 638;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = YVB38MZTJM;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (

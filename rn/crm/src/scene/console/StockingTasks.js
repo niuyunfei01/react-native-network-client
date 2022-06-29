@@ -151,7 +151,7 @@ class StockingTasks extends PureComponent {
                     </Text>
                   </View>
                   <Text style={numStyle}>
-                    x{item.origin_num}
+                    x{item.num}
                   </Text>
                 </View>
               )

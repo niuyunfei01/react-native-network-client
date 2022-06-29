@@ -37,10 +37,13 @@ import {Badge, Button, Image} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
-import {bundleFilePath, exists, deleteFile, createFile} from "../../pubilc/util/FileUtil";
+import {bundleFilePath, createDirectory, deleteFile, exists} from "../../pubilc/util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
+import {unzip} from '../../pubilc/component/react-native-zip/RNZip'
+import RNRestart from '../../pubilc/component/react-native-restart'
 import Cts from "../../pubilc/common/Cts";
 import RemindModal from "../../pubilc/component/remindModal";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const width = Dimensions.get("window").width;
 
@@ -79,6 +82,7 @@ const initState = {
   showNewVersionVisible: false,
   newVersionInfo: {},
   downloadFileProgress:'',
+  downloadFileFinish:false,
   isLoading: false,
   categoryLabels: [
     {tabname: '待打包', num: 0, status: 1},
@@ -238,28 +242,36 @@ class OrderListScene extends Component {
   }
 
   updateBundle=(newVersionInfo)=>{
-    RNFetchBlob.fetch('GET',newVersionInfo.bundle_url,{'Content-Type':'octet-stream'})
-        .progress({count:10},(received, total)=>{
+    const {downloadFileFinish}=this.state
+    if(downloadFileFinish){
+      RNRestart.Restart()
+      return
+    }
+    const source=Platform.OS==='ios'?bundleFilePath+'/last.ios.zip':bundleFilePath+'/last.android.zip';
+    RNFetchBlob.config({path:source})
+        .fetch('GET',newVersionInfo.bundle_url)
+        .progress({count:10, fileCache : true},(received, total)=>{
           const downloadFileProgress=parseInt(`${(received/total)*100}`)
           this.setState({downloadFileProgress:`${downloadFileProgress}%`})
         })
-        .then(async (resp) => {
-          const status = resp.info().status;
-          const fileNameArray = newVersionInfo.bundle_url.split('/');
-          const fileName = fileNameArray[fileNameArray.length - 1];
-          const filepath = bundleFilePath + '/' + fileName;
-          const existFile = await exists(filepath);
-          if (existFile) {
-            await deleteFile(filepath)
-          }
+        .then(async (res) => {
+          const status = res.info().status;
           if (status === 200) {
-            const content = resp.text()
-            await createFile(filepath, content)
-            this.setState({downloadFileProgress:'下载完成，请重新打开软件'})
+            const target=Platform.OS==='ios'?bundleFilePath+'/last.ios/':bundleFilePath+'/last.android/';
+            if(!await exists(target))
+              await createDirectory(target)
+            await unzip(source,target)
+            await deleteFile(source)
+            this.setState({downloadFileProgress:'',downloadFileFinish:true})
           }
-        }).catch(error => showError(error))
+        }).catch(error => {
+      showError(error.reason)
+    })
   }
 
+  closeNewVersionInfo=()=>{
+    this.setState({showNewVersionVisible:false})
+  }
   componentDidUpdate(prevProps, prevState, snapshot) {
     if(timeObj.method.length > 0) {
       const endTime = getTime()
@@ -537,7 +549,7 @@ class OrderListScene extends Component {
   render() {
     const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
 
-    const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress}=this.state
+    const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress,downloadFileFinish}=this.state
     return (
       <View style={{flex: 1}}>
         <FloatServiceIcon/>
@@ -598,31 +610,30 @@ class OrderListScene extends Component {
               </CellFooter>
             </Cell>
           </If>
-          <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
-            <View style={styles.modalWrap}>
-              <View style={styles.modalContentWrap}>
-                <View style={{alignItems:'center', justifyContent:'center'}}>
-                  <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
-                  {/*<Text style= {styles.modalTitleText}>*/}
-                  {/*  体验新版本*/}
-                  {/*</Text>*/}
-                </View>
-                <Text style={styles.modalContentText}>
-                  {newVersionInfo.info}
-                </Text>
-                <If condition={downloadFileProgress!==''}>
-                  <Text style= {styles.modalTitleText}>
-                    下载进度：{downloadFileProgress}
-                  </Text>
-                </If>
-                <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
-                  <Text style={styles.modalBtnText}>
-                    立即体验
-                  </Text>
-                </TouchableOpacity>
+        <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
+          <View style={styles.modalWrap}>
+            <View style={styles.modalContentWrap}>
+              <AntDesign name={'close'} style={styles.closeNewVersionModal} allowFontScaling={false}
+                         onPress={this.closeNewVersionInfo}/>
+              <View style={styles.center}>
+                <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
               </View>
+              <Text style={styles.modalContentText}>
+                {newVersionInfo.info}
+              </Text>
+              <If condition={downloadFileProgress!==''}>
+                <Text style= {styles.modalTitleText}>
+                  下载进度：{downloadFileProgress}
+                </Text>
+              </If>
+              <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
+                <Text style={styles.modalBtnText}>
+                  {downloadFileFinish===false?'立即更新':'立即体验'}
+                </Text>
+              </TouchableOpacity>
             </View>
-          </Modal>
+          </View>
+        </Modal>
           <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
         </View>
     );
@@ -1023,6 +1034,7 @@ const styles = StyleSheet.create({
     marginLeft:20,
     marginRight:20
   },
+  closeNewVersionModal:{fontSize:20,textAlign:'right'},
   modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
   cell_row: {
     marginLeft: 0,

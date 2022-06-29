@@ -62,11 +62,6 @@ class StallSettlementScene extends PureComponent {
                     <Text style={styles.stallTotal}>
                         摊位结算(总)
                     </Text>
-                    {/*<View style={styles.stallFlagWrap}>*/}
-                    {/*    <Text style={styles.stallFlagText}>*/}
-                    {/*        待结算*/}
-                    {/*    </Text>*/}
-                    {/*</View>*/}
                 </View>
                 {this.renderItemRow(styles.headerLeftWrap, styles.width50, price, num)}
             </View>

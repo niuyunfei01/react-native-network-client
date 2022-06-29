@@ -117,7 +117,6 @@ class SignInScene extends PureComponent {
         const api = `/api/sign_status_with_record/${currStoreId}/${selectDate}?access_token=${accessToken}`
         HttpUtils.get.bind(this.props)(api).then(res => {
             this.setState({sigInInfo: res})
-            console.log('res', res)
         }).catch((error) => {
             showSuccess(error)
         })
@@ -130,30 +129,31 @@ class SignInScene extends PureComponent {
 
     touchSignIn = () => {
         const {sigInInfo} = this.state
-        if (sigInInfo.sign_status === 2) {
-            showSuccess('今日已签到')
-            return;
-        }
         const {accessToken, currStoreId} = this.props.global;
-        if (sigInInfo.sign_status === 0) {
-            const url = `/api/sign_in/${currStoreId}?access_token=${accessToken}`
-            console.log('url', url)
-            HttpUtils.get.bind(this.props)(url).then(() => {
-                showSuccess('签到成功')
-            },(res)=>{
-                showSuccess('签到失败，原因：'+res.reason)
-            }).catch((error) => {
-                showError('签到失败，原因：' + error)
-            })
-            return
-        }
-        if (sigInInfo.sign_status === 1) {
-            const url = `/api/sign_off/${currStoreId}?access_token=${accessToken}`
-            HttpUtils.get.bind(this.props)(url).then(() => {
-                showSuccess('签退成功')
-            }).catch((error) => {
-                showError('签退失败，原因：' + error)
-            })
+        let url = `/api/sign_in/${currStoreId}?access_token=${accessToken}`
+        switch (sigInInfo.sign_status) {
+            case 0:
+                HttpUtils.get.bind(this.props)(url).then(() => {
+                    showSuccess('签到成功')
+                }, (res) => {
+                    showError('签到失败，原因：' + res.reason)
+                }).catch((error) => {
+                    showError('签到失败，原因：' + error)
+                })
+                break
+            case 1:
+                url = `/api/sign_off/${currStoreId}?access_token=${accessToken}`
+                HttpUtils.get.bind(this.props)(url).then(() => {
+                    showSuccess('签退成功')
+                }, res => {
+                    showError('签退失败，原因：' + res.reason)
+                }).catch((error) => {
+                    showError('签退失败，原因：' + error.reason)
+                })
+                break
+            case 2:
+                showSuccess('今日已签到')
+                break
         }
     }
 
