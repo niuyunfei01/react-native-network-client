@@ -78,16 +78,18 @@ class RemindModal extends React.Component {
                   maskClosable
                   visible={this.state.showAdvicesVisible}>
       <View style={styles.modalWrap}>
-        <View style={[styles.modalContentWrap]}>
-          <View style={styles.modalContentTitle}>
-            <Text style= {styles.modalContentTitleText}>
-              {this.state.advicesInfoArray.title}
-            </Text>
+        <View style={styles.modalContentWrap}>
+          <View style={styles.modalContentIcon}>
             <TouchableOpacity onPress={() => this.closeRemindModal()}>
               <Entypo name={'cross'} style={styles.closeIcon}/>
             </TouchableOpacity>
           </View>
-          <ScrollView style={{height: 200}} onMomentumScrollEnd={(e) => {
+          <View style={styles.modalContentTitle}>
+            <Text style= {styles.modalContentTitleText}>
+              {this.state.advicesInfoArray.title}
+            </Text>
+          </View>
+          <ScrollView style={styles.modalContainer} onMomentumScrollEnd={(e) => {
             let self = this
             let offsetY = e.nativeEvent.contentOffset.y;
             let contentSizeHeight = e.nativeEvent.contentSize.height;
@@ -162,15 +164,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
+  modalContainer: {height: 200, paddingHorizontal: 10, marginTop: 20},
   modalContentWrap:{
     width:'80%',
     backgroundColor: colors.colorEEE,
     borderRadius:8,
     padding:12,
+    position: "relative"
   },
-  modalContentTitle: {display: "flex", flexDirection: "row",alignItems:'center', justifyContent: "space-between"},
-  modalContentTitleText: {fontSize:12,fontWeight:'bold',paddingTop:8,paddingBottom:8,lineHeight:25, flex: 1, marginLeft: '30%'},
-  closeIcon: {fontSize: 35, color: colors.fontColor},
+  modalContentTitle: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems:'center',
+    justifyContent: "center"
+  },
+  modalContentIcon: {
+    flex: 1,
+    position: "absolute",
+    right: 0,
+    top: 0
+  },
+  modalContentTitleText: {
+    fontSize:12,
+    fontWeight:'bold',
+    paddingTop:8,
+    paddingBottom:8,
+    lineHeight:25
+  },
+  closeIcon: {
+    fontSize: 35,
+    color: colors.fontColor
+  },
   modalBtnWrap:{
     backgroundColor:colors.main_color,
     marginLeft:20,
@@ -188,8 +212,18 @@ const styles = StyleSheet.create({
     marginLeft:20,
     marginRight:20
   },
-  modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
-  modalBtnTextCancel:{color:colors.color333,fontSize:20,padding:12,textAlign:'center'},
+  modalBtnText:{
+    color:colors.white,
+    fontSize:20,
+    padding:12,
+    textAlign:'center'
+  },
+  modalBtnTextCancel:{
+    color:colors.color333,
+    fontSize:20,
+    padding:12,
+    textAlign:'center'
+  },
 });
 
 export default RemindModal
