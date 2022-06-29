@@ -71,7 +71,7 @@ class HistoryNoticeScene extends PureComponent {
     const api = `/v1/new_api/advice/getHistoryAdvices`
     HttpUtils.get.bind(this.props)(api, {
       page: this.state.page,
-      pageSize: this.state.pageSize,
+      page_size: this.state.pageSize,
       title: '',
       store_id: '',
       vendor_id: '',
@@ -80,7 +80,7 @@ class HistoryNoticeScene extends PureComponent {
       hideModal()
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
-      let lists = res.page == 1 ? res.lists : this.state.historyAdviceList.concat(res.lists)
+      let lists = res.lists
       this.setState({
         historyAdviceList: lists,
         isLastPage: isLastPage
@@ -97,7 +97,7 @@ class HistoryNoticeScene extends PureComponent {
 
   loadMore = () => {
     this.setState({
-      page: this.state.page + 1
+      pageSize: this.state.pageSize + 10
     }, () => {
       this.fetchHistoryAdvicesList()
     })
