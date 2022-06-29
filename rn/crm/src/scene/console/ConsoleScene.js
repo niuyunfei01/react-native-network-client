@@ -11,21 +11,6 @@ const BUTTON_LIST = [
         iconName: 'list-alt',
         routeName: config.ROUTE_CONSOLE_STOCKING_TASKS
     },
-    // {
-    //     title: '价格审核',
-    //     iconName: 'yen-sign',
-    //     routeName: '1'
-    // },
-    // {
-    //     title: '退款审核',
-    //     iconName: 'yen-sign',
-    //     routeName: '2'
-    // },
-    // {
-    //     title: '评价管理',
-    //     iconName: 'info-circle',
-    //     routeName: '3'
-    // },
     {
         title: '员工打卡',
         iconName: 'check-square',

@@ -63,7 +63,9 @@ import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
+import com.reactnativerestart.RestartPackage;
 import com.rnnewrelic.NewRelicPackage;
+import com.rnziparchive.RNZipArchivePackage;
 import com.songlcy.rnupgrade.UpgradePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
@@ -304,7 +306,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         protected String getJSBundleFile() {
             String DocumentDir = GlobalCtx.this.getFilesDir().getAbsolutePath();
-            String jsBundleFile = DocumentDir + File.separator + "last.android.bundle";
+            String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
             File file = new File(jsBundleFile);
             if (file.exists() && file.isFile()) {
                 jsBundleFile = file.getAbsolutePath();
@@ -346,7 +348,9 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new LinearGradientPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage(),
-                    new ClipboardPackage()
+                    new ClipboardPackage(),
+                    new RNZipArchivePackage(),
+                    new RestartPackage()
             );
         }
     };

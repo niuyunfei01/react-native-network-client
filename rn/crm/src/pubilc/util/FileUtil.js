@@ -1,9 +1,8 @@
 import RNFetchBlob from "rn-fetch-blob";
-import {Platform} from "react-native";
 
-const {DocumentDir, CacheDir, MainBundleDir} = RNFetchBlob.fs.dirs
+const {DocumentDir, CacheDir} = RNFetchBlob.fs.dirs
 export const logFilePath = CacheDir + '/log.txt'
-export const bundleFilePath = Platform.OS === 'ios' ? MainBundleDir : DocumentDir
+export const bundleFilePath = DocumentDir
 export const appendFile = async (content, filePath) => {
     return await RNFetchBlob.fs.appendFile(filePath, content + '\r\n', 'utf8')
 }
@@ -26,4 +25,8 @@ export const exists = async (filePath) => {
 
 export const createFile = async (filePath, data) => {
     return await RNFetchBlob.fs.createFile(filePath, data, 'utf8')
+}
+
+export const createDirectory = async (filePath) => {
+    return await RNFetchBlob.fs.mkdir(filePath)
 }

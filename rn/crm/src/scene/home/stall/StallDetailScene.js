@@ -7,7 +7,9 @@ import ModalSelector from "../../../pubilc/component/ModalSelector";
 import Entypo from "react-native-vector-icons/Entypo";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
+import dayjs from "dayjs";
 
+const today = dayjs().format('YYYY-MM-DD');
 const styles = StyleSheet.create({
     rowCenter: {flexDirection: 'row', alignItems: 'center', marginRight: 8},
     titleRightText: {fontSize: 14, fontWeight: '400', color: colors.main_color, lineHeight: 20, marginRight: 17},
@@ -293,8 +295,13 @@ export default class StallDetailScene extends PureComponent {
 
     modifySettlement = () => {
         const {stallInfo} = this.state
+        const {selectedDate} = this.props.route.params
+        if ( today === selectedDate) {
+            showError('今日账单暂不可修改');
+            return
+        }
         if (stallInfo?.bill_info?.bill_id === undefined) {
-            showError('当前没有收款或者退款信息');
+            showError('当前没有账单信息');
             return
         }
         this.setModalVisible(true)
@@ -469,11 +476,6 @@ export default class StallDetailScene extends PureComponent {
                     <Text style={styles.headerTopText}>
                         摊位结算-{stall_name}
                     </Text>
-                    {/*<View style={styles.headerTopRightWrap}>*/}
-                    {/*    <Text style={styles.headerTopRightText}>*/}
-                    {/*        待结算*/}
-                    {/*    </Text>*/}
-                    {/*</View>*/}
                 </View>
                 <Text style={styles.headerDateText}>
                     日期：{selectedDate}

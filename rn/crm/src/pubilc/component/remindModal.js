@@ -66,7 +66,7 @@ class RemindModal extends React.Component {
     this.setState({
       showAdvicesVisible: false
     }, () => {
-      this.clearRecord(val.id)
+      //this.clearRecord(val.id)
       this.props.onPress(Config.ROUTE_DETAIL_NOTICE, {content: val})
     })
   }
