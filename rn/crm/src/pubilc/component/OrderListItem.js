@@ -797,7 +797,7 @@ class OrderListItem extends React.PureComponent {
                                                                           buttonStyle={styles.catLocationBtn}
                                                                           titleStyle={styles.catLocationText}
                         /> : null}
-                        {info.btn_lists.add_tip === info.btn_lists.add_tip ?
+                        {info.btn_lists.add_tip === 1 ?
                           <Button title={'加小费'}
                                   onPress={() => this.goAddTip(info.ship_id)}
                                   buttonStyle={styles.addTipBtn}
