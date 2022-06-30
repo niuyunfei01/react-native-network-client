@@ -172,7 +172,7 @@ class MineScene extends PureComponent {
       is_mgr: false,
       showRecord: false,
       wsb_store_account: 0,
-      have_not_read_advice: false,
+      have_not_read_advice: 0,
       show_call_service_modal: false,
       is_self_yy: false,
       contacts: '',
@@ -209,7 +209,8 @@ class MineScene extends PureComponent {
     // this._doChangeStore(currStoreId)
     this.registerJpush();
     this.getActivity();
-    this.getStoreTurnover()
+    this.getStoreTurnover();
+    this.getHaveNotReadAdvice();
   }
 
   getStoreList = () => {
@@ -236,9 +237,24 @@ class MineScene extends PureComponent {
     })
   }
 
+  getHaveNotReadAdvice = () => {
+    const {accessToken, currStoreId, currentUser} = this.props.global
+    const api = `/v1/new_api/advice/haveNotReadAdvice`
+    HttpUtils.get.bind(this.props)(api, {
+      store_id: currStoreId,
+      access_token: accessToken,
+      uid: currentUser
+    }).then((res) => {
+      this.setState({
+        have_not_read_advice: res.have_not_read && res.have_not_read == 1
+      })
+    })
+  }
+
   onRefresh = () => {
     this.getStoreList();
-    this.getStoreTurnover()
+    this.getStoreTurnover();
+    this.getHaveNotReadAdvice();
   }
 
   onGetUserInfo = (uid) => {
@@ -324,7 +340,6 @@ class MineScene extends PureComponent {
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
         showRecord: res.show_questionnaire && res.show_questionnaire,
-        have_not_read_advice: res.have_not_read_advice && res.have_not_read_advice,
         is_self_yy: res.customer_service_auth !== undefined ? res.customer_service_auth?.is_self_yy : false,
         contacts: res.customer_service_auth !== undefined ? res.customer_service_auth?.contacts : "",
       })
@@ -1177,7 +1192,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box, {position: "relative"}]}
           onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
           activeOpacity={customerOpacity}>
-          {have_not_read_advice && <View style={[block_styles.notice_point]}/>}
+          {have_not_read_advice > 0 && <View style={[block_styles.notice_point]}/>}
           <Image
             style={[block_styles.block_img]}
             source={require("../../../img/My/inform.png")}
