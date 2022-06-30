@@ -1,14 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  Alert,
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View,} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -74,7 +65,7 @@ class SeetingDeliveryInfo extends PureComponent {
     });
   }
 
-  getDeliveryConf=()=> {
+  getDeliveryConf = () => {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let showBtn = this.props.route.params.showBtn;
       if (tool.length(response.bind_info) > 0) {
@@ -127,8 +118,8 @@ class SeetingDeliveryInfo extends PureComponent {
     })
   }
 
-  onBindDelivery=() =>{
-    const {auto_call,ship_ways,zs_way,max_call_time,deploy_time}=this.state
+  onBindDelivery = () => {
+    const {auto_call, ship_ways, zs_way, max_call_time, deploy_time} = this.state
     if (auto_call && ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
@@ -164,8 +155,8 @@ class SeetingDeliveryInfo extends PureComponent {
     }, 1000)
   }
 
-  get_time_interval=()=> {
-    const{ship_ways,max_call_time}=this.state
+  get_time_interval = () => {
+    const {ship_ways, max_call_time} = this.state
     if (ship_ways.length === 0 || max_call_time === 0) {
       return max_call_time + "分"
     }
@@ -193,7 +184,7 @@ class SeetingDeliveryInfo extends PureComponent {
     });
   }
 
-  onValueChange=(saveBtnStatus,res)=>{
+  onValueChange = (saveBtnStatus, res) => {
     if (saveBtnStatus === 0) {
       this.setState({auto_call: res, saveBtnStatus: 1}, () => {
         if (res === false) {
@@ -210,7 +201,7 @@ class SeetingDeliveryInfo extends PureComponent {
     }
   }
 
-  onChange=(event,item)=>{
+  onChange = (event, item) => {
     let {ship_ways, ship_ways_name} = this.state;
     if (event.target.checked) {
       ship_ways.push(item.id);
@@ -234,8 +225,8 @@ class SeetingDeliveryInfo extends PureComponent {
     })
   }
 
-  convertShowText=(length)=>{
-    if(length===0)
+  convertShowText = (length) => {
+    if (length === 0)
       return '没有勾选'
     return `勾选${length}方`
   }
@@ -271,7 +262,7 @@ class SeetingDeliveryInfo extends PureComponent {
           <View style={styles.titleItemWrap}>
             <View style={styles.titleWrap}>
               <Text style={{color: colors.color333}}>自动呼叫配送 </Text>
-              <Switch value={auto_call} onValueChange={(res) => this.onValueChange(saveBtnStatus,res)}/>
+              <Switch value={auto_call} onValueChange={(res) => this.onValueChange(saveBtnStatus, res)}/>
             </View>
           </View>
 
@@ -282,14 +273,26 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Text style={{color: colors.color333, fontWeight: "bold", fontSize: 16}}>开始发单时间 </Text>
               </View>
 
-              <View style={{flexDirection: "column", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+              <View style={{
+                flexDirection: "column",
+                borderBottomColor: colors.colorEEE,
+                borderBottomWidth: 1,
+                paddingHorizontal: 15,
+                paddingVertical: 10
+              }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                   <Text style={{color: colors.color333}}>及时单 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Text style={{color: colors.color333, marginRight: 10}}>下单</Text>
                     <TextInput placeholder="0"
                                underlineColorAndroid="transparent"
-                               style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                               style={{
+                                 height: 40,
+                                 borderWidth: 1,
+                                 borderColor: colors.colorDDD,
+                                 width: 80,
+                                 borderRadius: 5
+                               }}
                                placeholderTextColor={'#ddd'}
                                keyboardType={'numeric'}
                                value={deploy_time}
@@ -302,7 +305,12 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Text style={{color: '#DD2525', marginTop: 10}}>接到订单{deploy_time}分钟后自动呼叫骑手 </Text>
               </View>
 
-              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 15}}>
+              <View style={{
+                borderBottomColor: colors.colorEEE,
+                borderBottomWidth: 1,
+                paddingHorizontal: 15,
+                paddingVertical: 15
+              }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                   <Text style={{color: colors.color333}}>预订单 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -312,13 +320,24 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{order_require_minutes}分钟后自动呼叫骑手 </Text>
               </View>
 
-              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+              <View style={{
+                borderBottomColor: colors.colorEEE,
+                borderBottomWidth: 1,
+                paddingHorizontal: 15,
+                paddingVertical: 10
+              }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                   <Text style={{color: colors.color333}}>最长呼单时间 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <TextInput placeholder="0"
                                underlineColorAndroid="transparent"
-                               style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                               style={{
+                                 height: 40,
+                                 borderWidth: 1,
+                                 borderColor: colors.colorDDD,
+                                 width: 80,
+                                 borderRadius: 5
+                               }}
                                placeholderTextColor={'#ddd'}
                                keyboardType={'numeric'}
                                value={max_call_time}
@@ -333,14 +352,22 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{max_call_time}分钟后没有骑手接单会提示异常单 </Text>
               </View>
 
-              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 20}}>
+              <View style={{
+                borderBottomColor: colors.colorEEE,
+                borderBottomWidth: 1,
+                paddingHorizontal: 15,
+                paddingVertical: 20
+              }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                   <Text style={{color: colors.color333}}>发单间隔 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Text style={{color: colors.color333}}>{time_interval}</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>您{this.convertShowText(ship_ways.length)}配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟 </Text>
+                <Text style={{
+                  color: '#DD2525',
+                  marginTop: 10
+                }}>您{this.convertShowText(ship_ways.length)}配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟 </Text>
               </View>
 
             </View>
@@ -351,27 +378,27 @@ class SeetingDeliveryInfo extends PureComponent {
               <For index="idx" each='item' of={menus}>
                 <View style={styles.itemWrap} key={idx}>
                   {
-                    item.is_preference && item.is_preference === true  ?
-                        <View style={{flexDirection: "row", alignItems: 'center'}}>
-                          <Text style={{fontSize: pxToDp(32)}}>{item.name} </Text>
-                          <View style={{
-                            backgroundColor: '#59B26A',
-                            borderRadius: pxToDp(5),
-                            paddingVertical: pxToDp(5),
-                            paddingHorizontal: pxToDp(10),
-                            marginLeft: pxToDp(20)
-                          }}>
-                            <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
-                          </View>
-                        </View> :
-                        <View style={{flexDirection: "row", alignItems: 'center'}}>
-                          <Text style={{color: colors.color333}}>{item.name} </Text>
+                    item.is_preference && item.is_preference === true ?
+                      <View style={{flexDirection: "row", alignItems: 'center'}}>
+                        <Text style={{fontSize: pxToDp(32)}}>{item.name} </Text>
+                        <View style={{
+                          backgroundColor: '#59B26A',
+                          borderRadius: pxToDp(5),
+                          paddingVertical: pxToDp(5),
+                          paddingHorizontal: pxToDp(10),
+                          marginLeft: pxToDp(20)
+                        }}>
+                          <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
                         </View>
+                      </View> :
+                      <View style={{flexDirection: "row", alignItems: 'center'}}>
+                        <Text style={{color: colors.color333}}>{item.name} </Text>
+                      </View>
                   }
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <CheckboxItem
-                        checked={ship_ways.find(value => value === item.id)}
-                        onChange={event => this.onChange(event,item)}
+                      checked={ship_ways.find(value => value === item.id)}
+                      onChange={event => this.onChange(event, item)}
                     />
                   </View>
                 </View>
@@ -414,13 +441,13 @@ class SeetingDeliveryInfo extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  titleItemWrap:{
+  titleItemWrap: {
     backgroundColor: colors.white,
     width: '96%',
     margin: '2%',
     borderRadius: 10
   },
-  titleWrap:{
+  titleWrap: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -429,14 +456,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10
   },
-    container: {
-      marginBottom: pxToDp(22),
-      backgroundColor: colors.f7
-    },
-  areaWrap:{
+  container: {
+    marginBottom: pxToDp(22),
+    backgroundColor: colors.f7
+  },
+  areaWrap: {
     backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10
   },
-  shipWrap:{
+  shipWrap: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -445,10 +472,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10
   },
-  shipText:{
+  shipText: {
     color: colors.color333, fontWeight: "bold", fontSize: 16
   },
-  itemWrap:{
+  itemWrap: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -457,84 +484,84 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5
   },
-    btn_select: {
-      marginRight: pxToDp(20),
-      height: pxToDp(60),
-      width: pxToDp(60),
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      textAlign: "center",
-      textAlignVertical: "center"
-    },
-    cell_title: {
-      marginBottom: pxToDp(10),
-      fontSize: pxToDp(26),
-      color: colors.color999
-    },
-    cell_box: {
-      marginLeft: "2%",
-      marginRight: "2%",
-      marginTop: 5,
-      borderRadius: pxToDp(30)
-    },
-    cell_row: {
-      height: pxToDp(90),
-      justifyContent: "center"
-    },
-    cell_input: {
-      fontSize: pxToDp(30),
-      height: pxToDp(70),
-      borderWidth: pxToDp(1),
-      width: pxToDp(100),
-      paddingTop: pxToDp(13),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
+  btn_select: {
+    marginRight: pxToDp(20),
+    height: pxToDp(60),
+    width: pxToDp(60),
+    fontSize: pxToDp(40),
+    color: colors.color666,
+    textAlign: "center",
+    textAlignVertical: "center"
+  },
+  cell_title: {
+    marginBottom: pxToDp(10),
+    fontSize: pxToDp(26),
+    color: colors.color999
+  },
+  cell_box: {
+    marginLeft: "2%",
+    marginRight: "2%",
+    marginTop: 5,
+    borderRadius: pxToDp(30)
+  },
+  cell_row: {
+    height: pxToDp(90),
+    justifyContent: "center"
+  },
+  cell_input: {
+    fontSize: pxToDp(30),
+    height: pxToDp(70),
+    borderWidth: pxToDp(1),
+    width: pxToDp(100),
+    paddingTop: pxToDp(13),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
 
-    cell_inputs: {
-      textAlign: 'center',
-      fontSize: pxToDp(30),
-      height: pxToDp(90),
-      borderWidth: pxToDp(1),
-      width: pxToDp(100),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
-    cell_label: {
-      width: pxToDp(234),
-      fontSize: pxToDp(30),
-      fontWeight: "bold",
-      color: colors.color333
-    },
-    btn_submit: {
-      backgroundColor: '#808080',
-      marginHorizontal: pxToDp(30),
-      borderRadius: pxToDp(20),
-      textAlign: 'center',
-      height: pxToDp(65),
-      marginBottom: pxToDp(70),
-    },
-    map_icon: {
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      height: pxToDp(60),
-      width: pxToDp(40),
-      textAlignVertical: "center"
-    },
-    body_text: {
-      paddingLeft: pxToDp(8),
-      fontSize: pxToDp(30),
-      color: colors.color333,
-      height: pxToDp(60),
-      textAlignVertical: "center"
-    },
-    right_btn: {
-      fontSize: pxToDp(26),
-      margin: pxToDp(10),
-      color: colors.color999,
-      paddingTop: pxToDp(3),
-      marginLeft: 0,
-    },
-  });
+  cell_inputs: {
+    textAlign: 'center',
+    fontSize: pxToDp(30),
+    height: pxToDp(90),
+    borderWidth: pxToDp(1),
+    width: pxToDp(100),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
+  cell_label: {
+    width: pxToDp(234),
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    color: colors.color333
+  },
+  btn_submit: {
+    backgroundColor: '#808080',
+    marginHorizontal: pxToDp(30),
+    borderRadius: pxToDp(20),
+    textAlign: 'center',
+    height: pxToDp(65),
+    marginBottom: pxToDp(70),
+  },
+  map_icon: {
+    fontSize: pxToDp(40),
+    color: colors.color666,
+    height: pxToDp(60),
+    width: pxToDp(40),
+    textAlignVertical: "center"
+  },
+  body_text: {
+    paddingLeft: pxToDp(8),
+    fontSize: pxToDp(30),
+    color: colors.color333,
+    height: pxToDp(60),
+    textAlignVertical: "center"
+  },
+  right_btn: {
+    fontSize: pxToDp(26),
+    margin: pxToDp(10),
+    color: colors.color999,
+    paddingTop: pxToDp(3),
+    marginLeft: 0,
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeetingDeliveryInfo);

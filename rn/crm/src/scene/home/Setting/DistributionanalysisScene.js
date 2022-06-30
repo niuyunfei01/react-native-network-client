@@ -256,17 +256,24 @@ class DistributionanalysisScene extends PureComponent {
           style={{backgroundColor: colors.main_back}}>
           <View style={[styles.cell_box_header, {marginBottom: 10, paddingVertical: 10}]}>
             <For index='i' each='info' of={Cts.PLAT_ARRAY}>
-              <TouchableOpacity key={i} style={[this.state.filterPlatform === info.id ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, this.state.filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]} onPress={() => this.setFilterPlatform(info.id)}>
-                <Text style={{ fontSize: 12, color: this.state.filterPlatform === info.id ? colors.white : colors.fontBlack}}>{info.label}</Text>
+              <TouchableOpacity key={i}
+                                style={[this.state.filterPlatform === info.id ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, this.state.filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
+                                onPress={() => this.setFilterPlatform(info.id)}>
+                <Text style={{
+                  fontSize: 12,
+                  color: this.state.filterPlatform === info.id ? colors.white : colors.fontBlack
+                }}>{info.label}</Text>
               </TouchableOpacity>
             </For>
           </View>
           <View style={[styles.cell_box_header]}>
             <For index='i' each='info' of={timeOptions}>
-              <View style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
-                <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
-                  this.setLeftDateStatus(info.value)
-                }}> {info.label} </Text>
+              <View key={i} style={{flexDirection: "column", marginVertical: pxToDp(15), alignItems: "center"}}>
+                <Text
+                  style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1}
+                  onPress={() => {
+                    this.setLeftDateStatus(info.value)
+                  }}> {info.label} </Text>
               </View>
             </For>
           </View>
@@ -364,10 +371,12 @@ class DistributionanalysisScene extends PureComponent {
         >
           <View style={[styles.cell_box_header]}>
             <For index='i' each='info' of={timeOptions}>
-              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-                <Text style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1} onPress={() => {
-                  this.setRightDateStatus(info.value)
-                }}> {info.label} </Text>
+              <View key={i} style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text
+                  style={this.state.dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1}
+                  onPress={() => {
+                    this.setRightDateStatus(info.value)
+                  }}> {info.label} </Text>
               </View>
             </For>
           </View>

@@ -32,7 +32,7 @@ class SearchPopup extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({dataSource: nextProps.dataSource})
   }
 

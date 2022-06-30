@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
@@ -47,12 +47,13 @@ import NextSchedule from "./_Mine/NextSchedule";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
 import JbbText from "../../common/component/JbbText";
-import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
+import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {simpleStore} from "../../../pubilc/util/tool";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -171,7 +172,11 @@ class MineScene extends PureComponent {
       order_num_new: '',
       is_mgr: false,
       showRecord: false,
-      wsb_store_account: 0
+      wsb_store_account: 0,
+      have_not_read_advice: 0,
+      show_call_service_modal: false,
+      is_self_yy: false,
+      contacts: '',
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -205,10 +210,11 @@ class MineScene extends PureComponent {
     // this._doChangeStore(currStoreId)
     this.registerJpush();
     this.getActivity();
-    this.getStoreTurnover()
+    this.getStoreTurnover();
+    this.getHaveNotReadAdvice();
   }
 
-  getStoreList() {
+  getStoreList = () => {
     const {accessToken, currStoreId} = this.props.global;
     let {md5_read_stores} = this.props.global.config;
     const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
@@ -220,7 +226,7 @@ class MineScene extends PureComponent {
     })
   }
 
-  getStoreTurnover() {
+  getStoreTurnover = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `v1/new_api/stores/get_store_turnover/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
@@ -232,12 +238,27 @@ class MineScene extends PureComponent {
     })
   }
 
-  onRefresh() {
-    this.getStoreList();
-    this.getStoreTurnover()
+  getHaveNotReadAdvice = () => {
+    const {accessToken, currStoreId, currentUser} = this.props.global
+    const api = `/v1/new_api/advice/haveNotReadAdvice`
+    HttpUtils.get.bind(this.props)(api, {
+      store_id: currStoreId,
+      access_token: accessToken,
+      uid: currentUser
+    }).then((res) => {
+      this.setState({
+        have_not_read_advice: res.have_not_read && res.have_not_read == 1
+      })
+    })
   }
 
-  onGetUserInfo(uid) {
+  onRefresh = () => {
+    this.getStoreList();
+    this.getStoreTurnover();
+    this.getHaveNotReadAdvice();
+  }
+
+  onGetUserInfo = (uid) => {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
@@ -254,7 +275,7 @@ class MineScene extends PureComponent {
   }
 
 
-  onGetUserCount() {
+  onGetUserCount = () => {
     const {currentUser, accessToken} = this.props.global;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
@@ -273,7 +294,7 @@ class MineScene extends PureComponent {
     });
   }
 
-  onGetDutyUser() {
+  onGetDutyUser = () => {
     const {accessToken, currStoreId} = this.props.global;
     let _this = this;
     const {dispatch} = this.props;
@@ -291,7 +312,7 @@ class MineScene extends PureComponent {
     });
   }
 
-  getNotifyCenter() {
+  getNotifyCenter = () => {
     let _this = this;
     const {currStoreId, accessToken} = this.props.global;
     const url = `api/notify_center/${currStoreId}.json?access_token=${accessToken}`;
@@ -305,7 +326,7 @@ class MineScene extends PureComponent {
       })
   }
 
-  getStoreDataOfMine(store_id = 0) {
+  getStoreDataOfMine = (store_id = 0) => {
     const access_token = this.props.global.accessToken
     if (store_id <= 0) {
       store_id = this.props.global.currStoreId
@@ -319,7 +340,9 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
-        showRecord: res.show_questionnaire && res.show_questionnaire
+        showRecord: res.show_questionnaire && res.show_questionnaire,
+        is_self_yy: res.customer_service_auth !== undefined ? res.customer_service_auth?.is_self_yy : false,
+        contacts: res.customer_service_auth !== undefined ? res.customer_service_auth?.contacts : "",
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
@@ -340,7 +363,7 @@ class MineScene extends PureComponent {
     })
   }
 
-  onGetStoreTurnover(currStoreId, fnPriceControlled) {
+  onGetStoreTurnover = (currStoreId, fnPriceControlled) => {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
 
@@ -383,7 +406,7 @@ class MineScene extends PureComponent {
     });
   }
 
-  callCustomerService() {
+  callCustomerService = () => {
     let server_info = tool.server_info(this.props);
     let dutyUsers = this.state.dutyUsers;
     if (dutyUsers && Array.isArray(dutyUsers) && dutyUsers.length > 0) {
@@ -468,7 +491,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  registerJpush() {
+  registerJpush = () => {
     const {currentUser} = this.props.global
     let date = Math.round(new Date() / 1000)
     if (currentUser) {
@@ -482,7 +505,7 @@ class MineScene extends PureComponent {
     }
   }
 
-  _doChangeStore(store_id) {
+  _doChangeStore = (store_id) => {
     if (this.state.onStoreChanging) {
       return false;
     }
@@ -537,10 +560,10 @@ class MineScene extends PureComponent {
     }
   }
 
-  getTimeoutCommonConfig(store_id,
-                         should_refresh = false,
-                         callback = () => {
-                         }) {
+  getTimeoutCommonConfig = (store_id,
+                            should_refresh = false,
+                            callback = () => {
+                            }) => {
     const {accessToken, last_get_cfg_ts} = this.props.global;
     let diff_time = dayjs(new Date()).unix() - last_get_cfg_ts;
 
@@ -552,13 +575,14 @@ class MineScene extends PureComponent {
     }
   }
 
-  onCanChangeStore(store_id) {
+  onCanChangeStore = (store_id) => {
     const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
+    const {dispatch,global} = this.props;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
+          simpleStore(global, dispatch,store_id)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
@@ -581,7 +605,7 @@ class MineScene extends PureComponent {
     })
   }
 
-  renderHeader() {
+  renderHeader = () => {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
     let {currStoreName, is_mgr} = this.state
@@ -625,7 +649,7 @@ class MineScene extends PureComponent {
           </View>
           <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
-              <Icon name="exchange" style={header_styles.change_shop}/>
+              <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
             </View>
           </TouchableOpacity>
@@ -647,7 +671,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderManager() {
+  renderManager = () => {
     let {
       order_num,
       turnover,
@@ -713,7 +737,7 @@ class MineScene extends PureComponent {
                   >
                     预计最低收益: {!isNaN(turnover) && "¥"}
                     {turnover}&nbsp;
-                    <Icon
+                    <FontAwesome
                       name="question-circle"
                       style={{fontSize: pxToEm(30), color: "#00aeff"}}
                     />
@@ -732,14 +756,15 @@ class MineScene extends PureComponent {
               </Text>
             }
           </View>
-          {this.state.wsb_store_account === 1 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
-                                                   style={{
-                                                     marginTop: pxToDp(45),
-                                                     marginLeft: pxToDp(25),
-                                                     position: "absolute",
-                                                     top: 0,
-                                                     right: 40
-                                                   }}>
+          {this.state.wsb_store_account === 1 &&
+          <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
+                            style={{
+                              marginTop: pxToDp(45),
+                              marginLeft: pxToDp(25),
+                              position: "absolute",
+                              top: 0,
+                              right: 40
+                            }}>
             <View style={{
               width: pxToDp(96),
               height: pxToDp(46),
@@ -763,7 +788,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderWorker() {
+  renderWorker = () => {
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -883,51 +908,7 @@ class MineScene extends PureComponent {
               </TouchableOpacity>
             </View>
           </Dialog>
-          <BottomModal
-            title={'有奖问卷调研'}
-            actionText={'领取'}
-            btnStyle={{
-              backgroundColor: colors.white,
-            }}
-            btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
-            closeText={'下班再看'}
-            closeBtnStyle={{
-              borderColor: colors.fontColor,
-              borderRightWidth: pxToDp(1)
-            }}
-            btnBottomStyle={{
-              borderTopWidth: pxToDp(1),
-              borderColor: colors.fontColor,
-              paddingBottom: 0,
-            }}
-            onPressClose={() => {
-              store.dispatch(setRecordFlag(true))
-              this.setState({
-                showRecord: false,
-              })
-              this.recordQuestionFirstShow(1)
-            }}
-            onPress={() => {
-              this.recordQuestionFirstShow(0)
-              this.setState({
-                showRecord: false,
-              })
-              let url = 'https://jinshuju.net/f/ObTCwq';
-              this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
-            }}
-            visible={this.state.showRecord}
-            onClose={() => this.setState({
-              showRecord: false,
-            })}
-          >
-            <Text style={{
-              color: 'red',
-              fontWeight: 'bold',
-              fontSize: 16,
-              margin: 10,
-              textAlign: 'center'
-            }}>运营邀请您领取1000元现金红包</Text>
-          </BottomModal>
+          {this.renderModal()}
         </ScrollView>
         <SearchStore visible={this.state.searchStoreVisible}
                      onClose={() => this.setState({searchStoreVisible: false})}
@@ -939,7 +920,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  onPress(route, params = {}) {
+  onPress = (route, params = {}) => {
     if (route === Config.ROUTE_GOODS_COMMENT) {
       native.toUserComments();
       return;
@@ -947,7 +928,7 @@ class MineScene extends PureComponent {
     this.props.navigation.navigate(route, params);
   }
 
-  renderStoreBlock() {
+  renderStoreBlock = () => {
     const {
       // show_activity_mgr = false,
       show_goods_monitor = false,
@@ -961,8 +942,10 @@ class MineScene extends PureComponent {
       is_helper,
       is_service_mgr,
       fnPriceControlled,
-      fnProfitControlled
+      fnProfitControlled,
+      have_not_read_advice
     } = this.state
+    const {fn_stall} = this.props.global.simpleStore
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
@@ -1110,7 +1093,7 @@ class MineScene extends PureComponent {
         )}
         {this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn : this.state.wsb_store_account})}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../../img/My/yunyingshouyi_.png")}/>
@@ -1207,6 +1190,28 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={[block_styles.block_box, {position: "relative"}]}
+          onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
+          activeOpacity={customerOpacity}>
+          {have_not_read_advice > 0 && <View style={[block_styles.notice_point]}/>}
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/inform.png")}
+          />
+          <Text style={[block_styles.block_name]}>公告通知</Text>
+        </TouchableOpacity>
+        <If condition={fn_stall === '1'}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
+            activeOpacity={customerOpacity}>
+            <View style={block_styles.iconWrap}>
+              <FontAwesome5 name={'wallet'} size={16} color={colors.white}/>
+            </View>
+            <Text style={[block_styles.block_name]}>摊位结算 </Text>
+          </TouchableOpacity>
+        </If>
         {this.state.show_activity && GlobalUtil.getRecommend() ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
@@ -1223,7 +1228,7 @@ class MineScene extends PureComponent {
   }
 
 
-  getActivity() {
+  getActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
@@ -1242,8 +1247,7 @@ class MineScene extends PureComponent {
     })
   }
 
-  renderVersionBlock() {
-    let server_info = tool.server_info(this.props);
+  renderVersionBlock = () => {
     const {
       show_expense_center = false,
     } = this.props.global.config;
@@ -1278,15 +1282,7 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let {currVendorId} = tool.vendor(this.props.global)
-            let data = {
-              v: currVendorId,
-              s: this.props.global.currStoreId,
-              u: this.props.global.currentUser,
-              m: this.props.global.currentUserProfile.mobilephone,
-              place: 'mine'
-            }
-            JumpMiniProgram("/pages/service/index", data);
+            this.oncallservice();
             // this.callCustomerService()
           }}
           activeOpacity={customerOpacity}>
@@ -1321,8 +1317,28 @@ class MineScene extends PureComponent {
       </View>
     );
   }
+  oncallservice = () => {
+    if (!this.state.is_self_yy) {
+      return this.setState({
+        show_call_service_modal: true
+      })
+    }
+    this.openMiniprogarm()
+  }
 
-  renderCopyRight() {
+  openMiniprogarm = () => {
+    let {currVendorId} = tool.vendor(this.props.global)
+    let data = {
+      v: currVendorId,
+      s: this.props.global.currStoreId,
+      u: this.props.global.currentUser,
+      m: this.props.global.currentUserProfile.mobilephone,
+      place: 'mine'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
+  renderCopyRight = () => {
     const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
     return (
       <View style={[css]}>
@@ -1333,7 +1349,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderDirectBlock() {
+  renderDirectBlock = () => {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currStoreId, currVendorId} = this.state;
     let {global, dispatch} = this.props;
@@ -1513,7 +1529,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderZtBlock() {
+  renderZtBlock = () => {
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity
@@ -1530,6 +1546,117 @@ class MineScene extends PureComponent {
       </View>
     )
   }
+
+  renderModal = () => {
+    return (
+      <View style={[block_styles.container]}>
+        <BottomModal
+          title={'有奖问卷调研'}
+          actionText={'领取'}
+          btnStyle={{
+            backgroundColor: colors.white,
+          }}
+          btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
+          closeText={'下班再看'}
+          closeBtnStyle={{
+            borderColor: colors.fontColor,
+            borderRightWidth: pxToDp(1)
+          }}
+          btnBottomStyle={{
+            borderTopWidth: pxToDp(1),
+            borderColor: colors.fontColor,
+            paddingBottom: 0,
+          }}
+          onPressClose={() => {
+            store.dispatch(setRecordFlag(true))
+            this.setState({
+              showRecord: false,
+            })
+            this.recordQuestionFirstShow(1)
+          }}
+          onPress={() => {
+            this.recordQuestionFirstShow(0)
+            this.setState({
+              showRecord: false,
+            })
+            let url = 'https://jinshuju.net/f/ObTCwq';
+            this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+          }}
+          visible={this.state.showRecord}
+          onClose={() => this.setState({
+            showRecord: false,
+          })}
+        >
+          <Text style={{
+            color: 'red',
+            fontWeight: 'bold',
+            fontSize: 16,
+            margin: 10,
+            textAlign: 'center'
+          }}>运营邀请您领取1000元现金红包</Text>
+        </BottomModal>
+
+        <BottomModal title={'提示'} actionText={'其他问题'} closeText={'配送问题'} onPress={this.callService}
+                     onPressClose={() => this.oncloseCallModal(1)}
+                     visible={this.state.show_call_service_modal}
+                     btnBottomStyle={{
+                       borderTopWidth: 1,
+                       borderTopColor: "#E5E5E5",
+                     }}
+                     closeBtnStyle={{
+                       borderWidth: 0,
+                       borderRadius: 0,
+                       borderRightWidth: 1,
+                       borderColor: "#E5E5E5",
+                     }}
+                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
+                     closeBtnTitleStyle={{color: colors.color333}}
+                     btnTitleStyle={{color: colors.main_color}} onClose={this.oncloseCallModal}>
+          <View style={{
+            marginHorizontal: 20,
+            marginVertical: 8
+          }}>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}>您的问题是：</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+              marginVertical: 4,
+            }}> 配送问题：请点击配送问题，联系客服</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}> 其他问题：请点击其他问题或通过其他方式联系店铺运营 </Text>
+          </View>
+        </BottomModal>
+      </View>
+    )
+  }
+
+  oncloseCallModal = (e = 0) => {
+    this.setState({
+      show_call_service_modal: false
+    })
+    if (e === 1) {
+      this.openMiniprogarm()
+    }
+  }
+
+
+  callService = () => {
+    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
+      this.setState({
+        show_call_service_modal: false
+      }, () => {
+        native.dialNumber(this.state.contacts);
+      })
+    } else {
+      ToastLong("号码为空")
+    }
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -1704,6 +1831,16 @@ const block_styles = StyleSheet.create({
     borderColor: colors.main_back,
     borderWidth: pxToDp(1),
     alignItems: "center"
+  },
+  iconWrap: {
+    borderRadius: 4,
+    marginTop: pxToDp(30),
+    marginBottom: pxToDp(16),
+    width: pxToDp(60),
+    height: pxToDp(60),
+    backgroundColor: '#F5A61B',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   block_img: {
     marginTop: pxToDp(30),

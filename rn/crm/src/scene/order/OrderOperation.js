@@ -355,7 +355,7 @@ class OrderOperation extends Component {
           customHeaderIOS={() => {
             return (<View/>)
           }}
-          date={new Date(this.state.order.expectTime)}
+          date={new Date()}
           mode='datetime'
           isVisible={this.state.isEndVisible}
           onConfirm={(date) => {
@@ -375,6 +375,7 @@ class OrderOperation extends Component {
           {this.state.ActionSheet.map((item, idx) => {
             return (
               <CheckBox
+                key={idx}
                 left
                 title={item.label}
 
@@ -428,6 +429,7 @@ class OrderOperation extends Component {
         isEndVisible: true,
       });
     } else if (option.key === MENU_EDIT_STORE) {
+      GlobalUtil.setOrderFresh(1)
       navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order});
     } else if (option.key === MENU_FEEDBACK) {
       const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id

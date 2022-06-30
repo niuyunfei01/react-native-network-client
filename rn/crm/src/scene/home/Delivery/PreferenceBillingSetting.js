@@ -108,7 +108,7 @@ class PreferenceBillingSetting extends PureComponent {
       ship_ways: selectArr,
       keep_min: deploy_time,
       sync_all: checked_item ? 1 : 0,
-      is_open: auto_call ? 1: 0
+      is_open: auto_call ? 1 : 0
     }).then(res => {
       showSuccess('设置成功,即将返回上一页')
       setTimeout(() => {
@@ -139,7 +139,20 @@ class PreferenceBillingSetting extends PureComponent {
                     showsVerticalScrollIndicator={false}
         >
 
-          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: colors.white, width: '96%', borderRadius: 10, marginLeft: '2%', marginTop: 10}}>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottomColor: colors.colorEEE,
+            borderBottomWidth: 1,
+            paddingHorizontal: 15,
+            paddingVertical: 10,
+            backgroundColor: colors.white,
+            width: '96%',
+            borderRadius: 10,
+            marginLeft: '2%',
+            marginTop: 10
+          }}>
             <Text style={{color: colors.color333}}>偏好发单设置 </Text>
             <Switch value={this.state.auto_call}
                     onValueChange={(res) => {
@@ -156,94 +169,94 @@ class PreferenceBillingSetting extends PureComponent {
           </View>
 
           <If condition={this.state.auto_call}>
-          <For index="idx" each='item' of={menus}>
+            <For index="idx" each='item' of={menus}>
+              <Cells style={{
+                marginLeft: "2%",
+                marginRight: "2%",
+                marginTop: 5,
+                borderRadius: pxToDp(20),
+                borderColor: colors.white
+              }} key={idx}>
+                <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
+                  <CellBody>
+                    <Text style={{color: colors.color333}}>{item.name} </Text>
+                  </CellBody>
+                  <CellFooter>
+                    <CheckBox
+                      checked={item.checked}
+                      checkedColor={colors.main_color}
+                      onPress={() => {
+                        let menu = [...this.state.menus]
+                        menu[idx].checked = menu[idx].checked ? false : true;
+                        this.setState({
+                          menus: menu
+                        })
+                        if (menu[idx].checked) {
+                          selectArr.push(item.id)
+                        } else {
+                          selectArr.splice(selectArr.findIndex(index => Number(index) == item.id), 1)
+                        }
+                      }}
+                    />
+                  </CellFooter>
+                </Cell>
+              </Cells>
+            </For>
+            <View style={{marginVertical: pxToDp(5)}}></View>
+            <CellsTitle style={styles.cell_title}><Text style={{
+              fontSize: pxToDp(22),
+              color: colors.warn_color
+            }}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
+            <Cells style={{
+              marginLeft: "2%",
+              marginRight: "2%",
+              marginBottom: "2%",
+              marginTop: 5,
+              borderColor: colors.white,
+              borderRadius: pxToDp(20)
+            }}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  发单时间
+                </CellBody>
+                <CellFooter>
+                  <Input onChangeText={(deploy_time) => {
+                    this.setState({deploy_time})
+                  }}
+                         value={deploy_time}
+                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                         placeholder=""
+                         underlineColorAndroid='transparent'
+                  />
+                  <Text style={{color: colors.color333}}>分钟</Text>
+                </CellFooter>
+              </Cell>
+            </Cells>
+
             <Cells style={{
               marginLeft: "2%",
               marginRight: "2%",
               marginTop: 5,
               borderRadius: pxToDp(20),
               borderColor: colors.white
-            }} key={idx}>
+            }}>
               <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                 <CellBody>
-                  <Text style={{color: colors.color333}}>{item.name} </Text>
+                  将发单偏好应用到所有的外卖店铺
                 </CellBody>
                 <CellFooter>
                   <CheckBox
-                    checked={item.checked}
+                    checked={checked_item}
                     checkedColor={colors.main_color}
                     onPress={() => {
-                      let menu = [...this.state.menus]
-                      menu[idx].checked = menu[idx].checked ? false : true;
                       this.setState({
-                        menus: menu
+                        checked_item: !checked_item
                       })
-                      if (menu[idx].checked) {
-                        selectArr.push(item.id)
-                      } else {
-                        selectArr.splice(selectArr.findIndex(index => Number(index) == item.id), 1)
-                      }
                     }}
                   />
                 </CellFooter>
               </Cell>
             </Cells>
-          </For>
-          <View style={{marginVertical: pxToDp(5)}}></View>
-          <CellsTitle style={styles.cell_title}><Text style={{
-            fontSize: pxToDp(22),
-            color: colors.warn_color
-          }}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
-          <Cells style={{
-            marginLeft: "2%",
-            marginRight: "2%",
-            marginBottom: "2%",
-            marginTop: 5,
-            borderColor: colors.white,
-            borderRadius: pxToDp(20)
-          }}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                发单时间
-              </CellBody>
-              <CellFooter>
-                <Input onChangeText={(deploy_time) => {
-                  this.setState({deploy_time})
-                }}
-                       value={deploy_time}
-                       style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                       placeholder=""
-                       underlineColorAndroid='transparent'
-                />
-                <Text style={{color: colors.color333}}>分钟</Text>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
-          <Cells style={{
-            marginLeft: "2%",
-            marginRight: "2%",
-            marginTop: 5,
-            borderRadius: pxToDp(20),
-            borderColor: colors.white
-          }}>
-            <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
-              <CellBody>
-                将发单偏好应用到所有的外卖店铺
-              </CellBody>
-              <CellFooter>
-                <CheckBox
-                  checked={checked_item}
-                  checkedColor={colors.main_color}
-                  onPress={() => {
-                    this.setState({
-                      checked_item: !checked_item
-                    })
-                  }}
-                />
-              </CellFooter>
-            </Cell>
-          </Cells>
           </If>
         </ScrollView>
         <If condition={this.state.auto_call}>

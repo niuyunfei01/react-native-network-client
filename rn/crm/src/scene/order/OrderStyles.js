@@ -2,6 +2,7 @@ import {StyleSheet,} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
 import screen from '../../pubilc/util/screen'
+import pxToEm from "../../pubilc/util/pxToEm";
 
 const styles = StyleSheet.create({
   container: {
@@ -51,12 +52,20 @@ const styles = StyleSheet.create({
   moneyLeft: {
     width: pxToDp(480),
     flexDirection: 'row',
+    justifyContent: "flex-start"
   },
   moneyRow: {marginTop: 0, marginBottom: pxToDp(12), alignItems: 'center'},
+  moneyLabel: {
+    marginTop: pxToDp(12),
+    flexDirection: 'row',
+    alignContent: 'center',
+  },
   moneyListTitle: {
     fontSize: pxToDp(26),
     color: colors.color333,
   },
+  w480: {width: pxToDp(480)},
+  moneyRightTitle: {fontSize: pxToEm(20), flex: 1, marginTop: pxToDp(5), color: colors.color777},
   moneyListSub: {
     fontSize: pxToDp(26),
     color: colors.main_color,
@@ -125,7 +134,14 @@ const styles = StyleSheet.create({
     paddingBottom: pxToDp(14),
     borderBottomColor: colors.color999,
     borderBottomWidth: screen.onePixel
-  }
+  },
+  flex1: {
+    flex: 1
+  },
+  p20: {
+    padding: pxToDp(20)
+  },
+
 });
 
 export default styles;

@@ -6,6 +6,8 @@
 
 export default {
 
+  BUNDLE_VERSION: 3.162,//bundle文件的版本，每次升级需要修改，原生代码因为没有修改，每次获取到版本信息是不变的，无法升级bundle
+
   TASK_STATUS_WAITING: 0,//未处理
   TASK_STATUS_DONE: 1,//已处理
   TASK_STATUS_CONFIRMED: 2,//已确认
@@ -176,7 +178,7 @@ export default {
   GOODS_SEARCH_PAGE_NUM: 50,
 
   CODE_ACCESS_DENIED: 10001,
-  PLAT_ARRAY:  [
+  PLAT_ARRAY: [
     {label: '全部', id: 0},
     {label: '美团外卖', id: 3},
     {label: '饿了么', id: 4},

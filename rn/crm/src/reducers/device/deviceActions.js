@@ -15,7 +15,8 @@
  */
 const {
   SET_PLATFORM,
-  SET_VERSION
+  SET_VERSION,
+  SET_DEVICE_INFO
 } = require('../../pubilc/common/constants').default
 
 /**
@@ -37,5 +38,12 @@ export function setVersion(version) {
   return {
     type: SET_VERSION,
     payload: version
+  }
+}
+
+export function setDeviceInfo(deviceInfo) {
+  return {
+    type: SET_DEVICE_INFO,
+    deviceInfo: deviceInfo
   }
 }

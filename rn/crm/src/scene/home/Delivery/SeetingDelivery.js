@@ -421,8 +421,8 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
-              navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY,{
-                  ext_store_id: this.props.route.params.ext_store_id,
+              navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY, {
+                ext_store_id: this.props.route.params.ext_store_id,
               })
             }}>
               <CellBody>
@@ -442,7 +442,7 @@ class SeetingDelivery extends PureComponent {
     );
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'更换绑定'}

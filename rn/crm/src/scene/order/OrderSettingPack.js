@@ -2,15 +2,11 @@ import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CommonStyle from "../../pubilc/util/CommonStyles";
-
-import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
-import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
 import {DatePickerView} from "@ant-design/react-native"
 import {Input, TextArea} from "../../weui/index";
-import {userCanChangeStore} from "../../reducers/mine/mineActions";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
 import Dialog from "../common/component/Dialog";
@@ -18,6 +14,7 @@ import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pu
 import HttpUtils from "../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
 import {CheckBox} from 'react-native-elements';
+import * as globalActions from "../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   return {
@@ -25,22 +22,17 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps(dispatch) {
+const mapDispatchToProps = dispatch => {
   return {
-    dispatch,
-    ...bindActionCreators(
-      {saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder, userCanChangeStore},
-      dispatch
-    )
-  };
+    actions: bindActionCreators({...globalActions}, dispatch)
+  }
 }
 
+
 class OrderSettingScene extends Component {
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
     let {currStoreName} = tool.vendor(this.props.global);
-
-
     let {currStoreId, accessToken} = this.props.global
     this.state = {
       accessToken: accessToken,
@@ -86,10 +78,7 @@ class OrderSettingScene extends Component {
     }
   }
 
-  UNSAFE_componentWillMount() {
-  }
-
-  _toSetLocation() {
+  _toSetLocation = () => {
     const {location_long, location_lat, coordinates} = this.state
     let center = ""
     if (location_long && location_lat) {
@@ -125,21 +114,21 @@ class OrderSettingScene extends Component {
 
   }
 
-  onPress(route, params = {}) {
+  onPress = (route, params = {}) => {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
 
-  timeOutBack(time) {
+  timeOutBack = (time) => {
     let _this = this;
     setTimeout(() => {
       _this.props.navigation.goBack()
     }, time)
   }
 
-  showDatePicker() {
+  showDatePicker = () => {
     let {datePickerValue} = this.state
     return <View style={{marginTop: 12}}>
       <View style={styles.modalCancel}>
@@ -160,7 +149,7 @@ class OrderSettingScene extends Component {
     </View>
   }
 
-  onConfirm() {
+  onConfirm = () => {
     this.setState({
       showDateModal: false
     })
@@ -177,14 +166,14 @@ class OrderSettingScene extends Component {
     showSuccess("设置成功！")
   }
 
-  onRequestClose() {
+  onRequestClose = () => {
     this.setState({
       showDateModal: false,
       expect_time: ''
     })
   }
 
-  updateAddressBook() {
+  updateAddressBook = () => {
     const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, address} = this.state
     const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
     let params = {
@@ -203,7 +192,7 @@ class OrderSettingScene extends Component {
     })
   }
 
-  intelligentIdentification() {
+  intelligentIdentification = () => {
     const {smartText} = this.state
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
@@ -228,7 +217,7 @@ class OrderSettingScene extends Component {
     })
   }
 
-  orderToSave(status) {
+  orderToSave = (status) => {
     let {
       remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
@@ -300,11 +289,11 @@ class OrderSettingScene extends Component {
     })
   }
 
-  orderToSaveAndIssue() {
+  orderToSaveAndIssue = () => {
     this.orderToSave(0)
   }
 
-  onCallThirdShips(id, store_id) {
+  onCallThirdShips = (id, store_id) => {
     showModal('正在保存并发单，请稍等')
     const {addressId} = this.state
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {

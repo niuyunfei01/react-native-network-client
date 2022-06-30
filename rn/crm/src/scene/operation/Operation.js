@@ -301,35 +301,35 @@ class Operation extends BaseComponent {
               <Entypo name="chevron-right" style={styles.right_icon}/>
             </TouchableOpacity>
             <If condition={GlobalUtil.getRecommend()}>
-            <TouchableOpacity style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              borderRadius: pxToDp(15),
-              paddingHorizontal: pxToDp(10),
-              backgroundColor: colors.white,
-              alignItems: "center",
-              width: '98%',
-              marginLeft: '1%',
-              paddingVertical: '3%',
-              marginVertical: '2%'
-            }} onPress={() => {
-              let url = 'https://jinshuju.net/f/ObTCwq';
-              this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
-            }}>
-              <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
-              <View style={{flexDirection: "row"}}>
-                <View style={{
-                  backgroundColor: 'red',
-                  borderRadius: 30,
-                  paddingHorizontal: 5,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
-                  <Text style={{color: colors.white, fontSize: pxToDp(22)}}>领1000元红包</Text>
+              <TouchableOpacity style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                borderRadius: pxToDp(15),
+                paddingHorizontal: pxToDp(10),
+                backgroundColor: colors.white,
+                alignItems: "center",
+                width: '98%',
+                marginLeft: '1%',
+                paddingVertical: '3%',
+                marginVertical: '2%'
+              }} onPress={() => {
+                let url = 'https://jinshuju.net/f/ObTCwq';
+                this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+              }}>
+                <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
+                <View style={{flexDirection: "row"}}>
+                  <View style={{
+                    backgroundColor: 'red',
+                    borderRadius: 30,
+                    paddingHorizontal: 5,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <Text style={{color: colors.white, fontSize: pxToDp(22)}}>领1000元红包</Text>
+                  </View>
+                  <Entypo name="chevron-right" style={styles.right_icon}/>
                 </View>
-                <Entypo name="chevron-right" style={styles.right_icon}/>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
             </If>
           </View>
         </ScrollView>

@@ -1,15 +1,6 @@
 import React, {Component} from "react";
-import {
-  Alert,
-  Clipboard,
-  InteractionManager,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {Alert, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import Clipboard from '@react-native-community/clipboard';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -113,6 +104,9 @@ class StoreInfo extends Component {
       timemodalType: false,
       sale_category_name: "",
       sale_category: "",
+      bankcard_code: "",
+      bankcard_address: "",
+      bankcard_username: "",
       datePickerValue: new Date(),
       is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false,
       store_id: 0,
