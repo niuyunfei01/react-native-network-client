@@ -31,7 +31,7 @@ import {MixpanelInstance} from '../../pubilc/util/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
-import {showError} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {Badge, Button, Image} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
@@ -243,9 +243,13 @@ class OrderListScene extends Component {
 
   updateBundle=(newVersionInfo)=>{
     const {downloadFileFinish}=this.state
-    if(downloadFileFinish){
+    if(downloadFileFinish&&Platform.OS==='ios'){
       RNRestart.Restart()
       return
+    }
+    if(downloadFileFinish&&Platform.OS==='android') {
+      showSuccess('下载完成，请重新打开软件')
+      return;
     }
     const source=Platform.OS==='ios'?bundleFilePath+'/last.ios.zip':bundleFilePath+'/last.android.zip';
     RNFetchBlob.config({path:source})
@@ -262,7 +266,9 @@ class OrderListScene extends Component {
               await createDirectory(target)
             await unzip(source,target)
             await deleteFile(source)
-            this.setState({downloadFileProgress:'',downloadFileFinish:true})
+            this.setState({
+              downloadFileProgress:Platform.OS==='ios'?'':'下载完成，请重新打开软件',
+              downloadFileFinish:true})
           }
         }).catch(error => {
       showError(error.reason)
@@ -628,7 +634,7 @@ class OrderListScene extends Component {
               </If>
               <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
                 <Text style={styles.modalBtnText}>
-                  {downloadFileFinish===false?'立即更新':'立即体验'}
+                  {downloadFileFinish?'立即体验':'立即更新'}
                 </Text>
               </TouchableOpacity>
             </View>

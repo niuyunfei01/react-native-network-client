@@ -263,8 +263,8 @@ const styles = StyleSheet.create({
 })
 
 const MODAL_DATA = [
-    {value: '1', label: '扣款'},
-    {value: '2', label: '补偿'},
+    {value: 1, label: '扣款'},
+    {value: 2, label: '补偿'},
 ]
 export default class StallDetailScene extends PureComponent {
 
@@ -294,16 +294,6 @@ export default class StallDetailScene extends PureComponent {
     }
 
     modifySettlement = () => {
-        const {stallInfo} = this.state
-        const {selectedDate} = this.props.route.params
-        if ( today === selectedDate) {
-            showError('今日账单暂不可修改');
-            return
-        }
-        if (stallInfo?.bill_info?.bill_id === undefined) {
-            showError('当前没有账单信息');
-            return
-        }
         this.setModalVisible(true)
     }
 
@@ -313,20 +303,23 @@ export default class StallDetailScene extends PureComponent {
             return
         }
         const {stallInfo} = this.state
-        const {accessToken} = this.props.route.params
+        const {accessToken, stall_id, currStoreId} = this.props.route.params
         const url = `/api/mod_stall_bill_deduct?access_token=${accessToken}`
         const params = {
-            bill_id: stallInfo?.bill_info?.bill_id,
+            bill_id: stallInfo?.bill_info?.bill_id ? stallInfo.bill_info.bill_id : 0,
             type: modalContentObj.type.value,
-            amount: modalContentObj.money,
-            remark: modalContentObj.remark
+            amount: parseInt(modalContentObj.money),
+            remark: modalContentObj.remark,
+            stall_id: parseInt(stall_id),
+            store_id: currStoreId
         }
-
         HttpUtils.post.bind(this.props)(url, params).then(res => {
-            ToastShort('提交成功')
             this.getStallBillDetail()
+            ToastShort('提交成功')
+        }, res => {
+            showError(res.reason)
         }).catch(error => {
-            showError(error)
+            showError(error.reason)
         })
         this.setState({
             modalVisible: false,
@@ -470,6 +463,7 @@ export default class StallDetailScene extends PureComponent {
     }
 
     renderHeader = (stall_name, settle_amount, refund_fee, order_num, selectedDate) => {
+        const {stallInfo} = this.state
         return (
             <View style={styles.headerWrap}>
                 <View style={styles.headerTopWrap}>
@@ -490,7 +484,7 @@ export default class StallDetailScene extends PureComponent {
                                 ￥
                             </Text>
                             <Text style={styles.headerPrice}>
-                                {settle_amount}
+                                {stallInfo?.bill_info?.f_settle_amount ? stallInfo?.bill_info?.f_settle_amount : settle_amount}
                             </Text>
                         </View>
                     </View>
