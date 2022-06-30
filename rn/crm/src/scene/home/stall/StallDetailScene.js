@@ -302,6 +302,10 @@ export default class StallDetailScene extends PureComponent {
             showError('请先选择类型和输入备注', 1);
             return
         }
+        if(modalContentObj.money.startsWith('-')){
+            showError('请输入大于的0的数', 1);
+            return
+        }
         const {stallInfo} = this.state
         const {accessToken, stall_id, currStoreId} = this.props.route.params
         const url = `/api/mod_stall_bill_deduct?access_token=${accessToken}`
