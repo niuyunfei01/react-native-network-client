@@ -124,7 +124,7 @@ class StallSettlementScene extends PureComponent {
     viewStallDetailScene = (item) => {
         const {navigation} = this.props
         const {selectedDate} = this.state
-        const {accessToken} = this.props.global;
+        const {accessToken, currStoreId} = this.props.global;
         const {stall_id, stall_name, f_settle_amount, f_refund_fee, order_num} = item
         const params = {
             stall_id: stall_id,
@@ -133,7 +133,8 @@ class StallSettlementScene extends PureComponent {
             refund_fee: f_refund_fee,
             order_num: order_num,
             selectedDate: selectedDate,
-            accessToken: accessToken
+            accessToken: accessToken,
+            currStoreId: currStoreId
         }
         navigation.navigate(Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL, params);
     }

@@ -53,6 +53,7 @@ import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {simpleStore} from "../../../pubilc/util/tool";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -576,11 +577,12 @@ class MineScene extends PureComponent {
 
   onCanChangeStore = (store_id) => {
     const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
+    const {dispatch,global} = this.props;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
+          simpleStore(global, dispatch,store_id)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
