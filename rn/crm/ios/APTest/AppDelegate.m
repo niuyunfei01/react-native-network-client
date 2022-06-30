@@ -105,9 +105,17 @@ static void InitializeFlipper(UIApplication *application) {
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
+
  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-//  return [NSURL URLWithString:@"http://localhost:8081/index.bundle?platform=ios&dev=true"];
 #else
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+  NSString *docDir = [paths objectAtIndex:0];
+  NSString *bundlePath = [docDir stringByAppendingPathComponent:@"/last.ios/last.ios.bundle"];
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  if([fileManager fileExistsAtPath:bundlePath])
+  {
+    return [NSURL URLWithString:bundlePath];
+  }
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }

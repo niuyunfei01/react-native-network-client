@@ -249,17 +249,17 @@ class SettingScene extends PureComponent {
     })
   }
 
-  save_show_good_remake=(show_good_remake)=>{
+  save_show_good_remake = (show_good_remake) => {
     const {currStoreId, accessToken} = this.props.global;
     const api = `/v1/new_api/stores/set_switch_remark_show_rider/${currStoreId}?access_token=${accessToken}`
-    const parameter={show_remark_to_rider:show_good_remake?1:0}
+    const parameter = {show_remark_to_rider: show_good_remake ? 1 : 0}
     HttpUtils.get.bind(this.props)(api, parameter).then(() => {
       this.setState({
-        show_good_remake : show_good_remake
+        show_good_remake: show_good_remake
       }, () => {
         ToastShort("设置成功");
       });
-    }).catch(e=>ToastShort(e.reason))
+    }).catch(e => ToastShort(e.reason))
   }
   save_ship_order_list_set = (ship_order_list_set) => {
     const {currStoreId, accessToken} = this.props.global;
@@ -299,7 +299,7 @@ class SettingScene extends PureComponent {
 
   render() {
     const {dispatch} = this.props
-    const {show_good_remake,isRefreshing,show_orderlist_ext_store,hide_good_titles,ship_order_list_set}=this.state
+    const {show_good_remake, isRefreshing, show_orderlist_ext_store, hide_good_titles, ship_order_list_set} = this.state
     return (
       <ScrollView
         refreshControl={
@@ -368,7 +368,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>配送版订单列表 </Text>
             </CellBody>
             <CellFooter>
-              <Switch value={ship_order_list_set}
+              <Switch value={ship_order_list_set ? ship_order_list_set : false}
                       onValueChange={(val) => {
                         this.save_ship_order_list_set(val)
                       }}/>
@@ -694,7 +694,7 @@ class SettingScene extends PureComponent {
               flexWrap: "wrap",
             }}>
               <For each="item" index='idx' of={this.state.funds_threshold_mapping}>
-                <Button  key={idx} title={item === -1 ? '不通知' : "≤" + item + '元'}
+                <Button key={idx} title={item === -1 ? '不通知' : "≤" + item + '元'}
                         onPress={() => {
                           this.setState({
                             funds_thresholds: item,

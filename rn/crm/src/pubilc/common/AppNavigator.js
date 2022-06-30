@@ -8,8 +8,9 @@ import Config from "./config";
 import {Dimensions} from "react-native";
 
 let width = Dimensions.get("window").width;
+const Stack = createStackNavigator();
+
 const AppNavigator = (props) => {
-  const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
@@ -115,6 +116,12 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} options={{headerTitle: '添加蓝牙打印机'}}
                       getComponent={() => require("../../scene/home/Setting/BluePrinterSettings").default}
         />
+
+        <Stack.Screen name={Config.ROUTE_HISTORY_NOTICE} options={{headerTitle: '历史公告'}}
+                      getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
+        <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
+                      getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
+
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
         <Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}
@@ -444,6 +451,19 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/Worker/WorkerSchedule').default}/>
         <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
                       getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
+        <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
+                      getComponent={() => require('../../scene/console/StockingTasks').default}/>
+        <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}
+                      getComponent={()=>require('../../scene/order/RetailPriceScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT} options={{headerTitle:'摊位结算'}}
+                      getComponent={()=>require('../../scene/home/stall/StallSettlementScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL} options={{headerTitle:'摊位详情 '}}
+                      getComponent={()=>require('../../scene/home/stall/StallDetailScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle:'打卡'}}
+                      getComponent={()=>require('../../scene/console/SignInScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

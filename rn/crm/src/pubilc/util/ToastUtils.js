@@ -35,7 +35,7 @@ export function hideModal() {
   WModal.hide()
 }
 
-export function showSuccess(content,position=WToast.position.CENTER) {
+export function showSuccess(content, position = WToast.position.CENTER) {
   WModal.hide()
   const toastOpts = {
     data: content,
@@ -51,7 +51,7 @@ export function showSuccess(content,position=WToast.position.CENTER) {
   }, WToast.duration.LONG);
 }
 
-export function showError(content,position=WToast.position.CENTER) {
+export function showError(content, position = WToast.position.CENTER) {
   WModal.hide()
   const toastOpts = {
     data: content,

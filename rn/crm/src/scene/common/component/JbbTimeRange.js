@@ -26,7 +26,7 @@ export default class JbbTimeRange extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({ranges: nextProps.value})
   }
 

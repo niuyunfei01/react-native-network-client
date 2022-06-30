@@ -241,7 +241,7 @@ class BindMeituanSg extends PureComponent {
   }
 
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'绑 定'}

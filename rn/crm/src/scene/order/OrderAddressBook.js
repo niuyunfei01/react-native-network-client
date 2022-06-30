@@ -73,7 +73,7 @@ class OrderAddressBook extends Component {
     }, time)
   }
 
-  onCancel () {
+  onCancel() {
     this.setState({searchKeywords: ''});
   }
 
@@ -116,26 +116,34 @@ class OrderAddressBook extends Component {
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView style={[styles.container, {flex: 1}]} refreshControl={
           <RefreshControl
-              refreshing={this.state.isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
-              tintColor='gray'
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
           />
         }>
           <View style={{backgroundColor: colors.white}}>
             <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
               <SearchBar
-                  inputStyle={{ fontSize: 12}}
-                  inputContainerStyle={{backgroundColor: colors.white, height: 35}}
-                  containerStyle={{width: '70%', padding: 0, margin: 0, backgroundColor: colors.white, borderWidth: 1, borderColor: '#eee', borderRadius: 6}}
-                  lightTheme={'true'}
-                  placeholder="姓名 手机号 地址"
-                  onChangeText={(v) => {
-                    this.setState({
-                      searchKeywords: v
-                    })
-                  }}
-                  onCancel={this.onCancel}
-                  value={this.state.searchKeywords}
+                inputStyle={{fontSize: 12}}
+                inputContainerStyle={{backgroundColor: colors.white, height: 35}}
+                containerStyle={{
+                  width: '70%',
+                  padding: 0,
+                  margin: 0,
+                  backgroundColor: colors.white,
+                  borderWidth: 1,
+                  borderColor: '#eee',
+                  borderRadius: 6
+                }}
+                lightTheme={'true'}
+                placeholder="姓名 手机号 地址"
+                onChangeText={(v) => {
+                  this.setState({
+                    searchKeywords: v
+                  })
+                }}
+                onCancel={this.onCancel}
+                value={this.state.searchKeywords}
               />
               <Button title={'搜索'}
                       onPress={() => {
@@ -174,8 +182,17 @@ class OrderAddressBook extends Component {
             </View>
           </View>
           <For index="index" each="info" of={this.state.addressBook}>
-            <TouchableOpacity style={{flexDirection: "column", width: '96%', marginTop: '2%', marginHorizontal: '2%', borderRadius: 10, backgroundColor: colors.white}} onPress={() => {
-              this.onPress(Config.ROUTE_ORDER_SETTING, {addressItem: info}, () => {this.onHeaderRefresh()})
+            <TouchableOpacity style={{
+              flexDirection: "column",
+              width: '96%',
+              marginTop: '2%',
+              marginHorizontal: '2%',
+              borderRadius: 10,
+              backgroundColor: colors.white
+            }} onPress={() => {
+              this.onPress(Config.ROUTE_ORDER_SETTING, {addressItem: info}, () => {
+                this.onHeaderRefresh()
+              })
             }}>
               <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin: 15}}>
                 <View style={{flexDirection: "row"}}>
@@ -186,10 +203,14 @@ class OrderAddressBook extends Component {
                   <TouchableOpacity style={{flexDirection: "row", marginRight: 10}} onPress={() => {
                     this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {addItem: info, type: 'edit'})
                   }}>
-                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text style={{color: colors.color333, fontSize: 12}}> 编辑 </Text>
+                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text
+                    style={{color: colors.color333, fontSize: 12}}> 编辑 </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{flexDirection: "row"}} onPress={() => {this.deleteAddressItemBook(info.id)}}>
-                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text style={{color: colors.color333, fontSize: 12}}> 删除 </Text>
+                  <TouchableOpacity style={{flexDirection: "row"}} onPress={() => {
+                    this.deleteAddressItemBook(info.id)
+                  }}>
+                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text
+                    style={{color: colors.color333, fontSize: 12}}> 删除 </Text>
                   </TouchableOpacity>
                 </View>
               </View>

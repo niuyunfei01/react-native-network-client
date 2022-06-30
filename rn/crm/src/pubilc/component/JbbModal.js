@@ -52,7 +52,7 @@ class JbbModal extends React.Component {
         }]}>
           <ScrollView style={[{
             padding: 10,
-          },this.props.modalStyle]}>
+          }, this.props.modalStyle]}>
             {this.props.children}
           </ScrollView>
         </TouchableHighlight>

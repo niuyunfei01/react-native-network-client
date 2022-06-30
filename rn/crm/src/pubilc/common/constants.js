@@ -1,6 +1,7 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_DEVICE_INFO: null,
   SET_PLATFORM: null,
   SET_VERSION: null,
 
@@ -9,6 +10,7 @@ export default keyMirror({
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
   CHECK_VERSION_AT: null,
+  BLE_STARTED: null,
 
   SET_CURR_PROFILE: null,
   SET_CURR_STORE: null,
@@ -20,7 +22,7 @@ export default keyMirror({
   SET_PRINTER_ID: null,
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
-  SET_MIXPANEN_ID: null,
+  SET_USER_CONFIG: null,
   SET_SHOW_EXT_STORE: null,
   SET_RECORD_FLAG: null,
 

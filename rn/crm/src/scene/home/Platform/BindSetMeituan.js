@@ -299,7 +299,7 @@ class BindSetMeituan extends PureComponent {
     );
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'更换绑定'}

@@ -148,16 +148,13 @@ class DiyPrinterItem extends PureComponent {
                     color: colors.color333,
                     flex: 1
                   }}>备注放大 </Text>
-                  <Switch style={{
+                  <Switch color={colors.main_color} style={{
                     fontSize: 16,
                   }} onChange={() => {
                     this.setState({
                       remark_max: !this.state.remark_max
                     })
-                  }}
-                          disabled={true}
-                          value={this.state.remark_max}
-                  />
+                  }} value={this.state.remark_max}/>
                 </View>
 
               </TouchableOpacity>
@@ -185,16 +182,13 @@ class DiyPrinterItem extends PureComponent {
                     color: colors.color333,
                     flex: 1
                   }}>商品信息放大 </Text>
-                  <Switch style={{
+                  <Switch color={colors.main_color} style={{
                     fontSize: 16,
                   }} onChange={() => {
                     this.setState({
                       product_info_max: !this.state.product_info_max
                     })
-                  }}
-                          disabled={true}
-                          value={this.state.product_info_max}
-                  />
+                  }} value={this.state.product_info_max}/>
                 </View>
 
               </TouchableOpacity>
@@ -227,16 +221,13 @@ class DiyPrinterItem extends PureComponent {
                     color: colors.color333,
                     flex: 1
                   }}>店铺名称 </Text>
-                  <Switch style={{
+                  <Switch color={colors.main_color} style={{
                     fontSize: 16,
                   }} onChange={() => {
                     this.setState({
                       show_store_name: !this.state.show_store_name
                     })
-                  }}
-                          disabled={true}
-                          value={this.state.show_store_name}
-                  />
+                  }} value={this.state.show_store_name}/>
                 </View>
               </TouchableOpacity>
 
@@ -263,20 +254,15 @@ class DiyPrinterItem extends PureComponent {
                     color: colors.color333,
                     flex: 1
                   }}>商品信息 </Text>
-                  <Switch style={{
+                  <Switch color={colors.main_color} style={{
                     fontSize: 16,
                   }} onChange={() => {
                     this.setState({
                       show_product_info: !this.state.show_product_info
                     })
-                  }}
-                          disabled={true}
-                          value={this.state.show_product_info}
-                  />
+                  }} value={this.state.show_product_info}/>
                 </View>
-
               </TouchableOpacity>
-
             </View>
           </If>
 

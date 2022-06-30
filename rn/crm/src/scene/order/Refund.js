@@ -603,7 +603,7 @@ class Refund extends Component {
     )
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{padding: pxToDp(31)}}>
         {this.state.headerType === 1 ?

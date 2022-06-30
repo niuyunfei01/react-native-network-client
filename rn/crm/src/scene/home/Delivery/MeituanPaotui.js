@@ -26,14 +26,18 @@ class MeituanPaotui extends PureComponent {
     }
   }
 
-  onPress(route, params = {}, callback = {}) {
+  onPress = (route, params = {}, callback = {}) => {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
   }
 
-  onToggleFullScreen(showImg = '') {
+  onHeaderRefresh = () => {
+
+  }
+
+  onToggleFullScreen = (showImg = '') => {
     let {full_screen} = this.state;
     this.setState({
       full_screen: !full_screen,
@@ -177,7 +181,7 @@ class MeituanPaotui extends PureComponent {
     );
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'去授权'}

@@ -363,6 +363,7 @@ PODS:
     - React
   - RNVectorIcons (7.1.0):
     - React
+  - SSZipArchive (2.2.3)
   - TOCropViewController (2.6.0)
   - UTDID (1.0.0)
   - Yoga (1.14.0)
@@ -430,6 +431,7 @@ DEPENDENCIES:
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - SSZipArchive (= 2.2.3)
   - UTDID
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -440,6 +442,7 @@ SPEC REPOS:
     - Mixpanel-swift
     - NewRelicAgent
     - Qiniu
+    - SSZipArchive
     - TOCropViewController
     - UTDID
 
@@ -627,10 +630,11 @@ SPEC CHECKSUMS:
   RNSound: da030221e6ac7e8290c6b43f2b5f2133a8e225b0
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TOCropViewController: 3105367e808b7d3d886a74ff59bf4804e7d3ab38
   UTDID: 05c4737c8cf5c210e86d0235570816ed00e023e8
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 8b9f5b45c872cc79c4ffc6e2a62975c592f28394
+PODFILE CHECKSUM: 25cf21a91e1b74e2cba7ebc313278ca5a9e91acf
 
 COCOAPODS: 1.11.2

@@ -204,13 +204,6 @@ class PlatformBind extends React.Component {
             <If condition={item.subtitle.length > 0}>
               <Text style={{flexDirection: 'row', fontSize: 12, marginTop: 3}}>
                 {item.subtitle}
-                <If condition={item.alias === 'jd'}>
-                  <Text style={{color: colors.main_color, fontSize: 12}} onPress={() => {
-                    native.dialNumber(13241729048);
-                  }}>
-                    132-4172-9048
-                  </Text>
-                </If>
               </Text>
             </If>
           </View>
@@ -223,11 +216,14 @@ class PlatformBind extends React.Component {
             justifyContent: 'center',
             height: pxToDp(60)
           }}>
-            <Text style={{
-              fontSize: 12,
-              padding: pxToDp(20),
-              color: colors.f7
-            }}>去授权</Text>
+
+            <If condition={item.alias !== 'jd'}>
+              <Text style={{
+                fontSize: 12,
+                padding: pxToDp(20),
+                color: colors.f7
+              }}>去授权</Text>
+            </If>
           </View>
         </TouchableOpacity>
       </For>

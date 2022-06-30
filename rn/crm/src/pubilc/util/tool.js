@@ -204,17 +204,19 @@ export function store(global, store_id = null) {
  * 获取当前店铺信息；如果不存在，则需自行获取
  * @param global
  * @param dispatch if null, means don't do dispatch
+ * @param storeId if null,使用currStoreId
  * @param callback
  * @returns {*}
  */
-export function simpleStore(global, dispatch = null, callback = (store) => {
+export function simpleStore(global, dispatch = null,storeId=null, callback = (store) => {
 }) {
   const {currStoreId, simpleStore} = global
-  if (simpleStore && simpleStore.id == currStoreId) {
+  const id=null===storeId?currStoreId:storeId
+  if (simpleStore && simpleStore.id == id) {
     callback(simpleStore)
   } else {
     const {accessToken} = global;
-    HttpUtils.get.bind({global})(`/api/read_store_simple/${currStoreId}?access_token=${accessToken}`).then(store => {
+    HttpUtils.get.bind({global})(`/api/read_store_simple/${id}?access_token=${accessToken}`).then(store => {
       if (dispatch) {
         dispatch(setSimpleStore(store))
       }

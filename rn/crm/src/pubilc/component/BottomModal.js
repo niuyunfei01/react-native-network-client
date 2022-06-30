@@ -102,7 +102,7 @@ class BottomModal extends React.Component {
                 }, this.props.closeBtnStyle]}
                         titleStyle={[{color: colors.color666,}, this.props.closeBtnTitleStyle]}
                         title={this.props.closeText}
-                        onPress={this.props.onPressClose}></Button>
+                        onPress={this.props.onPressClose}/>
               </If>
 
               <Button buttonStyle={[{
@@ -110,7 +110,7 @@ class BottomModal extends React.Component {
                 width: this.props.closeText !== undefined ? width * 0.40 : width * 0.82,
               }, this.props.btnStyle]}
                       titleStyle={[{color: colors.white}, this.props.btnTitleStyle]} title={this.props.actionText}
-                      onPress={this.props.onPress}></Button>
+                      onPress={this.props.onPress}/>
             </View>
           </ScrollView>
         </TouchableHighlight>

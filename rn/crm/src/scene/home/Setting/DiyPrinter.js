@@ -107,7 +107,7 @@ class DiyPrinter extends PureComponent {
           isRefreshing: false
         })
       }, (err) => {
-        ToastLong("操作失败："+err.desc)
+        ToastLong("操作失败：" + err.desc)
         this.setState({isRefreshing: false})
       })
     }, 1000)
@@ -239,15 +239,13 @@ class DiyPrinter extends PureComponent {
                 color: colors.color333,
                 flex: 1,
               }}>商品价格 </Text>
-              <Switch style={{
+              <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
                 this.setState({
                   show_product_price: !this.state.show_product_price
                 })
-              }}
-                      disabled={true}
-                      value={this.state.show_product_price}
+              }} value={this.state.show_product_price}
               />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
@@ -269,15 +267,13 @@ class DiyPrinter extends PureComponent {
                 color: colors.color333,
                 flex: 1,
               }}>商品优惠信息 </Text>
-              <Switch style={{
+              <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
                 this.setState({
                   show_product_discounts: !this.state.show_product_discounts
                 })
-              }}
-                      disabled={true}
-                      value={this.state.show_product_discounts}
+              }} value={this.state.show_product_discounts}
               />
             </TouchableOpacity>
 
@@ -300,16 +296,13 @@ class DiyPrinter extends PureComponent {
                 color: colors.color333,
                 flex: 1,
               }}>配送距离 </Text>
-              <Switch style={{
+              <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
                 this.setState({
                   show_distribution_distance: !this.state.show_distribution_distance
                 })
-              }}
-                      disabled={true}
-                      value={this.state.show_distribution_distance}
-              />
+              }} value={this.state.show_distribution_distance}/>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {
@@ -331,16 +324,13 @@ class DiyPrinter extends PureComponent {
                 color: colors.color333,
                 flex: 1,
               }}>显示货号（暂仅显示美团货号） </Text>
-              <Switch style={{
+              <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
                 this.setState({
                   show_goods_code: !this.state.show_goods_code
                 })
-              }}
-                      disabled={true}
-                      value={this.state.show_goods_code}
-              />
+              }} value={this.state.show_goods_code}/>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {

@@ -131,7 +131,7 @@ class EbBindScene extends PureComponent {
     );
   }
 
-  rendenBtn() {
+  rendenBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'绑定'}

@@ -11,10 +11,11 @@ import {
   View
 } from "react-native";
 
-import {setPlatform} from "./reducers/device/deviceActions";
+import {setDeviceInfo, setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
+  setBleStarted,
   setCheckVersionAt,
   setCurrentStore,
   setUserProfile
@@ -114,11 +115,31 @@ class RootScene extends PureComponent<{}> {
       this.ptListener.remove()
     }
 
+    native.getAutoBluePrint((auto, isAutoBlePtMsg) => {
+      this.setState({auto_blue_print: auto})
+      if (!this.state.bleStarted) {
+        BleManager.start({showAlert: false}).then(() => {
+          console.log("done ble start")
+        });
+        this.setState({bleStarted: true})
+        this.store.dispatch(setBleStarted(true));
+      }
+      console.log("got ble auto print:" + auto + " msg:" + isAutoBlePtMsg)
+    })
+
     const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      const {printer_id} = this.store.getState().global
+      const {printer_id, bleStarted} = this.store.getState().global
       if (printer_id) {
+
+        if (!bleStarted) {
+          BleManager.start({showAlert: false}).then(() => {
+            console.log("done ble start")
+          });
+          this.store.dispatch(setBleStarted(true));
+        }
+
         setTimeout(() => {
           const state = this.store.getState();
           const clb = (msg, error) => {
@@ -126,9 +147,17 @@ class RootScene extends PureComponent<{}> {
             // noinspection JSIgnoredPromiseFromCall
             GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
           };
+
           BleManager.retrieveServices(printer_id).then((peripheral) => {
             print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
           }).catch((error) => {
+
+            //蓝牙尚未启动时，会导致App崩溃
+            if (!bleStarted) {
+              GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
+              return;
+            }
+
             //重新连接
             BleManager.connect(printer_id).then(() => {
               BleManager.retrieveServices(printer_id).then((peripheral) => {
@@ -231,6 +260,10 @@ class RootScene extends PureComponent<{}> {
         this.setState({rehydrated: true});
         const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
+        GlobalUtil.getDeviceInfo().then(deviceInfo => {
+          store.dispatch(setDeviceInfo(deviceInfo))
+        })
+
       }.bind(this)
     );
   }
@@ -302,7 +335,6 @@ class RootScene extends PureComponent<{}> {
             store_={this.store}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
-
           />
         </View>
       </Provider>

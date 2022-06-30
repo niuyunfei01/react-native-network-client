@@ -46,9 +46,10 @@ const {
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
+  BLE_STARTED,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_MIXPANEN_ID,
+  SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
 } = require('../../pubilc/common/constants').default;
@@ -68,6 +69,13 @@ export function setCheckVersionAt(checkAt) {
   return {
     type: CHECK_VERSION_AT,
     payload: checkAt
+  }
+}
+
+export function setBleStarted(bleStarted) {
+  return {
+    type: BLE_STARTED,
+    payload: bleStarted
   }
 }
 
@@ -132,10 +140,10 @@ export function setExtStore(list) {
 }
 
 
-export function set_mixpanel_id(id) {
+export function setUserCfg(info) {
   return {
-    type: SET_MIXPANEN_ID,
-    id: id
+    type: SET_USER_CONFIG,
+    info: info
   }
 }
 
