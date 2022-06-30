@@ -308,7 +308,7 @@ export default class StallDetailScene extends PureComponent {
         const params = {
             bill_id: stallInfo?.bill_info?.bill_id ? stallInfo.bill_info.bill_id : 0,
             type: modalContentObj.type.value,
-            amount: parseInt(modalContentObj.money),
+            amount: parseFloat(modalContentObj.money).toFixed(2),
             remark: modalContentObj.remark,
             stall_id: parseInt(stall_id),
             store_id: currStoreId
