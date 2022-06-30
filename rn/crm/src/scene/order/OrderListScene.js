@@ -1014,6 +1014,7 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
+  center:{alignItems:'center', justifyContent:'center'},
   modalWrap:{
     flexGrow: 1,
     justifyContent: 'center',
