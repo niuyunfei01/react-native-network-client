@@ -243,14 +243,11 @@ class OrderListScene extends Component {
 
   updateBundle=(newVersionInfo)=>{
     const {downloadFileFinish}=this.state
-    if(downloadFileFinish&&Platform.OS==='ios'){
+    if(downloadFileFinish){
       RNRestart.Restart()
       return
     }
-    if(downloadFileFinish&&Platform.OS==='android') {
-      showSuccess('下载完成，请重新打开软件')
-      return;
-    }
+
     const source=Platform.OS==='ios'?bundleFilePath+'/last.ios.zip':bundleFilePath+'/last.android.zip';
     RNFetchBlob.config({path:source})
         .fetch('GET',newVersionInfo.bundle_url)
@@ -267,8 +264,9 @@ class OrderListScene extends Component {
             await unzip(source,target)
             await deleteFile(source)
             this.setState({
-              downloadFileProgress:Platform.OS==='ios'?'':'下载完成，请重新打开软件',
-              downloadFileFinish:true})
+              downloadFileProgress: '',
+              downloadFileFinish: true
+            })
           }
         }).catch(error => {
       showError(error.reason)
@@ -1038,8 +1036,9 @@ const styles = StyleSheet.create({
   modalContentText:{paddingTop:12,paddingBottom:16,marginLeft:20,marginRight:20,lineHeight:25},
   modalBtnWrap:{
     backgroundColor:colors.main_color,
-    marginLeft:20,
-    marginRight:20
+    marginLeft: 20,
+    marginRight: 20,
+    borderRadius: 8
   },
   closeNewVersionModal:{fontSize:20,textAlign:'right'},
   modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
