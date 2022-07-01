@@ -2,13 +2,14 @@ import React, {PureComponent} from "react";
 import {View, StyleSheet, FlatList, Text, TouchableOpacity} from "react-native";
 import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import dayjs from "dayjs";
-import DateTimePicker from "react-native-modal-datetime-picker";
 import {getSimpleTime} from "../../pubilc/util/TimeUtil";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
-import tool from "../../pubilc/util/tool";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import DatePicker from "rmc-date-picker/lib/DatePicker";
+import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
+import PopPicker from "rmc-date-picker/lib/Popup";
+import PopupStyles from 'rmc-picker/lib/PopupStyles';
 
 const styles = StyleSheet.create({
     mainZoneWrap: {
@@ -76,30 +77,63 @@ const styles = StyleSheet.create({
     },
     itemWrap: {
         flexDirection: 'row',
-        paddingTop: 11,
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingLeft: 16,
-        paddingBottom: 10,
         paddingRight: 30
     },
-    itemText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, height: 40},
-    itemCenter: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, flex: 1, textAlign: 'center'}
+    itemText: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        textAlign: 'center',
+        justifyContent: 'center',
+        fontSize: 14,
+        fontWeight: '400',
+        color: colors.color333,
+        lineHeight: 20,
+    },
+    itemCenter: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        fontSize: 14,
+        fontWeight: '400',
+        color: colors.color333,
+        lineHeight: 20,
+        flex: 1,
+        textAlign: 'center'
+    },
+    selectMonthText: {
+        color: colors.title_color,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
 })
-const today = dayjs().format('YYYY-MM-DD');
+const today = new Date();
 
 class SignInScene extends PureComponent {
 
-    state = {
-        selectDate: today,
-        showDatePicker: false,
-        sigInInfo: {
-            records: [],
-            sign_status: 0
-        },
-        currentDatetime: getSimpleTime()
+    constructor() {
+        super();
+        this.state = {
+            selectDate: today,
+            start_day: this.format(today),
+            sigInInfo: {
+                records: [],
+                sign_status: 0
+            },
+            currentDatetime: getSimpleTime()
+        }
+    }
+
+// 处理月份函数
+    format = (date) => {
+        let month = date.getMonth() + 1;
+        month = month < 10 ? `0${month}` : month;
+        return `${date.getFullYear()}-${month}`;
     }
 
     componentDidMount() {
-        const {global, navigation} = this.props
+        const {navigation} = this.props
         this.focus = navigation.addListener('focus', async () => {
             this.getTime = setInterval(() => {
                 this.setState({currentDatetime: getSimpleTime()})
@@ -108,13 +142,14 @@ class SignInScene extends PureComponent {
         this.blur = navigation.addListener('blur', () => {
             this.getTime && clearInterval(this.getTime)
         })
-        const {selectDate} = this.state
-        this.getLogList(selectDate.substring(0, 7))
+        const {start_day} = this.state
+        this.getLogList(start_day)
+
     }
 
-    getLogList = (selectDate) => {
+    getLogList = (start_day) => {
         const {currStoreId, accessToken} = this.props.global;
-        const api = `/api/sign_status_with_record/${currStoreId}/${selectDate}?access_token=${accessToken}`
+        const api = `/api/sign_status_with_record/${currStoreId}/${start_day}?access_token=${accessToken}`
         HttpUtils.get.bind(this.props)(api).then(res => {
             this.setState({sigInInfo: res})
         }).catch((error) => {
@@ -128,13 +163,14 @@ class SignInScene extends PureComponent {
     }
 
     touchSignIn = () => {
-        const {sigInInfo} = this.state
+        const {sigInInfo, start_day} = this.state
         const {accessToken, currStoreId} = this.props.global;
         let url = `/api/sign_in/${currStoreId}?access_token=${accessToken}`
         switch (sigInInfo.sign_status) {
             case 0:
                 HttpUtils.get.bind(this.props)(url).then(() => {
                     showSuccess('签到成功')
+                    this.getLogList(start_day)
                 }, (res) => {
                     showError('签到失败，原因：' + res.reason)
                 }).catch((error) => {
@@ -145,6 +181,7 @@ class SignInScene extends PureComponent {
                 url = `/api/sign_off/${currStoreId}?access_token=${accessToken}`
                 HttpUtils.get.bind(this.props)(url).then(() => {
                     showSuccess('签退成功')
+                    this.getLogList(start_day)
                 }, res => {
                     showError('签退失败，原因：' + res.reason)
                 }).catch((error) => {
@@ -153,6 +190,7 @@ class SignInScene extends PureComponent {
                 break
             case 2:
                 showSuccess('今日已签到')
+                this.getLogList(start_day)
                 break
         }
     }
@@ -196,15 +234,36 @@ class SignInScene extends PureComponent {
         )
     }
     renderList = () => {
-        const {selectDate, sigInInfo} = this.state
+        const {start_day, selectDate, sigInInfo} = this.state
+        const datePicker = (
+            <DatePicker
+                rootNativeProps={{'data-xx': 'yy'}}
+                minDate={new Date(2015, 8, 15, 10, 30, 0)}
+                maxDate={new Date()}
+                defaultDate={selectDate}
+                mode="month"
+                locale={zh_CN}
+            />
+        );
         return (
             <View style={styles.bottomWrap}>
-                <TouchableOpacity style={styles.currentDateWrap} onPress={() => this.setShowDatePicker(true)}>
-                    <Text style={styles.currentDate}>
-                        {selectDate.substring(0, 7)}
-                    </Text>
+                <View style={styles.currentDateWrap}>
+                    <PopPicker datePicker={datePicker}
+                               transitionName="rmc-picker-popup-slide-fade"
+                               maskTransitionName="rmc-picker-popup-fade"
+                               styles={PopupStyles}
+                               title={'选择日期'}
+                               okText={'确认'}
+                               dismissText={'取消'}
+                               date={selectDate}
+                               onChange={this.onChange}>
+                        <Text style={styles.currentDate}>
+                            {start_day}
+                        </Text>
+                    </PopPicker>
+
                     <AntDesign name={'caretdown'} size={15}/>
-                </TouchableOpacity>
+                </View>
                 <View style={styles.listHeadWrap}>
                     <Text style={styles.listHeadDateText}>
                         日期
@@ -224,36 +283,18 @@ class SignInScene extends PureComponent {
         )
     }
 
-    emptyView = () => {
-        return (
-            <View/>
-        )
-    }
-    setShowDatePicker = (value) => {
-        this.setState({showDatePicker: value})
-    }
-
-    onConfirm = (date) => {
-        const newDate = tool.fullDay(date)
-        this.getLogList(newDate.substring(0, 7))
-        this.setState({showDatePicker: false, selectDate: newDate})
+    onChange = (date) => {
+        const start_day = this.format(date)
+        this.getLogList(start_day)
+        this.setState({start_day: start_day, selectDate: date})
     }
 
     render() {
-        const {selectDate, showDatePicker} = this.state
         return (
-            <View>
+            <>
                 {this.renderMainZone()}
                 {this.renderList()}
-                <DateTimePicker cancelTextIOS={'取消'}
-                                confirmTextIOS={'确定'}
-                                date={new Date(selectDate)}
-                                customHeaderIOS={this.emptyView}
-                                mode={'date'}
-                                isVisible={showDatePicker}
-                                onConfirm={(Date) => this.onConfirm(Date)}
-                                onCancel={() => this.setShowDatePicker(false)}/>
-            </View>
+            </>
         )
     }
 }

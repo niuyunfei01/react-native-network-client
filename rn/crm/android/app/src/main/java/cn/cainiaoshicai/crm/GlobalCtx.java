@@ -20,7 +20,6 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
@@ -297,8 +296,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         public boolean getUseDeveloperSupport() {
             return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-        }
-
+       }
         //如果是debug模式，最优先加载getJSMainModuleName
         //如果是release模式，优先加载getJSBundleFile
         //如果getJSBundleFile为null，加载getBundleAssetName
@@ -309,10 +307,9 @@ public class GlobalCtx extends Application implements ReactApplication {
             String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
             File file = new File(jsBundleFile);
             if (file.exists() && file.isFile()) {
-                jsBundleFile = file.getAbsolutePath();
                 return jsBundleFile;
             }
-            return null;
+            return super.getJSBundleFile();
         }
 
         @Override
