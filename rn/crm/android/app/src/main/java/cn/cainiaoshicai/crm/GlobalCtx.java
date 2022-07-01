@@ -295,8 +295,7 @@ public class GlobalCtx extends Application implements ReactApplication {
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
-            return false;
-        }
+            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
 
         //如果是debug模式，最优先加载getJSMainModuleName
         //如果是release模式，优先加载getJSBundleFile
