@@ -9,12 +9,13 @@ import {DatePickerView} from "@ant-design/react-native"
 import {Input, TextArea} from "../../weui/index";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
-import Dialog from "../common/component/Dialog";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
 import {CheckBox} from 'react-native-elements';
 import * as globalActions from "../../reducers/global/globalActions";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   return {
@@ -150,9 +151,6 @@ class OrderSettingScene extends Component {
   }
 
   onConfirm = () => {
-    this.setState({
-      showDateModal: false
-    })
     let time = this.state.datePickerValue
     let str = Math.round(new Date(time) / 1000)
     if (str > Math.round(new Date() / 1000)) {
@@ -163,7 +161,7 @@ class OrderSettingScene extends Component {
     this.setState({
       expect_time: str
     })
-    showSuccess("设置成功！")
+    showSuccess(`设置送达时间为${dayjs(time).format('YYYY-MM-DD HH:mm')}`)
   }
 
   onRequestClose = () => {
@@ -327,7 +325,7 @@ class OrderSettingScene extends Component {
       isSaveToBook
     } = this.state
     let time = datePickerValue
-    let str = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
+    let str = dayjs(time).format('YYYY-MM-DD HH:mm')
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container]}>
@@ -524,9 +522,26 @@ class OrderSettingScene extends Component {
             </View>
           </View>
 
-          <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
-            {this.showDatePicker()}
-          </Dialog>
+          <DateTimePicker
+              is24Hour={true}
+              cancelTextIOS={'取消'}
+              confirmTextIOS={'确定'}
+              customHeaderIOS={() => {
+                return (<View/>)
+              }}
+              minimumDate={new Date()}
+              date={datePickerValue}
+              mode='datetime'
+              isVisible={this.state.showDateModal}
+              onConfirm={(date) => {
+                this.setState({datePickerValue: date, showDateModal: false}, () => {
+                  setTimeout(() => {
+                    this.onConfirm()
+                  }, 1000)
+                })
+              }}
+              onCancel={() => this.onRequestClose()}
+          />
 
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
             <View style={{
