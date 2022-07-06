@@ -409,19 +409,22 @@ public class GlobalCtx extends Application implements ReactApplication {
             //定义前台服务的默认样式。即标题、描述和图标
             ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
                 @Override
-                public void foregroundNotificationClick() {
+                public void foregroundNotificationClick(Context context, Intent intent) {
 
                 }
+
             });
 
             //启动保活服务
-            KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+            KeepLive.startWork(this, KeepLive.RunMode.ENERGY,foregroundNotification, new KeepLiveService() {
                 @Override
-                public void onWorking(Context context) {
+                public void onWorking() {
+
                 }
 
                 @Override
-                public void onStop(Context context) {
+                public void onStop() {
+
                 }
             });
         } catch (Exception e) {
