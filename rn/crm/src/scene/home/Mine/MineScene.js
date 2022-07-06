@@ -39,6 +39,7 @@ import {
   userCanChangeStore
 } from "../../../reducers/mine/mineActions";
 import * as tool from "../../../pubilc/util/tool";
+import {simpleStore} from "../../../pubilc/util/tool";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import {Dialog} from "../../../weui";
@@ -53,7 +54,6 @@ import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {simpleStore} from "../../../pubilc/util/tool";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -577,12 +577,12 @@ class MineScene extends PureComponent {
 
   onCanChangeStore = (store_id) => {
     const {accessToken} = this.props.global;
-    const {dispatch,global} = this.props;
+    const {dispatch, global} = this.props;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          simpleStore(global, dispatch,store_id)
+          simpleStore(global, dispatch, store_id)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
@@ -647,7 +647,9 @@ class MineScene extends PureComponent {
               }}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
+          <TouchableOpacity style={{
+            height: pxToDp(85), width: 200
+          }} onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
@@ -1713,7 +1715,7 @@ const header_styles = StyleSheet.create({
     color: colors.main_color,
     fontSize: pxToEm(30),
     fontWeight: "bold",
-    lineHeight: pxToDp(35)
+    lineHeight: pxToDp(36)
   },
   icon_box: {
     position: "absolute",

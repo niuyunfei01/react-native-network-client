@@ -421,8 +421,8 @@ class OrderListItem extends React.PureComponent {
           <Image source={{uri: item.platformIcon}}
                  style={styles.platformIcon}/>
           <View style={styles.platformId}>
-            <Text style={[styles.platformText, {marginLeft: 10, fontSize: 16}]}># </Text>
-            <Text style={[styles.platformText, {fontSize: 24}]}>{item.platform_dayId} </Text>
+            {/*<Text style={[styles.platformText, {marginLeft: 10, fontSize: 16}]}># </Text>*/}
+            <Text style={[styles.platformText, {marginLeft: 10, fontSize: 24}]}>{item.platform_dayId} </Text>
             <Text
               style={styles.platformDayId}>总#{item.dayId} </Text>
             <If condition={Number(item.orderStatus) === 5}>
@@ -458,10 +458,18 @@ class OrderListItem extends React.PureComponent {
           </View>
           <FontAwesome5 solid={false} onPress={() => this.dialNumber(item.mobile)} name={'phone-alt'}
                         style={styles.mobileIcon}/>
-          <Entypo onPress={() => {
+
+
+          <FontAwesome5 solid={false} onPress={() => {
             let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
             this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
-          }} name={"location-pin"} style={styles.locationIcon}/>
+          }} name={'map-marker-alt'}
+                        style={styles.locationIcon}/>
+
+          {/*<Entypo onPress={() => {*/}
+          {/*  let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;*/}
+          {/*  this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});*/}
+          {/*}} name={"location-pin"} style={styles.locationIcon}/>*/}
         </View>
         <Text style={styles.userAddressText}>
           {item.address}
@@ -523,7 +531,7 @@ class OrderListItem extends React.PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         this.fetchShipData(item)
-      }} style={styles.contentHeader}>
+      }} style={styles.contentHeader1}>
         <View style={[{alignItems: 'center'}, styles.orderInfoContent]}>
           <Text style={[styles.orderTimeValue, {flex: 1, fontWeight: 'bold'}]}>配送状态 </Text>
           <Text style={styles.mainText}>查看配送详情 </Text>
@@ -616,7 +624,8 @@ class OrderListItem extends React.PureComponent {
         title={'到店核销'}
         actionText={'确定'}
         closeText={'取消'}
-        onClose={() => this.closePickModal()}>
+        onClose={() => this.closePickModal()}
+        onPressClose={() => this.closePickModal()}>
         <TextInput placeholder={"请输入取货码"}
                    onChangeText={(pickupCode) => {
                      this.setState({pickupCode})
@@ -642,74 +651,74 @@ class OrderListItem extends React.PureComponent {
       {label: '10元', value: 10}
     ]
     return (
-        <Modal
-            visible={this.state.addTipModal}
-            onRequestClose={() => this.closeAddTipModal()}
-            animationType={'slide'}
-            transparent={true}
-        >
-          <View style={styles.modalBackground}>
-            <View style={[styles.container]}>
-              <TouchableOpacity onPress={() => this.closeAddTipModal()} style={styles.addTipRightIcon}>
-                <Entypo name={"circle-with-cross"}
-                        style={styles.addTipRightIconStyle}/>
-              </TouchableOpacity>
-              <Text style={styles.addTipTitleText}>加小费</Text>
-              <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
-              <If condition={is_merchant_add_tip === 1}>
-                <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
-              </If>
-              <View style={[styles.container1]}>
-                <Text style={styles.f26}>金额</Text>
-                <View style={styles.tipSelect}>
-                  <For index='i' each='info' of={tipListTop}>
-                    <Text key={i} style={styles.amountBtn} onPress={() => {
-                      this.onChangeAccount(info.value)
-                    }}>{info.label}</Text>
-                  </For>
-                </View>
-                <View style={styles.tipSelect}>
-                  <For index='i' each='info' of={tipListBottom}>
-                    <Text key={i} style={styles.amountBtn} onPress={() => {
-                      this.onChangeAccount(info.value)
-                    }}>{info.label}</Text>
-                  </For>
-                </View>
-                <View style={styles.addTipInputBox}>
-                  <Input
-                      style={styles.addTipInput}
-                      placeholder={'请输入其他金额'}
-                      defaultValue={`${this.state.addMoneyNum}`}
-                      keyboardType='numeric'
-                      onChangeText={(value) =>
-                          this.onChangeAccount(value)
-                      }
-                  />
-                  <Text style={styles.addTipInputRight}>元</Text>
-                </View>
-                {
-                  (!this.state.ok || this.state.addMoneyNum === 0) &&
-                  <View
-                      style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
-                    <Entypo name={"help-with-circle"}
-                            style={styles.addTipHelpIcon}/>
-                    <Text style={styles.addTipReason}>{this.state.respReason}</Text>
-                  </View>
-                }
+      <Modal
+        visible={this.state.addTipModal}
+        onRequestClose={() => this.closeAddTipModal()}
+        animationType={'slide'}
+        transparent={true}
+      >
+        <View style={styles.modalBackground}>
+          <View style={[styles.container]}>
+            <TouchableOpacity onPress={() => this.closeAddTipModal()} style={styles.addTipRightIcon}>
+              <Entypo name={"circle-with-cross"}
+                      style={styles.addTipRightIconStyle}/>
+            </TouchableOpacity>
+            <Text style={styles.addTipTitleText}>加小费</Text>
+            <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
+            <If condition={is_merchant_add_tip === 1}>
+              <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+            </If>
+            <View style={[styles.container1]}>
+              <Text style={styles.f26}>金额</Text>
+              <View style={styles.tipSelect}>
+                <For index='i' each='info' of={tipListTop}>
+                  <Text key={i} style={styles.amountBtn} onPress={() => {
+                    this.onChangeAccount(info.value)
+                  }}>{info.label}</Text>
+                </For>
               </View>
-              <View style={styles.btn1}>
-                <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
-                                                             onPress={() => this.closeAddTipModal()}><Text
-                    style={styles.btnText2}>取消</Text></TouchableOpacity></View>
-                <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
-                                                             onPress={() => {
-                                                               this.upAddTip()
-                                                             }}><Text
-                    style={styles.btnText}>确定</Text></TouchableOpacity></View>
+              <View style={styles.tipSelect}>
+                <For index='i' each='info' of={tipListBottom}>
+                  <Text key={i} style={styles.amountBtn} onPress={() => {
+                    this.onChangeAccount(info.value)
+                  }}>{info.label}</Text>
+                </For>
               </View>
+              <View style={styles.addTipInputBox}>
+                <Input
+                  style={styles.addTipInput}
+                  placeholder={'请输入其他金额'}
+                  defaultValue={`${this.state.addMoneyNum}`}
+                  keyboardType='numeric'
+                  onChangeText={(value) =>
+                    this.onChangeAccount(value)
+                  }
+                />
+                <Text style={styles.addTipInputRight}>元</Text>
+              </View>
+              {
+                (!this.state.ok || this.state.addMoneyNum === 0) &&
+                <View
+                  style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                  <Entypo name={"help-with-circle"}
+                          style={styles.addTipHelpIcon}/>
+                  <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                </View>
+              }
+            </View>
+            <View style={styles.btn1}>
+              <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
+                                                           onPress={() => this.closeAddTipModal()}><Text
+                style={styles.btnText2}>取消</Text></TouchableOpacity></View>
+              <View style={styles.flex1}><TouchableOpacity style={styles.marginH10}
+                                                           onPress={() => {
+                                                             this.upAddTip()
+                                                           }}><Text
+                style={styles.btnText}>确定</Text></TouchableOpacity></View>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
     )
   }
 
@@ -945,6 +954,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: colors.colorEEE
   },
+  contentHeader1: {
+    paddingVertical: 10,
+    marginHorizontal: 12,
+    paddingHorizontal: 4,
+  },
   orderInfoContent: {flexDirection: "row", marginTop: 4},
   orderInfoStoreName: {fontSize: 14, color: colors.color333, width: width * 0.24},
   orderInfoStoreNameText: {fontSize: 14, color: colors.color333},
@@ -978,13 +992,15 @@ const styles = StyleSheet.create({
   },
   orderTimeText: {color: colors.white, fontSize: 10},
   mobileIcon: {width: width * 0.125, fontSize: 25, color: colors.main_color},
-  locationIcon: {fontSize: 35, color: colors.main_color},
+  locationIcon: {fontSize: 28, color: colors.main_color},
   userAddressText: {fontSize: 14, color: colors.color666, marginTop: 10},
   btnContent: {
     paddingVertical: 10,
     marginHorizontal: 4,
     flexDirection: 'row',
     justifyContent: 'space-around',
+    borderTopWidth: 1,
+    borderColor: colors.colorEEE
   },
   modalBtn: {
     borderRadius: 2,
@@ -1021,7 +1037,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     paddingHorizontal: 4,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderColor: colors.colorEEE
   },
   helpIcon: {
     fontSize: 20,

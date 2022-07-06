@@ -105,7 +105,10 @@ const styles = StyleSheet.create({
     selectMonthText: {
         color: colors.title_color,
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        padding: 5,
+        width: 200,
+        textAlign: 'right'
     },
 })
 const today = new Date();
@@ -259,10 +262,10 @@ class SignInScene extends PureComponent {
                                onChange={this.onChange}>
                         <Text style={styles.currentDate}>
                             {start_day}
+                            <AntDesign name={'caretdown'} size={15}/>
                         </Text>
                     </PopPicker>
 
-                    <AntDesign name={'caretdown'} size={15}/>
                 </View>
                 <View style={styles.listHeadWrap}>
                     <Text style={styles.listHeadDateText}>

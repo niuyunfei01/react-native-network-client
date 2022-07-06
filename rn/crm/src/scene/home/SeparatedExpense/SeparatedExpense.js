@@ -521,9 +521,12 @@ class SeparatedExpense extends PureComponent {
             onDismiss={this.onDismiss}
             onChange={this.onChange}
           >
-            <Text style={Styles.selectMonthText}> {this.state.start_day} </Text>
+            <Text style={Styles.selectMonthText}>
+              {this.state.start_day} &nbsp;&nbsp;&nbsp;
+              <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+            </Text>
           </PopPicker>
-          <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+
         </View>
 
         <If condition={choseTab === 1}>
@@ -716,7 +719,10 @@ const Styles = StyleSheet.create({
   selectMonthText: {
     color: colors.title_color,
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    padding: 5,
+    width: 200,
+    textAlign: 'right'
   },
   selectMonthIcon: {fontSize: 14, marginLeft: 10},
   recordsContent: {

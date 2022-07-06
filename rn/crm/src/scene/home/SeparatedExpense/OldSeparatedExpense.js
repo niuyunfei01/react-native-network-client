@@ -168,10 +168,15 @@ class SeparatedExpense extends PureComponent {
                 <Text style={{
                   color: colors.title_color,
                   fontSize: 16,
-                  fontWeight: 'bold'
-                }}> {this.state.start_day} </Text>
+                  fontWeight: 'bold',
+                  padding: 5,
+                  width: 200,
+                  textAlign: 'right'
+                }}>
+                  {this.state.start_day} &nbsp;&nbsp;&nbsp;
+                  <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
+                </Text>
               </PopPicker>
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
             </View>
           }}>
           {records && records.map((item, id) => {

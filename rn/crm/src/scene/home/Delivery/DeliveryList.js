@@ -78,7 +78,10 @@ class DeliveryList extends PureComponent {
         headerRight: (() => (
             <TouchableOpacity
               style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
                 marginRight: 10,
+                width: 100,
               }}
               onPress={() => {
                 this.setState({
