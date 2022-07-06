@@ -57,6 +57,7 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 
 const numeral = require('numeral');
 const {InteractionManager} = ReactNative;
+const {width, height} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   return {
@@ -296,11 +297,19 @@ class OrderInfo extends Component {
         methodName: 'fetchShipData',
         executeTime: res.endTime - res.startTime
       })
+
+      let logistics_arr = [];
+      tool.objectMap(obj.third_deliverie_list, (item) => {
+        if (item.is_show === 1) {
+          logistics_arr.push(item);
+        }
+      });
+
       this.setState({
         deliverie_status: obj.show_status,
         show_no_rider_tips: obj.show_no_rider_tips === 1,
         deliverie_desc: obj.desc,
-        logistics: obj.third_deliverie_list
+        logistics: logistics_arr
       })
 
     })
@@ -831,47 +840,45 @@ class OrderInfo extends Component {
   renderDeliveryInfo = () => {
     return (<View style={styles.flex1}>
       <For each="item" index="i" of={this.state.logistics}>
-        <If condition={item.is_show === 1} key={i}>
-          <View style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
-            <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
-            <View style={Styles.driverName}>
-              {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
-                <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
-                  <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
-                  <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
-                </TouchableOpacity> : null
-              }
-            </View>
-            <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
-              <View style={Styles.deliveryInfoBtnBox}>
-                {item.can_complaint ? <Button title={'投诉骑手'}
-                                              onPress={() => this.onPress(Config.ROUTE_COMPLAIN, {id: item.id})}
-                                              buttonStyle={Styles.deliveryInfoBtnWhite}
-                                              titleStyle={Styles.deliveryInfoBtnTextGray}
-                /> : null}
-                {item.show_trace ? <Button title={'联系骑手'}
-                                           onPress={() => this.dialPhone(item.driver_phone)}
-                                           buttonStyle={Styles.deliveryInfoBtnGreen}
-                                           titleStyle={Styles.deliveryInfoBtnTextWhite}
-                /> : null}
-                {item.can_add_tip ?
-                  <Button title={'加小费'}
-                          onPress={() => {
-                            this.addTip(item.id)
-                          }}
-                          buttonStyle={Styles.deliveryInfoBtnGreen}
-                          titleStyle={Styles.deliveryInfoBtnTextWhite}
-                  />
-                  : null}
-                {item.can_cancel ? <Button title={'取消配送'}
-                                           onPress={() => this.cancelDelivery(item.id)}
-                                           buttonStyle={Styles.deliveryInfoBtnWhite}
-                                           titleStyle={Styles.deliveryInfoBtnTextGray}
-                /> : null}
-              </View>
-            </If>
+        <View style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+          <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
+          <View style={Styles.driverName}>
+            {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
+              <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
+                <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
+                <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
+              </TouchableOpacity> : null
+            }
           </View>
-        </If>
+          <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
+            <View style={Styles.deliveryInfoBtnBox}>
+              {item.can_complaint ? <Button title={'投诉骑手'}
+                                            onPress={() => this.onPress(Config.ROUTE_COMPLAIN, {id: item.id})}
+                                            buttonStyle={Styles.deliveryInfoBtnWhite}
+                                            titleStyle={Styles.deliveryInfoBtnTextGray}
+              /> : null}
+              {item.show_trace ? <Button title={'联系骑手'}
+                                         onPress={() => this.dialPhone(item.driver_phone)}
+                                         buttonStyle={Styles.deliveryInfoBtnGreen}
+                                         titleStyle={Styles.deliveryInfoBtnTextWhite}
+              /> : null}
+              {item.can_add_tip ?
+                <Button title={'加小费'}
+                        onPress={() => {
+                          this.addTip(item.id)
+                        }}
+                        buttonStyle={Styles.deliveryInfoBtnGreen}
+                        titleStyle={Styles.deliveryInfoBtnTextWhite}
+                />
+                : null}
+              {item.can_cancel ? <Button title={'取消配送'}
+                                         onPress={() => this.cancelDelivery(item.id)}
+                                         buttonStyle={Styles.deliveryInfoBtnWhite}
+                                         titleStyle={Styles.deliveryInfoBtnTextGray}
+              /> : null}
+            </View>
+          </If>
+        </View>
       </For>
     </View>)
   }
@@ -1457,9 +1464,9 @@ class OrderInfo extends Component {
 
   renderDeliveryModal = () => {
     let {navigation} = this.props;
-    let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
+    let Modalheight = tool.length(this.state.delivery_list) >= 3 ? height * 0.75 : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
-      height = 400;
+      Modalheight = height * 0.5;
     }
     return (
       <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
@@ -1467,15 +1474,27 @@ class OrderInfo extends Component {
              transparent={true}>
         <View style={Styles.deliveryModalTop}>
           <TouchableOpacity style={styles.flex1} onPress={() => this.closeDeliveryModal()}/>
-          <View style={[Styles.deliveryModalHeader, {height: height}]}>
-            <View style={Styles.flexRow}>
+          <View style={[Styles.deliveryModalHeader, {height: Modalheight}]}>
+            <View style={[Styles.flexRow, {
+              justifyContent: "flex-end",
+              alignItems: "center",
+              alignContent: 'center'
+            }]}>
               <Text onPress={() => {
                 this.onPress(Config.ROUTE_STORE_STATUS)
                 this.closeDeliveryModal()
-              }} style={Styles.deliveryModalTitle}>呼叫配送规则</Text>
-              <View style={styles.flex1}/>
-              <TouchableOpacity onPress={() => this.closeDeliveryModal()}>
-                <Entypo name={'cross'} style={Styles.deliveryModalIcon}/>
+              }} style={[Styles.deliveryModalTitle, {flex: 1}]}>呼叫配送规则</Text>
+              <TouchableOpacity
+                style={[{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  width: '50%',
+                  marginRight: pxToDp(20),
+                  marginTop: pxToDp(20),
+                }]}
+                onPress={() => this.closeDeliveryModal()}>
+                <Entypo name="circle-with-cross"
+                        style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
               </TouchableOpacity>
             </View>
 
@@ -1808,7 +1827,7 @@ const Styles = StyleSheet.create({
   },
   tipSelect: {flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)},
   flexRow: {
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   flexRowMT15: {
     flexDirection: 'row',
@@ -2221,7 +2240,7 @@ const Styles = StyleSheet.create({
     borderTopRightRadius: pxToDp(30),
   },
   deliveryModalTitle: {color: colors.main_color, marginTop: pxToDp(20), marginLeft: pxToDp(20)},
-  deliveryModalIcon: {fontSize: pxToDp(50), color: colors.fontColor},
+  deliveryModalIcon: {fontSize: 25, color: colors.fontColor},
   deliveryModalContent: {padding: pxToDp(20)},
   deliveryModalContentInfo: {
     padding: pxToDp(20),

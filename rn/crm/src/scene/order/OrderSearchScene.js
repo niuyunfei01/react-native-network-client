@@ -6,7 +6,6 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import native from '../../pubilc/util/native';
 import Config from "../../pubilc/common/config";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../pubilc/util/http";
@@ -119,10 +118,12 @@ class OrderSearchScene extends PureComponent {
     let _this = this;
 
     if (route === Config.ROUTE_ORDER_INVALID) {
-      native.ordersInvalid();
+      this.onSearch("invalid:");
+      // native.ordersInvalid();
       return;
     } else if (route === Config.ROUTE_ORDER_SERIOUS_DELAY) {
-      native.ordersSeriousDelay();
+      this.onSearch("to_ship_late_serious:");
+      // native.ordersSeriousDelay();
       return;
     } else if (route === Config.ROUTE_ORDER_PEND_PAYMENT) {
       this.onSearch("paid:offline");
@@ -183,12 +184,12 @@ class OrderSearchScene extends PureComponent {
             点击标签直接搜索
           </Text>
           <View style={styles.label_view}>
-            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>
-              <Text style={styles.label_style}>无效订单 </Text>
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>
-              <Text style={styles.label_style}>严重延误 </Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>*/}
+            {/*  <Text style={styles.label_style}>无效订单 </Text>*/}
+            {/*</TouchableOpacity>*/}
+            {/*<TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>*/}
+            {/*  <Text style={styles.label_style}>严重延误 </Text>*/}
+            {/*</TouchableOpacity>*/}
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
               <Text style={styles.label_style}>需收款 </Text>
             </TouchableOpacity>
