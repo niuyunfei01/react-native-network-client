@@ -11,9 +11,6 @@ import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
 
-const Item = List;
-const Brief = Item;
-
 function mapStateToProps(state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global}

@@ -52,7 +52,7 @@ class InventoryItems extends Component {
   UNSAFE_componentWillMount() {
 
     const {global, dispatch} = this.props
-    simpleStore(global, dispatch, (store) => {
+    simpleStore(global, dispatch, null, (store) => {
       this.setState({fnPriceControlled: store['fn_price_controlled']})
       this.search()
     })

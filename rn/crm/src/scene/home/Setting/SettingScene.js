@@ -33,6 +33,7 @@ import tool from "../../../pubilc/util/tool";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const width = Dimensions.get("window").width;
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
@@ -56,7 +57,8 @@ function mapDispatchToProps(dispatch) {
 class SettingScene extends PureComponent {
   constructor(props) {
     super(props);
-
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('设置页')
     this.state = {
       isRefreshing: false,
       switch_val: false,

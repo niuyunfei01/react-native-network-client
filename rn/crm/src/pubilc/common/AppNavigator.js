@@ -9,8 +9,25 @@ import {Dimensions} from "react-native";
 
 let width = Dimensions.get("window").width;
 const Stack = createStackNavigator();
+const screenOptions = ({
+  headerShown: true,
+  headerStyle: {
+    height: 40,
+  },
+  headerTitleStyle: {
+    color: "#4a4a4a",
+    fontSize: 16,
+    fontWeight: "bold",
+    width: width / 1.7,
+    textAlign: "center",
+  },
+  headerBackTitle: null,
+  headerTruncatedBackTitle: null,
+  headerTintColor: "#333333",
+  showIcon: true
+})
 
-const AppNavigator = (props) => {
+export const AppNavigator = (props) => {
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
@@ -31,23 +48,7 @@ const AppNavigator = (props) => {
                          }}>
       <Stack.Navigator
         initialRouteName={initialRouteName}
-        screenOptions={() => ({
-          headerShown: true,
-          headerStyle: {
-            height: 40,
-          },
-          headerTitleStyle: {
-            color: "#4a4a4a",
-            fontSize: 16,
-            fontWeight: "bold",
-            width: width / 1.7,
-            textAlign: "center",
-          },
-          headerBackTitle: null,
-          headerTruncatedBackTitle: null,
-          headerTintColor: "#333333",
-          showIcon: true
-        })}>
+        screenOptions={() => screenOptions}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
                       getComponent={() => require("../../scene/common/TabHome").default}
         />
@@ -453,17 +454,17 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
                       getComponent={() => require('../../scene/console/StockingTasks').default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle:'零售价格'}}
-                      getComponent={()=>require('../../scene/order/RetailPriceScene').default}
+        <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle: '零售价格'}}
+                      getComponent={() => require('../../scene/order/RetailPriceScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT} options={{headerTitle:'摊位结算'}}
-                      getComponent={()=>require('../../scene/home/stall/StallSettlementScene').default}
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT} options={{headerTitle: '摊位结算'}}
+                      getComponent={() => require('../../scene/home/stall/StallSettlementScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL} options={{headerTitle:'摊位详情 '}}
-                      getComponent={()=>require('../../scene/home/stall/StallDetailScene').default}
+        <Stack.Screen name={Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL} options={{headerTitle: '摊位详情 '}}
+                      getComponent={() => require('../../scene/home/stall/StallDetailScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle:'打卡'}}
-                      getComponent={()=>require('../../scene/console/SignInScene').default}/>
+        <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle: '打卡'}}
+                      getComponent={() => require('../../scene/console/SignInScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

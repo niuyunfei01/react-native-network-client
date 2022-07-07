@@ -12,6 +12,7 @@ import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import config from "../../../pubilc/common/config";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -29,6 +30,8 @@ function mapDispatchToProps(dispatch) {
 class Complain extends React.Component {
   constructor(props) {
     super(props)
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("投诉页");
     this.state = {
       accessToken: this.props.global.accessToken,
       delivery_id: this.props.route.params.id,

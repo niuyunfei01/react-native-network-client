@@ -230,9 +230,9 @@ class StoreStatusScene extends PureComponent {
       } else {
         store_name_str = store.name
       }
-      let suspend_confirm_order = store.suspend_confirm_order === '0' ? true : false
+      let suspend_confirm_order = store.suspend_confirm_order === '0'
       items.push(
-        <TouchableOpacity style={{}} onPress={() => {
+        <TouchableOpacity onPress={() => {
 
           this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
 
@@ -274,9 +274,9 @@ class StoreStatusScene extends PureComponent {
                 top: pxToDp(4),
                 textAlign: 'center',
               }}>
-                {store.business_id ? <AntDesign name='earth' style={[styles.right_btn, {
-                  fontSize: pxToDp(35)
-                }]}/> : null}
+                <If condition={store.business_id}>
+                  <AntDesign name='earth' style={[styles.right_btn, {fontSize: pxToDp(35)}]}/>
+                </If>
               </TouchableOpacity>
 
             </View>
@@ -298,18 +298,14 @@ class StoreStatusScene extends PureComponent {
                   }]}>{store.status_label} </Text>
               </View>
               <View style={[styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-                {store.show_open_time &&
-                <Text style={{
-                  color: '#595959',
-                  width: pxToDp(300),
-                  fontSize: pxToDp(20)
-                }}>开店时间：{store.next_open_desc || store.next_open_time} </Text>}
+                <If condition={store.show_open_time}>
+                  <Text style={{color: '#595959', width: pxToDp(300), fontSize: pxToDp(20)}}>
+                    开店时间：{store.next_open_desc || store.next_open_time}
+                  </Text>
+                </If>
               </View>
               <View style={{flexDirection: 'row'}}>
-                <Text style={{
-                  fontSize: pxToDp(20),
-                  paddingTop: pxToDp(7),
-                }}>
+                <Text style={{fontSize: pxToDp(20), paddingTop: pxToDp(7),}}>
                   {store.zs_way}
                 </Text>
                 <View style={{flex: 1,}}></View>
@@ -320,8 +316,8 @@ class StoreStatusScene extends PureComponent {
                 {/*  {store.auto_call}*/}
                 {/*</Text>*/}
               </View>
-              {
-                store.zs_way === '商家自送' && <View style={{
+              <If condition={store.zs_way === '商家自送'}>
+                <View style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -343,7 +339,7 @@ class StoreStatusScene extends PureComponent {
                     <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
                   </View>
                 </View>
-              }
+              </If>
             </View>
           </View>
         </TouchableOpacity>)

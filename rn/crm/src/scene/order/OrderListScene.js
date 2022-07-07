@@ -46,7 +46,7 @@ import Cts from "../../pubilc/common/Cts";
 import RemindModal from "../../pubilc/component/remindModal";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
-const {width,height} = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {remind, global, device} = state;
@@ -675,6 +675,7 @@ class OrderListScene extends Component {
               orderStatus: this.state.categoryLabels[0].status,
             }, () => {
               this.onRefresh(this.state.categoryLabels[0].status)
+              this.mixpanel.track('处理中订单')
             })
           }}
                 style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
@@ -685,10 +686,12 @@ class OrderListScene extends Component {
               ListData: [],
             }, () => {
               this.onRefresh(7)
+              this.mixpanel.track('预订单')
             })
           }}
                 style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
           <Text onPress={() => {
+            this.mixpanel.track('全部的订单')
             const {navigation} = this.props
             navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
           }}
@@ -725,24 +728,24 @@ class OrderListScene extends Component {
           dropdownTextHighlightStyle={{color: '#fff'}}
           options={['新 建', '排 序']}
           defaultValue={''}
-          onSelect={(e) => {
-            if (e === 0) {
-              this.onPress(Config.ROUTE_ORDER_SETTING)
-            } else {
-              let showSortModal = !this.state.showSortModal;
-              this.setState({showSortModal: showSortModal})
-            }
-          }}
+          onSelect={(e) => this.onSelect(e)}
         >
-          <View style={{
-            marginRight: 16,
-            marginLeft: 18,
-          }}>
+          <View style={{marginRight: 16, marginLeft: 18}}>
             <Entypo name={"menu"} style={{fontSize: 24, color: colors.color666}}/>
           </View>
         </ModalDropdown>
       </View>
     )
+  }
+
+  onSelect = (e) => {
+    if (e === 0) {
+      this.mixpanel.track('新建订单')
+      this.onPress(Config.ROUTE_ORDER_SETTING)
+    } else {
+      let showSortModal = !this.state.showSortModal;
+      this.setState({showSortModal: showSortModal})
+    }
   }
 
 
@@ -896,6 +899,7 @@ class OrderListScene extends Component {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={this.state.showBtn}
+                     key={index}
                      fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}

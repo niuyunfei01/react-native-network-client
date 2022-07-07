@@ -28,6 +28,7 @@ import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const {StyleSheet} = ReactNative
 
@@ -69,6 +70,8 @@ const timeObj = {
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('钱包页')
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     let date = new Date();
     this.state = {
@@ -272,6 +275,7 @@ class SeparatedExpense extends PureComponent {
     this.setState({
       switchType: val
     })
+    this.mixpanel.track(val === 0 ? '钱包页' : '三方充值页')
   }
 
   // 切换费用账单 充值记录tab
@@ -452,7 +456,7 @@ class SeparatedExpense extends PureComponent {
       <View style={Styles.WSBHeader}>
         <Text style={Styles.WSBHeaderTitle}>当前余额（元） </Text>
         <Text style={Styles.WSBHeaderBalanceNum}>{this.state.balanceNum} </Text>
-        <TouchableOpacity style={Styles.WSBCZBtn} onPress={() => this.onPress(Config.ROUTE_ACCOUNT_FILL)}>
+        <TouchableOpacity style={Styles.WSBCZBtn} onPress={this.accountFill}>
           <Text style={Styles.WSBCZText}> 充 值 </Text>
         </TouchableOpacity>
         <TouchableOpacity style={Styles.WSBSZBtn} onPress={() => this.onPress(Config.ROUTE_SETTING)}>
@@ -460,6 +464,11 @@ class SeparatedExpense extends PureComponent {
         </TouchableOpacity>
       </View>
     )
+  }
+
+  accountFill = () => {
+    this.mixpanel.track('三方支付')
+    this.onPress(Config.ROUTE_ACCOUNT_FILL)
   }
 
   renderWSBType = () => {
@@ -477,12 +486,7 @@ class SeparatedExpense extends PureComponent {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => {
-          this.setState({
-            choseTab: 2
-          })
-          this.fetchRechargeRecord();
-        }}>
+        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.rechargeRecord()}>
           <View style={[choseTab === 2 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
             <Text style={Styles.color333}>充值记录 </Text>
           </View>
@@ -491,6 +495,19 @@ class SeparatedExpense extends PureComponent {
     )
   }
 
+  rechargeRecord = () => {
+
+    this.setState({
+      choseTab: 2
+    })
+    this.fetchRechargeRecord();
+    this.mixpanel.track('充值记录')
+  }
+
+  viewItemDetail = (item) => {
+    this.mixpanel.track('清单详情页')
+    this.onItemClicked(item)
+  }
   renderWSBContent = () => {
     const {date, records, records2, choseTab} = this.state;
     const datePicker = (
@@ -521,17 +538,14 @@ class SeparatedExpense extends PureComponent {
             onDismiss={this.onDismiss}
             onChange={this.onChange}
           >
-            <Text style={Styles.selectMonthText}>
-              {this.state.start_day} &nbsp;&nbsp;&nbsp;
-              <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
-            </Text>
+            <Text style={Styles.selectMonthText}> {this.state.start_day} &nbsp;&nbsp;&nbsp; </Text>
           </PopPicker>
-
+          <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
         </View>
 
         <If condition={choseTab === 1}>
           {records && records.map((item, id) => {
-            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked(item)}>
+            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
               <View style={Styles.recordsBody}>
                 <Text style={Styles.recordsItemTime}>{item.day} </Text>
                 <View style={Styles.flex1}/>
@@ -582,6 +596,7 @@ class SeparatedExpense extends PureComponent {
       <View style={Styles.THIRDContainerList}>
         <For index='i' each='info' of={thirdAccountList}>
           <LinearGradient style={Styles.THIRDContainerItemLinear}
+                          key={i}
                           start={{x: 0, y: 0}}
                           end={{x: 1, y: 1}}
                           colors={info.background_color}>

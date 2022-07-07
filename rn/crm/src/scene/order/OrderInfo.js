@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
-import ReactNative, {
+import {
   Alert,
-  Clipboard,
   Dimensions,
   Modal,
   PermissionsAndroid,
@@ -10,8 +9,11 @@ import ReactNative, {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
+  StyleSheet,
+  InteractionManager
 } from 'react-native'
+import Clipboard from '@react-native-community/clipboard'
 import native from '../../pubilc/util/native'
 import tool from '../../pubilc/util/tool'
 import {bindActionCreators} from "redux";
@@ -54,10 +56,10 @@ import ItemRow from "../../pubilc/component/ItemRow";
 import OrderReminds from "../../pubilc/component/OrderReminds";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 const numeral = require('numeral');
-const {InteractionManager} = ReactNative;
-const {width, height} = Dimensions.get("window");
+const {height} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   return {
@@ -94,8 +96,6 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
-const {StyleSheet} = ReactNative
-
 const _editNum = function (edited, item) {
   return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
 };
@@ -131,6 +131,7 @@ class OrderInfo extends Component {
   constructor(props) {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
+    this.mixpanel = MixpanelInstance;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
@@ -304,7 +305,6 @@ class OrderInfo extends Component {
           logistics_arr.push(item);
         }
       });
-
       this.setState({
         deliverie_status: obj.show_status,
         show_no_rider_tips: obj.show_no_rider_tips === 1,
@@ -352,7 +352,7 @@ class OrderInfo extends Component {
         timeObj.method.push({
           interfaceName: api,
           executeStatus: error.executeStatus,
-          startTime: reerrors.startTime,
+          startTime: error.startTime,
           endTime: error.endTime,
           methodName: 'fetchThirdWays',
           executeTime: error.endTime - error.startTime
@@ -362,6 +362,7 @@ class OrderInfo extends Component {
   }
 
   navigateToOrderOperation = () => {
+    this.mixpanel.track("订单操作页");
     this.props.navigation.navigate('OrderOperation', {
       ActionSheet: this.state.ActionSheet,
       order: this.state.order,
@@ -476,7 +477,9 @@ class OrderInfo extends Component {
           <Text style={Styles.printText}
                 onPress={() => {
                   this.onPrint()
-                }}>打印</Text>
+                }}>
+            打印
+          </Text>
 
           <TouchableOpacity onPress={() => this.navigateToOrderOperation()}>
             <Entypo name='dots-three-horizontal' style={moreOperationsStyles}/>
@@ -654,6 +657,7 @@ class OrderInfo extends Component {
 
   deliveryModalFlag = () => {
     if (this.state.deliverie_status !== '待呼叫配送') {
+      this.mixpanel.track('订单详情页_>')
       this.setState({showDeliveryModal: true})
     }
   }
@@ -787,21 +791,22 @@ class OrderInfo extends Component {
   renderDelivery() {
     return (
       <View style={Styles.deliveryBody}>
-        {this.state.order.pickType === '1' ?
+        <If condition={this.state.order.pickType === '1'}>
           <TouchableOpacity onPress={() => this.showQrcodeFlag()} style={Styles.flexRow}>
             <Text style={Styles.qrcodeLabel}>取货码：{this.state.qrcode} </Text>
-            <MaterialCommunityIcons name={'focus-field'}
-                                    style={Styles.qrcodeIcon}/>
-          </TouchableOpacity> : null}
-
-        {this.state.order.pickType === '1' ?
+            <MaterialCommunityIcons name={'focus-field'} style={Styles.qrcodeIcon}/>
+          </TouchableOpacity>
+        </If>
+        <If condition={this.state.order.pickType === '1'}>
           <View style={Styles.qrcodeContent}>
             <QRCode
               value={this.state.qrcode}
               color="black"
               size={150}
             />
-          </View> : null}
+          </View>
+        </If>
+
         <If condition={this.state.order.pickType !== '1'}>
           <TouchableOpacity onPress={() => this.deliveryModalFlag()}>
             <Text style={Styles.deliveryStatusText}>{this.state.deliverie_status} </Text>
@@ -812,15 +817,12 @@ class OrderInfo extends Component {
             </Text>
           </TouchableOpacity>
 
-          {this.state.order.platform === '6' ?
+          <If condition={this.state.order.platform === '6'}>
             <View style={Styles.platformQR}>
-              <QRCode
-                value={this.state.order.platform_oid}
-                color="black"
-                size={150}
-              />
+              <QRCode value={this.state.order.platform_oid} color="black" size={150}/>
               <Text style={Styles.platformText}>{this.state.order.platform_oid} </Text>
-            </View> : null}
+            </View>
+          </If>
 
           {this.renderDeliveryInfo()}
 
@@ -837,52 +839,68 @@ class OrderInfo extends Component {
     )
   }
 
+
   renderDeliveryInfo = () => {
-    return (<View style={styles.flex1}>
-      <For each="item" index="i" of={this.state.logistics}>
-        <View style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
-          <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
-          <View style={Styles.driverName}>
-            {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
-              <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
-                <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
-                <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
-              </TouchableOpacity> : null
-            }
-          </View>
-          <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
-            <View style={Styles.deliveryInfoBtnBox}>
-              {item.can_complaint ? <Button title={'投诉骑手'}
-                                            onPress={() => this.onPress(Config.ROUTE_COMPLAIN, {id: item.id})}
-                                            buttonStyle={Styles.deliveryInfoBtnWhite}
-                                            titleStyle={Styles.deliveryInfoBtnTextGray}
-              /> : null}
-              {item.show_trace ? <Button title={'联系骑手'}
-                                         onPress={() => this.dialPhone(item.driver_phone)}
-                                         buttonStyle={Styles.deliveryInfoBtnGreen}
-                                         titleStyle={Styles.deliveryInfoBtnTextWhite}
-              /> : null}
-              {item.can_add_tip ?
-                <Button title={'加小费'}
-                        onPress={() => {
-                          this.addTip(item.id)
-                        }}
-                        buttonStyle={Styles.deliveryInfoBtnGreen}
-                        titleStyle={Styles.deliveryInfoBtnTextWhite}
-                />
-                : null}
-              {item.can_cancel ? <Button title={'取消配送'}
-                                         onPress={() => this.cancelDelivery(item.id)}
-                                         buttonStyle={Styles.deliveryInfoBtnWhite}
-                                         titleStyle={Styles.deliveryInfoBtnTextGray}
-              /> : null}
+    return (
+      <View style={styles.flex1}>
+        <For each="item" index="i" of={this.state.logistics}>
+          <View key={i} style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+            <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
+            <View style={Styles.driverName}>
+              <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
+                <TouchableOpacity style={Styles.flexRow} onPress={() => this.dialPhone(item.driver_phone)}>
+                  <Text style={Styles.driverInfo}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
+                  <Text style={Styles.driverPhone}>{item.driver_phone} </Text>
+                </TouchableOpacity>
+              </If>
             </View>
-          </If>
-        </View>
-      </For>
-    </View>)
+            <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
+              <View style={Styles.deliveryInfoBtnBox}>
+                <If condition={item.can_complaint}>
+                  <Button title={'投诉骑手'}
+                          onPress={() => this.complain(item)}
+                          buttonStyle={Styles.deliveryInfoBtnWhite}
+                          titleStyle={Styles.deliveryInfoBtnTextGray}
+                  />
+                </If>
+                <If condition={item.show_trace}>
+                  <Button title={'联系骑手'}
+                          onPress={() => {
+                            this.mixpanel.track('订单详情页_联系骑手')
+                            this.dialPhone(item.driver_phone)
+                          }}
+                          buttonStyle={Styles.deliveryInfoBtnGreen}
+                          titleStyle={Styles.deliveryInfoBtnTextWhite}
+                  />
+                </If>
+                <If condition={item.can_add_tip}>
+                  <Button title={'加小费'}
+                          onPress={() => {
+                            this.addTip(item.id)
+                          }}
+                          buttonStyle={Styles.deliveryInfoBtnGreen}
+                          titleStyle={Styles.deliveryInfoBtnTextWhite}
+                  />
+                </If>
+                <If condition={item.can_cancel}>
+                  <Button title={'取消配送'}
+                          onPress={() => this.cancelDelivery(item.id)}
+                          buttonStyle={Styles.deliveryInfoBtnWhite}
+                          titleStyle={Styles.deliveryInfoBtnTextGray}
+                  />
+                </If>
+              </View>
+            </If>
+          </View>
+        </For>
+      </View>
+    )
   }
 
+  complain = (item) => {
+    this.mixpanel.track('订单详情页_投诉骑手')
+    this.onPress(Config.ROUTE_COMPLAIN, {id: item.id})
+  }
   renderClient = () => {
     let {order} = this.state;
     return (
@@ -942,6 +960,7 @@ class OrderInfo extends Component {
   }
 
   dialPhone = (val) => {
+
     native.dialNumber(val)
   }
 
@@ -955,6 +974,7 @@ class OrderInfo extends Component {
   }
 
   cancelDelivery = (val) => {
+    this.mixpanel.track('订单详情页_取消配送')
     let token = this.props.global.accessToken
     const api = `/api/pre_cancel_order?access_token=${token}`;
     let params = {}
@@ -1013,13 +1033,6 @@ class OrderInfo extends Component {
     }).catch(e => {
       showError(`${e.reason}`)
     })
-  }
-
-  clientCatMap = (id) => {
-    const accessToken = this.props.global.accessToken
-    let path = '/AmapTrack.html?orderId=' + id + "&access_token=" + accessToken;
-    const uri = Config.serverUrl(path);
-    this.onPress(Config.ROUTE_WEB, {url: uri});
   }
 
   clientCatMap = (id) => {
@@ -1172,6 +1185,7 @@ class OrderInfo extends Component {
   }
 
   showLogChangeList = () => {
+    this.mixpanel.track('查看修改记录_>')
     this.setState({showChangeLogList: !this.state.showChangeLogList})
   }
 
@@ -1215,70 +1229,80 @@ class OrderInfo extends Component {
                     buttonStyle={Styles.goodsButtonRefund}
                     titleStyle={Styles.goodsButtonTitle}
             />
-            {!this.state.isEditing ?
+            <If condition={!this.state.isEditing}>
               <Button
                 title={'修改商品'}
                 disabled={!order._op_edit_goods}
                 onPress={() => this._doUpdate()}
                 buttonStyle={Styles.goodsButtonUpdate}
                 titleStyle={Styles.goodsButtonTitle}
-              /> : null}
-            {this.state.isEditing ? <Button
-              title={'修改'}
-              disabled={!order._op_edit_goods}
-              onPress={() => this._doSaveItemsEdit()}
-              buttonStyle={Styles.goodsButtonUpdate}
-              titleStyle={Styles.goodsButtonTitle}
-            /> : null}
-            {this.state.isEditing ? <Button
-              title={'取消'}
-              disabled={!order._op_edit_goods}
-              onPress={() => this._doCancel()}
-              buttonStyle={Styles.goodsButtonUpdate}
-              titleStyle={Styles.goodsButtonTitle}
-            /> : null}
+              />
+            </If>
+            <If condition={this.state.isEditing}>
+              <Button
+                title={'修改'}
+                disabled={!order._op_edit_goods}
+                onPress={() => this._doSaveItemsEdit()}
+                buttonStyle={Styles.goodsButtonUpdate}
+                titleStyle={Styles.goodsButtonTitle}
+              />
+            </If>
+            <If condition={this.state.isEditing}>
+              <Button
+                title={'取消'}
+                disabled={!order._op_edit_goods}
+                onPress={() => this._doCancel()}
+                buttonStyle={Styles.goodsButtonUpdate}
+                titleStyle={Styles.goodsButtonTitle}
+              />
+            </If>
           </View>
           {this.state.showGoodsList ?
             <Entypo name='chevron-thin-right' style={Styles.showGoodsList}/> :
             <Entypo name='chevron-thin-up' style={Styles.showGoodsList}/>}
         </TouchableOpacity>
+        <If condition={!this.state.showGoodsList}>
+          {
+            tool.objectMap(_items, (item, idx) => {
+              return (
+                <ItemRow
+                  key={idx}
+                  item={item}
+                  edited={this.state.itemsEdited[item.id]}
+                  idx={idx}
+                  orderStoreId={order.store_id}
+                  nav={this.props.navigation}
+                  isEditing={this.state.isEditing}
+                  onInputNumberChange={this._onItemRowNumberChanged.bind(this)}
+                  fnShowWmPrice={order.is_fn_show_wm_price}
+                  fnPriceControlled={order.is_fn_price_controlled}
+                  isServiceMgr={is_service_mgr}
+                />
+              );
+            })
+          }
+          {
+            tool.objectMap(this.state.itemsAdded, (item, idx) => {
+              return (
+                <ItemRow
+                  key={idx}
+                  item={item}
+                  isAdd={true}
+                  idx={idx}
+                  orderStoreId={order.store_id}
+                  nav={this.props.navigation}
+                  isEditing={this.state.isEditing}
+                  onInputNumberChange={this._onItemRowNumberChanged.bind(this)}
+                  fnShowWmPrice={order.is_fn_show_wm_price}
+                  fnPriceControlled={order.is_fn_price_controlled}
+                  isServiceMgr={is_service_mgr}
+                />
+              );
+            })
+          }
+        </If>
 
-        {!this.state.showGoodsList ? tool.objectMap(_items, (item, idx) => {
-          return (
-            <ItemRow
-              key={idx}
-              item={item}
-              edited={this.state.itemsEdited[item.id]}
-              idx={idx}
-              orderStoreId={order.store_id}
-              nav={this.props.navigation}
-              isEditing={this.state.isEditing}
-              onInputNumberChange={this._onItemRowNumberChanged.bind(this)}
-              fnShowWmPrice={order.is_fn_show_wm_price}
-              fnPriceControlled={order.is_fn_price_controlled}
-              isServiceMgr={is_service_mgr}
-            />
-          );
-        }) : null}
-        {!this.state.showGoodsList ? tool.objectMap(this.state.itemsAdded, (item, idx) => {
-          return (
-            <ItemRow
-              key={idx}
-              item={item}
-              isAdd={true}
-              idx={idx}
-              orderStoreId={order.store_id}
-              nav={this.props.navigation}
-              isEditing={this.state.isEditing}
-              onInputNumberChange={this._onItemRowNumberChanged.bind(this)}
-              fnShowWmPrice={order.is_fn_show_wm_price}
-              fnPriceControlled={order.is_fn_price_controlled}
-              isServiceMgr={is_service_mgr}
-            />
-          );
-        }) : null}
-
-        {order.is_fn_price_controlled ?
+        <If condition={order.is_fn_price_controlled}>
           <View style={[styles.moneyLabel, styles.moneyRow]}>
             <View style={styles.moneyLeft}>
               <Text style={styles.moneyListTitle}>供货价小计</Text>
@@ -1290,7 +1314,8 @@ class OrderInfo extends Component {
               {numeral(order.supply_price / 100).format('0.00')}
             </Text>
           </View>
-          : null}
+        </If>
+
         {/*管理员 和 直营店 可看*/}
         <If condition={is_service_mgr || !order.is_fn_price_controlled || order.is_fn_show_wm_price}>
           <View style={[styles.moneyLabel, styles.moneyRow]}>
@@ -1311,8 +1336,9 @@ class OrderInfo extends Component {
           <View style={[styles.moneyLabel, styles.moneyRow]}>
             <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'
-                                                               color={colors.color777}/></TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 5}}>
+                <Icons name='question-circle-o' color={colors.color777}/>
+              </TouchableOpacity>
             </View>
             <View style={styles.flex1}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')} </Text>
@@ -1325,8 +1351,7 @@ class OrderInfo extends Component {
             </View>
           </If>
         </If>
-
-        {order.additional_to_pay != '0' ?
+        <If condition={order.additional_to_pay != '0'}>
           <View style={Styles.additional}>
             <View style={Styles.additional}>
               <Text style={Styles.additionalText}>需加收/退款</Text>
@@ -1336,22 +1361,23 @@ class OrderInfo extends Component {
               {numeral(order.additional_to_pay / 100).format('+0.00')}
             </Text>
           </View>
-          : null}
+        </If>
         {/*管理员可看*/}
         <If condition={is_service_mgr || !order.is_fn_price_controlled}>
           <View style={Styles.fn_price}>
             <View style={[styles.w480, Styles.flexRow]}>
               <Text style={Styles.product_price}>商品原价</Text>
-              {totalMoneyEdit !== 0 &&
-              <View>
-                <Text
-                  style={totalMoneyEdit > 0 ? Styles.editStatusAdd : Styles.editStatusDeduct}>
-                  {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
-                </Text>
-                <Text style={Styles.totalGoodsPrice}>
-                  {numeral(order.total_goods_price / 100).format('0.00')}
-                </Text>
-              </View>}
+              <If condition={totalMoneyEdit !== 0}>
+                <>
+                  <Text
+                    style={totalMoneyEdit > 0 ? Styles.editStatusAdd : Styles.editStatusDeduct}>
+                    {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+                  </Text>
+                  <Text style={Styles.totalGoodsPrice}>
+                    {numeral(order.total_goods_price / 100).format('0.00')}
+                  </Text>
+                </>
+              </If>
             </View>
             <View style={styles.flex1}/>
             <Text style={Styles.totalGoodsPriceBottom}>
@@ -1360,28 +1386,24 @@ class OrderInfo extends Component {
           </View>
         </If>
         <View style={Styles.borderLine}/>
-        {tool.length(worker_nickname) > 0 ?
+        <If condition={tool.length(worker_nickname) > 0}>
           <View style={[styles.moneyLabel, styles.moneyRow]}>
             <Text style={Styles.f12w140}>分拣人姓名</Text>
             <Text style={Styles.f12}>{worker_nickname} </Text>
           </View>
-          : null}
-
-        {order.time_ready ?
+        </If>
+        <If condition={order.time_ready}>
           <View style={[styles.moneyLabel, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <Text style={Styles.f12w140}>分拣时间</Text>
             <Text style={Styles.f12}>{order.time_ready} </Text>
           </View>
-          : null}
-
-        {order.pack_operator ?
+        </If>
+        <If condition={order.pack_operator}>
           <View style={[styles.moneyLabel, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <Text style={Styles.f12w140}>记录人</Text>
             <Text style={Styles.f12}>{order.pack_operator.nickname} </Text>
           </View>
-          : null}
-
-
+        </If>
         <Refund
           orderId={order.id}
           platform={order.platform}
@@ -1441,10 +1463,12 @@ class OrderInfo extends Component {
           <View style={Styles.deliveryStatusHeader} key={i}>
             <View style={Styles.deliveryStatusHeaderTop}>
               <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusTitle]}>
-                {i !== 0 ?
-                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/> : null}
-                {i !== list.length - 1 ?
-                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/> : null}
+                <If condition={i !== 0}>
+                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/>
+                </If>
+                <If condition={i !== list.length - 1}>
+                  <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/>
+                </If>
               </View>
             </View>
             <View style={Styles.deliveryStatusHeaderBottom}>
@@ -1464,9 +1488,9 @@ class OrderInfo extends Component {
 
   renderDeliveryModal = () => {
     let {navigation} = this.props;
-    let Modalheight = tool.length(this.state.delivery_list) >= 3 ? height * 0.75 : tool.length(this.state.delivery_list) * 250;
+    let modalHeight = tool.length(this.state.delivery_list) >= 3 ? height * 0.75 : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
-      Modalheight = height * 0.5;
+      modalHeight = height * 0.5;
     }
     return (
       <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
@@ -1474,25 +1498,20 @@ class OrderInfo extends Component {
              transparent={true}>
         <View style={Styles.deliveryModalTop}>
           <TouchableOpacity style={styles.flex1} onPress={() => this.closeDeliveryModal()}/>
-          <View style={[Styles.deliveryModalHeader, {height: Modalheight}]}>
-            <View style={[Styles.flexRow, {
-              justifyContent: "flex-end",
-              alignItems: "center",
-              alignContent: 'center'
-            }]}>
+          <View style={[Styles.deliveryModalHeader, {height: modalHeight}]}>
+            <View style={Styles.flexRow}>
               <Text onPress={() => {
                 this.onPress(Config.ROUTE_STORE_STATUS)
                 this.closeDeliveryModal()
               }} style={[Styles.deliveryModalTitle, {flex: 1}]}>呼叫配送规则</Text>
-              <TouchableOpacity
-                style={[{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  width: '50%',
-                  marginRight: pxToDp(20),
-                  marginTop: pxToDp(20),
-                }]}
-                onPress={() => this.closeDeliveryModal()}>
+
+              <TouchableOpacity style={[{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                width: '50%',
+                marginRight: pxToDp(20),
+                marginTop: pxToDp(20),
+              }]} onPress={() => this.closeDeliveryModal()}>
                 <Entypo name="circle-with-cross"
                         style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
               </TouchableOpacity>
@@ -1510,16 +1529,18 @@ class OrderInfo extends Component {
                     <View key={i} style={Styles.deliveryModalContentInfo}>
                       <TouchableOpacity onPress={() => this.downDeliveryInfo(i)} style={Styles.flexRow}>
                         <Text style={Styles.deliveryModalText}>{info.desc}  </Text>
-                        <Text
-                          style={[{color: info.content_color}, Styles.deliveryModalText]}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
+                        <Text style={[{color: info.content_color}, Styles.deliveryModalText]}>
+                          {info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''}
+                        </Text>
                         <View style={styles.flex1}/>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={Styles.f14}/> :
                           <Entypo name='chevron-thin-up' style={Styles.f14}/>}
                       </TouchableOpacity>
                       <View style={Styles.deliveryInfoWeight}>
                         <Text style={[Styles.color333, Styles.f12]}> 商品重量-{info.weight}kg </Text>
-                        <If condition={info.fee_tip > 0}><Text
-                          style={[Styles.color333, Styles.f12]}> 小费：{info.fee_tip}元 </Text></If>
+                        <If condition={info.fee_tip > 0}>
+                          <Text style={[Styles.color333, Styles.f12]}> 小费：{info.fee_tip}元 </Text>
+                        </If>
                       </View>
 
                       <View style={Styles.deliveryInfoPhone}>
@@ -1536,57 +1557,61 @@ class OrderInfo extends Component {
                       </View>
                       {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
                       <View style={Styles.deliveryModalButton}>
-                        {info.btn_lists.can_cancel === 1 ? <Button title={'撤回呼叫'}
-                                                                   onPress={() => {
-                                                                     this.setState({showDeliveryModal: false})
-                                                                     this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                                                       {
-                                                                         order: this.state.order,
-                                                                         ship_id: info.ship_id,
-                                                                         onCancelled: (ok, reason) => {
-                                                                           this.fetchData()
-                                                                         }
-                                                                       });
-                                                                   }}
-                                                                   buttonStyle={Styles.deliveryButtonBgWhite}
-                                                                   titleStyle={Styles.deliveryModalButtonTextBlack}
-                        /> : null}
-                        {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
-                                                                        onPress={() => {
-                                                                          this.setState({showDeliveryModal: false})
-                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
-                                                                            text: '确定',
-                                                                            onPress: () => {
-                                                                              this.cancelPlanDelivery(this.state.order_id, info.plan_id)
-                                                                            }
-                                                                          }])
-                                                                        }}
-                                                                        buttonStyle={Styles.deliveryButtonBgWhite}
-                                                                        titleStyle={Styles.deliveryModalButtonTextBlack}
-                        /> : null}
-                        {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
-                                                                      onPress={() => {
-                                                                        this.setState({showDeliveryModal: false})
-                                                                        navigation.navigate(Config.ROUTE_COMPLAIN, {id: info.ship_id})
-                                                                      }}
-                                                                      buttonStyle={Styles.deliveryButtonBgWhite}
-                                                                      titleStyle={Styles.deliveryModalButtonTextBlack}
-                        /> : null}
-
-                        {info.btn_lists.can_view_position === 1 ? <Button title={'查看位置'}
-                                                                          onPress={() => {
-                                                                            this.setState({showDeliveryModal: false})
-                                                                            const accessToken = this.props.global.accessToken
-                                                                            let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
-                                                                            const uri = Config.serverUrl(path);
-                                                                            this.onPress(Config.ROUTE_WEB, {url: uri});
-                                                                          }}
-                                                                          buttonStyle={[Styles.deliveryButtonBgWhite, {borderColor: colors.main_color}]}
-                                                                          titleStyle={Styles.deliveryModalButtonTextGreen}
-                        /> : null}
-                        {info.btn_lists.add_tip === 1 ?
+                        <If condition={info.btn_lists.can_cancel === 1}>
+                          <Button title={'撤回呼叫'}
+                                  onPress={() => {
+                                    this.mixpanel.track('配送调度页_撤回呼叫')
+                                    this.setState({showDeliveryModal: false})
+                                    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                                      {
+                                        order: this.state.order,
+                                        ship_id: info.ship_id,
+                                        onCancelled: (ok, reason) => {
+                                          this.fetchData()
+                                        }
+                                      });
+                                  }}
+                                  buttonStyle={Styles.deliveryButtonBgWhite}
+                                  titleStyle={Styles.deliveryModalButtonTextBlack}
+                          />
+                        </If>
+                        <If condition={info.btn_lists.can_cancel_plan === 1}>
+                          <Button title={'取消预约'}
+                                  onPress={() => {
+                                    this.setState({showDeliveryModal: false})
+                                    Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+                                      text: '确定',
+                                      onPress: () => {
+                                        this.cancelPlanDelivery(this.state.order_id, info.plan_id)
+                                      }
+                                    }])
+                                  }}
+                                  buttonStyle={Styles.deliveryButtonBgWhite}
+                                  titleStyle={Styles.deliveryModalButtonTextBlack}
+                          />
+                        </If>
+                        <If condition={info.btn_lists.can_complaint === 1}>
+                          <Button title={'投诉骑手'}
+                                  onPress={() => {
+                                    this.mixpanel.track('投诉页')
+                                    this.setState({showDeliveryModal: false})
+                                    navigation.navigate(Config.ROUTE_COMPLAIN, {id: info.ship_id})
+                                  }}
+                                  buttonStyle={Styles.deliveryButtonBgWhite}
+                                  titleStyle={Styles.deliveryModalButtonTextBlack}
+                          />
+                        </If>
+                        <If condition={info.btn_lists.can_view_position === 1}>
+                          <Button title={'查看位置'}
+                                  onPress={() => this.canViewPosition(info)}
+                                  buttonStyle={[Styles.deliveryButtonBgWhite, {borderColor: colors.main_color}]}
+                                  titleStyle={Styles.deliveryModalButtonTextGreen}
+                          />
+                        </If>
+                        <If condition={info.btn_lists.add_tip === 1}>
                           <Button title={'加小费'}
                                   onPress={() => {
+                                    this.mixpanel.track('点击加小费')
                                     this.setState({
                                       addTipModal: true,
                                       modalTip: false,
@@ -1596,15 +1621,18 @@ class OrderInfo extends Component {
                                   }}
                                   buttonStyle={Styles.deliveryButtonBgGreen}
                                   titleStyle={Styles.deliveryModalButtonTextWhite}
-                          /> : null
-                        }
-                        {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
-                                                                 onPress={() => {
-                                                                   native.dialNumber(info.driver_phone)
-                                                                 }}
-                                                                 buttonStyle={Styles.deliveryButtonBgGreen}
-                                                                 titleStyle={Styles.deliveryModalButtonTextWhite}
-                        /> : null}
+                          />
+                        </If>
+                        <If condition={info.btn_lists.can_call === 1}>
+                          <Button title={'联系骑手'}
+                                  onPress={() => {
+                                    this.mixpanel.track('配送调度页_联系骑手')
+                                    native.dialNumber(info.driver_phone)
+                                  }}
+                                  buttonStyle={Styles.deliveryButtonBgGreen}
+                                  titleStyle={Styles.deliveryModalButtonTextWhite}
+                          />
+                        </If>
 
                       </View>
                     </View>
@@ -1616,6 +1644,15 @@ class OrderInfo extends Component {
         </View>
       </Modal>
     )
+  }
+
+  canViewPosition = (info) => {
+    this.setState({showDeliveryModal: false})
+    const accessToken = this.props.global.accessToken
+    let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
+    const uri = Config.serverUrl(path);
+    this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.mixpanel.track('查看位置')
   }
 
   renderAddTipModal = () => {
@@ -1652,16 +1689,16 @@ class OrderInfo extends Component {
               <Text style={Styles.f26}>金额</Text>
               <View style={Styles.tipSelect}>
                 <For index='i' each='info' of={tipListTop}>
-                  <Text key={i} style={Styles.amountBtn} onPress={() => {
-                    this.onChangeAccount(info.value)
-                  }}>{info.label}</Text>
+                  <Text key={i} style={Styles.amountBtn} onPress={() => this.onChangeAccount(info.value)}>
+                    {info.label}
+                  </Text>
                 </For>
               </View>
               <View style={Styles.tipSelect}>
                 <For index='i' each='info' of={tipListBottom}>
-                  <Text key={i} style={Styles.amountBtn} onPress={() => {
-                    this.onChangeAccount(info.value)
-                  }}>{info.label}</Text>
+                  <Text key={i} style={Styles.amountBtn} onPress={() => this.onChangeAccount(info.value)}>
+                    {info.label}
+                  </Text>
                 </For>
               </View>
               <View style={Styles.addTipInputBox}>
@@ -1676,25 +1713,27 @@ class OrderInfo extends Component {
                 />
                 <Text style={Styles.addTipInputRight}>元</Text>
               </View>
-              {
-                (!this.state.ok || this.state.addMoneyNum === 0) &&
-                <View
-                  style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+              <If condition={!this.state.ok || this.state.addMoneyNum === 0}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
                   <Entypo name={"help-with-circle"}
                           style={Styles.addTipHelpIcon}/>
                   <Text style={Styles.addTipReason}>{this.state.respReason}</Text>
                 </View>
-              }
+              </If>
             </View>
             <View style={Styles.btn1}>
-              <View style={styles.flex1}><TouchableOpacity style={Styles.marginH10}
-                                                           onPress={() => this.closeAddTipModal()}><Text
-                style={Styles.btnText2}>取消</Text></TouchableOpacity></View>
-              <View style={styles.flex1}><TouchableOpacity style={Styles.marginH10}
-                                                           onPress={() => {
-                                                             this.onConfirmAddTip()
-                                                           }}><Text
-                style={Styles.btnText}>确定</Text></TouchableOpacity></View>
+              <View style={styles.flex1}>
+                <TouchableOpacity style={Styles.marginH10} onPress={() => this.closeAddTipModal()}>
+                  <Text style={Styles.btnText2}>取消</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.flex1}>
+                <TouchableOpacity style={Styles.marginH10} onPress={() => {
+                  this.onConfirmAddTip()
+                }}>
+                  <Text style={Styles.btnText}>确定</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -1702,24 +1741,27 @@ class OrderInfo extends Component {
     )
   }
 
+  refreshControl = () => {
+    return (
+      <RefreshControl
+        refreshing={this.state.isFetching}
+        onRefresh={this._dispatchToInvalidate.bind(this)}
+        tintColor='gray'
+      />
+    )
+  }
+
   render() {
     const order = this.state.order;
-    let refreshControl = <RefreshControl
-      refreshing={this.state.isFetching}
-      onRefresh={this._dispatchToInvalidate.bind(this)}
-      tintColor='gray'
-    />;
     const orderId = (this.props.route.params || {}).orderId;
     const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
 
     return noOrder ?
-      <ScrollView
-        contentContainerStyle={Styles.contentContainer}
-        refreshControl={refreshControl}>
-        <View>
+      <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl}>
+        <>
           <FloatServiceIcon/>
           <Text style={Styles.textAlignCenter}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>
-        </View>
+        </>
       </ScrollView>
       : (
         <View style={Styles.contentBody}>
@@ -1727,7 +1769,7 @@ class OrderInfo extends Component {
           <FloatServiceIcon/>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView
-            refreshControl={refreshControl}
+            refreshControl={this.refreshControl}
             style={styles.p20}>
             {this.renderPrinter()}
             {this.renderHeader()}
@@ -1827,7 +1869,7 @@ const Styles = StyleSheet.create({
   },
   tipSelect: {flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)},
   flexRow: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   flexRowMT15: {
     flexDirection: 'row',
