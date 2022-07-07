@@ -366,6 +366,7 @@ class OrderListItem extends React.PureComponent {
     let path = '/rider_tracks.html?delivery_id=' + val + "&access_token=" + accessToken;
     const uri = Config.serverUrl(path);
     this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.mixpanel.track('查看位置')
   }
 
   goAddTip = (val) => {
@@ -585,7 +586,7 @@ class OrderListItem extends React.PureComponent {
           <Button title={'呼叫配送'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
-                    this.mixpanel.track('呼叫配送页')
+                    this.mixpanel.track('订单列表页_呼叫配送')
                   }}
                   buttonStyle={styles.callDeliveryBtn}
                   titleStyle={{color: colors.white, fontSize: 16}}
@@ -838,7 +839,6 @@ class OrderListItem extends React.PureComponent {
                           <Button title={'查看位置'}
                                   onPress={() => {
                                     this.catLocation(info.ship_id)
-                                    this.mixpanel.track('查看位置')
                                   }}
                                   buttonStyle={styles.catLocationBtn}
                                   titleStyle={styles.catLocationText}

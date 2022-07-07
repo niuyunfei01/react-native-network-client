@@ -467,7 +467,7 @@ class SeparatedExpense extends PureComponent {
   }
 
   accountFill = () => {
-    this.mixpanel.track('三方支付')
+    this.mixpanel.track('钱包_充值')
     this.onPress(Config.ROUTE_ACCOUNT_FILL)
   }
 

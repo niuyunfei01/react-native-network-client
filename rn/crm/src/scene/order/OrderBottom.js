@@ -233,6 +233,7 @@ class OrderBottom extends PureComponent {
         <If condition={btn_list && btn_list.transfer_self}>
           <Button title={'我自己送'}
                   onPress={() => {
+                    this.mixpanel.track('订单详情页_我自己送')
                     this.onAinSend(order.id, order.store_id)
                   }}
                   buttonStyle={{
