@@ -388,21 +388,21 @@ class StoreGoodsList extends Component {
           </View>
 
           {sp &&
-            <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
-                                productName={p.name}
-                                strictProviding={false} accessToken={accessToken}
-                                storeId={Number(this.props.global.currStoreId)}
-                                currStatus={Number(sp.status)}
-                                vendor_id={currVendorId}
-                                doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                onClose={() => this.setState({modalType: ''}, () => {
-                                  this.search()
-                                })}
-                                spId={Number(sp.id)}
-                                applyingPrice={Number(sp.applying_price || sp.supply_price)}
-                                navigation={this.props.navigation}
-                                storePro={p}
-                                beforePrice={Number(sp.supply_price)}/>}
+          <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
+                              productName={p.name}
+                              strictProviding={false} accessToken={accessToken}
+                              storeId={Number(this.props.global.currStoreId)}
+                              currStatus={Number(sp.status)}
+                              vendor_id={currVendorId}
+                              doneProdUpdate={this.doneProdUpdate.bind(this)}
+                              onClose={() => this.setState({modalType: ''}, () => {
+                                this.search()
+                              })}
+                              spId={Number(sp.id)}
+                              applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                              navigation={this.props.navigation}
+                              storePro={p}
+                              beforePrice={Number(sp.supply_price)}/>}
 
           <Modal
             visible={this.state.inventory_Dialog}
@@ -582,7 +582,7 @@ class StoreGoodsList extends Component {
           onPress={() => {
             navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
           }}>
-          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5}}/>
+          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
         </TouchableOpacity>
       </View>
     )

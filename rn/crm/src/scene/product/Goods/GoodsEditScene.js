@@ -127,7 +127,7 @@ class GoodsEditScene extends PureComponent {
             alignItems: "center"
           }}>
             <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
-            <Text style={{fontWeight: "bold", marginLeft: pxToDp(30)}}>扫码新增</Text>
+            <Text style={{fontWeight: "bold", marginLeft: pxToDp(30), color: colors.color333}}>扫码新增</Text>
           </View>}
         </TouchableOpacity>
       )
@@ -1302,7 +1302,8 @@ const styles = StyleSheet.create({
   navLeftIcon: {
     width: pxToDp(28),
     height: pxToDp(28),
-    marginRight: 16
+    marginRight: 16,
+    color: colors.color333
   },
   n1grey3: {
     color: colors.color333,
