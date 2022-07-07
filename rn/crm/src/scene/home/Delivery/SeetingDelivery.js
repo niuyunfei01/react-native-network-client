@@ -23,6 +23,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const mapStateToProps = state => {
   const {mine, user, global} = state;
@@ -47,6 +48,7 @@ function FetchView({navigation, onRefresh}) {
 class SeetingDelivery extends PureComponent {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     this.state = {
       isRefreshing: true,
       menus: [],
@@ -365,6 +367,7 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.mixpanel.track('自动呼叫设置页')
               navigation.navigate(config.ROUTE_SEETING_DELIVERY_INFO, {
                 auto_call: this.state.auto_call,
                 ext_store_id: this.props.route.params.ext_store_id,
@@ -383,6 +386,7 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.mixpanel.track('就近分配订单')
               navigation.navigate(config.ROUTE_SEETING_DELIVERY_ORDER, {
                 auto_call: this.state.auto_call,
                 ext_store_id: this.props.route.params.ext_store_id,
@@ -400,6 +404,7 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.mixpanel.track('偏好发单设置页')
               navigation.navigate(config.ROUTE_SEETING_PREFERENCE_DELIVERY, {
                 auto_call: this.state.auto_call,
                 ext_store_id: this.props.route.params.ext_store_id,
@@ -409,11 +414,15 @@ class SeetingDelivery extends PureComponent {
                 <Text style={[styles.cell_body_text]}>偏好发单设置</Text>
               </CellBody>
               <CellFooter>
-                {
-                  isShowSettingText ? <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text> :
+                <>
+                  <If condition={isShowSettingText}>
+                    <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text>
+                  </If>
+                  <If condition={!isShowSettingText}>
                     <Text style={{color: colors.color333}}> </Text>
-                }
-                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                  </If>
+                  <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                </>
               </CellFooter>
             </Cell>
           </Cells>
@@ -421,6 +430,7 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.mixpanel.track('保底配送页')
               navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY, {
                 ext_store_id: this.props.route.params.ext_store_id,
               })

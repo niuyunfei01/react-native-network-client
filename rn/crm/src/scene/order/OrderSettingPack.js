@@ -16,6 +16,7 @@ import {CheckBox} from 'react-native-elements';
 import * as globalActions from "../../reducers/global/globalActions";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   return {
@@ -33,6 +34,8 @@ const mapDispatchToProps = dispatch => {
 class OrderSettingScene extends Component {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("新建订单");
     let {currStoreName} = tool.vendor(this.props.global);
     let {currStoreId, accessToken} = this.props.global
     this.state = {
@@ -80,6 +83,7 @@ class OrderSettingScene extends Component {
   }
 
   _toSetLocation = () => {
+    this.mixpanel.track('请选择收货地址')
     const {location_long, location_lat, coordinates} = this.state
     let center = ""
     if (location_long && location_lat) {
@@ -288,6 +292,7 @@ class OrderSettingScene extends Component {
   }
 
   orderToSaveAndIssue = () => {
+    this.mixpanel.track('新建订单_保存并发单')
     this.orderToSave(0)
   }
 
@@ -684,6 +689,7 @@ class OrderSettingScene extends Component {
           paddingVertical: 10
         }}>
           <TouchableOpacity onPress={() => {
+            this.mixpanel.track('新建订单_保存')
             this.orderToSave(1)
           }}>
             <View

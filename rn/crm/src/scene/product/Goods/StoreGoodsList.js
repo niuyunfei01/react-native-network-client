@@ -37,50 +37,47 @@ function FetchRender({navigation, onRefresh}) {
   return null;
 }
 
-const initState = {
-  currStoreId: '',
-  goods: [],
-  page: 1,
-  statusList: [
-    {label: '全部商品', value: 'all'},
-    {label: '售罄商品', value: 'out_of_stock'},
-    {label: '最近上新', value: 'new_arrivals'},
-    {label: '在售商品', value: 'in_stock'},
-  ],
-  pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
-  categories: [],
-  isLoading: false,
-  loadingCategory: true,
-  isLastPage: false,
-  isCanLoadMore: false,
-  selectedTagId: '',
-  selectedChildTagId: '',
-  fnProviding: false,
-  modalType: '',
-  selectedStatus: '',
-  selectedProduct: {},
-  shouldShowNotificationBar: false,
-  showstatusModal: false,
-  inventory_Dialog: false,
-  storeName: '',
-  storeCity: '',
-  storeVendor: '',
-  all_amount: 0,
-  all_count: 0,
-  inventorySummary: {},
-  selectStatusItem: '',
-  onStrict: false
-};
-
 class StoreGoodsList extends Component {
-  state = initState
-
   constructor(props) {
     super(props);
-    const {currStoreId, accessToken} = this.props.global;
-    this.state.currStoreId = currStoreId;
+
     const {global, dispatch} = this.props
-    simpleStore(global, dispatch, (store) => {
+    const {currStoreId, accessToken} = global;
+    this.state = {
+      currStoreId: currStoreId,
+      goods: [],
+      page: 1,
+      statusList: [
+        {label: '全部商品', value: 'all'},
+        {label: '售罄商品', value: 'out_of_stock'},
+        {label: '最近上新', value: 'new_arrivals'},
+        {label: '在售商品', value: 'in_stock'},
+      ],
+      pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
+      categories: [],
+      isLoading: false,
+      loadingCategory: true,
+      isLastPage: false,
+      isCanLoadMore: false,
+      selectedTagId: '',
+      selectedChildTagId: '',
+      fnProviding: false,
+      modalType: '',
+      selectedStatus: '',
+      selectedProduct: {},
+      shouldShowNotificationBar: false,
+      showstatusModal: false,
+      inventory_Dialog: false,
+      storeName: '',
+      storeCity: '',
+      storeVendor: '',
+      all_amount: 0,
+      all_count: 0,
+      inventorySummary: {},
+      selectStatusItem: '',
+      onStrict: false
+    }
+    simpleStore(global, dispatch, currStoreId, (store) => {
       this.setState({
         fnPriceControlled: store['fn_price_controlled'],
         fnProviding: Number(store['strict_providing']) > 0,
@@ -155,7 +152,8 @@ class StoreGoodsList extends Component {
   }
 
   fetchUnreadPriceAdjustment(storeId, accessToken) {
-    HttpUtils.get.bind(this.props)(`/api/is_existed_unread_price_adjustments/${storeId}?access_token=${accessToken}`).then(res => {
+    const url = `/api/is_existed_unread_price_adjustments/${storeId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url).then(res => {
       if (res) {
         this.setState({
           shouldShowNotificationBar: true
@@ -390,21 +388,21 @@ class StoreGoodsList extends Component {
           </View>
 
           {sp &&
-          <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
-                              productName={p.name}
-                              strictProviding={false} accessToken={accessToken}
-                              storeId={Number(this.props.global.currStoreId)}
-                              currStatus={Number(sp.status)}
-                              vendor_id={currVendorId}
-                              doneProdUpdate={this.doneProdUpdate.bind(this)}
-                              onClose={() => this.setState({modalType: ''}, () => {
-                                this.search()
-                              })}
-                              spId={Number(sp.id)}
-                              applyingPrice={Number(sp.applying_price || sp.supply_price)}
-                              navigation={this.props.navigation}
-                              storePro={p}
-                              beforePrice={Number(sp.supply_price)}/>}
+            <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
+                                productName={p.name}
+                                strictProviding={false} accessToken={accessToken}
+                                storeId={Number(this.props.global.currStoreId)}
+                                currStatus={Number(sp.status)}
+                                vendor_id={currVendorId}
+                                doneProdUpdate={this.doneProdUpdate.bind(this)}
+                                onClose={() => this.setState({modalType: ''}, () => {
+                                  this.search()
+                                })}
+                                spId={Number(sp.id)}
+                                applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                                navigation={this.props.navigation}
+                                storePro={p}
+                                beforePrice={Number(sp.supply_price)}/>}
 
           <Modal
             visible={this.state.inventory_Dialog}
@@ -552,21 +550,21 @@ class StoreGoodsList extends Component {
         <View style={{flex: 1}}></View>
         <If condition={onStrict}>
           <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                justifyContent: "center",
-                alignItems: 'center',
-                backgroundColor: colors.main_color,
-                width: pxToDp(35),
-                height: pxToDp(35),
-                marginTop: 10,
-                borderRadius: pxToDp(17)
-              }}
-              onPress={() => {
-                this.setState({
-                  inventory_Dialog: true
-                })
-              }}>
+            style={{
+              flexDirection: 'row',
+              justifyContent: "center",
+              alignItems: 'center',
+              backgroundColor: colors.main_color,
+              width: pxToDp(35),
+              height: pxToDp(35),
+              marginTop: 10,
+              borderRadius: pxToDp(17)
+            }}
+            onPress={() => {
+              this.setState({
+                inventory_Dialog: true
+              })
+            }}>
             <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>
           </TouchableOpacity>
         </If>
@@ -590,7 +588,7 @@ class StoreGoodsList extends Component {
     )
   }
 
-  onChangeRadioItem=(event,item)=>{
+  onChangeRadioItem = (event, item) => {
     if (event.target.checked) {
       this.setState({
         showstatusModal: false,
@@ -601,19 +599,19 @@ class StoreGoodsList extends Component {
   }
 
   showstatusSelect() {
-    let {selectedStatus,statusList} = this.state;
+    let {selectedStatus, statusList} = this.state;
     return (
-        <View style={{marginTop: 2}}>
-          <For each="item" of={statusList} index="i">
-            <RadioItem key={i} style={{backgroundColor: colors.white}}
-                       checked={selectedStatus.value === item.value}
-                       onChange={event => this.onChangeRadioItem(event,item)}>
-              <Text style={{fontSize: 18, color: colors.fontBlack,}}>
-                {item.label}
-              </Text>
-            </RadioItem>
-          </For>
-        </View>
+      <View style={{marginTop: 2}}>
+        <For each="item" of={statusList} index="i">
+          <RadioItem key={i} style={{backgroundColor: colors.white}}
+                     checked={selectedStatus.value === item.value}
+                     onChange={event => this.onChangeRadioItem(event, item)}>
+            <Text style={{fontSize: 18, color: colors.fontBlack,}}>
+              {item.label}
+            </Text>
+          </RadioItem>
+        </For>
+      </View>
     )
   }
 
@@ -638,16 +636,17 @@ class StoreGoodsList extends Component {
     }
     const selectedCategory = this.state.categories.find(category => `${category.id}` === `${this.state.selectedTagId}`)
     if (selectedCategory.children.length) {
-      {/* TODO 需要定制子分类的样式*/}
+      {/* TODO 需要定制子分类的样式*/
+      }
       return (
-          <ScrollView
-            style={{marginBottom: 1, marginLeft: 1}}
-            horizontal={true}
-            showsHorizontalScrollIndicator={true}>
-            {selectedCategory.children.map(childCategory => {
-              return this.renderChildCategory(childCategory)
-            })}
-          </ScrollView>
+        <ScrollView
+          style={{marginBottom: 1, marginLeft: 1}}
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}>
+          {selectedCategory.children.map(childCategory => {
+            return this.renderChildCategory(childCategory)
+          })}
+        </ScrollView>
       )
     }
   }
@@ -708,7 +707,7 @@ class StoreGoodsList extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
 
 const styles = StyleSheet.create({
-  modalCountText:{
+  modalCountText: {
     fontSize: pxToDp(30), color: colors.color333
   },
   container: {

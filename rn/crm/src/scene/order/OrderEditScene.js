@@ -140,13 +140,8 @@ class OrderEditScene extends Component {
 
   UNSAFE_componentWillMount() {
     const {order} = this.props.route.params || {};
-    const init = {
-      autoSaveUserBackup: true,
-      loc_name: order.street_block
-    };
-    this.editFields.map(edit => {
-      init[edit.key] = edit.val(order);
-    });
+    const init = {autoSaveUserBackup: true, loc_name: order.street_block};
+    this.editFields.map(edit => init[edit.key] = edit.val(order));
 
     this.setState(init);
     this.getUserTags();
@@ -444,7 +439,7 @@ class OrderEditScene extends Component {
         <Cells style={CommonStyle.cells35}>
           <Cell onPress={this._toSetLocation}>
             <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>导航座标</Label>
+              <Label style={CommonStyle.cellTextH35W70}>导航坐标</Label>
             </CellHeader>
             <CellBody style={{flexDirection: "row", flex: 1}}>
               <IconEvilIcons name="location" size={26}/>

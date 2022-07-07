@@ -9,6 +9,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   return {
@@ -30,6 +31,8 @@ function FetchView({navigation, onRefresh}) {
 class OrderAinSend extends Component {
   constructor(props: Object) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("我自己送");
     this.state = {
       orderId: this.props.route.params.orderId,
       storeId: this.props.route.params.storeId,
