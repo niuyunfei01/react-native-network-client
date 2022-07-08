@@ -5,7 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  TextInput
+  TextInput, ScrollView
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -189,8 +189,15 @@ const styles = StyleSheet.create({
   modalSelectText: {
     fontSize: 12, color: colors.color333, fontWeight: '400', marginRight: 6
   },
-
-  modifySettlementWrap: {margin: 10, backgroundColor: colors.white, borderRadius: 8, maxHeight: '32%', padding: 12},
+  modifySettlementWrap: {
+    margin: 10,
+    backgroundColor: colors.white,
+    flex: 1,
+    borderRadius: 8,
+    paddingTop: 12,
+    paddingLeft: 12,
+    paddingRight: 12
+  },
   modifySettlementTitleWrap: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -259,7 +266,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap'
   },
-
+  remarkContentWrap: {paddingTop: 4},
+  remarkPerson: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20},
+  remarkText: {fontSize: 14, fontWeight: '400', color: colors.color333, paddingBottom: 14, lineHeight: 20}
 })
 
 const MODAL_DATA = [
@@ -449,17 +458,18 @@ export default class StallDetailScene extends PureComponent {
               </Text>
             </View>
             <View style={styles.remarkWrap}>
-              <Text style={styles.remark}>
+              <Text style={styles.remarkPerson}>
                 操作人员：{item.username}
               </Text>
             </View>
-            <View style={styles.remarkWrap}>
-              <Text style={styles.remark}>
+            <ScrollView style={styles.remarkContentWrap}>
+              <Text style={styles.remarkText}>
                 备注信息：{item.deduct_desc}
               </Text>
-            </View>
+            </ScrollView>
           </View>
         </For>
+
       </If>
     )
   }
@@ -666,7 +676,7 @@ export default class StallDetailScene extends PureComponent {
           {this.renderList(stallInfo)}
         </If>
         <If condition={selectType === 'other'}>
-          {this.renderOther(stallInfo['other'])}
+          {this.renderOther(stallInfo.other)}
         </If>
         {this.renderModalContent()}
       </>
