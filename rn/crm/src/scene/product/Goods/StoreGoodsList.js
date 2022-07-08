@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     width: pxToDp(160),
     backgroundColor: colors.colorEEE,
     height: '100%'
-  },
+  }, 
   notificationBar: {
     flex: 1,
     flexDirection: 'row',
