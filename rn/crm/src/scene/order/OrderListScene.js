@@ -161,7 +161,6 @@ class OrderListScene extends Component {
 
     GlobalUtil.setOrderFresh(1)
 
-
   }
 
   openAndroidNotification = () => {
@@ -212,6 +211,47 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+    JPush.init();
+    //连接状态
+    this.connectListener = result => {
+      console.log("connectListener:" + JSON.stringify(result))
+    };
+    JPush.addConnectEventListener(this.connectListener);
+    //通知回调
+    this.notificationListener = result => {
+      console.log("notificationListener:" + JSON.stringify(result))
+    };
+    JPush.addNotificationListener(this.notificationListener);
+    //本地通知回调
+    this.localNotificationListener = result => {
+      console.log("localNotificationListener:" + JSON.stringify(result))
+    };
+    JPush.addLocalNotificationListener(this.localNotificationListener);
+    //自定义消息回调
+    this.customMessageListener = result => {
+      console.log("customMessageListener:" + JSON.stringify(result))
+    };
+    // JPush.addCustomMessagegListener(this.customMessageListener);
+    //tag alias事件回调
+    this.tagAliasListener = result => {
+      console.log("tagAliasListener:" + JSON.stringify(result))
+    };
+    JPush.addTagAliasListener(this.tagAliasListener);
+    //手机号码事件回调
+    this.mobileNumberListener = result => {
+      console.log("mobileNumberListener:" + JSON.stringify(result))
+    };
+    JPush.addMobileNumberListener(this.mobileNumberListener);
+
+    JPush.addConnectEventListener((connectEnable) => {
+      console.log("connectEnable:" + connectEnable)
+    })
+
+    JPush.setLoggerEnable(true);
+    JPush.getRegistrationID(result =>
+      console.log("registerID:" + JSON.stringify(result))
+    )
+
     const {global, dispatch} = this.props
     simpleStore(global, dispatch)
     this.openAndroidNotification();
@@ -556,6 +596,10 @@ class OrderListScene extends Component {
 
   render() {
     const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+
+    JPush.isNotificationEnabled((enabled) => {
+      console.log("JPush-is-notification enabled:", enabled)
+    })
 
     const {
       showNewVersionVisible,

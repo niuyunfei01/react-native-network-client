@@ -70,46 +70,6 @@ class RootScene extends PureComponent<{}> {
   }
 
   componentDidMount() {
-    JPush.init();
-    //连接状态
-    this.connectListener = result => {
-      console.log("connectListener:" + JSON.stringify(result))
-    };
-    JPush.addConnectEventListener(this.connectListener);
-    //通知回调
-    this.notificationListener = result => {
-      console.log("notificationListener:" + JSON.stringify(result))
-    };
-    JPush.addNotificationListener(this.notificationListener);
-    //本地通知回调
-    this.localNotificationListener = result => {
-      console.log("localNotificationListener:" + JSON.stringify(result))
-    };
-    JPush.addLocalNotificationListener(this.localNotificationListener);
-    //自定义消息回调
-    this.customMessageListener = result => {
-      console.log("customMessageListener:" + JSON.stringify(result))
-    };
-    // JPush.addCustomMessagegListener(this.customMessageListener);
-    //tag alias事件回调
-    this.tagAliasListener = result => {
-      console.log("tagAliasListener:" + JSON.stringify(result))
-    };
-    JPush.addTagAliasListener(this.tagAliasListener);
-    //手机号码事件回调
-    this.mobileNumberListener = result => {
-      console.log("mobileNumberListener:" + JSON.stringify(result))
-    };
-    JPush.addMobileNumberListener(this.mobileNumberListener);
-
-    JPush.addConnectEventListener((connectEnable) => {
-      console.log("connectEnable:" + connectEnable)
-    })
-
-    JPush.setLoggerEnable(true);
-    JPush.getRegistrationID(result =>
-      console.log("registerID:" + JSON.stringify(result))
-    )
 
     if (this.ptListener) {
       this.ptListener.remove()
@@ -127,7 +87,7 @@ class RootScene extends PureComponent<{}> {
       console.log("got ble auto print:" + auto + " msg:" + isAutoBlePtMsg)
     })
 
-    const {currentUser} = this.store.getState().global;
+
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
       const {printer_id, bleStarted} = this.store.getState().global
@@ -151,7 +111,6 @@ class RootScene extends PureComponent<{}> {
           BleManager.retrieveServices(printer_id).then((peripheral) => {
             print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
           }).catch((error) => {
-
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
               GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
@@ -191,13 +150,12 @@ class RootScene extends PureComponent<{}> {
       }
     })
 
+    const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
       GlobalUtil.sendDeviceStatus(state, obj)
     })
-
-
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
   }
 
@@ -255,14 +213,12 @@ class RootScene extends PureComponent<{}> {
         this.doJPushSetAlias(currentUser, "afterConfigureStore")
         GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
         }).then(r => {
+
         })
 
         this.setState({rehydrated: true});
         const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-        GlobalUtil.getDeviceInfo().then(deviceInfo => {
-          store.dispatch(setDeviceInfo(deviceInfo))
-        })
 
       }.bind(this)
     );
@@ -317,10 +273,6 @@ class RootScene extends PureComponent<{}> {
         );
       }
     }
-
-    JPush.isNotificationEnabled((enabled) => {
-      console.log("JPush-is-notification enabled:", enabled)
-    })
 
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
