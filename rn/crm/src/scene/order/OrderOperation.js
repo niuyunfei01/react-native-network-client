@@ -86,7 +86,7 @@ class OrderOperation extends Component {
     this.mixpanel = MixpanelInstance;
     const order_id = (this.props.route.params || {}).orderId;
     this.state = {
-      actionSheet: this.props.route.params.ActionSheet,
+      actionSheet: props.route.params.actionSheet,
       checked: true,
       isEndVisible: false,//修改配送时间弹窗
       visibleReceiveQr: false,//收款码
@@ -372,7 +372,7 @@ class OrderOperation extends Component {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}>
           {
-            actionSheet.map((item, idx) => {
+            actionSheet&&actionSheet.map((item, idx) => {
               item.checked = false
               return (
                 <CheckBox

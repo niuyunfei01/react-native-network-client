@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {FlatList, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View} from 'react-native'
+import {FlatList, Modal, Platform, TouchableOpacity, StyleSheet, Text, TextInput, View} from 'react-native'
 import Config from "../../common/config";
 import {showError, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
@@ -211,16 +211,16 @@ export default class MultiSpecsModal extends PureComponent {
         <View style={styles.container}>
           <View style={styles.visibleArea}>
             <View style={styles.btn}>
-              <Pressable onPress={onClose}>
+              <TouchableOpacity style={styles.btnWrap} tyle={{padding: 8, backgroundColor: 'red'}} onPress={onClose}>
                 <Text style={styles.cancelBtn}>
                   取消
                 </Text>
-              </Pressable>
-              <Pressable onPress={() => this.done(onClose)}>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btnWrap} onPress={() => this.done(onClose)}>
                 <Text style={styles.doneStyle}>
                   完成
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
             <FlatList data={data}
                       renderItem={(item) => this.renderItem(item)}
@@ -249,9 +249,11 @@ const styles = StyleSheet.create({
   btn: {
     flexDirection: 'row',
     justifyContent: "space-between",
-    padding: 8,
     borderBottomColor: '#EEEEEE',
     borderBottomWidth: 1
+  },
+  btnWrap: {
+    paddingBottom: 8, paddingTop: 8, paddingLeft: 20, paddingRight: 20
   },
   cancelBtn: {
     fontWeight: '400', color: '#666666', fontSize: 16, lineHeight: 22

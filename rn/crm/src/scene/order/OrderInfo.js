@@ -141,7 +141,7 @@ class OrderInfo extends Component {
       showGoodsList: false,
       order_id: order_id,
       order: {},
-      ActionSheet: [],
+      actionSheet: [],
       isFetching: false,
       shipCallHided: true,
       isEditing: false,
@@ -364,7 +364,7 @@ class OrderInfo extends Component {
   navigateToOrderOperation = () => {
     this.mixpanel.track("订单操作页");
     this.props.navigation.navigate('OrderOperation', {
-      ActionSheet: this.state.ActionSheet,
+      actionSheet: this.state.actionSheet,
       order: this.state.order,
       orderId: this.props.route.params.orderId
     });
@@ -468,7 +468,7 @@ class OrderInfo extends Component {
     if (order && order.fn_coupon_redeem_good) {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
-    this.setState({ActionSheet: as})
+    this.setState({actionSheet: as})
     let {navigation} = this.props;
     navigation.setOptions({
       headerTitle: '订单详情',
@@ -1593,7 +1593,8 @@ class OrderInfo extends Component {
                         <If condition={info.btn_lists.can_complaint === 1}>
                           <Button title={'投诉骑手'}
                                   onPress={() => {
-                                    this.mixpanel.track('投诉页')
+                                    //this.mixpanel.track('投诉页')
+                                    this.mixpanel.track('配送调度页_投诉骑手')
                                     this.setState({showDeliveryModal: false})
                                     navigation.navigate(Config.ROUTE_COMPLAIN, {id: info.ship_id})
                                   }}
@@ -1652,7 +1653,7 @@ class OrderInfo extends Component {
     let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
     const uri = Config.serverUrl(path);
     this.onPress(Config.ROUTE_WEB, {url: uri});
-    this.mixpanel.track('查看位置')
+    this.mixpanel.track('配送调度页_查看位置')
   }
 
   renderAddTipModal = () => {
@@ -1757,11 +1758,11 @@ class OrderInfo extends Component {
     const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
 
     return noOrder ?
-      <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl}>
-        <>
+      <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
+        <View>
           <FloatServiceIcon/>
           <Text style={Styles.textAlignCenter}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>
-        </>
+        </View>
       </ScrollView>
       : (
         <View style={Styles.contentBody}>
@@ -1769,7 +1770,7 @@ class OrderInfo extends Component {
           <FloatServiceIcon/>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView
-            refreshControl={this.refreshControl}
+            refreshControl={this.refreshControl()}
             style={styles.p20}>
             {this.renderPrinter()}
             {this.renderHeader()}

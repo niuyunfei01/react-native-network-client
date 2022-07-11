@@ -35,7 +35,7 @@ class OrderSettingScene extends Component {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    this.mixpanel.track("新建订单");
+    this.mixpanel.track("创建订单");
     let {currStoreName} = tool.vendor(this.props.global);
     let {currStoreId, accessToken} = this.props.global
     this.state = {

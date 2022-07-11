@@ -164,26 +164,25 @@ class StoreGoodsList extends Component {
 
 
   search(setList = 1) {
-
-    if (this.state.isLoading) {
-      return null;
+    const {isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum} = this.state
+    if (isLoading) {
+      return;
     }
-    const accessToken = this.props.global.accessToken;
+    const {accessToken, currStoreId} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
     const {prod_status} = this.props.route.params || {};
     this.setState({
       isLoading: true,
     })
-    const storeId = this.props.global.currStoreId;
     const params = {
       vendor_id: currVendorId,
-      status: this.state.selectedStatus.value,
-      tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
-      page: this.state.page,
-      pageSize: this.state.pageNum,
-      storeId: storeId,
+      status: selectedStatus.value,
+      tagId: selectedChildTagId ? selectedChildTagId : selectedTagId,
+      page: page,
+      pageSize: pageNum,
+      storeId: currStoreId,
     }
-    if (storeId) {
+    if (currStoreId) {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
@@ -198,11 +197,12 @@ class StoreGoodsList extends Component {
   }
 
   doneProdUpdate(pid, prodFields, spFields) {
-    const idx = this.state.goods.findIndex(g => `${g.id}` === `${pid}`);
-    const item = this.state.goods[idx];
+    const {goods} = this.state
+    const idx = goods.findIndex(g => `${g.id}` === `${pid}`);
+    const item = goods[idx];
     const removal = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
     if (removal) {
-      this.state.goods.splice(idx, 1)
+      goods.splice(idx, 1)
     } else {
       Object.keys(prodFields).map(k => {
         item[k] = prodFields[k]
@@ -210,9 +210,9 @@ class StoreGoodsList extends Component {
       Object.keys(spFields).map(k => {
         item['sp'][k] = spFields[k]
       })
-      this.state.goods[idx] = item;
+      goods[idx] = item;
     }
-    this.setState({goods: this.state.goods})
+    this.setState({goods: goods})
   }
 
   onRefresh() {
@@ -276,14 +276,17 @@ class StoreGoodsList extends Component {
 
 
   renderCategories() {
-    const categories = this.state.categories
-    let item = []
-    for (let i in categories) {
-      item.push(this.renderCategory(categories[i]))
-    }
-    return item
+    const {categories, selectedTagId} = this.state
+    return (
+      <For each="item" of={categories} index="i">
+        <TouchableOpacity key={i} onPress={() => this.onSelectCategory(item)}>
+          <View style={[selectedTagId === item.id ? styles.categoryItemActive : styles.categoryItem]}>
+            <Text style={styles.n2grey6}>{item.name} </Text>
+          </View>
+        </TouchableOpacity>
+      </For>
+    )
   }
-
 
   onSelectStatus = () => {
     this.setState({
@@ -291,23 +294,42 @@ class StoreGoodsList extends Component {
       selectedTagId: '',
       selectedChildTagId: '',
     }, () => {
-      const {accessToken} = this.props.global;
+      const {accessToken, currStoreId} = this.props.global;
       const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-      this.fetchCategories(this.props.global.currStoreId, prod_status, accessToken)
+      this.fetchCategories(currStoreId, prod_status, accessToken)
     })
   }
 
-  readNotification() {
+  readNotification = () => {
     const {accessToken, currStoreId} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${currStoreId}/?access_token=${accessToken}`).then(res => {
       // ToastShort("设置为已读");
     })
+    this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
   }
 
-
+  onEndReached=()=>{
+    if (this.state.isCanLoadMore) {
+      this.setState({isCanLoadMore: false}, () => {
+        this.onLoadMore();
+      })
+    }
+  }
+  onMomentumScrollBegin=()=>{
+    this.setState({
+      isCanLoadMore: true
+    })
+  }
+  onTouchMove=(e)=>{
+    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+      this.setState({scrollLocking: true});
+    } else {
+      this.setState({scrollLocking: false});
+    }
+  }
   render() {
     const p = this.state.selectedProduct;
-    const sp = this.state.selectedProduct.sp;
+    const {sp} = this.state.selectedProduct;
     const {accessToken, simpleStore} = this.props.global;
     let {all_amount, all_count, inventorySummary, selectStatusItem} = this.state;
     const {currVendorId} = tool.vendor(this.props.global);
@@ -320,62 +342,34 @@ class StoreGoodsList extends Component {
           <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
             {this.showstatusSelect()}
           </Dialog>
-
-          {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
-            <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
-            <TouchableOpacity onPress={() => {
-              this.readNotification()
-              this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
-            }}
-                              style={{
-                                marginRight: 10,
-                                marginBottom: 8,
-                                flex: 2,
-                                alignItems: 'center',
-                                alignSelf: 'flex-end',
-                                backgroundColor: '#E26A6E',
-                              }}>
-              <Text style={{color: 'white'}}>查看 </Text>
-            </TouchableOpacity>
-          </View> : null}
-
-          <View style={{
-            flex: 14, flexDirection: 'row'
-          }}>
-
+          <If condition={this.state.shouldShowNotificationBar}>
+            <View style={styles.notificationBar}>
+              <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
+              <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
+                <Text style={{color: 'white'}}>查看 </Text>
+              </TouchableOpacity>
+            </View>
+          </If>
+          <View style={{flex: 14, flexDirection: 'row'}}>
             <View style={styles.categoryBox}>
               <ScrollView>
                 {this.renderCategories()}
               </ScrollView>
             </View>
 
-            <View style={{flex: 1}}>
-              {this.renderChildrenCategories()}
+            <View style={{flex: 1,}}>
+              <View style={{marginBottom: 4, marginLeft: 1}}>
+                {this.renderChildrenCategories()}
+              </View>
               <FlatList
-                extraData={this.state.goods}
+                style={{flex: 1}}
                 data={this.state.goods}
                 legacyImplementation={false}
                 directionalLockEnabled={true}
                 onEndReachedThreshold={0.3}
-                onEndReached={() => {
-                  if (this.state.isCanLoadMore) {
-                    this.setState({isCanLoadMore: false}, () => {
-                      this.onLoadMore();
-                    })
-                  }
-                }}
-                onMomentumScrollBegin={() => {
-                  this.setState({
-                    isCanLoadMore: true
-                  })
-                }}
-                onTouchMove={(e) => {
-                  if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-                    this.setState({scrollLocking: true});
-                  } else {
-                    this.setState({scrollLocking: false});
-                  }
-                }}
+                onEndReached={ this.onEndReached}
+                onMomentumScrollBegin={this.onMomentumScrollBegin}
+                onTouchMove={(e) => this.onTouchMove(e)}
                 renderItem={this.renderItem.bind(this)}
                 onRefresh={this.onRefresh.bind(this)}
                 refreshing={this.state.isLoading}
@@ -386,8 +380,7 @@ class StoreGoodsList extends Component {
               />
             </View>
           </View>
-
-          {sp &&
+          <If condition={sp}>
             <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
                                 productName={p.name}
                                 strictProviding={false} accessToken={accessToken}
@@ -402,8 +395,8 @@ class StoreGoodsList extends Component {
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                 navigation={this.props.navigation}
                                 storePro={p}
-                                beforePrice={Number(sp.supply_price)}/>}
-
+                                beforePrice={Number(sp.supply_price)}/>
+          </If>
           <Modal
             visible={this.state.inventory_Dialog}
             onRequestClose={() => this.setState({inventory_Dialog: false})}
@@ -419,8 +412,9 @@ class StoreGoodsList extends Component {
                 padding: pxToDp(20),
                 alignItems: 'center'
               }}>
-                <Text
-                  style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name} </Text>
+                <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>
+                  {simpleStore.name}
+                </Text>
                 <View style={{
                   flexDirection: "column",
                   marginVertical: pxToDp(30)
@@ -582,7 +576,7 @@ class StoreGoodsList extends Component {
           onPress={() => {
             navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
           }}>
-          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5}}/>
+          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
         </TouchableOpacity>
       </View>
     )
@@ -640,7 +634,6 @@ class StoreGoodsList extends Component {
       }
       return (
         <ScrollView
-          style={{marginBottom: 1, marginLeft: 1}}
           horizontal={true}
           showsHorizontalScrollIndicator={true}>
           {selectedCategory.children.map(childCategory => {
@@ -651,18 +644,38 @@ class StoreGoodsList extends Component {
     }
   }
 
-  renderCategory(category) {
-    const selectCategoryId = this.state.selectedTagId
-    const isActive = selectCategoryId === category.id
+  opBar = (onSale, item) => {
     return (
-      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-        <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.n2grey6}>{category.name} </Text>
-        </View>
-      </TouchableOpacity>
+      <View style={[styles.row_center, styles.btnWrap]}>
+        <If condition={onSale}>
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.onOpenModal('off_sale', item)}>
+            <Text style={{color: colors.color333}}>下架 </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+            <Text style={{color: colors.color333}}>价格/库存 </Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={!onSale}>
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.onOpenModal('on_sale', item)}>
+            <Text style={{color: colors.color333}}>上架 </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                            onPress={() => this.onOpenModal('set_price', item)}>
+            <Text style={{color: colors.color333}}>报价 </Text>
+          </TouchableOpacity>
+        </If>
+        {/*{onOpen &&*/}
+        {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
+        {/*                      onPress={() => this.onOpenModal('set_price', item)}>*/}
+        {/*      <Text style={{color: colors.color333}}>报价 </Text>*/}
+        {/*    </TouchableOpacity>}*/}
+
+      </View>
     )
   }
-
 
   renderItem(order) {
     let {item, index} = order;
@@ -671,34 +684,7 @@ class StoreGoodsList extends Component {
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    opBar={<View style={[styles.row_center, styles.btnWrap]}>
-                      <If condition={onSale}>
-                        <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('off_sale', item)}>
-                          <Text style={{color: colors.color333}}>下架 </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-                          <Text style={{color: colors.color333}}>价格/库存 </Text>
-                        </TouchableOpacity>
-                      </If>
-                      <If condition={!onSale}>
-                        <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('on_sale', item)}>
-                          <Text style={{color: colors.color333}}>上架 </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price', item)}>
-                          <Text style={{color: colors.color333}}>报价 </Text>
-                        </TouchableOpacity>
-                      </If>
-                      {/*{onOpen &&*/}
-                      {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
-                      {/*                      onPress={() => this.onOpenModal('set_price', item)}>*/}
-                      {/*      <Text style={{color: colors.color333}}>报价 </Text>*/}
-                      {/*    </TouchableOpacity>}*/}
-
-                    </View>}
+                    opBar={this.opBar(onSale, item)}
       />
     );
   }
@@ -718,7 +704,7 @@ const styles = StyleSheet.create({
     width: pxToDp(160),
     backgroundColor: colors.colorEEE,
     height: '100%'
-  },
+  }, 
   notificationBar: {
     flex: 1,
     flexDirection: 'row',
@@ -783,4 +769,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  readNotification:{
+    marginRight: 10,
+    marginBottom: 8,
+    flex: 2,
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    backgroundColor: '#E26A6E',
+  }
 })
