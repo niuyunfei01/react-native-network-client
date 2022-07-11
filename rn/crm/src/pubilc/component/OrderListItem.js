@@ -27,7 +27,7 @@ import {
   orderCallShip
 } from "../../reducers/order/orderActions";
 
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
 import pxToDp from "../util/pxToDp";
 import HttpUtils from "../util/http";
 import native from "../../pubilc/util/native";
@@ -79,7 +79,8 @@ class OrderListItem extends React.PureComponent {
     delivery_btn: [],
     if_reship: 0,
     ok: true,
-    is_merchant_add_tip: 0
+    is_merchant_add_tip: 0,
+    toastContext: ''
   }
 
   constructor(props) {
@@ -400,6 +401,59 @@ class OrderListItem extends React.PureComponent {
     this.onCallThirdShips(order_id, store_id, 0)
   }
 
+  cancelDelivery = (val) => {
+    const token = this.props.accessToken
+    let orderId = val
+    const api = `/api/pre_cancel_order?access_token=${token}`;
+    let params = {
+      order_id: orderId
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      if (res.deduct_fee < 0) {
+        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
+          text: '确定', onPress: () => {
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                {
+                  order: orderId,
+                  ship_id: 0,
+                  onCancelled: (ok, reason) => {
+                    this.fetchData()
+                  }
+                });
+          }
+        }, {'text': '取消'}]);
+      } else if (res.deduct_fee == 0) {
+        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: orderId,
+              ship_id: 0,
+              onCancelled: (ok, reason) => {
+                this.fetchData()
+              }
+            });
+      } else {
+        this.setState({
+          toastContext: res.deduct_fee
+        }, () => {
+          Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
+            text: '确定', onPress: () => {
+              this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                  {
+                    order: orderId,
+                    ship_id: 0,
+                    onCancelled: (ok, reason) => {
+                      this.fetchData()
+                    }
+                  });
+            }
+          }, {'text': '取消'}]);
+        })
+      }
+    }).catch(e => {
+      showError(`${e.reason}`)
+    })
+  }
+
   render() {
     return (
       <View>
@@ -567,11 +621,11 @@ class OrderListItem extends React.PureComponent {
     this.mixpanel.track('订单列表页_我自己送')
   }
   renderButton = () => {
-    let {item} = this.props;
+    let {item, orderStatus} = this.props;
     return (
       <View style={styles.btnContent}>
 
-        <If condition={Number(item.orderStatus) === 1 && this.props.showBtn}>
+        <If condition={orderStatus === 9 && this.props.showBtn}>
           <Button title={'忽略配送'}
                   onPress={() => this.loseDelivery(item.id)}
                   buttonStyle={[styles.modalBtn, {borderColor: colors.colorCCC}]}
@@ -589,6 +643,38 @@ class OrderListItem extends React.PureComponent {
                   }}
                   buttonStyle={styles.callDeliveryBtn}
                   titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+        <If condition={(Number(orderStatus) === 10 || Number(orderStatus) === 8) && this.props.showBtn}>
+          <Button title={'呼叫配送'}
+                  onPress={() => {
+                    this.onCallThirdShips(item.id, item.store_id)
+                  }}
+                  buttonStyle={styles.callDeliveryBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+          <Button title={'我自己送'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.onAinSend(item.id, item.store_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  titleStyle={{color: colors.main_color, fontSize: 16}}
+          />
+        </If>
+        <If condition={(Number(orderStatus) === 2 || Number(orderStatus) === 3) && this.props.showBtn}>
+          <Button title={'联系骑手'}
+                  onPress={() => this.dialNumber(item.driver_phone)}
+                  buttonStyle={styles.callDeliveryBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+          <Button title={'取消配送'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.cancelDelivery(item.id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
         <If condition={item.pickType === "1" && item.orderStatus < 4}>

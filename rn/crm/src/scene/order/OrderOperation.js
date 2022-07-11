@@ -18,7 +18,7 @@ import {ActionSheet} from "../../weui";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
@@ -249,16 +249,20 @@ class OrderOperation extends Component {
                 {
                   text: '确认', onPress: () => {
                     HttpUtils.get(url).then(res => {
-                      ToastLong('订单取消成功即将返回!')
                       this.setState({
                         showDeliveryModal: false
                       }, () => {
+                        showSuccess('订单取消成功即将返回!')
                         setTimeout(() => {
                           this.props.navigation.goBack();
                         }, 1000);
                       })
-                    }).catch(() => {
-                      showError('取消订单失败')
+                    }).catch((error) => {
+                      this.setState({
+                        showDeliveryModal: false
+                      }, () => {
+                        showError(`${error.reason}`)
+                      })
                     })
                   }
                 },
