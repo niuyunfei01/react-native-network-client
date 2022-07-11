@@ -1760,14 +1760,14 @@ class OrderInfo extends Component {
     return noOrder ?
       <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
         <View>
-          <FloatServiceIcon/>
+          <FloatServiceIcon fromComponent={'订单详情'}/>
           <Text style={Styles.textAlignCenter}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>
         </View>
       </ScrollView>
       : (
         <View style={Styles.contentBody}>
 
-          <FloatServiceIcon/>
+          <FloatServiceIcon fromComponent={'订单详情'}/>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView
             refreshControl={this.refreshControl()}
