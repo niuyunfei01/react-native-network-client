@@ -471,13 +471,12 @@ class MineScene extends PureComponent {
     this.getStoreDataOfMine()
     // this.renderStoreBlock()
 
-    let _this = this;
-    const {dispatch} = this.props;
-    const {accessToken, currStoreId} = this.props.global;
+    const {dispatch, global} = this.props;
+    const {accessToken, currStoreId} = global;
     dispatch(
       upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
         if (ok) {
-          _this.setState({
+          this.setState({
             prefer_store: obj.prefer_store,
             screen_name: obj.screen_name,
             mobile_phone: obj.mobilephone,
@@ -644,7 +643,8 @@ class MineScene extends PureComponent {
               }}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={{height: pxToDp(85), width: 200}} onPress={() => this.setState({searchStoreVisible: true})}>
+          <TouchableOpacity style={{height: pxToDp(85), width: 200}}
+                            onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
