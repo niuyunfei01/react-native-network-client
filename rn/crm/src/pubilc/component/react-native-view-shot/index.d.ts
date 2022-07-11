@@ -8,11 +8,15 @@
  * @desc react-native-view-shot.d.ts
  */
 
-declare module '@zt-mobile/react-native-view-shot' {
-  import { Component, ReactInstance, RefObject } from 'react'
+declare module 'react-native-view-shot' {
+  import { Component, ReactInstance, RefObject, ReactNode } from 'react'
   import { ViewStyle } from 'react-native'
 
   export interface CaptureOptions {
+    /**
+     * (Android only) the file name of the file. Must be at least 3 characters long.
+     */
+    fileName?: string;
     /**
      * (number): the width and height of the final image (resized from the View bound. don't provide it if you want
      * the original pixel size).
@@ -59,6 +63,10 @@ declare module '@zt-mobile/react-native-view-shot' {
      */
     captureMode?: 'mount' | 'continuous' | 'update';
     /**
+     * children of ViewShot component
+     */
+    children?: ReactNode;
+    /**
      * when a captureMode is defined, this callback will be called with the capture result.
      * @param {string} uri
      */
@@ -69,13 +77,18 @@ declare module '@zt-mobile/react-native-view-shot' {
      */
     onCaptureFailure?(error: Error): void;
     /**
+     * Invoked on mount and layout changes
+     * @param {LayoutEvent} event
+     */
+    onLayout?(event: LayoutEvent): void;
+    /**
      * style prop as ViewStyle
      */
     style?: ViewStyle;
   }
 
   export default class ViewShot extends Component<ViewShotProperties> {
-  capture?(): Promise<string>;
+    capture?(): Promise<string>;
   }
 
   /**

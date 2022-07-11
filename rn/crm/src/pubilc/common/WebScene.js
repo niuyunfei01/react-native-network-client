@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
   Modal,
-  SafeAreaView, Image, ImageBackground
+  SafeAreaView,
+  Image
 } from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
@@ -22,8 +23,7 @@ import tool from "../util/tool";
 import colors from "../styles/colors";
 import * as wechat from "react-native-wechat-lib";
 import {shareWechatImage} from "../util/WechatUtils";
-import ViewShot from "../component/react-native-view-shot";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import ViewShot, {captureRef} from "../component/react-native-view-shot";
 
 function mapStateToProps(state) {
   return {
@@ -35,12 +35,12 @@ function mapDispatchToProps(dispatch) {
   return {dispatch, ...bindActionCreators({}, dispatch)}
 }
 
-const options = {fileName: 'shareWechat', format: 'png', quality: 1, width: 250, height: 410.66}
+const options = {fileName: 'shareWechat', format: 'png', quality: 1}
 const wechatShareImage = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/wechatShareImage.png'
 const wechatLogo = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/icon64_wx_logo.png'
 const wechatFriendImage = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/icon_res_download_moments.png'
-const descriptionLeft = '扫描二维码下载外送帮，注\r册时填写您推荐人的ID：'
-const descriptionRight = '，完成绑店、充值、\r发单，即可参与活动。'
+const descriptionLeft = '扫描二维码下载外送帮，注\n册时填写您推荐人的ID：'
+const descriptionRight = '，完成绑店、充值、\n发单，即可参与活动。'
 
 class WebScene extends PureComponent {
 
@@ -241,14 +241,6 @@ class WebScene extends PureComponent {
     return this._jumpIfShould(e.url);
   };
 
-  getWechatShareImageAddress = async () => {
-    return await AsyncStorage.getItem('wechatShareImage')
-  }
-
-  setWechatShareImageAddress = async (value) => {
-    return await AsyncStorage.setItem('wechatShareImage', value)
-  }
-
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       ToastShort('加载中')
@@ -278,7 +270,7 @@ class WebScene extends PureComponent {
   }
 
   render() {
-    const {shareWechatModal} = this.state
+    const {shareWechatModal, uri} = this.state
     const {global} = this.props
     return (
       <View style={styles.container}>
@@ -297,23 +289,24 @@ class WebScene extends PureComponent {
           <SafeAreaView style={styles.modalWrap}>
 
             <View style={styles.center}>
+
               <ViewShot ref={ref => this.viewRef = ref} options={options}>
-                <ImageBackground source={{uri: wechatShareImage}} style={styles.imgBackground} onLoadEnd={this.onLoad}>
-                  <View style={styles.descriptionContent}>
+                <Image source={{uri: wechatShareImage}} style={styles.imgBackground}/>
+                <View style={styles.descriptionContent}>
+                  <Text style={styles.descriptionText}>
+                    {descriptionLeft}
+                  </Text>
+                  <Text>
+                    <Text style={styles.currentUserIdDescriptionText}>
+                      {global.currentUser}
+                    </Text>
                     <Text style={styles.descriptionText}>
-                      {descriptionLeft}
+                      {descriptionRight}
                     </Text>
-                    <Text>
-                      <Text style={styles.currentUserIdDescriptionText}>
-                        {global.currentUser}
-                      </Text>
-                      <Text style={styles.descriptionText}>
-                        {descriptionRight}
-                      </Text>
-                    </Text>
-                  </View>
-                </ImageBackground>
+                  </Text>
+                </View>
               </ViewShot>
+
             </View>
             <View style={styles.modalContentWrap}>
               <Text style={styles.modalText}>
@@ -340,32 +333,29 @@ class WebScene extends PureComponent {
   }
 
   onLoad = async () => {
-    const address = await this.getWechatShareImageAddress()
-    if (address) {
-      this.setState({uri: address})
-      return
-    }
-    const uri = await this.viewRef.capture()
+    const uri = await captureRef(this.viewRef, options)
     this.setState({uri: uri})
-    await this.setWechatShareImageAddress(uri)
+    console.log('读取结束')
   }
   hideShareWechatModal = () => {
     this.setState({shareWechatModal: false})
   }
-  shareWechat = (scene) => {
-    const {uri} = this.state
-
+  shareWechat = async (scene) => {
+    const uri = await captureRef(this.viewRef, options)
     if (uri.length <= 0) {
-      showError('分享失败，图片为空')
+      showError('获取图片失败')
       return
     }
-    shareWechatImage(uri, scene).then(({errCode, errStr}) => {
+    try {
+      const {errCode, errStr} = await shareWechatImage(uri, scene)
       if (0 === errCode) {
         this.hideShareWechatModal()
         return
       }
       showError('分享失败，原因：' + errStr)
-    }).catch(error => showError('分享失败，原因：' + error.errStr))
+    } catch (error) {
+      showError('分享失败，原因：' + error.errStr)
+    }
   }
 }
 
@@ -395,7 +385,7 @@ const styles = StyleSheet.create({
   },
   selectItemIconWrap: {paddingLeft: 20, paddingRight: 20},
   selectItemIcon: {height: 64, width: 64},
-  descriptionContent: {paddingLeft: 25.33, paddingTop: 316},
+  descriptionContent: {paddingLeft: 25.33, paddingTop: 316, position: 'absolute'},
   currentUserIdDescriptionText: {
     color: colors.color333,
     fontSize: 8,

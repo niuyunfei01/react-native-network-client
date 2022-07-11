@@ -5,10 +5,8 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.os.Build;
-
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
-
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;

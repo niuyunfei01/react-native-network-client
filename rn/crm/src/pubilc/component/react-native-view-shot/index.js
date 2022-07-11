@@ -100,18 +100,9 @@ export function ensureModuleIsLoaded() {
   }
 }
 
-export function captureRef<T: React$ElementType>(
-  view: number | ?View | React$Ref<T>,
-  optionsObject?: Object
-): Promise<string> {
+export function captureRef<T: React$ElementType>(view: number | ?View | React$Ref<T>, optionsObject?: Object): Promise<string> {
   ensureModuleIsLoaded();
-  if (
-    view &&
-    typeof view === "object" &&
-    "current" in view &&
-    // $FlowFixMe view is a ref
-    view.current
-  ) {
+  if (view && typeof view === "object" && "current" in view && view.current) {
     // $FlowFixMe view is a ref
     view = view.current;
     if (!view) {
@@ -246,7 +237,7 @@ export default class ViewShot extends Component<Props> {
         this._raf = requestAnimationFrame(loop);
         if (previousCaptureURI === this.lastCapturedURI) return; // previous capture has not finished, don't capture yet
         previousCaptureURI = this.lastCapturedURI;
-        this.capture();
+        this.capture().then();
       };
       this._raf = requestAnimationFrame(loop);
     }
@@ -265,7 +256,7 @@ export default class ViewShot extends Component<Props> {
   componentDidMount() {
     if (__DEV__) checkCompatibleProps(this.props);
     if (this.props.captureMode === "mount") {
-      this.capture();
+      this.capture().then();
     } else {
       this.syncCaptureLoop(this.props.captureMode);
     }
@@ -278,7 +269,7 @@ export default class ViewShot extends Component<Props> {
       }
     }
     if (this.props.captureMode === "update") {
-      this.capture();
+      this.capture().then();
     }
   }
 
