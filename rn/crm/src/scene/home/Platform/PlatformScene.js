@@ -4,6 +4,7 @@ import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import {Button, List, SwipeAction} from '@ant-design/react-native';
 import * as globalActions from "../../../reducers/global/globalActions"
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const mapStateToProps = state => {
   let {global} = state
@@ -19,6 +20,8 @@ const mapDispatchToProps = dispatch => {
 class PlatformScene extends PureComponent {
   constructor(props) {
     super(props)
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('绑定平台页')
     this.state = {
       isRefreshing: false,
       platformsList: [],

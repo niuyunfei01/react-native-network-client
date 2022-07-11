@@ -7,6 +7,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../util/http";
 import Config from "../common/config";
 import {showError} from "../util/ToastUtils";
+import pxToDp from "../util/pxToDp";
 
 const initState = {
   scrollViewIsBottom: false,
@@ -105,13 +106,13 @@ class RemindModal extends React.Component {
             </Text>
           </ScrollView>
           <If condition={this.state.advicesInfoArray.type == 4}>
-            <View style={{display: "flex",flexDirection: "row",justifyContent: "space-around",alignItems: "center"}}>
+            <View style={[styles.modalButtonBox, {paddingTop: 10, paddingLeft: 20}]}>
               <Button title={'取消'}
                       onPress={() => {
                         this.closeAdvicesModal(this.state.advicesInfoArray.id)
                       }}
-                      buttonStyle={styles.modalBtnWrapCancel}
-                      titleStyle={styles.modalBtnTextCancel}
+                      buttonStyle={styles.modalBtnWrap1}
+                      titleStyle={styles.modalBtnText}
               />
               <Button title={'同意'}
                       onPress={() => {
@@ -123,32 +124,38 @@ class RemindModal extends React.Component {
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 1}>
+            <View style={styles.modalButtonBox}>
             <Button title={'知道了'}
                     onPress={() => {
                       this.closeAdvicesModal(this.state.advicesInfoArray.id)
                     }}
-                    buttonStyle={styles.modalBtnWrap}
-                    titleStyle={styles.modalBtnText}
+                    buttonStyle={styles.modalBtnWrapWhite}
+                    titleStyle={styles.modalBtnTextGreen}
             />
+            </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 2}>
-            <Button title={'查看详情'}
-                    onPress={() => {
-                      this.toAdvicesDetail(this.state.advicesInfoArray)
-                    }}
-                    buttonStyle={styles.modalBtnWrap}
-                    titleStyle={styles.modalBtnText}
-            />
+            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
+              <Button title={'查看详情'}
+                      onPress={() => {
+                        this.toAdvicesDetail(this.state.advicesInfoArray)
+                      }}
+                      buttonStyle={[styles.modalBtnWrap, {width: '100%'}]}
+                      titleStyle={styles.modalBtnText}
+              />
+            </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 3}>
-            <Button title={'我已阅读'}
-                    onPress={() => {
-                      this.closeAdvicesModal(this.state.advicesInfoArray.id)
-                    }}
-                    disabled={!this.state.scrollViewIsBottom}
-                    buttonStyle={this.state.scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1}
-                    titleStyle={styles.modalBtnText}
-            />
+            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
+              <Button title={'我已阅读'}
+                      onPress={() => {
+                        this.closeAdvicesModal(this.state.advicesInfoArray.id)
+                      }}
+                      disabled={!this.state.scrollViewIsBottom}
+                      buttonStyle={[this.state.scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1, {width: '100%'}]}
+                      titleStyle={styles.modalBtnText}
+              />
+            </View>
           </If>
         </View>
       </View>
@@ -164,12 +171,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
-  modalContainer: {height: 200, paddingHorizontal: 10, marginTop: 20},
+  modalContainer: {height: 200, paddingHorizontal: 20, marginTop: 20},
+  modalContentText: {color: colors.fontBlack},
   modalContentWrap:{
     width:'80%',
     backgroundColor: colors.colorEEE,
     borderRadius:8,
-    padding:12,
     position: "relative"
   },
   modalContentTitle: {
@@ -185,7 +192,7 @@ const styles = StyleSheet.create({
     top: 0
   },
   modalContentTitleText: {
-    fontSize:12,
+    fontSize:16,
     fontWeight:'bold',
     paddingTop:8,
     paddingBottom:8,
@@ -197,19 +204,15 @@ const styles = StyleSheet.create({
   },
   modalBtnWrap:{
     backgroundColor:colors.main_color,
-    marginLeft:20,
     marginRight:20
   },
-  modalBtnWrapCancel:{
-    backgroundColor:colors.white,
-    borderWidth: 1,
-    borderColor: colors.color333,
+  modalBtnWrapWhite:{
+    backgroundColor: colors.colorEEE,
     marginLeft:20,
     marginRight:20
   },
   modalBtnWrap1:{
     backgroundColor:colors.fontColor,
-    marginLeft:20,
     marginRight:20
   },
   modalBtnText:{
@@ -218,12 +221,21 @@ const styles = StyleSheet.create({
     padding:12,
     textAlign:'center'
   },
-  modalBtnTextCancel:{
-    color:colors.color333,
+  modalBtnTextGreen:{
+    color:colors.main_color,
     fontSize:20,
     padding:12,
     textAlign:'center'
   },
+  modalButtonBox: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: colors.colorDDD,
+    marginVertical: pxToDp(10)
+  }
 });
 
 export default RemindModal

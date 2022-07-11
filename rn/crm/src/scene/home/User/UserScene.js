@@ -57,7 +57,6 @@ class UserScene extends PureComponent {
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
               onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
                   navigation.navigate(Config.ROUTE_USER_ADD, {
                     type: 'edit',
                     user_id: params.currentUser,
@@ -69,7 +68,6 @@ class UserScene extends PureComponent {
                     worker_nav_key: params.navigation_key,
                     user_info_key: key,
                   });
-                });
               }}
             >
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>

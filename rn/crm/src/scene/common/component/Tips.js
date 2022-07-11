@@ -98,12 +98,12 @@ class Tips extends Component {
 
             <View style={styles.Item}>
               <View style={styles.circle}></View>
-              <Text style={styles.txt}>您开通的配送较少、 </Text>
+              <Text style={styles.txt}>您开通的配送较少 </Text>
             </View>
 
             <View style={styles.Item}>
               <View style={styles.circle}></View>
-              <Text style={styles.txt}>请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
+              <Text style={styles.txt}>请开通美团飞速达、顺丰（不需审核立即开通) </Text>
             </View>
             <View style={styles.Item}>
               <View style={styles.circle}></View>

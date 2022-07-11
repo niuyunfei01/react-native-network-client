@@ -208,10 +208,10 @@ export function store(global, store_id = null) {
  * @param callback
  * @returns {*}
  */
-export function simpleStore(global, dispatch = null,storeId=null, callback = (store) => {
+export function simpleStore(global, dispatch = null, storeId = null, callback = (store) => {
 }) {
   const {currStoreId, simpleStore} = global
-  const id=null===storeId?currStoreId:storeId
+  const id = null === storeId ? currStoreId : storeId
   if (simpleStore && simpleStore.id == id) {
     callback(simpleStore)
   } else {

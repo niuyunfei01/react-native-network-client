@@ -133,20 +133,20 @@ export default class ModalSelector extends BaseComponent {
     });
   }
 
-  renderSection(section, styles, bottom_line) {
+  renderSection(section, styles, bottom_line, key) {
 
     return (
-      <View key={section.key} style={[bottom_line, styles.sectionStyle, this.props.sectionStyle]}>
+      <View key={key} style={[bottom_line, styles.sectionStyle, this.props.sectionStyle]}>
         <Text style={[styles.sectionTextStyle, this.props.sectionTextStyle]}>{section.label} </Text>
       </View>
     );
   }
 
-  renderDefault(default_section, styles, bottom_line) {
+  renderDefault(default_section, styles, bottom_line, key) {
     let checkMark = this.props.checkMark ? {flexDirection: 'row', justifyContent: 'center', paddingLeft: 20} : null;
 
     return (
-      <View key={default_section.key} style={[
+      <View key={key} style={[
         bottom_line,
         checkMark,
         styles.defaultSelectStyle,
@@ -158,10 +158,10 @@ export default class ModalSelector extends BaseComponent {
     );
   }
 
-  renderOption(option, styles, bottom_line) {
+  renderOption(option, styles, bottom_line, key) {
 
     return (
-      <TouchableOpacity key={option.key} onPress={() => this.onChange(option)}>
+      <TouchableOpacity key={key} onPress={() => this.onChange(option)}>
         <View style={[bottom_line, styles.optionStyle, this.props.optionStyle]}>
           <Text style={[styles.optionTextStyle, this.props.optionTextStyle]}>{option.label} </Text>
         </View>
@@ -175,11 +175,11 @@ export default class ModalSelector extends BaseComponent {
       let bottom_line = last_item !== key ? styles.bottom_line : (bottomLine ? styles.bottom_line : null);
 
       if (item.section) {
-        return this.renderSection(item, styles, bottom_line);
+        return this.renderSection(item, styles, bottom_line, key);
       } else if (parseInt(this.props.defaultKey) === parseInt(item.key)) {
-        return this.renderDefault(item, styles, bottom_line);
+        return this.renderDefault(item, styles, bottom_line, key);
       }
-      return this.renderOption(item, styles, bottom_line);
+      return this.renderOption(item, styles, bottom_line, key);
     });
 
     const closeOverlay = this.props.backdropPressToClose;

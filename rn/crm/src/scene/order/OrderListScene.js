@@ -1,16 +1,17 @@
 import React, {Component} from 'react'
 import {
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  InteractionManager,
-  View,
-  SafeAreaView,
   Alert,
   Dimensions,
+  FlatList,
+  InteractionManager,
+  Modal,
   Platform,
-  StatusBar, Modal
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -31,7 +32,7 @@ import {MixpanelInstance} from '../../pubilc/util/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
-import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import {showError} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {Badge, Button, Image} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
@@ -45,7 +46,7 @@ import Cts from "../../pubilc/common/Cts";
 import RemindModal from "../../pubilc/component/remindModal";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
-const width = Dimensions.get("window").width;
+const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {remind, global, device} = state;
@@ -81,8 +82,8 @@ function FetchView({navigation, onRefresh}) {
 const initState = {
   showNewVersionVisible: false,
   newVersionInfo: {},
-  downloadFileProgress:'',
-  downloadFileFinish:false,
+  downloadFileProgress: '',
+  downloadFileFinish: false,
   isLoading: false,
   categoryLabels: [
     {tabname: '待打包', num: 0, status: 1},
@@ -140,7 +141,7 @@ const timeObj = {
   componentName: '',
   method: []
 }
-const platform=Platform.OS==='android'?'Android-Bundle':'IOS-Bundle'
+const platform = Platform.OS === 'android' ? 'Android-Bundle' : 'IOS-Bundle'
 
 class OrderListScene extends Component {
   state = initState;
@@ -231,55 +232,56 @@ class OrderListScene extends Component {
     calcMs(timeObj, accessToken)
   }
 
-  getNewVersionInfo=()=>{
-    const url='/v1/new_api/Version/getBundleUrl'
-    const version=__DEV__?'5':Cts.BUNDLE_VERSION;
-    const params={platform:platform,version:version}
-    HttpUtils.get.bind(this.props)(url,params).then(res=>{
-      if(parseInt(res.android)>version)
-        this.setState({newVersionInfo:res,showNewVersionVisible:true})
-    }).catch(error=>{showError(error)})
+  getNewVersionInfo = () => {
+    const url = '/v1/new_api/Version/getBundleUrl'
+    const version = __DEV__ ? '5' : Cts.BUNDLE_VERSION;
+    const params = {platform: platform, version: version}
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+      if (parseInt(res.android) > version)
+        this.setState({newVersionInfo: res, showNewVersionVisible: true})
+    }).catch(error => {
+      showError(error)
+    })
   }
 
-  updateBundle=(newVersionInfo)=>{
-    const {downloadFileFinish}=this.state
-    if(downloadFileFinish&&Platform.OS==='ios'){
+  updateBundle = (newVersionInfo) => {
+    const {downloadFileFinish} = this.state
+    if (downloadFileFinish) {
       RNRestart.Restart()
       return
     }
-    if(downloadFileFinish&&Platform.OS==='android') {
-      showSuccess('下载完成，请重新打开软件')
-      return;
-    }
-    const source=Platform.OS==='ios'?bundleFilePath+'/last.ios.zip':bundleFilePath+'/last.android.zip';
-    RNFetchBlob.config({path:source})
-        .fetch('GET',newVersionInfo.bundle_url)
-        .progress({count:10, fileCache : true},(received, total)=>{
-          const downloadFileProgress=parseInt(`${(received/total)*100}`)
-          this.setState({downloadFileProgress:`${downloadFileProgress}%`})
-        })
-        .then(async (res) => {
-          const status = res.info().status;
-          if (status === 200) {
-            const target=Platform.OS==='ios'?bundleFilePath+'/last.ios/':bundleFilePath+'/last.android/';
-            if(!await exists(target))
-              await createDirectory(target)
-            await unzip(source,target)
-            await deleteFile(source)
-            this.setState({
-              downloadFileProgress:Platform.OS==='ios'?'':'下载完成，请重新打开软件',
-              downloadFileFinish:true})
-          }
-        }).catch(error => {
+
+    const source = Platform.OS === 'ios' ? bundleFilePath + '/last.ios.zip' : bundleFilePath + '/last.android.zip';
+    RNFetchBlob.config({path: source})
+      .fetch('GET', newVersionInfo.bundle_url)
+      .progress({count: 10, fileCache: true}, (received, total) => {
+        const downloadFileProgress = parseInt(`${(received / total) * 100}`)
+        this.setState({downloadFileProgress: `${downloadFileProgress}%`})
+      })
+      .then(async (res) => {
+        const status = res.info().status;
+        if (status === 200) {
+          const target = Platform.OS === 'ios' ? bundleFilePath + '/last.ios/' : bundleFilePath + '/last.android/';
+          if (!await exists(target))
+            await createDirectory(target)
+          await unzip(source, target)
+          await deleteFile(source)
+          this.setState({
+            downloadFileProgress: '',
+            downloadFileFinish: true
+          })
+        }
+      }).catch(error => {
       showError(error.reason)
     })
   }
 
-  closeNewVersionInfo=()=>{
-    this.setState({showNewVersionVisible:false})
+  closeNewVersionInfo = () => {
+    this.setState({showNewVersionVisible: false})
   }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(timeObj.method.length > 0) {
+    if (timeObj.method.length > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -304,7 +306,7 @@ class OrderListScene extends Component {
       pos: 1
     }
     HttpUtils.post.bind(this.props)(api, data, true).then((res) => {
-      const{obj} = res
+      const {obj} = res
       timeObj.method.push({
         interfaceName: api,
         startTime: res.startTime,
@@ -555,7 +557,15 @@ class OrderListScene extends Component {
   render() {
     const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
 
-    const {showNewVersionVisible,showSortModal,ext_store_list,searchStoreVisible,newVersionInfo,downloadFileProgress,downloadFileFinish}=this.state
+    const {
+      showNewVersionVisible,
+      showSortModal,
+      ext_store_list,
+      searchStoreVisible,
+      newVersionInfo,
+      downloadFileProgress,
+      downloadFileFinish
+    } = this.state
     return (
       <View style={{flex: 1}}>
         <FloatServiceIcon/>
@@ -575,12 +585,12 @@ class OrderListScene extends Component {
             backgroundColor: colors.white
           }}>
             <Text onPress={() => {
-                this.setState({searchStoreVisible: true})
-              }}
-              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name} </Text>
+              this.setState({searchStoreVisible: true})
+            }}
+                  style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name} </Text>
             <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
           </View>
-          </If>
+        </If>
         <SearchExtStore visible={searchStoreVisible}
                         data={ext_store_list}
                         onClose={() => this.setState({
@@ -605,17 +615,17 @@ class OrderListScene extends Component {
                           })
                         }}/>
 
-          {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
-          <If condition={this.state.show_hint}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
-              </CellBody>
-              <CellFooter>
-                <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
-              </CellFooter>
-            </Cell>
-          </If>
+        {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
+        <If condition={this.state.show_hint}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+            </CellBody>
+            <CellFooter>
+              <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
+            </CellFooter>
+          </Cell>
+        </If>
         <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
           <View style={styles.modalWrap}>
             <View style={styles.modalContentWrap}>
@@ -627,25 +637,25 @@ class OrderListScene extends Component {
               <Text style={styles.modalContentText}>
                 {newVersionInfo.info}
               </Text>
-              <If condition={downloadFileProgress!==''}>
-                <Text style= {styles.modalTitleText}>
+              <If condition={downloadFileProgress !== ''}>
+                <Text style={styles.modalTitleText}>
                   下载进度：{downloadFileProgress}
                 </Text>
               </If>
-              <TouchableOpacity style={styles.modalBtnWrap} onPress={()=>this.updateBundle(newVersionInfo)}>
+              <TouchableOpacity style={styles.modalBtnWrap} onPress={() => this.updateBundle(newVersionInfo)}>
                 <Text style={styles.modalBtnText}>
-                  {downloadFileFinish?'立即体验':'立即更新'}
+                  {downloadFileFinish ? '立即体验' : '立即更新'}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
-          <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
-        </View>
+        <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
+      </View>
     );
   }
 
-  openNotifySetting= () => {
+  openNotifySetting = () => {
     if (this.state.hint_msg === 1) {
       native.toOpenNotifySettings()
     }
@@ -665,6 +675,7 @@ class OrderListScene extends Component {
               orderStatus: this.state.categoryLabels[0].status,
             }, () => {
               this.onRefresh(this.state.categoryLabels[0].status)
+              this.mixpanel.track('处理中订单')
             })
           }}
                 style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
@@ -675,10 +686,12 @@ class OrderListScene extends Component {
               ListData: [],
             }, () => {
               this.onRefresh(7)
+              this.mixpanel.track('预订单')
             })
           }}
                 style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
           <Text onPress={() => {
+            this.mixpanel.track('全部的订单')
             const {navigation} = this.props
             navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
           }}
@@ -715,24 +728,24 @@ class OrderListScene extends Component {
           dropdownTextHighlightStyle={{color: '#fff'}}
           options={['新 建', '排 序']}
           defaultValue={''}
-          onSelect={(e) => {
-            if (e === 0) {
-              this.onPress(Config.ROUTE_ORDER_SETTING)
-            } else {
-              let showSortModal = !this.state.showSortModal;
-              this.setState({showSortModal: showSortModal})
-            }
-          }}
+          onSelect={(e) => this.onSelect(e)}
         >
-          <View style={{
-            marginRight: pxToDp(20),
-            marginLeft: 18,
-          }}>
-            <Entypo name={"menu"} style={{fontSize: 26, color: colors.color666}}/>
+          <View style={{marginRight: 16, marginLeft: 18}}>
+            <Entypo name={"menu"} style={{fontSize: 24, color: colors.color666}}/>
           </View>
         </ModalDropdown>
       </View>
     )
+  }
+
+  onSelect = (e) => {
+    if (e === 0) {
+      this.mixpanel.track('新建订单')
+      this.onPress(Config.ROUTE_ORDER_SETTING)
+    } else {
+      let showSortModal = !this.state.showSortModal;
+      this.setState({showSortModal: showSortModal})
+    }
   }
 
 
@@ -853,20 +866,20 @@ class OrderListScene extends Component {
   showSortSelect = () => {
     let {user_config} = this.props.global;
     let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
-    return(
-        <View style={{marginTop: 12}}>
-          <For index="index" each="sortItem" of={this.state.sortData}>
-            <RadioItem key={index} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
-                       checked={sort === sortItem.value}
-                       onChange={event => {
-                         if (event.target.checked) {
-                           this.setOrderBy(sortItem.value)
-                         }
-                       }}>
-              <Text style={{color: colors.fontBlack}}>{sortItem.label} </Text>
-            </RadioItem>
-          </For>
-        </View>
+    return (
+      <View style={{marginTop: 12}}>
+        <For index="index" each="sortItem" of={this.state.sortData}>
+          <RadioItem key={index} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
+                     checked={sort === sortItem.value}
+                     onChange={event => {
+                       if (event.target.checked) {
+                         this.setOrderBy(sortItem.value)
+                       }
+                     }}>
+            <Text style={{color: colors.fontBlack}}>{sortItem.label} </Text>
+          </RadioItem>
+        </For>
+      </View>
     )
   }
   setOrderBy = (order_by) => {
@@ -886,6 +899,7 @@ class OrderListScene extends Component {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={this.state.showBtn}
+                     key={index}
                      fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}
@@ -922,12 +936,12 @@ class OrderListScene extends Component {
                     borderRadius: pxToDp(10),
                     backgroundColor: colors.main_color,
                     marginTop: pxToDp(30)
-          }}
+                  }}
 
                   titleStyle={{
                     color: colors.white,
                     fontSize: 16
-          }}
+                  }}
           />
         </If>
       </View>
@@ -959,7 +973,7 @@ class OrderListScene extends Component {
               width: '100%',
               backgroundColor: '#EEDEE0',
               height: 40
-          }}>
+            }}>
             <Text style={{color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1}}>
               存在补送的订单
             </Text>
@@ -981,7 +995,8 @@ class OrderListScene extends Component {
             </Button>
           </TouchableOpacity>
         </If>
-        <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+        <If
+          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
           <TouchableOpacity onPress={() => {
             this.onPressActivity()
           }} style={{paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'}}>
@@ -1006,10 +1021,12 @@ class OrderListScene extends Component {
 
   renderbottomImg = () => {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+      <If
+        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
-        }} style={{paddingTop: '5%', paddingLeft: '3%', paddingRight: '3%',
+        }} style={{
+          paddingTop: '5%', paddingLeft: '3%', paddingRight: '3%',
         }}>
           <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
         </TouchableOpacity>
@@ -1020,29 +1037,30 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
-  center:{alignItems:'center', justifyContent:'center'},
-  modalWrap:{
+  center: {alignItems: 'center', justifyContent: 'center'},
+  modalWrap: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
-  modalContentWrap:{
-    width:'80%',
+  modalContentWrap: {
+    width: '80%',
     backgroundColor: colors.colorEEE,
-    borderRadius:8,
-    padding:12,
+    borderRadius: 8,
+    padding: 12,
   },
-  modalTitleText:{fontSize:12,fontWeight:'bold',paddingTop:8,paddingBottom:8,marginLeft:20,lineHeight:25},
-  modalImgStyle:{width:51.2,height:51.2,marginTop:12,borderRadius:8},
-  modalContentText:{paddingTop:12,paddingBottom:16,marginLeft:20,marginRight:20,lineHeight:25},
-  modalBtnWrap:{
-    backgroundColor:colors.main_color,
-    marginLeft:20,
-    marginRight:20
+  modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
+  modalImgStyle: {width: 51.2, height: 51.2, marginTop: 12, borderRadius: 8},
+  modalContentText: {paddingTop: 12, paddingBottom: 16, marginLeft: 20, marginRight: 20, lineHeight: 25},
+  modalBtnWrap: {
+    backgroundColor: colors.main_color,
+    marginLeft: 20,
+    marginRight: 20,
+    borderRadius: 8
   },
-  closeNewVersionModal:{fontSize:20,textAlign:'right'},
-  modalBtnText:{color:colors.white,fontSize:20,padding:12,textAlign:'center'},
+  closeNewVersionModal: {fontSize: 20, textAlign: 'right'},
+  modalBtnText: {color: colors.white, fontSize: 20, padding: 12, textAlign: 'center'},
   cell_row: {
     marginLeft: 0,
     paddingLeft: pxToDp(20),

@@ -6,15 +6,18 @@ import android.os.Looper;
 
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.JSBundleLoader;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
-public class RestartModule extends ReactContextBaseJavaModule {
+import org.devio.rn.splashscreen.SplashScreen;
 
-    private static final String REACT_APPLICATION_CLASS_NAME = "com.facebook.react.ReactApplication";
-    private static final String REACT_NATIVE_HOST_CLASS_NAME = "com.facebook.react.ReactNativeHost";
+import java.io.File;
+import java.lang.reflect.Field;
+
+public class RestartModule extends ReactContextBaseJavaModule {
 
     private LifecycleEventListener mLifecycleEventListener = null;
 
@@ -27,13 +30,7 @@ public class RestartModule extends ReactContextBaseJavaModule {
         if (currentActivity == null) {
             return;
         }
-
-        currentActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                currentActivity.recreate();
-            }
-        });
+        currentActivity.runOnUiThread(currentActivity::recreate);
     }
 
     private void loadBundle() {
@@ -46,7 +43,19 @@ public class RestartModule extends ReactContextBaseJavaModule {
 
             new Handler(Looper.getMainLooper()).post(() -> {
                 try {
-                    instanceManager.recreateReactContextInBackground();
+                    String DocumentDir = getReactApplicationContext().getFilesDir().getAbsolutePath();
+                    String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
+                    File file = new File(jsBundleFile);
+                    if (file.exists() && file.isFile()) {
+                        SplashScreen.show(getCurrentActivity());
+                        JSBundleLoader loader = JSBundleLoader.createFileLoader(jsBundleFile);
+                        Field loadField = instanceManager.getClass().getDeclaredField("mBundleLoader");
+                        loadField.setAccessible(true);
+                        loadField.set(instanceManager, loader);
+                        instanceManager.recreateReactContextInBackground();
+                        return;
+                    }
+                    loadBundleLegacy();
                 } catch (Throwable t) {
                     loadBundleLegacy();
                 }

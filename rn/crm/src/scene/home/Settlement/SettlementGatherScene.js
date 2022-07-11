@@ -125,10 +125,12 @@ class SettlementGatherScene extends PureComponent {
             onDismiss={() => {
             }}
           >
-            <Text style={header.time}>{this.state.date}  </Text>
+            <Text style={header.time}>
+              {this.state.date} &nbsp;&nbsp;&nbsp;
+              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+            </Text>
           </PopPicker>
 
-          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
@@ -269,8 +271,11 @@ const header = StyleSheet.create({
     justifyContent: 'center',
   },
   time: {
-    fontSize: pxToDp(24),
-    color: colors.fontGray
+    color: colors.fontGray,
+    fontWeight: 'bold',
+    fontSize: 15,
+    padding: 5,
+    width: 200,
   },
   text_box: {
     flex: 1,
