@@ -92,7 +92,7 @@ class OrderCancelShip extends Component {
     let {dispatch} = this.props;
 
     let {order} = this.props.route.params;
-    const order_id = order ? order.id : 0;
+    const order_id = order ? order : 0;
 
     const self = this;
     dispatch(cancelShip(ship_id, reason_id, order_id, token, async (ok, reason) => {
