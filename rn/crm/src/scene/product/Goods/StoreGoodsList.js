@@ -308,25 +308,26 @@ class StoreGoodsList extends Component {
     this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
   }
 
-  onEndReached=()=>{
+  onEndReached = () => {
     if (this.state.isCanLoadMore) {
       this.setState({isCanLoadMore: false}, () => {
         this.onLoadMore();
       })
     }
   }
-  onMomentumScrollBegin=()=>{
+  onMomentumScrollBegin = () => {
     this.setState({
       isCanLoadMore: true
     })
   }
-  onTouchMove=(e)=>{
+  onTouchMove = (e) => {
     if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
       this.setState({scrollLocking: true});
     } else {
       this.setState({scrollLocking: false});
     }
   }
+
   render() {
     const p = this.state.selectedProduct;
     const {sp} = this.state.selectedProduct;
@@ -367,7 +368,7 @@ class StoreGoodsList extends Component {
                 legacyImplementation={false}
                 directionalLockEnabled={true}
                 onEndReachedThreshold={0.3}
-                onEndReached={ this.onEndReached}
+                onEndReached={this.onEndReached}
                 onMomentumScrollBegin={this.onMomentumScrollBegin}
                 onTouchMove={(e) => this.onTouchMove(e)}
                 renderItem={this.renderItem.bind(this)}
@@ -644,7 +645,7 @@ class StoreGoodsList extends Component {
     }
   }
 
-  opBar = (onSale, item) => {
+  opBar = (onSale, onStrict, item) => {
     return (
       <View style={[styles.row_center, styles.btnWrap]}>
         <If condition={onSale}>
@@ -652,16 +653,20 @@ class StoreGoodsList extends Component {
                             onPress={() => this.onOpenModal('off_sale', item)}>
             <Text style={{color: colors.color333}}>下架 </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-            <Text style={{color: colors.color333}}>价格/库存 </Text>
-          </TouchableOpacity>
         </If>
         <If condition={!onSale}>
           <TouchableOpacity style={[styles.toOnlineBtn]}
                             onPress={() => this.onOpenModal('on_sale', item)}>
             <Text style={{color: colors.color333}}>上架 </Text>
           </TouchableOpacity>
+        </If>
+        <If condition={onStrict}>
+          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+            <Text style={{color: colors.color333}}>价格/库存 </Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={!onStrict}>
           <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                             onPress={() => this.onOpenModal('set_price', item)}>
             <Text style={{color: colors.color333}}>报价 </Text>
@@ -684,7 +689,7 @@ class StoreGoodsList extends Component {
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    opBar={this.opBar(onSale, item)}
+                    opBar={this.opBar(onSale, onStrict, item)}
       />
     );
   }
@@ -704,7 +709,7 @@ const styles = StyleSheet.create({
     width: pxToDp(160),
     backgroundColor: colors.colorEEE,
     height: '100%'
-  }, 
+  },
   notificationBar: {
     flex: 1,
     flexDirection: 'row',
@@ -769,7 +774,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  readNotification:{
+  readNotification: {
     marginRight: 10,
     marginBottom: 8,
     flex: 2,
