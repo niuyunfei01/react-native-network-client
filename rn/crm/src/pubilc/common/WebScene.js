@@ -24,6 +24,7 @@ import colors from "../styles/colors";
 import * as wechat from "react-native-wechat-lib";
 import {shareWechatImage} from "../util/WechatUtils";
 import ViewShot, {captureRef} from "../component/react-native-view-shot";
+import {MixpanelInstance} from "../util/analytics";
 
 function mapStateToProps(state) {
   return {
@@ -46,6 +47,7 @@ class WebScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     this.state = {
       source: {},
       canGoBack: false,
@@ -79,6 +81,7 @@ class WebScene extends PureComponent {
   }
 
   wechatShare = () => {
+    this.mixpanel.track('act_user_ref_ad_page_share')
     wechat.isWXAppInstalled().then(isInstalled => {
       if (isInstalled) {
         this.setState({shareWechatModal: true})
@@ -270,7 +273,7 @@ class WebScene extends PureComponent {
   }
 
   render() {
-    const {shareWechatModal, uri} = this.state
+    const {shareWechatModal} = this.state
     const {global} = this.props
     return (
       <View style={styles.container}>
@@ -332,11 +335,6 @@ class WebScene extends PureComponent {
     );
   }
 
-  onLoad = async () => {
-    const uri = await captureRef(this.viewRef, options)
-    this.setState({uri: uri})
-    console.log('读取结束')
-  }
   hideShareWechatModal = () => {
     this.setState({shareWechatModal: false})
   }

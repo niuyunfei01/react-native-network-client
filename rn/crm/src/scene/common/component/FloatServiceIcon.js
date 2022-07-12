@@ -7,6 +7,7 @@ import {Text} from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {setUserCfg} from "../../../reducers/global/globalActions";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -19,21 +20,35 @@ let width = Dimensions.get("window").width;
 class FloatServiceIcon extends React.Component {
   constructor(props) {
     super(props)
+    this.mixpanel = MixpanelInstance;
     this.timeout = null;
   }
 
-  render() {
+  contactService = () => {
+    const {global, fromComponent} = this.props
+    let {currStoreId, currentUser, currentUserProfile} = global;
+    if (fromComponent)
+      this.mixpanel.track(fromComponent + '_联系客服');
+    let {currVendorId} = tool.vendor(global)
+    let data = {
+      v: currVendorId,
+      s: currStoreId,
+      u: currentUser,
+      m: currentUserProfile.mobilephone,
+      place: 'float'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
 
-    let {user_config} = this.props.global;
-    let {
-      top,
-      left
-    } = user_config !== undefined && user_config?.coordinate ? user_config?.coordinate : {
+  render() {
+    const {global} = this.props
+    let {user_config, config} = global;
+    let {top, left} = user_config !== undefined && user_config?.coordinate ? user_config?.coordinate : {
       top: height * 0.65,
       left: width * 0.82
     };
 
-    if (Number(this.props.global.config.float_kf_icon) !== 1) {
+    if (Number(config.float_kf_icon) !== 1) {
       return null;
     }
     return (
@@ -52,18 +67,7 @@ class FloatServiceIcon extends React.Component {
             ref={(c) => this.floatIcon = c}
             {...this._panResponder.panHandlers}>
 
-        <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={() => {
-          let {currVendorId} = tool.vendor(this.props.global)
-          let data = {
-            v: currVendorId,
-            s: this.props.global.currStoreId,
-            u: this.props.global.currentUser,
-            m: this.props.global.currentUserProfile.mobilephone,
-            place: 'float'
-          }
-          JumpMiniProgram("/pages/service/index", data);
-        }}
-        >
+        <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={this.contactService}>
           <MaterialCommunityIcons style={{color: colors.white, fontSize: 32}} name={'face-agent'}/>
           <Text style={{color: colors.white, fontSize: 10}}>客服</Text>
         </TouchableOpacity>

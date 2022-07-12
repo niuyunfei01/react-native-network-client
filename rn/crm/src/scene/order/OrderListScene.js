@@ -568,7 +568,7 @@ class OrderListScene extends Component {
     } = this.state
     return (
       <View style={{flex: 1}}>
-        <FloatServiceIcon/>
+        <FloatServiceIcon fromComponent={'订单列表'}/>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
         {this.renderTabsHead()}
