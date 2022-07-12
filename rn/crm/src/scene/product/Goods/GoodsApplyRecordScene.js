@@ -446,10 +446,6 @@ class GoodsApplyRecordScene extends Component {
           </TouchableOpacity>
         </View>
         {this.renderTitle()}
-        {/*<Toast icon="loading" show={this.state.query} onRequestClose={() => {*/}
-        {/*}}>*/}
-        {/*  加载中*/}
-        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

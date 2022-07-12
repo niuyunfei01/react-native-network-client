@@ -532,33 +532,6 @@ class OrderEditScene extends Component {
 
         <WhiteSpace/>
 
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
-
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmittingConfirm}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  正在发送订单修改通知*/}
-        {/*</Toast>*/}
-
-        {/*<Toast*/}
-        {/*  icon="success"*/}
-        {/*  show={this.state.confirmSent}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  发送成功*/}
-        {/*</Toast>*/}
-        {/*标签列表*/}
         <UserTagPopup
           multiple={this.state.userTagPopupMulti}
           visible={this.state.userTagPopupVisible}

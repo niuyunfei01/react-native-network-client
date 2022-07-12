@@ -203,12 +203,6 @@ class HelpScene extends PureComponent {
               })
             }
           </View>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.query}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>加载中</Toast>*/}
 
         </ScrollView>
         <View style={styles.call_btn_wrapper}>

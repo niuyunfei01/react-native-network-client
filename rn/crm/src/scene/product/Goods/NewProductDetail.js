@@ -335,11 +335,6 @@ class NewProductDetail extends Component {
   render() {
     return (
       <View style={{flex: 1}}>
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.isSave}*/}
-        {/*>正在保存，请稍后!*/}
-        {/*</Toast>*/}
         {this.state.visual ? this.modal() : null}
         {this.title("基本信息")}
         <Left

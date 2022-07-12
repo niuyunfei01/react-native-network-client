@@ -122,13 +122,6 @@ class UrgeShipScene extends Component {
               }]}
       ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
 
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onLoadingReasons}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>正在加载...</Toast>*/}
-
       <CellsTitle style={styles.cellsTitle}>选择预设信息</CellsTitle>
       <RadioCells
         style={{marginTop: 2}}
@@ -162,19 +155,6 @@ class UrgeShipScene extends Component {
                 style={{marginHorizontal: 15}}>回复客户</Button>
       </ButtonArea>
 
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="success"*/}
-      {/*  show={this.state.doneSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>已回复客户</Toast>*/}
     </ScrollView>
   }
 }

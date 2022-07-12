@@ -411,7 +411,8 @@ class OrderOperation extends Component {
         <BottomModal title={''} visible={showErrorModal}
                      actionText={'联系客服'}
                      closeText={'取消'}
-                     onClose={() => this.setState({showDeliveryModal: false})}>
+                     onPressClose={() => this.setState({showErrorModal: false})}
+                     onClose={() => this.setState({showErrorModal: false})}>
           <Text style={{
             fontSize: 18,
             color: colors.color333,
