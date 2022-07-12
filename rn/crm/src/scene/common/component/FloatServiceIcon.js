@@ -8,10 +8,13 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {setUserCfg} from "../../../reducers/global/globalActions";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import BottomModal from "../../../pubilc/component/BottomModal";
+import native from "../../../pubilc/util/native";
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 let height = Dimensions.get("window").height;
@@ -22,9 +25,22 @@ class FloatServiceIcon extends React.Component {
     super(props)
     this.mixpanel = MixpanelInstance;
     this.timeout = null;
+    this.state = {
+      show_call_service_modal: false,
+      contacts: ''
+    }
   }
 
-  contactService = () => {
+  oncallservice = () => {
+    if (!this.state.is_self_yy) {
+      return this.setState({
+        show_call_service_modal: true
+      })
+    }
+    this.openMiniprogarm()
+  }
+
+  openMiniprogarm = () => {
     const {global, fromComponent} = this.props
     let {currStoreId, currentUser, currentUserProfile} = global;
     if (fromComponent)
@@ -39,6 +55,40 @@ class FloatServiceIcon extends React.Component {
     }
     JumpMiniProgram("/pages/service/index", data);
   }
+
+  contactService = () => {
+    let {config} = this.props.global;
+    let {is_self_yy, contacts} = config.customer_service_auth;
+    if (!is_self_yy) {
+      return this.setState({
+        show_call_service_modal: true,
+        contacts: contacts
+      })
+    }
+    this.openMiniprogarm()
+  }
+
+  callService = () => {
+    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
+      this.setState({
+        show_call_service_modal: false
+      }, () => {
+        native.dialNumber(this.state.contacts);
+      })
+    } else {
+      ToastLong("号码为空")
+    }
+  }
+
+  oncloseCallModal = (e = 0) => {
+    this.setState({
+      show_call_service_modal: false
+    })
+    if (e === 1) {
+      this.openMiniprogarm()
+    }
+  }
+
 
   render() {
     const {global} = this.props
@@ -67,6 +117,42 @@ class FloatServiceIcon extends React.Component {
             ref={(c) => this.floatIcon = c}
             {...this._panResponder.panHandlers}>
 
+        <BottomModal title={'提示'} actionText={'其他问题'} closeText={'配送问题'} onPress={this.callService}
+                     onPressClose={() => this.oncloseCallModal(1)}
+                     visible={this.state.show_call_service_modal}
+                     btnBottomStyle={{
+                       borderTopWidth: 1,
+                       borderTopColor: "#E5E5E5",
+                     }}
+                     closeBtnStyle={{
+                       borderWidth: 0,
+                       borderRadius: 0,
+                       borderRightWidth: 1,
+                       borderColor: "#E5E5E5",
+                     }}
+                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
+                     closeBtnTitleStyle={{color: colors.color333}}
+                     btnTitleStyle={{color: colors.main_color}} onClose={this.oncloseCallModal}>
+          <View style={{
+            marginHorizontal: 20,
+            marginVertical: 8
+          }}>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}>您的问题是：</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+              marginVertical: 4,
+            }}> 配送问题：请点击配送问题，联系客服</Text>
+            <Text style={{
+              fontSize: 15,
+              color: colors.color333,
+            }}> 其他问题：请点击其他问题或通过其他方式联系店铺运营 </Text>
+          </View>
+        </BottomModal>
+
         <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={this.contactService}>
           <MaterialCommunityIcons style={{color: colors.white, fontSize: 32}} name={'face-agent'}/>
           <Text style={{color: colors.white, fontSize: 10}}>客服</Text>
@@ -76,6 +162,7 @@ class FloatServiceIcon extends React.Component {
     )
   }
 
+
   UNSAFE_componentWillMount() {
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
@@ -83,15 +170,7 @@ class FloatServiceIcon extends React.Component {
       },
       onMoveShouldSetPanResponder: (evt, gestureState) => {
         this.timeout = setTimeout(() => {
-          let {currVendorId} = tool.vendor(this.props.global)
-          let data = {
-            v: currVendorId,
-            s: this.props.global.currStoreId,
-            u: this.props.global.currentUser,
-            m: this.props.global.currentUserProfile.mobilephone,
-            place: 'float'
-          }
-          JumpMiniProgram("/pages/service/index", data);
+          this.contactService()
         }, 800)
         return true;
       },
@@ -99,16 +178,6 @@ class FloatServiceIcon extends React.Component {
         const {pageY, locationY, pageX, locationX} = evt.nativeEvent;
         this.preY = pageY - locationY - 58;
         this.preX = pageX - locationX - 23;
-        // console.log(pageY, locationY, 'pageY, locationY9')
-        // item.setNativeProps({
-        //   style: {
-        //     shadowColor: "#000",
-        //     shadowOpacity: 0.3,
-        //     shadowRadius: 5,
-        //     shadowOffset: {height: 0, width: 2},
-        //     elevation: 5
-        //   }
-        // });
       },
       onPanResponderMove: (evt, gestureState) => {
 
@@ -140,16 +209,13 @@ class FloatServiceIcon extends React.Component {
         });
       },
       onPanResponderTerminationRequest: (evt, gestureState) => {
-        // console.log(3)
         return true;
       },
       onPanResponderRelease: (evt, gestureState) => {
-        // console.log(evt, '4')
         return true;
 
       },
       onPanResponderTerminate: (evt, gestureState) => {
-        // console.log(5)
         return true;
         // Another component has become the responder, so this gesture
         // should be cancelled
