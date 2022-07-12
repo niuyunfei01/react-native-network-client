@@ -409,13 +409,14 @@ class OrderListItem extends React.PureComponent {
     let params = {
       order_id: orderId
     }
+    let order = this.props.item
     HttpUtils.get.bind(this.props)(api, params).then(res => {
       if (res.deduct_fee < 0) {
         Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
           text: '确定', onPress: () => {
             this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
                 {
-                  order: orderId,
+                  order: order,
                   ship_id: 0,
                   onCancelled: (ok, reason) => {
                     this.fetchData()
@@ -426,7 +427,7 @@ class OrderListItem extends React.PureComponent {
       } else if (res.deduct_fee == 0) {
         this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
             {
-              order: orderId,
+              order: order,
               ship_id: 0,
               onCancelled: (ok, reason) => {
                 this.fetchData()
@@ -440,7 +441,7 @@ class OrderListItem extends React.PureComponent {
             text: '确定', onPress: () => {
               this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
                   {
-                    order: orderId,
+                    order: order,
                     ship_id: 0,
                     onCancelled: (ok, reason) => {
                       this.fetchData()
