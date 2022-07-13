@@ -363,13 +363,13 @@ class OrderOperation extends Component {
 
   openMiniprogarm = () => {
     let {currStoreId, currentUser, currentUserProfile} = this.props.global;
-    let {currVendorId} = tool.vendor(global)
+    let {currVendorId} = tool.vendor(this.props.global)
     let data = {
       v: currVendorId,
       s: currStoreId,
       u: currentUser,
       m: currentUserProfile.mobilephone,
-      place: 'float'
+      place: 'cancelOrder'
     }
     JumpMiniProgram("/pages/service/index", data);
   }
