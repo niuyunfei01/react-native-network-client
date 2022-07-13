@@ -666,7 +666,7 @@ class OrderListItem extends React.PureComponent {
         </If>
         <If condition={(Number(orderStatus) === 2 || Number(orderStatus) === 3) && this.props.showBtn}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(item.driver_phone)}
+                  onPress={() => this.dialNumber(item.ship_worker_mobile)}
                   buttonStyle={styles.callDeliveryBtn}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
