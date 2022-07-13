@@ -474,7 +474,7 @@ class MineScene extends PureComponent {
     const {dispatch, global} = this.props;
     const {accessToken, currStoreId} = global;
     dispatch(
-      upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
+      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj)=> {
         if (ok) {
           this.setState({
             prefer_store: obj.prefer_store,
