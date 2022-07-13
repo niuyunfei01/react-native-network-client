@@ -32,6 +32,7 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
@@ -235,7 +236,7 @@ class OrderOperation extends Component {
               this.setState({
                 showDeliveryModal: false,
                 showErrorModal: true,
-                errMsg: "请联系顾客或者取消订单"
+                errMsg: "请联系顾客或客服取消订单"
               })
             })
           }
@@ -360,6 +361,19 @@ class OrderOperation extends Component {
     })
   }
 
+  openMiniprogarm = () => {
+    let {currStoreId, currentUser, currentUserProfile} = this.props.global;
+    let {currVendorId} = tool.vendor(global)
+    let data = {
+      v: currVendorId,
+      s: currStoreId,
+      u: currentUser,
+      m: currentUserProfile.mobilephone,
+      place: 'float'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
   render() {
     const {
       actionSheet,
@@ -408,7 +422,7 @@ class OrderOperation extends Component {
     } = this.state
     return (
       <View>
-        <BottomModal title={''} visible={showErrorModal}
+        <BottomModal title={''} onPress={() => this.openMiniprogarm()} visible={showErrorModal}
                      actionText={'联系客服'}
                      closeText={'取消'}
                      onPressClose={() => this.setState({showErrorModal: false})}
