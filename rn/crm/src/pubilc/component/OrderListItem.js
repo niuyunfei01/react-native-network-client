@@ -710,7 +710,7 @@ class OrderListItem extends React.PureComponent {
           {this.renderUser()}
           {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
-          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.state.showBtn ? this.renderButton() : null}
+          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.props.showBtn ? this.renderButton() : null}
           <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity
               onPress={() => this.openModalTipChangeInfo(item.store_id, item.id)} style={styles.noRunMan}>
