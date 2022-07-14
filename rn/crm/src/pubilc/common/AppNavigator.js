@@ -384,6 +384,15 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpenseInfo').default}
         />
 
+        <Stack.Screen name={Config.ROUTE_SERVICE_CHARGE_INFO} options={{headerTitle: '账单明细'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/ServiceChargeInfo').default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_SERVICE_CHARGE_DESC} options={{headerTitle: '计费规则'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/ServiceChargeDesc').default}
+        />
+
+
         <Stack.Screen name={Config.ROUTE_FREEZE_LIST} options={{headerTitle: ""}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
         />

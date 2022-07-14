@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import ReactNative, {
+  Dimensions,
   ImageBackground,
   InteractionManager,
   RefreshControl,
@@ -31,6 +32,7 @@ import {getTime} from "../../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const {StyleSheet} = ReactNative
+const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {global, device} = state;
@@ -80,6 +82,7 @@ class SeparatedExpense extends PureComponent {
       balanceNum: 0,
       records: [],
       records2: [],
+      records3: [],
       by_labels: [],
       data_labels: [],
       date: date,
@@ -91,13 +94,16 @@ class SeparatedExpense extends PureComponent {
       thirdAccountList: [],
       pay_url: '',
       dadaAccountModal: false,
-      dadaAccountNum: 0
+      dadaAccountNum: 0,
+      service_msg: "",
+      show_service_msg: false
     }
   }
 
   UNSAFE_componentWillMount() {
     this.fetchExpenses()
     this.fetchBalance()
+    this.fetchServiceCharge()
     this.fetchFreeze()
   }
 
@@ -209,6 +215,36 @@ class SeparatedExpense extends PureComponent {
     })
   }
 
+
+  //获取余额
+  fetchServiceCharge() {
+    const {global} = this.props;
+    const url = `/v1/new_api/delivery/service_fee?access_token=${global.accessToken}`;
+    HttpUtils.post.bind(this.props)(url, {store_id: global.currStoreId}, true).then(res => {
+      timeObj.method.push({
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchBalance',
+        executeTime: res.endTime - res.startTime
+      })
+      this.setState({
+        service_msg: res.obj.fee + '/' + res.obj.unit,
+        show_service_msg: res.obj.fee > 0
+      })
+    }).catch((res) => {
+      timeObj.method.push({
+        interfaceName: url,
+        executeStatus: res.executeStatus,
+        startTime: res.startTime,
+        endTime: res.endTime,
+        methodName: 'fetchBalance',
+        executeTime: res.endTime - res.startTime
+      })
+    })
+  }
+
   //获取冻结
   fetchFreeze() {
     const {global} = this.props;
@@ -250,6 +286,18 @@ class SeparatedExpense extends PureComponent {
     })
   }
 
+
+  // 获取服务费记录
+  fetchServiceList = () => {
+    const {global} = this.props;
+    const url = `/v1/new_api/delivery/service_fee_list?access_token=${global.accessToken}`;
+    HttpUtils.post.bind(this.props)(url, {store_id: global.currStoreId, month: this.state.start_day}).then(res => {
+      if (res.records) {
+        this.setState({records3: res.records})
+      }
+    })
+  }
+
   // 获取三方配送充值列表
   fetchThirdDeliveryList = () => {
     showModal('加载中')
@@ -268,6 +316,7 @@ class SeparatedExpense extends PureComponent {
     if (val === WSB_ACCOUNT) {
       this.fetchExpenses()
       this.fetchBalance()
+      this.fetchServiceCharge()
       this.fetchFreeze()
     } else if (val === THIRD_PARTY_ACCOUNT) {
       this.fetchThirdDeliveryList()
@@ -305,6 +354,17 @@ class SeparatedExpense extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       _this.onPress(Config.ROUTE_SEP_EXPENSE_INFO, {
         day: item.day
+      });
+    });
+  }
+
+
+  // 跳转到费用账单详情
+  onItemClicked3 = (item) => {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.onPress(Config.ROUTE_SERVICE_CHARGE_INFO, {
+        day: item.date
       });
     });
   }
@@ -436,15 +496,15 @@ class SeparatedExpense extends PureComponent {
     let {switchType} = this.state
     return (
       <View style={Styles.headerType}>
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(0)}>
+        <TouchableOpacity style={Styles.WSBHeaderBtn} onPress={() => this.onChangeSwitchType(0)}>
           <View style={[switchType === WSB_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
             <Text style={Styles.color333}> 外送帮钱包 </Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(1)}>
+        <TouchableOpacity style={Styles.WSBHeaderBtn} onPress={() => this.onChangeSwitchType(1)}>
           <View style={[switchType === THIRD_PARTY_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}>三方配送充值</Text>
+            <Text style={Styles.color333}> 三方配送充值 </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -454,14 +514,54 @@ class SeparatedExpense extends PureComponent {
   renderWSBHeader = () => {
     return (
       <View style={Styles.WSBHeader}>
-        <Text style={Styles.WSBHeaderTitle}>当前余额（元） </Text>
-        <Text style={Styles.WSBHeaderBalanceNum}>{this.state.balanceNum} </Text>
-        <TouchableOpacity style={Styles.WSBCZBtn} onPress={this.accountFill}>
-          <Text style={Styles.WSBCZText}> 充 值 </Text>
+
+        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_SETTING)} style={{
+          width: "100%",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          marginTop: 4,
+        }}>
+          <FontAwesome5 name={'cog'} size={16} color={colors.main_color}/>
+          <Text style={Styles.WSBHeaderTitle}> 电话通知 </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={Styles.WSBSZBtn} onPress={() => this.onPress(Config.ROUTE_SETTING)}>
-          <Text style={Styles.WSBSZText}> 去设置余额不足电话通知 </Text>
-        </TouchableOpacity>
+        <View style={{
+          marginHorizontal: 16,
+          marginVertical: 24,
+          flexDirection: 'row',
+          justifyContent: "center",
+          alignItems: 'center'
+        }}>
+          <View style={{
+            justifyContent: "center",
+            alignItems: 'center'
+          }}>
+            <Text style={{fontSize: 16, color: colors.color333}}> 当前余额(元) </Text>
+            <Text style={Styles.WSBHeaderBalanceNum}> {this.state.balanceNum} </Text>
+          </View>
+
+          <If condition={this.state.show_service_msg}>
+            <View style={{
+              justifyContent: "center",
+              alignItems: 'center',
+              marginLeft: "24%",
+            }}>
+              <Text style={{fontSize: 16, color: colors.color333}}> 发单服务费(元) </Text>
+              <Text style={Styles.WSBHeaderBalanceNum}> {this.state.service_msg} </Text>
+            </View>
+          </If>
+        </View>
+        <Button title={'充值'}
+                onPress={this.accountFill}
+                buttonStyle={{
+                  width: width * 0.9,
+                  borderRadius: 4,
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
       </View>
     )
   }
@@ -475,6 +575,7 @@ class SeparatedExpense extends PureComponent {
     let choseTab = this.state.choseTab
     return (
       <View style={Styles.WSBType}>
+
         <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => {
           this.setState({
             choseTab: 1
@@ -482,18 +583,33 @@ class SeparatedExpense extends PureComponent {
           this.fetchExpenses();
         }}>
           <View style={[choseTab === 1 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}> 费用账单 </Text>
+            <Text style={[Styles.color333, Styles.fontSize16]}> 费用账单 </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.serviceList()}>
+          <View style={[choseTab === 3 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
+            <Text style={[Styles.color333, Styles.fontSize16]}> 发单服务费 </Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.rechargeRecord()}>
           <View style={[choseTab === 2 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}>充值记录 </Text>
+            <Text style={[Styles.color333, Styles.fontSize16]}> 充值记录 </Text>
           </View>
         </TouchableOpacity>
+
       </View>
     )
   }
+
+  serviceList = () => {
+    this.setState({
+      choseTab: 3
+    })
+    this.fetchServiceList();
+  }
+
 
   rechargeRecord = () => {
 
@@ -509,7 +625,7 @@ class SeparatedExpense extends PureComponent {
     this.onItemClicked(item)
   }
   renderWSBContent = () => {
-    const {date, records, records2, choseTab} = this.state;
+    const {date, records, records3, records2, choseTab} = this.state;
     const datePicker = (
       <DatePicker
         rootNativeProps={{'data-xx': 'yy'}}
@@ -538,29 +654,53 @@ class SeparatedExpense extends PureComponent {
             onDismiss={this.onDismiss}
             onChange={this.onChange}
           >
-            <Text style={Styles.selectMonthText}> {this.state.start_day} &nbsp;&nbsp;&nbsp; </Text>
+            <Text style={Styles.selectMonthText}> {this.state.start_day} &nbsp; <Entypo
+              name='chevron-thin-down' style={Styles.selectMonthIcon}/></Text>
           </PopPicker>
-          <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
         </View>
 
         <If condition={choseTab === 1}>
           {records && records.map((item, id) => {
             return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
-              <View style={Styles.recordsBody}>
-                <Text style={Styles.recordsItemTime}>{item.day} </Text>
-                <View style={Styles.flex1}/>
-                <Text
-                  style={Styles.recordsItemBalanced}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-                </Text>
-                <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+              <View style={{flex: 1}}>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={Styles.recordsItemTime}>{item.day} </Text>
+                  <View style={Styles.flex1}/>
+                  <Text
+                    style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
+                  </Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <View style={Styles.flex1}/>
+                  <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
+                </View>
               </View>
-              <View style={Styles.recordsItemDesc}>
-                <Text style={Styles.recordsItemDescTextLeft}>使用前金额: {item.total_ideal_balanced} </Text>
-                <Text style={Styles.recordsItemDescTextRight}>使用后金额: {item.total_balanced} </Text>
-              </View>
+              <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+
             </TouchableOpacity>
           })}
         </If>
+        <If condition={choseTab === 3}>
+          {records3 && records3.map((item, id) => {
+            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked3(item)}>
+              <View style={{flex: 1}}>
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <Text style={[Styles.recordsItemTime, Styles.flex1]}>{item.month}-{item.day} </Text>
+                  <View style={{marginTop: 10, marginBottom: 12, flexDirection: 'row', justifyContent: 'center'}}>
+                    <Text style={{fontSize: 16, color: colors.color999}}>{item.desc} </Text>
+                    <Text
+                      style={[Styles.recordsItemBalanced, {width: 50}]}>{item.total_fee}
+                    </Text>
+                    <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+                  </View>
+
+                </View>
+              </View>
+
+            </TouchableOpacity>
+          })}
+        </If>
+
 
         <If condition={choseTab === 2}>
           {records2 && records2.map((item, idx) => {
@@ -693,6 +833,7 @@ const Styles = StyleSheet.create({
   flex3: {flex: 3},
   fontBold: {fontWeight: "bold"},
   color333: {color: colors.color333},
+  fontSize16: {fontSize: 16},
   containerContent: {flex: 1, backgroundColor: '#f5f5f9'},
   containerHeader: {
     flex: 1,
@@ -722,7 +863,7 @@ const Styles = StyleSheet.create({
   expensesHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: "100%",
+    marginHorizontal: 8,
     backgroundColor: colors.white,
     borderBottomWidth: pxToDp(1),
     borderColor: '#ccc',
@@ -730,7 +871,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     zIndex: 999,
   },
-  selectMonthLabel: {flex: 1, color: colors.color333, fontWeight: "bold"},
+  selectMonthLabel: {flex: 1, color: colors.color333, fontSize: 15, fontWeight: "bold"},
   selectMonthText: {
     color: colors.title_color,
     fontSize: 16,
@@ -739,33 +880,31 @@ const Styles = StyleSheet.create({
     width: 200,
     textAlign: 'right'
   },
-  selectMonthIcon: {fontSize: 14, marginLeft: 10},
+  selectMonthIcon: {fontSize: 18, marginHorizontal: 10, color: colors.color333},
   recordsContent: {
-    paddingVertical: pxToDp(25),
-    paddingHorizontal: pxToDp(30),
-    flex: 1,
+    marginHorizontal: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     alignItems: "center",
-    flexDirection: 'column',
-    backgroundColor: 'white',
+    flexDirection: 'row',
+    backgroundColor: colors.white,
     borderBottomWidth: pxToDp(1),
     borderColor: '#ccc',
   },
   recordsBody: {alignItems: "center", flexDirection: 'row'},
-  recordsItemTime: {fontSize: 16, color: colors.color333, fontWeight: 'bold'},
+  recordsItemTime: {fontSize: 16, color: colors.color333,},
   recordsItemBalanced: {
     fontSize: 16,
-    fontWeight: 'bold',
-    width: "30%",
     textAlign: 'right',
   },
-  recordsItemIcon: {fontSize: 14, marginLeft: 10},
-  recordsItemDesc: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10},
+  recordsItemIcon: {fontSize: 18, marginHorizontal: 10, color: colors.color999},
+  recordsItemDesc: {flexDirection: "row", justifyContent: "flex-end", marginTop: 10},
   recordsItemDescTextLeft: {fontSize: 14, color: colors.color999, flex: 1},
-  recordsItemDescTextRight: {fontSize: 14, color: colors.color999},
+  recordsItemDescTextRight: {fontSize: 14, textAlign: 'right', color: colors.color999},
   recordsContainer2: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: "100%",
+    marginHorizontal: 10,
     borderBottomWidth: pxToDp(1),
     borderColor: '#ccc',
     paddingTop: pxToDp(20),
@@ -782,34 +921,33 @@ const Styles = StyleSheet.create({
   WSBHeader: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: '#28A077',
-    margin: pxToDp(20),
-    paddingVertical: pxToDp(50),
+    margin: 10,
+    padding: 8,
+    backgroundColor: colors.white,
     borderRadius: pxToDp(8)
   },
   WSBHeaderTitle: {
-    width: '100%',
-    marginLeft: pxToDp(100),
+    fontSize: 12,
     textAlign: 'left',
-    color: 'white'
+    color: colors.main_color
   },
   WSBHeaderBalanceNum: {
-    marginVertical: pxToDp(30),
-    fontSize: pxToDp(120),
+    fontSize: 26,
+    color: colors.color333,
     fontWeight: "bold",
-    textAlign: 'center',
-    color: 'white'
+    marginTop: 13
   },
   WSBCZBtn: {
     backgroundColor: 'white',
-    width: 140,
-    borderRadius: 15,
+    width: 158,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: "center",
   },
   WSBCZText: {
     color: colors.main_color,
     textAlign: 'center',
+    fontSize: 18,
     paddingVertical: pxToDp(10),
   },
   WSBSZBtn: {
@@ -818,19 +956,22 @@ const Styles = StyleSheet.create({
     marginTop: pxToDp(10),
   },
   WSBSZText: {
-    color: '#f7f7f7',
+    color: colors.white,
     textAlign: 'center',
+    fontSize: 12,
     paddingVertical: pxToDp(10),
     textDecorationLine: 'underline',
   },
   WSBType: {
-    width: '100%',
     flexDirection: 'row',
     backgroundColor: colors.white,
     height: 40,
+    marginHorizontal: 10,
     marginBottom: 5,
+    borderRadius: 4,
   },
-  WSBTypeBtn: {width: '50%', alignItems: "center"},
+  WSBHeaderBtn: {width: '50%', alignItems: "center"},
+  WSBTypeBtn: {width: '33%', alignItems: "center"},
   headerType: {
     width: '100%',
     flexDirection: 'row',
