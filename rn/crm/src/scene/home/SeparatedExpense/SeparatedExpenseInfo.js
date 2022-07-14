@@ -78,6 +78,7 @@ class SeparatedExpenseInfo extends PureComponent {
     const {global} = self.props;
     const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
+      console.log(res,'res')
       self.setState({
         records: res.records,
         by_labels: res.by_labels,
