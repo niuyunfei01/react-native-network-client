@@ -275,12 +275,6 @@ class AuditRefundScene extends Component {
         {
           this.renderReason()
         }
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>提交中</Toast>*/}
       </ScrollView>
     )
   }

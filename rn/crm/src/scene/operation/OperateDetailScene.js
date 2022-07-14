@@ -328,13 +328,6 @@ class OperateDetailScene extends PureComponent {
           ) : null}
         </ScrollView>
 
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.uploading}*/}
-        {/*  onRequestClose={() => {}}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

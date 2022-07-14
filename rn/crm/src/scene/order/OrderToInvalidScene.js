@@ -7,18 +7,7 @@ import {orderToInvalid} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
-import {
-  Button,
-  ButtonArea,
-  Cell,
-  CellBody,
-  Cells,
-  CellsTitle,
-  Dialog,
-  RadioCells,
-  TextArea,
-  Toast
-} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -131,13 +120,6 @@ class OrderToInvalidScene extends Component {
                 }
               }]}
       ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
-
-      <Toast
-        icon="loading"
-        show={this.state.onLoadingReasons}
-        onRequestClose={() => {
-        }}
-      >正在加载...</Toast>
 
       <CellsTitle style={styles.cellsTitle}>选择退单原因</CellsTitle>
       <RadioCells

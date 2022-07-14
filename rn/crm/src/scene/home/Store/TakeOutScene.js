@@ -314,24 +314,6 @@ class TakeOutScene extends Component {
 
         {this.renderConfirmModal()}
 
-        {/*<Toast*/}
-        {/*	icon="loading"*/}
-        {/*	show={this.state.isToggleSubmitting}*/}
-        {/*	onRequestClose={() => {*/}
-        {/*	}}*/}
-        {/*>*/}
-        {/*	提交中*/}
-        {/*</Toast>*/}
-
-        {/*<Toast*/}
-        {/*	icon="loading"*/}
-        {/*	show={this.state.isSearching}*/}
-        {/*	onRequestClose={() => {*/}
-        {/*	}}*/}
-        {/*>*/}
-        {/*	查询中外卖店铺中...*/}
-        {/*</Toast>*/}
-
         <View style={styles.service}>
           <CallBtn
             style={styles.service_text}

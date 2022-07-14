@@ -18,7 +18,7 @@ import {ActionSheet} from "../../weui";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
@@ -32,6 +32,7 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
@@ -101,19 +102,10 @@ class OrderOperation extends Component {
       type: "",
       showDeliveryModal: false,
       idx: -1,
+      showErrorModal: false,
+      errMsg: "",
     }
     this.order_reason();
-  }
-
-
-  renderReceiveQr(order) {
-    return (
-      <ReceiveMoney
-        formVisible={this.state.visibleReceiveQr}
-        onCloseForm={() => this.setState({visibleReceiveQr: false})}
-        order={order}
-      />
-    )
   }
 
   order_reason() {
@@ -223,172 +215,41 @@ class OrderOperation extends Component {
     }
   }
 
-  cancel_order() {
+  cancelOrder = () => {
     this.setState({
-      showDeliveryModal: true
+      showDeliveryModal: false
     })
-
-  }
-
-  render() {
-    const {actionSheet, showCallStore, order, showDeliveryModal, queList, isShowInput} = this.state
-    return (
-      <View>
-        <BottomModal
-          visible={showDeliveryModal}
-          title={'取消原因'}
-          actionText={'确认'}
-          onClose={() => this.setState({showDeliveryModal: false})}
-          onPress={() => {
-            let {orderId} = this.props.route.params;
-            let {accessToken} = this.props.global;
-            let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
-            Alert.alert(
-              '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-              [
-                {
-                  text: '确认', onPress: () => {
-                    HttpUtils.get(url).then(res => {
-                      ToastLong('订单取消成功即将返回!')
-                      this.setState({
-                        showDeliveryModal: false
-                      }, () => {
-                        setTimeout(() => {
-                          this.props.navigation.goBack();
-                        }, 1000);
-                      })
-                    }).catch(() => {
-                      showError('取消订单失败')
-                    })
-                  }
-                },
-                {
-                  "text": '返回', onPress: () => {
-                    Alert.alert('我知道了')
-                  }
-                }
-              ]
-            )
-          }}>
-          <View>
-            {
-              queList.map((item, idx) => {
-                item.checked = false;
-                return (
-                  <TouchableOpacity
-                    key={idx}
-                    style={[
-                      {
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 15
-                      }
-                    ]}
-                    onPress={() => {
-                      queList[idx].checked = true;
-                      this.setState({
-                        queList: queList,
-                        idx: idx,
-                        type: queList[idx].type
-                      })
-                      if ((idx + 1) === tool.length(queList)) {
-                        this.setState({isShowInput: true})
-                      } else {
-                        this.setState({isShowInput: false})
-                      }
-                    }}
-                  >
-                    <View style={{
-                      borderRadius: 10,
-                      width: 20,
-                      height: 20,
-                      backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
-                      justifyContent: "center",
-                      alignItems: 'center',
-                    }}>
-                      <Entypo name={this.state.idx === idx ? 'check' : 'circle'}
-                              size={pxToDp(32)}
-                              style={{color: this.state.idx === idx ? 'white' : colors.main_color}}/>
-                    </View>
-                    <Text style={{marginLeft: 20}}>
-                      {item.msg}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              })}
-
-            <If condition={isShowInput}>
-              <TextInput
-                style={[styles.TextInput]}
-                placeholder="请输入取消原因!"
-                onChangeText={(text) => this.setState({reasontext: text})}
-              />
-            </If>
-          </View>
-
-        </BottomModal>
-
-
-        <ActionSheet
-          visible={showCallStore}
-          onRequestClose={() => {
-            this.setState({showCallStore: false})
-          }}
-          menus={this._contacts2menus()}
-          actions={[
-            {
-              type: 'default',
-              label: '取消',
-              onPress: this._hideCallStore.bind(this),
-            }
-          ]}
-        />
-        {this.renderReceiveQr(order)}
-        <DateTimePicker
-          cancelTextIOS={'取消'}
-          confirmTextIOS={'修改'}
-          customHeaderIOS={() => {
-            return (<View/>)
-          }}
-          date={new Date()}
-          mode='datetime'
-          isVisible={this.state.isEndVisible}
-          onConfirm={(date) => {
-            this.onSaveDelayShip(date)
-          }}
-          onCancel={() => {
-            this.setState({
-              isEndVisible: false,
-            });
-          }}
-        />
-        <ScrollView
-          overScrollMode="always"
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}>
-          {
-            actionSheet&&actionSheet.map((item, idx) => {
-              item.checked = false
-              return (
-                <CheckBox
-                  key={idx}
-                  left
-                  title={item.label}
-                  checkedIcon='dot-circle-o'
-                  uncheckedIcon='circle-o'
-                  checked={item.checked || false}
-                  checkedColor={colors.main_color}
-                  onPress={() => this.touchItem(actionSheet, idx)}
-                />
-              )
+    let {orderId} = this.props.route.params;
+    let {accessToken} = this.props.global;
+    let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
+    Alert.alert(
+      '确认是否取消订单', '取消订单后无法撤回，是否继续？',
+      [
+        {
+          text: '确认', onPress: () => {
+            HttpUtils.get(url).then(res => {
+              showSuccess('订单取消成功即将返回!')
+              setTimeout(() => {
+                this.props.navigation.goBack();
+              }, 1000);
+            }).catch((error) => {
+              this.setState({
+                showDeliveryModal: false,
+                showErrorModal: true,
+                errMsg: "请联系顾客或客服取消订单"
+              })
             })
           }
-          <View style={{width: '100%', height: pxToDp(200)}}></View>
-        </ScrollView>
-
-      </View>
-    );
+        },
+        {
+          "text": '返回', onPress: () => {
+            this.setState({
+              showDeliveryModal: true
+            })
+          }
+        }
+      ]
+    )
   }
 
   touchItem = (actionSheet, idx) => {
@@ -493,6 +354,194 @@ class OrderOperation extends Component {
         break
     }
   }
+
+  cancel_order() {
+    this.setState({
+      showDeliveryModal: true
+    })
+  }
+
+  openMiniprogarm = () => {
+    let {currStoreId, currentUser, currentUserProfile} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global)
+    let data = {
+      v: currVendorId,
+      s: currStoreId,
+      u: currentUser,
+      m: currentUserProfile.mobilephone,
+      place: 'cancelOrder'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
+  render() {
+    const {
+      actionSheet,
+    } = this.state
+    return (
+      <View>
+        {this.renderModal()}
+        <ScrollView
+          overScrollMode="always"
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
+          {
+            actionSheet && actionSheet.map((item, idx) => {
+              item.checked = false
+              return (
+                <CheckBox
+                  key={idx}
+                  left
+                  title={item.label}
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checked={item.checked || false}
+                  checkedColor={colors.main_color}
+                  onPress={() => this.touchItem(actionSheet, idx)}
+                />
+              )
+            })
+          }
+          <View style={{width: '100%', height: pxToDp(200)}}></View>
+        </ScrollView>
+
+      </View>
+    );
+  }
+
+  renderModal = () => {
+    const {
+      showCallStore,
+      order,
+      showDeliveryModal,
+      showErrorModal,
+      errMsg,
+      queList,
+      isShowInput
+    } = this.state
+    return (
+      <View>
+        <BottomModal title={''} onPress={() => this.openMiniprogarm()} visible={showErrorModal}
+                     actionText={'联系客服'}
+                     closeText={'取消'}
+                     onPressClose={() => this.setState({showErrorModal: false})}
+                     onClose={() => this.setState({showErrorModal: false})}>
+          <Text style={{
+            fontSize: 18,
+            color: colors.color333,
+            fontWeight: 'bold',
+            marginVertical: 20,
+            textAlign: 'center',
+            flex: 1
+          }}>{errMsg} </Text>
+        </BottomModal>
+
+        <BottomModal
+          visible={showDeliveryModal}
+          title={'取消原因'}
+          actionText={'确认'}
+          onClose={() => this.setState({showDeliveryModal: false})}
+          onPress={() => this.cancelOrder()}>
+          <View>
+            {
+              queList.map((item, idx) => {
+                item.checked = false;
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 15
+                      }
+                    ]}
+                    onPress={() => {
+                      queList[idx].checked = true;
+                      this.setState({
+                        queList: queList,
+                        idx: idx,
+                        type: queList[idx].type
+                      })
+                      if ((idx + 1) === tool.length(queList)) {
+                        this.setState({isShowInput: true})
+                      } else {
+                        this.setState({isShowInput: false})
+                      }
+                    }}
+                  >
+                    <View style={{
+                      borderRadius: 10,
+                      width: 20,
+                      height: 20,
+                      backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
+                      justifyContent: "center",
+                      alignItems: 'center',
+                    }}>
+                      <Entypo name={this.state.idx === idx ? 'check' : 'circle'}
+                              size={pxToDp(32)}
+                              style={{color: this.state.idx === idx ? 'white' : colors.main_color}}/>
+                    </View>
+                    <Text style={{marginLeft: 20}}>
+                      {item.msg}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+
+            <If condition={isShowInput}>
+              <TextInput
+                style={[styles.TextInput]}
+                placeholder="请输入取消原因!"
+                onChangeText={(text) => this.setState({reasontext: text})}
+              />
+            </If>
+          </View>
+        </BottomModal>
+
+        <ActionSheet
+          visible={showCallStore}
+          onRequestClose={() => {
+            this.setState({showCallStore: false})
+          }}
+          menus={this._contacts2menus()}
+          actions={[
+            {
+              type: 'default',
+              label: '取消',
+              onPress: this._hideCallStore.bind(this),
+            }
+          ]}
+        />
+
+        <ReceiveMoney
+          formVisible={this.state.visibleReceiveQr}
+          onCloseForm={() => this.setState({visibleReceiveQr: false})}
+          order={order}
+        />
+        <DateTimePicker
+          cancelTextIOS={'取消'}
+          confirmTextIOS={'修改'}
+          customHeaderIOS={() => {
+            return (<View/>)
+          }}
+          date={new Date()}
+          mode='datetime'
+          isVisible={this.state.isEndVisible}
+          onConfirm={(date) => {
+            this.onSaveDelayShip(date)
+          }}
+          onCancel={() => {
+            this.setState({
+              isEndVisible: false,
+            });
+          }}
+        />
+      </View>
+    )
+  }
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderOperation)

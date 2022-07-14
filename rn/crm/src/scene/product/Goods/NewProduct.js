@@ -305,17 +305,6 @@ class NewProduct extends PureComponent {
         </View>
         {this.renderBtn()}
 
-        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
-        {/*  图片上传中...*/}
-        {/*</Toast>*/}
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.uploading}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

@@ -404,13 +404,6 @@ class GoodsDetailScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Dialog>
-
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={isSyncGoods}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>同步中</Toast>*/}
       </View>
     );
   };

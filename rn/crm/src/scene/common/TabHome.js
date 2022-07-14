@@ -10,6 +10,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
 import {setRecordFlag} from "../../reducers/store/storeActions";
+import tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -65,6 +66,7 @@ class TabHome extends React.Component {
     let {remindNum} = this.props.remind;
     let isBlx = false;
     let global = this.props.global
+    let {co_type} = tool.vendor(global);
     let storeVendorId = Number(global.config.vendor.id)
     let enabledGoodMgr = Number(global.config.enabled_good_mgr)
     if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
@@ -78,40 +80,41 @@ class TabHome extends React.Component {
       <Tab.Navigator
         initialRouteName={initTab}
         tabBarOptions={tabBarOptions}>
-        <If condition={storeVendorId !== 68}>
+        <If condition={co_type !== 'peisong'}>
           <Tab.Screen
-              name="Home"
-              getComponent={() => require("../Remind/RemindScene").default}
-              options={
-                {
-                  tabBarLabel: "提醒",
-                  tabBarIcon: ({focused}) => (
-                      <View style={{position: "relative"}}>
-                        <FontAwesome5 name={'bell'} size={22}
-                                      color={focused ? colors.main_color : colors.colorCCC}
-                        />
-                        <If condition={remindNum > 0}>
-                          <Badge
-                              value={remindNum > 99 ? '99+' : remindNum}
-                              status="error"
-                              containerStyle={{position: 'absolute', top: -5, right: -25}}
-                          />
-                        </If>
-                      </View>
-                  )
-                }
+            name="Home"
+            getComponent={() => require("../Remind/RemindScene").default}
+            options={
+              {
+                tabBarLabel: "提醒",
+                tabBarIcon: ({focused}) => (
+                  <View style={{position: "relative"}}>
+                    <FontAwesome5 name={'bell'} size={22}
+                                  color={focused ? colors.main_color : colors.colorCCC}
+                    />
+                    <If condition={remindNum > 0}>
+                      <Badge
+                        value={remindNum > 99 ? '99+' : remindNum}
+                        status="error"
+                        containerStyle={{position: 'absolute', top: -5, right: -25}}
+                      />
+                    </If>
+                  </View>
+                )
               }
+            }
           />
         </If>
         <If condition={global.simpleStore.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
-                      options={{tabBarLabel: '控制台',
+                      options={{
+                        tabBarLabel: '控制台',
                         tabBarIcon: ({focused}) => (
                           <Icon name={'grid'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>)
                       }}/>
         </If>
-        <If condition={storeVendorId === 68}>
+        <If condition={co_type === 'peisong'}>
           <Tab.Screen
             name="CreateOrder"
             getComponent={() => require("../order/OrderSettingPack").default}
@@ -145,44 +148,44 @@ class TabHome extends React.Component {
             }
           }
         />
-          <If condition={enabledGoodMgr}>
-              <Tab.Screen
-                  name="Goods"
-                  getComponent={() => require("../product/Goods/StoreGoodsList").default}
-                  options={
-                      {
-                          tabBarLabel: "商品",
-                          tabBarIcon: ({focused}) => (
-                              <Icon name={"shopping-bag"}
-                                    style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
-                          ),
-                      }
-                  }
-              />
-          </If>
-          <If condition={isBlx}>
-              <Tab.Screen
-                  name="Operation"
-                  getComponent={() => require("../operation/Operation").default}
-                  options={{
-                      tabBarLabel: "运营",
-                      tabBarIcon: ({focused}) => (
-                          <View style={{position: "relative"}}>
-                              <FontAwesome5 name={'cloudsmith'} size={22}
-                                            color={focused ? colors.main_color : colors.colorCCC}
-                              />
-                              <If condition={showFlag}>
-                                  <Badge
-                                      value={'点我'}
-                                      status="error"
-                                      containerStyle={{position: 'absolute', top: -5, right: -30}}
-                                  />
-                              </If>
-                          </View>
-                      )
-                  }
-                  }/>
-          </If>
+        <If condition={enabledGoodMgr}>
+          <Tab.Screen
+            name="Goods"
+            getComponent={() => require("../product/Goods/StoreGoodsList").default}
+            options={
+              {
+                tabBarLabel: "商品",
+                tabBarIcon: ({focused}) => (
+                  <Icon name={"shopping-bag"}
+                        style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
+                ),
+              }
+            }
+          />
+        </If>
+        <If condition={isBlx}>
+          <Tab.Screen
+            name="Operation"
+            getComponent={() => require("../operation/Operation").default}
+            options={{
+              tabBarLabel: "运营",
+              tabBarIcon: ({focused}) => (
+                <View style={{position: "relative"}}>
+                  <FontAwesome5 name={'cloudsmith'} size={22}
+                                color={focused ? colors.main_color : colors.colorCCC}
+                  />
+                  <If condition={showFlag}>
+                    <Badge
+                      value={'点我'}
+                      status="error"
+                      containerStyle={{position: 'absolute', top: -5, right: -30}}
+                    />
+                  </If>
+                </View>
+              )
+            }
+            }/>
+        </If>
         <Tab.Screen
           name="Mine"
           getComponent={() => require("../home/Mine/MineScene").default}

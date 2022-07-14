@@ -144,6 +144,7 @@ import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -347,7 +348,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNAlipayPackage(),
                     new ClipboardPackage(),
                     new RNZipArchivePackage(),
-                    new RestartPackage()
+                    new RestartPackage(),
+                    new RNViewShotPackage()
             );
         }
     };
