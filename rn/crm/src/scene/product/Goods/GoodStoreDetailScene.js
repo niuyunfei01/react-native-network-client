@@ -17,7 +17,12 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import * as tool from "../../../pubilc/util/tool";
-import {fetchProductDetail, fetchVendorProduct, fetchVendorTags,UpdateWMGoods} from "../../../reducers/product/productActions";
+import {
+  fetchProductDetail,
+  fetchVendorProduct,
+  fetchVendorTags,
+  UpdateWMGoods
+} from "../../../reducers/product/productActions";
 import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../../pubilc/util/http";
@@ -28,7 +33,7 @@ import NoFoundDataView from "../../common/component/NoFoundDataView";
 import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import {hideModal, showModal, showSuccess,showError} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, showError} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
@@ -77,8 +82,8 @@ const MORE_ITEM = [
     label: '摊位关联'
   },
   {
-    value:'5',
-    label:'零售价格'
+    value: '5',
+    label: '零售价格'
   },
 ]
 
@@ -147,7 +152,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   componentDidMount() {
     const {fn_stall} = this.props.global.simpleStore
-    this.handleAuthItem('fn_stall', fn_stall ? fn_stall : '0' )
+    this.handleAuthItem('fn_stall', fn_stall ? fn_stall : '0')
     //showModal('加载中')
     const {accessToken} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
@@ -160,7 +165,7 @@ class GoodStoreDetailScene extends PureComponent {
 
     }, (res) => {
       //hideModal()
-    }).catch(()=>{
+    }).catch(() => {
       //hideModal()
     })
     this.getStoreProdWithProd();
@@ -169,7 +174,7 @@ class GoodStoreDetailScene extends PureComponent {
   handleAuthItem = (authName, value) => {
     const stockIndex = MORE_ITEM.findIndex(item => item.label === '库存')
     const stallIndex = MORE_ITEM.findIndex(item => item.label === '摊位关联')
-    const retail_price_enabledIndex = MORE_ITEM.findIndex(item=>item.label==='零售价格')
+    const retail_price_enabledIndex = MORE_ITEM.findIndex(item => item.label === '零售价格')
     switch (authName) {
       case 'strict_providing':
         if (value === '0' && stockIndex !== -1)
@@ -186,10 +191,10 @@ class GoodStoreDetailScene extends PureComponent {
           MORE_ITEM.push({value: '4', label: '摊位关联'})
         break
       case 'retail_price_enabled':
-        if(value === '0' && retail_price_enabledIndex !==-1)
-          MORE_ITEM.splice(retail_price_enabledIndex,1)
-        if(value === '1'&& retail_price_enabledIndex === -1)
-            MORE_ITEM.push({value: '5', label: '零售价格'})
+        if (value === '0' && retail_price_enabledIndex !== -1)
+          MORE_ITEM.splice(retail_price_enabledIndex, 1)
+        if (value === '1' && retail_price_enabledIndex === -1)
+          MORE_ITEM.push({value: '5', label: '零售价格'})
         break
     }
   }
@@ -218,7 +223,7 @@ class GoodStoreDetailScene extends PureComponent {
         })
       }
 
-    }).catch(error=>{
+    }).catch(error => {
       //hideModal()
     })
   }
@@ -256,8 +261,8 @@ class GoodStoreDetailScene extends PureComponent {
             goodsName: spec.name
           })
         })
-      selectedSpecArray.sort((a,b) => {
-        return a.label > b.label? 1 : -1
+      selectedSpecArray.sort((a, b) => {
+        return a.label > b.label ? 1 : -1
       })
       if (pid === 0) {
         this.setState({
@@ -269,7 +274,7 @@ class GoodStoreDetailScene extends PureComponent {
         })
       } else {
         this.setState({
-          ext_stores:data.ext_stores,
+          ext_stores: data.ext_stores,
           product: data.p,
           store_prod: data.sp,
           isRefreshing: false,
@@ -281,13 +286,13 @@ class GoodStoreDetailScene extends PureComponent {
     }, (res) => {
       //hideModal()
       this.setState({isRefreshing: false, errorMsg: `未找到商品:${res.reason}`})
-    }).catch(error=>{
+    }).catch(error => {
       //hideModal()
       this.setState({isRefreshing: false, errorMsg: `未找到商品:${error.reason}`})
     })
   }
 
-  onHeaderRefresh=()=> {
+  onHeaderRefresh = () => {
     this.setState({isRefreshing: true});
     this.getStoreProdWithProd();
   }
@@ -330,8 +335,9 @@ class GoodStoreDetailScene extends PureComponent {
       <RefreshControl refreshing={this.state.isRefreshing} onRefresh={this.onHeaderRefresh} tintColor='gray'/>
     )
   }
+
   render() {
-    let {full_screen, product, store_prod, selectItem,errorMsg,vendorId,product_id,activity} = this.state;
+    let {full_screen, product, store_prod, selectItem, errorMsg, vendorId, product_id, activity} = this.state;
     if (full_screen) {
       if (product_id != 0)
         return this.renderImg(product.list_img, product.source_img);
@@ -386,8 +392,13 @@ class GoodStoreDetailScene extends PureComponent {
                   width: '98%',
                   borderRadius: pxToDp(10),
                   marginBottom: 10
+                }}>
+                  <View style={{
+                    paddingLeft: 10,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}>
-                  <View style={{ paddingLeft: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
                     <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
                     <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
                       <Text style={styles.normalText}>
@@ -405,7 +416,7 @@ class GoodStoreDetailScene extends PureComponent {
                     </TouchableOpacity>
                     <If condition={onStrict}>
                       <TouchableOpacity style={activity === 'inventory_num' ? styles.tabActivity : styles.tab}
-                        onPress={() => this.setState({activity: 'inventory_num'})}>
+                                        onPress={() => this.setState({activity: 'inventory_num'})}>
                         <Text style={activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
                           库存数量
                         </Text>
@@ -469,7 +480,7 @@ class GoodStoreDetailScene extends PureComponent {
                                 onClose={() => this.setState({modalType: ''})}
                                 spId={Number(sp.id)}
                                 applyingPrice={applyingPrice}
-                                storePro={{...product,... store_prod}}
+                                storePro={{...product, ...store_prod}}
                                 navigation={this.props.navigation}
                                 beforePrice={Number(sp.supply_price)}/>
           </If>
@@ -478,10 +489,10 @@ class GoodStoreDetailScene extends PureComponent {
     );
   }
 
-  renderStall=()=>{
-    const{selectedSpecArray}=this.state
-    return(
-      <If condition={selectedSpecArray.length>0}>
+  renderStall = () => {
+    const {selectedSpecArray} = this.state
+    return (
+      <If condition={selectedSpecArray.length > 0}>
         <View style={styles.stallWrap}>
           <View style={styles.stallTopWrap}>
             <Text style={styles.stallTopText}>
@@ -490,7 +501,7 @@ class GoodStoreDetailScene extends PureComponent {
 
           </View>
           <For each="info" index="i" of={selectedSpecArray}>
-            <If condition={info?.stallName?.length>0}>
+            <If condition={info?.stallName?.length > 0}>
               <View style={styles.modalRowWrap} key={i}>
                 <Text style={styles.stallBottomText}>
                   {info.stallName}
@@ -507,7 +518,7 @@ class GoodStoreDetailScene extends PureComponent {
     )
   }
 
-  onShowStall=()=>{
+  onShowStall = () => {
     this.getStallData()
   }
   getStallData = () => {
@@ -606,18 +617,18 @@ class GoodStoreDetailScene extends PureComponent {
   closeModal = () => {
     this.setState({
       stallVisible: false,
-      selectStall:{
+      selectStall: {
         value: '',
         label: '请选择要关联的摊位'
       },
-      selectedSpec:{
+      selectedSpec: {
         value: '',
         label: '请选择商品的规格'
       },
     })
   }
   onChange = (selectItem, store_prod) => {
-    const {ext_stores,selectedSpecArray}=this.state
+    const {ext_stores, selectedSpecArray} = this.state
     switch (selectItem.value) {
       case '1':
         this.onOpenModal('set_price')
@@ -708,7 +719,7 @@ class GoodStoreDetailScene extends PureComponent {
     let {activity, product, store_prod, fn_price_controlled} = this.state;
     return (
       <View style={{
-       flexDirection: "column",
+        flexDirection: "column",
         backgroundColor: colors.white,
         paddingHorizontal: 20,
         paddingTop: 20,
@@ -738,14 +749,15 @@ class GoodStoreDetailScene extends PureComponent {
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
               <Text style={styles.normalText}>
-              {`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`}
+                {`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`}
               </Text>
             </If>
           </View>
         </View>
         <If condition={store_prod.skus !== undefined}>
           <For each="info" index="i" of={store_prod.skus}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
+            <View
+              style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
               key={i}>
               <Text style={{color: colors.color333, fontSize: 12, width: '80%'}}>
                 {product.name}[{info.sku_name}]
@@ -802,7 +814,7 @@ const full_styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   page: {flex: 1, flexDirection: "column"},
-  normalText:{color: colors.color333, fontSize: 12},
+  normalText: {color: colors.color333, fontSize: 12},
   iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
   iconSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
   scrollViewWrap: {backgroundColor: colors.main_back, flexDirection: 'column'},
@@ -818,7 +830,15 @@ const styles = StyleSheet.create({
     lineHeight: 21
   },
   stallBottomText: {padding: 4, fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20},
-  selectWrap: {borderColor: colors.color999, borderWidth: 1, borderRadius: 4, padding: 4,flex:5,marginLeft:12,marginRight:16},
+  selectWrap: {
+    borderColor: colors.color999,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    flex: 5,
+    marginLeft: 12,
+    marginRight: 16
+  },
   modalWrap: {flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end'},
   modalVisibleAreaWrap: {
     backgroundColor: colors.white,
@@ -843,7 +863,7 @@ const styles = StyleSheet.create({
     paddingTop: 11,
     paddingBottom: 11,
   },
-  modalRowText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, flex:1,textAlign:'right'},
+  modalRowText: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20, flex: 1, textAlign: 'right'},
   modalNotSelectBtn: {
     backgroundColor: colors.colorCCC,
     marginTop: 39,

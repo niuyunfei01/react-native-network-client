@@ -33,6 +33,7 @@ import tool from "../../../pubilc/util/tool";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const width = Dimensions.get("window").width;
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
@@ -56,7 +57,8 @@ function mapDispatchToProps(dispatch) {
 class SettingScene extends PureComponent {
   constructor(props) {
     super(props);
-
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('设置页')
     this.state = {
       isRefreshing: false,
       switch_val: false,
@@ -420,23 +422,23 @@ class SettingScene extends PureComponent {
           </Cells>
         </If>
 
-        <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.recommend}
-                      onValueChange={(recommend) => {
-                        this.setState({
-                            recommend
-                          },
-                          () => GlobalUtil.setRecommend(recommend))
-                      }}/>
-            </CellFooter>
-          </Cell>
-        </Cells>
+        {/*<CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>*/}
+        {/*<Cells style={[styles.cell_box]}>*/}
+        {/*  <Cell customStyle={[styles.cell_row]}>*/}
+        {/*    <CellBody>*/}
+        {/*      <Text style={[styles.cell_body_text]}>个性化推荐 </Text>*/}
+        {/*    </CellBody>*/}
+        {/*    <CellFooter>*/}
+        {/*      <Switch value={this.state.recommend}*/}
+        {/*              onValueChange={(recommend) => {*/}
+        {/*                this.setState({*/}
+        {/*                    recommend*/}
+        {/*                  },*/}
+        {/*                  () => GlobalUtil.setRecommend(recommend))*/}
+        {/*              }}/>*/}
+        {/*    </CellFooter>*/}
+        {/*  </Cell>*/}
+        {/*</Cells>*/}
 
         {this.renderServers()}
         <Cells style={[styles.cell_box, {marginTop: 20}]}>

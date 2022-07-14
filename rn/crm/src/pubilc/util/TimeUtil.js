@@ -12,6 +12,13 @@ export const getSimpleTime = () => {
   return time.toJSON().substring(11, 16)
 }
 
+// 处理月份函数
+export const format = (date) => {
+  let month = date.getMonth() + 1;
+  month = month < 10 ? `0${month}` : month;
+  return `${date.getFullYear()}-${month}`;
+}
+
 export default class TimeUtil {
   static getWeek(date = new Date()) {
     const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];

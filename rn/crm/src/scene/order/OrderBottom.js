@@ -9,6 +9,7 @@ import colors from "../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 const width = Dimensions.get("window").width;
 
@@ -23,6 +24,7 @@ class OrderBottom extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     const {order} = this.props;
     let {orderStatus} = order;
     orderStatus = parseInt(orderStatus);
@@ -85,6 +87,7 @@ class OrderBottom extends PureComponent {
 
 
   onAinSend(order_id, store_id) {
+    this.mixpanel.track('我自己送')
     this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
@@ -135,175 +138,187 @@ class OrderBottom extends PureComponent {
         shadowOpacity: 0.75,
         shadowRadius: 4,
       }}>
-        {btn_list && btn_list.btn_pack_green ? <Button title={'打包完成'}
-                                                       onPress={() => {
-                                                         this._onToProvide()
-                                                       }}
-                                                       buttonStyle={{
-                                                         width: width - 20,
-                                                         borderRadius: pxToDp(10),
-                                                         backgroundColor: colors.main_color,
-                                                       }}
+        <If condition={btn_list && btn_list.btn_pack_green}>
+          <Button title={'打包完成'}
+                  onPress={() => {
+                    this._onToProvide()
+                  }}
+                  buttonStyle={{
+                    width: width - 20,
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
 
-                                                       titleStyle={{
-                                                         color: colors.white,
-                                                         fontSize: 16
-                                                       }}
-        /> : null}
-        {btn_list && btn_list.btn_pack_white ? <Button title={'打包完成'}
-                                                       onPress={() => {
-                                                         this._onToProvide()
-                                                       }}
-                                                       buttonStyle={{
-                                                         borderRadius: pxToDp(10),
-                                                         backgroundColor: colors.white,
-                                                         borderWidth: pxToDp(1),
-                                                         borderColor: colors.main_color
-                                                       }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.btn_pack_white}>
+          <Button title={'打包完成'}
+                  onPress={() => {
+                    this._onToProvide()
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.white,
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.main_color
+                  }}
 
-                                                       titleStyle={{
-                                                         color: colors.main_color,
-                                                         fontSize: 16
-                                                       }}
-        /> : null}
+                  titleStyle={{
+                    color: colors.main_color,
+                    fontSize: 16
+                  }}
+          />
+        </If>
 
+        <If condition={btn_list && btn_list.btn_ignore_delivery}>
+          <Button title={'忽略配送'}
+                  onPress={() => {
+                    this.mixpanel.track('订单详情页_忽略配送')
+                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                      text: '继续忽略配送',
+                      onPress: () => {
+                        this.onOverlookDelivery(order.id)
+                      }
+                    }])
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.fontColor,
+                  }}
 
-        {btn_list && btn_list.btn_ignore_delivery ? <Button title={'忽略配送'}
-                                                            onPress={() => {
-                                                              Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                                                                text: '继续忽略配送',
-                                                                onPress: () => {
-                                                                  this.onOverlookDelivery(order.id)
-                                                                }
-                                                              }])
-                                                            }}
-                                                            buttonStyle={{
-                                                              borderRadius: pxToDp(10),
-                                                              backgroundColor: colors.fontColor,
-                                                            }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.btn_call_third_delivery_zs}>
+          <Button title={'发起配送'}
+                  onPress={() => {
+                    this.onCallThirdShips(order.id, order.store_id)
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.fontColor,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+          <Button title={'忽略配送'}
+                  onPress={() => {
+                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                      text: '继续忽略配送',
+                      onPress: () => {
+                        this.onOverlookDelivery(order.id)
+                      }
+                    }])
 
-                                                            titleStyle={{
-                                                              color: colors.white,
-                                                              fontSize: 16
-                                                            }}
-        /> : null}
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.transfer_self}>
+          <Button title={'我自己送'}
+                  onPress={() => {
+                    this.mixpanel.track('订单详情页_我自己送')
+                    this.onAinSend(order.id, order.store_id)
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.white,
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.main_color,
+                    color: colors.main_color
+                  }}
+                  titleStyle={{
+                    color: colors.main_color,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.btn_call_third_delivery}>
+          <Button title={'呼叫配送'}
+                  onPress={() => {
+                    this.mixpanel.track('订单详情页_呼叫配送')
+                    this.onCallThirdShips(order.id, order.store_id)
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.btn_resend_white}>
+          <Button title={'补 送'}
+                  onPress={() => {
+                    this.mixpanel.track('订单详情页_补送')
+                    this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
+                  }}
+                  buttonStyle={{
+                    width: width * 0.3,
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.white,
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.main_color,
+                    color: colors.main_color
+                  }}
+                  titleStyle={{
+                    color: colors.main_color,
+                    fontSize: 16
+                  }}
+          />
+        </If>
 
+        <If condition={btn_list && btn_list.btn_confirm_arrived}>
+          <Button title={'确认送达'}
+                  onPress={() => {
+                    this.toSetOrderComplete(order.id)
+                  }}
+                  buttonStyle={{
+                    width: width * 0.3,
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={btn_list && btn_list.btn_resend}>
+          <Button title={'补  送'}
+                  onPress={() => {
+                    this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
+                  }}
+                  buttonStyle={{
+                    width: width - 20,
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
 
-        {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'发起配送'}
-                                                                   onPress={() => {
-                                                                     this.onCallThirdShips(order.id, order.store_id)
-                                                                   }}
-                                                                   buttonStyle={{
-                                                                     borderRadius: pxToDp(10),
-                                                                     backgroundColor: colors.fontColor,
-                                                                   }}
-                                                                   titleStyle={{
-                                                                     color: colors.white,
-                                                                     fontSize: 16
-                                                                   }}
-        /> : null}
-
-        {btn_list && btn_list.transfer_self ? <Button title={'我自己送'}
-                                                      onPress={() => {
-                                                        this.onAinSend(order.id, order.store_id)
-                                                      }}
-                                                      buttonStyle={{
-                                                        borderRadius: pxToDp(10),
-                                                        backgroundColor: colors.white,
-                                                        borderWidth: pxToDp(1),
-                                                        borderColor: colors.main_color,
-                                                        color: colors.main_color
-                                                      }}
-                                                      titleStyle={{
-                                                        color: colors.main_color,
-                                                        fontSize: 16
-                                                      }}
-        /> : null}
-
-        {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
-                                                                   onPress={() => {
-                                                                     Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                                                                       text: '继续忽略配送',
-                                                                       onPress: () => {
-                                                                         this.onOverlookDelivery(order.id)
-                                                                       }
-                                                                     }])
-
-                                                                   }}
-                                                                   buttonStyle={{
-                                                                     borderRadius: pxToDp(10),
-                                                                     backgroundColor: colors.main_color,
-                                                                   }}
-                                                                   titleStyle={{
-                                                                     color: colors.white,
-                                                                     fontSize: 16
-                                                                   }}
-        /> : null}
-        {btn_list && btn_list.btn_call_third_delivery ? <Button title={'呼叫配送'}
-                                                                onPress={() => {
-                                                                  this.onCallThirdShips(order.id, order.store_id)
-                                                                }}
-                                                                buttonStyle={{
-                                                                  borderRadius: pxToDp(10),
-                                                                  backgroundColor: colors.main_color,
-                                                                }}
-                                                                titleStyle={{
-                                                                  color: colors.white,
-                                                                  fontSize: 16
-                                                                }}
-        /> : null}
-
-
-        {btn_list && btn_list.btn_resend_white ? <Button title={'补 送'}
-                                                         onPress={() => {
-                                                           this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
-                                                         }}
-                                                         buttonStyle={{
-                                                           width: width * 0.3,
-                                                           borderRadius: pxToDp(10),
-                                                           backgroundColor: colors.white,
-                                                           borderWidth: pxToDp(1),
-                                                           borderColor: colors.main_color,
-                                                           color: colors.main_color
-                                                         }}
-                                                         titleStyle={{
-                                                           color: colors.main_color,
-                                                           fontSize: 16
-                                                         }}
-        /> : null}
-
-
-        {btn_list && btn_list.btn_confirm_arrived ? <Button title={'确认送达'}
-                                                            onPress={() => {
-                                                              this.toSetOrderComplete(order.id)
-                                                            }}
-                                                            buttonStyle={{
-                                                              width: width * 0.3,
-                                                              borderRadius: pxToDp(10),
-                                                              backgroundColor: colors.main_color,
-                                                            }}
-                                                            titleStyle={{
-                                                              color: colors.white,
-                                                              fontSize: 16
-                                                            }}
-        /> : null}
-
-
-        {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
-                                                   onPress={() => {
-                                                     this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
-                                                   }}
-                                                   buttonStyle={{
-                                                     width: width - 20,
-                                                     borderRadius: pxToDp(10),
-                                                     backgroundColor: colors.main_color,
-                                                   }}
-
-                                                   titleStyle={{
-                                                     color: colors.white,
-                                                     fontSize: 16
-                                                   }}
-        /> : null}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
       </View>
     </View>;
   }

@@ -29,6 +29,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../../weui";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Alipay from '@uiw/react-native-alipay';
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 
 function mapStateToProps(state) {
@@ -54,6 +55,8 @@ class SeparatedAccountFill extends PureComponent {
 
   constructor(props: Object) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('三方支付')
     this.state = {
       to_fill_yuan: '100',
       pay_by: PAY_ALI_APP,
@@ -167,13 +170,12 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   wechatPay() {
-    const self = this;
     wechat.isWXAppInstalled()
       .then((isInstalled) => {
         if (isInstalled) {
-          const {accessToken} = self.props.global;
-          const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
-          HttpUtils.post.bind(self.props)(url).then(res => {
+          const {accessToken} = this.props.global;
+          const url = `api/gen_pay_app_order/${this.state.to_fill_yuan}?access_token=${accessToken}`;
+          HttpUtils.post.bind(this.props)(url).then(res => {
             res = res.result;
             const params = {
               partnerId: res.partnerid,
@@ -184,15 +186,13 @@ class SeparatedAccountFill extends PureComponent {
               sign: res.sign,
             };
             wechat.pay(params).then((requestJson) => {
-              console.log("----微信支付成功----", requestJson, params);
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                self.PayCallback(PAID_OK)
+                this.PayCallback(PAID_OK)
               }
             }).catch((err) => {
-              console.log(err, "params", params);
               ToastLong(`支付失败:${err}`);
-              self.PayCallback(PAID_FAIL)
+              this.PayCallback(PAID_FAIL)
 
             });
           });
@@ -226,6 +226,7 @@ class SeparatedAccountFill extends PureComponent {
               <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式 </Text>
 
               <TouchableOpacity onPress={() => {
+                this.mixpanel.track('使用支付宝充值')
                 this.setState({
                   pay_by: PAY_ALI_APP
                 })
@@ -274,6 +275,7 @@ class SeparatedAccountFill extends PureComponent {
                 }
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
+                this.mixpanel.track('使用微信充值')
                 this.setState({
                   pay_by: PAY_WECHAT_APP
                 })
@@ -329,6 +331,20 @@ class SeparatedAccountFill extends PureComponent {
 
   }
 
+  wechatAndAliPay = () => {
+    this.setState({
+      headerType: 1,
+    })
+    this.mixpanel.track('三方支付')
+  }
+
+  mobileBank = () => {
+    this.setState({
+      headerType: 2,
+    })
+    this.mixpanel.track('手机银行支付')
+  }
+
   renderHeader() {
     if (this.state.showHeader && this.state.paid_done === PAID_WAIT) {
       return (
@@ -337,20 +353,14 @@ class SeparatedAccountFill extends PureComponent {
           flexDirection: 'row',
           backgroundColor: colors.fontColor,
         }}>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 1,
-              })
-            }}
-            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝 </Text>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 2,
-              })
-            }}
-            style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账 </Text>
+          <Text onPress={() => this.wechatAndAliPay()}
+                style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>
+            微信/支付宝
+          </Text>
+          <Text onPress={() => this.mobileBank()}
+                style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>
+            手机银行转账
+          </Text>
 
         </View>
       )
@@ -387,7 +397,7 @@ class SeparatedAccountFill extends PureComponent {
         })
         showSuccess('提交成功');
       }, (res) => {
-        showError('提交失败' + res);
+        showError('提交失败' + res.reason);
       })
     }, 1000)
   }
@@ -432,21 +442,21 @@ class SeparatedAccountFill extends PureComponent {
       </View>
 
       {!!this.state.img &&
-      <View style={{
-        marginLeft: pxToDp(40),
-        marginBottom: pxToDp(15),
-        height: pxToDp(170),
-        width: pxToDp(170),
-        flexDirection: "row",
-        alignItems: "flex-end"
-      }}>
-        <Image style={style.img_add} source={{uri: this.state.img}}/>
-        <TouchableOpacity style={{position: "absolute", right: pxToDp(14), top: pxToDp(14)}} onPress={() => {
-          this.setState({img: false});
+        <View style={{
+          marginLeft: pxToDp(40),
+          marginBottom: pxToDp(15),
+          height: pxToDp(170),
+          width: pxToDp(170),
+          flexDirection: "row",
+          alignItems: "flex-end"
         }}>
-          <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
-        </TouchableOpacity>
-      </View>}
+          <Image style={style.img_add} source={{uri: this.state.img}}/>
+          <TouchableOpacity style={{position: "absolute", right: pxToDp(14), top: pxToDp(14)}} onPress={() => {
+            this.setState({img: false});
+          }}>
+            <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
+          </TouchableOpacity>
+        </View>}
 
     </View>;
   }
@@ -643,24 +653,24 @@ class SeparatedAccountFill extends PureComponent {
         {this.renderWechat()}
         {this.renderBankCard()}
         {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{color: colors.color333}}>支付完成! </Text>
-          </View>
-          <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
-        </View>}
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={{color: colors.color333}}>支付完成! </Text>
+            </View>
+            <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
+          </View>}
         {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{color: colors.color333}}>支付失败! </Text>
-          </View>
-          <Button onPress={() => {
-            if (this.props.route.params.onBack) {
-              this.props.route.params.onBack(false)
-            }
-            this.props.navigation.goBack()
-          }} type="warning">返回</Button>
-        </View>}
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={{color: colors.color333}}>支付失败! </Text>
+            </View>
+            <Button onPress={() => {
+              if (this.props.route.params.onBack) {
+                this.props.route.params.onBack(false)
+              }
+              this.props.navigation.goBack()
+            }} type="warning">返回</Button>
+          </View>}
       </View>
     );
   }

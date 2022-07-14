@@ -9,12 +9,14 @@ import {DatePickerView} from "@ant-design/react-native"
 import {Input, TextArea} from "../../weui/index";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
-import Dialog from "../common/component/Dialog";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
 import {CheckBox} from 'react-native-elements';
 import * as globalActions from "../../reducers/global/globalActions";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import dayjs from "dayjs";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   return {
@@ -32,6 +34,8 @@ const mapDispatchToProps = dispatch => {
 class OrderSettingScene extends Component {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("创建订单");
     let {currStoreName} = tool.vendor(this.props.global);
     let {currStoreId, accessToken} = this.props.global
     this.state = {
@@ -79,6 +83,7 @@ class OrderSettingScene extends Component {
   }
 
   _toSetLocation = () => {
+    this.mixpanel.track('请选择收货地址')
     const {location_long, location_lat, coordinates} = this.state
     let center = ""
     if (location_long && location_lat) {
@@ -150,9 +155,6 @@ class OrderSettingScene extends Component {
   }
 
   onConfirm = () => {
-    this.setState({
-      showDateModal: false
-    })
     let time = this.state.datePickerValue
     let str = Math.round(new Date(time) / 1000)
     if (str > Math.round(new Date() / 1000)) {
@@ -163,7 +165,7 @@ class OrderSettingScene extends Component {
     this.setState({
       expect_time: str
     })
-    showSuccess("设置成功！")
+    showSuccess(`设置送达时间为${dayjs(time).format('YYYY-MM-DD HH:mm')}`)
   }
 
   onRequestClose = () => {
@@ -290,6 +292,7 @@ class OrderSettingScene extends Component {
   }
 
   orderToSaveAndIssue = () => {
+    this.mixpanel.track('新建订单_保存并发单')
     this.orderToSave(0)
   }
 
@@ -327,7 +330,7 @@ class OrderSettingScene extends Component {
       isSaveToBook
     } = this.state
     let time = datePickerValue
-    let str = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
+    let str = dayjs(time).format('YYYY-MM-DD HH:mm')
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container]}>
@@ -524,9 +527,26 @@ class OrderSettingScene extends Component {
             </View>
           </View>
 
-          <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
-            {this.showDatePicker()}
-          </Dialog>
+          <DateTimePicker
+              is24Hour={true}
+              cancelTextIOS={'取消'}
+              confirmTextIOS={'确定'}
+              customHeaderIOS={() => {
+                return (<View/>)
+              }}
+              minimumDate={new Date()}
+              date={datePickerValue}
+              mode='datetime'
+              isVisible={this.state.showDateModal}
+              onConfirm={(date) => {
+                this.setState({datePickerValue: date, showDateModal: false}, () => {
+                  setTimeout(() => {
+                    this.onConfirm()
+                  }, 1000)
+                })
+              }}
+              onCancel={() => this.onRequestClose()}
+          />
 
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
             <View style={{
@@ -669,6 +689,7 @@ class OrderSettingScene extends Component {
           paddingVertical: 10
         }}>
           <TouchableOpacity onPress={() => {
+            this.mixpanel.track('新建订单_保存')
             this.orderToSave(1)
           }}>
             <View

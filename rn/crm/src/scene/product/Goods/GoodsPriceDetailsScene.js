@@ -712,20 +712,7 @@ class GoodsPriceDetails extends PureComponent {
               tool.toFixed(setReferPrice * setLowerLimit)
             } </Text>
           </View>
-
         </Dialog>
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.query}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>加载中...</Toast>*/}
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.uploading}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>提交中...</Toast>*/}
       </View>
     )
   }

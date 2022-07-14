@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import {SearchBar} from "../../weui";
 import {calcMs} from '../../pubilc/util/AppMonitorInfo'
 import {getTime} from "../../pubilc/util/TimeUtil";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 const {
   FlatList,
@@ -60,6 +61,7 @@ const STATUS_FILTER = [
 class OrderQueryResultScene extends PureComponent {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     const {navigation, route} = this.props
     let title = ''
@@ -69,6 +71,7 @@ class OrderQueryResultScene extends PureComponent {
       type = 'search'
     } else {
       title = '全部订单'
+      this.mixpanel.track("全部的订单")
     }
     if (route.params.additional !== undefined && route.params.additional) {
       title = '补送单'

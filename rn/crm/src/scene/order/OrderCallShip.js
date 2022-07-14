@@ -143,20 +143,6 @@ class OrderCallShip extends Component {
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._onClick}
                 style={{marginHorizontal: 15}}>发配送</Button>
       </ButtonArea>
-
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="success"*/}
-      {/*  show={this.state.doneSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>已发出</Toast>*/}
     </ScrollView>
   }
 }

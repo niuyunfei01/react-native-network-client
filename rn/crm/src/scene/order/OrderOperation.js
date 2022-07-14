@@ -18,7 +18,7 @@ import {ActionSheet} from "../../weui";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
@@ -31,6 +31,8 @@ import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
@@ -82,11 +84,11 @@ function mapStateToProps(state) {
 class OrderOperation extends Component {
   constructor(props) {
     super(props)
+    this.mixpanel = MixpanelInstance;
     const order_id = (this.props.route.params || {}).orderId;
     this.state = {
-      ActionSheet: this.props.route.params.ActionSheet,
+      actionSheet: props.route.params.actionSheet,
       checked: true,
-      choseItem: false,
       isEndVisible: false,//修改配送时间弹窗
       visibleReceiveQr: false,//收款码
       showCallStore: false,//修改门店
@@ -100,19 +102,10 @@ class OrderOperation extends Component {
       type: "",
       showDeliveryModal: false,
       idx: -1,
-    },
-      this.order_reason();
-  }
-
-
-  renderReceiveQr(order) {
-    return (
-      <ReceiveMoney
-        formVisible={this.state.visibleReceiveQr}
-        onCloseForm={() => this.setState({visibleReceiveQr: false})}
-        order={order}
-      />
-    )
+      showErrorModal: false,
+      errMsg: "",
+    }
+    this.order_reason();
   }
 
   order_reason() {
@@ -222,120 +215,293 @@ class OrderOperation extends Component {
     }
   }
 
+  cancelOrder = () => {
+    this.setState({
+      showDeliveryModal: false
+    })
+    let {orderId} = this.props.route.params;
+    let {accessToken} = this.props.global;
+    let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
+    Alert.alert(
+      '确认是否取消订单', '取消订单后无法撤回，是否继续？',
+      [
+        {
+          text: '确认', onPress: () => {
+            HttpUtils.get(url).then(res => {
+              showSuccess('订单取消成功即将返回!')
+              setTimeout(() => {
+                this.props.navigation.goBack();
+              }, 1000);
+            }).catch((error) => {
+              this.setState({
+                showDeliveryModal: false,
+                showErrorModal: true,
+                errMsg: "请联系顾客或客服取消订单"
+              })
+            })
+          }
+        },
+        {
+          "text": '返回', onPress: () => {
+            this.setState({
+              showDeliveryModal: true
+            })
+          }
+        }
+      ]
+    )
+  }
+
+  touchItem = (actionSheet, idx) => {
+    actionSheet[idx].checked = true;
+    switch (actionSheet[idx].key) {
+      case 3:
+        this.mixpanel.track('点击修改门店')
+        break
+      case 15:
+        this.mixpanel.track('点击取消订单')
+        this.setState({
+          showDeliveryModal: true
+        })
+        break
+      case 16:
+        this.mixpanel.track('点击置为完成')
+        break
+    }
+    this.setState({
+      actionSheet
+    }, () => {
+      this.onMenuOptionSelected(actionSheet[idx])
+    })
+  }
+
+  onMenuOptionSelected(option) {
+    const {navigation, global} = this.props;
+    const {accessToken} = global;
+    const {order} = this.state
+    const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id
+      : "#!/feedback/order/" + order.id;
+    const path = `vm?access_token=${accessToken}${vm_path}`;
+    const url = Config.serverUrl(path, Config.https);
+    switch (option?.key) {
+      case MENU_EDIT_BASIC:
+        navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
+        break
+      case MENU_EDIT_EXPECT_TIME://修改配送时间
+        this.setState({
+          isEndVisible: true,
+        });
+        break
+      case MENU_EDIT_STORE:
+        GlobalUtil.setOrderFresh(1)
+        navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order});
+        break
+      case MENU_FEEDBACK:
+        navigation.navigate(Config.ROUTE_WEB, {url});
+        break
+      case MENU_SET_INVALID:
+        navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
+        GlobalUtil.setOrderFresh(1)
+        break
+      case MENU_CANCEL_ORDER:
+        GlobalUtil.setOrderFresh(1)
+        this.cancel_order()
+        break
+      case MENU_ADD_TODO:
+        navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
+        break
+      case MENU_OLD_VERSION:
+        GlobalUtil.setOrderFresh(1)
+        native.toNativeOrder(order.id).then();
+        break
+      case MENU_PROVIDING:
+        this._onToProvide();
+        break
+      case MENU_RECEIVE_QR:
+        this.setState({visibleReceiveQr: true})
+        break
+      case MENU_SEND_MONEY:
+        navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.id, storeId: order.store_id})
+        break
+      case MENU_ORDER_SCAN:
+        navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.id})
+        break
+      case MENU_ORDER_SCAN_READY:
+        navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
+        break
+      case MENU_ORDER_CANCEL_TO_ENTRY:
+        navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.id})
+        break
+      case MENU_REDEEM_GOOD_COUPON:
+        navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
+          type: 'select',
+          storeId: order.store_id,
+          orderId: order.id,
+          coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
+          to_u_id: order.user_id,
+          to_u_name: order.userName,
+          to_u_mobile: order.mobile,
+        })
+        break
+      case MENU_SET_COMPLETE:
+        this.toSetOrderComplete()
+        break
+      case MENU_CALL_STAFF:
+        this._onShowStoreCall()
+        break
+      default:
+        ToastLong('未知的操作');
+        break
+    }
+  }
+
   cancel_order() {
     this.setState({
       showDeliveryModal: true
     })
+  }
 
+  openMiniprogarm = () => {
+    let {currStoreId, currentUser, currentUserProfile} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global)
+    let data = {
+      v: currVendorId,
+      s: currStoreId,
+      u: currentUser,
+      m: currentUserProfile.mobilephone,
+      place: 'cancelOrder'
+    }
+    JumpMiniProgram("/pages/service/index", data);
   }
 
   render() {
+    const {
+      actionSheet,
+    } = this.state
     return (
       <View>
-        <BottomModal
-          visible={this.state.showDeliveryModal}
-          title={'取消原因'}
-          actionText={'确认'}
-          onClose={() => this.setState({
-            showDeliveryModal: false,
-          })}
-          onPress={() => {
-            let that = this;
-            let {orderId} = this.props.route.params;
-            let {accessToken} = this.props.global;
-            let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
-            Alert.alert(
-              '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-              [
-                {
-                  text: '确认', onPress: () => {
-                    HttpUtils.get(url).then(res => {
-                      ToastLong('订单取消成功即将返回!')
-                      that.setState({
-                        showDeliveryModal: false
-                      }, () => {
-                        setTimeout(() => {
-                          this.props.navigation.goBack();
-                        }, 1000);
-                      })
-                    }).catch(() => {
-                      showError('取消订单失败')
-                    })
-                  }
-                },
-                {
-                  "text": '返回', onPress: () => {
-                    Alert.alert('我知道了')
-                  }
-                }
-              ]
-            )
-          }}>
-          <View>
-            {this.state.queList.map((item, idx) => {
+        {this.renderModal()}
+        <ScrollView
+          overScrollMode="always"
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
+          {
+            actionSheet && actionSheet.map((item, idx) => {
+              item.checked = false
               return (
-                <TouchableOpacity
-                  style={[
-                    {
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 15
-                    }
-                  ]}
-                  onPress={() => {
-                    let queList = [...this.state.queList];
-                    queList.forEach((tabItem) => {
-                      tabItem.checked = false;
-                    })
-                    queList[idx].checked = true;
-                    this.state.type = queList[idx].type;
-                    this.setState({
-                      queList,
-                      idx,
-                    })
-                    if ((idx + 1) === tool.length(this.state.queList)) {
-                      this.setState({
-                        isShowInput: true
-                      })
-                    } else {
-                      this.setState({
-                        isShowInput: false
-                      })
-                    }
-                  }}
-                >
-                  <View style={{
-                    borderRadius: 10,
-                    width: 20,
-                    height: 20,
-                    backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
-                    justifyContent: "center",
-                    alignItems: 'center',
-                  }}>
-                    <Entypo name={this.state.idx === idx ? 'check' : 'circle'} style={{
-                      fontSize: pxToDp(32),
-                      color: this.state.idx === idx ? 'white' : colors.main_color,
-                    }}/>
-                  </View>
-                  <Text style={{marginLeft: 20}}>
-                    {item.msg}
-                  </Text>
-                </TouchableOpacity>
+                <CheckBox
+                  key={idx}
+                  left
+                  title={item.label}
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checked={item.checked || false}
+                  checkedColor={colors.main_color}
+                  onPress={() => this.touchItem(actionSheet, idx)}
+                />
               )
-            })}
+            })
+          }
+          <View style={{width: '100%', height: pxToDp(200)}}></View>
+        </ScrollView>
 
-            {this.state.isShowInput && <TextInput
-              style={[styles.TextInput]}
-              placeholder="请输入取消原因!"
-              onChangeText={(reasontext) => this.setState({reasontext})}
-            />}
-          </View>
+      </View>
+    );
+  }
 
+  renderModal = () => {
+    const {
+      showCallStore,
+      order,
+      showDeliveryModal,
+      showErrorModal,
+      errMsg,
+      queList,
+      isShowInput
+    } = this.state
+    return (
+      <View>
+        <BottomModal title={''} onPress={() => this.openMiniprogarm()} visible={showErrorModal}
+                     actionText={'联系客服'}
+                     closeText={'取消'}
+                     onPressClose={() => this.setState({showErrorModal: false})}
+                     onClose={() => this.setState({showErrorModal: false})}>
+          <Text style={{
+            fontSize: 18,
+            color: colors.color333,
+            fontWeight: 'bold',
+            marginVertical: 20,
+            textAlign: 'center',
+            flex: 1
+          }}>{errMsg} </Text>
         </BottomModal>
 
+        <BottomModal
+          visible={showDeliveryModal}
+          title={'取消原因'}
+          actionText={'确认'}
+          onClose={() => this.setState({showDeliveryModal: false})}
+          onPress={() => this.cancelOrder()}>
+          <View>
+            {
+              queList.map((item, idx) => {
+                item.checked = false;
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 15
+                      }
+                    ]}
+                    onPress={() => {
+                      queList[idx].checked = true;
+                      this.setState({
+                        queList: queList,
+                        idx: idx,
+                        type: queList[idx].type
+                      })
+                      if ((idx + 1) === tool.length(queList)) {
+                        this.setState({isShowInput: true})
+                      } else {
+                        this.setState({isShowInput: false})
+                      }
+                    }}
+                  >
+                    <View style={{
+                      borderRadius: 10,
+                      width: 20,
+                      height: 20,
+                      backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
+                      justifyContent: "center",
+                      alignItems: 'center',
+                    }}>
+                      <Entypo name={this.state.idx === idx ? 'check' : 'circle'}
+                              size={pxToDp(32)}
+                              style={{color: this.state.idx === idx ? 'white' : colors.main_color}}/>
+                    </View>
+                    <Text style={{marginLeft: 20}}>
+                      {item.msg}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+
+            <If condition={isShowInput}>
+              <TextInput
+                style={[styles.TextInput]}
+                placeholder="请输入取消原因!"
+                onChangeText={(text) => this.setState({reasontext: text})}
+              />
+            </If>
+          </View>
+        </BottomModal>
 
         <ActionSheet
-          visible={this.state.showCallStore}
+          visible={showCallStore}
           onRequestClose={() => {
             this.setState({showCallStore: false})
           }}
@@ -348,7 +514,12 @@ class OrderOperation extends Component {
             }
           ]}
         />
-        {this.renderReceiveQr(this.state.order)}
+
+        <ReceiveMoney
+          formVisible={this.state.visibleReceiveQr}
+          onCloseForm={() => this.setState({visibleReceiveQr: false})}
+          order={order}
+        />
         <DateTimePicker
           cancelTextIOS={'取消'}
           confirmTextIOS={'修改'}
@@ -367,117 +538,10 @@ class OrderOperation extends Component {
             });
           }}
         />
-        <ScrollView
-          overScrollMode="always"
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}>
-          {this.state.ActionSheet.map((item, idx) => {
-            return (
-              <CheckBox
-                key={idx}
-                left
-                title={item.label}
-
-                checkedIcon='dot-circle-o'
-                uncheckedIcon='circle-o'
-                checked={item.checked || false}
-                checkedColor={colors.main_color}
-                onPress={() => {
-                  let ActionSheet = [...this.state.ActionSheet];
-                  ActionSheet.forEach((tabItem) => {
-                    tabItem.checked = false;
-                  })
-                  ActionSheet[idx].checked = true;
-                  if (ActionSheet[idx].key === 15) {
-                    this.setState({
-                      showDeliveryModal: true
-                    })
-                  }
-                  this.state.choseItem = ActionSheet[idx];
-                  this.setState({
-                    ActionSheet
-                  }, () => {
-
-                    if (!this.state.choseItem) {
-                      ToastLong('请先选择操作方式！')
-                      return
-                    }
-                    this.onMenuOptionSelected(this.state.choseItem)
-                  })
-
-                }}
-              />
-            )
-          })
-          }
-          <View style={{width: '100%', height: pxToDp(200)}}></View>
-        </ScrollView>
-
       </View>
-    );
+    )
   }
 
-  onMenuOptionSelected(option) {
-    const {accessToken} = this.props.global;
-    const {navigation} = this.props;
-    let order = this.state.order
-    if (option.key === MENU_EDIT_BASIC) {
-      navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
-    } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
-      this.setState({
-        isEndVisible: true,
-      });
-    } else if (option.key === MENU_EDIT_STORE) {
-      GlobalUtil.setOrderFresh(1)
-      navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order});
-    } else if (option.key === MENU_FEEDBACK) {
-      const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id
-        : "#!/feedback/order/" + order.id;
-      const path = `vm?access_token=${accessToken}${vm_path}`;
-      const url = Config.serverUrl(path, Config.https);
-      navigation.navigate(Config.ROUTE_WEB, {url});
-    } else if (option.key === MENU_SET_INVALID) {
-      navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
-      GlobalUtil.setOrderFresh(1)
-    } else if (option.key === MENU_CANCEL_ORDER) {
-      GlobalUtil.setOrderFresh(1)
-      this.cancel_order()
-    } else if (option.key === MENU_ADD_TODO) {
-      navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
-    } else if (option.key === MENU_OLD_VERSION) {
-      GlobalUtil.setOrderFresh(1)
-      native.toNativeOrder(order.id);
-    } else if (option.key === MENU_PROVIDING) {
-      this._onToProvide();
-    } else if (option.key === MENU_RECEIVE_QR) {
-      this.setState({visibleReceiveQr: true})
-    } else if (option.key === MENU_SEND_MONEY) {
-      navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.id, storeId: order.store_id})
-    } else if (option.key === MENU_ORDER_SCAN) {
-      navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.id})
-    } else if (option.key === MENU_ORDER_SCAN_READY) {
-      navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
-    } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
-      navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.id})
-    } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
-      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
-        type: 'select',
-        storeId: order.store_id,
-        orderId: order.id,
-        coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
-        to_u_id: order.user_id,
-        to_u_name: order.userName,
-        to_u_mobile: order.mobile,
-      })
-    } else if (option.key === MENU_SET_COMPLETE) {
-      this.toSetOrderComplete()
-    } else if (option.key === MENU_CALL_STAFF) {
-      this._onShowStoreCall()
-    } else {
-      ToastLong('未知的操作');
-    }
-  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderOperation)

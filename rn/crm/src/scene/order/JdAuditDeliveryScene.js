@@ -172,19 +172,6 @@ class JdAuditDeliveryScene extends Component {
         >回复审核</Button>
       </ButtonArea>
 
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="success"*/}
-      {/*  show={this.state.doneSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>已回复配送</Toast>*/}
     </ScrollView>
   }
 }

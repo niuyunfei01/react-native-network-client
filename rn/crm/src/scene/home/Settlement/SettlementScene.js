@@ -335,18 +335,23 @@ class SettlementScene extends PureComponent {
             date={this.state.date}
             onChange={this.onChange}
           >
-            <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: 15}}>
-              {this.state.dates}
+            <Text style={{
+              color: colors.color333,
+              fontWeight: 'bold',
+              fontSize: 15,
+              padding: 5,
+              width: 200,
+            }}>
+              {this.state.dates} &nbsp;
+              <Entypo
+                name={"triangle-down"}
+                style={{
+                  marginLeft: 5,
+                  fontSize: 20,
+                  color: colors.color999,
+                }}/>
             </Text>
-
           </PopPicker>
-          <Entypo
-            name={"triangle-down"}
-            style={{
-              marginLeft: 5,
-              fontSize: 20,
-              color: colors.color999,
-            }}/>
           <View style={{flex: 1}}></View>
           <Text onPress={() => {
             this.toMonthGather()

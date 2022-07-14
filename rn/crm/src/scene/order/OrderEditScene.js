@@ -140,13 +140,8 @@ class OrderEditScene extends Component {
 
   UNSAFE_componentWillMount() {
     const {order} = this.props.route.params || {};
-    const init = {
-      autoSaveUserBackup: true,
-      loc_name: order.street_block
-    };
-    this.editFields.map(edit => {
-      init[edit.key] = edit.val(order);
-    });
+    const init = {autoSaveUserBackup: true, loc_name: order.street_block};
+    this.editFields.map(edit => init[edit.key] = edit.val(order));
 
     this.setState(init);
     this.getUserTags();
@@ -444,7 +439,7 @@ class OrderEditScene extends Component {
         <Cells style={CommonStyle.cells35}>
           <Cell onPress={this._toSetLocation}>
             <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>导航座标</Label>
+              <Label style={CommonStyle.cellTextH35W70}>导航坐标</Label>
             </CellHeader>
             <CellBody style={{flexDirection: "row", flex: 1}}>
               <IconEvilIcons name="location" size={26}/>
@@ -537,33 +532,6 @@ class OrderEditScene extends Component {
 
         <WhiteSpace/>
 
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
-
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmittingConfirm}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  正在发送订单修改通知*/}
-        {/*</Toast>*/}
-
-        {/*<Toast*/}
-        {/*  icon="success"*/}
-        {/*  show={this.state.confirmSent}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  发送成功*/}
-        {/*</Toast>*/}
-        {/*标签列表*/}
         <UserTagPopup
           multiple={this.state.userTagPopupMulti}
           visible={this.state.userTagPopupVisible}

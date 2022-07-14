@@ -15,6 +15,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToEm from "../../../pubilc/util/pxToEm";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -33,6 +34,8 @@ function mapDispatchToProps(dispatch) {
 class HelpScene extends PureComponent {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('帮助页')
     this.state = {
       types: [],
       questions: [],
@@ -200,12 +203,6 @@ class HelpScene extends PureComponent {
               })
             }
           </View>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.query}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>加载中</Toast>*/}
 
         </ScrollView>
         <View style={styles.call_btn_wrapper}>

@@ -7,6 +7,17 @@ import {getReadableVersion} from "react-native-device-info/src/index";
 
 wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
 
+function shareWechatImage(imageUrl, scene) {
+  return new Promise((resolve, reject) => {
+    wechat.shareLocalImage({imageUrl: imageUrl, scene: scene}).then((res) => {
+      resolve(res)
+    }).catch(reason => {
+      reject(reason)
+    })
+  })
+
+}
+
 function JumpMiniProgram(path = "/pages/service/index", data = {}) {
   let str = '?ver=' + getReadableVersion() + '&';
   if (tool.length(data) > 0) {
@@ -18,6 +29,7 @@ function JumpMiniProgram(path = "/pages/service/index", data = {}) {
     userName: Config.Program_id,
     path: path + str
   }, (res) => {
+  }).then(() => {
   });
 }
 
@@ -40,8 +52,9 @@ function JumpWeb(title, desc, img, url, type = 0) {
     thumbImageUrl: img,
     webpageUrl: url,
     scene: type,
+  }).then(() => {
   });
 }
 
-export {JumpMiniProgram, JumpWeb, wechatLogin}
+export {JumpMiniProgram, JumpWeb, wechatLogin, shareWechatImage}
 

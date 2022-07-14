@@ -78,6 +78,7 @@ class OrderCancelShip extends Component {
         this.setState({list: resp.obj, loading: false});
       } else {
         ToastLong(`错误: ${resp.desc}`)
+        this.timeOutBack(300);
       }
     }));
   }
@@ -129,20 +130,6 @@ class OrderCancelShip extends Component {
                 }}
                 style={{marginHorizontal: 15}}>撤回</Button>
       </ButtonArea>
-
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.loading}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>加载中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.upLoading}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
 
       <Dialog onRequestClose={() => {
       }}

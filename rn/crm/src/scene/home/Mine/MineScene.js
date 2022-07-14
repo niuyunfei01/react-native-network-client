@@ -39,6 +39,7 @@ import {
   userCanChangeStore
 } from "../../../reducers/mine/mineActions";
 import * as tool from "../../../pubilc/util/tool";
+import {simpleStore} from "../../../pubilc/util/tool";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import {Dialog} from "../../../weui";
@@ -53,7 +54,7 @@ import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -99,7 +100,7 @@ const customerOpacity = 0.6;
 class MineScene extends PureComponent {
   constructor(props) {
     super(props);
-
+    this.mixpanel = MixpanelInstance;
     const {
       currentUser,
       currStoreId,
@@ -470,13 +471,12 @@ class MineScene extends PureComponent {
     this.getStoreDataOfMine()
     // this.renderStoreBlock()
 
-    let _this = this;
-    const {dispatch} = this.props;
-    const {accessToken, currStoreId} = this.props.global;
+    const {dispatch, global} = this.props;
+    const {accessToken, currStoreId} = global;
     dispatch(
-      upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
+      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj)=> {
         if (ok) {
-          _this.setState({
+          this.setState({
             prefer_store: obj.prefer_store,
             screen_name: obj.screen_name,
             mobile_phone: obj.mobilephone,
@@ -577,21 +577,17 @@ class MineScene extends PureComponent {
 
   onCanChangeStore = (store_id) => {
     const {accessToken} = this.props.global;
-    const {dispatch,global} = this.props;
+    const {dispatch, global} = this.props;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          simpleStore(global, dispatch,store_id)
+          simpleStore(global, dispatch, store_id)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
       })
     );
-  }
-
-  nameToLines = (storeName) => {
-
   }
 
   recordQuestionFirstShow(flag) {
@@ -647,7 +643,8 @@ class MineScene extends PureComponent {
               }}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
+          <TouchableOpacity style={{height: pxToDp(85), width: 200}}
+                            onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
@@ -673,16 +670,13 @@ class MineScene extends PureComponent {
 
   renderManager = () => {
     let {
-      order_num,
       turnover,
       fnPriceControlled,
       fnProfitControlled,
-      // DistributionBalance,
       turnover_new,
       title_new,
       order_num_new
     } = this.state;
-    let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
     // let CurrentDistributionBalance = {}
     // DistributionBalance && DistributionBalance.map((item, index) => {
@@ -732,11 +726,8 @@ class MineScene extends PureComponent {
                     this.setState({FnPriceMsg: true});
                   }}
                 >
-                  <Text
-                    style={[worker_styles.sale_text, worker_styles.sales_money]}
-                  >
-                    预计最低收益: {!isNaN(turnover) && "¥"}
-                    {turnover}&nbsp;
+                  <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
+                    预计最低收益: {!isNaN(turnover) && "¥"}{turnover}&nbsp;
                     <FontAwesome
                       name="question-circle"
                       style={{fontSize: pxToEm(30), color: "#00aeff"}}
@@ -749,39 +740,38 @@ class MineScene extends PureComponent {
               //   >
               //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
               //   </Text> :
-              <Text
-                style={[worker_styles.sale_text, worker_styles.sales_money]}
-              >
+              <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
                 {title_new}: ¥{turnover_new}
               </Text>
             }
           </View>
-          {this.state.wsb_store_account === 1 &&
-          <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
-                            style={{
-                              marginTop: pxToDp(45),
-                              marginLeft: pxToDp(25),
-                              position: "absolute",
-                              top: 0,
-                              right: 40
-                            }}>
-            <View style={{
-              width: pxToDp(96),
-              height: pxToDp(46),
-              backgroundColor: colors.main_color,
-              marginRight: 8,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}>
-              <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-            </View>
-          </TouchableOpacity>}
+          <If condition={this.state.wsb_store_account === 1}>
+            <TouchableOpacity onPress={() => {
+              this.mixpanel.track('我的_充值')
+              navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+            }}
+                              style={{
+                                marginTop: pxToDp(45),
+                                marginLeft: pxToDp(25),
+                                position: "absolute",
+                                top: 0,
+                                right: 40
+                              }}>
+              <View style={{
+                width: pxToDp(96),
+                height: pxToDp(46),
+                backgroundColor: colors.main_color,
+                marginRight: 8,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           <View style={[worker_styles.chevron_right]}>
-            <Button
-              name="chevron-thin-right"
-              style={[worker_styles.right_btn]}
-            />
+            <Button name="chevron-thin-right" style={[worker_styles.right_btn]}/>
           </View>
         </View>
       </TouchableOpacity>
@@ -807,10 +797,7 @@ class MineScene extends PureComponent {
           <View>
             <Image
               style={[worker_styles.icon_head]}
-              source={
-                !!this.state.cover_image
-                  ? {uri: this.state.cover_image}
-                  : require("../../../img/My/touxiang180x180_.png")
+              source={!!this.state.cover_image ? {uri: this.state.cover_image} : require("../../../img/My/touxiang180x180_.png")
               }
             />
           </View>
@@ -870,10 +857,14 @@ class MineScene extends PureComponent {
         >
           {this.renderHeader()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
-          {currVersion === Cts.VERSION_DIRECT ? <NextSchedule/> : null}
+          <If condition={currVersion === Cts.VERSION_DIRECT}>
+            <NextSchedule/>
+          </If>
           {this.renderStoreBlock()}
-          {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
-          {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
+          <If condition={currVersion === Cts.VERSION_DIRECT}>
+            {this.renderDirectBlock()}
+            {this.renderZtBlock()}
+          </If>
           {this.renderVersionBlock()}
           {this.renderCopyRight()}
           <Dialog
@@ -928,6 +919,26 @@ class MineScene extends PureComponent {
     this.props.navigation.navigate(route, params);
   }
 
+  orderSearch = () => {
+    this.mixpanel.track('订单搜索')
+    this.onPress(Config.ROUTE_ORDER_SEARCH)
+  }
+
+  distributionAnalysis = () => {
+    this.mixpanel.track('数据分析页')
+    this.onPress(Config.ROUTE_DistributionAnalysis)
+  }
+
+  storeManager = () => {
+    this.mixpanel.track('店铺页')
+    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
+    this.onPress(Config.ROUTE_STORE, {
+      currentUser: currentUser,
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+      is_mgr: is_mgr
+    });
+  }
   renderStoreBlock = () => {
     const {
       // show_activity_mgr = false,
@@ -951,7 +962,7 @@ class MineScene extends PureComponent {
         <If condition={this.state.allow_analys || is_service_mgr}>
           <TouchableOpacity
             style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            onPress={this.distributionAnalysis}
             activeOpacity={customerOpacity}>
             <Image
               style={[block_styles.block_img]}
@@ -983,6 +994,7 @@ class MineScene extends PureComponent {
                 let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
+                this.mixpanel.track('业绩页')
               } else {
                 ToastLong("您没有查看业绩的权限");
               }
@@ -992,33 +1004,27 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         </If>
-        {enabled_good_mgr && <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/yunyingshouyi_.png")}
-          />
-          <Text style={[block_styles.block_name]}>订单补偿</Text>
-        </TouchableOpacity>}
+        <If condition={enabled_good_mgr}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/yunyingshouyi_.png")}
+            />
+            <Text style={[block_styles.block_name]}>订单补偿</Text>
+          </TouchableOpacity>
+        </If>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => {
-            this.onPress(Config.ROUTE_STORE, {
-              currentUser: this.state.currentUser,
-              currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName,
-              is_mgr: is_mgr
-            });
-          }}
+          onPress={this.storeManager}
           activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/dianpu_.png")}/>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/dianpu_.png")}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          this.mixpanel.track('员工页')
           this.onPress(Config.ROUTE_WORKER, {
             type: "worker",
             currentUser: this.state.currentUser,
@@ -1030,21 +1036,22 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require("../../../img/My/yuangong_.png")}/>
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
-        {currVersion === Cts.VERSION_DIRECT && <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
-            let url = Config.serverUrl(path, Config.https);
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/kaoqin_.png")}/>
-          <Text style={[block_styles.block_name]}>考勤记录</Text>
-        </TouchableOpacity>}
-        {fnPriceControlled > 0 &&
-        is_service_mgr && (
+        <If condition={currVersion === Cts.VERSION_DIRECT}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => {
+              let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(path, Config.https);
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            }}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/kaoqin_.png")}/>
+            <Text style={[block_styles.block_name]}>考勤记录</Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={fnPriceControlled > 0 && is_service_mgr}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
@@ -1052,20 +1059,18 @@ class MineScene extends PureComponent {
                 let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
+                this.mixpanel.track('业绩页')
               } else {
                 ToastLong("您没有查看托管店业绩的权限");
               }
             }}
             activeOpacity={customerOpacity}
           >
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/yeji_.png")}
-            />
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
-        )}
-        {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr) ? (
+        </If>
+        <If condition={fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr)}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
@@ -1077,10 +1082,8 @@ class MineScene extends PureComponent {
             />
             <Text style={[block_styles.block_name]}>运营收益</Text>
           </TouchableOpacity>
-        ) : (
-          <View/>
-        )}
-        {this.state.wsb_store_account === 1 ? (
+        </If>
+        <If condition={this.state.wsb_store_account === 1}>
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -1088,10 +1091,8 @@ class MineScene extends PureComponent {
                    source={require("../../../img/My/yunyingshouyi_.png")}/>
             <Text style={[block_styles.block_name]}>钱包</Text>
           </TouchableOpacity>
-        ) : (
-          <View/>
-        )}
-        {this.state.wsb_store_account !== 1 ? (
+        </If>
+        <If condition={this.state.wsb_store_account !== 1}>
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})}
                             activeOpacity={customerOpacity}>
@@ -1099,49 +1100,39 @@ class MineScene extends PureComponent {
                    source={require("../../../img/My/yunyingshouyi_.png")}/>
             <Text style={[block_styles.block_name]}>费用账单</Text>
           </TouchableOpacity>
-        ) : (
-          <View/>
-        )}
+        </If>
 
         <TouchableOpacity style={[block_styles.block_box]}
-          // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
-                          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                            updateStoreStatusCb: (storeStatus) => {
-                              this.setState({storeStatus: storeStatus})
-                            }
-                          })}
+                          onPress={this.platformSetting}
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/yunyingshouyi_.png")}/>
           <Text style={[block_styles.block_name]}>平台设置</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[block_styles.block_box]}
-                          onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.deliverySetting}
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/yunyingshouyi_.png")}/>
           <Text style={[block_styles.block_name]}>配送设置</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[block_styles.block_box]}
-                          onPress={() => this.onPress(Config.ROUTE_PRINTERS)}
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.printerSetting}
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/PrintSetting.png")}/>
           <Text style={[block_styles.block_name]}>打印设置</Text>
         </TouchableOpacity>
-        {Platform.OS !== 'ios' &&
-        <TouchableOpacity style={[block_styles.block_box]}
-                          onPress={() => this.onPress(Config.ROUTE_INFORM)}
-                          activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-                 source={require("../../../img/My/inform.png")}/>
-          <Text style={[block_styles.block_name]}>消息与铃声</Text>
-        </TouchableOpacity>}
-
-
-        {currVersion === Cts.VERSION_DIRECT && (
+        <If condition={Platform.OS !== 'ios'}>
+          <TouchableOpacity style={[block_styles.block_box]}
+                            onPress={() => this.onPress(Config.ROUTE_INFORM)}
+                            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]}
+                   source={require("../../../img/My/inform.png")}/>
+            <Text style={[block_styles.block_name]}>消息与铃声</Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={currVersion === Cts.VERSION_DIRECT}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
@@ -1157,36 +1148,31 @@ class MineScene extends PureComponent {
             />
             <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
-        )}
+        </If>
 
         <TouchableOpacity style={[block_styles.block_box]}
-                          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+                          onPress={this.orderSearch}
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/dingdansousuo_.png")}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
+        <If condition={show_goods_monitor}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
+            activeOpacity={customerOpacity}>
+            {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/shangpinqingbao_.png")}
+            />
+            <Text style={[block_styles.block_name]}>商品调整</Text>
+          </TouchableOpacity>
+        </If>
 
-        {show_goods_monitor ? <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
-          activeOpacity={customerOpacity}>
-          {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/shangpinqingbao_.png")}
-          />
-          <Text style={[block_styles.block_name]}>商品调整</Text>
-        </TouchableOpacity> : null}
-
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_PUSH)}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/push.png")}
-          />
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.pushSetting} activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/push.png")}/>
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
@@ -1194,11 +1180,10 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box, {position: "relative"}]}
           onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
           activeOpacity={customerOpacity}>
-          {have_not_read_advice > 0 && <View style={[block_styles.notice_point]}/>}
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/inform.png")}
-          />
+          <If condition={have_not_read_advice > 0}>
+            <View style={[block_styles.notice_point]}/>
+          </If>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/inform.png")}/>
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
         <If condition={fn_stall === '1'}>
@@ -1212,21 +1197,45 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-        {this.state.show_activity && GlobalUtil.getRecommend() ? <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={{uri: this.state.activity_img}}
-          />
-          <Text style={[block_styles.block_name]}>老带新活动</Text>
-        </TouchableOpacity> : null}
+        <If condition={this.state.show_activity && GlobalUtil.getRecommend()}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={{uri: this.state.activity_img}}
+            />
+            <Text style={[block_styles.block_name]}>老带新活动</Text>
+          </TouchableOpacity>
+        </If>
 
       </View>
     );
   }
 
+  pushSetting = () => {
+    this.mixpanel.track('推送页')
+    this.onPress(Config.ROUTE_PUSH)
+  }
+  platformSetting = () => {
+    this.mixpanel.track('平台页')
+    this.onPress(Config.ROUTE_STORE_STATUS, {
+      updateStoreStatusCb: (storeStatus) => {
+        this.setState({storeStatus: storeStatus})
+      }
+    })
+  }
+
+  printerSetting = () => {
+    this.mixpanel.track('打印页')
+    this.onPress(Config.ROUTE_PRINTERS)
+  }
+
+  deliverySetting = () => {
+    this.mixpanel.track('配送管理')
+    this.onPress(Config.ROUTE_DELIVERY_LIST)
+  }
 
   getActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
@@ -1247,6 +1256,11 @@ class MineScene extends PureComponent {
     })
   }
 
+  helpPage = () => {
+    this.mixpanel.track('帮助页')
+    this.onPress(Config.ROUTE_HELP)
+  }
+
   renderVersionBlock = () => {
     const {
       show_expense_center = false,
@@ -1254,68 +1268,47 @@ class MineScene extends PureComponent {
     return (
       <View style={[block_styles.container]}>
 
-        {show_expense_center && (<TouchableOpacity
+        <If condition={show_expense_center}>
+          <TouchableOpacity
             style={[block_styles.block_box]}
             activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/huiyuan_.png")}
-            />
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/huiyuan_.png")}/>
             <Text style={[block_styles.block_name]}>我的钱包</Text>
           </TouchableOpacity>
-        )}
+        </If>
 
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          activeOpacity={customerOpacity}
-          onPress={() => {
-            this.onPress(Config.ROUTE_HELP);
-          }}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/help_.png")}
-          />
+        <TouchableOpacity style={[block_styles.block_box]} activeOpacity={customerOpacity} onPress={this.helpPage}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/help_.png")}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            this.oncallservice();
-            // this.callCustomerService()
-          }}
-          activeOpacity={customerOpacity}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.oncallservice} activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]} source={require("../../../img/My/fuwu_.png")}/>
           <Text style={[block_styles.block_name]}>联系客服</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
-          onPress={() => {
-            this.onPress(Config.ROUTE_VERSION);
-          }}
+          onPress={this.versionInfo}
         >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/banben_.png")}
-          />
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/banben_.png")}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_SETTING)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../../img/My/shezhi_.png")}
-          />
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.settingPage} activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/shezhi_.png")}/>
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
+  }
+  settingPage = () => {
+    this.mixpanel.track('设置页')
+    this.onPress(Config.ROUTE_SETTING)
+  }
+  versionInfo = () => {
+    this.mixpanel.track('版本信息页')
+    this.onPress(Config.ROUTE_VERSION);
   }
   oncallservice = () => {
     if (!this.state.is_self_yy) {
@@ -1713,7 +1706,7 @@ const header_styles = StyleSheet.create({
     color: colors.main_color,
     fontSize: pxToEm(30),
     fontWeight: "bold",
-    lineHeight: pxToDp(35)
+    lineHeight: pxToDp(36)
   },
   icon_box: {
     position: "absolute",

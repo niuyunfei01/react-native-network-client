@@ -518,23 +518,26 @@ class OrderTransferThird extends Component {
               marginRight: pxToDp(15),
               marginBottom: pxToDp(300)
             }}>
-            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-              this.onPress(Config.ROUTE_STORE_STATUS)
-              this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
-            }} style={{flexDirection: "row", alignItems: "center"}}>
-              <Entypo name='cog'
-                      style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
-              <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
-            </TouchableOpacity>}
-            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-              Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
-                {text: '确定'}
-              ])
-            }}>
-              <Entypo name='help-with-circle'
-                      style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/>
-            </TouchableOpacity>
-            }
+
+            <If condition={allow_edit_ship_rule}>
+              <TouchableOpacity onPress={() => {
+                this.onPress(Config.ROUTE_STORE_STATUS)
+                this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
+              }} style={{flexDirection: "row", alignItems: "center"}}>
+                <Entypo name='cog'
+                        style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
+                <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                this.mixpanel.track('自动发单说明')
+                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
+                  {text: '确定'}
+                ])
+              }}>
+                <Entypo name='help-with-circle'
+                        style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/>
+              </TouchableOpacity>
+            </If>
           </View>
         </ScrollView>
         {this.renderBtn()}
@@ -810,6 +813,7 @@ class OrderTransferThird extends Component {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }} onPress={() => {
+                  this.mixpanel.track('不能发单配送说明')
                   Alert.alert('错误信息', `${item.error_msg}`, [
                     {text: '知道了'}
                   ])
@@ -830,6 +834,7 @@ class OrderTransferThird extends Component {
   }
 
 
+
   renderBtn = () => {
     return (
       <View>
@@ -844,6 +849,7 @@ class OrderTransferThird extends Component {
         }}>
 
           <TouchableOpacity onPress={() => {
+            this.mixpanel.track('预约配送')
             this.setState({showDateModal: true, datePickerList: this.timeSlot(10, true)})
           }} style={{
             flexDirection: 'row',
@@ -851,18 +857,15 @@ class OrderTransferThird extends Component {
             justifyContent: 'center',
             flex: 1
           }}>
-            <Text
-              style={{
-                textAlign: 'right',
-                fontSize: pxToDp(30),
-                fontWeight: 'bold',
-                marginRight: 6
-              }}>呼叫时间 </Text>
+            <Text style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold', marginRight: 6}}>
+              呼叫时间
+            </Text>
             <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
             this.setState({showContentModal: true})
+            this.mixpanel.track('设置备注')
           }} style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -871,18 +874,15 @@ class OrderTransferThird extends Component {
             borderLeftWidth: pxToDp(1),
             flex: 1
           }}>
-            <Text
-              style={{
-                textAlign: 'right',
-                fontSize: pxToDp(30),
-                fontWeight: 'bold',
-                marginRight: 6
-              }}>{this.state.remark ? "已备注" : "写备注"} </Text>
+            <Text style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold', marginRight: 6}}>
+              {this.state.remark ? "已备注" : "写备注"}
+            </Text>
             <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
             this.setState({showDeliveryModal: true})
+            this.mixpanel.track('设置重量')
           }} style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -991,8 +991,11 @@ class OrderTransferThird extends Component {
                   callDelivery_Day: this.createDatePickerArray()[2],
                   datePickerOther: this.timeSlot(10, false)
                 })
-              }}><Text
-              style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>后天</Text></TouchableOpacity>
+              }}>
+              <Text style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>
+                后天
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={{flex: 3, height: 250}}>
             <ScrollView
@@ -1087,8 +1090,9 @@ class OrderTransferThird extends Component {
               showContentModal: false,
             })} style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
-              <Text
-                style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red, flex: 1}}>·美团众包及达达暂不支持填写备注</Text>
+              <Text style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red, flex: 1}}>
+                ·美团众包及达达暂不支持填写备注
+              </Text>
               <Entypo name="circle-with-cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </TouchableOpacity>
@@ -1188,12 +1192,13 @@ class OrderTransferThird extends Component {
           showDeliveryModal: false,
         })} modal_type={'bottom'}>
           <View>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>商品重量</Text>
-            <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-            }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              商品重量
+            </Text>
+            <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>
+              默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量
+            </Text>
+            <View style={{width: '100%', flexDirection: 'row'}}>
               <Text style={{marginRight: pxToDp(20), lineHeight: pxToDp(60)}}>当前选择</Text>
               <Text style={{textAlign: 'center', color: 'red', fontWeight: 'bold', fontSize: pxToDp(50)}}>
                 {this.state.weight}

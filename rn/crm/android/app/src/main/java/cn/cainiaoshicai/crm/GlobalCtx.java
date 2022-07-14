@@ -20,7 +20,6 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
@@ -145,6 +144,7 @@ import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -297,8 +297,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         public boolean getUseDeveloperSupport() {
             return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-        }
-
+       }
         //如果是debug模式，最优先加载getJSMainModuleName
         //如果是release模式，优先加载getJSBundleFile
         //如果getJSBundleFile为null，加载getBundleAssetName
@@ -309,10 +308,9 @@ public class GlobalCtx extends Application implements ReactApplication {
             String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
             File file = new File(jsBundleFile);
             if (file.exists() && file.isFile()) {
-                jsBundleFile = file.getAbsolutePath();
                 return jsBundleFile;
             }
-            return null;
+            return super.getJSBundleFile();
         }
 
         @Override
@@ -350,7 +348,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNAlipayPackage(),
                     new ClipboardPackage(),
                     new RNZipArchivePackage(),
-                    new RestartPackage()
+                    new RestartPackage(),
+                    new RNViewShotPackage()
             );
         }
     };
@@ -412,19 +411,22 @@ public class GlobalCtx extends Application implements ReactApplication {
             //定义前台服务的默认样式。即标题、描述和图标
             ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
                 @Override
-                public void foregroundNotificationClick() {
+                public void foregroundNotificationClick(Context context, Intent intent) {
 
                 }
+
             });
 
             //启动保活服务
-            KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+            KeepLive.startWork(this, KeepLive.RunMode.ENERGY,foregroundNotification, new KeepLiveService() {
                 @Override
-                public void onWorking(Context context) {
+                public void onWorking() {
+
                 }
 
                 @Override
-                public void onStop(Context context) {
+                public void onStop() {
+
                 }
             });
         } catch (Exception e) {
