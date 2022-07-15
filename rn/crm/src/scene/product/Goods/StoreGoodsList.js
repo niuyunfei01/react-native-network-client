@@ -14,6 +14,7 @@ import Dialog from "../../common/component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 
 function mapStateToProps(state) {
@@ -40,7 +41,7 @@ function FetchRender({navigation, onRefresh}) {
 class StoreGoodsList extends Component {
   constructor(props) {
     super(props);
-
+    this.mixpanel = MixpanelInstance;
     const {global, dispatch} = this.props
     const {currStoreId, accessToken} = global;
     this.state = {
@@ -566,6 +567,7 @@ class StoreGoodsList extends Component {
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
           onPress={() => {
+            this.mixpanel.track('商品页面_上新')
             navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
           }}>
           <Text style={{color: colors.color333}}>上新 </Text>
