@@ -584,9 +584,8 @@ class MineScene extends PureComponent {
     const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
     const {dispatch} = this.props
     HttpUtils.get(api).then(res => {
-      console.log('res', res)
       const status = new Date(time) < new Date(res.expire_date)
-      dispatch(receiveIncrement({...res, incrementStatus: status}))
+      dispatch(receiveIncrement({...res, expire_date: status ? res.expire_date : '已到期', incrementStatus: status}))
     }).catch(error => {
       dispatch(receiveIncrement({
         auto_pack: {
@@ -601,7 +600,7 @@ class MineScene extends PureComponent {
           expire_date: '',
           status: 'off'
         },
-        expire_date: '2022-07-10',
+        expire_date: '已到期',
         incrementStatus: false
       }))
       showError(error.reason)
@@ -875,8 +874,9 @@ class MineScene extends PureComponent {
     nrInteraction(MineScene.name)
 
     let {currVersion, is_mgr, is_helper} = this.state;
-    const {navigation, global, mine} = this.props
-    const {currStoreId, accessToken} = global
+    const {navigation, global} = this.props
+    const {currStoreId, accessToken, simpleStore} = global
+    const {added_service} = simpleStore
     return (
       <View>
 
@@ -896,7 +896,10 @@ class MineScene extends PureComponent {
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
-          <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
+          <If condition={added_service === '1'}>
+            <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
+          </If>
+
           {this.renderStoreBlock()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             {this.renderDirectBlock()}

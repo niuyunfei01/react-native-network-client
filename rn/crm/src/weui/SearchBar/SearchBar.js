@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {StyleSheet, Text, TextInput, View, ViewPropTypes} from 'react-native'
 import {Icon} from '../Icon'
+import colors from "../../pubilc/styles/colors";
 
 const styles = StyleSheet.create({
   searchBar: {
@@ -158,16 +159,16 @@ class SearchBar extends Component {
               onChangeText={this.changeHandle}
               value={text}
               autoCorrect={false}
-              blurOnSubmit={!false}
+              blurOnSubmit={true}
               returnKeyType="search"
               underlineColorAndroid='transparent'
             />
-            <Icon name="search"/>
-            {text ? (
+            <Icon name="search" color={colors.color999} size={12}/>
+            <If condition={text}>
               <Text onPress={this.clearHandle}>
                 <Icon name="clear" style={styles.clearIcon}/>
               </Text>
-            ) : null}
+            </If>
           </View>
           {/*{(focus || text) ? null :*/}
           {/*    <TouchableOpacity style={styles.searchCover} onPress={this.focus}>*/}
@@ -176,8 +177,11 @@ class SearchBar extends Component {
           {/*    </TouchableOpacity>*/}
           {/*}*/}
         </View>
-        {!focus ? null :
-          <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel} </Text>}
+        <If condition={focus}>
+          <Text style={styles.searchCancel} onPress={this.cancelHandle}>
+            {lang.cancel}
+          </Text>
+        </If>
       </View>
     )
   }
