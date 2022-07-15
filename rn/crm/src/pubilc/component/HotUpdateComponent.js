@@ -57,7 +57,6 @@ export class HotUpdateComponent extends PureComponent {
     const version = __DEV__ ? '1' : Cts.BUNDLE_VERSION;
     const params = {platform: platform, version: version}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      console.log('res', res)
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
     }).catch(error => {
