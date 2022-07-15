@@ -101,7 +101,6 @@ export class HotUpdateComponent extends PureComponent {
               downloadFileFinish: false
             })
           }
-          console.log('source', source)
           await deleteFile(source)
         }
       }).catch(error => {

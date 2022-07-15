@@ -201,7 +201,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '订单搜索'}}
+        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
                       getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}

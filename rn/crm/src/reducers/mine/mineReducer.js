@@ -39,7 +39,7 @@ const initialState = {
       expire_date: '',
       status: 'off'
     },
-    expire_date: '2022-07-10',
+    expire_date: '已到期',
     incrementStatus: false
   }
 };
