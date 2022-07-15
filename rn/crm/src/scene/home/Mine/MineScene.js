@@ -30,13 +30,13 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
 import native from "../../../pubilc/util/native";
-import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import {
   fetchDutyUsers,
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
-  userCanChangeStore
+  userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
 import * as tool from "../../../pubilc/util/tool";
 import {simpleStore} from "../../../pubilc/util/tool";
@@ -55,6 +55,8 @@ import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import GoodsIncrement from "../../common/component/GoodsIncrement";
+import {receiveIncrement} from "../../../reducers/mine/mineActions";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -96,6 +98,7 @@ function FetchView({navigation, onRefresh}) {
 
 
 const customerOpacity = 0.6;
+const time = dayjs().format('YYYY-MM-DD')
 
 class MineScene extends PureComponent {
   constructor(props) {
@@ -105,8 +108,8 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
+      accessToken
     } = this.props.global;
-
 
     let prefer_store = "";
     let screen_name = "";
@@ -177,7 +180,7 @@ class MineScene extends PureComponent {
       have_not_read_advice: 0,
       show_call_service_modal: false,
       is_self_yy: false,
-      contacts: '',
+      contacts: ''
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -196,6 +199,7 @@ class MineScene extends PureComponent {
     }
 
     this.onGetDutyUser();
+    this.getServiceStatus(currStoreId, accessToken)
   }
 
   UNSAFE_componentWillMount() {
@@ -474,7 +478,7 @@ class MineScene extends PureComponent {
     const {dispatch, global} = this.props;
     const {accessToken, currStoreId} = global;
     dispatch(
-      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj)=> {
+      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj) => {
         if (ok) {
           this.setState({
             prefer_store: obj.prefer_store,
@@ -575,14 +579,44 @@ class MineScene extends PureComponent {
     }
   }
 
+  getServiceStatus = (currStoreId, accessToken) => {
+
+    const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
+    const {dispatch} = this.props
+    HttpUtils.get(api).then(res => {
+      console.log('res', res)
+      const status = new Date(time) < new Date(res.expire_date)
+      dispatch(receiveIncrement({...res, incrementStatus: status}))
+    }).catch(error => {
+      dispatch(receiveIncrement({
+        auto_pack: {
+          expire_date: '',
+          status: 'off'
+        },
+        auto_reply: {
+          expire_date: '',
+          status: 'off'
+        },
+        bad_notify: {
+          expire_date: '',
+          status: 'off'
+        },
+        expire_date: '2022-07-10',
+        incrementStatus: false
+      }))
+      showError(error.reason)
+    })
+  }
+
   onCanChangeStore = (store_id) => {
-    const {accessToken} = this.props.global;
     const {dispatch, global} = this.props;
+    const {accessToken} = global;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
           simpleStore(global, dispatch, store_id)
+          this.getServiceStatus(store_id, accessToken)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
@@ -841,6 +875,8 @@ class MineScene extends PureComponent {
     nrInteraction(MineScene.name)
 
     let {currVersion, is_mgr, is_helper} = this.state;
+    const {navigation, global, mine} = this.props
+    const {currStoreId, accessToken} = global
     return (
       <View>
 
@@ -860,6 +896,7 @@ class MineScene extends PureComponent {
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
+          <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
           {this.renderStoreBlock()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             {this.renderDirectBlock()}
@@ -1655,7 +1692,7 @@ class MineScene extends PureComponent {
 const styles = StyleSheet.create({
   fn_price_msg: {
     fontSize: pxToEm(30),
-    color: "#333"
+    color: colors.color333
   },
   help_msg: {
     fontSize: pxToEm(30),
@@ -1851,7 +1888,7 @@ const block_styles = StyleSheet.create({
     width: pxToDp(30),
     height: pxToDp(30),
     borderRadius: pxToDp(15),
-    backgroundColor: '#f00',
+    backgroundColor: colors.red,
     position: 'absolute',
     right: pxToDp(60),
     top: pxToDp(20),

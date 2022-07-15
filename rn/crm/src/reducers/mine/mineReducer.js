@@ -7,7 +7,8 @@ const {
   GET_STORE_TURNOVER,
   GET_WM_STORES,
   GET_USER_WAGE_DATA,
-  GET_VENDOR_DUTY_USERS
+  GET_VENDOR_DUTY_USERS,
+  GET_INCREMENT
 } = require('../../pubilc/common/constants').default;
 
 /**
@@ -24,7 +25,23 @@ const initialState = {
   turnover: {},
   wm_list: {},
   wage_data: {},
-  duty_users: []
+  duty_users: [],
+  increment: {
+    auto_pack: {
+      expire_date: '',
+      status: 'off'
+    },
+    auto_reply: {
+      expire_date: '',
+      status: 'off'
+    },
+    bad_notify: {
+      expire_date: '',
+      status: 'off'
+    },
+    expire_date: '2022-07-10',
+    incrementStatus: false
+  }
 };
 
 export default function mine(state = initialState, action) {
@@ -66,6 +83,8 @@ export default function mine(state = initialState, action) {
         ...state,
         wage_data: wage_data(state, action)
       };
+    case GET_INCREMENT:
+      return {...state, increment: action.increment}
     default:
       return state;
   }

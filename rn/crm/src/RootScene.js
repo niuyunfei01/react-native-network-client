@@ -154,7 +154,8 @@ class RootScene extends PureComponent<{}> {
 
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
-              GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
+              GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'}).then(() => {
+              })
               return;
             }
 
@@ -363,7 +364,7 @@ class RootScene extends PureComponent<{}> {
           {text: '稍等再说', style: 'cancel'},
           {
             text: '现在更新', onPress: () => {
-              console.log("start to download_url:", res.download_url)
+              //console.log("start to download_url:", res.download_url)
               downloadApk({
                 interval: 250, // listen to upload progress event, emit every 666ms
                 apkUrl: res.download_url,
@@ -379,6 +380,7 @@ class RootScene extends PureComponent<{}> {
 
                   }
                 }
+              }).then(() => {
               });
             }
           },
