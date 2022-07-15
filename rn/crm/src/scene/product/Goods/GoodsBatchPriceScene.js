@@ -336,12 +336,6 @@ class GoodsBatchPriceScene extends PureComponent {
   render() {
     return (
       <ScrollView>
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.uploading}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>提交中</Toast>*/}
         <View style={styles.title}>
           <View style={styles.title_item}>
             <Text style={{color: colors.color333}}>门店名称

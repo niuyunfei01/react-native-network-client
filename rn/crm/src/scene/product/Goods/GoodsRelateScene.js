@@ -215,12 +215,6 @@ class GoodsRelatedScene extends PureComponent {
             }) : this.renderEmpty()
           }
         </ScrollView>
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.loading}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>{this.state.msg}</Toast>*/}
       </View>
     )
   }

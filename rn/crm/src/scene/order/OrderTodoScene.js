@@ -170,26 +170,6 @@ class OrderTodoScene extends Component {
                 style={{marginHorizontal: 15}}>创建任务</Button>
       </ButtonArea>
 
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.loadingTypes}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>加载中...</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="success"*/}
-      {/*  show={this.state.doneSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>任务已创建</Toast>*/}
     </ScrollView>
   }
 }

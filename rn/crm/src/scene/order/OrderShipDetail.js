@@ -104,14 +104,6 @@ class OrderShipDetail extends Component {
                 style={{marginHorizontal: 15}}>发配送</Button>
       </ButtonArea>
 
-      {/*<Toast*/}
-      {/*  icon="loading"*/}
-      {/*  show={this.state.onSubmitting}*/}
-      {/*  onRequestClose={() => {*/}
-      {/*  }}*/}
-      {/*>提交中</Toast>*/}
-
-
     </ScrollView>
   }
 }

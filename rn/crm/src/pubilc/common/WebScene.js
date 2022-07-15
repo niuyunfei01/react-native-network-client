@@ -1,15 +1,30 @@
 import React, {PureComponent} from 'react'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {BackHandler, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Alert,
+  BackHandler,
+  InteractionManager,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  SafeAreaView,
+  Image
+} from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
 import Config from "./config";
-import {showSuccess, ToastShort} from "../util/ToastUtils";
+import {showError, showSuccess, ToastShort} from "../util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 import native from "../util/native";
 import tool from "../util/tool";
 import colors from "../styles/colors";
+import * as wechat from "react-native-wechat-lib";
+import {shareWechatImage} from "../util/WechatUtils";
+import ViewShot, {captureRef} from "../component/react-native-view-shot";
+import {MixpanelInstance} from "../util/analytics";
 
 function mapStateToProps(state) {
   return {
@@ -21,28 +36,66 @@ function mapDispatchToProps(dispatch) {
   return {dispatch, ...bindActionCreators({}, dispatch)}
 }
 
+const options = {fileName: 'shareWechat', format: 'png', quality: 1}
+const wechatShareImage = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/wechatShareImage.png'
+const wechatLogo = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/icon64_wx_logo.png'
+const wechatFriendImage = 'https://cnsc-pics.cainiaoshicai.cn/wechatShare/icon_res_download_moments.png'
+const descriptionLeft = '扫描二维码下载外送帮，注\n册时填写您推荐人的ID：'
+const descriptionRight = '，完成绑店、充值、\n发单，即可参与活动。'
+
 class WebScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     this.state = {
       source: {},
       canGoBack: false,
-      title: ''
+      title: '',
+      uri: '',
+      shareWechatModal: false
     };
     this.navigationOptions(this.props)
     this._do_go_back = this._do_go_back.bind(this)
   }
 
-  navigationOptions = ({navigation, route}) => {
-    navigation.setOptions({
-      headerTitle: () => <Text
-        style={{color: colors.color333}}>{this.state.title || (route.params || {}).title} </Text>,
-      headerRight: () => {
-        return (<TouchableOpacity onPress={() => this.webview.reload()} style={{marginRight: 10}}>
-          <Icon name={'cycle'} style={{fontSize: 20}}/>
-        </TouchableOpacity>)
+  headerTitle = (route) => {
+    return (
+      <Text style={{color: colors.color333}}>{this.state.title || (route.params || {}).title} </Text>
+    )
+  }
+
+  headerRight = (url) => {
+    return (
+      <View style={styles.iconBtnWrap}>
+        <If condition={url.indexOf('platform_activity/show/1') !== -1}>
+          <TouchableOpacity onPress={this.wechatShare}>
+            <Icon name={'share'} style={styles.iconBtn}/>
+          </TouchableOpacity>
+        </If>
+        <TouchableOpacity onPress={this.onRefresh} style={{marginRight: 10}}>
+          <Icon name={'cycle'} style={styles.iconBtn}/>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  wechatShare = () => {
+    this.mixpanel.track('act_user_ref_ad_page_share')
+    wechat.isWXAppInstalled().then(isInstalled => {
+      if (isInstalled) {
+        this.setState({shareWechatModal: true})
+      } else {
+        Alert.alert('没有安装微信软件，请您安装微信之后再试');
       }
+    })
+  }
+
+  navigationOptions = ({navigation, route}) => {
+    const {url} = route.params;
+    navigation.setOptions({
+      headerTitle: () => this.headerTitle(route),
+      headerRight: () => this.headerRight(url)
     })
   };
 
@@ -203,9 +256,9 @@ class WebScene extends PureComponent {
       let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
       this.setState(state)
     });
-
     // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-    this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.webview.reload()});
+    this.props.navigation.setParams({backHandler: this.backHandler, refresh: this.onRefresh});
+
   }
 
   componentWillUnmount() {
@@ -220,6 +273,8 @@ class WebScene extends PureComponent {
   }
 
   render() {
+    const {shareWechatModal} = this.state
+    const {global} = this.props
     return (
       <View style={styles.container}>
         <WebView
@@ -233,14 +288,75 @@ class WebScene extends PureComponent {
           onLoadEnd={(e) => this.onLoadEnd(e)}
           scalesPageToFit
         />
+        <Modal visible={shareWechatModal} transparent={true} hardwareAccelerated={true}>
+          <SafeAreaView style={styles.modalWrap}>
+
+            <View style={styles.center}>
+
+              <ViewShot ref={ref => this.viewRef = ref} options={options}>
+                <Image source={{uri: wechatShareImage}} style={styles.imgBackground}/>
+                <View style={styles.descriptionContent}>
+                  <Text style={styles.descriptionText}>
+                    {descriptionLeft}
+                  </Text>
+                  <Text>
+                    <Text style={styles.currentUserIdDescriptionText}>
+                      {global.currentUser}
+                    </Text>
+                    <Text style={styles.descriptionText}>
+                      {descriptionRight}
+                    </Text>
+                  </Text>
+                </View>
+              </ViewShot>
+
+            </View>
+            <View style={styles.modalContentWrap}>
+              <Text style={styles.modalText}>
+                分享
+              </Text>
+              <View style={styles.selectItemIconZone}>
+                <TouchableOpacity style={styles.selectItemIconWrap} onPress={() => this.shareWechat(0)}>
+                  <Image source={{uri: wechatLogo}} style={styles.selectItemIcon}/>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.selectItemIconWrap} onPress={() => this.shareWechat(1)}>
+                  <Image source={{uri: wechatFriendImage}} style={styles.selectItemIcon}/>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity style={styles.cancelTextWrap} onPress={this.hideShareWechatModal}>
+                <Text style={styles.cancelText}>
+                  取消
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </Modal>
       </View>
     );
   }
 
-
+  hideShareWechatModal = () => {
+    this.setState({shareWechatModal: false})
+  }
+  shareWechat = async (scene) => {
+    const uri = await captureRef(this.viewRef, options)
+    if (uri.length <= 0) {
+      showError('获取图片失败')
+      return
+    }
+    try {
+      const {errCode, errStr} = await shareWechatImage(uri, scene)
+      if (0 === errCode) {
+        this.hideShareWechatModal()
+        return
+      }
+      showError('分享失败，原因：' + errStr)
+    } catch (error) {
+      showError('分享失败，原因：' + error.errStr)
+    }
+  }
 }
 
-// define your styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -249,6 +365,38 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  center: {alignItems: 'center', justifyContent: 'center', flex: 1},
+  iconBtnWrap: {flexDirection: 'row', alignItems: 'center'},
+  iconBtn: {paddingLeft: 12, paddingRight: 12, fontSize: 20},
+  modalWrap: {flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.50)', justifyContent: 'flex-end'},
+  modalContentWrap: {height: 150, backgroundColor: colors.colorEEE},
+  modalText: {fontSize: 14, paddingTop: 12, paddingLeft: 12, color: colors.color333},
+  cancelTextWrap: {borderTopWidth: 1, borderTopColor: colors.colorDDD},
+  cancelText: {fontSize: 14, padding: 12, color: colors.color333, textAlign: 'center'},
+  imgBackground: {width: 250, height: 410.66},
+  selectItemIconZone: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  selectItemIconWrap: {paddingLeft: 20, paddingRight: 20},
+  selectItemIcon: {height: 64, width: 64},
+  descriptionContent: {paddingLeft: 25.33, paddingTop: 316, position: 'absolute'},
+  currentUserIdDescriptionText: {
+    color: colors.color333,
+    fontSize: 8,
+    fontWeight: '400',
+    lineHeight: 13.33,
+    textDecorationLine: 'underline'
+  },
+  descriptionText: {
+    color: colors.color333,
+    fontSize: 8,
+    fontWeight: '400',
+    lineHeight: 13.33,
+    textDecorationLine: 'none',
   }
 });
 

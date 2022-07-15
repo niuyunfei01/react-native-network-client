@@ -436,19 +436,6 @@ class GoodsMangerScene extends PureComponent {
             }
           </View>
         </View>
-        {/*  <Toast*/}
-        {/*      icon="loading"*/}
-        {/*      show={this.state.query}*/}
-        {/*      onRequestClose={() => {*/}
-        {/*      }}*/}
-        {/*  >加载中</Toast>*/}
-        {/*  <Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.queryTags}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>加载中</Toast>*/}
-
       </View>
     )
   }

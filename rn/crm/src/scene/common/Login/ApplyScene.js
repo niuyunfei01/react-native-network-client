@@ -111,7 +111,6 @@ class ApplyScene extends PureComponent {
       )
       fetch(url).then(response => response.json()).then((data) => {
         if (data.status === "1") {
-          console.log(data, 'data1')
           that.setState({
             cityname: data.regeocode.addressComponent.city,
             address: data.regeocode.addressComponent.township + data.regeocode.addressComponent.streetNumber.street,
@@ -492,8 +491,6 @@ class ApplyScene extends PureComponent {
                          onChangeText={(referrer_id) => {
                            this.setState({referrer_id})
                          }}
-                         type={"number"}
-                         keyboardType="numeric"
                          placeholderTextColor={'#ccc'}
                          value={this.state.referrer_id}
                          style={{

@@ -169,13 +169,6 @@ class OrderSetPackDone extends Component {
                 onPress={this._doReply} style={{marginHorizontal: 15}}>保存</Button>
       </ButtonArea>
 
-      {/*<Toast show={this.state.onSubmitting}>提交中</Toast>*/}
-      {/*<Toast show={this.state.loadingPacker}>加载中</Toast>*/}
-
-      {/*<Toast*/}
-      {/*  icon="success"*/}
-      {/*  show={this.state.doneSubmitting}*/}
-      {/*>保存成功</Toast>*/}
     </ScrollView>
   }
 }

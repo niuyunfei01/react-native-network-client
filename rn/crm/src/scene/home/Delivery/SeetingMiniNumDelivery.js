@@ -66,6 +66,14 @@ class SeetingMiniNumDelivery extends PureComponent {
   }
 
   setMiniNumDelivery() {
+    if (this.state.enable) {
+      if (this.state.wait_min <= 0) {
+        return ToastShort("请选择保底配送触发时间");
+      }
+      if (this.state.ship_ways.length <= 0) {
+        return ToastShort("请选择保底配送平台");
+      }
+    }
     let access_token = this.props.global.accessToken
     const api = `/v1/new_api/ExtStores/set_guarantee_ship_config/${this.state.ext_store_id}?access_token=${access_token}`
     HttpUtils.post.bind(this.props)(api, {

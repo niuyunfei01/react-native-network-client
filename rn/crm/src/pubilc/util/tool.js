@@ -176,6 +176,7 @@ export function vendor(global) {
     allow_store_mgr_call_ship: allow_store_mgr_call_ship,
     allow_merchants_edit_prod: allow_merchants_edit_prod,
     wsb_store_account,
+    co_type: currVendor.co_type,
   };
 }
 
