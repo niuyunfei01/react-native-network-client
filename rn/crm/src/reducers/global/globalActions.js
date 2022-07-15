@@ -158,7 +158,7 @@ export function updateCfg(cfg) {
 export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    native.logout();
+    native.logout().then(() => {});
     JPush.deleteAlias({sequence: dayjs().unix()})
     if (typeof callback === 'function') {
       callback();
@@ -222,7 +222,6 @@ export function getCommonConfig(token, storeId, callback) {
         dispatch(updateCfg(cfg));
         callback(true, '获取配置成功', cfg)
       } else {
-        let msg = '获取服务器端参数失败, 请联系服务经理';
         callback(false, json.reason)
       }
     }, (error) => {

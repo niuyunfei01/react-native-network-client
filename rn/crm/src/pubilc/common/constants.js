@@ -85,6 +85,7 @@ export default keyMirror({
   GET_STORE_TURNOVER: null,
   GET_WM_STORES: null,
   GET_VENDOR_DUTY_USERS: null,
+  GET_INCREMENT: null,
 
   GET_CONTACT_REQUEST: null,
   GET_CONTACT_SUCCESS: null,
