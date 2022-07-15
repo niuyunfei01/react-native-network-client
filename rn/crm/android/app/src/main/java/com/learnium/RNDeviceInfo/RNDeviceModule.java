@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings.Secure;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
@@ -130,30 +131,30 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         p.resolve(getDeviceSync());
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public String getDeviceNameSync() {
-        try {
-            String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
-            if (bluetoothName != null) {
-                return bluetoothName;
-            }
+//    @ReactMethod(isBlockingSynchronousMethod = true)
+//    public String getDeviceNameSync() {
+//        try {
+//            String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
+//            if (bluetoothName != null) {
+//                return bluetoothName;
+//            }
+//
+//            if (Build.VERSION.SDK_INT >= 25) {
+//                String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
+//                if (deviceName != null) {
+//                    return deviceName;
+//                }
+//            }
+//        } catch (Exception e) {
+//            // same as default unknown return
+//        }
+//        return "unknown";
+//    }
 
-            if (Build.VERSION.SDK_INT >= 25) {
-                String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
-                if (deviceName != null) {
-                    return deviceName;
-                }
-            }
-        } catch (Exception e) {
-            // same as default unknown return
-        }
-        return "unknown";
-    }
-
-    @ReactMethod
-    public void getDeviceName(Promise p) {
-        p.resolve(getDeviceNameSync());
-    }
+//    @ReactMethod
+//    public void getDeviceName(Promise p) {
+//        p.resolve(getDeviceNameSync());
+//    }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public float getFontScaleSync() { return getReactApplicationContext().getResources().getConfiguration().fontScale; }
@@ -216,65 +217,65 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     public @Nullable
     Map<String, Object> getConstants() {
         HashMap<String, Object> constants = new HashMap<String, Object>();
-
-        PackageManager packageManager = this.reactContext.getPackageManager();
-        String packageName = this.reactContext.getPackageName();
-
-        constants.put("appVersion", "not available");
-        constants.put("buildVersion", "not available");
-        constants.put("buildNumber", 0);
-
-        try {
-            PackageInfo info = packageManager.getPackageInfo(packageName, 0);
-            constants.put("appVersion", info.versionName);
-            constants.put("buildNumber", info.versionCode);
-            constants.put("firstInstallTime", info.firstInstallTime);
-            constants.put("lastUpdateTime", info.lastUpdateTime);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        String deviceName = "Unknown";
-
-        try {
-            BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
-            if (myDevice != null) {
-                deviceName = myDevice.getName();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //constants.put("instanceId", InstanceID.getInstance(this.reactContext).getId());
-        constants.put("serialNumber", Build.SERIAL);
-        constants.put("deviceName", deviceName);
-        constants.put("systemName", "Android");
-        constants.put("systemVersion", Build.VERSION.RELEASE);
-        constants.put("model", Build.MODEL);
-        constants.put("brand", Build.BRAND);
-        constants.put("deviceId", Build.BOARD);
-        constants.put("apiLevel", Build.VERSION.SDK_INT);
-        constants.put("deviceLocale", this.getCurrentLanguage());
-        constants.put("deviceCountry", this.getCurrentCountry());
-        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
-        constants.put("systemManufacturer", Build.MANUFACTURER);
-        constants.put("bundleId", packageName);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            constants.put("userAgent", WebSettings.getDefaultUserAgent(this.reactContext));
-        }
-        constants.put("timezone", TimeZone.getDefault().getID());
-        constants.put("isEmulator", this.isEmulator());
-        constants.put("isTablet", this.isTablet());
-        Activity currentActivity = getCurrentActivity();
-        if (currentActivity == null) {
-            return constants;
-        }
-        if (currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED ||
-                currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED ||
-                currentActivity.checkCallingOrSelfPermission("android.permission.READ_PHONE_NUMBERS") == PackageManager.PERMISSION_GRANTED) {
-            TelephonyManager telMgr = (TelephonyManager) this.reactContext.getSystemService(Context.TELEPHONY_SERVICE);
-            constants.put("phoneNumber", telMgr.getLine1Number());
-        }
+        Log.e("1212","test");
+//        PackageManager packageManager = this.reactContext.getPackageManager();
+//        String packageName = this.reactContext.getPackageName();
+//
+//        constants.put("appVersion", "not available");
+//        constants.put("buildVersion", "not available");
+//        constants.put("buildNumber", 0);
+//
+//        try {
+//            PackageInfo info = packageManager.getPackageInfo(packageName, 0);
+//            constants.put("appVersion", info.versionName);
+//            constants.put("buildNumber", info.versionCode);
+//            constants.put("firstInstallTime", info.firstInstallTime);
+//            constants.put("lastUpdateTime", info.lastUpdateTime);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String deviceName = "Unknown";
+//
+//        try {
+//            BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+//            if (myDevice != null) {
+//                deviceName = myDevice.getName();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        //constants.put("instanceId", InstanceID.getInstance(this.reactContext).getId());
+//        constants.put("serialNumber", Build.SERIAL);
+//        constants.put("deviceName", deviceName);
+//        constants.put("systemName", "Android");
+//        constants.put("systemVersion", Build.VERSION.RELEASE);
+//        constants.put("model", Build.MODEL);
+//        constants.put("brand", Build.BRAND);
+//        constants.put("deviceId", Build.BOARD);
+//        constants.put("apiLevel", Build.VERSION.SDK_INT);
+//        constants.put("deviceLocale", this.getCurrentLanguage());
+//        constants.put("deviceCountry", this.getCurrentCountry());
+//        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
+//        constants.put("systemManufacturer", Build.MANUFACTURER);
+//        constants.put("bundleId", packageName);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//            constants.put("userAgent", WebSettings.getDefaultUserAgent(this.reactContext));
+//        }
+//        constants.put("timezone", TimeZone.getDefault().getID());
+//        constants.put("isEmulator", this.isEmulator());
+//        constants.put("isTablet", this.isTablet());
+//        Activity currentActivity = getCurrentActivity();
+//        if (currentActivity == null) {
+//            return constants;
+//        }
+//        if (currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED ||
+//                currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED ||
+//                currentActivity.checkCallingOrSelfPermission("android.permission.READ_PHONE_NUMBERS") == PackageManager.PERMISSION_GRANTED) {
+//            TelephonyManager telMgr = (TelephonyManager) this.reactContext.getSystemService(Context.TELEPHONY_SERVICE);
+//            constants.put("phoneNumber", telMgr.getLine1Number());
+//        }
         return constants;
     }
 }

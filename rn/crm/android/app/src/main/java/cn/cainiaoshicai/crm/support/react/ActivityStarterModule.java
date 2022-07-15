@@ -45,6 +45,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
@@ -72,6 +73,7 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
+import cn.jiguang.plugins.push.JPushModule;
 import cn.jpush.android.api.JPushInterface;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -298,6 +300,10 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         String msg = "";
         if (activity != null) {
             try {
+
+                //初始化蓝牙管理
+                AppInfo.init(this.getReactApplicationContext());
+                JPushModule.registerActivityLifecycle(GlobalCtx.app());
 
                 // 初始化合成对象
                 SpeechUtility.createUtility(activity, SpeechConstant.APPID + "=58b571b2");

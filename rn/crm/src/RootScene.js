@@ -11,7 +11,7 @@ import {
   View
 } from "react-native";
 
-import {setDeviceInfo, setPlatform} from "./reducers/device/deviceActions";
+import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,

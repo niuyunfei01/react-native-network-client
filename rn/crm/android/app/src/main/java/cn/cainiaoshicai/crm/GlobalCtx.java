@@ -3,7 +3,6 @@ package cn.cainiaoshicai.crm;
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
@@ -16,10 +15,10 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
@@ -141,7 +140,6 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
-import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
@@ -368,12 +366,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
         application = this;
 
-        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
-        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        updateAfterGap(24 * 60 * 60 * 1000);
-
         try {
             Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
             field.setAccessible(true);
@@ -391,12 +383,10 @@ public class GlobalCtx extends Application implements ReactApplication {
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
 
-        //初始化蓝牙管理
-        AppInfo.init(this);
         startKeepAlive();
 
         SoLoader.init(this, /* native exopackage */ false);
-        JPushModule.registerActivityLifecycle(this);
+
 
     }
 
