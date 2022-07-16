@@ -16,6 +16,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Button from "react-native-vector-icons/Entypo";
+import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
 import pxToEm from "../../../pubilc/util/pxToEm";
@@ -36,6 +37,7 @@ import {
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
+  receiveIncrement,
   userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
 import * as tool from "../../../pubilc/util/tool";
@@ -56,7 +58,6 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {receiveIncrement} from "../../../reducers/mine/mineActions";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -180,7 +181,12 @@ class MineScene extends PureComponent {
       have_not_read_advice: 0,
       show_call_service_modal: false,
       is_self_yy: false,
-      contacts: ''
+      contacts: '',
+      title: "今日美团外卖自配送回传率",
+      label: '实时回传：',
+      content: "全部已达标",
+      color: "green",
+      footer: '自然日有效配送信息上传率需>=90%'
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -200,6 +206,7 @@ class MineScene extends PureComponent {
 
     this.onGetDutyUser();
     this.getServiceStatus(currStoreId, accessToken)
+    this.getHuichuan(currStoreId, accessToken)
   }
 
   UNSAFE_componentWillMount() {
@@ -579,6 +586,22 @@ class MineScene extends PureComponent {
     }
   }
 
+
+  getHuichuan = (currStoreId, accessToken) => {
+    const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {
+      store_id: currStoreId
+    }).then(res => {
+      this.setState({
+        title: res.title,
+        label: res.sync_info.label,
+        content: res.sync_info.content,
+        color: res.sync_info.color,
+        footer: res.footer,
+      })
+    })
+  }
+
   getServiceStatus = (currStoreId, accessToken) => {
 
     const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
@@ -616,6 +639,7 @@ class MineScene extends PureComponent {
           this._doChangeStore(store_id);
           simpleStore(global, dispatch, store_id)
           this.getServiceStatus(store_id, accessToken)
+          this.getHuichuan(store_id, accessToken)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
@@ -893,6 +917,8 @@ class MineScene extends PureComponent {
         >
           {this.renderHeader()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
+
+          {this.renderHuichuan()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
@@ -949,6 +975,31 @@ class MineScene extends PureComponent {
                      }}/>
       </View>
     );
+  }
+
+  renderHuichuan = () => {
+    let {title, label, content, color, footer} = this.state;
+    return (
+      <TouchableOpacity onPress={() => {
+        this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+      }} style={{
+        backgroundColor: colors.white,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        marginBottom: 12,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <View>
+          <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>{label} <Text
+            style={{fontSize: 14, color: color, fontWeight: 'bold'}}>{content} </Text> </Text>
+          <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
+        </View>
+        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
+      </TouchableOpacity>
+    )
   }
 
   onPress = (route, params = {}) => {

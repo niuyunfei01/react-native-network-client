@@ -233,6 +233,11 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_COMES_BACK} options={{headerTitle: '店铺信息'}}
+                      getComponent={() => require("../../scene/home/Store/ComesBack").default}/>
+        <Stack.Screen name={Config.ROUTE_COMES_BACK_INFO} options={{headerTitle: '店铺信息'}}
+                      getComponent={() => require("../../scene/home/Store/ComesBackInfo").default}/>
+
         <Stack.Screen name={Config.ROUTE_STORE_CLOSE} options={{headerTitle: ''}}
                       getComponent={() => require("../../scene/home/Store/CloseStore").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} options={{headerTitle: '商品详情'}}
@@ -491,8 +496,8 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/GoodsIncrementService/TemplateSettingsScene').default}
         />
         <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
-                      options={{headerTitle:'功能详情'}}
-                      getComponent={()=>require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
+                      options={{headerTitle: '功能详情'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
         />
       </Stack.Navigator>
     </NavigationContainer>
