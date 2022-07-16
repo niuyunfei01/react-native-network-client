@@ -4,9 +4,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import android.text.TextUtils;
 
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 

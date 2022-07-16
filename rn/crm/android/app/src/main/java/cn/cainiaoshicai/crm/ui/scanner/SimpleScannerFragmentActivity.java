@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.scanner;
 
 import android.os.Bundle;
+
 import cn.cainiaoshicai.crm.R;
 
 public class SimpleScannerFragmentActivity extends BaseScannerActivity {

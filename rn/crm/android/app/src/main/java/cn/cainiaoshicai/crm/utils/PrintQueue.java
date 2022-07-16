@@ -1,6 +1,8 @@
 package cn.cainiaoshicai.crm.utils;
 
 
+import static cn.cainiaoshicai.crm.support.helper.SettingUtility.getAutoPrintSetting;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -15,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -24,8 +25,6 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
-
-import static cn.cainiaoshicai.crm.support.helper.SettingUtility.getAutoPrintSetting;
 
 public class PrintQueue {
 

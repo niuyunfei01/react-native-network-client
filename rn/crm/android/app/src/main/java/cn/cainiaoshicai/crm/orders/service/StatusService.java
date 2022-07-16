@@ -1,7 +1,5 @@
 package cn.cainiaoshicai.crm.orders.service;
 
-import java.util.ArrayList;
-
 /**
  */
 public class StatusService {

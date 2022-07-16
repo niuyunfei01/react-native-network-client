@@ -1,8 +1,9 @@
 package cn.cainiaoshicai.crm.support.helper;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

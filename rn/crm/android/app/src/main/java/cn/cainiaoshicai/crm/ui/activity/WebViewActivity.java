@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,10 +13,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;

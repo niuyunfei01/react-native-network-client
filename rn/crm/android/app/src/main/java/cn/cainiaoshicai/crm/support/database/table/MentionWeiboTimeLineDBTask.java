@@ -1,14 +1,14 @@
 package cn.cainiaoshicai.crm.support.database.table;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
 import java.util.List;

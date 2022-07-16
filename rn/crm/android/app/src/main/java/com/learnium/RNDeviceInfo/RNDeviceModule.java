@@ -9,25 +9,21 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings.Secure;
-import android.util.Log;
-import android.webkit.WebSettings;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
+import android.webkit.WebSettings;
 
-//import com.google.android.gms.iid.InstanceID;
-import android.provider.Settings;
-
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.Promise;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -36,6 +32,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import javax.annotation.Nullable;
+
 
 public class RNDeviceModule extends ReactContextBaseJavaModule {
 
@@ -217,65 +214,64 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     public @Nullable
     Map<String, Object> getConstants() {
         HashMap<String, Object> constants = new HashMap<String, Object>();
-        Log.e("1212","test");
-//        PackageManager packageManager = this.reactContext.getPackageManager();
-//        String packageName = this.reactContext.getPackageName();
-//
-//        constants.put("appVersion", "not available");
-//        constants.put("buildVersion", "not available");
-//        constants.put("buildNumber", 0);
-//
-//        try {
-//            PackageInfo info = packageManager.getPackageInfo(packageName, 0);
-//            constants.put("appVersion", info.versionName);
-//            constants.put("buildNumber", info.versionCode);
-//            constants.put("firstInstallTime", info.firstInstallTime);
-//            constants.put("lastUpdateTime", info.lastUpdateTime);
-//        } catch (PackageManager.NameNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
-//        String deviceName = "Unknown";
-//
-//        try {
-//            BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
-//            if (myDevice != null) {
-//                deviceName = myDevice.getName();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        //constants.put("instanceId", InstanceID.getInstance(this.reactContext).getId());
-//        constants.put("serialNumber", Build.SERIAL);
-//        constants.put("deviceName", deviceName);
-//        constants.put("systemName", "Android");
-//        constants.put("systemVersion", Build.VERSION.RELEASE);
-//        constants.put("model", Build.MODEL);
-//        constants.put("brand", Build.BRAND);
-//        constants.put("deviceId", Build.BOARD);
-//        constants.put("apiLevel", Build.VERSION.SDK_INT);
-//        constants.put("deviceLocale", this.getCurrentLanguage());
-//        constants.put("deviceCountry", this.getCurrentCountry());
-//        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
-//        constants.put("systemManufacturer", Build.MANUFACTURER);
-//        constants.put("bundleId", packageName);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            constants.put("userAgent", WebSettings.getDefaultUserAgent(this.reactContext));
-//        }
-//        constants.put("timezone", TimeZone.getDefault().getID());
-//        constants.put("isEmulator", this.isEmulator());
-//        constants.put("isTablet", this.isTablet());
-//        Activity currentActivity = getCurrentActivity();
-//        if (currentActivity == null) {
-//            return constants;
-//        }
-//        if (currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED ||
-//                currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED ||
-//                currentActivity.checkCallingOrSelfPermission("android.permission.READ_PHONE_NUMBERS") == PackageManager.PERMISSION_GRANTED) {
-//            TelephonyManager telMgr = (TelephonyManager) this.reactContext.getSystemService(Context.TELEPHONY_SERVICE);
-//            constants.put("phoneNumber", telMgr.getLine1Number());
-//        }
+        PackageManager packageManager = this.reactContext.getPackageManager();
+        String packageName = this.reactContext.getPackageName();
+
+        constants.put("appVersion", "not available");
+        constants.put("buildVersion", "not available");
+        constants.put("buildNumber", 0);
+
+        try {
+            PackageInfo info = packageManager.getPackageInfo(packageName, 0);
+            constants.put("appVersion", info.versionName);
+            constants.put("buildNumber", info.versionCode);
+            constants.put("firstInstallTime", info.firstInstallTime);
+            constants.put("lastUpdateTime", info.lastUpdateTime);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String deviceName = "Unknown";
+
+        try {
+            BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+            if (myDevice != null) {
+                deviceName = myDevice.getName();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //constants.put("instanceId", InstanceID.getInstance(this.reactContext).getId());
+        constants.put("serialNumber", Build.SERIAL);
+        constants.put("deviceName", deviceName);
+        constants.put("systemName", "Android");
+        constants.put("systemVersion", Build.VERSION.RELEASE);
+        constants.put("model", Build.MODEL);
+        constants.put("brand", Build.BRAND);
+        constants.put("deviceId", Build.BOARD);
+        constants.put("apiLevel", Build.VERSION.SDK_INT);
+        constants.put("deviceLocale", this.getCurrentLanguage());
+        constants.put("deviceCountry", this.getCurrentCountry());
+        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
+        constants.put("systemManufacturer", Build.MANUFACTURER);
+        constants.put("bundleId", packageName);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            constants.put("userAgent", WebSettings.getDefaultUserAgent(this.reactContext));
+        }
+        constants.put("timezone", TimeZone.getDefault().getID());
+        constants.put("isEmulator", this.isEmulator());
+        constants.put("isTablet", this.isTablet());
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity == null) {
+            return constants;
+        }
+        if (currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED ||
+                currentActivity.checkCallingOrSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED ||
+                currentActivity.checkCallingOrSelfPermission("android.permission.READ_PHONE_NUMBERS") == PackageManager.PERMISSION_GRANTED) {
+            TelephonyManager telMgr = (TelephonyManager) this.reactContext.getSystemService(Context.TELEPHONY_SERVICE);
+            constants.put("phoneNumber", telMgr.getLine1Number());
+        }
         return constants;
     }
 }

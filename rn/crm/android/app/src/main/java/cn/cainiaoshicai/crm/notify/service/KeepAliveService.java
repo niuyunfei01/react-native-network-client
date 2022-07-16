@@ -2,15 +2,12 @@ package cn.cainiaoshicai.crm.notify.service;
 
 import android.content.Intent;
 import android.os.IBinder;
-import android.text.TextUtils;
 
 import com.xdandroid.hellodaemon.AbsWorkService;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.orders.util.Log;
-import cn.jpush.android.api.JPushInterface;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 

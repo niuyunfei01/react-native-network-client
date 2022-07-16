@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm.support.react;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.SearchManager;
@@ -15,6 +18,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
@@ -35,7 +40,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
-import com.xdandroid.hellodaemon.IntentWrapper;
 import com.xdandroid.hellodaemon.IntentWrapperReImpl;
 
 import java.io.IOException;
@@ -74,14 +78,8 @@ import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
 import cn.jiguang.plugins.push.JPushModule;
-import cn.jpush.android.api.JPushInterface;
 import retrofit2.Call;
 import retrofit2.Response;
-
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
-import androidx.annotation.RequiresApi;
 
 /**
  * Expose Java to JavaScript.
@@ -122,7 +120,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
         //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
-        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
+//        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
     @ReactMethod

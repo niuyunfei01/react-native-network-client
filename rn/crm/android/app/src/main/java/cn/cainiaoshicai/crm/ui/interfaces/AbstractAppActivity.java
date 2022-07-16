@@ -5,9 +5,10 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
 
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
