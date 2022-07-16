@@ -17,6 +17,7 @@ import {SearchBar} from "../../weui";
 import {calcMs} from '../../pubilc/util/AppMonitorInfo'
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import Config from "../../pubilc/common/config";
 
 const {
   FlatList,
@@ -66,13 +67,15 @@ class OrderQueryResultScene extends PureComponent {
     const {navigation, route} = this.props
     let title = ''
     let type = 'done'
-    if (tool.length(route.params.term) > 0) {
-      title = `订单中搜索:${route.params.term || ""}`
-      type = 'search'
-    } else {
-      title = '全部订单'
-      this.mixpanel.track("全部的订单")
-    }
+    // if (tool.length(route.params.term) > 0) {
+    //   title = `订单中搜索:${route.params.term || ""}`
+    //   type = 'search'
+    // } else {
+    //   title = '全部订单'
+    //   this.mixpanel.track("全部的订单")
+    // }
+    title = '全部订单'
+    this.mixpanel.track("全部的订单")
     if (route.params.additional !== undefined && route.params.additional) {
       title = '补送单'
       type = 'additional'
@@ -373,12 +376,18 @@ class OrderQueryResultScene extends PureComponent {
     })
   }
 
+  jumpToSearch = () => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH);
+    });
+
+  }
+
   renderHeader() {
     const {selectStatus, date, showDatePicker, dateBtn, platform, platformBtn} = this.state
     return (
       <View>
-        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onBlurSearch={(keywords) => this.onSearch(keywords, true)}
-                   lang={{cancel: '搜索'}}/>
+        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onFocus={this.jumpToSearch}/>
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}

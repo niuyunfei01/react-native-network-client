@@ -11,6 +11,7 @@ const {
   GET_STORE_TURNOVER,
   GET_WM_STORES,
   GET_USER_WAGE_DATA,
+  GET_INCREMENT,
   GET_VENDOR_DUTY_USERS
 } = require("../../pubilc/common/constants").default;
 
@@ -351,6 +352,13 @@ export function userCanChangeStore(store_id, token, callback) {
         callback({ok: false, desc: error.message});
       });
   };
+}
+
+export function receiveIncrement(increment) {
+  return {
+    type: GET_INCREMENT,
+    increment: increment
+  }
 }
 
 function receiveUserWageData(wageData = {}) {

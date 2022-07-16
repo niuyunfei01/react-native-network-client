@@ -129,7 +129,7 @@ class HttpUtils {
   }
 
   static logout(navigation) {
-    native.logout()
+    native.logout().then(r => {})
     if (navigation !== HttpUtils) {
       if (navigation != null) {
         const resetAction = CommonActions.reset({

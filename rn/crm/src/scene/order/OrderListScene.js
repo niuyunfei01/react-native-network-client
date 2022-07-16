@@ -4,7 +4,6 @@ import {
   Dimensions,
   FlatList,
   InteractionManager,
-  Modal,
   Platform,
   SafeAreaView,
   StatusBar,
@@ -38,13 +37,8 @@ import {Badge, Button, Image} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
-import {bundleFilePath, createDirectory, deleteFile, exists} from "../../pubilc/util/FileUtil";
-import RNFetchBlob from "rn-fetch-blob";
-import {unzip} from '../../pubilc/component/react-native-zip/RNZip'
-import RNRestart from '../../pubilc/component/react-native-restart'
-import Cts from "../../pubilc/common/Cts";
 import RemindModal from "../../pubilc/component/remindModal";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
 
 const {width} = Dimensions.get("window");
 
@@ -80,10 +74,6 @@ function FetchView({navigation, onRefresh}) {
 
 
 const initState = {
-  showNewVersionVisible: false,
-  newVersionInfo: {},
-  downloadFileProgress: '',
-  downloadFileFinish: false,
   isLoading: false,
   categoryLabels: [
     {tabname: '待打包', num: 0, status: 1},
@@ -141,7 +131,6 @@ const timeObj = {
   componentName: '',
   method: []
 }
-const platform = Platform.OS === 'android' ? 'Android-Bundle' : 'IOS-Bundle'
 
 class OrderListScene extends Component {
   state = initState;
@@ -158,9 +147,7 @@ class OrderListScene extends Component {
     this.mixpanel.track("orderpage_view", {})
     this.renderItem = this.renderItem.bind(this);
     this.getActivity();
-
     GlobalUtil.setOrderFresh(1)
-
   }
 
   openAndroidNotification = () => {
@@ -255,7 +242,6 @@ class OrderListScene extends Component {
     const {global, dispatch} = this.props
     simpleStore(global, dispatch)
     this.openAndroidNotification();
-    this.getNewVersionInfo()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -270,54 +256,6 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
     calcMs(timeObj, accessToken)
-  }
-
-  getNewVersionInfo = () => {
-    const url = '/v1/new_api/Version/getBundleUrl'
-    const version = __DEV__ ? '5' : Cts.BUNDLE_VERSION;
-    const params = {platform: platform, version: version}
-    HttpUtils.get.bind(this.props)(url, params).then(res => {
-      if (parseInt(res.android) > version)
-        this.setState({newVersionInfo: res, showNewVersionVisible: true})
-    }).catch(error => {
-      showError(error)
-    })
-  }
-
-  updateBundle = (newVersionInfo) => {
-    const {downloadFileFinish} = this.state
-    if (downloadFileFinish) {
-      RNRestart.Restart()
-      return
-    }
-
-    const source = Platform.OS === 'ios' ? bundleFilePath + '/last.ios.zip' : bundleFilePath + '/last.android.zip';
-    RNFetchBlob.config({path: source})
-      .fetch('GET', newVersionInfo.bundle_url)
-      .progress({count: 10, fileCache: true}, (received, total) => {
-        const downloadFileProgress = parseInt(`${(received / total) * 100}`)
-        this.setState({downloadFileProgress: `${downloadFileProgress}%`})
-      })
-      .then(async (res) => {
-        const status = res.info().status;
-        if (status === 200) {
-          const target = Platform.OS === 'ios' ? bundleFilePath + '/last.ios/' : bundleFilePath + '/last.android/';
-          if (!await exists(target))
-            await createDirectory(target)
-          await unzip(source, target)
-          await deleteFile(source)
-          this.setState({
-            downloadFileProgress: '',
-            downloadFileFinish: true
-          })
-        }
-      }).catch(error => {
-      showError(error.reason)
-    })
-  }
-
-  closeNewVersionInfo = () => {
-    this.setState({showNewVersionVisible: false})
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -601,15 +539,7 @@ class OrderListScene extends Component {
       console.log("JPush-is-notification enabled:", enabled)
     })
 
-    const {
-      showNewVersionVisible,
-      showSortModal,
-      ext_store_list,
-      searchStoreVisible,
-      newVersionInfo,
-      downloadFileProgress,
-      downloadFileFinish
-    } = this.state
+    const {showSortModal, ext_store_list, searchStoreVisible} = this.state
     return (
       <View style={{flex: 1}}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
@@ -670,30 +600,7 @@ class OrderListScene extends Component {
             </CellFooter>
           </Cell>
         </If>
-        <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
-          <View style={styles.modalWrap}>
-            <View style={styles.modalContentWrap}>
-              <AntDesign name={'close'} style={styles.closeNewVersionModal} allowFontScaling={false}
-                         onPress={this.closeNewVersionInfo}/>
-              <View style={styles.center}>
-                <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
-              </View>
-              <Text style={styles.modalContentText}>
-                {newVersionInfo.info}
-              </Text>
-              <If condition={downloadFileProgress !== ''}>
-                <Text style={styles.modalTitleText}>
-                  下载进度：{downloadFileProgress}
-                </Text>
-              </If>
-              <TouchableOpacity style={styles.modalBtnWrap} onPress={() => this.updateBundle(newVersionInfo)}>
-                <Text style={styles.modalBtnText}>
-                  {downloadFileFinish ? '立即体验' : '立即更新'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        <HotUpdateComponent/>
         <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
       </View>
     );
@@ -1092,7 +999,6 @@ const styles = StyleSheet.create({
     width: '80%',
     backgroundColor: colors.colorEEE,
     borderRadius: 8,
-    padding: 12,
   },
   modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
   modalImgStyle: {width: 51.2, height: 51.2, marginTop: 12, borderRadius: 8},

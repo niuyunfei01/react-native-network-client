@@ -201,7 +201,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '订单搜索'}}
+        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
                       getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
@@ -474,6 +474,26 @@ export const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle: '打卡'}}
                       getComponent={() => require('../../scene/console/SignInScene').default}/>
+        <Stack.Screen name={Config.ROUTE_BAD_REVIEW_REMINDER}
+                      options={{headerTitle: '差评提醒'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/BadReviewReminderScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_AUTOMATIC_FEEDBACK}
+                      options={{headerTitle: '自动回评'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/AutomaticFeedbackScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_AUTOMATIC_PACKAGING}
+                      options={{headerTitle: '自动打包'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/AutomaticPackagingScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_TEMPLATE_SETTINGS}
+                      options={{headerTitle: '模板设置'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/TemplateSettingsScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
+                      options={{headerTitle:'功能详情'}}
+                      getComponent={()=>require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
