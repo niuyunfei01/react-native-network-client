@@ -160,7 +160,7 @@ class GoodItemEditBottom extends React.Component {
               <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_OFF_WORK)}>
                 <CheckBox center type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
                           uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_OFF_WORK}
-                          style={{backgroundColor: 'red'}}/>
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_OFF_WORK)}/>
                 <Text style={styles.offSaleItemContent}>
                   打烊后自动上架
                 </Text>
@@ -168,7 +168,7 @@ class GoodItemEditBottom extends React.Component {
               <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_MANUAL)}>
                 <CheckBox type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
                           uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_MANUAL}
-                          style={{backgroundColor: 'red'}}/>
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_MANUAL)}/>
                 <Text style={styles.offSaleItemContent}>
                   不要自动上架
                 </Text>
@@ -179,7 +179,7 @@ class GoodItemEditBottom extends React.Component {
               <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_NONE)}>
                 <CheckBox type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
                           uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_NONE}
-                          style={{backgroundColor: 'red'}}/>
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_NONE)}/>
                 <Text style={styles.offSaleItemContent}>
                   从本店的各个平台渠道下架, 并删除本品
                 </Text>
