@@ -10,7 +10,7 @@ import {format} from "../../pubilc/util/TimeUtil";
 
 const BUTTON_LIST = [
   {
-    title: '备货任务',
+    title: '拣货任务',
     iconName: 'list-alt',
     routeName: config.ROUTE_CONSOLE_STOCKING_TASKS
   },

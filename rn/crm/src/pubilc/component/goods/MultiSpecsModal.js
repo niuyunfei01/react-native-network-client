@@ -6,7 +6,7 @@ import colors from "../../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
 
-const height = Dimensions.get("window").height;
+const {height} = Dimensions.get("window");
 let checkStatus = true
 
 export default class MultiSpecsModal extends PureComponent {
@@ -177,8 +177,10 @@ export default class MultiSpecsModal extends PureComponent {
         })
       }
     })
-    if (!checkStatus)
+    if (!checkStatus) {
+      checkStatus = true
       return
+    }
     const url = `/api_products/batch_update_store_price_inventory?access_token=${accessToken}&&store_id=${storeId}&&vendor_id=${vendor_id}`
     let params = {prices: prices}
     if (inventory.length > 0)
@@ -186,8 +188,7 @@ export default class MultiSpecsModal extends PureComponent {
     if (prices.length > 0)
       HttpUtils.post.bind(this.props)(url, params).then(() => {
         showSuccess('已完成', 3)
-
-      }).catch(e => {
+      }, res => showError(res.reason, 1)).catch(e => {
         showError(e.reason, 1)
       })
     onClose()

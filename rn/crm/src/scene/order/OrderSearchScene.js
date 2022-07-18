@@ -13,14 +13,12 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import HttpUtils from "../../pubilc/util/http";
-import {SearchBar} from "../../weui";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import tool from "../../pubilc/util/tool";
-import {showError} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, user, global, device} = state;
@@ -185,6 +183,7 @@ class OrderSearchScene extends PureComponent {
     if (isLoading)
       return
     this.setState({isLoading: true})
+    showModal('加载中...')
     const params = {
       vendor_id: currVendorId,
       offset: (query.page - 1) * query.limit,
@@ -195,13 +194,16 @@ class OrderSearchScene extends PureComponent {
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get(url, params).then(res => {
+      hideModal()
       const orderList = isChangeType ? res.orders : this.state.orderList.concat(res.orders)
       const end = res.orders.length < query.limit
       this.setState({orderList: orderList, end: end, isLoading: false})
     }, res => {
+      hideModal()
       this.setState({isLoading: false})
       showError(res.reason)
     }).catch(error => {
+      hideModal()
       this.setState({isLoading: false})
       showError(error.reason)
     })
@@ -248,7 +250,11 @@ class OrderSearchScene extends PureComponent {
         </If>
         <If condition={orderList.length > 0}>
           <Text style={styles.filterBtnText}>
-            近七日共计{orderList.length}单
+            近七日共计
+            <Text style={styles.orderListLength}>
+              {orderList.length}
+            </Text>
+            单
           </Text>
         </If>
         <If condition={orderList.length === 0}>
@@ -267,6 +273,7 @@ class OrderSearchScene extends PureComponent {
                   onEndReachedThreshold={0.1}
                   onEndReached={this.onEndReached}
                   refreshing={isLoading}
+                  removeClippedSubviews={true}
                   keyExtractor={(item, index) => `${index}`}
         />
       </>
@@ -280,9 +287,7 @@ const styles = StyleSheet.create({
   searchWarp: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: colors.colorCCC,
     borderRadius: 2,
-    borderWidth: 1,
     height: 28,
     paddingRight: 12,
     paddingLeft: 12,
@@ -346,6 +351,7 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 14, color: colors.color999, flex: 1, paddingTop: 4, paddingBottom: 4, paddingLeft: 4
   },
+  orderListLength: {color: '#F21F1F'},
   line: {borderBottomWidth: 1, borderBottomColor: colors.colorEEE, marginLeft: 12, marginRight: 15}
 });
 
