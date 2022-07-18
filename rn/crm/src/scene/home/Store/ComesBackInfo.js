@@ -7,7 +7,7 @@ import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import OrderListItem from "../../../pubilc/component/OrderListItem";
-import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const {
   FlatList,
@@ -31,12 +31,21 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
 
 class OrderQueryResultScene extends PureComponent {
   constructor(props) {
     super(props);
     const {navigation, route} = this.props
-    if (route.params.store_id === undefined || !route.params.store_id || route.params.ext_store_id === undefined || !route.params.ext_store_id) {
+    if (route.params.ext_store_id === undefined || !route.params.ext_store_id) {
       navigation.back();
       return showError("参数错误");
     }
@@ -49,13 +58,34 @@ class OrderQueryResultScene extends PureComponent {
         maxPastDays: 20,
       },
       orders: [],
-
+      ext_store_name: '美团外卖店铺',
+      today_sync_rate: 90,
+      yesterday_sync_rate: 90,
+      failed: 0,
     };
     this.renderItem = this.renderItem.bind(this);
-    this.fetchOrders();
   }
 
+  fetchInfo = () => {
+    const {accessToken, currStoreId} = this.props.global;
+    const params = {
+      store_id: currStoreId,
+      ext_store_id: this.props.route.params.ext_store_id,
+    }
+    let url = `/v1/new_api/delivery_sync_log/detail?access_token=${accessToken}`;
+    HttpUtils.post.bind(this.props)(url, params).then(res => {
+      this.setState({
+        ext_store_name: res.ext_store_name,
+        today_sync_rate: res.today_sync_rate,
+        yesterday_sync_rate: res.yesterday_sync_rate,
+        failed: res.today ? res.today.failed : 0,
+      })
+    })
+  }
+
+
   fetchOrders = () => {
+    showModal("加载中")
     this.setState({isLoading: true})
     const {accessToken, currStoreId} = this.props.global;
     let {query} = this.state;
@@ -67,16 +97,19 @@ class OrderQueryResultScene extends PureComponent {
     }
     let url = `/v1/new_api/delivery_sync_log/failed_orders?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(url, params).then(res => {
+      hideModal()
       if (tool.length(res.orders) < this.state.query.limit) {
         this.setState({
           end: true,
         })
       }
-      // let orders = this.state.orders.concat(res.orders)
-      // this.setState({
-      //   orders: orders,
-      //   isLoading: false,
-      // })
+      let orders = this.state.orders.concat(res.orders)
+      this.setState({
+        orders: orders,
+        isLoading: false,
+      })
+    }).catch((res) => {
+      showError('获取失败：' + res.desc)
     })
   }
 
@@ -91,6 +124,7 @@ class OrderQueryResultScene extends PureComponent {
         orders: []
       }, () => {
         this.fetchOrders()
+        this.fetchInfo()
       })
     }, 600)
   }
@@ -114,16 +148,22 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   render() {
-    const orders = this.state.orders || []
     return (
       <View style={{flex: 1, backgroundColor: colors.back_color}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         {this.renderHeader()}
-        {this.renderContent(orders)}
+        {this.renderContent()}
       </View>
     );
   }
 
   renderHeader = () => {
+    let {
+      today_sync_rate,
+      yesterday_sync_rate,
+      ext_store_name,
+      failed,
+    } = this.state
     return (
       <View>
         <View style={{
@@ -142,31 +182,30 @@ class OrderQueryResultScene extends PureComponent {
               height: 60,
             }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png'}}/>
             <View style={{marginLeft: 15, marginTop: 4}}>
-              <Text style={{fontSize: 14, color: colors.color333}}>比邻鲜（龙锦综合市场店） </Text>
+              <Text style={{fontSize: 14, color: colors.color333}}>{ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>
                 <Text style={{fontSize: 12, color: colors.color333}}>今日回传： </Text>
-                <Text style={{fontSize: 14, color: colors.main_color}}>97% </Text>
+                <Text style={{fontSize: 14, color: colors.main_color}}>{today_sync_rate}% </Text>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <Text style={{fontSize: 12, color: colors.color333}}>昨日回传：</Text>
-                <Text style={{fontSize: 14, color: colors.red}}>84% </Text>
+                <Text style={{fontSize: 14, color: colors.red}}>{yesterday_sync_rate}% </Text>
               </Text>
             </View>
           </View>
         </View>
         <View
-          style={{backgroundColor: colors.white, marginVertical: 9, alignItems: 'center', justifyContent: 'center'}}>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 12}}>失败(9) </Text>
+          style={{backgroundColor: colors.white, marginTop: 9, alignItems: 'center', justifyContent: 'center'}}>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 12}}>失败({failed}) </Text>
           <View style={{backgroundColor: colors.main_color, width: 46, height: 4, borderRadius: 2}}/>
         </View>
       </View>
     )
   }
 
-
   renderItem = (order) => {
     let {item, index} = order;
     return (
-      <OrderListItem showBtn={false}
+      <OrderListItem showBtn={false} comesBackBtn={true}
                      fetchData={() => this.onSearch('', false)}
                      item={item} index={index}
                      accessToken={this.props.global.accessToken}
@@ -181,7 +220,8 @@ class OrderQueryResultScene extends PureComponent {
     );
   }
 
-  renderContent = (orders) => {
+  renderContent = () => {
+    const orders = this.state.orders || []
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
         <FlatList

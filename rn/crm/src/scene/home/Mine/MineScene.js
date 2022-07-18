@@ -186,7 +186,8 @@ class MineScene extends PureComponent {
       label: '实时回传：',
       content: "全部已达标",
       color: "green",
-      footer: '自然日有效配送信息上传率需>=90%'
+      footer: '自然日有效配送信息上传率需>=90%',
+      showComesback: false,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -598,6 +599,7 @@ class MineScene extends PureComponent {
         content: res.sync_info.content,
         color: res.sync_info.color,
         footer: res.footer,
+        showComesback: res.show,
       })
     })
   }
@@ -897,7 +899,7 @@ class MineScene extends PureComponent {
 
     nrInteraction(MineScene.name)
 
-    let {currVersion, is_mgr, is_helper} = this.state;
+    let {currVersion, is_mgr, is_helper, showComesback} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, simpleStore} = global
     const {added_service} = simpleStore
@@ -918,7 +920,9 @@ class MineScene extends PureComponent {
           {this.renderHeader()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
 
-          {this.renderHuichuan()}
+          <If condition={showComesback}>
+            {this.renderHuichuan()}
+          </If>
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>

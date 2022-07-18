@@ -63,7 +63,8 @@ class OrderListItem extends React.PureComponent {
     orderStatus: PropType.number,
     order: PropType.object,
     onItemClick: PropTypes.func,
-    setState: PropType.func
+    setState: PropType.func,
+    comesBackBtn: PropType.number,
   };
   state = {
     modalTip: false,
@@ -415,24 +416,24 @@ class OrderListItem extends React.PureComponent {
         Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
           text: '确定', onPress: () => {
             this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                {
-                  order: order,
-                  ship_id: 0,
-                  onCancelled: (ok, reason) => {
-                    this.fetchData()
-                  }
-                });
+              {
+                order: order,
+                ship_id: 0,
+                onCancelled: (ok, reason) => {
+                  this.fetchData()
+                }
+              });
           }
         }, {'text': '取消'}]);
       } else if (res.deduct_fee == 0) {
         this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: order,
-              ship_id: 0,
-              onCancelled: (ok, reason) => {
-                this.fetchData()
-              }
-            });
+          {
+            order: order,
+            ship_id: 0,
+            onCancelled: (ok, reason) => {
+              this.fetchData()
+            }
+          });
       } else {
         this.setState({
           toastContext: res.deduct_fee
@@ -440,13 +441,13 @@ class OrderListItem extends React.PureComponent {
           Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
             text: '确定', onPress: () => {
               this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                  {
-                    order: order,
-                    ship_id: 0,
-                    onCancelled: (ok, reason) => {
-                      this.fetchData()
-                    }
-                  });
+                {
+                  order: order,
+                  ship_id: 0,
+                  onCancelled: (ok, reason) => {
+                    this.fetchData()
+                  }
+                });
             }
           }, {'text': '取消'}]);
         })
@@ -687,6 +688,20 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+        <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
+          <Button title={'重新上传配送信息'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.onAinSend(item.id, item.store_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    width: width * 0.86,
+                    borderColor: colors.main_color,
+                    backgroundColor: colors.main_color
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
       </View>
     )
   }
@@ -710,7 +725,7 @@ class OrderListItem extends React.PureComponent {
           {this.renderUser()}
           {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
-          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.props.showBtn ? this.renderButton() : null}
+          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.props.showBtn || this.props.comesBackBtn ? this.renderButton() : null}
           <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity
               onPress={() => this.openModalTipChangeInfo(item.store_id, item.id)} style={styles.noRunMan}>
