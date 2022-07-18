@@ -11,27 +11,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../pubilc/util/pxToDp";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Button from "react-native-vector-icons/Entypo";
-import Entypo from "react-native-vector-icons/Entypo";
-import Config from "../../../pubilc/common/config";
-import Cts from "../../../pubilc/common/Cts";
-import pxToEm from "../../../pubilc/util/pxToEm";
 
-
-import AppConfig from "../../../pubilc/common/config.js";
-import FetchEx from "../../../pubilc/util/fetchEx";
-import HttpUtils from "../../../pubilc/util/http";
-
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from "../../../reducers/global/globalActions";
-import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
-import native from "../../../pubilc/util/native";
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import {
   fetchDutyUsers,
   fetchStoreTurnover,
@@ -40,24 +20,43 @@ import {
   receiveIncrement,
   userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
-import * as tool from "../../../pubilc/util/tool";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
+import store from "../../../reducers/store/index"
+import {setRecordFlag} from "../../../reducers/store/storeActions"
+import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
+
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
+import JPush from "jpush-react-native";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import dayjs from "dayjs";
+
+import JbbText from "../../common/component/JbbText";
+import GoodsIncrement from "../../common/component/GoodsIncrement";
+import BottomModal from "../../../pubilc/component/BottomModal";
+
+import Config from "../../../pubilc/common/config";
+import Cts from "../../../pubilc/common/Cts";
+import FetchEx from "../../../pubilc/util/fetchEx";
+import HttpUtils from "../../../pubilc/util/http";
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import pxToEm from "../../../pubilc/util/pxToEm";
+import native from "../../../pubilc/util/native";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import * as tool from "../../../pubilc/util/tool";
+import {simpleStore} from "../../../pubilc/util/tool";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
-import JPush from "jpush-react-native";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
-import JbbText from "../../common/component/JbbText";
-import dayjs from "dayjs";
-import BottomModal from "../../../pubilc/component/BottomModal";
-import store from "../../../reducers/store/index"
-import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {MixpanelInstance} from "../../../pubilc/util/analytics";
-import GoodsIncrement from "../../common/component/GoodsIncrement";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -329,7 +328,7 @@ class MineScene extends PureComponent {
     let _this = this;
     const {currStoreId, accessToken} = this.props.global;
     const url = `api/notify_center/${currStoreId}.json?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+    FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
@@ -660,6 +659,133 @@ class MineScene extends PureComponent {
     })
   }
 
+  onPress = (route, params = {}) => {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
+      native.toUserComments();
+      return;
+    }
+    this.props.navigation.navigate(route, params);
+  }
+
+  orderSearch = () => {
+    this.mixpanel.track('订单搜索')
+    this.onPress(Config.ROUTE_ORDER_SEARCH)
+  }
+
+  distributionAnalysis = () => {
+    this.mixpanel.track('数据分析页')
+    this.onPress(Config.ROUTE_DistributionAnalysis)
+  }
+
+  storeManager = () => {
+    this.mixpanel.track('店铺页')
+    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
+    this.onPress(Config.ROUTE_STORE, {
+      currentUser: currentUser,
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+      is_mgr: is_mgr
+    });
+  }
+
+  pushSetting = () => {
+    this.mixpanel.track('推送页')
+    this.onPress(Config.ROUTE_PUSH)
+  }
+  platformSetting = () => {
+    this.mixpanel.track('平台页')
+    this.onPress(Config.ROUTE_STORE_STATUS, {
+      updateStoreStatusCb: (storeStatus) => {
+        this.setState({storeStatus: storeStatus})
+      }
+    })
+  }
+
+  printerSetting = () => {
+    this.mixpanel.track('打印页')
+    this.onPress(Config.ROUTE_PRINTERS)
+  }
+
+  deliverySetting = () => {
+    this.mixpanel.track('配送管理')
+    this.onPress(Config.ROUTE_DELIVERY_LIST)
+  }
+
+  settingPage = () => {
+    this.mixpanel.track('设置页')
+    this.onPress(Config.ROUTE_SETTING)
+  }
+  versionInfo = () => {
+    this.mixpanel.track('版本信息页')
+    this.onPress(Config.ROUTE_VERSION);
+  }
+  oncallservice = () => {
+    if (!this.state.is_self_yy) {
+      return this.setState({
+        show_call_service_modal: true
+      })
+    }
+    this.openMiniprogarm()
+  }
+
+  getActivity = () => {
+    const {accessToken, currStoreId} = this.props.global;
+    const api = `api/get_activity_info?access_token=${accessToken}`
+    let data = {
+      "storeId": currStoreId,
+      "pos": 1,
+      "auto_hide": 0,
+    }
+    HttpUtils.post.bind(this.props)(api, data).then((res) => {
+      if (tool.length(res) > 0) {
+        this.setState({
+          show_activity: true,
+          activity_img: res.icon,
+          activity_url: res.url + '?access_token=' + accessToken,
+        })
+      }
+    })
+  }
+
+  helpPage = () => {
+    this.mixpanel.track('帮助页')
+    this.onPress(Config.ROUTE_HELP)
+  }
+
+  openMiniprogarm = () => {
+    let {currVendorId} = tool.vendor(this.props.global)
+    let data = {
+      v: currVendorId,
+      s: this.props.global.currStoreId,
+      u: this.props.global.currentUser,
+      m: this.props.global.currentUserProfile.mobilephone,
+      place: 'mine'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
+  oncloseCallModal = (e = 0) => {
+    this.setState({
+      show_call_service_modal: false
+    })
+    if (e === 1) {
+      this.openMiniprogarm()
+    }
+  }
+
+
+  callService = () => {
+    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
+      this.setState({
+        show_call_service_modal: false
+      }, () => {
+        native.dialNumber(this.state.contacts);
+      })
+    } else {
+      ToastLong("号码为空")
+    }
+  }
+
   renderHeader = () => {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
@@ -830,7 +956,7 @@ class MineScene extends PureComponent {
             </TouchableOpacity>
           </If>
           <View style={[worker_styles.chevron_right]}>
-            <Button name="chevron-thin-right" style={[worker_styles.right_btn]}/>
+            <Entypo name="chevron-thin-right" style={[worker_styles.right_btn]}/>
           </View>
         </View>
       </TouchableOpacity>
@@ -885,7 +1011,7 @@ class MineScene extends PureComponent {
               })
             }
           >
-            <Button
+            <Entypo
               name="chevron-thin-right"
               style={[worker_styles.right_btn]}
             />
@@ -1006,34 +1132,6 @@ class MineScene extends PureComponent {
     )
   }
 
-  onPress = (route, params = {}) => {
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
-    this.props.navigation.navigate(route, params);
-  }
-
-  orderSearch = () => {
-    this.mixpanel.track('订单搜索')
-    this.onPress(Config.ROUTE_ORDER_SEARCH)
-  }
-
-  distributionAnalysis = () => {
-    this.mixpanel.track('数据分析页')
-    this.onPress(Config.ROUTE_DistributionAnalysis)
-  }
-
-  storeManager = () => {
-    this.mixpanel.track('店铺页')
-    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
-    this.onPress(Config.ROUTE_STORE, {
-      currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: currVendorName,
-      is_mgr: is_mgr
-    });
-  }
   renderStoreBlock = () => {
     const {
       // show_activity_mgr = false,
@@ -1309,53 +1407,6 @@ class MineScene extends PureComponent {
     );
   }
 
-  pushSetting = () => {
-    this.mixpanel.track('推送页')
-    this.onPress(Config.ROUTE_PUSH)
-  }
-  platformSetting = () => {
-    this.mixpanel.track('平台页')
-    this.onPress(Config.ROUTE_STORE_STATUS, {
-      updateStoreStatusCb: (storeStatus) => {
-        this.setState({storeStatus: storeStatus})
-      }
-    })
-  }
-
-  printerSetting = () => {
-    this.mixpanel.track('打印页')
-    this.onPress(Config.ROUTE_PRINTERS)
-  }
-
-  deliverySetting = () => {
-    this.mixpanel.track('配送管理')
-    this.onPress(Config.ROUTE_DELIVERY_LIST)
-  }
-
-  getActivity = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `api/get_activity_info?access_token=${accessToken}`
-    let data = {
-      "storeId": currStoreId,
-      "pos": 1,
-      "auto_hide": 0,
-    }
-    HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (tool.length(res) > 0) {
-        this.setState({
-          show_activity: true,
-          activity_img: res.icon,
-          activity_url: res.url + '?access_token=' + accessToken,
-        })
-      }
-    })
-  }
-
-  helpPage = () => {
-    this.mixpanel.track('帮助页')
-    this.onPress(Config.ROUTE_HELP)
-  }
-
   renderVersionBlock = () => {
     const {
       show_expense_center = false,
@@ -1396,34 +1447,6 @@ class MineScene extends PureComponent {
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
-  }
-  settingPage = () => {
-    this.mixpanel.track('设置页')
-    this.onPress(Config.ROUTE_SETTING)
-  }
-  versionInfo = () => {
-    this.mixpanel.track('版本信息页')
-    this.onPress(Config.ROUTE_VERSION);
-  }
-  oncallservice = () => {
-    if (!this.state.is_self_yy) {
-      return this.setState({
-        show_call_service_modal: true
-      })
-    }
-    this.openMiniprogarm()
-  }
-
-  openMiniprogarm = () => {
-    let {currVendorId} = tool.vendor(this.props.global)
-    let data = {
-      v: currVendorId,
-      s: this.props.global.currStoreId,
-      u: this.props.global.currentUser,
-      m: this.props.global.currentUserProfile.mobilephone,
-      place: 'mine'
-    }
-    JumpMiniProgram("/pages/service/index", data);
   }
 
   renderCopyRight = () => {
@@ -1723,27 +1746,6 @@ class MineScene extends PureComponent {
     )
   }
 
-  oncloseCallModal = (e = 0) => {
-    this.setState({
-      show_call_service_modal: false
-    })
-    if (e === 1) {
-      this.openMiniprogarm()
-    }
-  }
-
-
-  callService = () => {
-    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
-      this.setState({
-        show_call_service_modal: false
-      }, () => {
-        native.dialNumber(this.state.contacts);
-      })
-    } else {
-      ToastLong("号码为空")
-    }
-  }
 
 }
 
