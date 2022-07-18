@@ -153,7 +153,6 @@ export default function globalReducer(state = initialState, action) {
       return {...state, printer_name: action.printer_info.name}
 
     case SET_USER_CONFIG:
-      console.log(action.info, 'info')
       return {...state, user_config: action.info}
 
     case SET_SHOW_EXT_STORE:
