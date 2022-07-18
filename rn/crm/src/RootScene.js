@@ -226,9 +226,8 @@ class RootScene extends PureComponent<{}> {
   }
 
   render() {
-    const launchProps = this.props.launchProps;
-    const orderId = launchProps["order_id"];
-    let backPage = launchProps["backPage"];
+    const {launchProps} = this.props;
+    const {orderId,backPage} = launchProps;
     let initialRouteName = launchProps["_action"];
     if (!!backPage) {
       launchProps["_action_params"]["backPage"] = backPage;

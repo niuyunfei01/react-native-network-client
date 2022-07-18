@@ -12,7 +12,8 @@ import pxToDp from "../util/pxToDp";
 const initState = {
   scrollViewIsBottom: false,
   advicesInfoArray: {},
-  showAdvicesVisible: false
+  showAdvicesVisible: false,
+  countDownTime: 5
 }
 
 class RemindModal extends React.Component {
@@ -34,7 +35,8 @@ class RemindModal extends React.Component {
     const params={store_id:currStoreId, access_token: accessToken}
     HttpUtils.get.bind(this.props)(url,params).then(res=>{
       this.setState({
-        advicesInfoArray: res, showAdvicesVisible: true
+        advicesInfoArray: res,
+        showAdvicesVisible: true
       })
     }).catch(error=>{showError(error)})
   }
@@ -71,7 +73,26 @@ class RemindModal extends React.Component {
       this.props.onPress(Config.ROUTE_DETAIL_NOTICE, {content: val})
     })
   }
+
+  countDown = () => {
+    let timer = setTimeout(() => {
+      this.setState((preState) =>({
+        countDownTime: preState.countDownTime - 1,
+      }),() => {
+        if(this.state.countDownTime == 0){
+          clearTimeout(timer)
+          this.setState({
+            scrollViewIsBottom: true
+          })
+        }
+      });
+    }, 1000)
+  }
+
   render(): React.ReactNode {
+    if (this.state.advicesInfoArray.type && this.state.advicesInfoArray.type == 3) {
+      this.countDown()
+    }
     return <Modal hardwareAccelerated={true}
                   onRequestClose={() => this.closeRemindModal()}
                   transparent={true}
@@ -80,27 +101,14 @@ class RemindModal extends React.Component {
                   visible={this.state.showAdvicesVisible}>
       <View style={styles.modalWrap}>
         <View style={styles.modalContentWrap}>
-          <View style={styles.modalContentIcon}>
-            <TouchableOpacity onPress={() => this.closeRemindModal()}>
-              <Entypo name={'cross'} style={styles.closeIcon}/>
+          <View style={styles.modalContentTitle}>
+            <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
+            <Text style={styles.modalContentTitleText}>{this.state.advicesInfoArray.title} </Text>
+            <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
+              <Entypo name="circle-with-cross" style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.main_color}}/>
             </TouchableOpacity>
           </View>
-          <View style={styles.modalContentTitle}>
-            <Text style= {styles.modalContentTitleText}>
-              {this.state.advicesInfoArray.title}
-            </Text>
-          </View>
-          <ScrollView style={styles.modalContainer} onMomentumScrollEnd={(e) => {
-            let self = this
-            let offsetY = e.nativeEvent.contentOffset.y;
-            let contentSizeHeight = e.nativeEvent.contentSize.height;
-            let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
-            if (offsetY + oriageScrollHeight + 1 >= contentSizeHeight){
-              self.setState({
-                scrollViewIsBottom: true
-              })
-            }
-          }} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
+          <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
             <Text style={styles.modalContentText}>
               {this.state.advicesInfoArray.content}
             </Text>
@@ -124,12 +132,12 @@ class RemindModal extends React.Component {
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 1}>
-            <View style={styles.modalButtonBox}>
+            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
             <Button title={'知道了'}
                     onPress={() => {
                       this.closeAdvicesModal(this.state.advicesInfoArray.id)
                     }}
-                    buttonStyle={styles.modalBtnWrapWhite}
+                    buttonStyle={[styles.modalBtnWrapWhite, {width: '100%'}]}
                     titleStyle={styles.modalBtnTextGreen}
             />
             </View>
@@ -171,33 +179,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
-  modalContainer: {height: 200, paddingHorizontal: 20, marginTop: 20},
+  modalContainer: {height: 200, paddingHorizontal: 20, marginTop: pxToDp(20)},
   modalContentText: {color: colors.fontBlack},
   modalContentWrap:{
     width:'80%',
-    backgroundColor: colors.colorEEE,
+    backgroundColor: colors.white,
     borderRadius:8,
     position: "relative"
   },
-  modalContentTitle: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems:'center',
-    justifyContent: "center"
-  },
-  modalContentIcon: {
-    flex: 1,
-    position: "absolute",
-    right: 0,
-    top: 0
-  },
-  modalContentTitleText: {
-    fontSize:16,
-    fontWeight:'bold',
-    paddingTop:8,
-    paddingBottom:8,
-    lineHeight:25
-  },
+  modalContentTitle: {flexDirection: "row", padding: 10, paddingBottom: 0, justifyContent: "flex-end", alignItems: "center"},
+  modalContentIcon: {flexDirection: "row", justifyContent: "flex-end", width: '10%'},
+  modalContentTitleText: {textAlign: 'center', color: colors.title_color, fontWeight: "bold", flex: 1, fontSize: pxToDp(28)},
   closeIcon: {
     fontSize: 35,
     color: colors.fontColor
@@ -208,7 +200,6 @@ const styles = StyleSheet.create({
   },
   modalBtnWrapWhite:{
     backgroundColor: colors.colorEEE,
-    marginLeft:20,
     marginRight:20
   },
   modalBtnWrap1:{
