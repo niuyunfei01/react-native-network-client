@@ -725,6 +725,7 @@ class MineScene extends PureComponent {
         show_call_service_modal: true
       })
     }
+    this.mixpanel.track('我的_联系客服')
     this.openMiniprogarm()
   }
 

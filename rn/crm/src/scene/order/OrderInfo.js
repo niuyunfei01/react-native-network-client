@@ -960,7 +960,7 @@ class OrderInfo extends Component {
   }
 
   dialPhone = (val) => {
-
+    this.mixpanel.track('订单详情页_拨打')
     native.dialNumber(val)
   }
 
