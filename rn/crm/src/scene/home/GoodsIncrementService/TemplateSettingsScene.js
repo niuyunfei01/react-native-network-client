@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 261,
     borderColor: colors.colorCCC,
-    borderRadius: 8
+    borderRadius: 8,
+    textAlignVertical: 'top'
   },
   row: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   applyBtn: {

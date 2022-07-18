@@ -46,7 +46,6 @@ class ServiceChargeInfo extends PureComponent {
       store_id: global.currStoreId,
       date: self.props.route.params.day
     }).then(res => {
-      console.log(res, 'res')
       self.setState({
         records: res.records,
         by_labels: res.by_labels,
