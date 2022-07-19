@@ -1,11 +1,33 @@
 import React, {PureComponent} from "react";
-import {View, Text, ScrollView, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet} from 'react-native'
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
-import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import {receiveIncrement} from "../../../reducers/mine/mineActions";
+import colors from "../../../pubilc/styles/colors";
+
+const styles = StyleSheet.create({
+  saveZoneWrap: {justifyContent: 'flex-end', backgroundColor: colors.white, flexDirection: 'row'},
+  yearWrap: {
+    flex: 1,
+    marginTop: 6,
+    marginBottom: 6,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 2,
+    backgroundColor: colors.main_color,
+  },
+  monthWrap: {
+    flex: 1,
+    marginTop: 6,
+    marginBottom: 6,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 2,
+    backgroundColor: colors.colorCCC,
+  }
+})
 
 const DESCRIPTION_LIST = [
   {
@@ -32,13 +54,13 @@ class IncrementServiceDescription extends PureComponent {
 
   }
 
-  useIncrementService = () => {
+  useIncrementService = (open_type = '2') => {
     const {currStoreId, accessToken} = this.props.global
 
     const params = {
       store_id: currStoreId,
       open_serv: ['bad_notify', 'auto_reply', 'auto_pack'],
-      open_type: '2',
+      open_type: open_type,
       confirm: '0'
     }
     const api = `/v1/new_api/added/service_open?access_token=${accessToken}`
@@ -51,21 +73,21 @@ class IncrementServiceDescription extends PureComponent {
         {
           text: '确定',
           style: 'default',
-          onPress: () => this.openService()
+          onPress: () => this.openService(open_type)
         }
       ])
     }).catch(error => showError(error.reason))
 
   }
 
-  openService = () => {
+  openService = (open_type = '2') => {
     const {currStoreId, accessToken} = this.props.global
     const {increment} = this.props.mine
     const {dispatch} = this.props
     const params = {
       store_id: currStoreId,
       open_serv: ['bad_notify', 'auto_reply', 'auto_pack'],
-      open_type: '2',
+      open_type: open_type,
       confirm: '1'
     }
     const api = `/v1/new_api/added/service_open?access_token=${accessToken}`
@@ -102,12 +124,26 @@ class IncrementServiceDescription extends PureComponent {
             })
           }
         </ScrollView>
-        <View style={Styles.saveZoneWrap}>
-          <TouchableOpacity style={Styles.saveWrap} onPress={this.useIncrementService}>
-            <Text style={Styles.saveText}>
-              {increment.incrementStatus ? '续费' : '开通功能'}
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.saveZoneWrap}>
+          <If condition={!increment.incrementStatus}>
+            <TouchableOpacity style={Styles.saveWrap} onPress={() => this.useIncrementService('2')}>
+              <Text style={Styles.saveText}>
+                {'开通功能'}
+              </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={increment.incrementStatus}>
+            <TouchableOpacity style={styles.monthWrap} onPress={() => this.useIncrementService('2')}>
+              <Text style={Styles.saveText}>
+                {'续费月费'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.yearWrap} onPress={() => this.useIncrementService('1')}>
+              <Text style={Styles.saveText}>
+                {'续费年费'}
+              </Text>
+            </TouchableOpacity>
+          </If>
         </View>
       </>
     )

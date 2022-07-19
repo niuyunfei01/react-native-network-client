@@ -484,6 +484,7 @@ class MineScene extends PureComponent {
 
     const {dispatch, global} = this.props;
     const {accessToken, currStoreId} = global;
+    this.getServiceStatus(currStoreId, accessToken)
     dispatch(
       upCurrentProfile(accessToken, currStoreId, (ok, desc, obj) => {
         if (ok) {
