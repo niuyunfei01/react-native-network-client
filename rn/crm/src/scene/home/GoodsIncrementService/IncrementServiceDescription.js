@@ -25,7 +25,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     borderRadius: 2,
-    backgroundColor: colors.colorCCC,
+    borderColor: colors.main_color,
+    borderWidth: 1
+  },
+  monthText:{
+    fontSize: 16,
+    fontWeight: '400',
+    color: colors.main_color,
+    lineHeight: 22,
+    paddingTop: 7,
+    paddingBottom: 7,
+    textAlign: 'center'
   }
 })
 
@@ -124,30 +134,18 @@ class IncrementServiceDescription extends PureComponent {
             })
           }
         </ScrollView>
-        <If condition={!increment.incrementStatus}>
-          <View style={Styles.saveZoneWrap}>
-            <TouchableOpacity style={Styles.saveWrap} onPress={() => this.useIncrementService('2')}>
-              <Text style={Styles.saveText}>
-                {'开通功能'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </If>
-        <If condition={increment.incrementStatus}>
-          <View style={styles.saveZoneWrap}>
-            <TouchableOpacity style={styles.monthWrap} onPress={() => this.useIncrementService('2')}>
-              <Text style={Styles.saveText}>
-                {'续费月费'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.yearWrap} onPress={() => this.useIncrementService('1')}>
-              <Text style={Styles.saveText}>
-                {'续费年费'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </If>
-
+        <View style={styles.saveZoneWrap}>
+          <TouchableOpacity style={styles.monthWrap} onPress={() => this.useIncrementService('2')}>
+            <Text style={styles.monthText}>
+              {increment.incrementStatus ? '续费月费' : '开通月费'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.yearWrap} onPress={() => this.useIncrementService('1')}>
+            <Text style={Styles.saveText}>
+              {increment.incrementStatus ? '续费年费' : '开通年费'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </>
     )
   }
