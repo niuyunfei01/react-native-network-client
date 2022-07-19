@@ -124,15 +124,17 @@ class IncrementServiceDescription extends PureComponent {
             })
           }
         </ScrollView>
-        <View style={styles.saveZoneWrap}>
-          <If condition={!increment.incrementStatus}>
+        <If condition={!increment.incrementStatus}>
+          <View style={Styles.saveZoneWrap}>
             <TouchableOpacity style={Styles.saveWrap} onPress={() => this.useIncrementService('2')}>
               <Text style={Styles.saveText}>
                 {'开通功能'}
               </Text>
             </TouchableOpacity>
-          </If>
-          <If condition={increment.incrementStatus}>
+          </View>
+        </If>
+        <If condition={increment.incrementStatus}>
+          <View style={styles.saveZoneWrap}>
             <TouchableOpacity style={styles.monthWrap} onPress={() => this.useIncrementService('2')}>
               <Text style={Styles.saveText}>
                 {'续费月费'}
@@ -143,8 +145,9 @@ class IncrementServiceDescription extends PureComponent {
                 {'续费年费'}
               </Text>
             </TouchableOpacity>
-          </If>
-        </View>
+          </View>
+        </If>
+
       </>
     )
   }
