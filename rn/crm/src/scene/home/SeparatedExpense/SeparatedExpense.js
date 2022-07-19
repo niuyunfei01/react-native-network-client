@@ -863,7 +863,7 @@ const Styles = StyleSheet.create({
   expensesHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 8,
+    marginHorizontal: 10,
     backgroundColor: colors.white,
     borderBottomWidth: pxToDp(1),
     borderColor: '#ccc',
