@@ -1,5 +1,15 @@
 import React, {PureComponent} from 'react'
-import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
@@ -7,7 +17,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
-import {Button, Input} from "react-native-elements";
+import {Button} from "react-native-elements";
 import Config from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import BigImage from "../../common/component/BigImage";
@@ -43,26 +53,32 @@ class EbBindScene extends PureComponent {
   }
 
   accreditEbStore() {
-    let {accessToken, currStoreId} = this.props.global
     const notify = '1.通过非主应用绑定外卖店铺不可以创建和修改门店。2.一个门店最多可以绑定20个非主应用。'
     if (this.state.shop_id && this.state.applicationType > 0) {
-      Alert.alert('提示', `${notify}`, [{
-        text: '确认',
-        onPress: () => {
-          HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shop_id}/${currStoreId}/${this.state.applicationType}?access_token=${accessToken}`).then(res => {
-            if (res) {
-              this.props.navigation.navigate(Config.ROUTE_WEB, {
-                url: res
-              })
-            } else {
-              ToastLong("品牌不支持绑定，请联系管理员");
-            }
-          })
-        }
-      }, {text: '取消'}])
+      if (this.state.applicationType == 2) {
+        Alert.alert('提示', `${notify}`, [{
+          text: '确认',
+          onPress: () => this.ebAccreditUrl()
+        }, {text: '取消'}])
+      } else {
+        this.ebAccreditUrl()
+      }
     } else {
       Alert.alert('提示', '请完善门店id与应用类型', [{text: '确认'}])
     }
+  }
+
+  ebAccreditUrl = () => {
+    let {accessToken, currStoreId} = this.props.global
+    HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shop_id}/${currStoreId}/${this.state.applicationType}?access_token=${accessToken}`).then(res => {
+      if (res) {
+        this.props.navigation.navigate(Config.ROUTE_WEB, {
+          url: res
+        })
+      } else {
+        ToastLong("品牌不支持绑定，请联系管理员");
+      }
+    })
   }
 
   onToggleFullScreen(showImg = '') {
@@ -96,28 +112,17 @@ class EbBindScene extends PureComponent {
             />
           } style={{backgroundColor: colors.main_back, flexGrow: 1}}>
 
-          <View style={{
-            flexDirection: "row",
-            flex: 1,
-            backgroundColor: colors.white,
-            padding: pxToDp(20),
-            marginBottom: 4,
-          }}>
-            <Text style={{
-              flexGrow: 1,
-              fontSize: pxToDp(30),
-              lineHeight: pxToDp(70),
-              justifyContent: 'center',
-            }}>饿百门店ID :</Text>
-            <Input onChangeText={(shop_id) => this.setState({shop_id})}
-                   value={this.state.shop_id}
-                   containerStyle={[styles.input]}
-              // underlineColorAndroid='transparent'
-              // underlineColorAndroid='transparent' //取消安卓下划线
-            />
-          </View>
-
-          <View style={styles.infoBox}>
+          <View style={styles.headerBox}>
+            <View style={{flexDirection: "row", flex: 1}}>
+              <Text style={styles.headerBoxLabel}>饿百门店ID :</Text>
+              <TextInput placeholder="请输入饿百门店ID"
+                         underlineColorAndroid="transparent"
+                         style={styles.input}
+                         placeholderTextColor={'#999'}
+                         value={this.state.shop_id}
+                         onChangeText={(shop_id) => this.setState({shop_id})}
+              />
+            </View>
             <View style={styles.typeBox}>
               <Text style={[styles.labelLine, {marginBottom: pxToDp(10)}]}>应用类型：</Text>
               <ModalSelector
@@ -137,6 +142,9 @@ class EbBindScene extends PureComponent {
                 </View>
               </ModalSelector>
             </View>
+          </View>
+
+          <View style={styles.infoBox}>
             <Text style={[styles.labelLine, {marginBottom: pxToDp(10)}]}>店铺绑定引导：</Text>
             <Text style={styles.labelLine}>1.打开饿了么零售商家版App。</Text>
             <Text style={styles.labelLine}>2.在“我的“页面点击“店铺设置”</Text>
@@ -211,8 +219,7 @@ const styles = StyleSheet.create({
     width: '70%',
     borderWidth: pxToDp(1),
     textAlign: 'center',
-    height: pxToDp(70),
-    // justifyContent: 'center',
+    height: pxToDp(70)
   },
   image: {
     width: pxToDp(150),
@@ -226,10 +233,19 @@ const styles = StyleSheet.create({
     padding: pxToDp(20)
   },
   labelLine: {fontSize: pxToDp(30), marginTop: pxToDp(10)},
+  headerBox: {
+    flexDirection: "column",
+    flex: 1,
+    backgroundColor: colors.white,
+    padding: pxToDp(20),
+    marginBottom: 4,
+  },
+  headerBoxLabel: {flexGrow: 1, fontSize: pxToDp(30), lineHeight: pxToDp(70), justifyContent: 'center'},
   typeBox: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    marginTop: pxToDp(20)
   },
   body_text: {
     display: "flex",

@@ -683,14 +683,6 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
-        <If condition={item.pickType === "1" && item.orderStatus < 4}>
-          <View style={{flex: 1}}/>
-          <Button title={'到店核销'}
-                  onPress={() => this.openVeriFicationToShop()}
-                  buttonStyle={styles.veriFicationBtn}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </If>
         <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
           <Button title={'重新上传配送信息'}
                   onPress={() => {
@@ -706,6 +698,19 @@ class OrderListItem extends React.PureComponent {
           />
         </If>
       </View>
+    )
+  }
+
+  renderVerificationBtn = () => {
+    return (
+        <View style={styles.btnContent}>
+          <View style={{flex: 1}}/>
+          <Button title={'到店核销'}
+                  onPress={() => this.openVeriFicationToShop()}
+                  buttonStyle={styles.veriFicationBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </View>
     )
   }
 
@@ -728,7 +733,12 @@ class OrderListItem extends React.PureComponent {
           {this.renderUser()}
           {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
-          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.props.showBtn || this.props.comesBackBtn ? this.renderButton() : null}
+          <If condition={(Number(item.pickType) === 1 && item.orderStatus < 4)}>
+            {this.renderVerificationBtn()}
+          </If>
+          <If condition={Number(item.pickType) !== 1 && (this.props.showBtn || this.props.comesBackBtn)}>
+            {this.renderButton()}
+          </If>
           <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity
               onPress={() => this.openModalTipChangeInfo(item.store_id, item.id)} style={styles.noRunMan}>
