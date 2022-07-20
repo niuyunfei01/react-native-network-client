@@ -576,7 +576,7 @@ class SeparatedExpense extends PureComponent {
     return (
       <View style={Styles.WSBType}>
 
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => {
+        <TouchableOpacity style={this.state.show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn} onPress={() => {
           this.setState({
             choseTab: 1
           })
@@ -587,13 +587,17 @@ class SeparatedExpense extends PureComponent {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.serviceList()}>
-          <View style={[choseTab === 3 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={[Styles.color333, Styles.fontSize16]}> 发单服务费 </Text>
-          </View>
-        </TouchableOpacity>
 
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.rechargeRecord()}>
+        <If condition={this.state.show_service_msg}>
+          <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.serviceList()}>
+            <View style={[choseTab === 3 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
+              <Text style={[Styles.color333, Styles.fontSize16]}> 发单服务费 </Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+
+        <TouchableOpacity style={this.state.show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn}
+                          onPress={() => this.rechargeRecord()}>
           <View style={[choseTab === 2 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
             <Text style={[Styles.color333, Styles.fontSize16]}> 充值记录 </Text>
           </View>
