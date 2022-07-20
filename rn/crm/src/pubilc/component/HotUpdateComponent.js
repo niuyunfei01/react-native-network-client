@@ -114,8 +114,10 @@ export class HotUpdateComponent extends PureComponent {
       <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
         <View style={styles.modalWrap}>
           <View style={styles.modalContentWrap}>
-            <AntDesign name={'close'} style={styles.closeNewVersionModal} allowFontScaling={false}
-                       onPress={this.closeNewVersionInfo}/>
+            <If condition={newVersionInfo.force === 0}>
+              <AntDesign name={'close'} style={styles.closeNewVersionModal} allowFontScaling={false}
+                         onPress={this.closeNewVersionInfo}/>
+            </If>
             <View style={styles.center}>
               <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
             </View>
