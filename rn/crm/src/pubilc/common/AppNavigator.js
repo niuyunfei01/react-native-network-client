@@ -379,10 +379,10 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/product/Goods/StoreGoodsSearch').default}/>
         <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} options={{headerTitle: '绑定平台信息'}}
                       getComponent={() => require('../../scene/home/Platform/PlatformScene').default}/>
-        <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+        <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpense').default}
         />
-        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/OldSeparatedExpense').default}
         />
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}

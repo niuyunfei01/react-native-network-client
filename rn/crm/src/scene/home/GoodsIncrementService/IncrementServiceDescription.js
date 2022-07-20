@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     borderColor: colors.main_color,
     borderWidth: 1
   },
-  monthText:{
+  monthText: {
     fontSize: 16,
     fontWeight: '400',
     color: colors.main_color,
@@ -53,7 +53,7 @@ const DESCRIPTION_LIST = [
   {
     id: 2,
     title: '自动打包',
-    description: '自由设置来单x分钟后自动打包，节省处理时间，提升商家整体数据。'
+    description: '根据订单预计送达时间控制拣货时长，完成自动打包。'
   },
 ]
 
@@ -101,9 +101,14 @@ class IncrementServiceDescription extends PureComponent {
       confirm: '1'
     }
     const api = `/v1/new_api/added/service_open?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, params).then(() => {
+    HttpUtils.post.bind(this.props)(api, params).then((res) => {
+      const content = JSON.parse(res.content)
       showSuccess(increment.incrementStatus ? '续费成功' : '开通成功')
-      dispatch(receiveIncrement({...increment, incrementStatus: true}))
+      dispatch(receiveIncrement({
+        ...increment,
+        expire_date: content.expire_date,
+        incrementStatus: true
+      }))
     }).catch(error => showError(error.reason))
   }
 
