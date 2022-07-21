@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -253,7 +254,7 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         constants.put("apiLevel", Build.VERSION.SDK_INT);
         constants.put("deviceLocale", this.getCurrentLanguage());
         constants.put("deviceCountry", this.getCurrentCountry());
-        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
+        constants.put("uniqueId", UUID.randomUUID().toString());
         constants.put("systemManufacturer", Build.MANUFACTURER);
         constants.put("bundleId", packageName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
