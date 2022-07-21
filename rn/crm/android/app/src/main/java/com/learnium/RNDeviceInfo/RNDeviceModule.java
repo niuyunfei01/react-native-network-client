@@ -25,6 +25,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
+import org.xutils.common.util.MD5;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
@@ -33,6 +35,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 
 public class RNDeviceModule extends ReactContextBaseJavaModule {
@@ -254,7 +258,14 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         constants.put("apiLevel", Build.VERSION.SDK_INT);
         constants.put("deviceLocale", this.getCurrentLanguage());
         constants.put("deviceCountry", this.getCurrentCountry());
-        constants.put("uniqueId", UUID.randomUUID().toString());
+
+        String myId = SettingUtility.getMyUUID();
+        if ("".equals(myId)) {
+            myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+            SettingUtility.setMyUUID(myId);
+        }
+
+        constants.put("uniqueId", myId);
         constants.put("systemManufacturer", Build.MANUFACTURER);
         constants.put("bundleId", packageName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {

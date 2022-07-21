@@ -512,6 +512,14 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
     }
 
+    public static String getMyUUID() {
+        return SettingHelper.getSharedPreferences(getContext(), "wsb_my_uuid", "");
+    }
+
+    public static void setMyUUID(String isChecked) {
+        SettingHelper.setEditor(getContext(), "wsb_my_uuid", isChecked);
+    }
+
     public static void setDisableNewOrderSoundNotify(boolean isChecked) {
         SettingHelper.setEditor(getContext(), "disable_new_order_sound_notify", isChecked);
     }
