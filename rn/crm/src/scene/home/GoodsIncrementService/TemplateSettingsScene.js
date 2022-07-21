@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   textInput: {
+    padding: 8,
     marginTop: 8,
     marginBottom: 8,
     marginLeft: 15,
@@ -88,7 +89,7 @@ export default class TemplateSettingsScene extends PureComponent {
       selectItem: '-1',
       tempValue: {
         defaultTemp: '',
-        customerTemp: ''
+        customerTemp: props.route.params.store.tpl_content
       }
     }
     this.getDefaultTempContent(props.route.params.store)

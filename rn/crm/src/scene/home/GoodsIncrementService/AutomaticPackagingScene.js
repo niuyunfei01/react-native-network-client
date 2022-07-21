@@ -75,12 +75,12 @@ class AutomaticPackagingScene extends PureComponent {
   saveSetting = () => {
     const {global} = this.props
     const {accessToken, currStoreId} = global
-    const {packageTime, packageStatus} = this.state
+    const {packageStatus} = this.state
     const api = `/v1/new_api/added/auto_pack?access_token=${accessToken}`
     const params = {
       store_id: currStoreId,
       auto_pack: packageStatus,
-      pack_time: packageTime
+      pack_time: 0
     }
     HttpUtils.post(api, params).then(() => {
       showSuccess('保存成功')
@@ -88,7 +88,7 @@ class AutomaticPackagingScene extends PureComponent {
   }
 
   render() {
-    const {packageTime, packageStatus} = this.state
+    const {packageStatus} = this.state
     return (
       <>
         <ScrollView>
@@ -98,32 +98,6 @@ class AutomaticPackagingScene extends PureComponent {
             </Text>
             <Switch value={packageStatus === 'on'} onValueChange={value => this.onValueChange(value)}/>
           </View>
-          <If condition={packageStatus === 'on'}>
-            <View style={styles.rowWrap}>
-              <View style={styles.rowContentWrap}>
-                <Text style={styles.description}>
-                  订单
-                </Text>
-                <View style={styles.contentWrap}>
-                  <Text style={styles.text}>
-                    来单后
-                  </Text>
-                  <TextInput style={styles.textInput}
-                             value={packageTime}
-                             keyboardType={'numeric'}
-                             onChangeText={text => this.onChangeText(text)}
-                             allowFontScaling={false}/>
-                  <Text style={styles.rightText}>
-                    分钟后自动打包
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.tipText}>
-                支持所有平台自动打包
-              </Text>
-            </View>
-
-          </If>
         </ScrollView>
         <View style={Styles.saveZoneWrap}>
           <TouchableOpacity style={Styles.saveWrap} onPress={this.saveSetting}>

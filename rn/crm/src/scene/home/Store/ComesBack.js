@@ -111,10 +111,10 @@ class ComesBack extends PureComponent {
               <Text style={{fontSize: 14, color: colors.color333}}>{item.ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>
                 <Text style={{fontSize: 12, color: colors.color333}}>今日回传： </Text>
-                <Text style={{fontSize: 14, color: colors.main_color}}>{item.today_sync_rate}% </Text>
+                <Text style={{fontSize: 14, color: item.today_sync_color}}>{item.today_sync_rate}% </Text>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <Text style={{fontSize: 12, color: colors.color333}}>昨日回传：</Text>
-                <Text style={{fontSize: 14, color: colors.red}}>{item.yesterday_sync_rate}% </Text>
+                <Text style={{fontSize: 14, color: item.yesterday_sync_color}}>{item.yesterday_sync_rate}% </Text>
               </Text>
             </View>
           </View>

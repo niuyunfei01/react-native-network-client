@@ -157,12 +157,24 @@ class AutomaticFeedbackScene extends PureComponent {
   touchTempDetail = (item) => {
     const {global} = this.props
     const {currStoreId, accessToken} = global
-    const {selectStore} = this.state
+    const {selectStore, settings} = this.state
+    let tpl_content = ''
+    Object.keys(settings).map(key => {
+      if (key === selectStore.id) {
+        const storeInfo = settings[key]
+        Object.keys(storeInfo?.tpl).map(tplKey => {
+          if (tplKey === `${item.id}`) {
+            tpl_content = storeInfo.tpl[tplKey].tpl_content
+          }
+        })
+      }
+    })
     this.props.navigation.navigate(Config.ROUTE_TEMPLATE_SETTINGS, {
       store: {
         store_id: currStoreId,
         ext_store_id: selectStore.value,
         tpl_level: `${item.id}`,
+        tpl_content: tpl_content,
         title: item.title,
         accessToken: accessToken
       }

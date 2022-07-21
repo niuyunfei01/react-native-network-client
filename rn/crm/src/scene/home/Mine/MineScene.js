@@ -484,6 +484,7 @@ class MineScene extends PureComponent {
 
     const {dispatch, global} = this.props;
     const {accessToken, currStoreId} = global;
+    this.getServiceStatus(currStoreId, accessToken)
     dispatch(
       upCurrentProfile(accessToken, currStoreId, (ok, desc, obj) => {
         if (ok) {
@@ -608,8 +609,13 @@ class MineScene extends PureComponent {
     const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
     const {dispatch} = this.props
     HttpUtils.get(api).then(res => {
-      const status = new Date(time) < new Date(res.expire_date)
-      dispatch(receiveIncrement({...res, expire_date: status ? res.expire_date : '已到期', incrementStatus: status}))
+      const {is_new, expire_date} = res
+      const status = new Date(time) < new Date(expire_date)
+      dispatch(receiveIncrement({
+        ...res,
+        expire_date: is_new === 1 ? '未开通' : status ? expire_date : '已到期',
+        incrementStatus: status
+      }))
     }).catch(error => {
       dispatch(receiveIncrement({
         auto_pack: {
@@ -624,7 +630,7 @@ class MineScene extends PureComponent {
           expire_date: '',
           status: 'off'
         },
-        expire_date: '已到期',
+        expire_date: '未开通',
         incrementStatus: false
       }))
       showError(error.reason)

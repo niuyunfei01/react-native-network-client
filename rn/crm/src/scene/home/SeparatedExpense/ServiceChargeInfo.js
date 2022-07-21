@@ -95,7 +95,6 @@ class ServiceChargeInfo extends PureComponent {
           <View style={{paddingVertical: 12, paddingHorizontal: 10, backgroundColor: colors.background}}>
             {records.map((item, idx) => {
               return <List.Item arrow="horizontal"
-                                style={{borderRadius: 4,}}
                                 key={idx}
                                 multipleLine
                                 onClick={() => this.onItemClicked(item)}

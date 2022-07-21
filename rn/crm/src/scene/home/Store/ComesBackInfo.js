@@ -62,6 +62,8 @@ class OrderQueryResultScene extends PureComponent {
       today_sync_rate: 90,
       yesterday_sync_rate: 90,
       failed: 0,
+      today_sync_color: "",
+      yesterday_sync_color: "",
     };
     this.renderItem = this.renderItem.bind(this);
   }
@@ -78,6 +80,8 @@ class OrderQueryResultScene extends PureComponent {
         ext_store_name: res.ext_store_name,
         today_sync_rate: res.today_sync_rate,
         yesterday_sync_rate: res.yesterday_sync_rate,
+        today_sync_color: res.today_sync_color,
+        yesterday_sync_color: res.yesterday_sync_color,
         failed: res.today ? res.today.failed : 0,
       })
     })
@@ -163,6 +167,8 @@ class OrderQueryResultScene extends PureComponent {
       yesterday_sync_rate,
       ext_store_name,
       failed,
+      today_sync_color,
+      yesterday_sync_color,
     } = this.state
     return (
       <View>
@@ -185,10 +191,10 @@ class OrderQueryResultScene extends PureComponent {
               <Text style={{fontSize: 14, color: colors.color333}}>{ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>
                 <Text style={{fontSize: 12, color: colors.color333}}>今日回传： </Text>
-                <Text style={{fontSize: 14, color: colors.main_color}}>{today_sync_rate}% </Text>
+                <Text style={{fontSize: 14, color: today_sync_color}}>{today_sync_rate}% </Text>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <Text style={{fontSize: 12, color: colors.color333}}>昨日回传：</Text>
-                <Text style={{fontSize: 14, color: colors.red}}>{yesterday_sync_rate}% </Text>
+                <Text style={{fontSize: 14, color: yesterday_sync_color}}>{yesterday_sync_rate}% </Text>
               </Text>
             </View>
           </View>

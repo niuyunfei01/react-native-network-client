@@ -39,7 +39,7 @@ const initialState = {
       expire_date: '',
       status: 'off'
     },
-    expire_date: '已到期',
+    expire_date: '未开通',
     incrementStatus: false
   }
 };

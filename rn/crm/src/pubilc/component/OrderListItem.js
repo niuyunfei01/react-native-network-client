@@ -478,19 +478,22 @@ class OrderListItem extends React.PureComponent {
           <View style={styles.ItemHeader}/>
           <Text style={styles.ItemHeaderTitle}>预 </Text>
         </If>
-        <If condition={item.pickType === "1"}>
-          <View style={styles.pickType1}>
-            <Text style={styles.pickType1Text}>到店自提 </Text>
-          </View>
-        </If>
 
-        <View style={[styles.ItemHeaderInfo, {top: item.pickType !== "1" ? 10 : 24}]}>
+        <View style={[styles.ItemHeaderInfo, {top: item.pickType !== "1" ? 10 : 20}]}>
           <Image source={{uri: item.platformIcon}}
                  style={styles.platformIcon}/>
           <View style={styles.platformId}>
             {/*<Text style={[styles.platformText, {marginLeft: 10, fontSize: 16}]}># </Text>*/}
-            <Text style={[styles.platformText, {marginLeft: 10, fontSize: 24}]}>{item.platform_dayId} </Text>
-            <Text style={styles.platformDayId}>总#{item.dayId} </Text>
+            <Text
+              style={[styles.platformText, {marginLeft: 10, fontSize: 28}]}>{item.platform_dayId} </Text>
+            <Text style={[styles.platformDayId, {marginBottom: 7}]}>总#{item.dayId} </Text>
+
+            <If condition={item.pickType === "1"}>
+              <View style={styles.pickType1}>
+                <Text style={styles.pickType1Text}> 到店自提 </Text>
+              </View>
+            </If>
+
             <If condition={Number(item.orderStatus) === 5}>
               <Text style={styles.orderCancelDesc}>订单已取消 </Text>
             </If>
@@ -501,7 +504,7 @@ class OrderListItem extends React.PureComponent {
           <View style={{flexDirection: 'row', marginTop: item.is_right_once ? 10 : 50, marginLeft: 26}}>
             <Text style={styles.pickTypeText}> 预计 </Text>
             <Text style={styles.humanExpectTime}> {item.humanExpectTime} </Text>
-            <Text style={styles.pickTypeText}> 前送达 </Text>
+            <Text style={styles.pickTypeText}> 送达 </Text>
           </View>
         </If>
 
@@ -680,14 +683,6 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
-        <If condition={item.pickType === "1" && item.orderStatus < 4}>
-          <View style={{flex: 1}}/>
-          <Button title={'到店核销'}
-                  onPress={() => this.openVeriFicationToShop()}
-                  buttonStyle={styles.veriFicationBtn}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </If>
         <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
           <Button title={'重新上传配送信息'}
                   onPress={() => {
@@ -703,6 +698,19 @@ class OrderListItem extends React.PureComponent {
           />
         </If>
       </View>
+    )
+  }
+
+  renderVerificationBtn = () => {
+    return (
+        <View style={styles.btnContent}>
+          <View style={{flex: 1}}/>
+          <Button title={'到店核销'}
+                  onPress={() => this.openVeriFicationToShop()}
+                  buttonStyle={styles.veriFicationBtn}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </View>
     )
   }
 
@@ -725,7 +733,12 @@ class OrderListItem extends React.PureComponent {
           {this.renderUser()}
           {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
-          {(Number(item.pickType) === 1 && item.orderStatus < 4) || this.props.showBtn || this.props.comesBackBtn ? this.renderButton() : null}
+          <If condition={(Number(item.pickType) === 1 && item.orderStatus < 4)}>
+            {this.renderVerificationBtn()}
+          </If>
+          <If condition={Number(item.pickType) !== 1 && (this.props.showBtn || this.props.comesBackBtn)}>
+            {this.renderButton()}
+          </If>
           <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity
               onPress={() => this.openModalTipChangeInfo(item.store_id, item.id)} style={styles.noRunMan}>
@@ -1071,7 +1084,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   platformText: {fontWeight: 'bold', color: colors.color333},
-  platformDayId: {fontSize: 14, color: colors.color333, marginLeft: 10},
+  platformDayId: {fontSize: 12, color: colors.color333, marginLeft: 10},
   orderCancelDesc: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -1083,15 +1096,16 @@ const styles = StyleSheet.create({
   humanExpectTime: {fontWeight: "bold", fontSize: 14, color: "#FF8854"},
   pickType1: {
     backgroundColor: "#3CABFF",
-    borderBottomRightRadius: 8,
-    width: 66,
-    height: 19,
+    borderRadius: 2,
+    padding: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 10,
+    marginBottom: 7
   },
   pickType1Text: {
     color: colors.white,
-    fontSize: 14,
+    fontSize: 12,
   },
   contentHeader: {
     paddingVertical: 10,
