@@ -80,10 +80,6 @@ class LoginScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount = () => {
-
-    const {dispatch} = this.props;
-    dispatch(logout());
-
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
@@ -223,6 +219,7 @@ class LoginScene extends PureComponent {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
+    dispatch(logout());
 
     dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {

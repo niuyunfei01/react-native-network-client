@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import {
   check_is_bind_ext,
   customerApply,
-  getCommonConfig,
+  getCommonConfig, logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 
@@ -182,6 +182,7 @@ class ApplyScene extends PureComponent {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
+    dispatch(logout());
     dispatch(customerApply(data, (success, msg, res) => {
       hideModal();
       this.setState({doingApply: false})
