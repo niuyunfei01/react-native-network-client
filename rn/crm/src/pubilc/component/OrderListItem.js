@@ -930,6 +930,7 @@ class OrderListItem extends React.PureComponent {
                       <View style={styles.driverContent}>
                         <Text style={styles.driverText}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                       </View>
+                      {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
                       <View style={styles.btnList}>
                         <If condition={info.btn_lists.can_cancel === 1}>
                           <Button title={'撤回呼叫'}
