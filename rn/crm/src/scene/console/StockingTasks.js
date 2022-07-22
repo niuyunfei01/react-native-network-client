@@ -21,9 +21,9 @@ class StockingTasks extends PureComponent {
       id: '',
       label: '全部摊位'
     },
-    stockList: [],//备货列表
+    stockList: [],//拣货列表
     stallArray: [],//摊位数组
-    selectType: '1',//1-待备货，2-已备货
+    selectType: '1',//1-待拣货，2-已拣货
     selectItem: -1,
     page: 1,
     pageSize: 10,
@@ -159,13 +159,13 @@ class StockingTasks extends PureComponent {
           }
           <If condition={selectType === '2'}>
             <Text style={styles.stallSuccessText}>
-              {time}备货完成
+              {time}拣货完成
             </Text>
           </If>
           <If condition={selectType === '1'}>
             <TouchableOpacity style={styles.stallSuccessBtn} onPress={() => this.stallSuccessBtn(id)}>
               <Text style={styles.stallSuccessBtnText}>
-                备货完成
+                拣货完成
               </Text>
             </TouchableOpacity>
           </If>
@@ -180,7 +180,7 @@ class StockingTasks extends PureComponent {
     const params = {id: id}
     const {page, stall, selectType} = this.state
     HttpUtils.post.bind(this.props)(url, params).then(() => {
-      ToastShort('备货完成')
+      ToastShort('拣货完成')
       this.getStallList(page, stall, selectType, false)
     })
   }
@@ -207,12 +207,12 @@ class StockingTasks extends PureComponent {
                 </View>
                 <If condition={status === '2'}>
                   <Text style={styles.alreadyStock}>
-                    {time}备货完成
+                    {time}拣货完成
                   </Text>
                 </If>
                 <If condition={status === '1'}>
                   <Text style={styles.prepareStock}>
-                    待备货
+                    待拣货
                   </Text>
                 </If>
               </View>
@@ -266,13 +266,13 @@ class StockingTasks extends PureComponent {
         <TouchableOpacity style={'1' === selectType ? styles.selectedItem : styles.notSelectItem}
                           onPress={() => this.selectType('1')}>
           <Text style={'1' === selectType ? styles.selectedItemText : styles.notSelectedItemText}>
-            待备货
+            待拣货
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={'2' === selectType ? styles.selectedItem : styles.notSelectItem}
                           onPress={() => this.selectType('2')}>
           <Text style={'2' === selectType ? styles.selectedItemText : styles.notSelectedItemText}>
-            已备货
+            已拣货
           </Text>
         </TouchableOpacity>
       </View>
@@ -310,7 +310,7 @@ class StockingTasks extends PureComponent {
 
   listEmpty = () => {
     const {selectType} = this.state
-    const tip = selectType === '1' ? '暂无待备货订单' : '暂无已备货订单'
+    const tip = selectType === '1' ? '暂无待拣货订单' : '暂无已拣货订单'
     return (
       <View style={styles.listEmptyWrap}>
         <FontAwesome5 name={'list-alt'} style={styles.listEmptyIcon}/>

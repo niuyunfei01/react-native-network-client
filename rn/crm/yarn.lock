@@ -2662,6 +2662,14 @@ buffer@^5.4.3:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
 
+buffer@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.npmmirror.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
+
 builtin-modules@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/builtin-modules/-/builtin-modules-1.1.1.tgz#270f076c5a72c02f5b65a47df94c5fe3a278892f"
@@ -4446,7 +4454,7 @@ iconv-lite@^0.6.2, iconv-lite@^0.6.3:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-ieee754@^1.1.13:
+ieee754@^1.1.13, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
@@ -5713,6 +5721,11 @@ lodash.truncate@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
+
+lodash@4.17.15:
+  version "4.17.15"
+  resolved "https://registry.npmmirror.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
+  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
 lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.4, lodash@^4.3.0, lodash@^4.6.1, lodash@^4.7.0:
   version "4.17.21"
@@ -7737,12 +7750,9 @@ rmc-picker@~5.0.0:
     rmc-dialog "^1.1.1"
     rmc-feedback "^2.0.0"
 
-rn-app-upgrade@^2.1.7:
+"rn-app-upgrade@git+ssh://git@github.com/Bilinxian/react-native-app-upgrade.git":
   version "2.1.8"
-  resolved "https://registry.yarnpkg.com/rn-app-upgrade/-/rn-app-upgrade-2.1.8.tgz#7b854ceb7c4ea493370cbe71a3ac8dca3c8e2016"
-  integrity sha512-qFhf4Fby6J9fBoG0tqjZXuXmYBuc26Ftf8oqDLhqDJtFIrxiY8mzstX7Y5/bG1l5LkxXSu2394BwGJryzmBfwA==
-  dependencies:
-    rn-fetch-blob "^0.12.0"
+  resolved "git+ssh://git@github.com/Bilinxian/react-native-app-upgrade.git#dba01c923457b2d01219919ca2804fbf8bc62a99"
 
 rn-fetch-blob@0.10.15:
   version "0.10.15"
@@ -7752,21 +7762,14 @@ rn-fetch-blob@0.10.15:
     base-64 "0.1.0"
     glob "7.0.6"
 
-rn-fetch-blob@^0.10.15:
-  version "0.10.16"
-  resolved "https://registry.yarnpkg.com/rn-fetch-blob/-/rn-fetch-blob-0.10.16.tgz#bd54f66c94f7a8e06c213077483646478ae8d230"
-  integrity sha512-hZV+nF0HK4CWmspXGMw7/G8Q8qugpS/wbKiNLsFpdBZR8XYzjFZNvBWgGyC0F5JWQn3sjmK2w/FJjBlwdQWNQg==
+rn-fetch-blob@^0.13.0-beta-1:
+  version "0.13.0-beta-1"
+  resolved "https://registry.npmmirror.com/rn-fetch-blob/-/rn-fetch-blob-0.13.0-beta-1.tgz#8f6d68c2b8ee0bce3df36f5ad90d6099e57bf90b"
+  integrity sha512-zM5kd7fNyOTbG9Aoup+wGhFa2QklZeP8iEzGegpjYsmToD5EAXQN7Y8Op8MPc2/1UGMVHuKMvYHMchNuaSHcew==
   dependencies:
     base-64 "0.1.0"
     glob "7.0.6"
-
-rn-fetch-blob@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/rn-fetch-blob/-/rn-fetch-blob-0.12.0.tgz#ec610d2f9b3f1065556b58ab9c106eeb256f3cba"
-  integrity sha512-+QnR7AsJ14zqpVVUbzbtAjq0iI8c9tCg49tIoKO2ezjzRunN7YL6zFSFSWZm6d+mE/l9r+OeDM3jmb2tBb2WbA==
-  dependencies:
-    base-64 "0.1.0"
-    glob "7.0.6"
+    lodash "4.17.15"
 
 rsvp@^4.8.4:
   version "4.8.5"

@@ -268,7 +268,6 @@ class OrderBottom extends PureComponent {
         <If condition={btn_list && btn_list.btn_resend_white}>
           <Button title={'补 送'}
                   onPress={() => {
-                    this.mixpanel.track('订单详情页_补送')
                     this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
                   }}
                   buttonStyle={{
@@ -305,6 +304,7 @@ class OrderBottom extends PureComponent {
         <If condition={btn_list && btn_list.btn_resend}>
           <Button title={'补  送'}
                   onPress={() => {
+                    this.mixpanel.track('订单详情页_补送')
                     this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
                   }}
                   buttonStyle={{

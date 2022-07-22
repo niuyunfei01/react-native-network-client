@@ -1,5 +1,5 @@
-import React from 'react'
-import ReactNative, {StyleSheet, TouchableOpacity} from 'react-native'
+import React, {PureComponent} from 'react'
+import {FlatList, Text, InteractionManager, View, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -17,15 +17,7 @@ import {SearchBar} from "../../weui";
 import {calcMs} from '../../pubilc/util/AppMonitorInfo'
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-
-const {
-  FlatList,
-  Text,
-  InteractionManager,
-  View,
-  SafeAreaView
-} = ReactNative;
-const {PureComponent} = React;
+import Config from "../../pubilc/common/config";
 
 function mapStateToProps(state) {
   const {remind, global, device} = state;
@@ -66,13 +58,8 @@ class OrderQueryResultScene extends PureComponent {
     const {navigation, route} = this.props
     let title = ''
     let type = 'done'
-    if (tool.length(route.params.term) > 0) {
-      title = `订单中搜索:${route.params.term || ""}`
-      type = 'search'
-    } else {
-      title = '全部订单'
-      this.mixpanel.track("全部的订单")
-    }
+    title = '全部订单'
+    this.mixpanel.track("全部的订单")
     if (route.params.additional !== undefined && route.params.additional) {
       title = '补送单'
       type = 'additional'
@@ -96,8 +83,7 @@ class OrderQueryResultScene extends PureComponent {
       selectStatus: STATUS_FILTER[0]
     };
     navigation.setOptions({headerTitle: title})
-    this.onSearch('', false)
-    this.renderItem = this.renderItem.bind(this);
+
   }
 
   onRefresh = () => {
@@ -121,8 +107,8 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   onEndReached() {
-    const query = this.state.query;
-    if (this.state.end) {
+    const {query, end} = this.state;
+    if (end) {
       ToastShort('没有更多数据了')
       return null
     }
@@ -132,7 +118,7 @@ class OrderQueryResultScene extends PureComponent {
     })
   }
 
-  renderItem(order) {
+  renderItem = (order) => {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={false}
@@ -157,7 +143,7 @@ class OrderQueryResultScene extends PureComponent {
           extraData={orders}
           data={orders}
           renderItem={this.renderItem}
-          onRefresh={this.onRefresh.bind(this)}
+          onRefresh={() => this.onRefresh()}
           onEndReachedThreshold={0.1}
           // onEndReached={this.onEndReached.bind(this)}
           onEndReached={() => {
@@ -174,28 +160,25 @@ class OrderQueryResultScene extends PureComponent {
           refreshing={this.state.isLoading}
           keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
-          // getItemLayout={this._getItemLayout}
-          ListEmptyComponent={() =>
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              flexDirection: 'row',
-              height: 210
-            }}>
-              <If condition={!this.state.isLoading}>
-                <Text style={{fontSize: 18, color: colors.fontColor}}>
-                  未搜索到订单
-                </Text>
-              </If>
-
-            </View>}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={this.listEmptyComponent()}
           initialNumToRender={5}
         />
       </SafeAreaView>
     );
   }
 
+  listEmptyComponent = () => {
+    return (
+      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
+        <If condition={!this.state.isLoading}>
+          <Text style={{fontSize: 18, color: colors.fontColor}}>
+            未搜索到订单
+          </Text>
+        </If>
+      </View>
+    )
+  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
@@ -220,6 +203,7 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   componentDidMount() {
+    this.onSearch('', false)
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -241,10 +225,10 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   render() {
-    const orders = this.state.orders || []
+    const {orders, type} = this.state || []
     return (
       <View style={{flex: 1, backgroundColor: colors.back_color}}>
-        <If condition={this.state.type === 'done'}>
+        <If condition={type === 'done'}>
           {this.renderHeader()}
         </If>
         {this.renderContent(orders)}
@@ -253,16 +237,13 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   onSearch = (keywords, isSearch) => {
-    const {isLoading, date, platformBtn, selectStatus, query, orders, type} = this.state
+    const {isLoading, date, platformBtn, selectStatus, query, orders} = this.state
     if (isLoading) {
       return
     }
     showModal("加载中...")
     this.setState({isLoading: true})
-    if (type === 'additional' || type === 'search') {
-      this.fetchOrders(query)
-      return;
-    }
+
     let params = {
       search_date: date,
       platform: platformBtn,
@@ -305,66 +286,6 @@ class OrderQueryResultScene extends PureComponent {
     })
   };
 
-  fetchOrders = (query) => {
-    const {accessToken, currStoreId} = this.props.global;
-    const {currVendorId} = tool.vendor(this.props.global);
-    const params = {
-      vendor_id: currVendorId,
-      offset: (query.page - 1) * query.limit,
-      limit: query.limit,
-      use_v2: 1
-    }
-    let url = `/api/orders.json?access_token=${accessToken}`;
-    if (this.state.type === 'search') {
-      const {term, max_past_day} = this.props.route.params
-      params.max_past_day = max_past_day || query.maxPastDays;
-      params.search = encodeURIComponent(term);
-      if ("invalid:" === term) {
-        params.status = Cts.ORDER_STATUS_INVALID
-      }
-    } else if (this.state.type === 'additional') {
-      params.store_id = currStoreId;
-      url = `/api/get_three_day_delivery_order?access_token=${accessToken}`;
-    } else {
-      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
-      params.status = Cts.ORDER_STATUS_DONE;
-    }
-    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchOrders',
-        executeTime: res.endTime - res.startTime
-      })
-      const {obj} = res
-      hideModal()
-      if (tool.length(obj.orders) < this.state.query.limit) {
-        this.setState({
-          end: true,
-        })
-      }
-      let orders = this.state.orders.concat(obj.orders)
-      this.setState({
-        orders: orders,
-        isLoading: false,
-      })
-
-    }, (res) => {
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchOrders',
-        executeTime: res.endTime - res.startTime
-      })
-      this.setState({isLoading: false})
-      showError(res.reason)
-
-    })
-  }
   selectItem = (item) => {
     this.setState({
       selectStatus: item,
@@ -373,12 +294,18 @@ class OrderQueryResultScene extends PureComponent {
     })
   }
 
+  jumpToSearch = () => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH);
+    });
+
+  }
+
   renderHeader() {
     const {selectStatus, date, showDatePicker, dateBtn, platform, platformBtn} = this.state
     return (
-      <View>
-        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onBlurSearch={(keywords) => this.onSearch(keywords, true)}
-                   lang={{cancel: '搜索'}}/>
+      <>
+        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onFocus={this.jumpToSearch}/>
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}
@@ -419,10 +346,7 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text style={{
-              fontSize: 12,
-              color: dateBtn === 1 ? colors.white : colors.fontBlack,
-            }}>今天</Text>
+            <Text style={{fontSize: 12, color: dateBtn === 1 ? colors.white : colors.fontBlack}}>今天</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
@@ -440,10 +364,7 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text style={{
-              fontSize: 12,
-              color: dateBtn === 2 ? colors.white : colors.fontBlack,
-            }}>昨天</Text>
+            <Text style={{fontSize: 12, color: dateBtn === 2 ? colors.white : colors.fontBlack}}>昨天</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
@@ -459,10 +380,7 @@ class OrderQueryResultScene extends PureComponent {
             justifyContent: 'center',
             padding: pxToDp(10),
           }}>
-            <Text style={{
-              fontSize: 12,
-              color: dateBtn === 3 ? colors.white : colors.fontBlack,
-            }}>自定义</Text>
+            <Text style={{fontSize: 12, color: dateBtn === 3 ? colors.white : colors.fontBlack}}>自定义</Text>
           </TouchableOpacity>
         </View>
 
@@ -483,10 +401,9 @@ class OrderQueryResultScene extends PureComponent {
               justifyContent: 'center',
               padding: pxToDp(10),
             }}>
-              <Text style={{
-                fontSize: 12,
-                color: platformBtn === info.id ? colors.white : colors.fontBlack,
-              }}>{info.label} </Text>
+              <Text style={{fontSize: 12, color: platformBtn === info.id ? colors.white : colors.fontBlack}}>
+                {info.label}
+              </Text>
             </TouchableOpacity>
           </For>
 
@@ -508,7 +425,7 @@ class OrderQueryResultScene extends PureComponent {
             })
           }
         </View>
-      </View>
+      </>
     )
   }
 

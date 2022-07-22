@@ -14,6 +14,7 @@ import Dialog from "../../common/component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 
 function mapStateToProps(state) {
@@ -40,7 +41,7 @@ function FetchRender({navigation, onRefresh}) {
 class StoreGoodsList extends Component {
   constructor(props) {
     super(props);
-
+    this.mixpanel = MixpanelInstance;
     const {global, dispatch} = this.props
     const {currStoreId, accessToken} = global;
     this.state = {
@@ -222,11 +223,11 @@ class StoreGoodsList extends Component {
   }
 
   onLoadMore() {
-    if (this.state.isLastPage) {
+    let {page, isLastPage} = this.state
+    if (isLastPage) {
       ToastShort("暂无更多数据")
       return null;
     }
-    let page = this.state.page
 
     this.setState({page: page + 1}, () => {
       this.search(0)
@@ -371,7 +372,7 @@ class StoreGoodsList extends Component {
                 onEndReached={this.onEndReached}
                 onMomentumScrollBegin={this.onMomentumScrollBegin}
                 onTouchMove={(e) => this.onTouchMove(e)}
-                renderItem={this.renderItem.bind(this)}
+                renderItem={this.renderItem}
                 onRefresh={this.onRefresh.bind(this)}
                 refreshing={this.state.isLoading}
                 keyExtractor={this._keyExtractor}
@@ -400,7 +401,7 @@ class StoreGoodsList extends Component {
           </If>
           <Modal
             visible={this.state.inventory_Dialog}
-            onRequestClose={() => this.setState({inventory_Dialog: false})}
+            onRequestClose={this.closeCountModal}
             animationType={'fade'}
             transparent={true}
           >
@@ -486,15 +487,10 @@ class StoreGoodsList extends Component {
                     </If>
                   </View>
                 </View>
-                <TouchableOpacity style={{
-                  borderTopColor: '#E5E5E5',
-                  borderTopWidth: pxToDp(1),
-                  width: '100%',
-                  paddingTop: pxToDp(20),
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }} onPress={() => this.setState({inventory_Dialog: false})}>
-                  <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}> 确 定 </Text>
+                <TouchableOpacity style={styles.modalDetermineWrap} onPress={this.closeCountModal}>
+                  <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}>
+                    确 定
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -506,7 +502,13 @@ class StoreGoodsList extends Component {
     )
   }
 
+  closeCountModal = () => {
+    this.setState({inventory_Dialog: false})
+  }
 
+  openCountModal = () => {
+    this.setState({inventory_Dialog: true})
+  }
   _keyExtractor = (item) => {
     return item.id.toString();
   }
@@ -527,6 +529,7 @@ class StoreGoodsList extends Component {
       <View style={{
         flexDirection: 'row',
         height: 40,
+        alignItems: 'center',
         backgroundColor: colors.white,
         borderBottomColor: colors.fontGray,
         borderBottomWidth: pxToDp(1)
@@ -544,32 +547,18 @@ class StoreGoodsList extends Component {
 
         <View style={{flex: 1}}></View>
         <If condition={onStrict}>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              justifyContent: "center",
-              alignItems: 'center',
-              backgroundColor: colors.main_color,
-              width: pxToDp(35),
-              height: pxToDp(35),
-              marginTop: 10,
-              borderRadius: pxToDp(17)
-            }}
-            onPress={() => {
-              this.setState({
-                inventory_Dialog: true
-              })
-            }}>
-            <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>
+          <TouchableOpacity style={styles.stockWrap} onPress={this.openCountModal}>
+            <Text style={styles.stockText}> 库 </Text>
           </TouchableOpacity>
         </If>
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
           onPress={() => {
+            this.mixpanel.track('商品页面_上新')
             navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
           }}>
           <Text style={{color: colors.color333}}>上新 </Text>
-          <Entypo name='circle-with-plus' style={{fontSize: 18}}/>
+          <Entypo name='circle-with-plus' size={18}/>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -651,25 +640,25 @@ class StoreGoodsList extends Component {
         <If condition={onSale}>
           <TouchableOpacity style={[styles.toOnlineBtn]}
                             onPress={() => this.onOpenModal('off_sale', item)}>
-            <Text style={{color: colors.color333}}>下架 </Text>
+            <Text style={styles.goodsOperationBtn}>下架 </Text>
           </TouchableOpacity>
         </If>
         <If condition={!onSale}>
           <TouchableOpacity style={[styles.toOnlineBtn]}
                             onPress={() => this.onOpenModal('on_sale', item)}>
-            <Text style={{color: colors.color333}}>上架 </Text>
+            <Text style={styles.goodsOperationBtn}>上架 </Text>
           </TouchableOpacity>
         </If>
         <If condition={onStrict}>
           <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                             onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-            <Text style={{color: colors.color333}}>价格/库存 </Text>
+            <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
           </TouchableOpacity>
         </If>
         <If condition={!onStrict}>
           <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                             onPress={() => this.onOpenModal('set_price', item)}>
-            <Text style={{color: colors.color333}}>报价 </Text>
+            <Text style={styles.goodsOperationBtn}>报价 </Text>
           </TouchableOpacity>
         </If>
         {/*{onOpen &&*/}
@@ -682,7 +671,7 @@ class StoreGoodsList extends Component {
     )
   }
 
-  renderItem(order) {
+  renderItem = (order) => {
     let {item, index} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
@@ -698,9 +687,30 @@ class StoreGoodsList extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
 
 const styles = StyleSheet.create({
+  stockWrap: {
+    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: 'center',
+    backgroundColor: colors.main_color,
+    width: pxToDp(35),
+    height: pxToDp(35),
+    borderRadius: pxToDp(17)
+  },
+  stockText: {
+    color: colors.white, fontWeight: "bold", fontSize: 12
+  },
+  modalDetermineWrap: {
+    borderTopColor: '#E5E5E5',
+    borderTopWidth: pxToDp(1),
+    width: '100%',
+    paddingTop: pxToDp(20),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   modalCountText: {
     fontSize: pxToDp(30), color: colors.color333
   },
+  goodsOperationBtn: {color: colors.color333, fontSize: 14},
   container: {
     flex: 1,
     flexDirection: 'column'

@@ -11,50 +11,52 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../pubilc/util/pxToDp";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Button from "react-native-vector-icons/Entypo";
-import Config from "../../../pubilc/common/config";
-import Cts from "../../../pubilc/common/Cts";
-import pxToEm from "../../../pubilc/util/pxToEm";
 
-
-import AppConfig from "../../../pubilc/common/config.js";
-import FetchEx from "../../../pubilc/util/fetchEx";
-import HttpUtils from "../../../pubilc/util/http";
-
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from "../../../reducers/global/globalActions";
-import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
-import native from "../../../pubilc/util/native";
-import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import {
   fetchDutyUsers,
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
-  userCanChangeStore
+  receiveIncrement,
+  userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
-import * as tool from "../../../pubilc/util/tool";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
+import store from "../../../reducers/store/index"
+import {setRecordFlag} from "../../../reducers/store/storeActions"
+import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
+
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
+import JPush from "jpush-react-native";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import dayjs from "dayjs";
+
+import JbbText from "../../common/component/JbbText";
+import GoodsIncrement from "../../common/component/GoodsIncrement";
+import BottomModal from "../../../pubilc/component/BottomModal";
+
+import Config from "../../../pubilc/common/config";
+import Cts from "../../../pubilc/common/Cts";
+import FetchEx from "../../../pubilc/util/fetchEx";
+import HttpUtils from "../../../pubilc/util/http";
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import pxToEm from "../../../pubilc/util/pxToEm";
+import native from "../../../pubilc/util/native";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import * as tool from "../../../pubilc/util/tool";
+import {simpleStore} from "../../../pubilc/util/tool";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
-import JPush from "jpush-react-native";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
-import JbbText from "../../common/component/JbbText";
-import dayjs from "dayjs";
-import BottomModal from "../../../pubilc/component/BottomModal";
-import store from "../../../reducers/store/index"
-import {setRecordFlag} from "../../../reducers/store/storeActions"
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -96,6 +98,7 @@ function FetchView({navigation, onRefresh}) {
 
 
 const customerOpacity = 0.6;
+const time = dayjs().format('YYYY-MM-DD')
 
 class MineScene extends PureComponent {
   constructor(props) {
@@ -105,8 +108,8 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
+      accessToken
     } = this.props.global;
-
 
     let prefer_store = "";
     let screen_name = "";
@@ -178,6 +181,12 @@ class MineScene extends PureComponent {
       show_call_service_modal: false,
       is_self_yy: false,
       contacts: '',
+      title: "今日美团外卖自配送回传率",
+      label: '实时回传：',
+      content: "全部已达标",
+      color: "green",
+      footer: '自然日有效配送信息上传率需>=90%',
+      showComesback: false,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -196,6 +205,8 @@ class MineScene extends PureComponent {
     }
 
     this.onGetDutyUser();
+    this.getServiceStatus(currStoreId, accessToken)
+    this.getHuichuan(currStoreId, accessToken)
   }
 
   UNSAFE_componentWillMount() {
@@ -317,7 +328,7 @@ class MineScene extends PureComponent {
     let _this = this;
     const {currStoreId, accessToken} = this.props.global;
     const url = `api/notify_center/${currStoreId}.json?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+    FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
@@ -473,8 +484,9 @@ class MineScene extends PureComponent {
 
     const {dispatch, global} = this.props;
     const {accessToken, currStoreId} = global;
+    this.getServiceStatus(currStoreId, accessToken)
     dispatch(
-      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj)=> {
+      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj) => {
         if (ok) {
           this.setState({
             prefer_store: obj.prefer_store,
@@ -575,14 +587,66 @@ class MineScene extends PureComponent {
     }
   }
 
+
+  getHuichuan = (currStoreId, accessToken) => {
+    const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {
+      store_id: currStoreId
+    }).then(res => {
+      this.setState({
+        title: res.title,
+        label: res.sync_info.label,
+        content: res.sync_info.content,
+        color: res.sync_info.color,
+        footer: res.footer,
+        showComesback: res.show,
+      })
+    })
+  }
+
+  getServiceStatus = (currStoreId, accessToken) => {
+
+    const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
+    const {dispatch} = this.props
+    HttpUtils.get(api).then(res => {
+      const {is_new, expire_date} = res
+      const status = new Date(time) < new Date(expire_date)
+      dispatch(receiveIncrement({
+        ...res,
+        expire_date: is_new === 1 ? '未开通' : status ? expire_date : '已到期',
+        incrementStatus: status
+      }))
+    }).catch(error => {
+      dispatch(receiveIncrement({
+        auto_pack: {
+          expire_date: '',
+          status: 'off'
+        },
+        auto_reply: {
+          expire_date: '',
+          status: 'off'
+        },
+        bad_notify: {
+          expire_date: '',
+          status: 'off'
+        },
+        expire_date: '未开通',
+        incrementStatus: false
+      }))
+      showError(error.reason)
+    })
+  }
+
   onCanChangeStore = (store_id) => {
-    const {accessToken} = this.props.global;
     const {dispatch, global} = this.props;
+    const {accessToken} = global;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
           simpleStore(global, dispatch, store_id)
+          this.getServiceStatus(store_id, accessToken)
+          this.getHuichuan(store_id, accessToken)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
@@ -599,6 +663,134 @@ class MineScene extends PureComponent {
     }).then((res) => {
 
     })
+  }
+
+  onPress = (route, params = {}) => {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
+      native.toUserComments();
+      return;
+    }
+    this.props.navigation.navigate(route, params);
+  }
+
+  orderSearch = () => {
+    this.mixpanel.track('订单搜索')
+    this.onPress(Config.ROUTE_ORDER_SEARCH)
+  }
+
+  distributionAnalysis = () => {
+    this.mixpanel.track('数据分析页')
+    this.onPress(Config.ROUTE_DistributionAnalysis)
+  }
+
+  storeManager = () => {
+    this.mixpanel.track('店铺页')
+    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
+    this.onPress(Config.ROUTE_STORE, {
+      currentUser: currentUser,
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+      is_mgr: is_mgr
+    });
+  }
+
+  pushSetting = () => {
+    this.mixpanel.track('推送页')
+    this.onPress(Config.ROUTE_PUSH)
+  }
+  platformSetting = () => {
+    this.mixpanel.track('平台页')
+    this.onPress(Config.ROUTE_STORE_STATUS, {
+      updateStoreStatusCb: (storeStatus) => {
+        this.setState({storeStatus: storeStatus})
+      }
+    })
+  }
+
+  printerSetting = () => {
+    this.mixpanel.track('打印页')
+    this.onPress(Config.ROUTE_PRINTERS)
+  }
+
+  deliverySetting = () => {
+    this.mixpanel.track('配送管理')
+    this.onPress(Config.ROUTE_DELIVERY_LIST)
+  }
+
+  settingPage = () => {
+    this.mixpanel.track('设置页')
+    this.onPress(Config.ROUTE_SETTING)
+  }
+  versionInfo = () => {
+    this.mixpanel.track('版本信息页')
+    this.onPress(Config.ROUTE_VERSION);
+  }
+  oncallservice = () => {
+    if (!this.state.is_self_yy) {
+      return this.setState({
+        show_call_service_modal: true
+      })
+    }
+    this.mixpanel.track('我的_联系客服')
+    this.openMiniprogarm()
+  }
+
+  getActivity = () => {
+    const {accessToken, currStoreId} = this.props.global;
+    const api = `api/get_activity_info?access_token=${accessToken}`
+    let data = {
+      "storeId": currStoreId,
+      "pos": 1,
+      "auto_hide": 0,
+    }
+    HttpUtils.post.bind(this.props)(api, data).then((res) => {
+      if (tool.length(res) > 0) {
+        this.setState({
+          show_activity: true,
+          activity_img: res.icon,
+          activity_url: res.url + '?access_token=' + accessToken,
+        })
+      }
+    })
+  }
+
+  helpPage = () => {
+    this.mixpanel.track('帮助页')
+    this.onPress(Config.ROUTE_HELP)
+  }
+
+  openMiniprogarm = () => {
+    let {currVendorId} = tool.vendor(this.props.global)
+    let data = {
+      v: currVendorId,
+      s: this.props.global.currStoreId,
+      u: this.props.global.currentUser,
+      m: this.props.global.currentUserProfile.mobilephone,
+      place: 'mine'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
+  oncloseCallModal = (e = 0) => {
+    this.setState({
+      show_call_service_modal: false
+    })
+    if (e === 1) {
+      this.openMiniprogarm()
+    }
+  }
+
+
+  callService = () => {
+    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
+      this.setState({
+        show_call_service_modal: false
+      }, () => {
+        native.dialNumber(this.state.contacts);
+      })
+    } else {
+      ToastLong("号码为空")
+    }
   }
 
   renderHeader = () => {
@@ -771,7 +963,7 @@ class MineScene extends PureComponent {
             </TouchableOpacity>
           </If>
           <View style={[worker_styles.chevron_right]}>
-            <Button name="chevron-thin-right" style={[worker_styles.right_btn]}/>
+            <Entypo name="chevron-thin-right" style={[worker_styles.right_btn]}/>
           </View>
         </View>
       </TouchableOpacity>
@@ -826,7 +1018,7 @@ class MineScene extends PureComponent {
               })
             }
           >
-            <Button
+            <Entypo
               name="chevron-thin-right"
               style={[worker_styles.right_btn]}
             />
@@ -840,7 +1032,10 @@ class MineScene extends PureComponent {
 
     nrInteraction(MineScene.name)
 
-    let {currVersion, is_mgr, is_helper} = this.state;
+    let {currVersion, is_mgr, is_helper, showComesback} = this.state;
+    const {navigation, global} = this.props
+    const {currStoreId, accessToken, simpleStore} = global
+    const {added_service} = simpleStore
     return (
       <View>
 
@@ -857,9 +1052,17 @@ class MineScene extends PureComponent {
         >
           {this.renderHeader()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
+
+          <If condition={showComesback}>
+            {this.renderHuichuan()}
+          </If>
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
+          <If condition={added_service === '1'}>
+            <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
+          </If>
+
           {this.renderStoreBlock()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             {this.renderDirectBlock()}
@@ -911,34 +1114,31 @@ class MineScene extends PureComponent {
     );
   }
 
-  onPress = (route, params = {}) => {
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
-    this.props.navigation.navigate(route, params);
+  renderHuichuan = () => {
+    let {title, label, content, color, footer} = this.state;
+    return (
+      <TouchableOpacity onPress={() => {
+        this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+      }} style={{
+        backgroundColor: colors.white,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        marginBottom: 12,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <View>
+          <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>{label} <Text
+            style={{fontSize: 14, color: color, fontWeight: 'bold'}}>{content} </Text> </Text>
+          <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
+        </View>
+        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
+      </TouchableOpacity>
+    )
   }
 
-  orderSearch = () => {
-    this.mixpanel.track('订单搜索')
-    this.onPress(Config.ROUTE_ORDER_SEARCH)
-  }
-
-  distributionAnalysis = () => {
-    this.mixpanel.track('数据分析页')
-    this.onPress(Config.ROUTE_DistributionAnalysis)
-  }
-
-  storeManager = () => {
-    this.mixpanel.track('店铺页')
-    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
-    this.onPress(Config.ROUTE_STORE, {
-      currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: currVendorName,
-      is_mgr: is_mgr
-    });
-  }
   renderStoreBlock = () => {
     const {
       // show_activity_mgr = false,
@@ -1214,53 +1414,6 @@ class MineScene extends PureComponent {
     );
   }
 
-  pushSetting = () => {
-    this.mixpanel.track('推送页')
-    this.onPress(Config.ROUTE_PUSH)
-  }
-  platformSetting = () => {
-    this.mixpanel.track('平台页')
-    this.onPress(Config.ROUTE_STORE_STATUS, {
-      updateStoreStatusCb: (storeStatus) => {
-        this.setState({storeStatus: storeStatus})
-      }
-    })
-  }
-
-  printerSetting = () => {
-    this.mixpanel.track('打印页')
-    this.onPress(Config.ROUTE_PRINTERS)
-  }
-
-  deliverySetting = () => {
-    this.mixpanel.track('配送管理')
-    this.onPress(Config.ROUTE_DELIVERY_LIST)
-  }
-
-  getActivity = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `api/get_activity_info?access_token=${accessToken}`
-    let data = {
-      "storeId": currStoreId,
-      "pos": 1,
-      "auto_hide": 0,
-    }
-    HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (tool.length(res) > 0) {
-        this.setState({
-          show_activity: true,
-          activity_img: res.icon,
-          activity_url: res.url + '?access_token=' + accessToken,
-        })
-      }
-    })
-  }
-
-  helpPage = () => {
-    this.mixpanel.track('帮助页')
-    this.onPress(Config.ROUTE_HELP)
-  }
-
   renderVersionBlock = () => {
     const {
       show_expense_center = false,
@@ -1301,34 +1454,6 @@ class MineScene extends PureComponent {
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
-  }
-  settingPage = () => {
-    this.mixpanel.track('设置页')
-    this.onPress(Config.ROUTE_SETTING)
-  }
-  versionInfo = () => {
-    this.mixpanel.track('版本信息页')
-    this.onPress(Config.ROUTE_VERSION);
-  }
-  oncallservice = () => {
-    if (!this.state.is_self_yy) {
-      return this.setState({
-        show_call_service_modal: true
-      })
-    }
-    this.openMiniprogarm()
-  }
-
-  openMiniprogarm = () => {
-    let {currVendorId} = tool.vendor(this.props.global)
-    let data = {
-      v: currVendorId,
-      s: this.props.global.currStoreId,
-      u: this.props.global.currentUser,
-      m: this.props.global.currentUserProfile.mobilephone,
-      place: 'mine'
-    }
-    JumpMiniProgram("/pages/service/index", data);
   }
 
   renderCopyRight = () => {
@@ -1628,34 +1753,13 @@ class MineScene extends PureComponent {
     )
   }
 
-  oncloseCallModal = (e = 0) => {
-    this.setState({
-      show_call_service_modal: false
-    })
-    if (e === 1) {
-      this.openMiniprogarm()
-    }
-  }
-
-
-  callService = () => {
-    if (this.state.contacts !== '' && this.state.contacts !== undefined) {
-      this.setState({
-        show_call_service_modal: false
-      }, () => {
-        native.dialNumber(this.state.contacts);
-      })
-    } else {
-      ToastLong("号码为空")
-    }
-  }
 
 }
 
 const styles = StyleSheet.create({
   fn_price_msg: {
     fontSize: pxToEm(30),
-    color: "#333"
+    color: colors.color333
   },
   help_msg: {
     fontSize: pxToEm(30),
@@ -1851,7 +1955,7 @@ const block_styles = StyleSheet.create({
     width: pxToDp(30),
     height: pxToDp(30),
     borderRadius: pxToDp(15),
-    backgroundColor: '#f00',
+    backgroundColor: colors.red,
     position: 'absolute',
     right: pxToDp(60),
     top: pxToDp(20),

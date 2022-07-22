@@ -201,7 +201,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '订单搜索'}}
+        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
                       getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
@@ -233,6 +233,11 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_COMES_BACK} options={{headerTitle: '店铺信息'}}
+                      getComponent={() => require("../../scene/home/Store/ComesBack").default}/>
+        <Stack.Screen name={Config.ROUTE_COMES_BACK_INFO} options={{headerTitle: '店铺信息'}}
+                      getComponent={() => require("../../scene/home/Store/ComesBackInfo").default}/>
+
         <Stack.Screen name={Config.ROUTE_STORE_CLOSE} options={{headerTitle: ''}}
                       getComponent={() => require("../../scene/home/Store/CloseStore").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} options={{headerTitle: '商品详情'}}
@@ -374,15 +379,24 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/product/Goods/StoreGoodsSearch').default}/>
         <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} options={{headerTitle: '绑定平台信息'}}
                       getComponent={() => require('../../scene/home/Platform/PlatformScene').default}/>
-        <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+        <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpense').default}
         />
-        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/OldSeparatedExpense').default}
         />
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpenseInfo').default}
         />
+
+        <Stack.Screen name={Config.ROUTE_SERVICE_CHARGE_INFO} options={{headerTitle: '账单明细'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/ServiceChargeInfo').default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_SERVICE_CHARGE_DESC} options={{headerTitle: '计费规则'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/ServiceChargeDesc').default}
+        />
+
 
         <Stack.Screen name={Config.ROUTE_FREEZE_LIST} options={{headerTitle: ""}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
@@ -465,6 +479,26 @@ export const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_CONSOLE_SIGN_IN} options={{headerTitle: '打卡'}}
                       getComponent={() => require('../../scene/console/SignInScene').default}/>
+        <Stack.Screen name={Config.ROUTE_BAD_REVIEW_REMINDER}
+                      options={{headerTitle: '差评提醒'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/BadReviewReminderScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_AUTOMATIC_FEEDBACK}
+                      options={{headerTitle: '自动回评'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/AutomaticFeedbackScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_AUTOMATIC_PACKAGING}
+                      options={{headerTitle: '自动打包'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/AutomaticPackagingScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_TEMPLATE_SETTINGS}
+                      options={{headerTitle: '模板设置'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/TemplateSettingsScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
+                      options={{headerTitle: '功能详情'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
