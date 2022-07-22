@@ -104,6 +104,7 @@ class MineScene extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('我的')
     const {
       currentUser,
       currStoreId,
@@ -1119,6 +1120,7 @@ class MineScene extends PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+        this.mixpanel.track('我的_查看回传率')
       }} style={{
         backgroundColor: colors.white,
         paddingVertical: 12,
@@ -1130,8 +1132,12 @@ class MineScene extends PureComponent {
       }}>
         <View>
           <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>{label} <Text
-            style={{fontSize: 14, color: color, fontWeight: 'bold'}}>{content} </Text> </Text>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>
+            {label}
+            <Text style={{fontSize: 14, color: color, fontWeight: 'bold'}}>
+              {content}
+            </Text>
+          </Text>
           <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>

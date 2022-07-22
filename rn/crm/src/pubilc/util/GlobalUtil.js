@@ -214,8 +214,7 @@ export default class GlobalUtil {
         data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
         data.disable_sound_notify = settings.disabledSoundNotify;
         data.auto_print = settings.autoPrint;
-        let mute = settings.currentSoundVolume > 0 ? true : false;
-        data.Volume = mute
+        data.Volume = settings.currentSoundVolume > 0
         data.isRun = settings.isRunInBg;
         data.isRinger = settings.isRinger;
         const {accessToken} = props.global
