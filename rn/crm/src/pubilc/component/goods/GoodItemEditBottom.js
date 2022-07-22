@@ -1,17 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import Cts from "../../common/Cts";
 import BottomModal from "../BottomModal";
-import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
-import {Dialog} from "../../../weui/Dialog";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {showError} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import MultiSpecsModal from "./MultiSpecsModal";
-
-const AgreeItem = Checkbox.AgreeItem;
+import CommonModal from "./CommonModal";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import {CheckBox} from 'react-native-elements'
 
 class GoodItemEditBottom extends React.Component {
   static propTypes = {
@@ -34,22 +33,20 @@ class GoodItemEditBottom extends React.Component {
 
   state = {
     onSubmitting: false,
-    errorMsg: '',
     pid: '',
     setPrice: '',
     setPriceAddInventory: '',
     remainNum: 0,
     totalRemain: 0,
-    offOption: Cts.RE_ON_SALE_MANUAL,
+    offOption: -1,
     storePro: this.props.storePro && this.props.storePro,
-    orderUse: 0
+    orderUse: 0,
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.pid && (props.pid !== state.pid || props.modalType !== state.modalType)) {
       return {
         onSubmitting: false,
-        errorMsg: '',
         pid: props.pid,
         modalType: props.modalType,
         setPrice: parseFloat(props.applyingPrice / 100).toFixed(2),
@@ -63,6 +60,7 @@ class GoodItemEditBottom extends React.Component {
   }
 
   resetModal = () => {
+    this.setItem(-1)
     const {onClose} = this.props
     onClose()
   }
@@ -70,43 +68,43 @@ class GoodItemEditBottom extends React.Component {
   onOnSale = (accessToken, storeId, currStatus, doneProdUpdate) => {
     const destStatus = Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE.value
     const {pid} = this.state;
-
-    this.setState({onSubmitting: true})
-    showModal('提交中')
     const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(url).then(res => {
-      hideModal()
+    HttpUtils.post.bind(this.props)(url).then(() => {
       this.resetModal()
       doneProdUpdate(pid, {}, {status: destStatus})
     }, (res) => {
-      hideModal()
-      this.setState({onSubmitting: false, errorMsg: `上架失败：${res.reason}`})
+      this.resetModal()
+      showError(`上架失败：${res.reason}`)
+    }).catch(error => {
+      this.resetModal()
+      showError(`上架失败：${error.reason}`)
     })
   }
 
   onOffSale = (accessToken, spId, doneProdUpdate) => {
-    const pid = this.state.pid
-    const option = this.state.offOption
-    const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
-    this.resetModal()
-    this.setState({onSubmitting: true})
+    const {pid, offOption} = this.state
+    const url = `/api/chg_item_when_on_sale/${spId}/${offOption}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(url).then(res => {
       this.resetModal()
       doneProdUpdate(pid, {}, {status: res.destStatus})
+
     }, (res) => {
-      this.setState({onSubmitting: false, errorMsg: `下架失败：${res.reason}`})
+      this.resetModal()
+      showError(`下架失败：${res.reason}`)
+    }).catch(error => {
+      this.resetModal()
+      showError(`下架失败：${error.reason}`)
     })
   }
 
   fetchData() {
-    const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
-    self.setState({loading: true})
-    HttpUtils.get.bind(self.props)(api, {
+    this.setState({loading: true})
+    HttpUtils.get.bind(this.props)(api, {
       productId: this.state.pid,
-      storeId: self.props.storeId
+      storeId: this.props.storeId
     }).then(res => {
-      self.setState({
+      this.setState({
         remainNum: res.left_since_last_stat,
         orderUse: res.orderUse,
         setPriceAddInventory: res.totalRemain
@@ -114,10 +112,13 @@ class GoodItemEditBottom extends React.Component {
     })
   }
 
+  setItem = (value) => {
+    this.setState({offOption: value})
+  }
+
   render(): React.ReactNode {
     const {
       productName,
-      strictProviding,
       accessToken,
       storeId,
       currStatus,
@@ -128,65 +129,90 @@ class GoodItemEditBottom extends React.Component {
       storePro,
       vendor_id
     } = this.props;
-    return modalType ? <View>
+    const {offOption} = this.state
+    return (
+      <If condition={modalType}>
+        <>
 
-      <BottomModal title={'上  架'} actionText={'确认上架'}
-                   onPress={() => this.onOnSale(accessToken, storeId, currStatus, doneProdUpdate)}
-                   onClose={this.resetModal} visible={modalType === 'on_sale'}
-                   btnStyle={{backgroundColor: colors.main_color}}
-      >
-        <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
-      </BottomModal>
+          <BottomModal title={'上  架'} actionText={'确认上架'}
+                       onPress={() => this.onOnSale(accessToken, storeId, currStatus, doneProdUpdate)}
+                       onClose={this.resetModal} visible={modalType === 'on_sale'}
+                       btnStyle={{backgroundColor: colors.main_color}}
+          >
+            <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
+          </BottomModal>
+          <CommonModal visible={modalType === 'off_sale'} onClose={this.resetModal} position={'flex-end'}>
+            <View style={styles.offSaleWrap}>
+              <View style={styles.offSaleTitleWrap}>
+                <View/>
+                <Text style={styles.offSaleTitleText}>
+                  下架
+                </Text>
+                <AntDesign name={'close'} size={24} onPress={this.resetModal}/>
+              </View>
+              <Text style={styles.offSaleProductNameText}>
+                {productName}
+              </Text>
+              <LineView/>
+              <Text style={styles.offSaleItemTitle}>
+                将状态改为下架
+              </Text>
+              <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_OFF_WORK)}>
+                <CheckBox center type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
+                          uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_OFF_WORK}
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_OFF_WORK)}/>
+                <Text style={styles.offSaleItemContent}>
+                  打烊后自动上架
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_MANUAL)}>
+                <CheckBox type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
+                          uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_MANUAL}
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_MANUAL)}/>
+                <Text style={styles.offSaleItemContent}>
+                  不要自动上架
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.offSaleItemTitle}>
+                从本店删除
+              </Text>
+              <TouchableOpacity style={styles.offSaleItemWrap} onPress={() => this.setItem(Cts.RE_ON_SALE_NONE)}>
+                <CheckBox type={'material'} color={'green'} size={16} checkedIcon={'dot-circle-o'}
+                          uncheckedIcon={'circle-o'} checked={offOption === Cts.RE_ON_SALE_NONE}
+                          style={{backgroundColor: 'red'}} onPress={() => this.setItem(Cts.RE_ON_SALE_NONE)}/>
+                <Text style={styles.offSaleItemContent}>
+                  从本店的各个平台渠道下架, 并删除本品
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={offOption !== Cts.RE_ON_SALE_PROVIDED ? styles.offSaleSaveWrapSelect : styles.offSaleSaveWrap}
+                onPress={() => this.onOffSale(accessToken, spId, doneProdUpdate)}>
+                <Text style={styles.offSaleSaveText}>
+                  确认
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </CommonModal>
 
-      <BottomModal title={'下  架'} actionText={'确认修改'} onPress={() => this.onOffSale(accessToken, spId, doneProdUpdate)}
-                   onClose={this.resetModal} visible={modalType === 'off_sale'}
-                   btnStyle={{backgroundColor: colors.main_color}}
-      >
-        <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
-        <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
-          const idx = e.nativeEvent.selectedSegmentIndex
-          this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
-        }}/>
-
-        <WhiteSpace size={'lg'}/>
-        {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
-          <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e) => {
-            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
-          }}>打烊后自动上架</AgreeItem>
-
-          <WhiteSpace size={'lg'}/>
-          <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
-            this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
-          }}>不要自动上架</AgreeItem>
-          <WhiteSpace size={'lg'}/>
-          {strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
-            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED : Cts.RE_ON_SALE_MANUAL})
-          }}>订货送到后自动上架</AgreeItem>}
-          <WhiteSpace/>
-        </View>}
-
-        {this.state.offOption === Cts.RE_ON_SALE_NONE && <View>
-          <Text style={[styles.n2, {paddingLeft: 10}]}>从本店的各个平台渠道下架, 并删除本品</Text>
-          <WhiteSpace size={'lg'}/>
-        </View>}
-      </BottomModal>
-
-      <MultiSpecsModal
-        visible={modalType === 'set_price' || modalType === 'update_apply_price' || modalType === 'set_price_add_inventory'}
-        onClose={this.resetModal}
-        storePro={storePro}
-        storeId={storeId}
-        productName={productName}
-        accessToken={accessToken}
-        navigation={navigation}
-        vendor_id={vendor_id}/>
-      <Dialog onRequestClose={() => {
-      }} visible={!!this.state.errorMsg}
-              buttons={[{type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''})}]}>
-        <View><Text style={{color: '#000'}}>{this.state.errorMsg} </Text></View>
-      </Dialog>
-    </View> : null
+          <MultiSpecsModal
+            visible={modalType === 'set_price' || modalType === 'update_apply_price' || modalType === 'set_price_add_inventory'}
+            onClose={this.resetModal}
+            storePro={storePro}
+            storeId={storeId}
+            productName={productName}
+            accessToken={accessToken}
+            navigation={navigation}
+            vendor_id={vendor_id}/>
+        </>
+      </If>
+    )
   }
+}
+
+const LineView = () => {
+  return (
+    <View style={styles.line}/>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -200,7 +226,63 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginRight: 5
   },
-
+  line: {borderBottomColor: colors.colorEEE, borderBottomWidth: 1},
+  offSaleWrap: {
+    backgroundColor: colors.white, borderTopLeftRadius: 8, borderTopRightRadius: 8
+  },
+  offSaleTitleWrap: {
+    flexDirection: 'row', justifyContent: 'space-between', padding: 10, alignItems: 'center'
+  },
+  offSaleTitleText: {
+    fontSize: 18, fontWeight: '600', color: colors.color333, lineHeight: 25
+  },
+  offSaleProductNameText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 20,
+    paddingLeft: 16,
+    paddingBottom: 5
+  },
+  offSaleItemTitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 20,
+    paddingTop: 26,
+    paddingLeft: 31,
+  },
+  offSaleItemWrap: {
+    flexDirection: 'row', alignItems: 'center', paddingTop: 12, paddingLeft: 46
+  },
+  offSaleItemContent: {
+    fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 20
+  },
+  offSaleSaveWrap: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 21,
+    marginTop: 45,
+    backgroundColor: colors.colorCCC,
+    borderRadius: 2
+  },
+  offSaleSaveWrapSelect: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 21,
+    marginTop: 45,
+    backgroundColor: colors.main_color,
+    borderRadius: 2
+  },
+  offSaleSaveText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 22,
+    paddingTop: 7,
+    paddingBottom: 7,
+    textAlign: 'center'
+  }
 });
 
 export default GoodItemEditBottom

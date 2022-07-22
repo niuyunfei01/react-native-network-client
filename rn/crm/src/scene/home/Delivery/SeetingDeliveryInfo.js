@@ -349,7 +349,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333, marginLeft: 10}}>分钟</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{max_call_time}分钟后没有骑手接单会提示异常单 </Text>
+                <Text style={{color: '#DD2525', marginTop: 10}}>订单在{max_call_time}分钟后最多呼叫{ship_ways.length}个配送 </Text>
               </View>
 
               <View style={{

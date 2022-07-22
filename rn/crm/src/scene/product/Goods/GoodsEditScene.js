@@ -27,6 +27,7 @@ import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const Item = List.Item;
 
@@ -66,6 +67,7 @@ const right = <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>;
 class GoodsEditScene extends PureComponent {
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
     let {scan} = (this.props.route.params || {});
     this.state = {
@@ -118,17 +120,13 @@ class GoodsEditScene extends PureComponent {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerRight: () => (type !== 'edit' &&
         <TouchableOpacity style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}
-                          onPress={() => this.startScan(true)}>
-          {type !== "edit" && <View style={{
-            flexDirection: "row",
-            paddingRight: pxToDp(20),
-            height: pxToDp(72),
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}>
-            <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
-            <Text style={{fontWeight: "bold", marginLeft: pxToDp(30), color: colors.color333}}>扫码新增</Text>
-          </View>}
+                          onPress={()=>this.startScan(true)}>
+          <If condition={'edit'!==type}>
+            <View style={{flexDirection: "row", paddingRight: pxToDp(20), height: pxToDp(72), justifyContent: "space-between", alignItems: "center"}}>
+              <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
+              <Text style={{fontWeight: "bold", marginLeft: pxToDp(30), color: colors.color333}}>扫码新增</Text>
+            </View>
+          </If>
         </TouchableOpacity>
       )
     });
@@ -410,6 +408,7 @@ class GoodsEditScene extends PureComponent {
 
   onScanSuccess = (code) => {
     if (code) {
+      this.mixpanel.track('自动填入upc')
       this.initEmptyState({upc: code});
       this.getProdDetailByUpc(code)
     }
@@ -430,6 +429,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   startScan = flag => {
+    this.mixpanel.track('商品新增页_扫码新增')
     this.setState({scanBoolean: flag, store_has: false});
   };
 
@@ -534,6 +534,7 @@ class GoodsEditScene extends PureComponent {
       this.setState({uploading: false});
       if (ok) {
         if (type === "add") {
+          this.mixpanel.track('商品新增页面_点击保存')
           this.setState({selectToWhere: true});
         } else {
           showSuccess("修改成功");

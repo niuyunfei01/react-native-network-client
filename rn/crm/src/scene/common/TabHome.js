@@ -111,7 +111,7 @@ class TabHome extends React.Component {
                       options={{
                         tabBarLabel: '控制台',
                         tabBarIcon: ({focused}) => (
-                          <Icon name={'grid'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>)
+                          <Icon name={'grid'} size={26} color={focused ? colors.main_color : colors.colorCCC}/>)
                       }}/>
         </If>
         <If condition={co_type === 'peisong'}>

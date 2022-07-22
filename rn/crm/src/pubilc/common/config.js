@@ -133,6 +133,12 @@ const C = {
   ROUTE_HOME_SETTLEMENT_STALL_DETAIL: 'StallDetail',//摊位详情
   ROUTE_HOME_SETTLEMENT_STALL_DETAILS: 'StallDetails',//摊位明细
 
+  ROUTE_BAD_REVIEW_REMINDER: 'ROUTE_BAD_REVIEW_REMINDER',//差评提醒
+  ROUTE_AUTOMATIC_FEEDBACK: 'ROUTE_AUTOMATIC_FEEDBACK',//自动回评
+  ROUTE_AUTOMATIC_PACKAGING: 'ROUTE_AUTOMATIC_PACKAGING',//自动打包
+  ROUTE_TEMPLATE_SETTINGS: 'ROUTE_TEMPLATE_SETTINGS',//回评模板
+  ROUTE_INCREMENT_SERVICE_DESCRIPTION: 'ROUTE_INCREMENT_SERVICE_DESCRIPTION',//详情介绍
+
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -143,6 +149,8 @@ const C = {
   ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
+  ROUTE_COMES_BACK: 'ComesBack',
+  ROUTE_COMES_BACK_INFO: 'ComesBackInfo',
   ROUTE_STORE_CLOSE: 'StoreClose',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
@@ -178,6 +186,8 @@ const C = {
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
   ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
+  ROUTE_SERVICE_CHARGE_INFO: 'ServiceChargeInfo',        //服务费详细
+  ROUTE_SERVICE_CHARGE_DESC: 'ServiceChargeDesc',        //服务费详细
   ROUTE_FREEZE_LIST: 'FREEZE_LIST',        //冻结列表
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值

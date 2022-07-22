@@ -206,7 +206,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   showAlert() {
-    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众包”配送；\n' +
+    Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团众包”配送；\n' +
       '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
       '•兼容模式不支持自动接单\t\t\t', [
       {

@@ -117,7 +117,6 @@ class PreferenceBillingSetting extends PureComponent {
         })
       }, 1000)
     }).catch((error) => {
-      console.log(error, 'error')
       showError(`${error.reason}`)
     })
   }
