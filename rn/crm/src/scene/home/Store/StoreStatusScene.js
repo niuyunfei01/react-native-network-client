@@ -390,7 +390,7 @@ class StoreStatusScene extends PureComponent {
     } else if (icon_name === 'jd') {
       return require(`../../../img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`../../../img/PlatformLogo/pl_store_meituan.png`)
+      return {uri:'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}
     } else if (icon_name === 'txd') {
       return require(`../../../img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {

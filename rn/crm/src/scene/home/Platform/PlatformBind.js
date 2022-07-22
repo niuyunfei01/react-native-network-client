@@ -58,7 +58,7 @@ class PlatformBind extends React.Component {
         {
           name: '美团',
           alias: 'mt',
-          avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png`,
+          avatar_url: `https://cnsc-pics.cainiaoshicai.cn/meituan.png`,
           subtitle: '建议餐饮、甜品、蛋糕类客户选择',
           enable: true,
         },
