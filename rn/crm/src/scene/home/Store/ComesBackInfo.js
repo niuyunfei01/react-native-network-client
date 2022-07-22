@@ -8,6 +8,7 @@ import tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import OrderListItem from "../../../pubilc/component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const {
   FlatList,
@@ -66,6 +67,8 @@ class OrderQueryResultScene extends PureComponent {
       yesterday_sync_color: "",
     };
     this.renderItem = this.renderItem.bind(this);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('配送回传详情页')
   }
 
   fetchInfo = () => {

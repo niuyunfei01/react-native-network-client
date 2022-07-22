@@ -121,7 +121,7 @@ class VersionScene extends PureComponent {
         resp = JSON.parse(resp);
         let {version_name, version_code} = resp;
         callback(version_code, version_name);
-      });
+      }).then();
     }
   }
 

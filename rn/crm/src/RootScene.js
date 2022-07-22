@@ -181,6 +181,7 @@ class RootScene extends PureComponent<{}> {
         }, 300);
       } else {
         // noinspection JSIgnoredPromiseFromCall
+
         GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '未连接'})
         Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
           text: '确定', onPress: () => {
@@ -260,6 +261,7 @@ class RootScene extends PureComponent<{}> {
 
         this.setState({rehydrated: true});
         const passed_ms = dayjs().valueOf() - current_ms;
+        console.log('耗时：',passed_ms)
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
         GlobalUtil.getDeviceInfo().then(deviceInfo => {
           store.dispatch(setDeviceInfo(deviceInfo))
@@ -271,7 +273,7 @@ class RootScene extends PureComponent<{}> {
 
   render() {
     const {launchProps} = this.props;
-    const {orderId,backPage} = launchProps;
+    const {orderId, backPage} = launchProps;
     let initialRouteName = launchProps["_action"];
     if (!!backPage) {
       launchProps["_action_params"]["backPage"] = backPage;
