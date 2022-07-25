@@ -1,21 +1,18 @@
 import React, {PureComponent} from "react";
-import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View,} from "react-native";
-import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from "../../../pubilc/util/pxToDp";
-import {Switch} from "../../../weui";
-import {Button, Checkbox} from '@ant-design/react-native';
-import * as globalActions from "../../../reducers/global/globalActions";
-import tool from "../../../pubilc/util/tool";
-import {showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import AppConfig from "../../../pubilc/common/config";
+import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import Config from "../../../pubilc/common/config";
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import {Button, Switch} from "react-native-elements";
+import * as globalActions from "../../../reducers/global/globalActions";
+import {showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 
-const CheckboxItem = Checkbox.CheckboxItem;
 const mapStateToProps = state => {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {global} = state;
+  return {global: global};
 }
 const mapDispatchToProps = dispatch => {
   return {
@@ -35,7 +32,7 @@ class SeetingDeliveryInfo extends PureComponent {
       max_call_time: "10",
       ship_ways: [],
       order_require_minutes: 0,
-      default: '',
+      default_str: '',
       zs_way: false,
       show_auto_confirm_order: false,
       showBtn: false,
@@ -72,7 +69,7 @@ class SeetingDeliveryInfo extends PureComponent {
         showBtn = response.bind_info.rebind === 1 ? false : showBtn;
         this.setState({
           showBind: response.bind_info.rebind === 1,
-          bind_url: AppConfig.apiUrl(response.bind_info.bind_url),
+          bind_url: Config.apiUrl(response.bind_info.bind_url),
           notice: response.bind_info.notice === 1,
         })
         if (tool.length(response.bind_info.notice_info) > 0) {
@@ -83,20 +80,20 @@ class SeetingDeliveryInfo extends PureComponent {
           })
         }
       }
-      let ship_ways_name = ''
-      if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
-        for (let i of response.ship_ways) {
-          for (let j of response.menus) {
-            if (i === j.id) {
-              if (tool.length(ship_ways_name) === 0) {
-                ship_ways_name = j.name
-              } else {
-                ship_ways_name = ship_ways_name + ',' + j.name
-              }
-            }
-          }
-        }
-      }
+      // let ship_ways_name = ''
+      // if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
+      //   for (let i of response.ship_ways) {
+      //     for (let j of response.menus) {
+      //       if (i === j.id) {
+      //         if (tool.length(ship_ways_name) === 0) {
+      //           ship_ways_name = j.name
+      //         } else {
+      //           ship_ways_name = ship_ways_name + ',' + j.name
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
@@ -106,11 +103,11 @@ class SeetingDeliveryInfo extends PureComponent {
         deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
         max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
-        default: response.default ? response.default : '',
+        default_str: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0 ? true : false,
-        show_auto_confirm_order: response.vendor_id && response.vendor_id === '68',
+        show_auto_confirm_order: this.props.global.config.vendor.wsb_store_account === '1',
         showBtn: showBtn,
-        ship_ways_name: ship_ways_name
+        // ship_ways_name: ship_ways_name
       }, () => {
         this.get_time_interval()
       })
@@ -119,7 +116,7 @@ class SeetingDeliveryInfo extends PureComponent {
   }
 
   onBindDelivery = () => {
-    const {auto_call, ship_ways, zs_way, max_call_time, deploy_time} = this.state
+    const {auto_call, ship_ways, zs_way, max_call_time, deploy_time,order_require_minutes,default_str} = this.state
     if (auto_call && ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
@@ -139,10 +136,11 @@ class SeetingDeliveryInfo extends PureComponent {
         this.props.route.params.ext_store_id,
         {
           auto_call: auto_call ? 1 : 2,
-          ship_ways: ship_ways,
-          default: this.state.default,
-          max_call_time: max_call_time,
-          deploy_time: deploy_time,
+           ship_ways,
+          default: default_str,
+          max_call_time,
+          deploy_time,
+          order_require_minutes,
         },
         (success) => {
           this.setState({isRefreshing: false})
@@ -184,10 +182,11 @@ class SeetingDeliveryInfo extends PureComponent {
     });
   }
 
-  onValueChange = (saveBtnStatus, res) => {
+  onValueChange = (saveBtnStatus) => {
+    let auto_call = !this.state.auto_call;
     if (saveBtnStatus === 0) {
-      this.setState({auto_call: res, saveBtnStatus: 1}, () => {
-        if (res === false) {
+      this.setState({auto_call: auto_call, saveBtnStatus: 1}, () => {
+        if (auto_call === false) {
           Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
             {text: '稍等再说', style: 'cancel'},
             {
@@ -197,28 +196,30 @@ class SeetingDeliveryInfo extends PureComponent {
         }
       })
     } else {
-      this.setState({auto_call: res, saveBtnStatus: 0});
+      this.setState({auto_call: auto_call, saveBtnStatus: 0});
     }
   }
 
-  onChange = (event, item) => {
+  onChange = (check, item) => {
+
+
     let {ship_ways, ship_ways_name} = this.state;
-    if (event.target.checked) {
+    if (check) {
       ship_ways.push(item.id);
-      if (tool.length(ship_ways_name) > 0) {
-        ship_ways_name = ship_ways_name + ',' + item.name;
-      } else {
-        ship_ways_name = item.name;
-      }
+      // if (tool.length(ship_ways_name) > 0) {
+      //   ship_ways_name = ship_ways_name + ',' + item.name;
+      // } else {
+      //   ship_ways_name = item.name;
+      // }
     } else {
       ship_ways.splice(ship_ways.findIndex(index => Number(index) === item.id), 1)
-      if (ship_ways_name.includes(',' + item.name)) {
-        ship_ways_name = ship_ways_name.replace(',' + item.name, '')
-      } else if (ship_ways_name.includes(item.name + ',')) {
-        ship_ways_name = ship_ways_name.replace(item.name + ',', '')
-      } else {
-        ship_ways_name = ship_ways_name.replace(item.name, '')
-      }
+      // if (ship_ways_name.includes(',' + item.name)) {
+      //   ship_ways_name = ship_ways_name.replace(',' + item.name, '')
+      // } else if (ship_ways_name.includes(item.name + ',')) {
+      //   ship_ways_name = ship_ways_name.replace(item.name + ',', '')
+      // } else {
+      //   ship_ways_name = ship_ways_name.replace(item.name, '')
+      // }
     }
     this.setState({ship_ways, ship_ways_name}, () => {
       this.get_time_interval()
@@ -245,6 +246,7 @@ class SeetingDeliveryInfo extends PureComponent {
       max_call_time,
       time_interval
     } = this.state;
+    console.log(ship_ways, 'ship_ways_name1')
     return (
       <View style={{flex: 1}}>
         <ScrollView style={styles.container}
@@ -263,7 +265,7 @@ class SeetingDeliveryInfo extends PureComponent {
             <Text style={styles.descriptionText}>
               开启自动发单，省心省力
             </Text>
-            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY,{showId: 1})}>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY, {showId: 1})}>
               了解更多
             </Text>
           </View>
@@ -271,7 +273,13 @@ class SeetingDeliveryInfo extends PureComponent {
 
             <View style={styles.titleWrap}>
               <Text style={{color: colors.color333}}>自动呼叫配送 </Text>
-              <Switch value={auto_call} onValueChange={(res) => this.onValueChange(saveBtnStatus, res)}/>
+
+              <Switch color={colors.main_color} style={{
+                fontSize: 16,
+              }} value={this.state.auto_call}
+                      onChange={() => {
+                        this.onValueChange(saveBtnStatus)
+                      }}/>
             </View>
           </View>
 
@@ -290,16 +298,16 @@ class SeetingDeliveryInfo extends PureComponent {
                 paddingVertical: 10
               }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                  <Text style={{color: colors.color333}}>及时单 </Text>
+                  <Text style={{color: colors.color333, fontSize: 14}}>及时单 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <Text style={{color: colors.color333, marginRight: 10}}>下单</Text>
+                    <Text style={{color: colors.color333, fontSize: 14}}>下单后 </Text>
                     <TextInput placeholder="0"
                                underlineColorAndroid="transparent"
                                style={{
                                  height: 40,
-                                 borderWidth: 1,
-                                 borderColor: colors.colorDDD,
-                                 width: 80,
+                                 borderBottomWidth: 1,
+                                 borderColor: colors.color333,
+                                 width: 40,
                                  borderRadius: 5
                                }}
                                placeholderTextColor={'#ddd'}
@@ -308,7 +316,7 @@ class SeetingDeliveryInfo extends PureComponent {
                                onChangeText={(deploy_time) => this.setState({deploy_time})}
                                textAlign='center'
                     />
-                    <Text style={{color: colors.color333, marginLeft: 10}}>分钟后</Text>
+                    <Text style={{color: colors.color333, fontSize: 14}}>分钟后 </Text>
                   </View>
                 </View>
                 <Text style={{color: '#DD2525', marginTop: 10}}>接到订单{deploy_time}分钟后自动呼叫骑手 </Text>
@@ -321,9 +329,24 @@ class SeetingDeliveryInfo extends PureComponent {
                 paddingVertical: 15
               }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                  <Text style={{color: colors.color333}}>预订单 </Text>
+                  <Text style={{color: colors.color333, fontSize: 14}}>预定单 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <Text style={{color: colors.color333}}>预计送达前{order_require_minutes}分钟</Text>
+                    <Text style={{color: colors.color333, fontSize: 14}}>配送前 </Text>
+                    <TextInput placeholder="0"
+                               underlineColorAndroid="transparent"
+                               style={{
+                                 height: 40,
+                                 borderBottomWidth: 1,
+                                 borderColor: colors.color333,
+                                 width: 40,
+                               }}
+                               placeholderTextColor={'#ddd'}
+                               keyboardType={'numeric'}
+                               value={order_require_minutes}
+                               onChangeText={order_require_minutes => this.setState({order_require_minutes})}
+                               textAlign='center'
+                    />
+                    <Text style={{color: colors.color333, fontSize: 14}}>分钟 </Text>
                   </View>
                 </View>
                 <Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{order_require_minutes}分钟后自动呼叫骑手 </Text>
@@ -336,16 +359,15 @@ class SeetingDeliveryInfo extends PureComponent {
                 paddingVertical: 10
               }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                  <Text style={{color: colors.color333}}>最长呼单时间 </Text>
+                  <Text style={{color: colors.color333, fontSize: 14}}>最长呼单时间 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <TextInput placeholder="0"
                                underlineColorAndroid="transparent"
                                style={{
                                  height: 40,
-                                 borderWidth: 1,
-                                 borderColor: colors.colorDDD,
-                                 width: 80,
-                                 borderRadius: 5
+                                 borderBottomWidth: 1,
+                                 borderColor: colors.color333,
+                                 width: 40,
                                }}
                                placeholderTextColor={'#ddd'}
                                keyboardType={'numeric'}
@@ -355,7 +377,7 @@ class SeetingDeliveryInfo extends PureComponent {
                                })}
                                textAlign='center'
                     />
-                    <Text style={{color: colors.color333, marginLeft: 10}}>分钟</Text>
+                    <Text style={{color: colors.color333, fontSize: 14}}>分钟 </Text>
                   </View>
                 </View>
                 <Text style={{color: '#DD2525', marginTop: 10}}>订单在{max_call_time}分钟后最多呼叫{ship_ways.length}个配送 </Text>
@@ -368,9 +390,9 @@ class SeetingDeliveryInfo extends PureComponent {
                 paddingVertical: 20
               }}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                  <Text style={{color: colors.color333}}>发单间隔 </Text>
+                  <Text style={{color: colors.color333, fontSize: 14}}>发单间隔 </Text>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <Text style={{color: colors.color333}}>{time_interval}</Text>
+                    <Text style={{color: colors.color333, fontSize: 14}}>{time_interval} </Text>
                   </View>
                 </View>
                 <Text style={{
@@ -397,7 +419,7 @@ class SeetingDeliveryInfo extends PureComponent {
                           paddingHorizontal: pxToDp(10),
                           marginLeft: pxToDp(20)
                         }}>
-                          <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
+                          <Text style={{color: colors.white, fontSize: 17}}>偏好</Text>
                         </View>
                       </View> :
                       <View style={{flexDirection: "row", alignItems: 'center'}}>
@@ -405,10 +427,12 @@ class SeetingDeliveryInfo extends PureComponent {
                       </View>
                   }
                   <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <CheckboxItem
-                      checked={ship_ways.find(value => value === item.id)}
-                      onChange={event => this.onChange(event, item)}
-                    />
+                    <Switch color={colors.main_color} style={{
+                      fontSize: 16,
+                    }} value={Boolean(ship_ways.find(value => value === item.id))}
+                            onChange={() => {
+                              this.onChange(!ship_ways.find(value => value === item.id), item)
+                            }}/>
                   </View>
                 </View>
               </For>
@@ -417,35 +441,49 @@ class SeetingDeliveryInfo extends PureComponent {
         </ScrollView>
 
         <If condition={showBtn && auto_call}>
-          <View style={styles.btn_submit}>
-
-            <Button type="primary" onPress={() => {
-              auto_call ?
-                Alert.alert('确认', `从现在起新来的订单，将在来单 ${deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
-                  {text: '稍等再说', style: 'cancel'},
-                  {
-                    text: '确认', onPress: () => {
-                      this.onBindDelivery()
-                    }
-                  },
-                ]) :
-                Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
-                  {text: '稍等再说', style: 'cancel'},
-                  {
-                    text: '确认', onPress: () => this.onBindDelivery()
-                  },
-                ])
-            }
-            }
-                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-              保存
-            </Button>
-
-          </View>
+          {this.renderBtn()}
         </If>
       </View>
 
     );
+  }
+
+  renderBtn() {
+    const {
+      auto_call,
+      deploy_time,
+    } = this.state;
+    return (
+      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+        <Button title={'保存'}
+                onPress={() => {
+                  auto_call ?
+                    Alert.alert('确认', `从现在起新来的订单，将在来单 ${deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
+                      {text: '稍等再说', style: 'cancel'},
+                      {
+                        text: '确认', onPress: () => {
+                          this.onBindDelivery()
+                        }
+                      },
+                    ]) :
+                    Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
+                      {text: '稍等再说', style: 'cancel'},
+                      {
+                        text: '确认', onPress: () => this.onBindDelivery()
+                      },
+                    ])
+                }}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
+    )
   }
 }
 
@@ -504,10 +542,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderBottomColor: colors.colorEEE,
-    borderBottomWidth: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 5
+    padding: 12,
+    paddingRight: 15,
   },
   btn_select: {
     marginRight: pxToDp(20),

@@ -928,11 +928,6 @@ class MineScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
               ) :
-              // currVendorId == 68 ? <Text
-              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-              //   >
-              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-              //   </Text> :
               <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
                 {title_new}: ¥{turnover_new}
               </Text>
