@@ -55,15 +55,7 @@ class OrderQueryResultScene extends PureComponent {
     super(props);
     this.mixpanel = MixpanelInstance;
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
-    const {navigation, route} = this.props
-    let title = ''
-    let type = 'done'
-    title = '全部订单'
     this.mixpanel.track("全部的订单")
-    if (route.params.additional !== undefined && route.params.additional) {
-      title = '补送单'
-      type = 'additional'
-    }
     this.state = {
       isLoading: false,
       query: {
@@ -73,7 +65,6 @@ class OrderQueryResultScene extends PureComponent {
       },
       orders: [],
       isCanLoadMore: false,
-      type: type,
       date: dayjs().format('YYYY-MM-DD'),
       showDatePicker: false,
       end: false,
@@ -82,7 +73,6 @@ class OrderQueryResultScene extends PureComponent {
       platform: Cts.PLAT_ARRAY,
       selectStatus: STATUS_FILTER[0]
     };
-    navigation.setOptions({headerTitle: title})
 
   }
 
@@ -136,31 +126,32 @@ class OrderQueryResultScene extends PureComponent {
     );
   }
 
-  renderContent(orders) {
+  onMomentumScrollBegin = () => {
+    this.setState({
+      isCanLoadMore: true
+    })
+  }
+
+  renderContent() {
+    const {orders, isCanLoadMore, isLoading} = this.state
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
         <FlatList
-          extraData={orders}
           data={orders}
           renderItem={this.renderItem}
           onRefresh={() => this.onRefresh()}
           onEndReachedThreshold={0.1}
-          // onEndReached={this.onEndReached.bind(this)}
           onEndReached={() => {
-            if (this.state.isCanLoadMore) {
+            if (isCanLoadMore) {
               this.onEndReached();
               this.setState({isCanLoadMore: false})
             }
           }}
-          onMomentumScrollBegin={() => {
-            this.setState({
-              isCanLoadMore: true
-            })
-          }}
-          refreshing={this.state.isLoading}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          refreshing={isLoading}
           keyExtractor={(item, index) => `${index}`}
-          shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
+          //shouldItemUpdate={this._shouldItemUpdate}
+          // getItemLayout={(data, index) => this.getItemLayout(data, index)}
           ListEmptyComponent={this.listEmptyComponent()}
           initialNumToRender={5}
         />
@@ -220,19 +211,13 @@ class OrderQueryResultScene extends PureComponent {
     calcMs(timeObj, accessToken)
   }
 
-  _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
-
   render() {
-    const {orders, type} = this.state || []
+
     return (
-      <View style={{flex: 1, backgroundColor: colors.back_color}}>
-        <If condition={type === 'done'}>
-          {this.renderHeader()}
-        </If>
-        {this.renderContent(orders)}
-      </View>
+      <>
+        {this.renderHeader()}
+        {this.renderContent()}
+      </>
     );
   }
 
