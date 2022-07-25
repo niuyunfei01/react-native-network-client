@@ -1,6 +1,4 @@
 import Cts from "../common/Cts";
-import HttpUtils from "./http";
-import {setSimpleStore} from "../../reducers/global/globalActions";
 import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
@@ -199,32 +197,6 @@ export function store(global, store_id = null) {
   const {canReadStores, currStoreId} = global;
   store_id = store_id ? store_id : currStoreId
   return canReadStores[store_id];
-}
-
-/**
- * 获取当前店铺信息；如果不存在，则需自行获取
- * @param global
- * @param dispatch if null, means don't do dispatch
- * @param storeId if null,使用currStoreId
- * @param callback
- * @returns {*}
- */
-export function simpleStore(global, dispatch = null, storeId = null, callback = (store) => {
-}) {
-  const {currStoreId, simpleStore} = global
-  const id = null === storeId ? currStoreId : storeId
-  if (simpleStore && simpleStore.id == id) {
-    callback(simpleStore)
-  } else {
-    const {accessToken} = global;
-    HttpUtils.get.bind({global})(`/api/read_store_simple/${id}?access_token=${accessToken}`).then(store => {
-      if (dispatch) {
-        dispatch(setSimpleStore(store))
-      }
-      callback(store)
-    }, (res) => {
-    })
-  }
 }
 
 export function length(obj) {

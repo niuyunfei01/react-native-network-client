@@ -4,9 +4,7 @@
 import StorageUtil from "./StorageUtil";
 import native from "./native";
 import {Alert} from 'react-native'
-import HttpUtils from "./http";
 import DeviceInfo from "react-native-device-info";
-import JPush from "jpush-react-native";
 
 global.hostPort = '';
 
@@ -89,14 +87,13 @@ export default class GlobalUtil {
   }
 
   static async getUser() {
-    const _this = this
     return new Promise((resolve, reject) => {
       if (global.user && Object.keys(global.user).length) {
         resolve && resolve(global.user)
       } else {
         StorageUtil._get('user').then(user => {
           if (user && Object.keys(user).length) {
-            _this.setUser(user)
+            // this.setUser(user)
             resolve && resolve(user)
           } else {
             if (reject) {
@@ -174,57 +171,5 @@ export default class GlobalUtil {
     }
   }
 
-  /**
-   Map<String, Object> deviceStatus = Maps.newHashMap();
-   deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知
-   deviceStatus.put("disable_new_order_sound_notify", allConfig.get("disable_new_order_sound_notify")); //新订单声音通知
-
-   deviceStatus.put("orderId", orderId); //订单ID
-   deviceStatus.put("msgId", msgId); //推送消息ID
-
-   deviceStatus.put("listener_stores", allConfig.get("listener_stores")); //当前所在门店
-   deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting()); //是否开启蓝牙自动打印
-   deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));  //开启语音播报
-   // 以下为新增
-   // 设备ID：显示设备ID
-   // 设备品牌：显示具体的手机型号信息
-   // 系统通知权限是否开启：开启/未开启
-   // 设备音量大小：静音/正常
-   // 后台运行是否开启：开启/未开启
-   // 省电模式：开启/未开启
-   // [已重复] 语音播报是否开启：开启/未开启 (disable_sound_notify)
-   // [已重复] 新订单通知：开启/未开启
-   * @param props
-   * @param data
-   * @returns {Promise<void>}
-   */
-
-  static async sendDeviceStatus(props, data) {
-    //品牌 设备id
-    let brand = DeviceInfo.getBrand();
-    let UniqueID = DeviceInfo.getUniqueId();
-    let Appversion = DeviceInfo.getBuildNumber();
-    data.brand = brand
-    data.UniqueID = UniqueID
-    data.Appversion = Appversion
-    //系统通知
-    JPush.isNotificationEnabled((enabled) => {
-      data.notificationEnabled = enabled
-      native.getSettings((ok, settings, msg) => {
-        data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
-        data.disable_sound_notify = settings.disabledSoundNotify;
-        data.auto_print = settings.autoPrint;
-        data.Volume = settings.currentSoundVolume > 0
-        data.isRun = settings.isRunInBg;
-        data.isRinger = settings.isRinger;
-        const {accessToken} = props.global
-        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-        }, (res) => {
-
-        })
-      })
-    })
-
-  }
 }
 

@@ -10,6 +10,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import tool from "../../../pubilc/util/tool";
 import {showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import AppConfig from "../../../pubilc/common/config";
+import Config from "../../../pubilc/common/config";
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const mapStateToProps = state => {
@@ -59,9 +60,8 @@ class SeetingDeliveryInfo extends PureComponent {
   }
 
   onPress(route, params = {}, callback = {}) {
-    let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params, callback);
+      this.props.navigation.navigate(route, params, callback);
     });
   }
 
@@ -231,6 +231,7 @@ class SeetingDeliveryInfo extends PureComponent {
     return `勾选${length}方`
   }
 
+
   render() {
     const {
       menus,
@@ -258,8 +259,16 @@ class SeetingDeliveryInfo extends PureComponent {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
         >
-
+          <View style={styles.row}>
+            <Text style={styles.descriptionText}>
+              开启自动发单，省心省力
+            </Text>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY,{showId: 1})}>
+              了解更多
+            </Text>
+          </View>
           <View style={styles.titleItemWrap}>
+
             <View style={styles.titleWrap}>
               <Text style={{color: colors.color333}}>自动呼叫配送 </Text>
               <Switch value={auto_call} onValueChange={(res) => this.onValueChange(saveBtnStatus, res)}/>
@@ -441,6 +450,22 @@ class SeetingDeliveryInfo extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  row: {
+    width: '96%',
+    margin: '2%',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  descriptionText: {
+    color: colors.color333,
+    fontSize: 12
+  },
+  touchMore: {
+    fontSize: 12,
+    color: colors.main_color,
+    textDecorationLine: "underline",
+    paddingLeft: 8
+  },
   titleItemWrap: {
     backgroundColor: colors.white,
     width: '96%',
