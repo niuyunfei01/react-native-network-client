@@ -12,6 +12,8 @@ import store from "../../reducers/store/index"
 import {setRecordFlag} from "../../reducers/store/storeActions";
 import tool from "../../pubilc/util/tool";
 
+import OrderListScene from '../order/OrderListScene'
+
 function mapStateToProps(state) {
   const {global, remind} = state;
   return {global: global, remind: remind};
@@ -37,10 +39,6 @@ class TabHome extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    this.fetchShowRecordFlag()
-  }
-
   componentDidMount() {
     this.fetchShowRecordFlag()
     store.subscribe(() => {
@@ -63,9 +61,8 @@ class TabHome extends React.Component {
   }
 
   render() {
-    let {remindNum} = this.props.remind;
     let isBlx = false;
-    let global = this.props.global
+    let {global, remind, route} = this.props
     let {co_type} = tool.vendor(global);
     let storeVendorId = Number(global.config.vendor.id)
     let enabledGoodMgr = Number(global.config.enabled_good_mgr)
@@ -73,8 +70,8 @@ class TabHome extends React.Component {
       isBlx = true;
     }
 
-    const initialRouteName = this.props.route.params?.initialRouteName ?? 'Login'
-    const initTab = initialRouteName === "Tab" && (this.props.route.params?.initTab || "Orders") || initialRouteName
+    const initialRouteName = route.params?.initialRouteName ?? 'Login'
+    const initTab = initialRouteName === "Tab" && (route.params?.initTab || "Orders") || initialRouteName
     let {showFlag} = this.state
     return (
       <Tab.Navigator
@@ -92,9 +89,9 @@ class TabHome extends React.Component {
                     <FontAwesome5 name={'bell'} size={22}
                                   color={focused ? colors.main_color : colors.colorCCC}
                     />
-                    <If condition={remindNum > 0}>
+                    <If condition={remind > 0}>
                       <Badge
-                        value={remindNum > 99 ? '99+' : remindNum}
+                        value={remind > 99 ? '99+' : remind}
                         status="error"
                         containerStyle={{position: 'absolute', top: -5, right: -25}}
                       />
@@ -123,8 +120,8 @@ class TabHome extends React.Component {
                 tabBarLabel: "创建",
                 tabBarIcon: ({focused}) => (
                   <View style={{position: "relative"}}>
-                    <Icon name={"circle-with-plus"}
-                          style={{fontSize: 26, color: focused ? colors.main_color : colors.colorCCC}}/>
+                    <Icon name={"circle-with-plus"} size={26}
+                          style={{color: focused ? colors.main_color : colors.colorCCC}}/>
 
                   </View>
                 )
@@ -135,14 +132,13 @@ class TabHome extends React.Component {
 
         <Tab.Screen
           name="Orders"
-          getComponent={() => require("../order/OrderListScene").default}
+          component={OrderListScene}
+          //getComponent={() => require('../order/OrderListScene').default}
           options={
             {
               tabBarLabel: "订单",
               tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'file-alt'} size={22}
-                              color={focused ? colors.main_color : colors.colorCCC}
-                />
+                <FontAwesome5 name={'file-alt'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>
               ),
 
             }

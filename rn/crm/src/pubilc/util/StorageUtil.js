@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Storage from 'react-native-storage';
 
 let storage
-const size = 1000
+const size = 2000
 
 export default class StorageUtil {
   static init() {

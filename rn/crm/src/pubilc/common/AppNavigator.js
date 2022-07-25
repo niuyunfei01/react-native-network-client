@@ -3,9 +3,10 @@ import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
-import native from "../util/native";
 import Config from "./config";
 import {Dimensions} from "react-native";
+import LoginScene from "../../scene/common/Login/LoginScene";
+import TabHome from "../../scene/common/TabHome";
 
 let width = Dimensions.get("window").width;
 const Stack = createStackNavigator();
@@ -37,24 +38,19 @@ export const AppNavigator = (props) => {
                            (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
                          }
                          onStateChange={async () => {
-                           const previousRouteName = routeNameRef.current;
-                           const currentRouteName = navigationRef.current.getCurrentRoute().name;
-
-                           if (previousRouteName !== currentRouteName) {
-                             await native.reportRoute(currentRouteName);
-                           }
                            // Save the current route name for later comparison
-                           routeNameRef.current = currentRouteName;
+                           routeNameRef.current = navigationRef.current.getCurrentRoute().name;
                          }}>
       <Stack.Navigator
         initialRouteName={initialRouteName}
-        screenOptions={() => screenOptions}>
+        screenOptions={screenOptions}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
-                      getComponent={() => require("../../scene/common/TabHome").default}
+                      component={TabHome}
         />
         <Stack.Screen name="Login"
                       options={{headerShown: false}}
-                      getComponent={() => require("../../scene/common/Login/LoginScene").default}
+                      component={LoginScene}
+          //getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfo").default}
@@ -498,6 +494,10 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
                       options={{headerTitle: '功能详情'}}
                       getComponent={() => require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
+        />
+        <Stack.Screen name={Config.ROUTE_AUTO_CALL_DELIVERY}
+                      options={{headerTitle: '自动呼叫配送介绍'}}
+                      getComponent={() => require('../../scene/home/Delivery/AutoCallDelivery').default}
         />
       </Stack.Navigator>
     </NavigationContainer>

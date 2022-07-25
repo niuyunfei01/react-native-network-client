@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {getSimpleStore} from "../../../reducers/global/globalActions";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
@@ -52,7 +52,7 @@ class InventoryItems extends Component {
   UNSAFE_componentWillMount() {
 
     const {global, dispatch} = this.props
-    simpleStore(global, dispatch, null, (store) => {
+    getSimpleStore(global, dispatch, null, (store) => {
       this.setState({fnPriceControlled: store['fn_price_controlled']})
       this.search()
     })

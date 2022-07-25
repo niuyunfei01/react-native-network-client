@@ -1,13 +1,23 @@
 import React, {PureComponent} from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  InteractionManager
+} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button, CheckBox, Switch} from "react-native-elements";
 import * as globalActions from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import Config from "../../../pubilc/common/config";
 
 const mapStateToProps = state => {
   const {global} = state;
@@ -18,6 +28,24 @@ const mapDispatchToProps = dispatch => {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
+const styles = StyleSheet.create({
+  row: {
+    width: '96%',
+    margin: '2%',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  descriptionText: {
+    color: colors.color333,
+    fontSize: 12
+  },
+  touchMore: {
+    fontSize: 12,
+    color: colors.main_color,
+    textDecorationLine: "underline",
+    paddingLeft: 8
+  },
+})
 
 class SeetingMiniNumDelivery extends PureComponent {
   constructor(props) {
@@ -92,6 +120,12 @@ class SeetingMiniNumDelivery extends PureComponent {
   }
 
 
+  onPress = (route, params = {}, callback = {}) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params, callback);
+    });
+  }
+
   render() {
     const {menus, ship_ways} = this.state;
     let ship_ways_arr = []
@@ -123,7 +157,14 @@ class SeetingMiniNumDelivery extends PureComponent {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
         >
-
+          <View style={styles.row}>
+            <Text style={styles.descriptionText}>
+              开启保底配送有利于提高接单率
+            </Text>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY, {showId: 3})}>
+              了解更多
+            </Text>
+          </View>
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
             <View style={{
               flexDirection: "row",

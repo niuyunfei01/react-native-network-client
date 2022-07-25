@@ -29,6 +29,12 @@ export const Styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 8
   },
+  titleText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.color333,
+    lineHeight: 25
+  },
   headerTitleText: {
     padding: 12,
     fontSize: 15,

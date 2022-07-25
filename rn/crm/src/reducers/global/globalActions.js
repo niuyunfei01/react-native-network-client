@@ -103,6 +103,32 @@ export function setCurrentStore(currStoreId, simpleStore = null) {
   }
 }
 
+/**
+ * 获取当前店铺信息；如果不存在，则需自行获取
+ * @param global
+ * @param dispatch if null, means don't do dispatch
+ * @param storeId if null,使用currStoreId
+ * @param callback
+ * @returns {*}
+ */
+export function getSimpleStore(global, dispatch = null, storeId = null, callback = (store) => {
+}) {
+  const {currStoreId, simpleStore} = global
+  const id = null === storeId ? currStoreId : storeId
+  if (simpleStore && simpleStore.id == id) {
+    callback(simpleStore)
+  } else {
+    const {accessToken} = global;
+    HttpUtils.get.bind({global})(`/api/read_store_simple/${id}?access_token=${accessToken}`).then(store => {
+      if (dispatch) {
+        dispatch(setSimpleStore(store))
+      }
+      callback(store)
+    }, (res) => {
+    })
+  }
+}
+
 export function setSimpleStore(store) {
   return {
     type: SET_SIMPLE_STORE,
@@ -158,7 +184,7 @@ export function updateCfg(cfg) {
 export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    native.logout().then(() => {});
+    native.logout().then();
     JPush.deleteAlias({sequence: dayjs().unix()})
     if (typeof callback === 'function') {
       callback();

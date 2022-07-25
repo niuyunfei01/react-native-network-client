@@ -50,7 +50,7 @@ import pxToEm from "../../../pubilc/util/pxToEm";
 import native from "../../../pubilc/util/native";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/util/tool";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {getSimpleStore} from "../../../reducers/global/globalActions";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
@@ -645,7 +645,7 @@ class MineScene extends PureComponent {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          simpleStore(global, dispatch, store_id)
+          getSimpleStore(global, dispatch, store_id)
           this.getServiceStatus(store_id, accessToken)
           this.getHuichuan(store_id, accessToken)
         } else {

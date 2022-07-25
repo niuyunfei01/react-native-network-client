@@ -3,7 +3,8 @@ import {FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} f
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
-import tool, {simpleStore} from "../../../pubilc/util/tool"
+import tool from "../../../pubilc/util/tool"
+import {getSimpleStore} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http"
 import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
@@ -78,7 +79,7 @@ class StoreGoodsList extends Component {
       selectStatusItem: '',
       onStrict: false
     }
-    simpleStore(global, dispatch, currStoreId, (store) => {
+    getSimpleStore(global, dispatch, currStoreId, (store) => {
       this.setState({
         fnPriceControlled: store['fn_price_controlled'],
         fnProviding: Number(store['strict_providing']) > 0,
