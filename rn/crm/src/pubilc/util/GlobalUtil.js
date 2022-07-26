@@ -13,7 +13,6 @@ global.hostPort = '';
 global.user = null
 global.isorderFresh = 1;
 global.isGoodsFresh = 1;
-global.recommend = true;
 
 export default class GlobalUtil {
   /**
@@ -37,15 +36,6 @@ export default class GlobalUtil {
 
   static setGoodsFresh(isGoodsFresh) {
     global.isGoodsFresh = isGoodsFresh;
-  }
-
-
-  static getRecommend() {
-    return global.recommend;
-  }
-
-  static setRecommend(recommend) {
-    global.recommend = recommend;
   }
 
 

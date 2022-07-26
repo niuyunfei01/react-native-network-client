@@ -1398,7 +1398,6 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-        <If condition={this.state.show_activity && GlobalUtil.getRecommend()}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
@@ -1409,7 +1408,6 @@ class MineScene extends PureComponent {
             />
             <Text style={[block_styles.block_name]}>老带新活动</Text>
           </TouchableOpacity>
-        </If>
 
       </View>
     );

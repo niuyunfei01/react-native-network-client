@@ -903,7 +903,7 @@ class OrderListScene extends Component {
           </TouchableOpacity>
         </If>
         <If
-          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg }>
           <TouchableOpacity onPress={() => {
             this.onPressActivity()
           }} style={{paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'}}>
@@ -929,7 +929,7 @@ class OrderListScene extends Component {
   renderbottomImg = () => {
     return (
       <If
-        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg }>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
