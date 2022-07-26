@@ -50,7 +50,7 @@ import pxToEm from "../../../pubilc/util/pxToEm";
 import native from "../../../pubilc/util/native";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/util/tool";
-import {simpleStore} from "../../../pubilc/util/tool";
+import {getSimpleStore} from "../../../reducers/global/globalActions";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
@@ -104,6 +104,7 @@ class MineScene extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('我的')
     const {
       currentUser,
       currStoreId,
@@ -644,7 +645,7 @@ class MineScene extends PureComponent {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          simpleStore(global, dispatch, store_id)
+          getSimpleStore(global, dispatch, store_id)
           this.getServiceStatus(store_id, accessToken)
           this.getHuichuan(store_id, accessToken)
         } else {
@@ -927,11 +928,6 @@ class MineScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
               ) :
-              // currVendorId == 68 ? <Text
-              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-              //   >
-              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-              //   </Text> :
               <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
                 {title_new}: ¥{turnover_new}
               </Text>
@@ -1119,6 +1115,7 @@ class MineScene extends PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+        this.mixpanel.track('我的_查看回传率')
       }} style={{
         backgroundColor: colors.white,
         paddingVertical: 12,
@@ -1130,8 +1127,12 @@ class MineScene extends PureComponent {
       }}>
         <View>
           <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>{label} <Text
-            style={{fontSize: 14, color: color, fontWeight: 'bold'}}>{content} </Text> </Text>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>
+            {label}
+            <Text style={{fontSize: 14, color: color, fontWeight: 'bold'}}>
+              {content}
+            </Text>
+          </Text>
           <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
@@ -1397,7 +1398,6 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-        <If condition={this.state.show_activity && GlobalUtil.getRecommend()}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
@@ -1408,7 +1408,6 @@ class MineScene extends PureComponent {
             />
             <Text style={[block_styles.block_name]}>老带新活动</Text>
           </TouchableOpacity>
-        </If>
 
       </View>
     );

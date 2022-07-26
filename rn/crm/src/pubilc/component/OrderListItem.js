@@ -686,6 +686,7 @@ class OrderListItem extends React.PureComponent {
         <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
           <Button title={'重新上传配送信息'}
                   onPress={() => {
+                    this.mixpanel.track('配送回传详情页_重新上传')
                     this.setState({showDeliveryModal: false})
                     this.onAinSend(item.id, item.store_id)
                   }}
@@ -929,6 +930,7 @@ class OrderListItem extends React.PureComponent {
                       <View style={styles.driverContent}>
                         <Text style={styles.driverText}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                       </View>
+                      {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
                       <View style={styles.btnList}>
                         <If condition={info.btn_lists.can_cancel === 1}>
                           <Button title={'撤回呼叫'}

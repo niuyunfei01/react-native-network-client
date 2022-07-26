@@ -50,6 +50,7 @@ export default function configureStore(persistDoneCall) {
   const cfg = {
     keyPrefix: 'com.waisongbang.',
     storage: AsyncStorage,
+    blacklist: ['device', 'order', 'product', 'activity', 'mine', 'user', 'invoicing'],
     transforms: [expireTransform]
   };
 

@@ -11,15 +11,7 @@ import {
   View
 } from "react-native";
 
-import {setPlatform} from "./reducers/device/deviceActions";
-import {
-  getCommonConfig,
-  setAccessToken,
-  setBleStarted,
-  setCheckVersionAt,
-  setCurrentStore,
-  setUserProfile
-} from "./reducers/global/globalActions";
+import {setBleStarted, setCheckVersionAt} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import DeviceInfo from "react-native-device-info";
@@ -57,7 +49,7 @@ nrInit('Root');
 Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
 
 
-class RootScene extends PureComponent<{}> {
+class RootScene extends PureComponent {
   constructor() {
     super();
     StatusBar.setBarStyle("light-content");
@@ -75,37 +67,31 @@ class RootScene extends PureComponent<{}> {
       this.ptListener.remove()
     }
 
-    native.getAutoBluePrint((auto, isAutoBlePtMsg) => {
+    native.getAutoBluePrint((auto) => {
       this.setState({auto_blue_print: auto})
       if (!this.state.bleStarted) {
-        BleManager.start({showAlert: false}).then(() => {
-          console.log("done ble start")
-        });
+        BleManager.start({showAlert: false}).then();
         this.setState({bleStarted: true})
         this.store.dispatch(setBleStarted(true));
       }
-      console.log("got ble auto print:" + auto + " msg:" + isAutoBlePtMsg)
-    })
+    }).then()
 
-
+    let { lastCheckVersion = 0} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
       const {printer_id, bleStarted} = this.store.getState().global
       if (printer_id) {
 
         if (!bleStarted) {
-          BleManager.start({showAlert: false}).then(() => {
-            console.log("done ble start")
-          });
+          BleManager.start({showAlert: false}).then();
           this.store.dispatch(setBleStarted(true));
         }
 
         setTimeout(() => {
           const state = this.store.getState();
           const clb = (msg, error) => {
-            console.log("auto-print callback:", msg, error)
             // noinspection JSIgnoredPromiseFromCall
-            GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+            this.sendDeviceStatus(state, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
           };
 
           BleManager.retrieveServices(printer_id).then((peripheral) => {
@@ -113,8 +99,7 @@ class RootScene extends PureComponent<{}> {
           }).catch((error) => {
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
-              GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'}).then(() => {
-              })
+              this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'}).then()
               return;
             }
 
@@ -122,12 +107,10 @@ class RootScene extends PureComponent<{}> {
             BleManager.connect(printer_id).then(() => {
               BleManager.retrieveServices(printer_id).then((peripheral) => {
                 print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
-              }).catch((error) => {
-                //忽略第二次的结果
               })
             }).catch((error2) => {
               // noinspection JSIgnoredPromiseFromCall
-              GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+              this.sendDeviceStatus(state, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
               Alert.alert('提示', '无法自动打印: 打印机已断开连接', [{
                 text: '确定', onPress: () => {
                   if (RootNavigation) {
@@ -140,7 +123,8 @@ class RootScene extends PureComponent<{}> {
         }, 300);
       } else {
         // noinspection JSIgnoredPromiseFromCall
-        GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '未连接'})
+
+        this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '未连接'})
         Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
           text: '确定', onPress: () => {
             if (RootNavigation) {
@@ -155,9 +139,14 @@ class RootScene extends PureComponent<{}> {
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
-      GlobalUtil.sendDeviceStatus(state, obj)
+      this.sendDeviceStatus(state, obj).then()
     })
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
+    const currentTs = dayjs(new Date()).unix();
+    if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+      this.store.dispatch(setCheckVersionAt(currentTs))
+      this.checkVersion({global: this.store.getState().global});
+    }
   }
 
   doJPushSetAlias = (currentUser, logDesc) => {
@@ -165,12 +154,12 @@ class RootScene extends PureComponent<{}> {
       const alias = `uid_${currentUser}`;
       JPush.setAlias({alias: alias, sequence: dayjs().unix()})
       JPush.isPushStopped((isStopped) => {
-        console.log(`JPush is stopped: ${isStopped}`)
+
         if (isStopped) {
           JPush.resumePush();
         }
       })
-      console.log(`${logDesc} setAlias ${alias}`)
+
     }
   }
 
@@ -182,42 +171,35 @@ class RootScene extends PureComponent<{}> {
   }
 
   UNSAFE_componentWillMount() {
-    const launchProps = this.props.launchProps;
+    //const launchProps = this.props.launchProps;
 
     const current_ms = dayjs().valueOf();
 
     this.store = configureStore(
       function (store) {
-        const {
-          access_token,
-          currStoreId,
-          userProfile,
-        } = launchProps;
-
-        const {last_get_cfg_ts, currentUser} = this.store.getState().global;
-        if (access_token) {
-          store.dispatch(setAccessToken({access_token}));
-          store.dispatch(setPlatform("android"));
-          store.dispatch(setUserProfile(userProfile));
-          store.dispatch(setCurrentStore(currStoreId));
-
-          if (this.common_state_expired(last_get_cfg_ts)
-            && !this.state.onGettingCommonCfg) {
-            console.log("get common config");
-            this.setState({onGettingCommonCfg: true})
-            store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
-              this.setState({onGettingCommonCfg: false})
-            }));
-          }
-        }
-
-        this.doJPushSetAlias(currentUser, "afterConfigureStore")
-        GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
-        }).then(r => {
-
-        })
+        // const {access_token, currStoreId, userProfile} = launchProps;
+        //
+        // const {last_get_cfg_ts, currentUser} = this.store.getState().global;
+        // if (access_token) {
+        //   store.dispatch(setAccessToken({access_token}));
+        //   store.dispatch(setPlatform("android"));
+        //   store.dispatch(setUserProfile(userProfile));
+        //   store.dispatch(setCurrentStore(currStoreId));
+        //
+        //   if (this.common_state_expired(last_get_cfg_ts) && !this.state.onGettingCommonCfg) {
+        //     console.log("get common config");
+        //     this.setState({onGettingCommonCfg: true})
+        //     store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+        //       this.setState({onGettingCommonCfg: false})
+        //     }));
+        //   }
+        // }
+        //
+        // this.doJPushSetAlias(currentUser, "afterConfigureStore")
+        GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
 
         this.setState({rehydrated: true});
+        this.doJPushSetAlias(currentUser, "afterConfigureStore")
         const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
 
@@ -225,70 +207,96 @@ class RootScene extends PureComponent<{}> {
     );
   }
 
+  /**
+   Map<String, Object> deviceStatus = Maps.newHashMap();
+   deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知
+   deviceStatus.put("disable_new_order_sound_notify", allConfig.get("disable_new_order_sound_notify")); //新订单声音通知
+
+   deviceStatus.put("orderId", orderId); //订单ID
+   deviceStatus.put("msgId", msgId); //推送消息ID
+
+   deviceStatus.put("listener_stores", allConfig.get("listener_stores")); //当前所在门店
+   deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting()); //是否开启蓝牙自动打印
+   deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));  //开启语音播报
+   // 以下为新增
+   // 设备ID：显示设备ID
+   // 设备品牌：显示具体的手机型号信息
+   // 系统通知权限是否开启：开启/未开启
+   // 设备音量大小：静音/正常
+   // 后台运行是否开启：开启/未开启
+   // 省电模式：开启/未开启
+   // [已重复] 语音播报是否开启：开启/未开启 (disable_sound_notify)
+   // [已重复] 新订单通知：开启/未开启
+   * @param props
+   * @param data
+   * @returns {Promise<void>}
+   */
+
+   sendDeviceStatus(props, data) {
+
+    //系统通知
+    JPush.isNotificationEnabled((enabled) => {
+      native.getSettings((ok, settings, msg) => {
+        //品牌 设备id
+        data.notificationEnabled = enabled
+        data.brand = DeviceInfo.getBrand();
+        data.UniqueID = DeviceInfo.getUniqueId()
+        data.Appversion = DeviceInfo.getBuildNumber()
+        data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
+        data.disable_sound_notify = settings.disabledSoundNotify;
+        data.auto_print = settings.autoPrint;
+        data.Volume = settings.currentSoundVolume > 0
+        data.isRun = settings.isRunInBg;
+        data.isRinger = settings.isRinger;
+        const {accessToken} = props.global
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
+        }, (res) => {
+
+        })
+      }).then()
+    })
+
+  }
+
   render() {
     const {launchProps} = this.props;
-    const {orderId,backPage} = launchProps;
+    const {orderId, backPage, currStoreId} = launchProps;
     let initialRouteName = launchProps["_action"];
     if (!!backPage) {
       launchProps["_action_params"]["backPage"] = backPage;
     }
     let initialRouteParams = launchProps["_action_params"] || {};
 
-    if (this.state.rehydrated) {
-      SplashScreen.hide();
+    let {accessToken, currentUser} = this.store.getState().global;
+    SplashScreen.hide();
+    if (!accessToken) {
+      // showError("请您先登录")
 
-      let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
-
-      if (!this.store.getState().global.accessToken) {
-        // showError("请您先登录")
-
-        initialRouteName = Config.ROUTE_LOGIN;
-        initialRouteParams = {next: "", nextParams: {}};
-      } else {
-
-        const currentTs = dayjs(new Date()).unix();
-        console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
-        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
-          this.store.dispatch(setCheckVersionAt(currentTs))
-          this.checkVersion({global: this.store.getState().global});
+      initialRouteName = Config.ROUTE_LOGIN;
+      initialRouteParams = {next: "", nextParams: {}};
+    } else {
+      if (!initialRouteName) {
+        if (orderId) {
+          initialRouteName = Config.ROUTE_ORDER;
+          initialRouteParams = {orderId};
+        } else {
+          initialRouteName = "Tab";
         }
-
-        if (!initialRouteName) {
-          if (orderId) {
-            initialRouteName = Config.ROUTE_ORDER;
-            initialRouteParams = {orderId};
-          } else {
-            initialRouteName = "Tab";
-          }
-        }
-      }
-
-      console.log(`initialRouteName: ${initialRouteName}, initialRouteParams: `, initialRouteParams);
-
-      const {last_get_cfg_ts} = this.store.getState().global;
-      if (this.common_state_expired(last_get_cfg_ts) && accessToken) {
-        this.store.dispatch(
-          getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-          })
-        );
       }
     }
-
+    nrRecordMetric("restore_redux", {time: this.passed_ms, currStoreId, currentUser})
     // on Android, the URI prefix typically contains a host in addition to scheme
-    const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
+    //const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     let rootView = (
       <Provider store={this.store}>
+
         <View style={styles.container}>
           <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
             <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
-          <AppNavigator
-            uriPrefix={prefix}
-            store_={this.store}
-            initialRouteName={initialRouteName}
-            initialRouteParams={initialRouteParams}
-          />
+          <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
         </View>
+
       </Provider>
     )
     if (Platform.OS === 'ios') {
@@ -298,15 +306,13 @@ class RootScene extends PureComponent<{}> {
         </SafeAreaView>
       )
     }
-    return !this.state.rehydrated ? (
-      <View/>
-    ) : rootView;
+    return this.state.rehydrated ? rootView : <View/>
   }
 
-  common_state_expired(last_get_cfg_ts) {
-    let current_time = dayjs(new Date()).unix();
-    return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
-  }
+  // common_state_expired(last_get_cfg_ts) {
+  //   let current_time = dayjs(new Date()).unix();
+  //   return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
+  // }
 
   checkVersion(props) {
     HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
@@ -328,11 +334,9 @@ class RootScene extends PureComponent<{}> {
                     console.log(errorMessage, statusCode, 'error')
                   },
                   onComplete() {
-
                   }
                 }
-              }).then(() => {
-              });
+              }).then();
             }
           },
         ])
