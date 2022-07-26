@@ -40,6 +40,7 @@ class DiyPrinter extends PureComponent {
       show_product_discounts: false,
       show_distribution_distance: false,
       show_goods_code: false,
+      invoice_serial_set: 0,
     }
     this.get_printer_custom_cfg()
   }
@@ -55,6 +56,7 @@ class DiyPrinter extends PureComponent {
         show_product_discounts: res.show_product_discounts,
         show_distribution_distance: res.show_distribution_distance,
         show_goods_code: res.show_goods_code,
+        invoice_serial_set: res.invoice_serial_set ? Number(res.invoice_serial_set) : 0,
         isRefreshing: false
       })
     })
@@ -89,7 +91,8 @@ class DiyPrinter extends PureComponent {
         show_product_price,
         show_product_discounts,
         show_distribution_distance,
-        show_goods_code
+        show_goods_code,
+        invoice_serial_set,
       } = this.state;
       let fromData = {
         font_size: font_size,
@@ -98,6 +101,7 @@ class DiyPrinter extends PureComponent {
         show_product_discounts: show_product_discounts,
         show_distribution_distance: show_distribution_distance,
         show_goods_code: show_goods_code,
+        invoice_serial_set: invoice_serial_set,
         store_id: currStoreId,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
@@ -167,7 +171,7 @@ class DiyPrinter extends PureComponent {
             <View style={{
               borderBottomWidth: 1,
               paddingBottom: 2,
-              borderColor: colors.colorCCC
+              borderColor: colors.colorEEE
             }}>
               <Text style={{
                 color: colors.color333,
@@ -209,7 +213,7 @@ class DiyPrinter extends PureComponent {
             <View style={{
               borderBottomWidth: 1,
               paddingBottom: 2,
-              borderColor: colors.colorCCC
+              borderColor: colors.colorEEE
             }}>
               <Text style={{
                 color: colors.color333,
@@ -228,7 +232,7 @@ class DiyPrinter extends PureComponent {
             }}
                               style={{
                                 borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
+                                borderColor: colors.colorEEE,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 paddingHorizontal: 8,
@@ -256,7 +260,7 @@ class DiyPrinter extends PureComponent {
             }}
                               style={{
                                 borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
+                                borderColor: colors.colorEEE,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 paddingHorizontal: 8,
@@ -285,7 +289,7 @@ class DiyPrinter extends PureComponent {
             }}
                               style={{
                                 borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
+                                borderColor: colors.colorEEE,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 paddingHorizontal: 8,
@@ -313,7 +317,7 @@ class DiyPrinter extends PureComponent {
             }}
                               style={{
                                 borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
+                                borderColor: colors.colorEEE,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 paddingHorizontal: 8,
@@ -338,7 +342,7 @@ class DiyPrinter extends PureComponent {
             }}
                               style={{
                                 borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
+                                borderColor: colors.colorEEE,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 paddingHorizontal: 8,
@@ -376,6 +380,77 @@ class DiyPrinter extends PureComponent {
             </TouchableOpacity>
           </View>
 
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            marginBottom: 10,
+            padding: 10,
+            paddingBottom: 4,
+          }}>
+            <View style={{
+              borderBottomWidth: 1,
+              paddingBottom: 2,
+              borderColor: colors.colorEEE
+            }}>
+              <Text style={{
+                color: colors.color333,
+                padding: 10,
+                paddingLeft: 8,
+                fontSize: 15,
+                fontWeight: 'bold',
+              }}>小票 </Text>
+            </View>
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                invoice_serial_set: 0
+              })
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorEEE,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>使用平台店名与平台单号 </Text>
+              <If condition={this.state.invoice_serial_set === 0}>
+                <Entypo name={'check'} style={{
+                  fontSize: 22,
+                  color: colors.main_color,
+                }}/>
+              </If>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                invoice_serial_set: 1
+              })
+            }}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>使用商家名称与总单号 </Text>
+              <If condition={this.state.invoice_serial_set === 1}>
+                <Entypo name={'check'} style={{
+                  fontSize: 22,
+                  color: colors.main_color,
+                }}/>
+              </If>
+            </TouchableOpacity>
+          </View>
 
           <View style={{
             backgroundColor: colors.white,
@@ -387,7 +462,7 @@ class DiyPrinter extends PureComponent {
             <View style={{
               borderBottomWidth: 1,
               paddingBottom: 2,
-              borderColor: colors.colorCCC
+              borderColor: colors.colorEEE
             }}>
               <Text style={{
                 color: colors.color333,

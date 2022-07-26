@@ -52,6 +52,7 @@ const {
   SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
+  SET_SHOW_FLOAT_SERVICE_ICON,
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
@@ -157,6 +158,12 @@ export function setOrderListExtStore(show) {
   }
 }
 
+export function setFloatSerciceIcon(show) {
+  return {
+    type: SET_SHOW_FLOAT_SERVICE_ICON,
+    show: show
+  }
+}
 
 export function setExtStore(list) {
   return {

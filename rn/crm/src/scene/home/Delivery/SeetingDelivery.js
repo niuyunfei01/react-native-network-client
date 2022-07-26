@@ -14,7 +14,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {Cell, CellBody, CellFooter, Cells, Switch} from "../../../weui";
-import Icons from "react-native-vector-icons/Entypo"
+import Entypo from "react-native-vector-icons/Entypo"
 import * as globalActions from "../../../reducers/global/globalActions";
 import {showError, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
@@ -26,9 +26,10 @@ import {Button} from "react-native-elements";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const mapStateToProps = state => {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {global} = state;
+  return {global: global};
 }
+
 const mapDispatchToProps = dispatch => {
   return {
     actions: bindActionCreators({...globalActions}, dispatch)
@@ -58,7 +59,7 @@ class SeetingDelivery extends PureComponent {
       max_call_time: "10",
       ship_ways: [],
       order_require_minutes: 0,
-      default: '',
+      default_str: '',
       zs_way: false,
       show_auto_confirm_order: false,
       showBtn: false,
@@ -69,7 +70,6 @@ class SeetingDelivery extends PureComponent {
       alert_title: '',
       alert_msg: '',
       alert_mobile: '',
-      ship_ways_name: '',
       saveBtnStatus: 0,
       isShowSettingText: false,
       showSetMeituanBtn: false,
@@ -110,20 +110,6 @@ class SeetingDelivery extends PureComponent {
           })
         }
       }
-      let ship_ways_name = ''
-      if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
-        for (let i of response.ship_ways) {
-          for (let j of response.menus) {
-            if (i === j.id) {
-              if (tool.length(ship_ways_name) === 0) {
-                ship_ways_name = j.name
-              } else {
-                ship_ways_name = ship_ways_name + ',' + j.name
-              }
-            }
-          }
-        }
-      }
 
       this.setState({
         isRefreshing: false,
@@ -134,16 +120,13 @@ class SeetingDelivery extends PureComponent {
         deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
         max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
-        default: response.default ? response.default : '',
+        default_str: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0,
         show_auto_confirm_order: this.props.global.config.vendor.wsb_store_account === '1',
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
-        ship_ways_name: ship_ways_name,
         isShowSettingText: JSON.parse(response.preference_ship_config).is_open === 1,
         showSetMeituanBtn: response.platform === '3',
-      }, () => {
-        this.get_time_interval()
       })
 
     })
@@ -151,21 +134,24 @@ class SeetingDelivery extends PureComponent {
 
   onBindDelivery() {
 
-    if (this.state.suspend_confirm_order) {
-      let {suspend_confirm_order} = this.state
-      this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
-    } else {
-      let {suspend_confirm_order} = this.state
-      this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
-    }
-
-    if (this.state.auto_call && this.state.ship_ways.length === 0) {
+    const {
+      suspend_confirm_order,
+      auto_call,
+      ship_ways,
+      zs_way,
+      max_call_time,
+      deploy_time,
+      order_require_minutes,
+      default_str,
+    } = this.state
+    this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
+    if (auto_call && ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
       return;
     }
 
-    if (this.state.zs_way) {
+    if (zs_way) {
       ToastLong("暂不支持平台专送修改");
       this.setState({isRefreshing: false});
       return;
@@ -177,12 +163,13 @@ class SeetingDelivery extends PureComponent {
         accessToken,
         this.props.route.params.ext_store_id,
         {
-          auto_call: this.state.auto_call ? 1 : 2,
-          suspend_confirm_order: this.state.suspend_confirm_order ? "0" : "1",
-          ship_ways: this.state.ship_ways,
-          default: this.state.default,
-          max_call_time: this.state.max_call_time,
-          deploy_time: this.state.deploy_time,
+          auto_call: auto_call ? 1 : 2,
+          suspend_confirm_order: suspend_confirm_order ? "0" : "1",
+          ship_ways: ship_ways,
+          default: default_str,
+          max_call_time: max_call_time,
+          deploy_time: deploy_time,
+          order_require_minutes: order_require_minutes
         },
         (success, response) => {
           this.setState({isRefreshing: false})
@@ -196,34 +183,6 @@ class SeetingDelivery extends PureComponent {
     }, 1000)
   }
 
-
-  get_time_interval() {
-    if (this.state.ship_ways.length == 0 || this.state.max_call_time == 0) {
-      return this.state.max_call_time + "分"
-    }
-    let interval = this.state.max_call_time * 60 / this.state.ship_ways.length
-    var theTime = parseInt(interval); // 秒
-    var theTime1 = 0; // 分
-    var theTime2 = 0; // 小时
-    if (theTime > 60) {
-      theTime1 = parseInt(theTime / 60);
-      theTime = parseInt(theTime % 60);
-      if (theTime1 > 60) {
-        theTime2 = parseInt(theTime1 / 60);
-        theTime1 = parseInt(theTime1 % 60);
-      }
-    }
-    var result = "" + parseInt(theTime) + "秒";
-    if (theTime1 > 0) {
-      result = "" + parseInt(theTime1) + "分" + result;
-    }
-    if (theTime2 > 0) {
-      result = "" + parseInt(theTime2) + "小时" + result;
-    }
-    this.setState({
-      time_interval: result
-    });
-  }
 
   render() {
     const {ship_ways} = this.state;
@@ -265,8 +224,8 @@ class SeetingDelivery extends PureComponent {
               marginBottom: pxToDp(10),
               alignItems: "center"
             }}>
-              <Icons name="help-with-circle"
-                     style={{marginTop: pxToDp(7), fontSize: pxToDp(30), color: colors.warn_color}}/>
+              <Entypo name="help-with-circle"
+                      style={{marginTop: pxToDp(7), fontSize: pxToDp(30), color: colors.warn_color}}/>
               <Text style={{
                 fontSize: pxToDp(30),
                 marginTop: pxToDp(7),
@@ -321,7 +280,7 @@ class SeetingDelivery extends PureComponent {
               {/*  color: colors.color999,*/}
               {/*  marginLeft: pxToDp(10)*/}
               {/*}}>了解详情 </Text>*/}
-              {/*<Icons name='chevron-thin-right' style={[styles.right_btn]}/>*/}
+              {/*<Entypo name='chevron-thin-right' style={[styles.right_btn]}/>*/}
             </TouchableOpacity>}
 
           <If condition={this.state.show_auto_confirm_order && !this.state.disabled_auto_confirm_order}>
@@ -378,7 +337,7 @@ class SeetingDelivery extends PureComponent {
                 <Text style={[styles.cell_body_text]}>自动呼叫配送</Text>
               </CellBody>
               <CellFooter>
-                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                <Entypo name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>
           </Cells>
@@ -397,7 +356,7 @@ class SeetingDelivery extends PureComponent {
                 <Text style={[styles.cell_body_text]}>就近分配订单</Text>
               </CellBody>
               <CellFooter>
-                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                <Entypo name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>
           </Cells>
@@ -418,10 +377,7 @@ class SeetingDelivery extends PureComponent {
                   <If condition={isShowSettingText}>
                     <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text>
                   </If>
-                  <If condition={!isShowSettingText}>
-                    <Text style={{color: colors.color333}}> </Text>
-                  </If>
-                  <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                  <Entypo name='chevron-thin-right' style={[styles.right_btns]}/>
                 </>
               </CellFooter>
             </Cell>
@@ -439,7 +395,7 @@ class SeetingDelivery extends PureComponent {
                 <Text style={[styles.cell_body_text]}>设置保底配送</Text>
               </CellBody>
               <CellFooter>
-                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                <Entypo name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>
           </Cells>
@@ -556,9 +512,6 @@ const
       color: colors.color333,
       height: pxToDp(60),
       textAlignVertical: "center"
-
-      // borderColor: 'green',
-      // borderWidth: 1,
     },
     right_btn: {
       fontSize: pxToDp(26),

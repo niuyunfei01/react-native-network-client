@@ -25,6 +25,7 @@ const {
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
+  SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
 } = require('../../pubilc/common/constants').default
 
@@ -48,6 +49,7 @@ const initialState = {
   printer_id: '',
   mixpanel_id: '',
   bleStarted: false,
+  show_float_service_icon: true,
   user_config: {
     order_list_by: 'expectTime asc',
   }
@@ -157,6 +159,9 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_SHOW_EXT_STORE:
       return {...state, show_orderlist_ext_store: action.show}
+
+    case SET_SHOW_FLOAT_SERVICE_ICON:
+      return {...state, show_float_service_icon: action.show}
 
 
     case SET_EXT_STORE:

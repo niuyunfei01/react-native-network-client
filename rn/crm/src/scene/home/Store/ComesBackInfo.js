@@ -189,7 +189,7 @@ class OrderQueryResultScene extends PureComponent {
             <Image style={{
               width: 60,
               height: 60,
-            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png'}}/>
+            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}}/>
             <View style={{marginLeft: 15, marginTop: 4}}>
               <Text style={{fontSize: 14, color: colors.color333}}>{ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>
