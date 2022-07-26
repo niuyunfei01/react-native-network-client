@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm;
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
@@ -15,6 +16,7 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -77,6 +79,7 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
+import org.xutils.common.util.MD5;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,6 +96,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -122,6 +126,7 @@ import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -363,6 +368,17 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
         application = this;
+
+        String myId = SettingUtility.getMyUUID();
+        if ("".equals(myId)) {
+            myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+            SettingUtility.setMyUUID(myId);
+        }
+
+        @SuppressLint("HardwareIds") String android_id = myId;
+        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
+        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
+        updateAfterGap(24 * 60 * 60 * 1000);
 
         try {
             Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");

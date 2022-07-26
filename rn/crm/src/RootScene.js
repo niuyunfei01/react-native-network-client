@@ -76,7 +76,7 @@ class RootScene extends PureComponent {
       }
     }).then()
 
-    let { lastCheckVersion = 0} = this.store.getState().global;
+    let {lastCheckVersion = 0} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
       const {printer_id, bleStarted} = this.store.getState().global
@@ -154,7 +154,6 @@ class RootScene extends PureComponent {
       const alias = `uid_${currentUser}`;
       JPush.setAlias({alias: alias, sequence: dayjs().unix()})
       JPush.isPushStopped((isStopped) => {
-
         if (isStopped) {
           JPush.resumePush();
         }
@@ -172,9 +171,6 @@ class RootScene extends PureComponent {
 
   UNSAFE_componentWillMount() {
     //const launchProps = this.props.launchProps;
-
-    const current_ms = dayjs().valueOf();
-
     this.store = configureStore(
       function (store) {
         // const {access_token, currStoreId, userProfile} = launchProps;
@@ -197,12 +193,7 @@ class RootScene extends PureComponent {
         //
         // this.doJPushSetAlias(currentUser, "afterConfigureStore")
         GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
-
         this.setState({rehydrated: true});
-        this.doJPushSetAlias(currentUser, "afterConfigureStore")
-        const passed_ms = dayjs().valueOf() - current_ms;
-        nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-
       }.bind(this)
     );
   }
@@ -232,7 +223,7 @@ class RootScene extends PureComponent {
    * @returns {Promise<void>}
    */
 
-   sendDeviceStatus(props, data) {
+  sendDeviceStatus(props, data) {
 
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
@@ -308,11 +299,6 @@ class RootScene extends PureComponent {
     }
     return this.state.rehydrated ? rootView : <View/>
   }
-
-  // common_state_expired(last_get_cfg_ts) {
-  //   let current_time = dayjs(new Date()).unix();
-  //   return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
-  // }
 
   checkVersion(props) {
     HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
