@@ -866,6 +866,7 @@ class OrderListScene extends Component {
   }
 
   rendertopImg = () => {
+    let showTopImg = this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg;
     return (
       <View>
         <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
@@ -903,7 +904,7 @@ class OrderListScene extends Component {
           </TouchableOpacity>
         </If>
         <If
-          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg }>
+          condition={showTopImg}>
           <TouchableOpacity onPress={() => {
             this.onPressActivity()
           }} style={{paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'}}>
