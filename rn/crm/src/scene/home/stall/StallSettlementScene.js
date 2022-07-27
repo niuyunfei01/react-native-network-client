@@ -14,10 +14,11 @@ const today = dayjs().format('YYYY-MM-DD');
 class StallSettlementScene extends PureComponent {
     constructor(props) {
         super(props)
-        this.navigationOptions()
+
     }
 
     componentDidMount() {
+        this.navigationOptions()
         const {selectedDate} = this.state
         this.getAllStallList(selectedDate)
     }
