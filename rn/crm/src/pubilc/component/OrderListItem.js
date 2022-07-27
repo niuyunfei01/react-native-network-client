@@ -52,6 +52,17 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+const tipListTop = [
+  {label: '1元', value: 1},
+  {label: '2元', value: 2},
+  {label: '3元', value: 3}
+]
+const tipListBottom = [
+  {label: '4元', value: 4},
+  {label: '5元', value: 5},
+  {label: '10元', value: 10}
+]
+
 class OrderListItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
@@ -97,9 +108,6 @@ class OrderListItem extends React.PureComponent {
 
   fetchShipData = (item) => {
     tool.debounces(() => {
-      //保存参数 作为Tips的传参
-      // this.state.order_id = item.id;
-      // this.state.store_id = item.store_id;
       showModal('加载中...')
       const api = `/v1/new_api/orders/third_deliverie_record/${this.props.item.id}?access_token=${this.props.accessToken}`;
       HttpUtils.get.bind(this.props)(api).then(res => {
@@ -185,8 +193,7 @@ class OrderListItem extends React.PureComponent {
 
   upAddTip = () => {
     let {addMoneyNum, shipId} = this.state;
-    const accessToken = this.props.accessToken;
-    const {dispatch} = this.props;
+    const {dispatch, accessToken} = this.props;
     if (addMoneyNum > 0) {
       dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
@@ -231,7 +238,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
-    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
+    this.onPress(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
       storeId: store_id,
       selectedWay: [],
@@ -248,8 +255,7 @@ class OrderListItem extends React.PureComponent {
 
   onClickTimes = (item) => {
     let searchTerm = `@@${item['real_mobile']}|||store:${item['store_id']}`
-    const {navigation} = this.props
-    navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {term: searchTerm, max_past_day: 10000})
+    this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {term: searchTerm, max_past_day: 10000})
   }
 
   goVeriFicationToShop = (id) => {
@@ -263,7 +269,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   onAinSend = (order_id, store_id) => {
-    this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
+    this.onPress(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
       onBack: (res) => {
@@ -276,6 +282,21 @@ class OrderListItem extends React.PureComponent {
         }
       }
     });
+  }
+
+  toSetOrderComplete = (order_id) => {
+    Alert.alert('确认将订单已送达', '订单置为已送达后无法撤回，是否继续？', [{
+      text: '确认', onPress: () => {
+        const api = `/api/complete_order/${order_id}?access_token=${this.props.accessToken}`
+        HttpUtils.get(api).then(res => {
+          ToastLong('订单已送达')
+          this.props.fetchData()
+          GlobalUtil.setOrderFresh(1)
+        }).catch(() => {
+          showError('置为送达失败')
+        })
+      }
+    }, {text: '再想想'}])
   }
 
   hideModalTip = () => {
@@ -458,10 +479,11 @@ class OrderListItem extends React.PureComponent {
   }
 
   render() {
+    let {order_id, modalTip, store_id} = this.state
     return (
       <View>
-        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
-              storeId={this.state.store_id} key={this.state.order_id} modalTip={this.state.modalTip}
+        <Tips navigation={this.props.navigation} orderId={order_id}
+              storeId={store_id} key={order_id} modalTip={modalTip}
               onItemClick={() => this.hideModalTip()}/>
         {this.renderItem()}
         {this.renderPickModal()}
@@ -627,21 +649,25 @@ class OrderListItem extends React.PureComponent {
     this.mixpanel.track('订单列表页_我自己送')
   }
   renderButton = () => {
-    let {item, orderStatus} = this.props;
+    let {item} = this.props;
     return (
       <View style={styles.btnContent}>
 
-        <If condition={orderStatus === 9 && this.props.showBtn}>
+        <If condition={item.btn_list && item.btn_list.btn_ignore_delivery}>
           <Button title={'忽略配送'}
                   onPress={() => this.loseDelivery(item.id)}
                   buttonStyle={[styles.modalBtn, {borderColor: colors.colorCCC}]}
                   titleStyle={{color: colors.colorCCC, fontSize: 16}}
           />
+        </If>
+        <If condition={item.btn_list && item.btn_list.transfer_self}>
           <Button title={'我自己送'}
                   onPress={() => this.myselfSend(item)}
                   buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
+        </If>
+        <If condition={item.btn_list && item.btn_list.btn_call_third_delivery}>
           <Button title={'呼叫配送'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
@@ -651,29 +677,14 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={(Number(orderStatus) === 10 || Number(orderStatus) === 8) && this.props.showBtn}>
-          <Button title={'呼叫配送'}
-                  onPress={() => {
-                    this.onCallThirdShips(item.id, item.store_id)
-                  }}
-                  buttonStyle={styles.callDeliveryBtn}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-          <Button title={'我自己送'}
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id)
-                  }}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
-                  titleStyle={{color: colors.main_color, fontSize: 16}}
-          />
-        </If>
-        <If condition={(Number(orderStatus) === 2 || Number(orderStatus) === 3) && this.props.showBtn}>
+        <If condition={item.btn_list && item.btn_list.btn_contact_rider}>
           <Button title={'联系骑手'}
                   onPress={() => this.dialNumber(item.ship_worker_mobile)}
                   buttonStyle={styles.callDeliveryBtn}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
+        </If>
+        <If condition={item.btn_list && item.btn_list.btn_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
@@ -689,6 +700,20 @@ class OrderListItem extends React.PureComponent {
                     this.mixpanel.track('配送回传详情页_重新上传')
                     this.setState({showDeliveryModal: false})
                     this.onAinSend(item.id, item.store_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    width: width * 0.86,
+                    borderColor: colors.main_color,
+                    backgroundColor: colors.main_color
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+        <If condition={item.btn_list && item.btn_list.btn_confirm_arrived == 1}>
+          <Button title={'确认送达'}
+                  onPress={() => {
+                    this.mixpanel.track('确认送达')
+                    this.toSetOrderComplete(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     width: width * 0.86,
@@ -781,16 +806,6 @@ class OrderListItem extends React.PureComponent {
 
   renderAddTipModal = () => {
     let {is_merchant_add_tip} = this.state
-    const tipListTop = [
-      {label: '1元', value: 1},
-      {label: '2元', value: 2},
-      {label: '3元', value: 3}
-    ]
-    const tipListBottom = [
-      {label: '4元', value: 4},
-      {label: '5元', value: 5},
-      {label: '10元', value: 10}
-    ]
     return (
       <Modal
         visible={this.state.addTipModal}
@@ -840,7 +855,7 @@ class OrderListItem extends React.PureComponent {
                 <Text style={styles.addTipInputRight}>元</Text>
               </View>
               <If condition={!this.state.ok || this.state.addMoneyNum === 0}>
-                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                <View style={styles.addTipIcon}>
                   <Entypo name={"help-with-circle"}
                           style={styles.addTipHelpIcon}/>
                   <Text style={styles.addTipReason}>{this.state.respReason}</Text>
@@ -1263,6 +1278,7 @@ const styles = StyleSheet.create({
     top: "25%",
     right: "5%"
   },
+  addTipIcon: {flexDirection: "row", alignItems: "center", justifyContent: "flex-start"},
   addTipHelpIcon: {
     fontSize: pxToDp(35),
     color: colors.warn_red,
