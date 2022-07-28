@@ -138,7 +138,6 @@ class BindMeituan extends PureComponent {
                   marginLeft: 'auto',
                   fontSize: pxToDp(24),
                   color: colors.main_color,
-                  width: pxToDp(160),
                   marginRight: pxToDp(20),
                   marginBottom: pxToDp(30),
                   borderRadius: pxToDp(5),
@@ -146,6 +145,7 @@ class BindMeituan extends PureComponent {
                   textAlign: 'center',
                   borderWidth: pxToDp(1),
                   borderColor: colors.main_color,
+                  padding: 10
                 }}>绑定打印机</Text>
             </If>
           </TouchableOpacity>
