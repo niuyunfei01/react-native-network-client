@@ -39,6 +39,7 @@ import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import RemindModal from "../../pubilc/component/remindModal";
 import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
+import Swiper from 'react-native-swiper'
 
 const {width} = Dimensions.get("window");
 
@@ -256,14 +257,16 @@ class OrderListScene extends Component {
         this.setState({
           img: obj.banner,
           showImgType: obj.can_close,
-          activityUrl: obj.url + '?access_token=' + accessToken,
-          activity: obj,
+          activity: obj.list,
         })
         this.mixpanel.track("act_user_ref_ad_view", {
-          img_name: obj.name,
-          pos: obj.pos_name,
           store_id: currStoreId,
+          list: obj.list
         });
+      } else {
+        this.setState({
+          show_img: false
+        })
       }
     }).catch(error => {
       timeObj.method.push({
@@ -277,14 +280,14 @@ class OrderListScene extends Component {
     })
   }
 
-  closeActivity = () => {
+  closeActivity = (info) => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/close_user_refer_ad?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
     })
     this.mixpanel.track("close_user_refer_ad", {
-      img_name: this.state.activity.name,
-      pos: this.state.activity.pos_name,
+      img_name: info.name,
+      pos: info.pos_name,
       store_id: currStoreId,
     });
   }
@@ -360,7 +363,6 @@ class OrderListScene extends Component {
       }
     })
   }
-
 
   onRefresh = (status) => {
     tool.debounces(() => {
@@ -775,6 +777,36 @@ class OrderListScene extends Component {
     );
   }
 
+  renderSwiper = () => {
+    let {activity} = this.state
+    return (
+        <Swiper style={styles.wrapper}
+                showsButtons={false}
+                height={100}
+                horizontal={true}
+                paginationStyle={{bottom: 10}}
+                autoplay={true}
+                autoplayTimeout={4}
+                loop={true}
+        >
+          <For index='i' each='info' of={activity}>
+            <View style={styles.slide1} key={i}>
+              <TouchableOpacity onPress={() => {
+                this.onPressActivity(info)
+              }} style={styles.topImgBottom}>
+                <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+              </TouchableOpacity>
+              <Entypo onPress={() => {
+                this.setState({
+                  show_img: false
+                }, () => this.closeActivity(info))
+              }} name='cross' size={25} style={styles.topImgIcon}/>
+            </View>
+          </For>
+        </Swiper>
+    )
+  }
+
   renderNoOrder = () => {
     return (
       <View style={styles.noOrderContent}>
@@ -790,18 +822,18 @@ class OrderListScene extends Component {
     )
   }
 
-  onPressActivity = () => {
-    const {currStoreId} = this.props.global;
-    this.onPress(Config.ROUTE_WEB, {url: this.state.activityUrl, title: '老带新活动'})
+  onPressActivity = (info) => {
+    const {currStoreId, accessToken} = this.props.global;
+    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
     this.mixpanel.track("act_user_ref_ad_click", {
-      img_name: this.state.activity.name,
-      pos: this.state.activity.pos_name,
+      img_name: info.name,
+      pos: info.pos_name,
       store_id: currStoreId,
     });
   }
 
   renderTopImg = () => {
-    let showTopImg = this.state.img !== '' && this.state.showImgType === 1 && this.state.show_img;
+    let showTopImg = this.state.showImgType === 1 && this.state.show_img;
     return (
       <View>
         <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
@@ -817,16 +849,7 @@ class OrderListScene extends Component {
           </TouchableOpacity>
         </If>
         <If condition={showTopImg}>
-          <TouchableOpacity onPress={() => {
-            this.onPressActivity()
-          }} style={styles.topImgBottom}>
-            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-            <Entypo onPress={() => {
-              this.setState({
-                show_img: false
-              }, () => this.closeActivity())
-            }} name='cross' style={styles.topImgIcon}/>
-          </TouchableOpacity>
+          {this.renderSwiper()}
         </If>
 
       </View>
@@ -834,13 +857,28 @@ class OrderListScene extends Component {
   }
 
   renderBottomImg = () => {
+    let {activity} = this.state
     return (
-      <If condition={this.state.img !== '' && this.state.showImgType !== 1 && this.state.show_img }>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={styles.bottomImg}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-        </TouchableOpacity>
+      <If condition={this.state.showImgType === 0 && this.state.show_img }>
+        <Swiper style={styles.wrapper}
+                showsButtons={false}
+                height={100}
+                horizontal={true}
+                paginationStyle={{bottom: 10}}
+                autoplay={true}
+                autoplayTimeout={4}
+                loop={true}
+        >
+          <For index='i' each='info' of={activity}>
+            <View style={styles.slide1} key={i}>
+              <TouchableOpacity onPress={() => {
+                this.onPressActivity(info)
+              }} style={styles.bottomImg}>
+                <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+              </TouchableOpacity>
+            </View>
+          </For>
+        </Swiper>
       </If>
     )
   }
@@ -1055,7 +1093,7 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10)
   },
   image: {
-    // width: '100%',
+    width: width,
     height: 70,
     borderRadius: 10
   },
@@ -1103,16 +1141,22 @@ const styles = StyleSheet.create({
   },
   topImgBottom: {paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'},
   topImgIcon: {
-    fontSize: 25,
     position: 'absolute',
     color: colors.white,
     right: 12,
     top: -1,
   },
   bottomImg: {
-    paddingTop: '5%', paddingLeft: '3%', paddingRight: '3%',
+    paddingLeft: '3%', paddingRight: '3%',paddingBottom: pxToDp(20)
   },
-
+  wrapper: {
+    marginVertical: 10
+  },
+  slide1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)
