@@ -745,11 +745,15 @@ class MineScene extends PureComponent {
       "auto_hide": 0,
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (tool.length(res) > 0) {
-        this.setState({
-          show_activity: true,
-          activity_img: res.icon,
-          activity_url: res.url + '?access_token=' + accessToken,
+      if (Array.isArray(res.list) && tool.length(res.list) > 0) {
+        res.list.map(item => {
+          if (item.id === '3') {
+            this.setState({
+              show_activity: true,
+              activity_img: item.icon,
+              activity_url: item.url + '?access_token=' + accessToken,
+            })
+          }
         })
       }
     })
