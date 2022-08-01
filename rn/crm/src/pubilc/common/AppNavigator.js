@@ -5,10 +5,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
 import {Dimensions} from "react-native";
-import LoginScene from "../../scene/common/Login/LoginScene";
+//import LoginScene from "../../scene/common/Login/LoginScene";
 import TabHome from "../../scene/common/TabHome";
 
-let width = Dimensions.get("window").width;
+let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
 const screenOptions = ({
   headerShown: true,
@@ -49,8 +49,8 @@ export const AppNavigator = (props) => {
         />
         <Stack.Screen name="Login"
                       options={{headerShown: false}}
-                      component={LoginScene}
-          //getComponent={() => require('../../scene/common/Login/LoginScene').default}
+          //component={LoginScene}
+                      getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfo").default}
