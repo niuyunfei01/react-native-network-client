@@ -58,6 +58,7 @@ class RootScene extends PureComponent {
     this.state = {
       rehydrated: false,
       onGettingCommonCfg: false,
+      bleStarted: false
     };
     this.store = null;
   }
@@ -109,7 +110,7 @@ class RootScene extends PureComponent {
     }
 
     native.getAutoBluePrint((auto, isAutoBlePtMsg) => {
-      this.setState({auto_blue_print: auto})
+      //this.setState({auto_blue_print: auto})
       if (!this.state.bleStarted) {
         BleManager.start({showAlert: false}).then();
         this.setState({bleStarted: true})
@@ -242,7 +243,7 @@ class RootScene extends PureComponent {
         //
         // this.doJPushSetAlias(currentUser, "afterConfigureStore")
         GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
-
+        SplashScreen.hide();
         this.setState({rehydrated: true});
         this.passed_ms = dayjs().valueOf() - current_ms;
         console.log('耗时：', this.passed_ms)
@@ -280,7 +281,7 @@ class RootScene extends PureComponent {
    * @returns {Promise<void>}
    */
 
-   sendDeviceStatus(props, data) {
+  sendDeviceStatus(props, data) {
 
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
@@ -297,16 +298,19 @@ class RootScene extends PureComponent {
         data.isRun = settings.isRunInBg;
         data.isRinger = settings.isRinger;
         const {accessToken} = props.global
-        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-        }, (res) => {
-
-        })
-      }).then()
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then()
+      })
+        .then()
     })
 
   }
 
   render() {
+
+    return this.state.rehydrated ? this.getRootView() : <View/>
+  }
+
+  getRootView = () => {
     const {launchProps} = this.props;
     const {orderId, backPage, currStoreId} = launchProps;
     let initialRouteName = launchProps["_action"];
@@ -316,7 +320,7 @@ class RootScene extends PureComponent {
     let initialRouteParams = launchProps["_action_params"] || {};
 
     let {accessToken, currentUser} = this.store.getState().global;
-    SplashScreen.hide();
+
     if (!accessToken) {
       // showError("请您先登录")
 
@@ -354,9 +358,8 @@ class RootScene extends PureComponent {
         </SafeAreaView>
       )
     }
-    return this.state.rehydrated ? rootView : <View/>
+    return rootView
   }
-
   // common_state_expired(last_get_cfg_ts) {
   //   let current_time = dayjs(new Date()).unix();
   //   return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;

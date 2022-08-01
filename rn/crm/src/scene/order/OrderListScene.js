@@ -164,8 +164,7 @@ class OrderListScene extends Component {
             },
             {
               text: '去设置', onPress: () => {
-                native.toOpenNotifySettings((resp, msg) => {
-                })
+                native.toOpenNotifySettings().then()
                 // this.onPress(Config.ROUTE_SETTING);
               }
             },
@@ -189,11 +188,11 @@ class OrderListScene extends Component {
             },
           ])
         }
-      })
+      }).then()
 
       native.xunfeiIdentily((resp) => {
         console.log(resp, 'kedaxunfei');
-      })
+      }).then()
 
     }
   }
@@ -257,7 +256,7 @@ class OrderListScene extends Component {
         this.setState({
           img: obj.banner,
           showImgType: obj.can_close,
-          activity: obj.list,
+          activity: obj.list ?? [obj]
         })
         this.mixpanel.track("act_user_ref_ad_view", {
           store_id: currStoreId,
@@ -644,9 +643,13 @@ class OrderListScene extends Component {
             <TouchableOpacity
               key={i}
               style={{width: tab_width * width, alignItems: "center"}}
-              onPress={() => {this.onRefresh(tab.status)}}>
+              onPress={() => {
+                this.onRefresh(tab.status)
+              }}>
               <View style={styles.statusTabItem}>
-                <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>{tab.tabname} </Text>
+                <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>
+                  {tab.tabname}
+                </Text>
                 <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
                   <Badge
                     status="error"
@@ -680,7 +683,7 @@ class OrderListScene extends Component {
           onEndReachedThreshold={0.3}
           onEndReached={() => {
             if (this.state.isCanLoadMore) {
-              this.setState({isCanLoadMore: false}, () => {this.listmore();})
+              this.setState({isCanLoadMore: false}, () => this.listmore())
             }
           }}
           onMomentumScrollBegin={() => {
@@ -780,30 +783,28 @@ class OrderListScene extends Component {
   renderSwiper = () => {
     let {activity} = this.state
     return (
-        <Swiper style={styles.wrapper}
-                showsButtons={false}
-                height={100}
-                horizontal={true}
-                paginationStyle={{bottom: 10}}
-                autoplay={true}
-                autoplayTimeout={4}
-                loop={true}
-        >
-          <For index='i' each='info' of={activity}>
-            <View style={styles.slide1} key={i}>
-              <TouchableOpacity onPress={() => {
-                this.onPressActivity(info)
-              }} style={styles.topImgBottom}>
-                <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
-              </TouchableOpacity>
-              <Entypo onPress={() => {
-                this.setState({
-                  show_img: false
-                }, () => this.closeActivity(info))
-              }} name='cross' size={25} style={styles.topImgIcon}/>
-            </View>
-          </For>
-        </Swiper>
+      <Swiper style={styles.wrapper}
+              showsButtons={false}
+              height={100}
+              horizontal={true}
+              paginationStyle={{bottom: 10}}
+              autoplay={true}
+              autoplayTimeout={4}
+              loop={true}
+      >
+        <For index='i' each='info' of={activity}>
+          <View style={styles.slide1} key={i}>
+            <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.topImgBottom}>
+              <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+            </TouchableOpacity>
+            <Entypo onPress={() => {
+              this.setState({
+                show_img: false
+              }, () => this.closeActivity(info))
+            }} name='cross' size={25} style={styles.topImgIcon}/>
+          </View>
+        </For>
+      </Swiper>
     )
   }
 
@@ -859,7 +860,7 @@ class OrderListScene extends Component {
   renderBottomImg = () => {
     let {activity} = this.state
     return (
-      <If condition={this.state.showImgType === 0 && this.state.show_img }>
+      <If condition={this.state.showImgType === 0 && this.state.show_img}>
         <Swiper style={styles.wrapper}
                 showsButtons={false}
                 height={100}
@@ -920,7 +921,15 @@ const styles = StyleSheet.create({
   },
   closeNewVersionModal: {fontSize: 20, textAlign: 'right'},
   modalBtnText: {color: colors.white, fontSize: 20, padding: 12, textAlign: 'center'},
-  cell_row: {marginLeft: 0, paddingLeft: pxToDp(20), backgroundColor: "#F2DDE0", height: pxToDp(70), flexDirection: "row", alignItems: "center", justifyContent: "space-between"},
+  cell_row: {
+    marginLeft: 0,
+    paddingLeft: pxToDp(20),
+    backgroundColor: "#F2DDE0",
+    height: pxToDp(70),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
   cell_body_text: {
     fontSize: pxToDp(30),
     fontWeight: 'bold',
@@ -1147,7 +1156,7 @@ const styles = StyleSheet.create({
     top: -1,
   },
   bottomImg: {
-    paddingLeft: '3%', paddingRight: '3%',paddingBottom: pxToDp(20)
+    paddingLeft: '3%', paddingRight: '3%', paddingBottom: pxToDp(20)
   },
   wrapper: {
     marginVertical: 10
