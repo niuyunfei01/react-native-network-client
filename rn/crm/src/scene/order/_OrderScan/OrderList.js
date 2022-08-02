@@ -79,7 +79,7 @@ class OrderList extends BaseComponent {
                   <Text style={{color: colors.color333}}>
                     {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
                     &nbsp;
-                    {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
+                    {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : (prod.product.upc ? `UPC:${prod.product.upc}` : '')}
                   </Text>
                   <If condition={prod.can_scan}>
                     <Text style={
