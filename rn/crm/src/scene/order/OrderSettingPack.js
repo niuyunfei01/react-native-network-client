@@ -75,7 +75,6 @@ class OrderSettingScene extends Component {
       addressId: '',
       refreshDom: false
     };
-
     this._toSetLocation = this._toSetLocation.bind(this);
   }
 
@@ -104,14 +103,12 @@ class OrderSettingScene extends Component {
     const {location_long, location_lat, coordinates} = this.state
     let center = ""
     if (location_long && location_lat) {
-      // center = `${location_long},${location_lat}`
       center = coordinates
     }
 
     const params = {
       action: Config.LOC_PICKER,
       center: center,
-      cityname: tool.store(this.props.global).city,
       loc_lat: tool.store(this.props.global).loc_lat,
       loc_lng: tool.store(this.props.global).loc_lng,
       isType: "orderSetting",
@@ -130,10 +127,7 @@ class OrderSettingScene extends Component {
         });
       }
     };
-
     this.onPress(Config.ROUTE_SEARC_HSHOP, params);
-
-
   }
 
   onPress = (route, params = {}) => {
@@ -165,7 +159,7 @@ class OrderSettingScene extends Component {
         this.onConfirm()
       }} style={styles.modalCancel1}>
         <View>
-          <Text style={styles.modalCancelText1}>确&nbsp;&nbsp;&nbsp;&nbsp;认</Text>
+          <Text style={styles.modalCancelText1}>确 认</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -302,7 +296,6 @@ class OrderSettingScene extends Component {
           showError('保存失败请重试！')
         }
       }
-
     }).catch((reason) => {
       showError(reason)
     })
@@ -352,23 +345,10 @@ class OrderSettingScene extends Component {
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.getCurrentStoreName.bind(this)}/>
         <ScrollView style={[styles.container]}>
-          <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1
-            }}>
-              <View style={{
-                backgroundColor: '#59B26A',
-                width: 31,
-                height: 31,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 20,
-                margin: 15
-              }}>
-                <Text style={{color: colors.white, fontSize: 16}}>寄</Text>
+          <View style={styles.containerTitle}>
+            <View style={styles.containerTitleSend}>
+              <View style={styles.titleLabel}>
+                <Text style={styles.titleLabelText}>寄</Text>
               </View>
               <Input
                 value={this.state.currentStoreName}
@@ -379,32 +359,19 @@ class OrderSettingScene extends Component {
               />
             </View>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onPress={this._toSetLocation}>
-              <View style={{
-                backgroundColor: '#FFB44B',
-                width: 31,
-                height: 31,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 20,
-                margin: 15
-              }}>
-                <Text style={{color: colors.white, fontSize: 16}}>收</Text>
+              <View style={styles.containerTitlePut}>
+                <Text style={styles.titleLabelText}>收</Text>
               </View>
               <Text style={[styles.body_text, {flex: 1}]}>
                 {(location_long !== "" && location_lat !== "")
                   ? `${location_long}(${location_lat})` : `请选择定位地址`}
               </Text>
               <Entypo name='chevron-thin-right'
-                      style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
+                      style={styles.locationIcon}/>
             </TouchableOpacity>
           </View>
-          <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1
-            }}>
+          <View style={styles.containerInfo}>
+            <View style={styles.containerInfoAddress}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>详细地址：</Text>
               <TextInput placeholder="楼号、单元、门牌号等 "
                          underlineColorAndroid="transparent"
@@ -416,18 +383,13 @@ class OrderSettingScene extends Component {
                          }}
               />
               <TouchableOpacity style={{marginLeft: 40, marginRight: 20, flex: 1}} onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_ORDER_ADDRESS_BOOK)
+                this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK)
                 this.setState({
                   refreshDom: false
                 })
               }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
             </View>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1
-            }}>
+            <View style={styles.containerInfoName}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>收货人：</Text>
               <TextInput placeholder="请输入收货人姓名"
                          underlineColorAndroid="transparent"
@@ -439,13 +401,7 @@ class OrderSettingScene extends Component {
                          }}
               />
             </View>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1
-            }}>
+            <View style={styles.containerInfoMobile}>
               <Text style={{color: colors.color333, marginLeft: 15, marginRight: 10}}> 联系方式：</Text>
               <TextInput placeholder="请输入收货人手机号 "
                          maxLength={11}
@@ -507,14 +463,7 @@ class OrderSettingScene extends Component {
                 this.state.inputShow &&
                 <TextArea
                   maxLength={240}
-                  style={{
-                    fontSize: 12,
-                    paddingLeft: 10,
-                    borderRadius: 5,
-                    backgroundColor: '#EEEEEE',
-                    marginTop: 10,
-                    marginBottom: 20
-                  }}
+                  style={styles.showInput}
                   placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
                   placeholderTextColor={'#bbb'}
                   onChange={value => {
@@ -526,18 +475,7 @@ class OrderSettingScene extends Component {
               }
               {
                 this.state.inputShow &&
-                <TouchableOpacity style={{
-                  backgroundColor: colors.main_color,
-                  borderRadius: 10,
-                  padding: 10,
-                  width: 100,
-                  marginTop: 10,
-                  position: "absolute",
-                  right: 70,
-                  top: 147,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }} onPress={() => {
+                <TouchableOpacity style={styles.showInputBtn} onPress={() => {
                   this.intelligentIdentification()
                 }}>
                   <Text style={{color: colors.white, fontSize: 12}}>智能识别</Text>
@@ -567,26 +505,12 @@ class OrderSettingScene extends Component {
           />
 
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1,
-              paddingHorizontal: 15,
-              paddingVertical: 10
-            }}>
+            <View style={styles.containerSetWeight}>
               <Text style={{color: colors.color333}}> 重量：</Text>
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <TextInput placeholder="0"
                            underlineColorAndroid="transparent"
-                           style={{
-                             height: 40,
-                             borderWidth: 1,
-                             borderColor: colors.colorDDD,
-                             width: 80,
-                             borderRadius: 5
-                           }}
+                           style={styles.containerSetWeightInput}
                            placeholderTextColor={'#ddd'}
                            keyboardType={'numeric'}
                            value={this.state.weight}
@@ -599,34 +523,13 @@ class OrderSettingScene extends Component {
                 <Text style={{color: colors.color333, marginHorizontal: 10}}>千克</Text>
               </View>
             </View>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1,
-              paddingHorizontal: 15,
-              paddingVertical: 10
-            }}>
+            <View style={styles.containerSetAmount}>
               <Text style={{color: colors.color333}}> 订单金额：</Text>
-              {(orderAmount > 0) && <View style={{
-                position: "absolute",
-                left: pxToDp(160),
-                top: pxToDp(40),
-                backgroundColor: colors.main_color,
-                padding: 2,
-                borderRadius: 10
-              }}><Text style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
+              {(orderAmount > 0) && <View style={styles.containerSetAmountNotice}><Text style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <TextInput placeholder="0"
                            underlineColorAndroid="transparent"
-                           style={{
-                             height: 40,
-                             borderWidth: 1,
-                             borderColor: colors.colorDDD,
-                             width: 80,
-                             borderRadius: 5
-                           }}
+                           style={styles.containerSetWeightInput}
                            placeholderTextColor={'#ddd'}
                            keyboardType={'numeric'}
                            value={this.state.orderAmount}
@@ -640,17 +543,7 @@ class OrderSettingScene extends Component {
               </View>
             </View>
           </View>
-          <TouchableOpacity style={{
-            backgroundColor: colors.white,
-            width: '96%',
-            margin: '2%',
-            borderRadius: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 15,
-            paddingVertical: 10,
-            justifyContent: "space-between"
-          }} onPress={() => {
+          <TouchableOpacity style={styles.dateModal} onPress={() => {
             this.setState({showDateModal: true})
           }}>
             <Text style={{color: colors.color333}}> 期望送达：</Text>
@@ -667,23 +560,12 @@ class OrderSettingScene extends Component {
               </Text>
               {is_right_once ?
                 <Entypo name='chevron-thin-right'
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "bold",
-                          color: colors.color999,
-                          marginHorizontal: 10
-                        }}/> : null}
+                        style={styles.dateModalIcon}/> : null}
             </View>
           </TouchableOpacity>
           <View
-            style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, paddingBottom: 10}}>
-            <View style={{
-              flexDirection: "row",
-              borderBottomColor: colors.colorEEE,
-              borderBottomWidth: 1,
-              paddingHorizontal: 15,
-              paddingVertical: 10
-            }}>
+            style={styles.setOrderRemark}>
+            <View style={styles.orderRemark}>
               <Text style={{color: colors.color333, height: 20, fontWeight: "bold"}}>订单备注</Text>
             </View>
             <TextArea
@@ -699,19 +581,12 @@ class OrderSettingScene extends Component {
             />
           </View>
         </ScrollView>
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginTop: pxToDp(20),
-          backgroundColor: colors.white,
-          paddingVertical: 10
-        }}>
+        <View style={styles.saveBtn}>
           <TouchableOpacity onPress={() => {
             this.mixpanel.track('新建订单_保存')
             this.orderToSave(1)
           }}>
-            <View
-              style={styles.saveButtonStyle1}>
+            <View style={styles.saveButtonStyle1}>
               <Text style={styles.saveButtonStyle}> 保存 </Text>
             </View>
           </TouchableOpacity>
@@ -730,6 +605,137 @@ class OrderSettingScene extends Component {
 
 const styles = StyleSheet.create({
   container: {backgroundColor: "#f2f2f2"},
+  containerTitle: {backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10},
+  containerTitleSend: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1
+  },
+  titleLabel: {
+    backgroundColor: '#59B26A',
+    width: 31,
+    height: 31,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    margin: 15
+  },
+  titleLabelText: {color: colors.white, fontSize: 16},
+  containerTitlePut: {
+    backgroundColor: '#FFB44B',
+    width: 31,
+    height: 31,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    margin: 15
+  },
+  locationIcon: {fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20},
+  containerInfo: {backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10},
+  containerInfoAddress: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1
+  },
+  containerInfoName: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1
+  },
+  containerInfoMobile: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1
+  },
+  showInput: {
+    fontSize: 12,
+    paddingLeft: 10,
+    borderRadius: 5,
+    backgroundColor: '#EEEEEE',
+    marginBottom: 20
+  },
+  showInputBtn: {
+    backgroundColor: colors.main_color,
+    borderRadius: 10,
+    padding: 10,
+    width: 100,
+    marginTop: 10,
+    position: "absolute",
+    right: 70,
+    top: 147,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  containerSetWeight: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10
+  },
+  containerSetWeightInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: colors.colorDDD,
+    width: 80,
+    borderRadius: 5
+  },
+  containerSetAmount: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10
+  },
+  containerSetAmountNotice: {
+    position: "absolute",
+    left: pxToDp(160),
+    top: pxToDp(40),
+    backgroundColor: colors.main_color,
+    padding: 2,
+    borderRadius: 10
+  },
+  dateModal: {
+    backgroundColor: colors.white,
+    width: '96%',
+    margin: '2%',
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    justifyContent: "space-between"
+  },
+  dateModalIcon: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.color999,
+    marginHorizontal: 10
+  },
+  orderRemark: {
+    flexDirection: "row",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10
+  },
+  setOrderRemark: {backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, paddingBottom: 10},
+  saveBtn: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: pxToDp(20),
+    backgroundColor: colors.white,
+    paddingVertical: 10
+  },
   border_top: {
     borderTopWidth: pxToDp(1),
     borderTopColor: colors.color999
