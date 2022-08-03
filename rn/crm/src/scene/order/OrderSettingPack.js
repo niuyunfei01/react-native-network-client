@@ -24,6 +24,16 @@ function mapStateToProps(state) {
   };
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 const mapDispatchToProps = dispatch => {
   return {
     actions: bindActionCreators({...globalActions}, dispatch)
@@ -80,6 +90,13 @@ class OrderSettingScene extends Component {
         addressId: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.id : '',
       }
     }
+  }
+
+  getCurrentStoreName = () => {
+    let {currStoreName} = tool.vendor(this.props.global);
+    this.setState({
+      currentStoreName: currStoreName
+    })
   }
 
   _toSetLocation = () => {
@@ -333,6 +350,7 @@ class OrderSettingScene extends Component {
     let str = dayjs(time).format('YYYY-MM-DD HH:mm')
     return (
       <View style={{flex: 1}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.getCurrentStoreName.bind(this)}/>
         <ScrollView style={[styles.container]}>
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
             <View style={{
