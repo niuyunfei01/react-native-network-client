@@ -115,7 +115,7 @@ class OrderSettingScene extends Component {
       onBack: resp => {
         let {name, address, location} = resp;
         let locate = name;
-        let locate1 = address;
+        let locate1 = address === '' ? name : address;
         let locationAll = location.split(',')
         this.setState({
           location_long: locate,
