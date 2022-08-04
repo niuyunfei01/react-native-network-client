@@ -357,7 +357,7 @@ class SettingScene extends PureComponent {
                           style={styles.item_row}>
           <Text style={styles.row_label}>余额不足通知 </Text>
           <Text style={styles.row_footer}>
-            {funds_threshold > 0 ? funds_threshold + '元' : "设置阀值"}
+            {funds_threshold > 0 ? funds_threshold + '元' : "设置通知"}
           </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
         </TouchableOpacity>
@@ -702,7 +702,7 @@ class SettingScene extends PureComponent {
         <JbbModal visible={this.state.showDeliveryModal} onClose={() =>
           this.setState({showDeliveryModal: false})}>
           <View>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>设置阀值</Text>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>设置通知</Text>
             <Text style={{color: 'red', lineHeight: pxToDp(40)}}>{this.get_msg()} </Text>
 
             <View style={{

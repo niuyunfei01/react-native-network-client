@@ -1,9 +1,8 @@
 import React, {PureComponent} from "react";
-import {FlatList, Modal, Platform, TouchableOpacity, StyleSheet, Text, TextInput, View} from 'react-native'
+import {FlatList, Modal, Platform, TouchableOpacity, Dimensions, StyleSheet, Text, TextInput, View} from 'react-native'
 import Config from "../../common/config";
 import {showError, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
-import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
 
 const {height} = Dimensions.get("window");

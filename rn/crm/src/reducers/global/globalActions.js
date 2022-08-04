@@ -316,7 +316,7 @@ export function doAuthLogin(access_token, expire, props, callback) {
     }
   }, (res) => {
     if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "账号异常")
+      callback(false, "账号错误，请检查账号是否正确")
     } else {
       callback(false, "获取不到账户相关信息");
     }

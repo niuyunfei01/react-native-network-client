@@ -1,5 +1,5 @@
 import React from 'react'
-import {Dimensions, PanResponder, TouchableOpacity, View} from "react-native";
+import {Dimensions, PanResponder, Platform, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
 import {connect} from "react-redux";
@@ -104,12 +104,12 @@ class FloatServiceIcon extends React.Component {
       return null;
     }
     return (
-      <View style={{
-        zIndex: 999,
-      }}>
+      <View style={[Platform.OS === "ios" ? {
+        zIndex: 999
+      } : {}]}>
         <View style={{
-          width: 60,
-          height: 60,
+          width: 62,
+          height: 62,
           borderRadius: 30,
           backgroundColor: colors.main_color,
           justifyContent: 'center',
@@ -174,7 +174,7 @@ class FloatServiceIcon extends React.Component {
           position: 'absolute',
           zIndex: 999,
           top: top - 4,
-          left: left + 50
+          left: left + 50,
         }} ref={(c) => this.floatIconx = c}
         >
           <Entypo onPress={() => {
@@ -182,7 +182,7 @@ class FloatServiceIcon extends React.Component {
             ToastLong("客服快捷功能已关闭，可在设置中打开")
           }} name="circle-with-cross"
                   style={{
-                    zIndex: 999, fontSize: 18, color: colors.fontGray
+                    zIndex: 999, fontSize: 20, color: colors.fontGray
                   }}/>
         </TouchableOpacity>
       </View>

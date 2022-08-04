@@ -49,6 +49,7 @@ nrInit('Root');
 Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
 
 
+
 class RootScene extends PureComponent {
   constructor() {
     super();
@@ -57,6 +58,7 @@ class RootScene extends PureComponent {
     this.state = {
       rehydrated: false,
       onGettingCommonCfg: false,
+      bleStarted: false
     };
     this.store = null;
   }
@@ -67,8 +69,8 @@ class RootScene extends PureComponent {
       this.ptListener.remove()
     }
 
-    native.getAutoBluePrint((auto) => {
-      this.setState({auto_blue_print: auto})
+    native.getAutoBluePrint((auto, isAutoBlePtMsg) => {
+      //this.setState({auto_blue_print: auto})
       if (!this.state.bleStarted) {
         BleManager.start({showAlert: false}).then();
         this.setState({bleStarted: true})
@@ -99,7 +101,7 @@ class RootScene extends PureComponent {
           }).catch((error) => {
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
-              this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'}).then()
+              this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
               return;
             }
 
@@ -139,7 +141,7 @@ class RootScene extends PureComponent {
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
-      this.sendDeviceStatus(state, obj).then()
+      this.sendDeviceStatus(state, obj)
     })
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
     const currentTs = dayjs(new Date()).unix();
@@ -193,6 +195,7 @@ class RootScene extends PureComponent {
         //
         // this.doJPushSetAlias(currentUser, "afterConfigureStore")
         GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
+        SplashScreen.hide();
         this.setState({rehydrated: true});
       }.bind(this)
     );
@@ -220,7 +223,6 @@ class RootScene extends PureComponent {
    // [已重复] 新订单通知：开启/未开启
    * @param props
    * @param data
-   * @returns {Promise<void>}
    */
 
   sendDeviceStatus(props, data) {
@@ -240,16 +242,18 @@ class RootScene extends PureComponent {
         data.isRun = settings.isRunInBg;
         data.isRinger = settings.isRinger;
         const {accessToken} = props.global
-        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-        }, (res) => {
-
-        })
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then()
       }).then()
     })
 
   }
 
   render() {
+
+    return this.state.rehydrated ? this.getRootView() : <View/>
+  }
+
+  getRootView = () => {
     const {launchProps} = this.props;
     const {orderId, backPage, currStoreId} = launchProps;
     let initialRouteName = launchProps["_action"];
@@ -259,7 +263,7 @@ class RootScene extends PureComponent {
     let initialRouteParams = launchProps["_action_params"] || {};
 
     let {accessToken, currentUser} = this.store.getState().global;
-    SplashScreen.hide();
+
     if (!accessToken) {
       // showError("请您先登录")
 
@@ -297,7 +301,7 @@ class RootScene extends PureComponent {
         </SafeAreaView>
       )
     }
-    return this.state.rehydrated ? rootView : <View/>
+    return rootView
   }
 
   checkVersion(props) {
