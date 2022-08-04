@@ -23,11 +23,16 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
+import {
+  getCommonConfig,
+  getSimpleStore,
+  setCurrentStore,
+  upCurrentProfile
+} from "../../../reducers/global/globalActions";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
-import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -50,12 +55,10 @@ import pxToEm from "../../../pubilc/util/pxToEm";
 import native from "../../../pubilc/util/native";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/util/tool";
-import {getSimpleStore} from "../../../reducers/global/globalActions";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
-import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 var ScreenWidth = Dimensions.get("window").width;
@@ -88,10 +91,9 @@ function mapDispatchToProps(dispatch) {
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    return navigation.addListener('focus', () => {
       onRefresh()
     });
-    return unsubscribe;
   }, [navigation])
   return null;
 }
@@ -147,7 +149,6 @@ class MineScene extends PureComponent {
       bad_cases_of: bad_cases_of[currentUser] || '',
       order_num: order_num[currStoreId] || '',
       turnover: turnover[currStoreId] || '',
-      currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,
       mobile_phone: mobilephone,
@@ -686,7 +687,8 @@ class MineScene extends PureComponent {
 
   storeManager = () => {
     this.mixpanel.track('店铺页')
-    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
+    const {currentUser} = this.props.global;
+    const {is_mgr, currVendorId, currVendorName} = this.state
     this.onPress(Config.ROUTE_STORE, {
       currentUser: currentUser,
       currVendorId: currVendorId,
@@ -755,7 +757,13 @@ class MineScene extends PureComponent {
             })
           }
         })
+        return
       }
+      this.setState({
+        show_activity: true,
+        activity_img: res.icon,
+        activity_url: res.url + '?access_token=' + accessToken,
+      })
     })
   }
 
@@ -874,20 +882,21 @@ class MineScene extends PureComponent {
       title_new,
       order_num_new
     } = this.state;
-    const {navigation} = this.props;
+    const {navigation, global} = this.props;
     // let CurrentDistributionBalance = {}
     // DistributionBalance && DistributionBalance.map((item, index) => {
     //   if (index === 0) {
     //     CurrentDistributionBalance = item
     //   }
     // })
+    const {currentUser} = global;
     return (
       <TouchableOpacity
         activeOpacity={1}
         onPress={() =>
           this.onPress(Config.ROUTE_USER, {
             type: "mine",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             screen_name: this.state.screen_name,
             mobile_phone: this.state.mobile_phone,
@@ -971,13 +980,14 @@ class MineScene extends PureComponent {
   }
 
   renderWorker = () => {
+    const {currentUser} = this.props.global;
     return (
       <TouchableOpacity
         activeOpacity={1}
         onPress={() =>
           this.onPress(Config.ROUTE_USER, {
             type: "mine",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             screen_name: this.state.screen_name,
             mobile_phone: this.state.mobile_phone,
@@ -1013,7 +1023,7 @@ class MineScene extends PureComponent {
             onPress={() =>
               this.onPress(Config.ROUTE_USER, {
                 type: "mine",
-                currentUser: this.state.currentUser,
+                currentUser: currentUser,
                 currVendorId: this.state.currVendorId
               })
             }
@@ -1145,12 +1155,9 @@ class MineScene extends PureComponent {
   }
 
   renderStoreBlock = () => {
-    const {
-      // show_activity_mgr = false,
-      show_goods_monitor = false,
-      enabled_good_mgr = false
-    } = this.props.global.config;
-    let token = `?access_token=${this.props.global.accessToken}`;
+    const {currentUser, accessToken, config, simpleStore} = this.props.global;
+    const {show_goods_monitor = false, enabled_good_mgr = false} = config;
+    let token = `?access_token=${accessToken}`;
     let {
       currVendorId,
       currVersion,
@@ -1161,7 +1168,7 @@ class MineScene extends PureComponent {
       fnProfitControlled,
       have_not_read_advice
     } = this.state
-    const {fn_stall} = this.props.global.simpleStore
+    const {fn_stall} = simpleStore
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
@@ -1232,7 +1239,7 @@ class MineScene extends PureComponent {
           this.mixpanel.track('员工页')
           this.onPress(Config.ROUTE_WORKER, {
             type: "worker",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             currVendorName: this.state.currVendorName
           });
@@ -1402,16 +1409,13 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
-            activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={{uri: this.state.activity_img}}
-            />
-            <Text style={[block_styles.block_name]}>老带新活动</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
+          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={{uri: this.state.activity_img}}/>
+          <Text style={[block_styles.block_name]}>老带新活动</Text>
+        </TouchableOpacity>
 
       </View>
     );

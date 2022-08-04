@@ -38,7 +38,7 @@ export const Styles = StyleSheet.create({
   headerTitleText: {
     padding: 12,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21
   },

@@ -220,9 +220,28 @@ class BadReviewReminderScene extends PureComponent {
 
   saveSetting = () => {
     const {settings} = this.state
+
+    if (settings.notify_start_at.length === 0 || settings.notify_end_at.length === 0) {
+      showError('请选择通知开始时间或者结束时间')
+      return;
+    }
     if (settings.mobile.length <= 10) {
       showError('请输入正确的手机号')
       return
+    }
+    try {
+      const startTimeArray = settings.notify_start_at.split(':')
+      const endTimeArray = settings.notify_end_at.split(':')
+
+      const startTime = parseInt(startTimeArray[0] * 60) + parseInt(startTimeArray[1])
+      const endTime = parseInt(endTimeArray[0] * 60) + parseInt(endTimeArray[1])
+
+      if (endTime - startTime < 30) {
+        showError('结束时间应大于开始时间，并且间隔不小于30分钟')
+        return;
+      }
+    }catch (e) {
+
     }
     const {accessToken, currStoreId} = this.props.global;
     const api = `/v1/new_api/added/bad_notify?access_token=${accessToken}`

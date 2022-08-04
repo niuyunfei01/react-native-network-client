@@ -5,8 +5,7 @@ import ModalSelector from "../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
-import {value} from "lodash/seq";
-import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 const styles = StyleSheet.create({
   storeWrap: {backgroundColor: colors.white, width: '100%'},
@@ -307,15 +306,19 @@ class RetailPriceScene extends PureComponent {
       money: type === 1 ? finalPrice : 0,
       percent: type === 0 ? percentagePrice : 0
     }
+    showModal('提交中')
     HttpUtils.post.bind(this.props)(url, params).then(res => {
+      hideModal()
       if (0 === type) {
         this.setState({finalPrice: res.wm_price})
         return
       }
       showSuccess('修改成功')
     }, res => {
+      hideModal()
       showError('修改失败，原因：' + res.reason)
     }).catch((error) => {
+      hideModal()
       showError('修改失败，原因：' + error.reason)
     })
   }

@@ -202,10 +202,10 @@ class GoodStoreDetailScene extends PureComponent {
   getproduct() {
     //showModal('加载中')
     const {accessToken} = this.props.global;
-    const {product_id, store_id, vendorId} = this.state;
+    const {product_id, store_id, vendorId, allow_merchants_edit_prod} = this.state;
     HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
       //hideModal()
-      if (this.state.allow_merchants_edit_prod) {
+      if (allow_merchants_edit_prod) {
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
             <TouchableOpacity

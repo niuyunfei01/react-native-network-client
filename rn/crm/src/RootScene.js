@@ -50,6 +50,7 @@ nrInit('Root');
 Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
 
 
+
 class RootScene extends PureComponent {
   constructor() {
     super();
@@ -64,6 +65,7 @@ class RootScene extends PureComponent {
   }
 
   componentDidMount() {
+
     JPush.init();
     //连接状态
     this.connectListener = result => {
@@ -142,7 +144,7 @@ class RootScene extends PureComponent {
 
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
-              this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'}).then()
+              this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
               return;
             }
 
@@ -183,7 +185,7 @@ class RootScene extends PureComponent {
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
-      this.sendDeviceStatus(state, obj).then()
+      this.sendDeviceStatus(state, obj)
     })
 
 
@@ -278,7 +280,6 @@ class RootScene extends PureComponent {
    // [已重复] 新订单通知：开启/未开启
    * @param props
    * @param data
-   * @returns {Promise<void>}
    */
 
   sendDeviceStatus(props, data) {
@@ -299,8 +300,7 @@ class RootScene extends PureComponent {
         data.isRinger = settings.isRinger;
         const {accessToken} = props.global
         HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then()
-      })
-        .then()
+      }).then()
     })
 
   }
