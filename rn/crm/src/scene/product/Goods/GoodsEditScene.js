@@ -82,16 +82,15 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    let {currVendorId, fnProviding} = tool.vendor(props.global);
-    let {scan} = (props.route.params || {});
-
+    const {currVendorId, fnProviding} = tool.vendor(props.global);
+    const {scan, product_detail} = (props.route.params || {});
     this.state = {
       isSelectCategory: true,
       selectHeaderText: '商品类目',
 
       visible: false,//modal
       weightList: [],//重量单位列表
-      selectWeight: {label: '克', value: 1},//选择重量单位
+      selectWeight: product_detail?.unit_info || {label: '克', value: 1},//选择重量单位
       provided: 1,
       name: "",//商品名称
       sku_having_unit: "1",
@@ -665,46 +664,6 @@ class GoodsEditScene extends PureComponent {
     }
     return true;
   }
-
-  // renderAddGood() {
-  //   let {type} = this.props.route.params;
-  //   if (type !== "edit") {
-  //     return (
-  //       <>
-  //         <GoodAttrs name="选填信息"/>
-  //         <ModalSelector skin="customer" data={this.state.selling_categories} onChange={option => {
-  //           this.setState({sale_status: option.key});
-  //         }}>
-  //           <Left title="售卖状态" info={tool.sellingStatus(this.state.sale_status)} right={right}/>
-  //         </ModalSelector>
-  //
-  //         {this.state.fnProviding ? (
-  //           <ModalSelector skin="customer" data={this.state.head_supplies} onChange={option => {
-  //             this.setState({provided: option.key});
-  //           }}>
-  //             <Left title="供货方式" info={tool.headerSupply(this.state.provided)} right={right}/>
-  //           </ModalSelector>
-  //         ) : null}
-  //
-  //
-  //         {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
-  //                                                     onChange={option => {
-  //                                                       this.setState({sku_unit: option.label});
-  //                                                     }}>
-  //           <Left title="库存单位" info={this.state.sku_unit} right={right}/>
-  //         </ModalSelector>}
-  //
-  //         {!this.isAddProdToStore() &&
-  //           <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
-  //                 onChangeText={text => this.setState({sku_having_unit: text})}/>}
-  //
-  //         {/*<PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>*/}
-  //
-  //       </>
-  //     );
-  //   }
-  // }
-
 
   pickSingleImg = () => {
     this.setState({showImgMenus: false})

@@ -45,9 +45,10 @@ const timeObj = {
 class OrderSearchScene extends PureComponent {
   constructor(props: Object) {
     super(props);
+    const {term} = props.route.params
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.state = {
-      keyword: '',
+      keyword: term && term.substring(9, 13) || '',
       isRefreshing: false,
       isSearching: false,
       prefix: [],
@@ -65,6 +66,10 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentDidMount() {
+    const {term} = this.props.route.params
+    if (term && term.length > 0) {
+      this.queryOrderInfo(false, true)
+    }
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -161,9 +166,9 @@ class OrderSearchScene extends PureComponent {
     );
   }
 
-  touchBtn = (value) => {
+  touchBtn = (value, contentFromOrderList) => {
     this.filterType = value
-    this.queryOrderInfo(true)
+    this.queryOrderInfo(true, contentFromOrderList)
   }
 
   onEndReached = () => {
@@ -176,10 +181,12 @@ class OrderSearchScene extends PureComponent {
     this.setState({query: query}, () => this.queryOrderInfo(false))
   }
 
-  queryOrderInfo = (isChangeType) => {
+  queryOrderInfo = (isChangeType, contentFromOrderList = false) => {
     const {accessToken} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
     const {query, keyword, isLoading} = this.state
+    const {term} = this.props.route.params
+
     if (isLoading)
       return
     this.setState({isLoading: true})
@@ -187,9 +194,9 @@ class OrderSearchScene extends PureComponent {
     const params = {
       vendor_id: currVendorId,
       offset: (query.page - 1) * query.limit,
+      max_past_day: contentFromOrderList ? 10000 : query.max_past_day,
       limit: query.limit,
-      max_past_day: query.max_past_day,
-      search: encodeURIComponent(`${this.filterType}${keyword}`),
+      search: contentFromOrderList ? encodeURIComponent(term) : encodeURIComponent(`${this.filterType}${keyword}`),
       use_v2: 1
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
@@ -211,7 +218,8 @@ class OrderSearchScene extends PureComponent {
 
   render() {
     const {keyword, prefix, orderList, isLoading} = this.state
-    const {global, navigation} = this.props
+    const {global, navigation, route} = this.props
+    const {term} = route.params
     return (
       <>
         <View style={styles.searchWarp}>
@@ -237,7 +245,7 @@ class OrderSearchScene extends PureComponent {
                   return (
                     <TouchableOpacity key={index}
                                       style={styles.filterBtn}
-                                      onPress={() => this.touchBtn(item.value)}>
+                                      onPress={() => this.touchBtn(item.value, false)}>
                       <Text style={styles.filterBtnText}>
                         {item.label}
                       </Text>
@@ -250,7 +258,7 @@ class OrderSearchScene extends PureComponent {
         </If>
         <If condition={orderList.length > 0}>
           <Text style={styles.filterBtnText}>
-            近七日共计
+            {term && term.length > 0 ? '' : '近七日'}共计
             <Text style={styles.orderListLength}>
               {orderList.length}
             </Text>
