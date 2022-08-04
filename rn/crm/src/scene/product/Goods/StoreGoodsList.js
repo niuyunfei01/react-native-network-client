@@ -43,10 +43,7 @@ class StoreGoodsList extends Component {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    const {global, dispatch} = this.props
-    const {currStoreId, accessToken} = global;
     this.state = {
-      currStoreId: currStoreId,
       goods: [],
       page: 1,
       statusList: [
@@ -79,6 +76,12 @@ class StoreGoodsList extends Component {
       selectStatusItem: '',
       onStrict: false
     }
+
+  }
+
+  componentDidMount() {
+    const {global, dispatch} = this.props
+    const {currStoreId, accessToken} = global;
     getSimpleStore(global, dispatch, currStoreId, (store) => {
       this.setState({
         fnPriceControlled: store['fn_price_controlled'],

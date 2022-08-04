@@ -1325,7 +1325,7 @@ class MineScene extends PureComponent {
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/yunyingshouyi_.png")}/>
-          <Text style={[block_styles.block_name]}>配送设置</Text>
+          <Text style={[block_styles.block_name]}>配送管理</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.printerSetting}

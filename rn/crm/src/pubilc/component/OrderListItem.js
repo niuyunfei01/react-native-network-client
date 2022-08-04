@@ -255,7 +255,7 @@ class OrderListItem extends React.PureComponent {
 
   onClickTimes = (item) => {
     let searchTerm = `@@${item['real_mobile']}|||store:${item['store_id']}`
-    this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {term: searchTerm, max_past_day: 10000})
+    this.onPress(Config.ROUTE_ORDER_SEARCH, {term: searchTerm, max_past_day: 10000})
   }
 
   goVeriFicationToShop = (id) => {
