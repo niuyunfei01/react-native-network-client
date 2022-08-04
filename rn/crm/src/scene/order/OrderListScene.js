@@ -849,7 +849,7 @@ class OrderListScene extends Component {
             </Button>
           </TouchableOpacity>
         </If>
-        <If condition={Array.isArray(this.state.activity) && showTopImg}>
+        <If condition={showTopImg}>
           {this.renderSwiper()}
         </If>
 
@@ -860,7 +860,7 @@ class OrderListScene extends Component {
   renderBottomImg = () => {
     let {activity} = this.state
     return (
-      <If condition={this.state.showImgType === 0 && this.state.show_img && Array.isArray(activity)}>
+      <If condition={this.state.showImgType === 0 && this.state.show_img }>
         <Swiper style={styles.wrapper}
                 showsButtons={false}
                 height={100}

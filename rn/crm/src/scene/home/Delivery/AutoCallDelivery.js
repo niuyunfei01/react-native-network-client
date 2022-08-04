@@ -1,7 +1,6 @@
 import React, {PureComponent} from "react";
 import {ScrollView, View, Text} from "react-native";
 import {Styles, LineView} from '../GoodsIncrementService/GoodsIncrementServiceStyle'
-import colors from "../../../pubilc/styles/colors";
 
 const CONTENT = [
   {
@@ -13,7 +12,7 @@ const CONTENT = [
       },
       {
         headerText: '2、开启自动发单有什么优势',
-        descriptionText: '优先呼叫商家设置的偏好配送，超过自定义时间后，系统按设置的自动发单规则，按价格由低到高依次呼叫配送（含外送帮账号以及商家自有账号配送）'
+        descriptionText: '开启自动发单后，商家可以省心省力，增强配送履约时效，减少用餐高峰期因发单不及时导致的顾客催单率，有效提升店铺整体的满意度'
       },
       {
         headerText: '3、如何开启自动配送',
