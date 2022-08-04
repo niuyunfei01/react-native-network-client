@@ -223,9 +223,12 @@ class MineScene extends PureComponent {
     this.getStoreDataOfMine()
     // this._doChangeStore(currStoreId)
     this.registerJpush();
-    this.getActivity();
     this.getStoreTurnover();
     this.getHaveNotReadAdvice();
+  }
+
+  componentDidMount() {
+    this.getActivity();
   }
 
   getStoreList = () => {
@@ -310,17 +313,16 @@ class MineScene extends PureComponent {
 
   onGetDutyUser = () => {
     const {accessToken, currStoreId} = this.props.global;
-    let _this = this;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(
         fetchDutyUsers(currStoreId, accessToken, resp => {
           if (resp.ok) {
-            _this.setState({
+            this.setState({
               dutyUsers: resp.obj
             })
           }
-          _this.setState({isRefreshing: false});
+          this.setState({isRefreshing: false});
         })
       );
     });
@@ -764,6 +766,7 @@ class MineScene extends PureComponent {
         activity_img: res.icon,
         activity_url: res.url + '?access_token=' + accessToken,
       })
+    }).catch(() => {
     })
   }
 
@@ -906,16 +909,14 @@ class MineScene extends PureComponent {
       >
 
         <View style={worker_styles.container}>
-          <View>
-            <Image
-              style={[worker_styles.icon_head]}
-              source={
-                !!this.state.cover_image
-                  ? {uri: this.state.cover_image}
-                  : require("../../../img/My/touxiang180x180_.png")
-              }
-            />
-          </View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={
+              this.state.cover_image.length > 0
+                ? {uri: this.state.cover_image}
+                : require("../../../img/My/touxiang180x180_.png")
+            }
+          />
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
@@ -996,13 +997,11 @@ class MineScene extends PureComponent {
         }
       >
         <View style={worker_styles.container}>
-          <View>
-            <Image
-              style={[worker_styles.icon_head]}
-              source={!!this.state.cover_image ? {uri: this.state.cover_image} : require("../../../img/My/touxiang180x180_.png")
-              }
-            />
-          </View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={this.state.cover_image.length > 0 ?
+              {uri: this.state.cover_image} : require("../../../img/My/touxiang180x180_.png")}
+          />
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
