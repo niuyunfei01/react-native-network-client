@@ -30,7 +30,7 @@ export const Styles = StyleSheet.create({
     borderRadius: 8
   },
   titleText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 25

@@ -556,7 +556,7 @@ class OrderListItem extends React.PureComponent {
                 {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </Text>
             </View>
           </View>
-          <FontAwesome5 solid={false} onPress={() => this.touchMobile(item)} name={'phone-alt'}
+          <FontAwesome5 solid={false} onPress={() => this.touchMobile(item)} name={'phone'}
                         style={styles.mobileIcon}/>
           <FontAwesome5 solid={false} onPress={() => this.touchLocation(item)} name={'map-marker-alt'}
                         style={styles.locationIcon}/>

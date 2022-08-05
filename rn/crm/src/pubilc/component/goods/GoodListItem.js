@@ -128,12 +128,13 @@ class GoodListItem extends React.PureComponent {
   render() {
     const {product, onPressImg, onPressRight} = this.props;
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-    const bg = onSale ? '#fff' : colors.colorDDD;
+    const bg = onSale ? colors.white : colors.colorDDD;
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
-    return <View style={[styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>
+    return <TouchableOpacity style={[styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}
+                             onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
-        <TouchableOpacity onPress={onPressImg}>
+        <View>
           <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[styles.listImageSize, offSaleImg]}/>
           <If condition={!onSale}>
             <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>
@@ -141,7 +142,7 @@ class GoodListItem extends React.PureComponent {
               <Text style={{color: colors.white}}>售 卖</Text>
             </View>
           </If>
-        </TouchableOpacity>
+        </View>
         <If condition={onPressRight}>
           <TouchableOpacity style={{flex: 1, marginLeft: 5, flexDirection: "column"}} onPress={onPressRight}>
             {this.right()}
@@ -152,7 +153,7 @@ class GoodListItem extends React.PureComponent {
         </If>
       </View>
       {this.props.opBar}
-    </View>
+    </TouchableOpacity>
   }
 }
 
