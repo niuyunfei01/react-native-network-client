@@ -87,7 +87,7 @@ class GoodsEditScene extends PureComponent {
     this.state = {
       isSelectCategory: true,
       selectHeaderText: '商品类目',
-
+      actualNum: '',//库存
       visible: false,//modal
       weightList: [],//重量单位列表
       selectWeight: product_detail?.unit_info || {label: '克', value: 1},//选择重量单位
@@ -329,6 +329,7 @@ class GoodsEditScene extends PureComponent {
     this.setState({
       provided: 1,
       name: "",
+      actualNum: '',
       sku_having_unit: "1",
       tag_info_nur: "",
       promote_name: "",
@@ -1118,16 +1119,14 @@ class GoodsEditScene extends PureComponent {
   renderSuccessInfo = () => {
     const {selectToWhere} = this.state
     return (
-      <If condition={selectToWhere}>
-        <Dialog visible={selectToWhere} buttons={this.goBackButtons()}>
-          <Text style={styles.successTipText}>
-            上传成功
-          </Text>
-          <Text style={styles.successAddStoreTipText}>
-            商品已成功添加到门店
-          </Text>
-        </Dialog>
-      </If>
+      <Dialog visible={selectToWhere} buttons={this.goBackButtons()}>
+        <Text style={styles.successTipText}>
+          上传成功
+        </Text>
+        <Text style={styles.successAddStoreTipText}>
+          商品已成功添加到门店
+        </Text>
+      </Dialog>
     )
   }
 
