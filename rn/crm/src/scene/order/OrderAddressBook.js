@@ -89,8 +89,6 @@ class OrderAddressBook extends Component {
         isRefreshing: false,
         searchKeywords: ''
       })
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
@@ -101,8 +99,6 @@ class OrderAddressBook extends Component {
       hideModal()
       showSuccess('删除成功')
       this.onHeaderRefresh()
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 

@@ -92,8 +92,6 @@ class RegisterShunfeng extends PureComponent {
         }
       })
 
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
