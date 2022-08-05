@@ -382,12 +382,18 @@ class OrderSettingScene extends Component {
                            this.setState({address: value, refreshDom: true});
                          }}
               />
-              <TouchableOpacity style={{marginLeft: 40, marginRight: 20, flex: 1}} onPress={() => {
-                this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK)
-                this.setState({
-                  refreshDom: false
-                })
-              }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
+              <TouchableOpacity style={{
+                paddingHorizontal: 20,
+                height: 50,
+                justifyContent: "center",
+                alignItems: 'center'
+              }}
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK)
+                                  this.setState({
+                                    refreshDom: false
+                                  })
+                                }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
             </View>
             <View style={styles.containerInfoName}>
               <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>收货人：</Text>
@@ -484,24 +490,24 @@ class OrderSettingScene extends Component {
           </View>
 
           <DateTimePicker
-              is24Hour={true}
-              cancelTextIOS={'取消'}
-              confirmTextIOS={'确定'}
-              customHeaderIOS={() => {
-                return (<View/>)
-              }}
-              minimumDate={new Date()}
-              date={datePickerValue}
-              mode='datetime'
-              isVisible={this.state.showDateModal}
-              onConfirm={(date) => {
-                this.setState({datePickerValue: date, showDateModal: false}, () => {
-                  setTimeout(() => {
-                    this.onConfirm()
-                  }, 1000)
-                })
-              }}
-              onCancel={() => this.onRequestClose()}
+            is24Hour={true}
+            cancelTextIOS={'取消'}
+            confirmTextIOS={'确定'}
+            customHeaderIOS={() => {
+              return (<View/>)
+            }}
+            minimumDate={new Date()}
+            date={datePickerValue}
+            mode='datetime'
+            isVisible={this.state.showDateModal}
+            onConfirm={(date) => {
+              this.setState({datePickerValue: date, showDateModal: false}, () => {
+                setTimeout(() => {
+                  this.onConfirm()
+                }, 1000)
+              })
+            }}
+            onCancel={() => this.onRequestClose()}
           />
 
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
@@ -525,7 +531,8 @@ class OrderSettingScene extends Component {
             </View>
             <View style={styles.containerSetAmount}>
               <Text style={{color: colors.color333}}> 订单金额：</Text>
-              {(orderAmount > 0) && <View style={styles.containerSetAmountNotice}><Text style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
+              {(orderAmount > 0) && <View style={styles.containerSetAmountNotice}><Text
+                style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <TextInput placeholder="0"
                            underlineColorAndroid="transparent"
