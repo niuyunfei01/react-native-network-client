@@ -41,7 +41,7 @@ class RemindModal extends React.Component {
         advicesInfoArray: res,
         showAdvicesVisible: true
       })
-    }).catch(error=>{showError(error)})
+    })
   }
 
   closeRemindModal = () => {

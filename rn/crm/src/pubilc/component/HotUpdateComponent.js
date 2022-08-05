@@ -65,8 +65,6 @@ export class HotUpdateComponent extends PureComponent {
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
-    }).catch(error => {
-      showError(error)
     })
   }
   closeNewVersionInfo = () => {
