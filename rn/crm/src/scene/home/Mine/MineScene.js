@@ -634,6 +634,7 @@ class MineScene extends PureComponent {
           expire_date: '',
           status: 'off'
         },
+        in_white_list: 0,
         expire_date: '未开通',
         incrementStatus: false
       }))
@@ -883,7 +884,8 @@ class MineScene extends PureComponent {
       fnProfitControlled,
       turnover_new,
       title_new,
-      order_num_new
+      order_num_new,
+      cover_image
     } = this.state;
     const {navigation, global} = this.props;
     // let CurrentDistributionBalance = {}
@@ -911,11 +913,7 @@ class MineScene extends PureComponent {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={
-              this.state.cover_image.length > 0
-                ? {uri: this.state.cover_image}
-                : require("../../../img/My/touxiang180x180_.png")
-            }
+            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
           />
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
@@ -982,6 +980,7 @@ class MineScene extends PureComponent {
 
   renderWorker = () => {
     const {currentUser} = this.props.global;
+    const {cover_image} = this.state
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -999,9 +998,7 @@ class MineScene extends PureComponent {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={this.state.cover_image.length > 0 ?
-              {uri: this.state.cover_image} : require("../../../img/My/touxiang180x180_.png")}
-          />
+            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
@@ -1027,10 +1024,7 @@ class MineScene extends PureComponent {
               })
             }
           >
-            <Entypo
-              name="chevron-thin-right"
-              style={[worker_styles.right_btn]}
-            />
+            <Entypo name="chevron-thin-right" style={[worker_styles.right_btn]}/>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -1165,7 +1159,9 @@ class MineScene extends PureComponent {
       is_service_mgr,
       fnPriceControlled,
       fnProfitControlled,
-      have_not_read_advice
+      have_not_read_advice,
+      activity_url,
+      activity_img
     } = this.state
     const {fn_stall} = simpleStore
     return (
@@ -1408,13 +1404,16 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
-          activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={{uri: this.state.activity_img}}/>
-          <Text style={[block_styles.block_name]}>老带新活动</Text>
-        </TouchableOpacity>
+        <If condition={activity_img.length > 0}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
+            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]} source={{uri: activity_img}}/>
+            <Text style={[block_styles.block_name]}>老带新活动</Text>
+          </TouchableOpacity>
+        </If>
+
 
       </View>
     );

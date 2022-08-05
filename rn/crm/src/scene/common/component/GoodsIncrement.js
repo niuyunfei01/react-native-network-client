@@ -96,6 +96,8 @@ class GoodsIncrement extends PureComponent {
 
   componentDidMount() {
     const {increment} = this.props.mine
+    if (increment.in_white_list === 1)
+      return
     const currentDate = dayjs().format('YYYY-MM-DD')
     const expire_date = dayjs(increment.expire_date).format('YYYY-MM-DD')
     const calc = (new Date(expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
@@ -126,16 +128,20 @@ class GoodsIncrement extends PureComponent {
           <Text style={styles.headerDescription}>
             商品增值月费
           </Text>
-          <Text style={styles.expireDate}>
-            服务到期时间：{increment.expire_date}
-          </Text>
+          <If condition={increment.in_white_list === 0}>
+            <Text style={styles.expireDate}>
+              服务到期时间：{increment.expire_date}
+            </Text>
+          </If>
         </View>
-        <TouchableOpacity style={styles.row} onPress={this.useIncrementService}>
-          <Text style={increment.incrementStatus ? styles.serviceText : styles.notServiceText}>
-            {increment.incrementStatus ? '续费' : '未开通'}
-          </Text>
-          <AntDesign name={'right'} style={styles.notServiceText}/>
-        </TouchableOpacity>
+        <If condition={increment.in_white_list === 0}>
+          <TouchableOpacity style={styles.row} onPress={this.useIncrementService}>
+            <Text style={increment.incrementStatus ? styles.serviceText : styles.notServiceText}>
+              {increment.incrementStatus ? '续费' : '未开通'}
+            </Text>
+            <AntDesign name={'right'} style={styles.notServiceText}/>
+          </TouchableOpacity>
+        </If>
       </View>
     )
   }
