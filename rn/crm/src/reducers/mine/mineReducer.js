@@ -39,6 +39,7 @@ const initialState = {
       expire_date: '',
       status: 'off'
     },
+    in_white_list: 0,
     expire_date: '未开通',
     incrementStatus: false
   }
