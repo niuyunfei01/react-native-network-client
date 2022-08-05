@@ -200,8 +200,6 @@ class OrderSettingScene extends Component {
     }
     HttpUtils.get.bind(this.props)(api, params).then(res => {
       ToastShort('地址保存成功')
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
@@ -225,8 +223,6 @@ class OrderSettingScene extends Component {
         refreshDom: true,
         smartText: ''
       })
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
@@ -296,8 +292,6 @@ class OrderSettingScene extends Component {
           showError('保存失败请重试！')
         }
       }
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
