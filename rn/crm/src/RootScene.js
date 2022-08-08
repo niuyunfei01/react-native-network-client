@@ -50,7 +50,6 @@ nrInit('Root');
 Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
 
 
-
 class RootScene extends PureComponent {
   constructor() {
     super();
@@ -112,7 +111,6 @@ class RootScene extends PureComponent {
     }
 
     native.getAutoBluePrint((auto, isAutoBlePtMsg) => {
-      //this.setState({auto_blue_print: auto})
       if (!this.state.bleStarted) {
         BleManager.start({showAlert: false}).then();
         this.setState({bleStarted: true})
@@ -195,6 +193,10 @@ class RootScene extends PureComponent {
       this.store.dispatch(setCheckVersionAt(currentTs))
       this.checkVersion({global: this.store.getState().global});
     }
+    GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      this.store.dispatch(setDeviceInfo(deviceInfo))
+    })
   }
 
   doJPushSetAlias = (currentUser, logDesc) => {
@@ -225,34 +227,12 @@ class RootScene extends PureComponent {
 
     this.store = configureStore(
       function (store) {
-        // const {access_token, currStoreId, userProfile} = launchProps;
-        //
-        // const {last_get_cfg_ts, currentUser} = this.store.getState().global;
-        // if (access_token) {
-        //   store.dispatch(setAccessToken({access_token}));
-        //   store.dispatch(setPlatform("android"));
-        //   store.dispatch(setUserProfile(userProfile));
-        //   store.dispatch(setCurrentStore(currStoreId));
-        //
-        //   if (this.common_state_expired(last_get_cfg_ts) && !this.state.onGettingCommonCfg) {
-        //     console.log("get common config");
-        //     this.setState({onGettingCommonCfg: true})
-        //     store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
-        //       this.setState({onGettingCommonCfg: false})
-        //     }));
-        //   }
-        // }
-        //
-        // this.doJPushSetAlias(currentUser, "afterConfigureStore")
-        GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
+
         SplashScreen.hide();
+
         this.setState({rehydrated: true});
         this.passed_ms = dayjs().valueOf() - current_ms;
-        console.log('耗时：', this.passed_ms)
-        // nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-        GlobalUtil.getDeviceInfo().then(deviceInfo => {
-          store.dispatch(setDeviceInfo(deviceInfo))
-        })
+
 
       }.bind(this)
     );
@@ -307,7 +287,11 @@ class RootScene extends PureComponent {
 
   render() {
 
-    return this.state.rehydrated ? this.getRootView() : <View/>
+    return this.state.rehydrated ? this.getRootView() : this.getEmptyView()
+  }
+
+  getEmptyView = () => {
+    return <View/>
   }
 
   getRootView = () => {
@@ -336,7 +320,11 @@ class RootScene extends PureComponent {
         }
       }
     }
-    nrRecordMetric("restore_redux", {time: this.passed_ms, currStoreId, currentUser})
+    nrRecordMetric("restore_redux", {
+      redux_time: this.passed_ms,
+      store_id: currStoreId ?? '未登录',
+      login_user: currentUser ?? '未登录'
+    })
     // on Android, the URI prefix typically contains a host in addition to scheme
     //const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     let rootView = (

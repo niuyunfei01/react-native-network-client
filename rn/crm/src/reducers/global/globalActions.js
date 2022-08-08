@@ -241,12 +241,14 @@ export function getCommonConfig(token, storeId, callback) {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
-        let resp_data = trans_data_to_java(json.obj);
-        let {can_read_vendors, can_read_stores, simpleStore} = resp_data;
+        let {can_read_vendors, can_read_stores, simpleStore} = trans_data_to_java(json.obj);
+        const config = json.obj
+        config.can_read_stores = undefined
+        config.can_read_vendors = undefined
         let cfg = {
           canReadStores: can_read_stores,
           canReadVendors: can_read_vendors,
-          config: json.obj,
+          config: config,
         };
 
         if (simpleStore && simpleStore.id) {

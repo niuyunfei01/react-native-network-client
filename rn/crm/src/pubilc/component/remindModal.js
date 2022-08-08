@@ -24,8 +24,7 @@ class RemindModal extends React.Component {
 
   static propTypes = {
     accessToken: PropTypes.string,
-    onPress: PropTypes.func,
-    currStoreId: PropTypes.string
+    onPress: PropTypes.func
   }
 
   componentDidMount() {
@@ -34,9 +33,9 @@ class RemindModal extends React.Component {
 
   getAdvicesInfo = () => {
     const {accessToken, currStoreId} = this.props;
-    const url='/v1/new_api/advice/showPopAdvice'
-    const params={store_id:currStoreId, access_token: accessToken}
-    HttpUtils.get.bind(this.props)(url,params).then(res=>{
+    const url = '/v1/new_api/advice/showPopAdvice'
+    const params = {store_id: currStoreId, access_token: accessToken}
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         advicesInfoArray: res,
         showAdvicesVisible: true
@@ -79,10 +78,10 @@ class RemindModal extends React.Component {
 
   countDown = () => {
     let timer = setTimeout(() => {
-      this.setState((preState) =>({
+      this.setState((preState) => ({
         countDownTime: preState.countDownTime - 1,
-      }),() => {
-        if(this.state.countDownTime == 0){
+      }), () => {
+        if (this.state.countDownTime == 0) {
           clearTimeout(timer)
           this.setState({
             scrollViewIsBottom: true
@@ -111,7 +110,8 @@ class RemindModal extends React.Component {
               <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
+          <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
+                      showsVerticalScrollIndicator={true} scrollsToTop={true}>
             <Text style={styles.modalContentText}>
               {this.state.advicesInfoArray.content}
             </Text>
@@ -136,13 +136,13 @@ class RemindModal extends React.Component {
           </If>
           <If condition={this.state.advicesInfoArray.type == 1}>
             <View style={[styles.modalButtonBox]}>
-            <Button title={'我知道了'}
-                    onPress={() => {
-                      this.closeAdvicesModal(this.state.advicesInfoArray.id)
-                    }}
-                    buttonStyle={[styles.modalBtnWrapWhite, {width: width * 0.8}]}
-                    titleStyle={styles.modalBtnTextGreen}
-            />
+              <Button title={'我知道了'}
+                      onPress={() => {
+                        this.closeAdvicesModal(this.state.advicesInfoArray.id)
+                      }}
+                      buttonStyle={[styles.modalBtnWrapWhite, {width: width * 0.8}]}
+                      titleStyle={styles.modalBtnTextGreen}
+              />
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 2}>
@@ -176,7 +176,7 @@ class RemindModal extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  modalWrap:{
+  modalWrap: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -184,43 +184,55 @@ const styles = StyleSheet.create({
   },
   modalContainer: {height: 200, paddingHorizontal: 20, marginTop: pxToDp(20)},
   modalContentText: {color: colors.fontBlack},
-  modalContentWrap:{
+  modalContentWrap: {
     width: width * 0.8,
     backgroundColor: colors.white,
-    borderRadius:8,
+    borderRadius: 8,
     position: "relative"
   },
-  modalContentTitle: {flexDirection: "row", padding: 10, paddingBottom: 0, justifyContent: "flex-end", alignItems: "center"},
+  modalContentTitle: {
+    flexDirection: "row",
+    padding: 10,
+    paddingBottom: 0,
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
   modalContentIcon: {flexDirection: "row", justifyContent: "flex-end", width: '10%'},
-  modalContentTitleText: {textAlign: 'center', color: colors.title_color, fontWeight: "bold", flex: 1, fontSize: pxToDp(28)},
+  modalContentTitleText: {
+    textAlign: 'center',
+    color: colors.title_color,
+    fontWeight: "bold",
+    flex: 1,
+    fontSize: pxToDp(28)
+  },
   closeIcon: {
     fontSize: 35,
     color: colors.fontColor
   },
-  modalBtnWrap:{
+  modalBtnWrap: {
     backgroundColor: colors.main_color,
     width: width * 0.35,
     height: 36,
     borderRadius: 2
   },
-  modalBtnWrapWhite:{
+  modalBtnWrapWhite: {
     backgroundColor: colors.white
   },
-  modalBtnWrap1:{
+  modalBtnWrap1: {
     backgroundColor: '#CCCCCC',
     width: width * 0.35,
     height: 36,
     borderRadius: 2
   },
-  modalBtnText:{
-    color:colors.white,
-    fontSize:pxToDp(30),
-    textAlign:'center'
+  modalBtnText: {
+    color: colors.white,
+    fontSize: pxToDp(30),
+    textAlign: 'center'
   },
-  modalBtnTextGreen:{
-    color:colors.main_color,
-    fontSize:20,
-    textAlign:'center'
+  modalBtnTextGreen: {
+    color: colors.main_color,
+    fontSize: 20,
+    textAlign: 'center'
   },
   modalButtonBox: {
     display: "flex",
