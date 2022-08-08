@@ -364,7 +364,7 @@ class OrderQueryResultScene extends PureComponent {
     const {selectStatus, date, showDatePicker, dateBtn, platform, platformBtn} = this.state
     return (
       <>
-        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onFocus={this.jumpToSearch}/>
+        <SearchBar placeholder="流水号/订单号/手机尾号/商品名称/取货码" onFocus={this.jumpToSearch}/>
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}
