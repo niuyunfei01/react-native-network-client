@@ -666,41 +666,27 @@ class SeparatedExpense extends PureComponent {
         <If condition={choseTab === 1}>
           {records && records.map((item, id) => {
             return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
-              <View style={{flex: 1}}>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={Styles.recordsItemTime}>{item.day} </Text>
-                  <View style={Styles.flex1}/>
-                  <Text
-                    style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <View style={Styles.flex1}/>
-                  <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
-                </View>
+              <Text style={Styles.recordsItemTime}>{item.day} </Text>
+              <View style={Styles.flex1}/>
+              <View>
+                <Text
+                  style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
+                </Text>
+                <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
               </View>
               <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-
             </TouchableOpacity>
           })}
         </If>
         <If condition={choseTab === 3}>
           {records3 && records3.map((item, id) => {
             return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked3(item)}>
-              <View style={{flex: 1}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                  <Text style={[Styles.recordsItemTime, Styles.flex1]}>{item.month}-{item.day} </Text>
-                  <View style={{marginTop: 10, marginBottom: 12, flexDirection: 'row', justifyContent: 'center'}}>
-                    <Text style={{fontSize: 16, color: colors.color999}}>{item.desc} </Text>
-                    <Text
-                      style={[Styles.recordsItemBalanced, {width: 50}]}>{item.total_fee}
-                    </Text>
-                    <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-                  </View>
-
-                </View>
-              </View>
-
+              <Text style={[Styles.recordsItemTime, Styles.flex1]}>{item.month}-{item.day} </Text>
+              <Text style={{fontSize: 16, color: colors.color999}}>{item.desc} </Text>
+              <Text
+                style={[Styles.recordsItemBalanced, {width: 50}]}>{item.total_fee}
+              </Text>
+              <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
             </TouchableOpacity>
           })}
         </If>

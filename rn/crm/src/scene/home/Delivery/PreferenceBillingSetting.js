@@ -44,13 +44,6 @@ class PreferenceBillingSetting extends PureComponent {
     this.getDeliveryConf();
   }
 
-  onPress(route, params = {}, callback = {}) {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params, callback);
-    });
-  }
-
   getPreferenceShipConfig() {
     let {ext_store_id} = this.state
     let access_token = this.props.global.accessToken
@@ -120,7 +113,11 @@ class PreferenceBillingSetting extends PureComponent {
       showError(`${error.reason}`)
     })
   }
-
+  onPress(route, params = {}, callback = {}) {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params, callback);
+    });
+  }
   render() {
     const {menus, selectArr, checked_item, deploy_time} = this.state;
     return (
@@ -137,7 +134,14 @@ class PreferenceBillingSetting extends PureComponent {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
         >
-
+          <View style={styles.row}>
+            <Text style={styles.descriptionText}>
+              偏好发单支持优先发起配送
+            </Text>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY,{showId: 2})}>
+              了解更多
+            </Text>
+          </View>
           <View style={{
             flexDirection: "row",
             alignItems: "center",
@@ -152,6 +156,7 @@ class PreferenceBillingSetting extends PureComponent {
             marginLeft: '2%',
             marginTop: 10
           }}>
+
             <Text style={{color: colors.color333}}>偏好发单设置 </Text>
             <Switch value={this.state.auto_call}
                     onValueChange={(res) => {
@@ -282,39 +287,54 @@ class PreferenceBillingSetting extends PureComponent {
   }
 }
 
-const
-  styles = StyleSheet.create({
-    container: {
-      backgroundColor: colors.f7
-    },
-    cell_title: {
-      marginBottom: pxToDp(10),
-      fontSize: pxToDp(26),
-      color: colors.color999
-    },
-    cell_row: {
-      height: pxToDp(90),
-      justifyContent: "center"
-    },
-    cell_input: {
-      fontSize: pxToDp(30),
-      height: pxToDp(70),
-      borderWidth: pxToDp(1),
-      width: pxToDp(120),
-      paddingTop: pxToDp(13),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
-    cell_inputs: {
-      textAlign: 'center',
-      fontSize: pxToDp(30),
-      height: pxToDp(60),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999,
-      width: pxToDp(120),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
-  });
+const styles = StyleSheet.create({
+  row: {
+    width: '96%',
+    margin: '2%',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  descriptionText: {
+    color: colors.color333,
+    fontSize: 12
+  },
+  touchMore: {
+    fontSize: 12,
+    color: colors.main_color,
+    textDecorationLine: "underline",
+    paddingLeft: 8
+  },
+  container: {
+    backgroundColor: colors.f7
+  },
+  cell_title: {
+    marginBottom: pxToDp(10),
+    fontSize: pxToDp(26),
+    color: colors.color999
+  },
+  cell_row: {
+    height: pxToDp(90),
+    justifyContent: "center"
+  },
+  cell_input: {
+    fontSize: pxToDp(30),
+    height: pxToDp(70),
+    borderWidth: pxToDp(1),
+    width: pxToDp(120),
+    paddingTop: pxToDp(13),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
+  cell_inputs: {
+    textAlign: 'center',
+    fontSize: pxToDp(30),
+    height: pxToDp(60),
+    borderBottomWidth: pxToDp(1),
+    borderColor: colors.color999,
+    width: pxToDp(120),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceBillingSetting);

@@ -125,11 +125,6 @@ class StoreStatusScene extends PureComponent {
       if (res.business_status.length > 0) {
         show_body = true
       }
-      if (currVendorId === "68" && res.business_status.length > 0) {
-        // this.setState({
-        //   dialogVisible: true
-        // })
-      }
 
       self.setState({
         all_close: res.all_close,
@@ -137,9 +132,9 @@ class StoreStatusScene extends PureComponent {
         allow_self_open: res.allow_self_open,
         business_status: res.business_status,
         show_body: show_body,
-        allow_merchants_store_bind: res.allow_merchants_store_bind === '1' ? true : false,
+        allow_merchants_store_bind: res.allow_merchants_store_bind === '1' ,
         total_wm_stores: res.business_status.length,
-        allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0' ? true : false,
+        allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0',
         alert_msg: res.alert_msg,
       })
       const {updateStoreStatusCb} = this.props.route.params;
@@ -390,7 +385,7 @@ class StoreStatusScene extends PureComponent {
     } else if (icon_name === 'jd') {
       return require(`../../../img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`../../../img/PlatformLogo/pl_store_meituan.png`)
+      return {uri:'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}
     } else if (icon_name === 'txd') {
       return require(`../../../img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {

@@ -42,12 +42,16 @@ const timeObj = {
   method: []
 }//记录耗时的对象
 
+let contentFromOrderList = false
+
 class OrderSearchScene extends PureComponent {
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
+
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
+    const term = props.route.params?.term
     this.state = {
-      keyword: '',
+      keyword: term && term.length > 12 && term.substring(9, 13) || '',
       isRefreshing: false,
       isSearching: false,
       prefix: [],
@@ -65,6 +69,11 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentDidMount() {
+    const term = this.props.route.params?.term
+    if (term && term.length > 0) {
+      contentFromOrderList = true
+      this.queryOrderInfo(true)
+    }
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -163,6 +172,7 @@ class OrderSearchScene extends PureComponent {
 
   touchBtn = (value) => {
     this.filterType = value
+    contentFromOrderList = false
     this.queryOrderInfo(true)
   }
 
@@ -180,6 +190,7 @@ class OrderSearchScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
     const {query, keyword, isLoading} = this.state
+    const term = this.props.route.params?.term
     if (isLoading)
       return
     this.setState({isLoading: true})
@@ -187,9 +198,9 @@ class OrderSearchScene extends PureComponent {
     const params = {
       vendor_id: currVendorId,
       offset: (query.page - 1) * query.limit,
+      max_past_day: contentFromOrderList ? 10000 : query.max_past_day,
       limit: query.limit,
-      max_past_day: query.max_past_day,
-      search: encodeURIComponent(`${this.filterType}${keyword}`),
+      search: term && contentFromOrderList ? encodeURIComponent(term) : encodeURIComponent(`${this.filterType}${keyword}`),
       use_v2: 1
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
@@ -211,21 +222,17 @@ class OrderSearchScene extends PureComponent {
 
   render() {
     const {keyword, prefix, orderList, isLoading} = this.state
-    const {global, navigation} = this.props
+    const {global, navigation, route} = this.props
+    const term = route.params?.term
     return (
       <>
         <View style={styles.searchWarp}>
           <AntDesign name={'search1'} size={14}/>
           <TextInput style={styles.textInput}
                      value={keyword}
-                     placeholder={'流水号/商品名称/订单号/手机尾号/顾客地址'}
+                     placeholder={'流水号/订单号/手机尾号/商品名称/取货码'}
                      onChangeText={(keyword) => this.onSearch(keyword)}/>
         </View>
-        {/*<SearchBar*/}
-        {/*  placeholder="订单流水号/商品名称/订单号/手机尾号/顾客地址"*/}
-        {/*  onBlurSearch={(keyword)=>this.onSearch(keyword)}*/}
-        {/*  lang={{cancel: '搜索'}}*/}
-        {/*/>*/}
         <If condition={keyword.length > 0}>
           <View style={styles.filterZoneWrap}>
             <Text style={styles.filterTipText}>
@@ -250,7 +257,7 @@ class OrderSearchScene extends PureComponent {
         </If>
         <If condition={orderList.length > 0}>
           <Text style={styles.filterBtnText}>
-            近七日共计
+            {contentFromOrderList && term && term.length > 0 ? '' : '近七日'}共计
             <Text style={styles.orderListLength}>
               {orderList.length}
             </Text>

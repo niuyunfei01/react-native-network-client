@@ -10,6 +10,7 @@ import RNRestart from "./react-native-restart";
 import {bundleFilePath, createDirectory, deleteFile, exists, calcFileHash} from "../util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
 import {unzip} from "./react-native-zip/RNZip";
+import {MixpanelInstance} from "../util/analytics";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -41,6 +42,11 @@ const platform = Platform.OS === 'android' ? 'Android-Bundle' : 'IOS-Bundle'
 
 export class HotUpdateComponent extends PureComponent {
 
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
+  }
+
   state = {
     showNewVersionVisible: false,
     newVersionInfo: {},
@@ -54,13 +60,11 @@ export class HotUpdateComponent extends PureComponent {
 
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
-    const version = __DEV__ ? '1' : Cts.BUNDLE_VERSION;
+    const version = __DEV__ ? '5' : Cts.BUNDLE_VERSION;
     const params = {platform: platform, version: version}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
-    }).catch(error => {
-      showError(error)
     })
   }
   closeNewVersionInfo = () => {
@@ -70,9 +74,11 @@ export class HotUpdateComponent extends PureComponent {
   updateBundle = (newVersionInfo) => {
     const {downloadFileFinish} = this.state
     if (downloadFileFinish) {
+      this.mixpanel.track(Platform.OS === 'ios' ? 'iOS_立即体验' : 'Android_立即体验')
       RNRestart.Restart()
       return
     }
+    this.mixpanel.track(Platform.OS === 'ios' ? 'iOS_立即更新' : 'Android_立即更新')
     const {md5, bundle_url} = newVersionInfo
     const source = Platform.OS === 'ios' ? bundleFilePath + '/last.ios.zip' : bundleFilePath + '/last.android.zip';
     RNFetchBlob.config({path: source})

@@ -16,18 +16,22 @@ import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {NavigationActions} from '@react-navigation/compat';
 //组件
-import {Left} from "../../common/component/All";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+//import {Left} from "../../common/component/All";
 import _ from 'lodash';
 import Scanner from "../../../pubilc/component/Scanner";
 import HttpUtils from "../../../pubilc/util/http";
-import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
+import {List} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Entypo from "react-native-vector-icons/Entypo";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import {LineView, Styles} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import {CheckBox} from 'react-native-elements'
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const Item = List.Item;
 
@@ -55,7 +59,17 @@ function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-const right = <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>;
+//const right = <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>;
+
+const pickImageOptions = (cropping) => {
+  return {
+    width: 800,
+    height: 800,
+    cropping: cropping,
+    cropperCircleOverlay: false,
+    includeExif: true
+  };
+}
 
 /**
  * 导航带入的参数：
@@ -68,9 +82,38 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    let {currVendorId, fnProviding} = tool.vendor(this.props.global);
-    let {scan} = (this.props.route.params || {});
+    const {currVendorId, fnProviding} = tool.vendor(props.global);
+    const {scan, product_detail} = (props.route.params || {});
     this.state = {
+      isSelectCategory: true,
+      selectHeaderText: '商品类目',
+      actualNum: '',//库存
+      visible: false,//modal
+      weightList: [],//重量单位列表
+      selectWeight: product_detail?.unit_info || {label: '克', value: 1},//选择重量单位
+      provided: 1,
+      name: "",//商品名称
+      sku_having_unit: "1",
+      tag_info_nur: "",
+      promote_name: "",
+      list_img: {},
+      selectedItems: [],
+      cover_img: "",
+      upload_files: {},
+      price: "",//商品价格
+      basic_category_obj: {},
+      basic_category: 0,
+      sku_tag_id: 0,
+      store_categories: [],
+      tag_list: "选择门店分类",
+      id: 0,
+      sku_unit: "个",
+      weight: "",//商品重量
+      likeProds: [],
+      upc: '',
+      sale_status: Cts.STORE_PROD_ON_SALE, //默认为售卖状态
+      transCode: '', //条码
+      typeCode: '', //条码类型
       isLoading: false,
       isUploadImg: false,
       editable_upc: true,
@@ -81,15 +124,15 @@ class GoodsEditScene extends PureComponent {
       basic_categories: [],
       store_tags: {},
       sg_tag_tree: [],
-      sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}, {label: "份", key: 2}],
+      //sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}, {label: "份", key: 2}],
       head_supplies: [
         {label: "门店自采", key: Cts.STORE_SELF_PROVIDED},
         {label: "总部供货", key: Cts.STORE_COMMON_PROVIDED}
       ],
-      selling_categories: [
-        {label: "上架", key: Cts.STORE_PROD_ON_SALE},
-        {label: "缺货", key: Cts.STORE_PROD_SOLD_OUT}
-      ],
+      // selling_categories: [
+      //   {label: "上架", key: Cts.STORE_PROD_ON_SALE},
+      //   {label: "缺货", key: Cts.STORE_PROD_SOLD_OUT}
+      // ],
 
       scanBoolean: scan === true,
       goBackValue: false,
@@ -99,50 +142,103 @@ class GoodsEditScene extends PureComponent {
       task_id: 0,
       vendor_id: currVendorId,
       fnProviding: fnProviding,
-      visible: false,
+
       store_has: false,
-      searchValue: '',
-      categoryId: '',
-      newArr: []
+      searchValue: ''//搜索内容
     };
-    this.navigationOptions(this.props)
-    this.startUploadImg = this.startUploadImg.bind(this)
-    this.upLoad = this.upLoad.bind(this)
+
     this.back = this.back.bind(this)
-    this.dataValidate = this.dataValidate.bind(this)
-    this.renderSelectTag = this.renderSelectTag.bind(this)
   }
+
 
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
     let {type} = params;
     navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerRight: () => (type !== 'edit' &&
-        <TouchableOpacity style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}
-                          onPress={()=>this.startScan(true)}>
-          <If condition={'edit'!==type}>
-            <View style={{flexDirection: "row", paddingRight: pxToDp(20), height: pxToDp(72), justifyContent: "space-between", alignItems: "center"}}>
-              <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
-              <Text style={{fontWeight: "bold", marginLeft: pxToDp(30), color: colors.color333}}>扫码新增</Text>
-            </View>
-          </If>
-        </TouchableOpacity>
-      )
-    });
+      headerRight: () => this.headerRight(type)
+    })
+
   };
 
+  headerRight = (type) => {
+    return (
+      <If condition={'edit' !== type}>
+        <TouchableOpacity style={styles.headerWrap}
+                          onPress={() => this.startScan(true)}>
+          <Text style={styles.headerText}>
+            扫码上新
+          </Text>
+          <Ionicons name={'scan-sharp'} size={16} iconStyle={styles.navLeftIcon}/>
+        </TouchableOpacity>
+      </If>
+    )
+  }
+
+  componentDidMount() {
+
+    this.navigationOptions(this.props)
+
+    this.getWeightUnitList()
+    //所有的原生通知统一管理
+    QNEngine.eventEmitter({
+      onProgress: (data) => {
+        this.setState({loadingPercent: Number(data.percent * 100) + '%'})
+      },
+      onComplete: (data) => {
+        HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
+          const {list_img, upload_files, newImageKey} = this.state;
+          const uri = res + newImageKey
+          const file_id = Object.keys(upload_files) + 1;
+          list_img[file_id] = {url: uri, name: newImageKey}
+          upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
+          hideModal()
+          this.setState({
+            list_img: list_img,
+            upload_files: upload_files,
+            isUploadImg: false
+          });
+        }, () => {
+          ToastLong("获取上传图片的地址失败");
+          hideModal()
+          this.setState({
+            isUploadImg: false
+          });
+        })
+      },
+      onError: (data) => {
+        switch (data.code) {
+          case '-2':
+            ToastLong('任务已暂停', 2)
+            break;
+          default:
+            ToastLong('错误：' + data.msg, 2)
+            break;
+        }
+      }
+    })
+  }
+
+  getWeightUnitList = () => {
+    const {accessToken} = this.props.global
+    const url = `/api_products/weight_unit_lists?access_token=${accessToken}`
+    HttpUtils.get(url).then(res => {
+      this.setState({weightList: res})
+
+    }).catch(error => {
+
+    })
+  }
+
   UNSAFE_componentWillMount() {
-    let {type} = this.props.route.params;
-    this.initEmptyState();
+    let {type, product_detail} = this.props.route.params;
+    //this.initEmptyState();
 
     if (type === "edit") {
-      let product_detail = tool.deepClone(
-        this.props.route.params.product_detail
-      );
       this.onReloadProd(product_detail);
     } else {
       let {task_id, name, images} = this.props.route.params || {};
+
       if (task_id && name) {
         let upload_files = {};
         let list_img = {};
@@ -200,10 +296,9 @@ class GoodsEditScene extends PureComponent {
     HttpUtils.get.bind(this.props)(url).then((obj) => {
       this.setState({
         basic_categories: obj,
-      },);
+      });
     })
   }
-
 
   getCatByVendor(_v_id) {
     if (_v_id > 0) {
@@ -234,6 +329,7 @@ class GoodsEditScene extends PureComponent {
     this.setState({
       provided: 1,
       name: "",
+      actualNum: '',
       sku_having_unit: "1",
       tag_info_nur: "",
       promote_name: "",
@@ -249,7 +345,7 @@ class GoodsEditScene extends PureComponent {
       tag_list: "选择门店分类",
       id: 0,
       sku_unit: "个",
-      weight: "1",
+      weight: "",
       likeProds: [],
       upc: '',
       sale_status: Cts.STORE_PROD_ON_SALE, //默认为售卖状态
@@ -300,7 +396,7 @@ class GoodsEditScene extends PureComponent {
       basic_category: basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list,
-      store_has: store_has === 1 && this.props.route.params.type === 'add' ? true : false,
+      store_has: store_has === 1 && this.props.route.params.type === 'add',
     });
   }
 
@@ -337,52 +433,6 @@ class GoodsEditScene extends PureComponent {
     });
   }
 
-  componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setParams({
-      upLoad: this.upLoad,
-      startScan: this.startScan,
-    });
-
-    //所有的原生通知统一管理
-    QNEngine.eventEmitter({
-      onProgress: (data) => {
-        this.setState({loadingPercent: Number(data.percent * 100) + '%'})
-      },
-      onComplete: (data) => {
-        HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
-          const {list_img, upload_files, newImageKey} = this.state;
-          const uri = res + newImageKey
-          const file_id = Object.keys(upload_files) + 1;
-          list_img[file_id] = {url: uri, name: newImageKey}
-          upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
-          hideModal()
-          this.setState({
-            list_img: list_img,
-            upload_files: upload_files,
-            isUploadImg: false
-          });
-        }, () => {
-          ToastLong("获取上传图片的地址失败");
-          hideModal()
-          this.setState({
-            isUploadImg: false
-          });
-        })
-      },
-      onError: (data) => {
-        switch (data.code) {
-          case '-2':
-            ToastLong('任务已暂停', 2)
-            break;
-          default:
-            ToastLong('错误：' + data.msg, 2)
-            break;
-        }
-      }
-    })
-  }
-
   onNameChanged = (name) => {
     let {type} = this.props.route.params;
     this.setState({name})
@@ -414,14 +464,17 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  onScanFail = (code) => {
-    Modal.alert('错误提示', '商品编码不合法，请重新扫描', [
-      {text: '确定', onPress: () => console.log('ok')},
+  onScanFail = () => {
+    Alert.alert('错误提示', '商品编码不合法，请重新扫描', [
+      {
+        text: '确定', onPress: () => {
+        }
+      },
     ]);
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.route;
+    let {params} = this.props.route;
     let {store_categories, tag_list} = params || {};
     if (store_categories && tag_list) {
       this.setState({store_categories: store_categories, tag_list: tag_list});
@@ -462,8 +515,8 @@ class GoodsEditScene extends PureComponent {
   goBackButtons = () => {
     const buttons = [{
       type: "default", label: "商品主页", onPress: () => {
-        this.props.navigation.goBack();
         this.setState({selectToWhere: false});
+        this.props.navigation.goBack();
       }
     }, {
       type: "primary", label: "继续添加", onPress: () => {
@@ -482,26 +535,14 @@ class GoodsEditScene extends PureComponent {
     return buttons
   }
 
-
   upLoad = async () => {
     let {type} = this.props.route.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
     let {
-      id,
-      name,
-      vendor_id,
-      sku_unit,
-      weight,
-      sku_having_unit,
-      sku_tag_id,
-      store_categories,
-      upload_files,
-      price,
-      sale_status,
-      provided,
-      task_id
+      id, name, vendor_id, weight, sku_having_unit, sku_tag_id, store_categories, upload_files, price,
+      sale_status, provided, task_id, actualNum, selectWeight
     } = this.state;
 
     const {accessToken, currStoreId} = this.props.global;
@@ -510,7 +551,7 @@ class GoodsEditScene extends PureComponent {
       id,
       vendor_id,
       name,
-      sku_unit,
+      sku_unit: selectWeight.label,
       weight,
       sku_having_unit,
       sku_tag_id,
@@ -526,25 +567,32 @@ class GoodsEditScene extends PureComponent {
         sale_status: sale_status,
         provided: provided
       };
-    }
-    const {dispatch} = this.props;
-    let check_res = this.dataValidate(formData);
-    const save_done = async (ok, reason, obj) => {
-      hideModal()
-      this.setState({uploading: false});
-      if (ok) {
-        if (type === "add") {
-          this.mixpanel.track('商品新增页面_点击保存')
-          this.setState({selectToWhere: true});
-        } else {
-          showSuccess("修改成功");
-          this.back();
-        }
-      } else {
-        ToastLong(reason);
+      formData.inventory = {
+        actualNum: actualNum,
+        differenceType: 2,
+        totalRemain: '0',
+        remark: '',
+        store_id: currStoreId
       }
     }
-    if (check_res) {
+    const {dispatch} = this.props;
+
+    if (this.dataValidate(formData)) {
+      const save_done = async (ok, reason, obj) => {
+        hideModal()
+        this.setState({uploading: false});
+        if (ok) {
+          if (type === "add") {
+            this.mixpanel.track('商品新增页面_点击保存')
+            this.setState({selectToWhere: true});
+          } else {
+            showSuccess("修改成功");
+            this.back();
+          }
+        } else {
+          ToastLong(reason);
+        }
+      }
       showModal('提交中')
       this.setState({uploading: true});
       if (this.state.uploading) {
@@ -553,183 +601,103 @@ class GoodsEditScene extends PureComponent {
       if (this.isAddProdToStore()) {
         this.addProdToStore(save_done)
       } else {
-        dispatch(
-          productSave(formData, accessToken, save_done)
-        );
+        dispatch(productSave(formData, accessToken, save_done));
       }
     }
   };
 
-  dataValidate(formData) {
+  dataValidate = (formData) => {
     let type = this.props.route.params.type;
     const {
-      id,
-      name,
-      vendor_id,
-      sku_unit,
-      weight,
-      sku_having_unit,
-      sku_tag_id,
-      store_categories,
+      id, name, vendor_id, weight, store_categories, store_goods_status
     } = formData;
-    let err_msg = "";
     if (type === "edit" && id <= 0) {
-      err_msg = "数据异常, 无法保存";
-    } else if (type === "add") {
+      ToastLong('数据异常, 无法保存')
+      return false
+    }
+    if (type === "add") {
       //增加商品
-      let {price, sale_status, provided} = formData.store_goods_status;
+      let {price, sale_status, provided} = store_goods_status;
       if (parseInt(price) < 0) {
-        err_msg = "请输入正确的商品价格";
-      } else if (!price) {
-        err_msg = "请输入商品价格";
-      } else if (
-        !(
-          sale_status === Cts.STORE_PROD_ON_SALE ||
-          sale_status === Cts.STORE_PROD_SOLD_OUT
-        )
-      ) {
-        err_msg = "请选择售卖状态";
-      } else if (
-        !(
-          provided === Cts.STORE_SELF_PROVIDED ||
-          provided === Cts.STORE_COMMON_PROVIDED
-        )
-      ) {
-        err_msg = "选择供货方式";
+        ToastLong('请输入正确的商品价格')
+        return false
+      }
+      if (!price) {
+        ToastLong('请输入商品价格')
+        return false
+      }
+      if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
+        ToastLong('请选择售卖状态')
+        return false
+      }
+      if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
+        ToastLong('选择供货方式')
+        return false
       }
     }
 
     if (!this.isAddProdToStore()) {
       if (name.length <= 0) {
-        err_msg = "请输入商品名";
-      } else if (!(vendor_id > 0)) {
-        err_msg = "无效的品牌商";
-      } else if (sku_unit.length <= 0) {
-        err_msg = "选择SKU单位";
-      } else if (sku_having_unit <= 0) {
-        err_msg = "请输入正确的份含量";
-      } else if (!(weight > 0)) {
-        err_msg = "请输入正确的重量";
-      } else if (store_categories.length <= 0) {
-        err_msg = "请选择门店分类";
+        ToastLong('请输入商品名称')
+        return false
+      }
+      if (!(vendor_id > 0)) {
+        ToastLong('无效的品牌商')
+        return false
+      }
+      // if (sku_unit.length <= 0) {
+      //   ToastLong('选择SKU单位')
+      //   return false
+      // }
+      // if (sku_having_unit <= 0) {
+      //   ToastLong('请输入正确的份含量')
+      //   return false
+      // }
+      if (!(weight > 0)) {
+
+        ToastLong('请输入正确的重量')
+        return false
+      }
+      if (store_categories.length <= 0) {
+        ToastLong('请选择门店分类')
+        return false
       }
     }
-
-    if (err_msg === "") {
-      return true;
-    } else {
-      ToastLong(err_msg);
-      return false;
-    }
+    return true;
   }
 
-  renderAddGood() {
-    let {type} = this.props.route.params;
-    if (!(type === "edit")) {
-      return (
-        <View>
-          <GoodAttrs name="选填信息"/>
-          <ModalSelector skin="customer" data={this.state.selling_categories} onChange={option => {
-            this.setState({sale_status: option.key});
-          }}>
-            <Left title="售卖状态" info={tool.sellingStatus(this.state.sale_status)} right={right}/>
-          </ModalSelector>
-
-          {this.state.fnProviding ? (
-            <ModalSelector skin="customer" data={this.state.head_supplies} onChange={option => {
-              this.setState({provided: option.key});
-            }}>
-              <Left title="供货方式" info={tool.headerSupply(this.state.provided)} right={right}/>
-            </ModalSelector>
-          ) : null}
-
-          {!this.isAddProdToStore() && this.state.editable_upc &&
-          <Left title="UPC" value={`${this.state.upc}`} placeholder="一般为商品包装上的条形码"
-                onChangeText={upc => this.setState({upc})}/>}
-
-          {!this.isAddProdToStore() &&
-          <Left title="商品类目" onPress={() => {
-            this.setState({'visible': true})
-          }} info={this.state.basic_category_obj.name_path ? (this.state.basic_category_obj.name_path) : ("选择基础类目")}
-                right={right}/>
-          }
-
-          {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
-                                                      onChange={option => {
-                                                        this.setState({sku_unit: option.label});
-                                                      }}>
-            <Left title="库存单位" info={this.state.sku_unit} right={right}/>
-          </ModalSelector>}
-
-          {!this.isAddProdToStore() &&
-          <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
-                onChangeText={text => this.setState({sku_having_unit: text})}/>}
-
-          {/*<PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>*/}
-
-        </View>
-      );
-    }
-  }
-
-
-  pickSingleImg() {
+  pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(pickImageOptions(true))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
-        }).catch((res) => {
-        ImagePicker.openPicker({
-          width: 800,
-          height: 800,
-          cropping: false,
-          cropperCircleOverlay: false,
-          includeExif: true
-        })
-          .then(image => {
-            let image_path = image.path;
-            let image_arr = image_path.split("/");
-            let image_name = image_arr[image_arr.length - 1];
-            this.startUploadImg(image_path, image_name);
-          })
-
+        }).catch(() => {
       })
-    }, 1000)
+    }, 500)
   }
 
-  pickCameraImg() {
+  pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
+      }).catch(() => {
       })
-    }, 1000)
+    }, 500)
+
   }
 
-
   getSgTagTree() {
-    const {accessToken} = this.props.global;
-    const {sg_tag_tree, sg_tag_tree_at} = this.props.product
-    const {dispatch} = this.props;
+    const {dispatch, global, product} = this.props;
+    const {accessToken} = global;
+    const {sg_tag_tree, sg_tag_tree_at} = product
 
     if (sg_tag_tree && dayjs().unix() - sg_tag_tree_at < 24 * 3600) {
       this.setState({sg_tag_tree})
@@ -750,7 +718,6 @@ class GoodsEditScene extends PureComponent {
       this.setState({likeProds: prods, showRecommend: true})
     })
   }
-
 
   getProdDetailByUpc = (upc) => {
     showModal("加载中...")
@@ -794,7 +761,7 @@ class GoodsEditScene extends PureComponent {
     }, save_done_callback)
   }
 
-  startUploadImg(imgPath, imgName) {
+  startUploadImg = (imgPath, imgName) => {
     showModal('图片上传中')
     this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
 
@@ -842,207 +809,422 @@ class GoodsEditScene extends PureComponent {
     return false
   }
 
-  render() {
-    let {searchValue, basic_categories, basic_category_obj, store_tags} = this.state
-    return <Provider>
-      <View style={{flex: 1}}>
-        <ScrollView>
-          <Scanner visible={this.state.scanBoolean} title="返回"
-                   onClose={() => this.setState({scanBoolean: false})}
-                   onScanSuccess={code => this.onScanSuccess(code)}
-                   onScanFail={code => this.onScanFail(code)}/>
-          <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
-                value={this.state.name} onChangeText={this.onNameChanged}
-                right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除 </Text> ||
-                <Text/>}/>
-          {this.state.showRecommend &&
+  menus = [
+    {
+      label: '拍照', onPress: this.pickCameraImg
+    },
+    {
+      label: '从相册选择', onPress: this.pickSingleImg
+    }
+  ]
+
+  actions = [
+    {
+      label: '取消', onPress: () => this.setState({showImgMenus: false})
+    }
+  ]
+
+  renderBaseInfo = () => {
+    let {
+      basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, likeProds, store_has, showRecommend,
+      store_tags, editable_upc, store_categories, price, selectWeight, actualNum
+    } = this.state
+    return (
+      <View style={Styles.zoneWrap}>
+        <Text style={Styles.headerTitleText}>
+          基本信息
+        </Text>
+        <LineView/>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            <Text style={styles.leftFlag}>
+              *
+            </Text>商品名称
+          </Text>
+          <TextInput allowFontScaling={false}
+                     value={name}
+                     style={styles.textInputStyle}
+                     onChangeText={text => this.onNameChanged(text)}
+                     placeholderTextColor={colors.color999}
+                     placeholder={'不超过40个字符'}/>
+          <If condition={name}>
+            <Text style={styles.clearBtn} onPress={this.onNameClear}>
+              清除
+            </Text>
+          </If>
+          <If condition={!name}>
+            <View style={styles.rightEmptyView}/>
+          </If>
+
+        </View>
+        <If condition={showRecommend}>
           <View style={styles.recommendList}>
-            {this.state.likeProds.map(like =>
+            {likeProds.map(like =>
               <View style={styles.recommendItem} key={like.id}>
                 <Text onPress={() => this.onRecommendTap(like)}
                       style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]}
-                      numberOfLines={1}>{like.name} </Text>
-                {like.status_text &&
-                <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text} </Text>}
+                      numberOfLines={1}>
+                  {like.name}
+                </Text>
+                <If condition={like.status_text}>
+                  <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text} </Text>
+                </If>
               </View>
             )}
           </View>
+        </If>
+        <If condition={store_has}>
+          <Text style={{padding: '3%', paddingLeft: '4%', backgroundColor: colors.white, color: colors.warn_color}}>
+            商品已存在
+          </Text>
+        </If>
+        <LineView/>
+        <View style={styles.baseRowWrap}>
+          <Text style={styles.leftText}>
+            <Text style={styles.leftFlag}>
+              *
+            </Text>商品图片
+          </Text>
+          {
+            this.renderUploadImg()
           }
-          {this.renderUploadImg()}
-
-          {this.state.store_has ? <Text style={{
-            padding: '3%',
-            paddingLeft: '4%',
-            backgroundColor: colors.white,
-            color: colors.warn_color
-          }}>商品已存在 </Text> : null}
-
-          {this.isStoreProdEditable() ? <Left title="报价" placeholder={"商品报价"} required={true}
-                                              right={<Text style={{fontSize: 14, color: colors.color333}}>元 </Text>}
-                                              type="numeric" value={this.state.price}
-                                              onChangeText={text => this.setState({price: text})}/> : null}
-
-          {!this.isAddProdToStore() &&
-          <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
-                right={<Text style={styles.n1grey3}>克 </Text>}
-                onChangeText={text => this.setState({weight: text})}/>}
-
-          {!this.isAddProdToStore() && tool.length(this.state.store_tags) > 0 ? <View
-            style={[{
-              backgroundColor: "#fff",
-              paddingHorizontal: pxToDp(10),
-              paddingVertical: 15
-            }]}
-          >
-            <SectionedMultiSelect
-              items={this.state.store_tags}
-              IconRenderer={Icon}
-              uniqueKey="id"
-              subKey="children"
-              selectText="请选择门店分类"
-              showDropDowns={true}
-              readOnlyHeadings={true}
-              onSelectedItemsChange={this.onSelectedItemsChange}
-              selectChildren={true}
-              highlightChildren={true}
-              selectedItems={this.state.store_categories}
-              selectedText={"个已选中"}
-              searchPlaceholderText='搜索门店分类'
-              confirmText={"确认选择"}
-              colors={{primary: '#59b26a'}}
-            />
-          </View> : null
-          }
-          {this.renderAddGood()}
-        </ScrollView>
-        <View style={[styles.around, {
-          backgroundColor: '#fff',
-          // marginLeft: pxToDp(20), marginRight: pxToDp(20),
-          borderWidth: 1,
-          borderColor: '#ddd',
-          shadowColor: '#000',
-          shadowOffset: {width: -4, height: -4},
-          height: pxToDp(120),
-        }]}>
-          {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
+          <View style={styles.rightEmptyView}/>
         </View>
-        <Dialog onRequestClose={() => {
-        }} visible={this.state.selectToWhere}
-                buttons={this.goBackButtons()}>
-          {<Text
-            style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功 </Text>}
-          {<Text style={{width: "100%", textAlign: "center"}}>商品已成功添加到门店 </Text>}
-        </Dialog>
-
-        <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
-          this.setState({showImgMenus: false})
-        }}
-                     menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
-                       label: '从相册选择',
-                       onPress: this.pickSingleImg.bind(this)
-                     }]}
-                     actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
-        />
-        <Modal
-          popup maskClosable
-          visible={this.state.visible}
-          animationType="slide-up"
-          onClose={this.onClose}
-          style={{
-            'height': '75%',
-          }}
-
-        >
-          <View style={[styles.endcenter, {
-            'marginLeft': 15,
-            'marginRight': 15, position: 'relative', bottom: 0
-          }]}>
-            <Text style={[{
-              textAlign: 'center',
-              flex: 1,
-              paddingVertical: 5,
-              paddingHorizontal: 10
-            }, styles.n1b]}>商品类目 </Text>
-            <TouchableOpacity
-              style={[styles.endcenter, {
-                width: pxToDp(120),
-                height: pxToDp(120),
-                marginTop: 1,
-                position: 'absolute'
-              }]}
-              onPress={this.onClose}>
-              <Text style={styles.n1b}><AntIcon name="close" size="md" color="red"/>
+        <LineView/>
+        <If condition={this.isStoreProdEditable()}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              <Text style={styles.leftFlag}>
+                *
+              </Text>报价
+            </Text>
+            <TextInput allowFontScaling={false}
+                       style={styles.textInputStyle}
+                       value={price}
+                       keyboardType={'numeric'}
+                       onChangeText={text => this.setState({price: text})}
+                       placeholderTextColor={colors.color999}
+                       placeholder={'请输入商品报价'}/>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
+        <If condition={!this.isAddProdToStore()}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              <Text style={styles.leftFlag}>
+                *
+              </Text>重量
+            </Text>
+            <TextInput allowFontScaling={false}
+                       style={styles.textInputStyle}
+                       value={weight}
+                       keyboardType={'numeric'}
+                       onChangeText={text => this.setState({weight: text})}
+                       placeholderTextColor={colors.color999}
+                       placeholder={'请输入商品重量'}/>
+            <ModalSelector style={styles.rightEmptyView}
+                           data={weightList}
+                           skin={'customer'}
+                           onChange={item => this.setState({selectWeight: item})}
+                           defaultKey={-999}>
+              <View style={styles.weightUnitWrap}>
+                <Text style={styles.weightUnit}>
+                  {`${selectWeight.label}>`}
+                </Text>
+              </View>
+            </ModalSelector>
+          </View>
+          <LineView/>
+          <If condition={editable_upc && this.isStoreProdEditable()}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                商品条码
               </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{paddingRight: 15, paddingLeft: 15, marginTop: 10}}>
-            <View style={{
-              height: 40,
-              backgroundColor: "#eee",
-              borderRadius: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: "space-around"
-            }}>
-              <Icon name={"search"} size={26}/>
-              <TextInput defaultValue={this.state.searchValue ? this.state.searchValue : ''}
-                         onChangeText={value => this.setState({searchValue: value})}
-                         style={{width: 150, padding: 0}}></TextInput>
-              <TouchableOpacity onPress={() => {
-                this.SearchCommodityCategories(searchValue, basic_categories)
-              }}>
-                <Text style={{color: '#59b26a', fontSize: 14}}>搜索 </Text>
-              </TouchableOpacity>
+              <TextInput allowFontScaling={false}
+                         value={upc}
+                         editable={this.isStoreProdEditable()}
+                         onChangeText={upc => this.setState({upc: upc})}
+                         style={styles.textInputStyle}
+                         placeholderTextColor={colors.color999}
+                         placeholder={'请扫描或输入条形码'}/>
+              <View style={styles.rightEmptyView}/>
             </View>
-          </View>
-          <View style={[{
-            flexDirection: "row",
-            alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
-          }]}>
-            <SegmentedControl
-              onValueChange={() => {
-                let {basic_category_obj} = this.state
-                if (Object.keys(basic_category_obj).length) {
-                  let id_path = basic_category_obj.id_path;
-                  let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
-                  arr.pop();
-                  if (arr.length >= 1) {
-                    basic_category_obj.id = arr[arr.length - 1]
-                    basic_category_obj.id_path = ',' + arr.toString() + ',';
-                    let name_path = basic_category_obj.name_path;
-                    name_path = name_path.split(',')
-                    name_path.pop()
-                    basic_category_obj.name = name_path[name_path.length - 1]
-                    basic_category_obj.name_path = name_path.toString();
-                  } else {
-                    basic_category_obj = {};
-                  }
-                  this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
-                }
+            <LineView/>
+          </If>
+          <If condition={fnProviding && this.isStoreProdEditable()}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>库存
+              </Text>
+              <TextInput allowFontScaling={false}
+                         value={actualNum}
+                         onChangeText={text => this.setState({actualNum: text})}
+                         style={styles.textInputStyle}
+                         placeholderTextColor={colors.color999}
+                         placeholder={'请输入商品库存'}/>
+              <View style={styles.rightEmptyView}/>
+            </View>
+            <LineView/>
+          </If>
+          <If condition={this.isStoreProdEditable()}>
+            <TouchableOpacity style={styles.baseRowCenterWrap} onPress={() => this.setState({
+              visible: true,
+              selectHeaderText: '商品类目',
+              isSelectCategory: true
+            })}>
+              <Text style={styles.leftText}>
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>商品类目
+              </Text>
+              <View style={styles.textInputStyle}>
+                <Text style={styles.selectTipText}>
+                  {basic_category_obj.name_path ?? '请选择类目'}
+                </Text>
+              </View>
+              <MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>
+            </TouchableOpacity>
+            <LineView/>
+          </If>
 
-              }}
-              tintColor={'#59b26a'}
-              values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
-              style={{height: 30, width: "90%", marginLeft: "4%"}}
-              selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
-            />
-          </View>
-          {this.renderSelectTag()}
-          <Button type={'primary'} disabled={this.state.buttonDisabled}
-                  style={{width: "100%", borderRadius: 0, position: "absolute", bottom: 0}} onPress={() => {
-            this.setState({
-              visible: false,
-            });
-          }}>
-            确认选中
-          </Button>
-        </Modal>
+          <If condition={tool.length(store_tags) > 0}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>商品分类
+              </Text>
+              {/*<TouchableOpacity style={styles.textInputStyle}*/}
+              {/*                  onPress={() => this.setState({*/}
+              {/*                    visible: true,*/}
+              {/*                    selectHeaderText: '商品分类',*/}
+              {/*                    isSelectCategory: false*/}
+              {/*                  })}>*/}
+              {/*  <Text style={styles.selectTipText}>*/}
+              {/*    {store_categories.length > 0 ? store_categories : '请选择分类'}*/}
+              {/*  </Text>*/}
+
+              {/*</TouchableOpacity>*/}
+              {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
+
+              <View style={styles.textInputStyle}>
+                <SectionedMultiSelect
+                  items={store_tags}
+                  IconRenderer={MaterialIcons}
+                  uniqueKey="id"
+                  subKey="children"
+                  selectText="请选择分类"
+                  showDropDowns={true}
+                  readOnlyHeadings={true}
+                  onSelectedItemsChange={this.onSelectedItemsChange}
+                  selectChildren={true}
+                  highlightChildren={true}
+                  selectedItems={store_categories}
+                  selectedText={"个已选中"}
+                  searchPlaceholderText='搜索门店分类'
+                  confirmText={"确认选择"}
+                  colors={{primary: colors.main_color}}
+                />
+              </View>
+            </View>
+            <LineView/>
+          </If>
+          <If condition={this.isStoreProdEditable()}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>上架状态
+              </Text>
+              <View style={styles.saleStatusWrap}>
+                <TouchableOpacity style={styles.saleStatusItemWrap}
+                                  onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
+                  <CheckBox type={'material'} color={'green'} checkedIcon={'dot-circle-o'}
+                            uncheckedIcon={'circle-o'} checked={sale_status === Cts.STORE_PROD_ON_SALE}
+                            onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}/>
+                  <Text style={styles.saleStatusText}>
+                    上架
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saleStatusItemWrap}
+                                  onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
+                  <CheckBox type={'material'} color={'green'} checkedIcon={'dot-circle-o'}
+                            uncheckedIcon={'circle-o'} checked={sale_status === Cts.STORE_PROD_OFF_SALE}
+                            onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}/>
+                  <Text style={styles.saleStatusText}>
+                    下架
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.rightEmptyView}/>
+            </View>
+          </If>
+        </If>
       </View>
-    </Provider>;
-
+    )
   }
 
-  renderSelectTag() {
+  renderOtherInfo = () => {
+    const {fnProviding, provided, head_supplies} = this.state
+    return (
+      <If condition={fnProviding && this.isStoreProdEditable()}>
+        <View style={Styles.zoneWrap}>
+          <Text style={Styles.headerTitleText}>
+            其他信息
+          </Text>
+          <LineView/>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              供货方式
+            </Text>
+            <ModalSelector skin="customer" data={head_supplies} style={styles.textInputStyle}
+                           onChange={option => this.setState({provided: option.key})}>
+              <Text style={styles.selectTipText}>
+                {tool.headerSupply(provided)}
+              </Text>
+            </ModalSelector>
+
+            <MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>
+          </View>
+        </View>
+      </If>
+    )
+  }
+
+  renderSaveInfo = () => {
+    return (
+      <View style={styles.saveZoneWrap}>
+        <TouchableOpacity style={Styles.saveWrap} onPress={this.upLoad}>
+          <Text style={Styles.saveText}>
+            保存
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  renderScanner = () => {
+    const {scanBoolean} = this.state
+    return (
+      <Scanner visible={scanBoolean} title="返回"
+               onClose={() => this.setState({scanBoolean: false})}
+               onScanSuccess={code => this.onScanSuccess(code)}
+               onScanFail={code => this.onScanFail(code)}/>
+    )
+  }
+
+  renderSuccessInfo = () => {
+    const {selectToWhere} = this.state
+    return (
+      <Dialog visible={selectToWhere} buttons={this.goBackButtons()}>
+        <Text style={styles.successTipText}>
+          上传成功
+        </Text>
+        <Text style={styles.successAddStoreTipText}>
+          商品已成功添加到门店
+        </Text>
+      </Dialog>
+    )
+  }
+
+  renderActionSheet = () => {
+    const {showImgMenus} = this.state
+    return (
+      <ActionSheet visible={showImgMenus} menus={this.menus} actions={this.actions}/>
+    )
+  }
+
+  renderModal = () => {
+    const {searchValue, basic_categories, basic_category_obj, visible, buttonDisabled, selectHeaderText} = this.state
+    return (
+      <If condition={visible}>
+        <CommonModal position={'flex-end'} visible={visible} animationType={'slide-up'}>
+          <View style={styles.modalWrap}>
+            <View style={styles.modalHeaderWrap}>
+              <View style={{padding: 8}}/>
+              <Text style={styles.modalHeaderText}>{selectHeaderText} </Text>
+              <TouchableOpacity style={{padding: 8}} onPress={this.onClose}>
+                <AntDesign name={'close'} size={20} color={colors.red}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalSearchZone}>
+              <View style={styles.modalSearchWrap}>
+                <MaterialIcons name={"search"} size={26} style={styles.modalSearchIcon}/>
+                <TextInput value={searchValue ? searchValue : ''}
+                           placeholder={`搜索${selectHeaderText}`}
+                           placeholderTextColor={colors.color999}
+                           onChangeText={value => this.setState({searchValue: value})}
+                           style={{flex: 1, padding: 0}}/>
+                <TouchableOpacity style={styles.modalSearchIcon}
+                                  onPress={() => this.SearchCommodityCategories(searchValue, basic_categories)}>
+                  <Text style={styles.modalSearch}>搜索 </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.selectCateStyle}>
+              <SegmentedControl
+                onValueChange={this.onValueChange}
+                tintColor={colors.main_color}
+                values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
+                style={{height: 30, width: "90%", marginLeft: "4%"}}
+                selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
+              />
+            </View>
+            {this.renderSelectTag()}
+            <Button type={'primary'}
+                    disabled={buttonDisabled}
+                    style={styles.selectedCateStyle}
+                    onPress={() => this.setState({visible: false})}>
+              确认选中
+            </Button>
+          </View>
+        </CommonModal>
+      </If>
+    )
+  }
+
+  render() {
+    return (
+      <>
+        <ScrollView>
+          {this.renderBaseInfo()}
+          {this.renderOtherInfo()}
+        </ScrollView>
+        {this.renderSaveInfo()}
+        {this.renderScanner()}
+        {this.renderSuccessInfo()}
+        {this.renderActionSheet()}
+        {this.renderModal()}
+      </>
+    )
+  }
+
+  onValueChange = () => {
+    let {basic_category_obj} = this.state
+    if (Object.keys(basic_category_obj).length) {
+      let id_path = basic_category_obj.id_path;
+      let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+      arr.pop();
+      if (arr.length >= 1) {
+        basic_category_obj.id = arr[arr.length - 1]
+        basic_category_obj.id_path = ',' + arr.toString() + ',';
+        let name_path = basic_category_obj.name_path;
+        name_path = name_path.split(',')
+        name_path.pop()
+        basic_category_obj.name = name_path[name_path.length - 1]
+        basic_category_obj.name_path = name_path.toString();
+      } else {
+        basic_category_obj = {};
+      }
+      this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
+    }
+  }
+
+  renderSelectTag = () => {
     let arr = [];
     let {basic_categories, basic_category_obj} = this.state
     if (Object.keys(basic_category_obj).length) {
@@ -1051,34 +1233,29 @@ class GoodsEditScene extends PureComponent {
     }
     let list = this.treeMenuList(basic_categories, arr);
     if (tool.length(list) === 0) {
-      return null
+      return
     }
     return (
-      <ScrollView style={{
-        'height': '75%',
-      }}>
-        <View style={{paddingBottom: "10%"}}>
-          <List>
-            {list.map((item, index) => {
-              return (tool.length(item.children) > 0 ? <Item key={index} arrow="horizontal" onPress={() => {
-                this.setState({
-                  basic_category_obj: {...item},
-                  sku_tag_id: item.id
-                })
-              }}>
-                {item.name}
-              </Item> : <Item onPress={() => {
-                this.setState({
-                  basic_category_obj: {...item},
-                  sku_tag_id: item.id,
-                  // visible: false,
-                })
-              }}>
-                {item.name}
-              </Item>)
-            })}
-          </List>
-        </View>
+      <ScrollView style={styles.modalStyle}>
+        <List>
+          {list.map((item, index) => {
+            return (
+              <View key={index}>
+                <If condition={tool.length(item.children) > 0}>
+                  <Item arrow="horizontal"
+                        onPress={() => this.setState({basic_category_obj: {...item}, sku_tag_id: item.id})}>
+                    {item.name}
+                  </Item>
+                </If>
+                <If condition={tool.length(item.children) <= 0}>
+                  <Item onPress={() => this.setState({basic_category_obj: {...item}, sku_tag_id: item.id})}>
+                    {item.name}
+                  </Item>
+                </If>
+              </View>
+            )
+          })}
+        </List>
       </ScrollView>
     );
   }
@@ -1110,92 +1287,202 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  renderUploadImg() {
-    return <View style={[
-      styles.area_cell,
-      {
-        minHeight: pxToDp(215),
-        flexDirection: "row",
-        flexWrap: "wrap",
-        paddingHorizontal: pxToDp(20),
-        paddingTop: pxToDp(10),
-        borderBottomWidth: 1,
-        borderColor: colors.main_back
-      }
-    ]}>
-      {tool.length(this.state.list_img) > 0 ? (
-        tool.objectMap(this.state.list_img, (img_data, img_id) => {
-          let img_url = img_data["url"];
-          return (
-            <View key={img_id}
-                  style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-              <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
-              {this.isProdEditable() &&
-              <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
-                                onPress={() => {
-                                  delete this.state.list_img[img_id];
-                                  delete this.state.upload_files[img_id];
-                                  this.forceUpdate();
-                                }}>
-                <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"}
-                      msg={false}/>
-              </TouchableOpacity>}
-            </View>
-          );
-        })
-      ) : this.state.cover_img ? (
-        <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-          <Image style={styles.img_add} source={{uri: Config.staticUrl(this.state.cover_img)}}/>
-          {this.isProdEditable() &&
-          <TouchableOpacity style={{position: "absolute", right: pxToDp(4), top: pxToDp(4)}} onPress={() => {
-            this.setState({cover_img: ""});
-          }}>
-            <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
-          </TouchableOpacity>}
-        </View>
-      ) : <View style={{
-        height: pxToDp(170),
-        width: pxToDp(170),
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
-        <FontAwesome5 name={'images'} size={32}
-                      color={colors.color666}
-        />
-      </View>}
-      {this.isProdEditable() &&
-      <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-        <TouchableOpacity
-          style={[styles.img_add, styles.img_add_box]}
-          onPress={() => this.setState({showImgMenus: true})}>
-          <Text style={{
-            fontSize: pxToDp(36),
-            color: "#bfbfbf",
-            textAlignVertical: "center",
-            textAlign: "center"
-          }}>+ </Text>
-        </TouchableOpacity>
-      </View>}
-    </View>;
-  }
-}
-
-class GoodAttrs extends PureComponent {
-  constructor(props) {
-    super(props);
+  deleteUploadImage = (img_id) => {
+    const {list_img, upload_files} = this.state
+    delete list_img[img_id];
+    delete upload_files[img_id];
+    this.forceUpdate()
   }
 
-  render() {
+  renderUploadImg = () => {
+    const {list_img, cover_img} = this.state
     return (
-      <View style={[styles.GoodAttrs]}>
-        <Text style={{fontSize: pxToDp(30)}}>{this.props.name} </Text>
+      <View style={styles.area_cell}>
+        <If condition={tool.length(list_img) > 0}>
+          {
+            tool.objectMap(list_img, (img_data, img_id) => {
+              let img_url = img_data["url"];
+              return (
+                <View key={img_id} style={styles.hasImageList}>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
+                  <If condition={this.isProdEditable()}>
+                    <TouchableOpacity style={styles.deleteUploadImageIcon}
+                                      onPress={() => this.deleteUploadImage(img_id)}>
+                      <MaterialIcons name={"clear"} size={pxToDp(40)} style={{backgroundColor: colors.white}}
+                                     color={"#d81e06"}
+                                     msg={false}/>
+                    </TouchableOpacity>
+                  </If>
+
+                </View>
+              );
+            })
+          }
+        </If>
+        <If condition={tool.length(list_img) <= 0}>
+          <If condition={cover_img}>
+            <View style={styles.hasImageList}>
+              <Image style={styles.img_add} source={{uri: Config.staticUrl(cover_img)}}/>
+              <If condition={this.isProdEditable()}>
+                <TouchableOpacity style={{position: "absolute", right: pxToDp(4), top: pxToDp(4)}}
+                                  onPress={() => this.setState({cover_img: ""})}>
+                  <MaterialIcons name={"clear"} size={pxToDp(40)} style={{backgroundColor: colors.white}}
+                                 color={"#d81e06"}
+                                 msg={false}/>
+                </TouchableOpacity>
+              </If>
+            </View>
+          </If>
+          <If condition={!cover_img}>
+            <View style={{
+              height: pxToDp(170),
+              width: pxToDp(170),
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <FontAwesome5 name={'images'} size={32} color={colors.color666}/>
+            </View>
+          </If>
+        </If>
+        <If condition={this.isProdEditable()}>
+          <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+            <TouchableOpacity
+              style={[styles.img_add, styles.img_add_box]}
+              onPress={() => this.setState({showImgMenus: true})}>
+              <Text style={{
+                fontSize: pxToDp(36),
+                color: "#bfbfbf",
+                textAlignVertical: "center",
+                textAlign: "center"
+              }}>+ </Text>
+            </TouchableOpacity>
+          </View>
+        </If>
       </View>
-    );
+    )
   }
+
 }
 
 const styles = StyleSheet.create({
+  weightUnitWrap: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 5, width: 40, justifyContent: 'flex-end'
+  },
+  weightUnit: {
+    fontSize: 12, fontWeight: '400', color: colors.color333, lineHeight: 17,
+  },
+  modalSearchIcon: {width: 40, textAlign: 'center'},
+  modalSearch: {color: colors.main_color, fontSize: 14},
+  successTipText: {width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333},
+  successAddStoreTipText: {width: "100%", textAlign: "center"},
+  saveZoneWrap: {marginTop: 32, justifyContent: 'flex-end', backgroundColor: colors.white},
+  headerWrap: {
+    height: pxToDp(72),
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingRight: pxToDp(30)
+  },
+  headerText: {
+    fontWeight: "bold", marginRight: 8, color: colors.color333, fontSize: 12
+  },
+  modalHeaderWrap: {
+    padding: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  modalHeaderText: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: "bold"
+  },
+  modalSearchZone: {
+    paddingRight: 15, paddingLeft: 15
+  },
+  modalSearchWrap: {
+    height: 40,
+    backgroundColor: colors.colorEEE,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: "space-around"
+  },
+  selectCateStyle: {
+    flexDirection: "row", alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
+  },
+  selectedCateStyle: {
+    width: "100%", borderRadius: 0, position: "absolute", bottom: 0
+  },
+  baseRowWrap: {
+    flexDirection: 'row',
+    paddingTop: 12,
+    paddingLeft: 12,
+    flex: 1,
+  },
+  baseRowCenterWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 12,
+    flex: 1,
+  },
+
+  leftText: {
+    width: 70,
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 20
+  },
+  leftFlag: {
+    color: '#EE2626'
+  },
+  hasImageList: {
+    height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"
+  },
+  deleteUploadImageIcon: {
+    position: "absolute", right: pxToDp(2), top: pxToDp(4)
+  },
+  textInputStyle: {
+    flex: 1,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  saleStatusWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+
+  },
+  saleStatusItemWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  saleStatusText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 17
+  },
+  rightEmptyView: {
+    width: 40,
+  },
+  modalStyle: {
+    height: '75%'
+  },
+  modalWrap: {
+    height: '75%', backgroundColor: colors.white, borderTopLeftRadius: 8, borderTopRightRadius: 8
+  },
+  selectTipText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color999,
+    lineHeight: 17
+  },
+
   GoodAttrs: {
     height: pxToDp(90),
     flexDirection: "row",
@@ -1231,7 +1518,7 @@ const styles = StyleSheet.create({
   },
   recommendList: {
     paddingHorizontal: pxToDp(31),
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   recommendItem: {
     flexDirection: "row",
@@ -1266,11 +1553,10 @@ const styles = StyleSheet.create({
   },
   area_cell: {
     paddingHorizontal: pxToDp(30),
-    borderTopColor: colors.new_back,
-    borderStyle: "solid",
-    borderTopWidth: pxToDp(1),
     paddingVertical: pxToDp(35),
-    backgroundColor: "#fff"
+    minHeight: 100,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   area_input_title: {
     color: "#363636",
@@ -1283,6 +1569,7 @@ const styles = StyleSheet.create({
     borderWidth: pxToDp(1),
     borderColor: "#bfbfbf"
   },
+
   img_add_box: {
     justifyContent: "center",
     alignItems: "center",
@@ -1294,11 +1581,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center"
-  },
-  headerText: {
-    height: "100%",
-    color: colors.main_color,
-    textAlignVertical: "center"
   },
   navLeftIcon: {
     width: pxToDp(28),

@@ -8,6 +8,9 @@ import HttpUtils from "../util/http";
 import Config from "../common/config";
 import {showError} from "../util/ToastUtils";
 import pxToDp from "../util/pxToDp";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+
+const width = Dimensions.get("window").width;
 
 const initState = {
   scrollViewIsBottom: false,
@@ -21,8 +24,7 @@ class RemindModal extends React.Component {
 
   static propTypes = {
     accessToken: PropTypes.string,
-    onPress: PropTypes.func,
-    currStoreId: PropTypes.string
+    onPress: PropTypes.func
   }
 
   componentDidMount() {
@@ -31,14 +33,14 @@ class RemindModal extends React.Component {
 
   getAdvicesInfo = () => {
     const {accessToken, currStoreId} = this.props;
-    const url='/v1/new_api/advice/showPopAdvice'
-    const params={store_id:currStoreId, access_token: accessToken}
-    HttpUtils.get.bind(this.props)(url,params).then(res=>{
+    const url = '/v1/new_api/advice/showPopAdvice'
+    const params = {store_id: currStoreId, access_token: accessToken}
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         advicesInfoArray: res,
         showAdvicesVisible: true
       })
-    }).catch(error=>{showError(error)})
+    })
   }
 
   closeRemindModal = () => {
@@ -76,10 +78,10 @@ class RemindModal extends React.Component {
 
   countDown = () => {
     let timer = setTimeout(() => {
-      this.setState((preState) =>({
+      this.setState((preState) => ({
         countDownTime: preState.countDownTime - 1,
-      }),() => {
-        if(this.state.countDownTime == 0){
+      }), () => {
+        if (this.state.countDownTime == 0) {
           clearTimeout(timer)
           this.setState({
             scrollViewIsBottom: true
@@ -105,16 +107,17 @@ class RemindModal extends React.Component {
             <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
             <Text style={styles.modalContentTitleText}>{this.state.advicesInfoArray.title} </Text>
             <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
-              <Entypo name="circle-with-cross" style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.main_color}}/>
+              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false} showsVerticalScrollIndicator={true} scrollsToTop={true}>
+          <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
+                      showsVerticalScrollIndicator={true} scrollsToTop={true}>
             <Text style={styles.modalContentText}>
               {this.state.advicesInfoArray.content}
             </Text>
           </ScrollView>
           <If condition={this.state.advicesInfoArray.type == 4}>
-            <View style={[styles.modalButtonBox, {paddingTop: 10, paddingLeft: 20}]}>
+            <View style={[styles.modalButtonBox]}>
               <Button title={'取消'}
                       onPress={() => {
                         this.closeAdvicesModal(this.state.advicesInfoArray.id)
@@ -132,35 +135,35 @@ class RemindModal extends React.Component {
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 1}>
-            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
-            <Button title={'知道了'}
-                    onPress={() => {
-                      this.closeAdvicesModal(this.state.advicesInfoArray.id)
-                    }}
-                    buttonStyle={[styles.modalBtnWrapWhite, {width: '100%'}]}
-                    titleStyle={styles.modalBtnTextGreen}
-            />
+            <View style={[styles.modalButtonBox]}>
+              <Button title={'我知道了'}
+                      onPress={() => {
+                        this.closeAdvicesModal(this.state.advicesInfoArray.id)
+                      }}
+                      buttonStyle={[styles.modalBtnWrapWhite, {width: width * 0.8}]}
+                      titleStyle={styles.modalBtnTextGreen}
+              />
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 2}>
-            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
+            <View style={[styles.modalButtonBox]}>
               <Button title={'查看详情'}
                       onPress={() => {
                         this.toAdvicesDetail(this.state.advicesInfoArray)
                       }}
-                      buttonStyle={[styles.modalBtnWrap, {width: '100%'}]}
+                      buttonStyle={[styles.modalBtnWrap, {width: width * 0.7}]}
                       titleStyle={styles.modalBtnText}
               />
             </View>
           </If>
           <If condition={this.state.advicesInfoArray.type == 3}>
-            <View style={[styles.modalButtonBox, {paddingTop: 10}]}>
+            <View style={[styles.modalButtonBox]}>
               <Button title={'我已阅读'}
                       onPress={() => {
                         this.closeAdvicesModal(this.state.advicesInfoArray.id)
                       }}
                       disabled={!this.state.scrollViewIsBottom}
-                      buttonStyle={[this.state.scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1, {width: '100%'}]}
+                      buttonStyle={[this.state.scrollViewIsBottom ? styles.modalBtnWrap : styles.modalBtnWrap1, {width: width * 0.7}]}
                       titleStyle={styles.modalBtnText}
               />
             </View>
@@ -173,7 +176,7 @@ class RemindModal extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  modalWrap:{
+  modalWrap: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -181,42 +184,55 @@ const styles = StyleSheet.create({
   },
   modalContainer: {height: 200, paddingHorizontal: 20, marginTop: pxToDp(20)},
   modalContentText: {color: colors.fontBlack},
-  modalContentWrap:{
-    width:'80%',
+  modalContentWrap: {
+    width: width * 0.8,
     backgroundColor: colors.white,
-    borderRadius:8,
+    borderRadius: 8,
     position: "relative"
   },
-  modalContentTitle: {flexDirection: "row", padding: 10, paddingBottom: 0, justifyContent: "flex-end", alignItems: "center"},
+  modalContentTitle: {
+    flexDirection: "row",
+    padding: 10,
+    paddingBottom: 0,
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
   modalContentIcon: {flexDirection: "row", justifyContent: "flex-end", width: '10%'},
-  modalContentTitleText: {textAlign: 'center', color: colors.title_color, fontWeight: "bold", flex: 1, fontSize: pxToDp(28)},
+  modalContentTitleText: {
+    textAlign: 'center',
+    color: colors.title_color,
+    fontWeight: "bold",
+    flex: 1,
+    fontSize: pxToDp(28)
+  },
   closeIcon: {
     fontSize: 35,
     color: colors.fontColor
   },
-  modalBtnWrap:{
-    backgroundColor:colors.main_color,
-    marginRight:20
+  modalBtnWrap: {
+    backgroundColor: colors.main_color,
+    width: width * 0.35,
+    height: 36,
+    borderRadius: 2
   },
-  modalBtnWrapWhite:{
-    backgroundColor: colors.colorEEE,
-    marginRight:20
+  modalBtnWrapWhite: {
+    backgroundColor: colors.white
   },
-  modalBtnWrap1:{
-    backgroundColor:colors.fontColor,
-    marginRight:20
+  modalBtnWrap1: {
+    backgroundColor: '#CCCCCC',
+    width: width * 0.35,
+    height: 36,
+    borderRadius: 2
   },
-  modalBtnText:{
-    color:colors.white,
-    fontSize:20,
-    padding:12,
-    textAlign:'center'
+  modalBtnText: {
+    color: colors.white,
+    fontSize: pxToDp(30),
+    textAlign: 'center'
   },
-  modalBtnTextGreen:{
-    color:colors.main_color,
-    fontSize:20,
-    padding:12,
-    textAlign:'center'
+  modalBtnTextGreen: {
+    color: colors.main_color,
+    fontSize: 20,
+    textAlign: 'center'
   },
   modalButtonBox: {
     display: "flex",
@@ -224,8 +240,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: colors.colorDDD,
-    marginVertical: pxToDp(10)
+    borderTopColor: colors.colorEEE,
+    padding: 12
   }
 });
 

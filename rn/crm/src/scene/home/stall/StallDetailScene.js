@@ -15,6 +15,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbModal from "../../../pubilc/component/JbbModal";
+import {connect} from "react-redux";
 
 const styles = StyleSheet.create({
   rowCenter: {flexDirection: 'row', alignItems: 'center', marginRight: 8},
@@ -123,7 +124,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   modalContentRightTextInput: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 20,
     width: '70%',
+    justifyContent:'center',
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#979797',
@@ -131,6 +137,15 @@ const styles = StyleSheet.create({
     paddingTop: 3,
     paddingLeft: 7,
     paddingBottom: 4
+  },
+  modalContentRightText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333,
+    lineHeight: 20,
+    width: '70%',
+    paddingTop: 3,
+    paddingBottom: 4,
   },
   modalContentRightMultipleTextInput: {
     width: '70%',
@@ -184,10 +199,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   modalNotSelectText: {
-    fontSize: 12, color: colors.colorDDD, fontWeight: '400', marginRight: 6
+    fontSize: 14, color: colors.colorDDD, fontWeight: '400', marginRight: 6, lineHeight: 20
   },
   modalSelectText: {
-    fontSize: 12, color: colors.color333, fontWeight: '400', marginRight: 6
+    fontSize: 14, color: colors.color333, fontWeight: '400', marginRight: 6, lineHeight: 20
   },
   modifySettlementWrap: {
     margin: 10,
@@ -275,12 +290,8 @@ const MODAL_DATA = [
   {value: 1, label: '扣款'},
   {value: 2, label: '补偿'},
 ]
-export default class StallDetailScene extends PureComponent {
 
-  constructor(props) {
-    super(props);
-    this.navigationOptions()
-  }
+class StallDetailScene extends PureComponent {
 
   navigationOptions = () => {
     const {navigation} = this.props
@@ -366,6 +377,7 @@ export default class StallDetailScene extends PureComponent {
   }
 
   componentDidMount() {
+    this.navigationOptions()
     this.getStallBillDetail()
   }
 
@@ -386,6 +398,30 @@ export default class StallDetailScene extends PureComponent {
                 modal_type={'center'}>
         <View style={styles.modalInputContentWrap}>
           <Text style={styles.modalTitle}>修改结算</Text>
+          <View style={styles.modalContentRowWrap}>
+            <Text style={styles.modalContentLeftText}>
+              门店
+            </Text>
+            <Text style={styles.modalContentRightText}>
+              {this.props.global.simpleStore.name}
+            </Text>
+          </View>
+          <View style={styles.modalContentRowWrap}>
+            <Text style={styles.modalContentLeftText}>
+              摊位
+            </Text>
+            <Text style={styles.modalContentRightText}>
+              {this.props.route.params.stall_name}
+            </Text>
+          </View>
+          <View style={styles.modalContentRowWrap}>
+            <Text style={styles.modalContentLeftText}>
+              日期
+            </Text>
+            <Text style={styles.modalContentRightText}>
+              {this.props.route.params.selectedDate}
+            </Text>
+          </View>
           <View style={styles.modalContentRowWrap}>
             <Text style={styles.modalContentLeftText}>
               类型
@@ -683,3 +719,10 @@ export default class StallDetailScene extends PureComponent {
     )
   }
 }
+
+function mapStateToProps(state) {
+  const {global} = state;
+  return {global: global}
+}
+
+export default connect(mapStateToProps)(StallDetailScene)

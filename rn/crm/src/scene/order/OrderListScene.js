@@ -22,8 +22,8 @@ import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
-import {Cell, CellBody, CellFooter} from "../../weui";
-import tool, {simpleStore} from "../../pubilc/util/tool";
+import tool from "../../pubilc/util/tool";
+import {getSimpleStore} from "../../reducers/global/globalActions";
 import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
 import Dialog from "../common/component/Dialog";
@@ -39,6 +39,9 @@ import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import RemindModal from "../../pubilc/component/remindModal";
 import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
+import Swiper from 'react-native-swiper'
+import dayjs from "dayjs";
+import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 
 const {width} = Dimensions.get("window");
 
@@ -110,8 +113,8 @@ const initState = {
   allow_merchants_store_bind: true,
   showBtn: false,
   img: '',
-  showimgType: 1,
-  showimg: true,
+  showImgType: 1,
+  show_img: true,
   activityUrl: '',
   activity: [],
   allow_edit_ship_rule: false,
@@ -163,8 +166,7 @@ class OrderListScene extends Component {
             },
             {
               text: '去设置', onPress: () => {
-                native.toOpenNotifySettings((resp, msg) => {
-                })
+                native.toOpenNotifySettings().then()
                 // this.onPress(Config.ROUTE_SETTING);
               }
             },
@@ -188,18 +190,39 @@ class OrderListScene extends Component {
             },
           ])
         }
-      })
+      }).then()
 
       native.xunfeiIdentily((resp) => {
         console.log(resp, 'kedaxunfei');
-      })
+      }).then()
 
     }
   }
 
+  calcAppStartTime = () => {
+    native.getStartAppTime((flag, startAppTime) => {
+      if (flag) {
+        const startAppEndTime = dayjs().valueOf()
+        const duration = startAppEndTime - parseInt(startAppTime)
+        if (duration > 30000)
+          return
+        const {currStoreId, currentUser} = this.props.global
+
+        nrRecordMetric("start_app_end_time", {
+          startAppTimeDuration: duration,
+          store_id: currStoreId,
+          user_id: currentUser
+        })
+      }
+    }).then()
+  }
+
   componentDidMount() {
     const {global, dispatch} = this.props
-    simpleStore(global, dispatch)
+    if (Platform.OS === 'android') {
+      this.calcAppStartTime()
+    }
+    getSimpleStore(global, dispatch)
     this.openAndroidNotification();
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -255,15 +278,17 @@ class OrderListScene extends Component {
       if (tool.length(obj) > 0) {
         this.setState({
           img: obj.banner,
-          showimgType: obj.can_close,
-          activityUrl: obj.url + '?access_token=' + accessToken,
-          activity: obj,
+          showImgType: obj.can_close,
+          activity: obj.list ?? [obj]
         })
         this.mixpanel.track("act_user_ref_ad_view", {
-          img_name: obj.name,
-          pos: obj.pos_name,
           store_id: currStoreId,
+          list: obj.list
         });
+      } else {
+        this.setState({
+          show_img: false
+        })
       }
     }).catch(error => {
       timeObj.method.push({
@@ -277,14 +302,14 @@ class OrderListScene extends Component {
     })
   }
 
-  closeActivity = () => {
+  closeActivity = (info) => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/close_user_refer_ad?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
     })
     this.mixpanel.track("close_user_refer_ad", {
-      img_name: this.state.activity.name,
-      pos: this.state.activity.pos_name,
+      img_name: info.name,
+      pos: info.pos_name,
       store_id: currStoreId,
     });
   }
@@ -360,7 +385,6 @@ class OrderListScene extends Component {
       }
     })
   }
-
 
   onRefresh = (status) => {
     tool.debounces(() => {
@@ -491,12 +515,43 @@ class OrderListScene extends Component {
     });
   }
 
+  searchExtStoreOnClose = () => {
+    this.setState({
+      searchStoreVisible: false,
+      ext_store_name: '所有外卖店铺',
+      ext_store_id: 0
+    })
+  }
+
+  searchExtStoreOnSelect = (item) => {
+    if (item.id === "0") {
+      item.name = '所有外卖店铺'
+    }
+    this.setState({
+      query: {
+        page: 1,
+        isAdd: true,
+        offset: 0
+      },
+      searchStoreVisible: false,
+      ext_store_id: item.id,
+      ext_store_name: item.name,
+      isLoading: false,
+    }, () => {
+      this.fetchOrders()
+    })
+  }
+
+  bind_platform = () => {
+    this.mixpanel.track("orderpage_authorizestore_click", {});
+    this.onPress(Config.PLATFORM_BIND)
+  }
+
   render() {
     const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
-
     const {showSortModal, ext_store_list, searchStoreVisible} = this.state
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
@@ -505,55 +560,24 @@ class OrderListScene extends Component {
           {this.showSortSelect()}
         </Dialog>
         <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
-          <View style={{
-            flexDirection: 'row',
-            lineHeight: 30,
-            paddingLeft: '2%',
-            paddingTop: 10,
-            paddingBottom: 6,
-            backgroundColor: colors.white
-          }}>
+          <View style={styles.extStore}>
             <Text onPress={() => {
               this.setState({searchStoreVisible: true})
-            }}
-                  style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name} </Text>
+            }} style={styles.extStoreLabel}>{this.state.ext_store_name} </Text>
             <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
           </View>
         </If>
         <SearchExtStore visible={searchStoreVisible}
                         data={ext_store_list}
-                        onClose={() => this.setState({
-                          searchStoreVisible: false,
-                          ext_store_name: '所有外卖店铺',
-                          ext_store_id: 0
-                        })}
-                        onSelect={(item) => {
-                          if (item.id === "0") {
-                            item.name = '所有外卖店铺'
-                          }
-                          this.state.query.page = 1;
-                          this.state.query.isAdd = true;
-                          this.state.query.offset = 0;
-                          this.setState({
-                            searchStoreVisible: false,
-                            ext_store_id: item.id,
-                            ext_store_name: item.name,
-                            isLoading: false,
-                          }, () => {
-                            this.fetchOrders()
-                          })
-                        }}/>
-
+                        onClose={() => this.searchExtStoreOnClose()}
+                        onSelect={item => this.searchExtStoreOnSelect(item)}/>
         {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
         <If condition={this.state.show_hint}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
-            </CellBody>
-            <CellFooter>
-              <Text style={[styles.button_status]} onPress={this.openNotifySetting}>去查看</Text>
-            </CellFooter>
-          </Cell>
+          <TouchableOpacity style={styles.cell_row}>
+            <Text
+              style={styles.cell_body_text}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+            <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
+          </TouchableOpacity>
         </If>
         <HotUpdateComponent/>
         <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
@@ -578,13 +602,12 @@ class OrderListScene extends Component {
             this.setState({
               showTabs: true,
               ListData: [],
-              orderStatus: this.state.categoryLabels[0].status,
+              orderStatus: this.state.categoryLabels[0].status
             }, () => {
               this.onRefresh(this.state.categoryLabels[0].status)
               this.mixpanel.track('处理中订单')
             })
-          }}
-                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
+          }} style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
           <Text onPress={() => {
             this.setState({
               showTabs: false,
@@ -594,50 +617,28 @@ class OrderListScene extends Component {
               this.onRefresh(7)
               this.mixpanel.track('预订单')
             })
-          }}
-                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
+          }} style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
           <Text onPress={() => {
             this.mixpanel.track('全部的订单')
             const {navigation} = this.props
             navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
-          }}
-                style={styles.tabsHeader3}> 全部订单 </Text>
+          }} style={styles.tabsHeader3}> 全部订单 </Text>
         </View>
 
-        <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_ORDER_SEARCH)
-        }} style={{width: 0.15 * width, flexDirection: 'row'}}>
-          <View style={{flex: 1}}></View>
-          <Entypo name={"magnifying-glass"} style={{fontSize: 24, color: colors.color666}}/>
+        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)} style={styles.tabsHeaderRight}>
+          <View style={styles.flex1}/>
+          <Entypo name={"magnifying-glass"} style={styles.glassIcon}/>
         </TouchableOpacity>
         <ModalDropdown
-          dropdownStyle={{
-            marginRight: pxToDp(10),
-            width: pxToDp(150),
-            height: pxToDp(180),
-            backgroundColor: '#5f6660',
-            marginTop: -StatusBar.currentHeight,
-          }}
-          dropdownTextStyle={{
-            textAlignVertical: 'center',
-            textAlign: 'center',
-            fontSize: pxToDp(28),
-            fontWeight: 'bold',
-            color: '#fff',
-            height: pxToDp(90),
-            backgroundColor: '#5f6660',
-            borderRadius: pxToDp(3),
-            borderColor: '#5f6660',
-            borderWidth: 1,
-            shadowRadius: pxToDp(3),
-          }}
+          dropdownStyle={styles.modalDropDown}
+          dropdownTextStyle={styles.modalDropDownText}
           dropdownTextHighlightStyle={{color: '#fff'}}
           options={['新 建', '排 序']}
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
         >
-          <View style={{marginRight: 16, marginLeft: 18}}>
-            <Entypo name={"menu"} style={{fontSize: 24, color: colors.color666}}/>
+          <View style={styles.modalDropDownIcon}>
+            <Entypo name={"menu"} style={styles.modalDropDownIconMenu}/>
           </View>
         </ModalDropdown>
       </View>
@@ -654,48 +655,37 @@ class OrderListScene extends Component {
     }
   }
 
-
   renderStatusTabs = () => {
-    const tabwidth = 1 / this.state.categoryLabels.length;
+    const tab_width = 1 / this.state.categoryLabels.length;
     if (!tool.length(this.state.categoryLabels) > 0) {
       return null;
     }
     return (
-      <View style={{flex: 1}}>
-        <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
+      <View style={styles.flex1}>
+        <View style={styles.statusTab}>
           <For index="i" each='tab' of={this.state.categoryLabels}>
-
             <TouchableOpacity
               key={i}
-              style={{width: tabwidth * width, alignItems: "center"}}
+              style={{width: tab_width * width, alignItems: "center"}}
               onPress={() => {
                 this.onRefresh(tab.status)
               }}>
-              <View style={{
-                borderColor: colors.main_color,
-                // borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
-                height: 38,
-                justifyContent: 'center',
-              }}>
-                <Text style={{
-                  color: colors.color333,
-                  fontSize: 14,
-                  fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"
-                }}>{tab.tabname} </Text>
+              <View style={styles.statusTabItem}>
+                <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>
+                  {tab.tabname}
+                </Text>
                 <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
                   <Badge
                     status="error"
                     value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                    containerStyle={{position: 'absolute', top: 1, right: -15}}/>
+                    containerStyle={styles.statusTabBadge}/>
                 </If>
               </View>
               <If condition={this.state.orderStatus === tab.status}>
-                <View style={{height: 2, width: 24, backgroundColor: colors.main_color}}></View>
+                <View style={styles.statusTabRight}/>
               </If>
             </TouchableOpacity>
-
           </For>
-
         </View>
         {this.renderContent(this.state.ListData)}
       </View>
@@ -704,7 +694,7 @@ class OrderListScene extends Component {
 
   renderContent = (orders) => {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+      <SafeAreaView style={styles.orderListContent}>
         <FlatList
           extraData={orders}
           data={orders}
@@ -714,19 +704,14 @@ class OrderListScene extends Component {
             this.pageX = e.nativeEvent.pageX;
             this.pageY = e.nativeEvent.pageY;
           }}
-
           onEndReachedThreshold={0.3}
           onEndReached={() => {
             if (this.state.isCanLoadMore) {
-              this.setState({isCanLoadMore: false}, () => {
-                this.listmore();
-              })
+              this.setState({isCanLoadMore: false}, () => this.listmore())
             }
           }}
           onMomentumScrollBegin={() => {
-            this.setState({
-              isCanLoadMore: true
-            })
+            this.setState({isCanLoadMore: true})
           }}
           onTouchMove={(e) => {
             if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
@@ -741,8 +726,8 @@ class OrderListScene extends Component {
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
-          ListFooterComponent={this.renderbottomImg()}
-          ListHeaderComponent={this.rendertopImg()}
+          ListFooterComponent={this.renderBottomImg()}
+          ListHeaderComponent={this.renderTopImg()}
           ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
@@ -755,7 +740,6 @@ class OrderListScene extends Component {
       this.fetchOrders(this.state.orderStatus, 0);
     }
   }
-
 
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
@@ -775,7 +759,7 @@ class OrderListScene extends Component {
     return (
       <View style={{marginTop: 12}}>
         <For index="index" each="sortItem" of={this.state.sortData}>
-          <RadioItem key={index} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
+          <RadioItem key={index} style={styles.sortSelect}
                      checked={sort === sortItem.value}
                      onChange={event => {
                        if (event.target.checked) {
@@ -790,8 +774,9 @@ class OrderListScene extends Component {
   }
   setOrderBy = (order_by) => {
     let {user_config} = this.props.global
+    let {dispatch} = this.props
     user_config.order_list_by = order_by
-    this.props.dispatch(setUserCfg(user_config));
+    dispatch(setUserCfg(user_config));
     this.setState({
       showSortModal: false,
       sort: order_by
@@ -800,142 +785,125 @@ class OrderListScene extends Component {
     })
   }
 
-
   renderItem = (order) => {
     let {item, index} = order;
+    let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
     return (
-      <OrderListItem showBtn={this.state.showBtn}
+      <OrderListItem showBtn={showBtn}
                      key={index}
-                     fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
+                     fetchData={this.onRefresh.bind(this, orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}
                      onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
-                     allow_edit_ship_rule={this.state.allow_edit_ship_rule}
+                     allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
-                     orderStatus={this.state.orderStatus}
+                     orderStatus={orderStatus}
                      onPress={this.onPress.bind(this)}/>
     );
   }
 
+  renderSwiper = () => {
+    let {activity} = this.state
+    return (
+      <Swiper style={styles.wrapper}
+              showsButtons={false}
+              height={100}
+              horizontal={true}
+              paginationStyle={{bottom: 10}}
+              autoplay={true}
+              autoplayTimeout={4}
+              loop={true}
+      >
+        <For index='i' each='info' of={activity}>
+          <View style={styles.slide1} key={i}>
+            <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.topImgBottom}>
+              <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+            </TouchableOpacity>
+            <Entypo onPress={() => {
+              this.setState({
+                show_img: false
+              }, () => this.closeActivity(info))
+            }} name='cross' size={25} style={styles.topImgIcon}/>
+          </View>
+        </For>
+      </Swiper>
+    )
+  }
+
   renderNoOrder = () => {
     return (
-      <View style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-        // flexDirection: 'row',
-        height: 210
-      }}>
-        <Text style={{fontSize: 18, color: colors.fontColor}}>
-          暂无订单
-        </Text>
+      <View style={styles.noOrderContent}>
+        <Text style={styles.noOrderDesc}>暂无订单</Text>
         <If condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
           <Button title={'去授权外卖店铺'}
-                  onPress={() => {
-                    this.mixpanel.track("orderpage_authorizestore_click", {});
-                    this.onPress(Config.PLATFORM_BIND)
-                  }}
-                  buttonStyle={{
-                    width: width - 20,
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                    marginTop: pxToDp(30)
-                  }}
-
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
+                  onPress={() => this.bind_platform()}
+                  buttonStyle={styles.noOrderBtn}
+                  titleStyle={styles.noOrderBtnTitle}
           />
         </If>
       </View>
     )
   }
 
-  onPressActivity = () => {
-    const {currStoreId} = this.props.global;
-    this.onPress(Config.ROUTE_WEB, {url: this.state.activityUrl, title: '老带新活动'})
+  onPressActivity = (info) => {
+    const {currStoreId, accessToken} = this.props.global;
+    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
     this.mixpanel.track("act_user_ref_ad_click", {
-      img_name: this.state.activity.name,
-      pos: this.state.activity.pos_name,
+      img_name: info.name,
+      pos: info.pos_name,
       store_id: currStoreId,
     });
   }
 
-  rendertopImg = () => {
+  renderTopImg = () => {
+    let showTopImg = this.state.showImgType === 1 && this.state.show_img;
     return (
       <View>
         <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
           <TouchableOpacity
-            onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
-            }}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: '100%',
-              backgroundColor: '#EEDEE0',
-              height: 40
-            }}>
-            <Text style={{color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1}}>
-              存在补送的订单
-            </Text>
-            <Button onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
-            }}
+            onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})}
+            style={styles.topImg}>
+            <Text style={styles.topImgDesc}>存在补送的订单</Text>
+            <Button onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})}
                     title={'查看'}
-                    buttonStyle={{
-                      backgroundColor: colors.red,
-                      borderRadius: 6,
-                      marginRight: 13,
-                      paddingVertical: 3,
-                      paddingHorizontal: 4,
-                    }}
-                    titleStyle={{
-                      fontSize: 12,
-                      color: colors.white,
-                    }}>
+                    buttonStyle={styles.topImgBtn}
+                    titleStyle={styles.topImgTitle}>
             </Button>
           </TouchableOpacity>
         </If>
-        <If
-          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
-          <TouchableOpacity onPress={() => {
-            this.onPressActivity()
-          }} style={{paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'}}>
-            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-            <Entypo onPress={() => {
-              this.setState({
-                showimg: false
-              }, () => this.closeActivity())
-            }} name='cross' style={{
-              fontSize: 25,
-              position: 'absolute',
-              color: colors.white,
-              right: 12,
-              top: -1,
-            }}/>
-          </TouchableOpacity>
+        <If condition={showTopImg}>
+          {this.renderSwiper()}
         </If>
 
       </View>
     )
   }
 
-  renderbottomImg = () => {
+  renderBottomImg = () => {
+    let {activity} = this.state
     return (
-      <If
-        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={{
-          paddingTop: '5%', paddingLeft: '3%', paddingRight: '3%',
-        }}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-        </TouchableOpacity>
+      <If condition={this.state.showImgType === 0 && this.state.show_img}>
+        <Swiper style={styles.wrapper}
+                showsButtons={false}
+                height={100}
+                horizontal={true}
+                paginationStyle={{bottom: 10}}
+                autoplay={true}
+                autoplayTimeout={4}
+                loop={true}
+        >
+          <For index='i' each='info' of={activity}>
+            <View style={styles.slide1} key={i}>
+              <TouchableOpacity onPress={() => {
+                this.onPressActivity(info)
+              }} style={styles.bottomImg}>
+                <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+              </TouchableOpacity>
+            </View>
+          </For>
+        </Swiper>
       </If>
     )
   }
@@ -943,6 +911,17 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
+  flex1: {flex: 1},
+  extStore: {
+    flexDirection: 'row',
+    lineHeight: 30,
+    paddingLeft: '2%',
+    paddingTop: 10,
+    paddingBottom: 6,
+    backgroundColor: colors.white
+  },
+  extStoreLabel: {fontSize: pxToDp(30), marginTop: pxToDp(3)},
+  glassIcon: {fontSize: 24, color: colors.color666},
   center: {alignItems: 'center', justifyContent: 'center'},
   modalWrap: {
     flexGrow: 1,
@@ -971,6 +950,9 @@ const styles = StyleSheet.create({
     paddingLeft: pxToDp(20),
     backgroundColor: "#F2DDE0",
     height: pxToDp(70),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
   },
   cell_body_text: {
     fontSize: pxToDp(30),
@@ -984,6 +966,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.warn_color,
     borderRadius: pxToDp(3),
     color: colors.white,
+    marginRight: 10
   },
   printer_status_ok: {
     color: colors.main_color,
@@ -1083,6 +1066,44 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(10),
     color: colors.title_color,
   },
+  tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
+  modalDropDown: {
+    marginRight: pxToDp(10),
+    width: pxToDp(150),
+    height: pxToDp(180),
+    backgroundColor: '#5f6660',
+    marginTop: -StatusBar.currentHeight,
+  },
+  modalDropDownText: {
+    textAlignVertical: 'center',
+    textAlign: 'center',
+    fontSize: pxToDp(28),
+    fontWeight: 'bold',
+    color: '#fff',
+    height: pxToDp(90),
+    backgroundColor: '#5f6660',
+    borderRadius: pxToDp(3),
+    borderColor: '#5f6660',
+    borderWidth: 1,
+    shadowRadius: pxToDp(3),
+  },
+  modalDropDownIcon: {marginRight: 16, marginLeft: 18},
+  modalDropDownIconMenu: {fontSize: 24, color: colors.color666},
+  statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 40},
+  statusTabItem: {
+    borderColor: colors.main_color,
+    // borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
+    height: 38,
+    justifyContent: 'center',
+  },
+  f14c33: {
+    color: colors.color333,
+    fontSize: 14
+  },
+  statusTabBadge: {position: 'absolute', top: 1, right: -15},
+  statusTabRight: {height: 2, width: 24, backgroundColor: colors.main_color},
+  orderListContent: {flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)},
+  sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   sortModal: {
     width: 0,
     height: 0,
@@ -1105,7 +1126,7 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10)
   },
   image: {
-    // width: '100%',
+    width: width,
     height: 70,
     borderRadius: 10
   },
@@ -1114,6 +1135,61 @@ const styles = StyleSheet.create({
     paddingTop: pxToDp(8),
     marginLeft: pxToDp(10),
   },
+  noOrderContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    height: 210
+  },
+  noOrderDesc: {fontSize: 18, color: colors.fontColor},
+  noOrderBtn: {
+    width: width - 20,
+    borderRadius: pxToDp(10),
+    backgroundColor: colors.main_color,
+    marginTop: pxToDp(30)
+  },
+  noOrderBtnTitle: {
+    color: colors.white,
+    fontSize: 16
+  },
+  topImg: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#EEDEE0',
+    height: 40
+  },
+  topImgDesc: {color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1},
+  topImgBtn: {
+    backgroundColor: colors.red,
+    borderRadius: 6,
+    marginRight: 13,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+  },
+  topImgTitle: {
+    fontSize: 12,
+    color: colors.white,
+  },
+  topImgBottom: {paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'},
+  topImgIcon: {
+    position: 'absolute',
+    color: colors.white,
+    right: 12,
+    top: -1,
+  },
+  bottomImg: {
+    paddingLeft: '3%', paddingRight: '3%', paddingBottom: pxToDp(20)
+  },
+  wrapper: {
+    marginVertical: 10
+  },
+  slide1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)

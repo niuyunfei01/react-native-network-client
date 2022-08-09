@@ -34,10 +34,11 @@ class AuditRefundScene extends Component {
 
   constructor(props) {
     super(props);
-
+    let {remind, order} = this.props.route.params;
     this.state = {
-      order: {},
-      remind: {},
+
+      order: order,
+      remind: remind,
       refund_yuan: '',
       selected_action: '',
       reason_key: '',
@@ -48,14 +49,6 @@ class AuditRefundScene extends Component {
       onSubmitting: false,
     };
     this.renderReason = this.renderReason.bind(this)
-  }
-
-  UNSAFE_componentWillMount() {
-    let {remind, order} = this.props.route.params;
-    this.setState({
-      order: order,
-      remind: remind,
-    })
   }
 
   tplAction(reason, agreeOrRefuse) {
@@ -77,10 +70,9 @@ class AuditRefundScene extends Component {
   }
 
   renderPartRefundGood(goodList) {
-    let rowView = goodList.map(item => {
-      return <Text style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price} </Text>
+    return goodList.map((item, index) => {
+      return <Text key={index} style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price} </Text>
     });
-    return rowView;
   }
 
   renderReason() {
@@ -92,18 +84,20 @@ class AuditRefundScene extends Component {
             <Text style={[styles.bottom_box_text, {color: colors.editStatusAdd}]}>
               同意退款后,货款立即原路退回，无法追回</Text>
           </View>
-          <MyBtn
-            text={'同意退款'}
-            onPress={async () => {
-              let {onSubmitting} = this.state;
-              if (onSubmitting) {
-                return false
-              }
-              await this.setState({onSubmitting: true});
-              showModal('提交中')
-              this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
-            }}
-            style={styles.handle}/>
+          <TouchableOpacity style={styles.handleAgreeWrap} onPress={async () => {
+            let {onSubmitting} = this.state;
+            if (onSubmitting) {
+              return false
+            }
+            await this.setState({onSubmitting: true});
+            showModal('提交中')
+            this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
+          }}>
+            <Text style={{color: colors.white, fontSize: 14}}>
+              同意退款
+            </Text>
+          </TouchableOpacity>
+
         </View>
       )
     } else if (tabNum === 2) {
@@ -117,26 +111,28 @@ class AuditRefundScene extends Component {
             }}
             underlineColorAndroid='transparent'
             placeholder='一定要输入理由'
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.colorCCC}
             style={{
               borderWidth: pxToDp(1),
               marginTop: pxToDp(30),
-              borderColor: '#ccc',
+              borderColor: colors.colorCCC,
             }}
           />
-          <MyBtn
-            text={'已与用户沟通,拒绝退款'}
-            onPress={async () => {
-              let {onSubmitting, reason} = this.state;
-              if (onSubmitting || (tool.length(reason) <= 0)) {
-                ToastLong('一定要输入理由');
-                return false
-              }
-              await this.setState({onSubmitting: true})
-              showModal('提交中')
-              this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
-            }}
-            style={[styles.handle, {color: colors.white, backgroundColor: colors.editStatusAdd}]}/>
+          <TouchableOpacity style={styles.handleRefuseWrap} onPress={async () => {
+            let {onSubmitting, reason} = this.state;
+            if (onSubmitting || (tool.length(reason) <= 0)) {
+              ToastLong('一定要输入理由');
+              return false
+            }
+            await this.setState({onSubmitting: true})
+            showModal('提交中')
+            this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
+          }}>
+            <Text style={{color: colors.white, fontSize: 14}}>
+              已与用户沟通,拒绝退款
+            </Text>
+          </TouchableOpacity>
+
         </View>
       )
     }
@@ -229,7 +225,7 @@ class AuditRefundScene extends Component {
                   {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
                 </Text>
                 {remind_id.hasOwnProperty("total_refund_price") &&
-                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
+                  <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
                 {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
                 {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
                   : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""} </Text>}
@@ -335,13 +331,20 @@ const styles = StyleSheet.create({
     color: colors.white,
     backgroundColor: colors.main_color
   },
-  handle: {
+  handleAgreeWrap: {
     width: '100%',
-    textAlign: 'center',
     backgroundColor: colors.main_color,
+    justifyContent: 'center',
+    alignItems: 'center',
     height: pxToDp(90),
-    color: colors.white,
-    textAlignVertical: "center",
+    borderRadius: pxToDp(8),
+  },
+  handleRefuseWrap: {
+    width: '100%',
+    backgroundColor: colors.editStatusAdd,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: pxToDp(90),
     borderRadius: pxToDp(8),
   }
 });

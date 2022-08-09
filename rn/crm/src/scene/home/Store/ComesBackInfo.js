@@ -8,6 +8,7 @@ import tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import OrderListItem from "../../../pubilc/component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const {
   FlatList,
@@ -66,6 +67,8 @@ class OrderQueryResultScene extends PureComponent {
       yesterday_sync_color: "",
     };
     this.renderItem = this.renderItem.bind(this);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('配送回传详情页')
   }
 
   fetchInfo = () => {
@@ -186,7 +189,7 @@ class OrderQueryResultScene extends PureComponent {
             <Image style={{
               width: 60,
               height: 60,
-            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png'}}/>
+            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}}/>
             <View style={{marginLeft: 15, marginTop: 4}}>
               <Text style={{fontSize: 14, color: colors.color333}}>{ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>

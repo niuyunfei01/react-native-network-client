@@ -52,6 +52,7 @@ const {
   SET_USER_CONFIG,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
+  SET_SHOW_FLOAT_SERVICE_ICON,
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
@@ -103,6 +104,32 @@ export function setCurrentStore(currStoreId, simpleStore = null) {
   }
 }
 
+/**
+ * 获取当前店铺信息；如果不存在，则需自行获取
+ * @param global
+ * @param dispatch if null, means don't do dispatch
+ * @param storeId if null,使用currStoreId
+ * @param callback
+ * @returns {*}
+ */
+export function getSimpleStore(global, dispatch = null, storeId = null, callback = (store) => {
+}) {
+  const {currStoreId, simpleStore} = global
+  const id = null === storeId ? currStoreId : storeId
+  if (simpleStore && simpleStore.id == id) {
+    callback(simpleStore)
+  } else {
+    const {accessToken} = global;
+    HttpUtils.get.bind({global})(`/api/read_store_simple/${id}?access_token=${accessToken}`).then(store => {
+      if (dispatch) {
+        dispatch(setSimpleStore(store))
+      }
+      callback(store)
+    }, (res) => {
+    })
+  }
+}
+
 export function setSimpleStore(store) {
   return {
     type: SET_SIMPLE_STORE,
@@ -131,6 +158,12 @@ export function setOrderListExtStore(show) {
   }
 }
 
+export function setFloatSerciceIcon(show) {
+  return {
+    type: SET_SHOW_FLOAT_SERVICE_ICON,
+    show: show
+  }
+}
 
 export function setExtStore(list) {
   return {
@@ -158,7 +191,7 @@ export function updateCfg(cfg) {
 export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    native.logout().then(() => {});
+    native.logout().then();
     JPush.deleteAlias({sequence: dayjs().unix()})
     if (typeof callback === 'function') {
       callback();
@@ -208,12 +241,14 @@ export function getCommonConfig(token, storeId, callback) {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
-        let resp_data = trans_data_to_java(json.obj);
-        let {can_read_vendors, can_read_stores, simpleStore} = resp_data;
+        let {can_read_vendors, can_read_stores, simpleStore} = trans_data_to_java(json.obj);
+        const config = json.obj
+        config.can_read_stores = undefined
+        config.can_read_vendors = undefined
         let cfg = {
           canReadStores: can_read_stores,
           canReadVendors: can_read_vendors,
-          config: json.obj,
+          config: config,
         };
 
         if (simpleStore && simpleStore.id) {
@@ -283,7 +318,7 @@ export function doAuthLogin(access_token, expire, props, callback) {
     }
   }, (res) => {
     if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "账号异常")
+      callback(false, "账号错误，请检查账号是否正确")
     } else {
       callback(false, "获取不到账户相关信息");
     }
