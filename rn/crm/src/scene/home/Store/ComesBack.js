@@ -8,6 +8,7 @@ import colors from "../../../pubilc/styles/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -38,6 +39,8 @@ class ComesBack extends PureComponent {
       list: [],
       isRefreshing: false,
     }
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('配送回传页')
   }
 
   fetchData = () => {
@@ -91,6 +94,7 @@ class ComesBack extends PureComponent {
             store_id: currStoreId,
             ext_store_id: item.ext_store_id
           });
+          this.mixpanel.track('配送回传页_查看详情')
         }} style={{
           backgroundColor: colors.white, borderRadius: 8,
           paddingVertical: 9,
@@ -106,7 +110,7 @@ class ComesBack extends PureComponent {
             <Image style={{
               width: 60,
               height: 60,
-            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png'}}/>
+            }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}}/>
             <View style={{marginLeft: 15, marginTop: 4}}>
               <Text style={{fontSize: 14, color: colors.color333}}>{item.ext_store_name} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>

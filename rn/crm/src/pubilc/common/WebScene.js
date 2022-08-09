@@ -55,7 +55,7 @@ class WebScene extends PureComponent {
       uri: '',
       shareWechatModal: false
     };
-    this.navigationOptions(this.props)
+
     this._do_go_back = this._do_go_back.bind(this)
   }
 
@@ -207,7 +207,7 @@ class WebScene extends PureComponent {
       || url.indexOf("/stores/search_wm_orders") > 0
       || url.indexOf("/stores/storage_common/") >= 0
       || url.indexOf("/stores/provide_prepare") >= 0) {
-      native.gotoActByUrl(url);
+      native.gotoActByUrl(url).then();
       stop = true;
     } else if (url.indexOf("/stores/crm_add_token") > 0) {
       let path = tool.parameterByName("path", url);
@@ -228,7 +228,7 @@ class WebScene extends PureComponent {
       || url.indexOf("/users/login/") >= 0) {
 
       const mobile = tool.parameterByName("m", url);
-      native.gotoLoginWithNoHistory(mobile);
+      native.gotoLoginWithNoHistory(mobile).then();
       stop = true;
     }
 
@@ -245,6 +245,7 @@ class WebScene extends PureComponent {
   };
 
   componentDidMount() {
+    this.navigationOptions(this.props)
     InteractionManager.runAfterInteractions(() => {
       ToastShort('加载中')
       let {url, action} = this.props.route.params;
@@ -256,7 +257,7 @@ class WebScene extends PureComponent {
       let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
       this.setState(state)
     });
-    // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
+    //BackHandler.addEventListener('hardwareBackPress', this.backHandler);
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: this.onRefresh});
 
   }
@@ -267,7 +268,9 @@ class WebScene extends PureComponent {
 
   onLoadEnd(e: any) {
     if (e.nativeEvent.title.length > 0 && e.nativeEvent.title.length < 10) {
-      this.props.navigation.setParams({title: e.nativeEvent.title})
+      this.props.navigation.setOptions({
+        headerTitle:  <Text style={{color: colors.color333}}>{e.nativeEvent.title} </Text>
+      })
       this.setState({title: e.nativeEvent.title})
     }
   }

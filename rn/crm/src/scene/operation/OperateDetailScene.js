@@ -13,6 +13,7 @@ import {Button, Dialog, Input} from "../../weui";
 import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
 import Header from "./OperateHeader";
 import Entypo from "react-native-vector-icons/Entypo";
+import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -41,7 +42,7 @@ class OperateDetailScene extends PureComponent {
       sum: 0,
       editable: false,
       check_detail: false,
-      income: null,
+      income: {1: {"num": "0"}, 2: {"num": 0}},
       outcome_normal: {
         [Cts.OPERATE_REFUND_OUT]: {num: 0, order_num: 0},
         [Cts.OPERATE_DISTRIBUTION_TIPS]: {num: 0, order_num: 0},
@@ -71,10 +72,11 @@ class OperateDetailScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
+    this.getProfitDaily();
     this.setState({
       total_balanced: this.props.route.params.total_balanced
     });
-    this.getProfitDaily();
+
   }
 
   profitOtherAdd() {
@@ -119,36 +121,29 @@ class OperateDetailScene extends PureComponent {
     );
   }
 
-  getProfitDaily() {
+  getProfitDaily = () => {
     let {currStoreId, accessToken} = this.props.global;
     let {day} = this.props.route.params;
-    const {dispatch} = this.props;
     showModal('加载中')
-    dispatch(
-      fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
-        let {
-          sum,
-          editable,
-          check_detail,
-          income,
-          outcome_normal,
-          outcome_other
-        } = obj;
-        if (ok) {
-          this.setState({
-            sum,
-            editable,
-            check_detail,
-            income,
-            outcome_normal,
-            outcome_other,
-            type: 0,
-            isLoading: false
-          });
-          hideModal()
-        }
-      })
-    );
+    const url = `api/profit_daily/${currStoreId}/${day}.json?access_token=${accessToken}`;
+    HttpUtils.get(url).then(res => {
+      let {sum, editable, check_detail, income, outcome_normal, outcome_other} = res;
+      this.setState({
+        sum,
+        editable,
+        check_detail,
+        income,
+        outcome_normal,
+        outcome_other,
+        type: 0,
+        isLoading: false
+      });
+      hideModal()
+    }, res => {
+
+    }).catch(error => {
+    })
+
   }
 
   renderTitle(title, type = 0, add = "") {
@@ -272,10 +267,13 @@ class OperateDetailScene extends PureComponent {
       total_balanced,
       balance_money
     } = this.state;
+    console.log('income', this.state.income)
     return (
       <View style={{flex: 1}}>
         <Header text={"今日运营收益"} money={toFixed(sum)}/>
-        {balance_money > 0 && <Header text={"运营收益结转"} money={toFixed(balance_money)}/>}
+        <If condition={balance_money > 0}>
+          <Header text={"运营收益结转"} money={toFixed(balance_money)}/>
+        </If>
         <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
         <ScrollView style={{paddingBottom: pxToDp(50)}}>
           <View style={content.in_box}>
@@ -417,60 +415,62 @@ class OperateDetailScene extends PureComponent {
   }
 }
 
-const content = StyleSheet.create({
-  in_box: {
-    backgroundColor: colors.white,
-    marginTop: pxToDp(30),
-    paddingHorizontal: pxToDp(30)
-  },
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: pxToDp(1),
-    borderBottomColor: colors.fontGray,
-    alignItems: "center",
-    height: pxToDp(90)
-  },
-  left: {
-    fontSize: pxToDp(30),
-    fontWeight: "900",
-    color: colors.title_color
-  },
-  right: {
-    fontSize: pxToDp(30),
-    fontWeight: "900",
-    color: colors.main_color
-  },
-  text: {
-    fontSize: pxToDp(30),
-    color: colors.title_color
-  },
-  money: {
-    fontSize: pxToDp(36),
-    color: colors.title_color
-  },
-  cancel_item: {
-    position: "relative"
-  },
-  cancel: {
-    position: "absolute",
-    borderTopWidth: pxToDp(1),
-    width: "100%",
-    left: pxToDp(30),
-    top: "50%"
-  },
-  img: {
-    height: pxToDp(36),
-    width: pxToDp(36),
-    marginLeft: pxToDp(10)
-  },
-  item_img: {
-    flexDirection: "row",
-    alignItems: "center"
-  }
-});
+const
+  content = StyleSheet.create({
+    in_box: {
+      backgroundColor: colors.white,
+      marginTop: pxToDp(30),
+      paddingHorizontal: pxToDp(30)
+    },
+    item: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      borderBottomWidth: pxToDp(1),
+      borderBottomColor: colors.fontGray,
+      alignItems: "center",
+      height: pxToDp(90)
+    },
+    left: {
+      fontSize: pxToDp(30),
+      fontWeight: "900",
+      color: colors.title_color
+    },
+    right: {
+      fontSize: pxToDp(30),
+      fontWeight: "900",
+      color: colors.main_color
+    },
+    text: {
+      fontSize: pxToDp(30),
+      color: colors.title_color
+    },
+    money: {
+      fontSize: pxToDp(36),
+      color: colors.title_color
+    },
+    cancel_item: {
+      position: "relative"
+    },
+    cancel: {
+      position: "absolute",
+      borderTopWidth: pxToDp(1),
+      width: "100%",
+      left: pxToDp(30),
+      top: "50%"
+    },
+    img: {
+      height: pxToDp(36),
+      width: pxToDp(36),
+      marginLeft: pxToDp(10)
+    },
+    item_img: {
+      flexDirection: "row",
+      alignItems: "center"
+    }
+  });
 
-class CellAccess extends PureComponent {
+class CellAccess
+  extends PureComponent {
   constructor(props) {
     super(props);
   }

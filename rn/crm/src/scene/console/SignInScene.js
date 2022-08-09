@@ -162,8 +162,6 @@ class SignInScene extends PureComponent {
     const api = `/api/sign_status_with_record/${currStoreId}/${start_day}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({sigInInfo: res})
-    }).catch((error) => {
-      showError(error)
     })
   }
 

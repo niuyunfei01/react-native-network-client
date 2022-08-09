@@ -23,11 +23,16 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
+import {
+  getCommonConfig,
+  getSimpleStore,
+  setCurrentStore,
+  upCurrentProfile
+} from "../../../reducers/global/globalActions";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
-import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../../reducers/global/globalActions";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -50,12 +55,10 @@ import pxToEm from "../../../pubilc/util/pxToEm";
 import native from "../../../pubilc/util/native";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/util/tool";
-import {simpleStore} from "../../../pubilc/util/tool";
 import {Dialog} from "../../../weui";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
-import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 var ScreenWidth = Dimensions.get("window").width;
@@ -88,10 +91,9 @@ function mapDispatchToProps(dispatch) {
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    return navigation.addListener('focus', () => {
       onRefresh()
     });
-    return unsubscribe;
   }, [navigation])
   return null;
 }
@@ -104,6 +106,7 @@ class MineScene extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('我的')
     const {
       currentUser,
       currStoreId,
@@ -132,7 +135,7 @@ class MineScene extends PureComponent {
       is_service_mgr,
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+    cover_image = cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }
@@ -146,7 +149,6 @@ class MineScene extends PureComponent {
       bad_cases_of: bad_cases_of[currentUser] || '',
       order_num: order_num[currStoreId] || '',
       turnover: turnover[currStoreId] || '',
-      currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,
       mobile_phone: mobilephone,
@@ -159,7 +161,7 @@ class MineScene extends PureComponent {
       fnPriceControlled: false,
       fnProfitControlled: false,
       currVendorName: currVendorName,
-      cover_image: !!cover_image ? cover_image : "",
+      cover_image: cover_image ? cover_image : "",
       adjust_cnt: 0,
       dutyUsers: [],
       searchStoreVisible: false,
@@ -221,9 +223,12 @@ class MineScene extends PureComponent {
     this.getStoreDataOfMine()
     // this._doChangeStore(currStoreId)
     this.registerJpush();
-    this.getActivity();
     this.getStoreTurnover();
     this.getHaveNotReadAdvice();
+  }
+
+  componentDidMount() {
+    this.getActivity();
   }
 
   getStoreList = () => {
@@ -308,17 +313,16 @@ class MineScene extends PureComponent {
 
   onGetDutyUser = () => {
     const {accessToken, currStoreId} = this.props.global;
-    let _this = this;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(
         fetchDutyUsers(currStoreId, accessToken, resp => {
           if (resp.ok) {
-            _this.setState({
+            this.setState({
               dutyUsers: resp.obj
             })
           }
-          _this.setState({isRefreshing: false});
+          this.setState({isRefreshing: false});
         })
       );
     });
@@ -418,20 +422,6 @@ class MineScene extends PureComponent {
     });
   }
 
-  callCustomerService = () => {
-    let server_info = tool.server_info(this.props);
-    let dutyUsers = this.state.dutyUsers;
-    if (dutyUsers && Array.isArray(dutyUsers) && dutyUsers.length > 0) {
-      let key = Math.floor(Math.random() * dutyUsers.length);
-      let u = dutyUsers[key];
-      if (u.mobilephone) {
-        native.dialNumber(u.mobilephone);
-        return;
-      }
-    }
-    native.dialNumber(server_info.mobilephone);
-  }
-
   UNSAFE_componentWillReceiveProps() {
     const {
       currentUser,
@@ -455,7 +445,7 @@ class MineScene extends PureComponent {
       is_helper,
     } = tool.vendor(this.props.global);
 
-    cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+    cover_image = cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }
@@ -630,6 +620,7 @@ class MineScene extends PureComponent {
           expire_date: '',
           status: 'off'
         },
+        in_white_list: 0,
         expire_date: '未开通',
         incrementStatus: false
       }))
@@ -644,7 +635,7 @@ class MineScene extends PureComponent {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          simpleStore(global, dispatch, store_id)
+          getSimpleStore(global, dispatch, store_id)
           this.getServiceStatus(store_id, accessToken)
           this.getHuichuan(store_id, accessToken)
         } else {
@@ -685,7 +676,8 @@ class MineScene extends PureComponent {
 
   storeManager = () => {
     this.mixpanel.track('店铺页')
-    const {is_mgr, currentUser, currVendorId, currVendorName} = this.state
+    const {currentUser} = this.props.global;
+    const {is_mgr, currVendorId, currVendorName} = this.state
     this.onPress(Config.ROUTE_STORE, {
       currentUser: currentUser,
       currVendorId: currVendorId,
@@ -744,13 +736,24 @@ class MineScene extends PureComponent {
       "auto_hide": 0,
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (tool.length(res) > 0) {
-        this.setState({
-          show_activity: true,
-          activity_img: res.icon,
-          activity_url: res.url + '?access_token=' + accessToken,
+      if (Array.isArray(res.list) && tool.length(res.list) > 0) {
+        res.list.map(item => {
+          if (item.id === '3') {
+            this.setState({
+              show_activity: true,
+              activity_img: item.icon,
+              activity_url: item.url + '?access_token=' + accessToken,
+            })
+          }
         })
+        return
       }
+      this.setState({
+        show_activity: true,
+        activity_img: res.icon,
+        activity_url: res.url + '?access_token=' + accessToken,
+      })
+    }).catch(() => {
     })
   }
 
@@ -867,22 +870,24 @@ class MineScene extends PureComponent {
       fnProfitControlled,
       turnover_new,
       title_new,
-      order_num_new
+      order_num_new,
+      cover_image
     } = this.state;
-    const {navigation} = this.props;
+    const {navigation, global} = this.props;
     // let CurrentDistributionBalance = {}
     // DistributionBalance && DistributionBalance.map((item, index) => {
     //   if (index === 0) {
     //     CurrentDistributionBalance = item
     //   }
     // })
+    const {currentUser} = global;
     return (
       <TouchableOpacity
         activeOpacity={1}
         onPress={() =>
           this.onPress(Config.ROUTE_USER, {
             type: "mine",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             screen_name: this.state.screen_name,
             mobile_phone: this.state.mobile_phone,
@@ -892,16 +897,10 @@ class MineScene extends PureComponent {
       >
 
         <View style={worker_styles.container}>
-          <View>
-            <Image
-              style={[worker_styles.icon_head]}
-              source={
-                !!this.state.cover_image
-                  ? {uri: this.state.cover_image}
-                  : require("../../../img/My/touxiang180x180_.png")
-              }
-            />
-          </View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
+          />
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
@@ -927,11 +926,6 @@ class MineScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
               ) :
-              // currVendorId == 68 ? <Text
-              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-              //   >
-              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-              //   </Text> :
               <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
                 {title_new}: ¥{turnover_new}
               </Text>
@@ -971,13 +965,15 @@ class MineScene extends PureComponent {
   }
 
   renderWorker = () => {
+    const {currentUser} = this.props.global;
+    const {cover_image} = this.state
     return (
       <TouchableOpacity
         activeOpacity={1}
         onPress={() =>
           this.onPress(Config.ROUTE_USER, {
             type: "mine",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             screen_name: this.state.screen_name,
             mobile_phone: this.state.mobile_phone,
@@ -986,13 +982,9 @@ class MineScene extends PureComponent {
         }
       >
         <View style={worker_styles.container}>
-          <View>
-            <Image
-              style={[worker_styles.icon_head]}
-              source={!!this.state.cover_image ? {uri: this.state.cover_image} : require("../../../img/My/touxiang180x180_.png")
-              }
-            />
-          </View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
@@ -1013,15 +1005,12 @@ class MineScene extends PureComponent {
             onPress={() =>
               this.onPress(Config.ROUTE_USER, {
                 type: "mine",
-                currentUser: this.state.currentUser,
+                currentUser: currentUser,
                 currVendorId: this.state.currVendorId
               })
             }
           >
-            <Entypo
-              name="chevron-thin-right"
-              style={[worker_styles.right_btn]}
-            />
+            <Entypo name="chevron-thin-right" style={[worker_styles.right_btn]}/>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -1119,6 +1108,7 @@ class MineScene extends PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+        this.mixpanel.track('我的_查看回传率')
       }} style={{
         backgroundColor: colors.white,
         paddingVertical: 12,
@@ -1130,8 +1120,12 @@ class MineScene extends PureComponent {
       }}>
         <View>
           <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>{label} <Text
-            style={{fontSize: 14, color: color, fontWeight: 'bold'}}>{content} </Text> </Text>
+          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>
+            {label}
+            <Text style={{fontSize: 14, color: color, fontWeight: 'bold'}}>
+              {content}
+            </Text>
+          </Text>
           <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
@@ -1140,12 +1134,9 @@ class MineScene extends PureComponent {
   }
 
   renderStoreBlock = () => {
-    const {
-      // show_activity_mgr = false,
-      show_goods_monitor = false,
-      enabled_good_mgr = false
-    } = this.props.global.config;
-    let token = `?access_token=${this.props.global.accessToken}`;
+    const {currentUser, accessToken, config, simpleStore} = this.props.global;
+    const {show_goods_monitor = false, enabled_good_mgr = false} = config;
+    let token = `?access_token=${accessToken}`;
     let {
       currVendorId,
       currVersion,
@@ -1154,9 +1145,11 @@ class MineScene extends PureComponent {
       is_service_mgr,
       fnPriceControlled,
       fnProfitControlled,
-      have_not_read_advice
+      have_not_read_advice,
+      activity_url,
+      activity_img
     } = this.state
-    const {fn_stall} = this.props.global.simpleStore
+    const {fn_stall} = simpleStore
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
@@ -1227,7 +1220,7 @@ class MineScene extends PureComponent {
           this.mixpanel.track('员工页')
           this.onPress(Config.ROUTE_WORKER, {
             type: "worker",
-            currentUser: this.state.currentUser,
+            currentUser: currentUser,
             currVendorId: this.state.currVendorId,
             currVendorName: this.state.currVendorName
           });
@@ -1314,7 +1307,7 @@ class MineScene extends PureComponent {
                           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../../img/My/yunyingshouyi_.png")}/>
-          <Text style={[block_styles.block_name]}>配送设置</Text>
+          <Text style={[block_styles.block_name]}>配送管理</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.printerSetting}
@@ -1397,18 +1390,16 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
-        <If condition={this.state.show_activity && GlobalUtil.getRecommend()}>
+        <If condition={activity_img.length > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
+            onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
             activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={{uri: this.state.activity_img}}
-            />
+            <Image style={[block_styles.block_img]} source={{uri: activity_img}}/>
             <Text style={[block_styles.block_name]}>老带新活动</Text>
           </TouchableOpacity>
         </If>
+
 
       </View>
     );

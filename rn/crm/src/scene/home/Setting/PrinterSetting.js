@@ -491,7 +491,7 @@ class PrinterSetting extends PureComponent {
               color: colors.color333,
               flex: 1,
             }}>用户联 </Text>
-            <Switch color={colors.main_color} color={colors.main_color} style={{
+            <Switch color={colors.main_color} style={{
               fontSize: 16,
             }} value={this.state.customer_print_item}
             />

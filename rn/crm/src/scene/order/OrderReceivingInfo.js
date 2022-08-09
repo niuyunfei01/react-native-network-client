@@ -167,8 +167,6 @@ class OrderReceivingInfo extends Component {
       setTimeout(() => {
         this.props.navigation.goBack();
       }, 1000)
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 
@@ -191,8 +189,6 @@ class OrderReceivingInfo extends Component {
         mobile: res.phone,
         smartText: ''
       })
-    }).catch((reason) => {
-      showError(reason)
     })
   }
 

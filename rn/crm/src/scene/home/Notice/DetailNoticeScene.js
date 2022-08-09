@@ -38,8 +38,13 @@ class HistoryNoticeScene extends PureComponent {
       time: '',
       content: '',
       height: Dimensions.get('window').height,
-      id: 0
+      id: 0,
+      webViewHeight: 0
     };
+  }
+
+  onWebViewMessage = (event) => {
+    this.setState({ webViewHeight: Number(event.nativeEvent.data) });
   }
 
   componentDidMount() {
@@ -68,7 +73,7 @@ class HistoryNoticeScene extends PureComponent {
   }
 
   render() {
-    let {title, time, content, height} = this.state
+    let {title, time, content, webViewHeight} = this.state
     return (
       <ScrollView style={Styles.scrollStyle}>
         <View style={Styles.Content}>
@@ -76,17 +81,17 @@ class HistoryNoticeScene extends PureComponent {
           <WebView
             style={{
               width: Dimensions.get('window').width * 0.90,
-              height: height * 0.9
+              height: webViewHeight
             }}
+            originWhitelist={['*']}
+            onMessage={(event) => this.onWebViewMessage(event)}
+            injectedJavaScript='window.ReactNativeWebView.postMessage(document.documentElement.scrollHeight)'
             automaticallyAdjustContentInsets={true}
             source={{html: `${content}`}}
             scalesPageToFit={true}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             scrollEnabled={false}
-            onMessage={(event) => {
-              this.setState({height: +event.nativeEvent.data})
-            }}
           />
           <Text style={Styles.timeText}>{time}</Text>
         </View>

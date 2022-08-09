@@ -55,15 +55,15 @@ class OrderQueryResultScene extends PureComponent {
     super(props);
     this.mixpanel = MixpanelInstance;
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
-    const {navigation, route} = this.props
-    let title = ''
-    let type = 'done'
-    title = '全部订单'
     this.mixpanel.track("全部的订单")
+    const {navigation, route} = props
+    let title = '全部订单'
+    let type = 'done'
     if (route.params.additional !== undefined && route.params.additional) {
       title = '补送单'
       type = 'additional'
     }
+    navigation.setOptions({headerTitle: title})
     this.state = {
       isLoading: false,
       query: {
@@ -82,7 +82,6 @@ class OrderQueryResultScene extends PureComponent {
       platform: Cts.PLAT_ARRAY,
       selectStatus: STATUS_FILTER[0]
     };
-    navigation.setOptions({headerTitle: title})
 
   }
 
@@ -95,7 +94,7 @@ class OrderQueryResultScene extends PureComponent {
         query: query,
         orders: []
       }, () => {
-        this.onSearch('', false)
+        this.getOrderList()
       })
     }, 600)
   }
@@ -114,7 +113,7 @@ class OrderQueryResultScene extends PureComponent {
     }
     query.page += 1
     this.setState({query}, () => {
-      this.onSearch('', false)
+      this.getOrderList()
     })
   }
 
@@ -122,7 +121,7 @@ class OrderQueryResultScene extends PureComponent {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={false}
-                     fetchData={() => this.onSearch('', false)}
+                     fetchData={this.getOrderList}
                      item={item} index={index}
                      accessToken={this.props.global.accessToken}
                      key={index}
@@ -136,31 +135,32 @@ class OrderQueryResultScene extends PureComponent {
     );
   }
 
-  renderContent(orders) {
+  onMomentumScrollBegin = () => {
+    this.setState({
+      isCanLoadMore: true
+    })
+  }
+
+  renderContent() {
+    const {orders, isCanLoadMore, isLoading} = this.state
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
         <FlatList
-          extraData={orders}
           data={orders}
           renderItem={this.renderItem}
           onRefresh={() => this.onRefresh()}
           onEndReachedThreshold={0.1}
-          // onEndReached={this.onEndReached.bind(this)}
           onEndReached={() => {
-            if (this.state.isCanLoadMore) {
+            if (isCanLoadMore) {
               this.onEndReached();
               this.setState({isCanLoadMore: false})
             }
           }}
-          onMomentumScrollBegin={() => {
-            this.setState({
-              isCanLoadMore: true
-            })
-          }}
-          refreshing={this.state.isLoading}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          refreshing={isLoading}
           keyExtractor={(item, index) => `${index}`}
-          shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
+          //shouldItemUpdate={this._shouldItemUpdate}
+          // getItemLayout={(data, index) => this.getItemLayout(data, index)}
           ListEmptyComponent={this.listEmptyComponent()}
           initialNumToRender={5}
         />
@@ -203,7 +203,8 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   componentDidMount() {
-    this.onSearch('', false)
+    // this.onSearch('', false)
+    this.getOrderList()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -220,20 +221,78 @@ class OrderQueryResultScene extends PureComponent {
     calcMs(timeObj, accessToken)
   }
 
-  _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+  getOrderList = (keywords = '', isSearch = false) => {
+    if (this.state.type === 'additional') {
+      this.fetchOrders()
+      return
+    }
+    this.onSearch(keywords, isSearch)
   }
 
   render() {
-    const {orders, type} = this.state || []
+    const {type} = this.state
+
     return (
       <View style={{flex: 1, backgroundColor: colors.back_color}}>
         <If condition={type === 'done'}>
           {this.renderHeader()}
         </If>
-        {this.renderContent(orders)}
+        {this.renderContent()}
       </View>
     );
+  }
+
+  fetchOrders = () => {
+    if (this.state.isLoading) {
+      return null;
+    }
+    showModal("加载中...")
+    this.setState({isLoading: true})
+    const {accessToken, currStoreId} = this.props.global;
+    const {currVendorId} = tool.vendor(this.props.global);
+    const params = {
+      vendor_id: currVendorId,
+      offset: (this.state.query.page - 1) * this.state.query.limit,
+      limit: this.state.query.limit,
+      use_v2: 1
+    }
+    if (this.state.type === 'search') {
+      const {term, max_past_day} = this.props.route.params
+      params.max_past_day = max_past_day || this.state.query.maxPastDays;
+      params.search = encodeURIComponent(term);
+      if ("invalid:" === term) {
+        params.status = Cts.ORDER_STATUS_INVALID
+      }
+    } else if (this.state.type === 'additional') {
+      params.store_id = currStoreId;
+    } else {
+      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
+      params.status = Cts.ORDER_STATUS_DONE;
+    }
+    let url = `/api/orders.json?access_token=${accessToken}`;
+
+    if (this.state.type === 'additional') {
+      url = `/api/get_three_day_delivery_order?access_token=${accessToken}`;
+    }
+
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+
+      hideModal()
+      if (tool.length(res.orders) < this.state.query.limit) {
+        this.setState({
+          end: true,
+        })
+      }
+      let orders = this.state.orders.concat(res.orders)
+      this.setState({
+        orders: orders,
+        isLoading: false,
+      })
+    }, (res) => {
+      this.setState({isLoading: false})
+      showError(res.reason)
+    })
+
   }
 
   onSearch = (keywords, isSearch) => {
@@ -305,7 +364,7 @@ class OrderQueryResultScene extends PureComponent {
     const {selectStatus, date, showDatePicker, dateBtn, platform, platformBtn} = this.state
     return (
       <>
-        <SearchBar placeholder="平台订单号/外送帮单号/手机号/顾客地址" onFocus={this.jumpToSearch}/>
+        <SearchBar placeholder="流水号/订单号/手机尾号/商品名称/取货码" onFocus={this.jumpToSearch}/>
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}

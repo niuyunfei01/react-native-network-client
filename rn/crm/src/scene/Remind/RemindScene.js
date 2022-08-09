@@ -593,6 +593,10 @@ class RemindItem extends React.PureComponent {
     });
   }
 
+  toggleDropDown = () => {
+
+  }
+
   render() {
     let {item, onPressDropdown, onPress} = this.props;
     let task_type = parseInt(item.type);
@@ -643,8 +647,7 @@ class RemindItem extends React.PureComponent {
                 <View>
                   <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
                 </View>
-                <TouchableOpacity style={[top_styles.icon_dropDown]}
-                                  onPress={() => this.toggleDropDown()}>
+                <TouchableOpacity style={[top_styles.icon_dropDown]} onPress={this.toggleDropDown}>
                   <ModalDropdown
                     onDropdownWillShow={this._dropdown_willShow.bind(this)}
                     onDropdownWillHide={this._dropdown_willHide.bind(this)}
@@ -681,7 +684,7 @@ class RemindItem extends React.PureComponent {
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
               {!!item.expect_end_time &&
-              <FontAwesome5 name={'clock'} style={[bottom_styles.icon_clock, {color: 'red'}]}/>}
+                <FontAwesome5 name={'clock'} style={[bottom_styles.icon_clock, {color: 'red'}]}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time} </Text>
               </View>

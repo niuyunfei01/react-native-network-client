@@ -24,6 +24,7 @@ export default keyMirror({
   SET_EXT_STORE: null,
   SET_USER_CONFIG: null,
   SET_SHOW_EXT_STORE: null,
+  SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
 
   DELETE_TOKEN_REQUEST: null,

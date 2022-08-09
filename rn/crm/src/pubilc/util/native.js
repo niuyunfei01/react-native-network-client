@@ -1,32 +1,33 @@
 import {Linking, NativeModules, Platform} from 'react-native'
 
+const {ActivityStarter} = NativeModules
 let _orderSearch = async function (term) {
-  if (NativeModules.ActivityStarter) {
-    await NativeModules.ActivityStarter.searchOrders(term);
+  if (ActivityStarter) {
+    await ActivityStarter.searchOrders(term);
   }
 };
 export default {
 
   updateAfterTokenGot: async function (access_token, expire, callback = function () {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.updateAfterTokenGot(access_token, expire, callback)
+    if (ActivityStarter) {
+      await ActivityStarter.updateAfterTokenGot(access_token, expire, callback)
     }
   },
 
   //打开通知设置
   toOpenNotifySettings: async function (callback = function () {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.toOpenNotifySettings(callback)
+    if (ActivityStarter) {
+      await ActivityStarter.toOpenNotifySettings(callback)
     }
   },
 
   //设置后台运行
   toRunInBg: async function (callback = function () {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.toRunInBg(callback)
+    if (ActivityStarter) {
+      await ActivityStarter.toRunInBg(callback)
     }
   },
 
@@ -35,8 +36,8 @@ export default {
    */
   setSoundVolume: async function (volume, callback = function (ok, msg) {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.setSoundVolume(volume, callback)
+    if (ActivityStarter) {
+      await ActivityStarter.setSoundVolume(volume, callback)
     }
   },
 
@@ -48,8 +49,8 @@ export default {
    */
   getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.getSoundVolume(callback)
+    if (ActivityStarter) {
+      await ActivityStarter.getSoundVolume(callback)
     }
   },
 
@@ -59,8 +60,8 @@ export default {
    */
   isRunInBg: async function (callback = function () {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.isRunInBg(callback)
+    if (ActivityStarter) {
+      await ActivityStarter.isRunInBg(callback)
     }
   },
 
@@ -71,15 +72,19 @@ export default {
    */
   xunfeiIdentily: async function (callback = function () {
   }) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.xunfeiIdentily(callback)
+    if (ActivityStarter) {
+      await ActivityStarter.xunfeiIdentily(callback)
     }
   },
-
+  getStartAppTime: async function (callback = function () {
+  }) {
+    if (ActivityStarter)
+      await ActivityStarter.getStartAppTime(callback)
+  },
 
   currentVersion: async function (callback) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.currentVersion(callback);
+    if (ActivityStarter) {
+      await ActivityStarter.currentVersion(callback);
     }
   },
 
@@ -101,31 +106,31 @@ export default {
   },
 
   toNativeOrder: async function (id) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.toOrder(id));
+    await (ActivityStarter &&
+      ActivityStarter.toOrder(id));
   },
 
   gotoPage: async function (page) {
-    if (NativeModules.ActivityStarter && page) {
-      await NativeModules.ActivityStarter.gotoPage(page);
+    if (ActivityStarter && page) {
+      await ActivityStarter.gotoPage(page);
     }
   },
 
   gotoNativeActivity: async function (activityName, putStack, json = '{}') {
-    if (NativeModules.ActivityStarter && activityName) {
-      await NativeModules.ActivityStarter.navigateToNativeActivity(activityName, putStack, json);
+    if (ActivityStarter && activityName) {
+      await ActivityStarter.navigateToNativeActivity(activityName, putStack, json);
     }
   },
 
   gotoRNActivity: async function (action, json = '{}') {
-    if (NativeModules.ActivityStarter && action) {
-      await NativeModules.ActivityStarter.navigateToRnView(action, json);
+    if (ActivityStarter && action) {
+      await ActivityStarter.navigateToRnView(action, json);
     }
   },
 
   nativeBack: async function () {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.nativeBack();
+    if (ActivityStarter) {
+      await ActivityStarter.nativeBack();
     }
   },
 
@@ -135,14 +140,14 @@ export default {
      * @returns {Promise.<void>}
      */
     async function (callback) {
-      if (NativeModules.ActivityStarter) {
-        await NativeModules.ActivityStarter.getHost(callback);
+      if (ActivityStarter) {
+        await ActivityStarter.getHost(callback);
       }
     },
 
   toUserComments: async function () {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.toUserComments();
+    if (ActivityStarter) {
+      await ActivityStarter.toUserComments();
     }
   },
 
@@ -154,52 +159,52 @@ export default {
    */
   setCurrStoreId: async function (storeId, callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
+    await (ActivityStarter &&
+      ActivityStarter.setCurrStoreId(storeId, callback));
   },
 
   gotoLoginWithNoHistory: async function (mobile = '') {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.gotoLoginWithNoHistory(mobile));
+    await (ActivityStarter &&
+      ActivityStarter.gotoLoginWithNoHistory(mobile));
   },
 
   gotoActByUrl: async function (url) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.gotoActByUrl(url));
+    await (ActivityStarter &&
+      ActivityStarter.gotoActByUrl(url));
   },
 
   logout: async function () {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.logout());
+    await (ActivityStarter &&
+      ActivityStarter.logout());
   },
 
   printBtPrinter: async function (order, callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
+    await (ActivityStarter &&
+      ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
   },
 
   printSmPrinter: async function (order, callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
+    await (ActivityStarter &&
+      ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
   },
 
   printInventoryOrder: async function (supplierOrder, callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.printInventoryOrder(JSON.stringify(supplierOrder), callback));
+    await (ActivityStarter &&
+      ActivityStarter.printInventoryOrder(JSON.stringify(supplierOrder), callback));
   },
 
   printSupplierSummaryOrder: async function (callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.printSupplierSummaryOrder(callback));
+    await (ActivityStarter &&
+      ActivityStarter.printSupplierSummaryOrder(callback));
   },
 
   ordersByMobileTimes: async function (phone, times) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.ordersByMobileTimes('' + phone, parseInt(times)))
+    await (ActivityStarter &&
+      ActivityStarter.ordersByMobileTimes('' + phone, parseInt(times)))
   },
 
   dialNumber: async function (number) {
@@ -215,68 +220,68 @@ export default {
 
   clearScan: async function (code, callback = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.clearScan(code, callback))
+    await (ActivityStarter &&
+      ActivityStarter.clearScan(code, callback))
   },
 
   updatePidApplyPrice: async function (pid, applyPrice, cb = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
+    await (ActivityStarter &&
+      ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
   updatePidStorage: async function (pid, storage, clb = function () {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.updatePidStorage(pid, storage, clb))
+    await (ActivityStarter &&
+      ActivityStarter.updatePidStorage(pid, storage, clb))
   },
 
   listenScan: async function (callback = function (scan_items) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.listenScan(callback))
+    await (ActivityStarter &&
+      ActivityStarter.listenScan(callback))
   },
 
   speakText: async function (text, callback = function (ok, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.speakText(text, callback))
+    await (ActivityStarter &&
+      ActivityStarter.speakText(text, callback))
   },
 
   setDisableSoundNotify: async function (disabled, callback = function (ok, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.setDisableSoundNotify(disabled, callback))
+    await (ActivityStarter &&
+      ActivityStarter.setDisableSoundNotify(disabled, callback))
   },
 
   getDisableSoundNotify: async function (callback = function (disabled, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.getDisableSoundNotify(callback))
+    await (ActivityStarter &&
+      ActivityStarter.getDisableSoundNotify(callback))
   },
 
   setDisabledNewOrderNotify: async function (disabled, callback = function (ok, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
+    await (ActivityStarter &&
+      ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
   },
 
   getNewOrderNotifyDisabled: async function (callback = function (disabled, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.getNewOrderNotifyDisabled(callback))
+    await (ActivityStarter &&
+      ActivityStarter.getNewOrderNotifyDisabled(callback))
   },
 
   setAutoBluePrint: async function (auto, callback = function (ok, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.setAutoBluePrint(auto, callback))
+    await (ActivityStarter &&
+      ActivityStarter.setAutoBluePrint(auto, callback))
   },
 
   getAutoBluePrint: async function (callback = function (auto, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.getAutoBluePrint(callback))
+    await (ActivityStarter &&
+      ActivityStarter.getAutoBluePrint(callback))
   },
 
   /**
@@ -295,27 +300,27 @@ export default {
    */
   getSettings: async function (callback = function (ok, settings, msg) {
   }) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.getSettings(callback))
+    await (ActivityStarter &&
+      ActivityStarter.getSettings(callback))
   },
 
   playWarningSound: async function () {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.playWarningSound())
+    await (ActivityStarter &&
+      ActivityStarter.playWarningSound())
   },
 
   showInputKeyboard: async function () {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.showInputMethod())
+    await (ActivityStarter &&
+      ActivityStarter.showInputMethod())
   },
 
   reportRoute: async function (routeName) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.reportRoute(routeName))
+    await (ActivityStarter &&
+      ActivityStarter.reportRoute(routeName))
   },
 
   reportException: async function (msg) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.reportException(msg))
+    await (ActivityStarter &&
+      ActivityStarter.reportException(msg))
   }
 }

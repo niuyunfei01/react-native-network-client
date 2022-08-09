@@ -29,7 +29,7 @@ export default class CommonModal extends PureComponent {
       <Modal hardwareAccelerated={true}
              transparent={true}
              visible={visible}
-             animationType={'fade'}
+             animationType={'slide'}
              onRequestClose={onClose}>
         <View style={[styles.page, positionStyle]}>
           {children}

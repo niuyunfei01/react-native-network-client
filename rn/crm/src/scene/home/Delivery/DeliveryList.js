@@ -60,6 +60,7 @@ class DeliveryList extends PureComponent {
       master_delivery_unbind_list: [],
       uuVisible: false,
       gxdVisible: false,
+      kfwVisible: false,
       phone: '',
       phone_code: '',
       count_down: -1,
@@ -244,6 +245,15 @@ class DeliveryList extends PureComponent {
           })
           return null;
         }
+
+        if (res.route === 'KuaiFuWu') {
+          this.setState({
+            kfwVisible: true
+          })
+          return null;
+        }
+
+
         this.onPress(res.route, {url: res.auth_url})
         break
       case 1:
@@ -331,6 +341,31 @@ class DeliveryList extends PureComponent {
       this.fetchData()
       this.setState({
         gxdVisible: false
+      }, () => ToastShort(res.desc))
+    }).catch((reason) => {
+      ToastShort(reason.desc)
+    })
+  }
+
+
+  getKfwAuthorizedToLog = () => {
+    let {accessToken, currStoreId} = this.props.global
+    let {phone, phone_code} = this.state
+    let {currVendorId} = tool.vendor(this.props.global);
+    if (!tool.length(phone) > 0 || !tool.length(phone_code) > 0) {
+      ToastShort('请输入手机号或者验证码')
+      return null;
+    }
+    const api = `/v1/new_api/delivery/bind_business_self_account?access_token=${accessToken}&vendorId=${currVendorId}`
+    HttpUtils.post.bind(this.props)(api, {
+      store_id: currStoreId,
+      mobile: phone,
+      password: phone_code,
+      ship_type: 18
+    }).then(res => {
+      this.fetchData()
+      this.setState({
+        kfwVisible: false
       }, () => ToastShort(res.desc))
     }).catch((reason) => {
       ToastShort(reason.desc)
@@ -770,6 +805,54 @@ class DeliveryList extends PureComponent {
               </CellBody>
             </Cell>
           </Cells>
+        </BottomModal>
+
+        <BottomModal
+          title={'开通快服务'}
+          actionText={'授权并登录'}
+          onPress={() => this.getKfwAuthorizedToLog()}
+          visible={this.state.kfwVisible}
+          btnStyle={{
+            backgroundColor: colors.main_color,
+            borderWidth: 0,
+          }}
+          onClose={() => this.setState({
+            kfwVisible: false
+          })}
+        >
+          <View>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 14, color: colors.color333}}>账号： </Text>
+              <Input
+                value={this.state.phone}
+                editable={true}
+                underlineColorAndroid={"transparent"}
+                style={[styles.phoneinput, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
+                clearButtonMode={true}
+                onChangeText={(value) => {
+                  this.setState({
+                    phone: value
+                  })
+                }}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 14, color: colors.color333}}>密码： </Text>
+              <Input
+                editable={true}
+                underlineColorAndroid={"transparent"}
+                style={[styles.phoneinput, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
+                clearButtonMode={true}
+                value={this.state.phone_code}
+                onChangeText={(code) => {
+                  this.setState({
+                    phone_code: code
+                  })
+                }}
+              />
+            </View>
+          </View>
         </BottomModal>
 
       </View>
