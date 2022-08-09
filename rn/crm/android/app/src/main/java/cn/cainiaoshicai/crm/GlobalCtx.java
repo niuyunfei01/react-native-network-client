@@ -5,7 +5,6 @@ import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -109,7 +108,6 @@ import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
@@ -143,6 +141,7 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
+import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
@@ -273,17 +272,6 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     private volatile boolean imageLoaderInited = false;
 
-    public void initImageLoader(Context appCtx) {
-        if (!imageLoaderInited) {
-            synchronized (this) {
-                if (this.imageLoaderInited)
-                    return;
-                imageLoader = new ImageLoader(appCtx);
-                this.imageLoaderInited = true;
-            }
-        }
-    }
-
     //Should set at startup
     private static AtomicReference<FileCache> fileCache = new AtomicReference<FileCache>();
 
@@ -363,7 +351,7 @@ public class GlobalCtx extends Application implements ReactApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        startAppTime = System.currentTimeMillis();
         MultiDex.install(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
@@ -404,6 +392,8 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     }
 
+    public static long startAppTime = 0;
+
     public void startKeepAlive() {
         try {
             LoadedApkHuaWei.hookHuaWeiVerifier(this);
@@ -422,7 +412,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             });
 
             //启动保活服务
-            KeepLive.startWork(this, KeepLive.RunMode.ENERGY,foregroundNotification, new KeepLiveService() {
+            KeepLive.startWork(this, KeepLive.RunMode.ENERGY, foregroundNotification, new KeepLiveService() {
                 @Override
                 public void onWorking() {
 
@@ -521,34 +511,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
-    private void initTalkSDK() {
-        cn.customer_serv.core.MQManager.setDebugMode(true);
-
-        // 替换成自己的key
-        UserTalkDao userTalkDao = new UserTalkDao(this.token());
-
-        MQConfig.init(this,
-                app().token(), userTalkDao, new OnInitCallback() {
-                    @Override
-                    public void onSuccess(String clientId) {
-                        Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(int code, String message) {
-                        Toast.makeText(GlobalCtx.this, "int failure message = " + message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        // 可选
-        customMeiqiaSDK();
-    }
-
-    private void customMeiqiaSDK() {
-        // 配置自定义信息
-        MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-    }
-
     public SortedMap<Integer, Worker> getWorkers() {
         Config cfg = getCfgNullCreated(SettingUtility.getListenerStore());
         return cfg == null ? new TreeMap<Integer, Worker>() : cfg.getWorkers();
@@ -600,9 +562,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         return storeWorkers.isEmpty() ? getWorkers() : storeWorkers;
     }
 
-    public Config getConfigByServer() {
-        return configByServer;
-    }
 
     public String[] getDelayReasons() {
         return this.delayReasons.get();
@@ -635,12 +594,6 @@ public class GlobalCtx extends Application implements ReactApplication {
     }
 
 
-    public synchronized LruCache<String, Bitmap> getBitmapCache() {
-        if (appBitmapCache == null) {
-            buildCache();
-        }
-        return appBitmapCache;
-    }
 
     public String getCurrentAccountId() {
         AccountBean bean = getAccountBean();
@@ -709,21 +662,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
-    private void buildCache() {
-        int memClass = ((ActivityManager) getSystemService(
-                Context.ACTIVITY_SERVICE)).getMemoryClass();
-
-        int cacheSize = Math.max(1024 * 1024 * 8, 1024 * 1024 * memClass / 5);
-
-        appBitmapCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-
-                return bitmap.getByteCount();
-            }
-        };
-    }
-
     public String getUrl(String key) {
         return this.getUrl(key, false);
     }
@@ -769,9 +707,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         return currentWorker == null || currentWorker.getPosition() != Cts.POSITION_EXT_SHIP;
     }
 
-    public boolean acceptReadyTimeoutNotify() {
-        return this.acceptNotifyNew();
-    }
 
     public boolean acceptTechNotify() {
         return this.acceptNotifyNew();
@@ -905,12 +840,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         Bundle params = new Bundle();
         params.putString("initTab", "Operation");
         i.putExtra("_action_params", params);
-        ctx.startActivity(i);
-    }
-
-    public void toGoodsEditProdStores(Activity ctx) {
-        Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "GoodMultiEdit");
         ctx.startActivity(i);
     }
 
@@ -1258,10 +1187,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         return new MainOrdersActivity();
     }
 
-    public boolean appEnabledGoodMgr() {
-        Config cfg = this.serverCfg.get(SettingUtility.getListenerStore());
-        return cfg != null && cfg.isEnabled_good_mgr();
-    }
 
     public ScanStatus scanInfo() {
         ssRef.compareAndSet(null, new ScanStatus());

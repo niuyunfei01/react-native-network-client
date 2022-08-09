@@ -40,6 +40,8 @@ import {getTime} from "../../pubilc/util/TimeUtil";
 import RemindModal from "../../pubilc/component/remindModal";
 import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
 import Swiper from 'react-native-swiper'
+import dayjs from "dayjs";
+import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 
 const {width} = Dimensions.get("window");
 
@@ -197,6 +199,24 @@ class OrderListScene extends Component {
     }
   }
 
+  calcAppStartTime = () => {
+    native.getStartAppTime((flag, startAppTime) => {
+      if (flag) {
+        const startAppEndTime = dayjs().valueOf()
+        const duration = startAppEndTime - parseInt(startAppTime)
+        if (duration > 30000)
+          return
+        const {currStoreId, currentUser} = this.props.global
+
+        nrRecordMetric("start_app_end_time", {
+          startAppTimeDuration: duration,
+          store_id: currStoreId,
+          user_id: currentUser
+        })
+      }
+    }).then()
+  }
+
   componentDidMount() {
     JPush.init();
     //连接状态
@@ -240,6 +260,9 @@ class OrderListScene extends Component {
     )
 
     const {global, dispatch} = this.props
+    if (Platform.OS === 'android') {
+      this.calcAppStartTime()
+    }
     getSimpleStore(global, dispatch)
     this.openAndroidNotification();
     timeObj.method[0].endTime = getTime()
@@ -597,7 +620,8 @@ class OrderListScene extends Component {
         {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
         <If condition={this.state.show_hint}>
           <TouchableOpacity style={styles.cell_row}>
-            <Text style={styles.cell_body_text}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+            <Text
+              style={styles.cell_body_text}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
             <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
           </TouchableOpacity>
         </If>
@@ -906,7 +930,7 @@ class OrderListScene extends Component {
   renderBottomImg = () => {
     let {activity} = this.state
     return (
-      <If condition={this.state.showImgType === 0 && this.state.show_img }>
+      <If condition={this.state.showImgType === 0 && this.state.show_img}>
         <Swiper style={styles.wrapper}
                 showsButtons={false}
                 height={100}

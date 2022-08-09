@@ -230,14 +230,9 @@ class OrderSearchScene extends PureComponent {
           <AntDesign name={'search1'} size={14}/>
           <TextInput style={styles.textInput}
                      value={keyword}
-                     placeholder={'流水号/商品名称/订单号/手机尾号/顾客地址'}
+                     placeholder={'流水号/订单号/手机尾号/商品名称/取货码'}
                      onChangeText={(keyword) => this.onSearch(keyword)}/>
         </View>
-        {/*<SearchBar*/}
-        {/*  placeholder="订单流水号/商品名称/订单号/手机尾号/顾客地址"*/}
-        {/*  onBlurSearch={(keyword)=>this.onSearch(keyword)}*/}
-        {/*  lang={{cancel: '搜索'}}*/}
-        {/*/>*/}
         <If condition={keyword.length > 0}>
           <View style={styles.filterZoneWrap}>
             <Text style={styles.filterTipText}>

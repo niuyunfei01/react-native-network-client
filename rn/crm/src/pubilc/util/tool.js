@@ -3,26 +3,6 @@ import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
 import dayjs from "dayjs";
-import pxToDp from "./pxToDp";
-import colors from "../styles/colors";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import React from "react";
-import {Text, View} from "react-native";
-
-export function urlByAppendingParams(url: string, params: Object) {
-  let result = url;
-  if (result.substr(result.length - 1) != "?") {
-    result = result + `?`;
-  }
-
-  for (let key in params) {
-    let value = params[key];
-    result += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
-  }
-
-  result = result.substring(0, result.length - 1);
-  return result;
-}
 
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
@@ -45,10 +25,6 @@ export function objectFilter(obj, fn) {
     .filter(key => fn(obj[key], key))
     .map(key => (filterObj[key] = obj[key]));
   return filterObj;
-}
-
-export function objectReduce(obj, fn) {
-  return Object.keys(obj).reduce((idx1, idx2) => fn(obj[idx1], obj[idx2]));
 }
 
 export function objectSum(obj, fn) {
@@ -81,27 +57,6 @@ export function fullDate(dt) {
 
 export function fullDay(dt) {
   return dayjs(dt).format("YYYY-MM-DD");
-}
-
-export function storeTime(dt) {
-  return dayjs(dt).format("H:mm");
-}
-
-export function diffDesc(dt) {
-  // let old_time = dayjs(dt);
-  // let now_time = dayjs(new Date()).diff(old_time, "seconds", true);
-  // let now_times = dayjs(new Date()).diff(old_time, "seconds", true);
-  // let diff_time = Math.floor(now_time.diff(old_time, "seconds", true));
-  let diff_time = 60
-  let diff_minutes = Math.floor(diff_time / 60);
-  let diff_seconds = diff_time % 60;
-  let diff_desc = "";
-  if (diff_minutes > 0) {
-    diff_desc = `${diff_minutes}分${diff_seconds}秒`;
-  } else {
-    diff_desc = `${diff_seconds}秒`;
-  }
-  return diff_desc;
 }
 
 export function vendorOfStoreId(storeId, global) {
@@ -154,7 +109,7 @@ export function vendor(global) {
 
   let {help_uid} = config;
   let is_helper = false;
-  if (!!help_uid) {
+  if (help_uid) {
     let helper = "," + help_uid.join(",") + ",";
     is_helper = helper.indexOf("," + currentUser + ",") !== -1;
   }
@@ -184,7 +139,7 @@ export function server_info({global, user}) {
   }
   let {service_uid} = vendor(global);
   let {user_info} = user;
-  return !!user_info[service_uid] ? user_info[service_uid] : {};
+  return user_info[service_uid] ? user_info[service_uid] : {};
 }
 
 /**
@@ -218,7 +173,6 @@ export function curr_vendor(vendor_data, currVendorId) {
     vendor_data[currVendorId] !== undefined
   ) {
     curr_data = vendor_data[currVendorId];
-  } else {
   }
   return curr_data;
 }
@@ -327,41 +281,6 @@ function parameterByName(name, url) {
   if (!results) return null;
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-export function disWayStatic(index) {
-  if (index == 1) {
-    let map = {};
-    map[Cts.FN_STATUS_ACCEPTED] = "系统已接单";
-    map[Cts.FN_STATUS_ASSIGNED] = "已分配骑手";
-    map[Cts.FN_STATUS_ARRIVED_STORE] = "骑手已到店";
-    map[Cts.FN_STATUS_ON_WAY] = "配送中";
-    map[Cts.FN_STATUS_ARRIVED] = "已送达";
-    map[Cts.FN_STATUS_CANCELED] = "已取消";
-    map[Cts.FN_STATUS_ABNORMAL] = "异常";
-    return map;
-  } else {
-    let map = {};
-    map[Cts.DADA_STATUS_TO_ACCEPT] = "待接单";
-    map[Cts.DADA_STATUS_TO_FETCH] = "待取货";
-    map[Cts.DADA_STATUS_SHIPPING] = "配送中";
-    map[Cts.DADA_STATUS_ARRIVED] = "已完成";
-    map[Cts.DADA_STATUS_CANCEL] = "已取消";
-    map[Cts.DADA_STATUS_TIMEOUT] = "已过期";
-    map[Cts.DADA_STATUS_ABNORMAL] = "指派单";
-    return map;
-  }
-}
-
-export function disWay() {
-  let map = {};
-  map[Cts.SHIP_AUTO_FN] = "蜂鸟";
-  map[Cts.SHIP_AUTO_NEW_DADA] = "新达达";
-  map[Cts.SHIP_AUTO_BD] = "百度";
-  map[Cts.SHIP_AUTO_SX] = "闪送";
-  map[Cts.SHIP_AUTO_MT] = "美团跑腿";
-  map[Cts.SHIP_AUTO_MT_ZB] = "美团众包";
-  return map;
 }
 
 export function storeActionSheet(canReadStores, is_service_mgr = false) {
@@ -530,20 +449,6 @@ export function storeListOfModalSelector(canReadStores) {
   return {return_data, return_data_deep}
 }
 
-/**
- * 按照城市分组门店
- * @param stores
- */
-export function storeListGroupByCity(stores) {
-  const storeByCity = ArrayGroupBy(sortStores(stores), ['city'])
-  const obj = {}
-  for (let item of storeByCity) {
-    const key = item.key
-    obj[key] = item.value
-  }
-  return obj
-}
-
 export function first_store_id(canReadStores) {
   let first_store_id = 0;
   for (let store of Object.values(canReadStores)) {
@@ -576,10 +481,6 @@ export function billStatus(status) {
   map[Cts.BILL_STATUS_PAID] = "已打款";
   map[Cts.BILL_STATUS_INVALID] = "已作废";
   return map[status];
-}
-
-export function autoPlat(type, status) {
-  return `${this.ship_name(type)}: ${this.zs_status(status)}`;
 }
 
 export function ship_name(type) {
@@ -646,8 +547,7 @@ export function simpleBarrier() {
       callback = callback || defaultCallback;
       requiredCallbacks++;
       return function () {
-        let result = callback.apply(this, arguments);
-        results[callbackIndex] = result;
+        results[callbackIndex] = callback.apply(this, arguments);
         doneCallbacks++;
         if (requiredCallbacks === doneCallbacks) {
           instance.duration = Date.now() - startTime;
@@ -723,29 +623,6 @@ function getSortName(sortId) {
   return map[sortId];
 }
 
-function goodSoldStatusImg(status) {
-  let map = {};
-  map[Cts.STORE_PROD_ON_SALE] =
-    <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
-  map[Cts.STORE_PROD_OFF_SALE] = <FontAwesome5 name={'cart-arrow-down'} style={{
-    fontSize: pxToDp(28),
-    marginLeft: pxToDp(20),
-    color: colors.gray
-  }}/>;
-  map[Cts.STORE_PROD_SOLD_OUT] = <View style={{
-    width: pxToDp(28),
-    height: pxToDp(28),
-    marginLeft: pxToDp(20),
-    alignSelf: "flex-end",
-    backgroundColor: colors.warn_color
-  }}><Text style={{color: colors.white}}>缺</Text></View>;
-  return map[status];
-}
-
-function getTimeStamp(str) {
-  return new Date(str.replace(/-/g, "/")).getTime();
-}
-
 /**
  * 价格尾数优化（需要和mobileweb项目 __priceWithExtra 方法保持一致）
  * @param $spPrice 分
@@ -809,18 +686,14 @@ function throttle(fn, wait) {
 function imageKey(imgName) {
   let curTime = Date.now();
   let UniqueId = DeviceInfo.getUniqueId();
-  let str = md5.hex_md5(UniqueId + curTime + imgName);
-  return str
+  return md5.hex_md5(UniqueId + curTime + imgName)
 }
 
 export default {
-  urlByAppendingParams,
   objectMap,
-  objectReduce,
   shortTimeDesc,
   shortTimestampDesc,
   shortOrderDay,
-  diffDesc,
   fullDate,
   orderOrderTimeShort,
   orderExpectTime,
@@ -829,22 +702,17 @@ export default {
   objectFilter,
   store,
   intOf,
-  disWayStatic,
-  disWay,
   vendor,
   user,
   vendorOfStoreId,
   length,
   parameterByName,
   user_info,
-  first_store_id,
   storeActionSheet,
-  storeListOfModalSelector,
   fullDay,
   toFixed,
   billStatus,
   get_platform_name,
-  autoPlat,
   ship_name,
   zs_status,
   sellingStatus,
@@ -853,9 +721,6 @@ export default {
   getOperateDetailsType,
   getVendorName,
   getSortName,
-  goodSoldStatusImg,
-  getTimeStamp,
-  simpleBarrier,
   isPreOrder,
   priceOptimize,
   debounces,

@@ -135,7 +135,7 @@ class MineScene extends PureComponent {
       is_service_mgr,
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+    cover_image = cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }
@@ -161,7 +161,7 @@ class MineScene extends PureComponent {
       fnPriceControlled: false,
       fnProfitControlled: false,
       currVendorName: currVendorName,
-      cover_image: !!cover_image ? cover_image : "",
+      cover_image: cover_image ? cover_image : "",
       adjust_cnt: 0,
       dutyUsers: [],
       searchStoreVisible: false,
@@ -422,20 +422,6 @@ class MineScene extends PureComponent {
     });
   }
 
-  callCustomerService = () => {
-    let server_info = tool.server_info(this.props);
-    let dutyUsers = this.state.dutyUsers;
-    if (dutyUsers && Array.isArray(dutyUsers) && dutyUsers.length > 0) {
-      let key = Math.floor(Math.random() * dutyUsers.length);
-      let u = dutyUsers[key];
-      if (u.mobilephone) {
-        native.dialNumber(u.mobilephone);
-        return;
-      }
-    }
-    native.dialNumber(server_info.mobilephone);
-  }
-
   UNSAFE_componentWillReceiveProps() {
     const {
       currentUser,
@@ -459,7 +445,7 @@ class MineScene extends PureComponent {
       is_helper,
     } = tool.vendor(this.props.global);
 
-    cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+    cover_image = cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }

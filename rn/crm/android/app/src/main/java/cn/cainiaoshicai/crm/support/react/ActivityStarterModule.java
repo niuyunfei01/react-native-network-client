@@ -319,6 +319,15 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    void getStartAppTime(final Callback callback) {
+        try {
+            callback.invoke(true, GlobalCtx.startAppTime + "", "成功获取启动时间");
+        } catch (Exception e) {
+            e.printStackTrace();
+            callback.invoke(false, 0, "获取启动时间失败");
+        }
+    }
 
     @ReactMethod
     void isRunInBg(final Callback callback) {
