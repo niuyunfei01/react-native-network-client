@@ -100,7 +100,7 @@ class SettingScene extends PureComponent {
     if (this.state.funds_thresholds > 0) {
       msg = `设置后，当余额≤0及≤该阈值时将免费对您的电话：${storeMgrMobile}进行提醒。`
     } else if (this.state.funds_thresholds >= 0) {
-      msg = '设置后，当余额≤0时将免费对您进行电话提醒';
+      msg = `设置后，当余额≤0时将免费对您进行电话：${storeMgrMobile}进行提醒`;
     }
     return msg
   }
