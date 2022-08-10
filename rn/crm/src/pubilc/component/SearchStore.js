@@ -4,12 +4,18 @@ import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
 import SearchStoreItem from "./SearchStoreItem";
+import Entypo from "react-native-vector-icons/Entypo";
+import colors from "../styles/colors";
 
 const rowHeight = 40
 
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
+}
+
+const initState = {
+  dataSource: []
 }
 
 class SearchStore extends React.Component {
@@ -21,8 +27,13 @@ class SearchStore extends React.Component {
 
   static defaultProps = {}
 
+  state = initState
+
   constructor(props) {
     super(props)
+  }
+
+  componentDidMount() {
     const {
       canReadStores
     } = this.props.global;
@@ -33,20 +44,20 @@ class SearchStore extends React.Component {
       item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
-    this.state = {
-      dataSource: dataSource
-    }
+    this.setState({
+      dataSource
+    })
   }
 
   // custom render row
-  renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
+  renderRow = (item, sectionID, rowID, highlightRowFunc, isSearching) => {
     return (<SearchStoreItem rowID={rowID} onPress={() => {
       this.props.onSelect && this.props.onSelect(item.item)
     }} item={item.item} rowHeight={rowHeight}/>)
   }
 
   // render empty view when datasource is empty
-  renderEmpty() {
+  renderEmpty = () => {
     return (
       <View style={styles.emptyDataSource}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> No Content </Text>
@@ -55,7 +66,7 @@ class SearchStore extends React.Component {
   }
 
   // render empty result view when search result is empty
-  renderEmptyResult(searchStr) {
+  renderEmptyResult = (searchStr) => {
     return (
       <View style={styles.emptySearchResult}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
@@ -66,32 +77,21 @@ class SearchStore extends React.Component {
     )
   }
 
-  renderBackBtn() {
+  renderBackBtn = () => {
     return (
-      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
-        <View style={{width: 80, alignItems: 'center'}}><Text
-          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()} style={{padding: 10}}>
+        <Entypo name="reply-all" style={{fontSize: 20, color: colors.white, marginLeft: 10}}/>
       </TouchableOpacity>
     )
   }
 
-  renderRightBtn() {
+  renderRightBtn = () => {
     return (<View style={{width: 80}}/>)
-  }
-
-  renderHeader() {
-    return (<View style={styles.header}>
-      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
-        <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </TouchableOpacity>
-      <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
-      <View style={{width: 40}}></View>
-    </View>)
   }
 
   render() {
     return (
-      <Modal style={styles.container} visible={this.props.visible}
+      <Modal style={styles.container} visible={this.props.visible} animationType={'fade'}
              onRequestClose={() => this.props.onClose && this.props.onClose()}>
         <SearchList
           data={this.state.dataSource}
@@ -103,11 +103,11 @@ class SearchStore extends React.Component {
           rowHeight={rowHeight}
           hideSectionList={this.state.dataSource.length >= 200}
           toolbarBackgroundColor={'#2196f3'}
-          title='搜索店铺'
+          title='搜索'
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchInputPlaceholder='搜索'
+          searchInputPlaceholder='搜索店铺'
           colors={{
             toolbarBackgroundColor: '#2196f3',
             titleTextColor: '#ffffff',

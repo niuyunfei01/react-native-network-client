@@ -1669,7 +1669,10 @@ class MineScene extends PureComponent {
           closeText={'下班再看'}
           closeBtnStyle={{
             borderColor: colors.fontColor,
-            borderRightWidth: pxToDp(1)
+            borderRightWidth: pxToDp(1),
+            borderLeftWidth: 0,
+            borderTopWidth: 0,
+            borderBottomWidth: 0
           }}
           btnBottomStyle={{
             borderTopWidth: pxToDp(1),
