@@ -1,5 +1,6 @@
 import React, {PureComponent} from "react";
 import {
+  DeviceEventEmitter,
   Dimensions,
   Image,
   InteractionManager,
@@ -164,7 +165,7 @@ class MineScene extends PureComponent {
       cover_image: cover_image ? cover_image : "",
       adjust_cnt: 0,
       dutyUsers: [],
-      searchStoreVisible: false,
+      // searchStoreVisible: false,
       storeStatus: {},
       fnSeparatedExpense: false,
       allow_merchants_store_bind: false,
@@ -201,6 +202,7 @@ class MineScene extends PureComponent {
     this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
     this.onGetDutyUser = this.onGetDutyUser.bind(this);
+    this.onRefresh = this.onRefresh.bind(this)
 
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
@@ -227,8 +229,11 @@ class MineScene extends PureComponent {
     this.getHaveNotReadAdvice();
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.getActivity();
+    this.subscription = DeviceEventEmitter.addListener("EventChangeStore", (params) => {
+      this.onCanChangeStore(params['id']);
+    })
   }
 
   getStoreList = () => {
@@ -839,7 +844,7 @@ class MineScene extends PureComponent {
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={{height: pxToDp(85), width: 200}}
-                            onPress={() => this.setState({searchStoreVisible: true})}>
+                            onPress={() => this.onPress(Config.ROUTE_STORE_SELECT)}>
             <View style={{flexDirection: "row"}}>
               <FontAwesome name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店 </Text>
@@ -1028,7 +1033,7 @@ class MineScene extends PureComponent {
     return (
       <View>
 
-        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh}/>
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -1093,12 +1098,12 @@ class MineScene extends PureComponent {
           </Dialog>
           {this.renderModal()}
         </ScrollView>
-        <SearchStore visible={this.state.searchStoreVisible}
-                     onClose={() => this.setState({searchStoreVisible: false})}
-                     onSelect={(item) => {
-                       this.onCanChangeStore(item.id);
-                       this.setState({searchStoreVisible: false})
-                     }}/>
+        {/*<SearchStore visible={this.state.searchStoreVisible}*/}
+        {/*             onClose={() => this.setState({searchStoreVisible: false})}*/}
+        {/*             onSelect={(item) => {*/}
+        {/*               this.onCanChangeStore(item.id);*/}
+        {/*               this.setState({searchStoreVisible: false})*/}
+        {/*             }}/>*/}
       </View>
     );
   }
