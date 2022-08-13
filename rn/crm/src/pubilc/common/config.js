@@ -149,6 +149,7 @@ const C = {
   ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
+  ROUTE_STORE_SELECT: 'StoreSelect',
   ROUTE_COMES_BACK: 'ComesBack',
   ROUTE_COMES_BACK_INFO: 'ComesBackInfo',
   ROUTE_STORE_CLOSE: 'StoreClose',

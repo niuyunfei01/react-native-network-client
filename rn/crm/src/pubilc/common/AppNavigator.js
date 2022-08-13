@@ -227,6 +227,8 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_SELECT} options={{headerTitle: '搜索店铺'}}
+                      getComponent={() => require("../../scene/home/Store/StoreSelectScene").default}/>
         <Stack.Screen name={Config.ROUTE_COMES_BACK} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Store/ComesBack").default}/>
         <Stack.Screen name={Config.ROUTE_COMES_BACK_INFO} options={{headerTitle: '店铺信息'}}
