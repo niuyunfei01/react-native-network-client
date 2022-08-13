@@ -60,7 +60,7 @@ export const AppNavigator = (props) => {
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Home" getComponent={() => require("../../scene/Remind/RemindScene").default}
+        <Stack.Screen name="Home" getComponent={() => require("../../scene/notice/NoticeList").default}
                       options={{headerShown: false}}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
@@ -217,8 +217,6 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Store/StoreRate").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_RULE} options={{headerTitle: '规则处理'}}
                       getComponent={() => require("../../scene/home/Store/StoreRule").default}/>
-        <Stack.Screen name={Config.ROUTE_DONE_REMIND}
-                      getComponent={() => require("../../scene/Remind/DoneRemindScene").default}/>
         <Stack.Screen name={Config.PLATFORM_BIND} options={{headerTitle: '绑定平台信息'}}
                       getComponent={() => require("../../scene/home/Platform/PlatformBind").default}/>
         <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}}
