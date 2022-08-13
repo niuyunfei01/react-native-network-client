@@ -12,7 +12,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions'
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
-import {Icon} from "../../../weui";
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchStoreItem from "../../../pubilc/component/SearchStoreItem";
 import Loadmore from 'react-native-loadmore'
@@ -193,7 +192,7 @@ class StoreSelect extends PureComponent {
       <View style={[styles.searchBar]}>
         <View style={styles.searchOuter}>
           <View style={styles.searchInner}>
-            <Icon name="search" color={colors.color999} size={12} style={{marginTop: 4, marginRight: 10}}/>
+            <Entypo name="magnifying-glass" size={12} style={{color: colors.color999, marginRight: 10}}/>
             <TextInput
               returnKeyType="search"
               eturnKeyLabel="搜索"
@@ -219,7 +218,7 @@ class StoreSelect extends PureComponent {
             />
             <If condition={searchKeywords !== ''}>
               <Text onPress={this.clearHandle}>
-                <Icon name="clear" style={styles.clearIcon}/>
+                <Entypo name="circle-with-cross" size={16} color={colors.color999} />
               </Text>
             </If>
           </View>
@@ -317,10 +316,6 @@ const styles = StyleSheet.create({
   searchCancel: {
     marginLeft: 10,
     color: '#09BB07',
-  },
-  clearIcon: {
-    fontSize: 16,
-    color: colors.color999
   }
 })
 
