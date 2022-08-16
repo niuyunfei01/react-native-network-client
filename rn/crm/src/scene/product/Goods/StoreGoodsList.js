@@ -29,16 +29,6 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-function FetchRender({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class StoreGoodsList extends Component {
   constructor(props) {
     super(props);
@@ -80,7 +70,7 @@ class StoreGoodsList extends Component {
   }
 
   componentDidMount() {
-    const {global, dispatch} = this.props
+    const {global, dispatch, navigation} = this.props
     const {currStoreId, accessToken} = global;
     getSimpleStore(global, dispatch, currStoreId, (store) => {
       this.setState({
@@ -90,13 +80,19 @@ class StoreGoodsList extends Component {
       })
       this.fetchUnreadPriceAdjustment(store.id, accessToken)
     })
+    this.restart()
+    this.focus = navigation.addListener('focus', () => this.restart());
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   restart() {
     if (GlobalUtil.getGoodsFresh() === 2) {
       GlobalUtil.setGoodsFresh(1)
       this.onRefresh()
-      return null;
+      return;
     }
     this.fetchGoodsCount()
   }
@@ -168,7 +164,8 @@ class StoreGoodsList extends Component {
   }
 
 
-  search(setList = 1) {
+  search = (setList = 1) => {
+
     const {isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum} = this.state
     if (isLoading) {
       return;
@@ -201,7 +198,7 @@ class StoreGoodsList extends Component {
     })
   }
 
-  doneProdUpdate(pid, prodFields, spFields) {
+  doneProdUpdate = (pid, prodFields, spFields) => {
     const {goods} = this.state
     const idx = goods.findIndex(g => `${g.id}` === `${pid}`);
     const item = goods[idx];
@@ -220,17 +217,17 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
-  onRefresh() {
+  onRefresh = () => {
     this.setState({page: 1}, () => {
       this.search()
     })
   }
 
-  onLoadMore() {
+  onLoadMore = () => {
     let {page, isLastPage} = this.state
     if (isLastPage) {
       ToastShort("暂无更多数据")
-      return null;
+      return;
     }
 
     this.setState({page: page + 1}, () => {
@@ -275,7 +272,7 @@ class StoreGoodsList extends Component {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
       storeId: this.props.global.currStoreId,
-      updatedCallback: this.doneProdUpdate.bind(this)
+      updatedCallback: this.doneProdUpdate
     })
   }
 
@@ -334,25 +331,20 @@ class StoreGoodsList extends Component {
   }
 
   render() {
-    const p = this.state.selectedProduct;
-    const {sp} = this.state.selectedProduct;
+
     const {accessToken, simpleStore} = this.props.global;
-    let {all_amount, all_count, inventorySummary, selectStatusItem} = this.state;
+    let {all_amount, all_count, inventorySummary, selectStatusItem, selectedProduct, goods, isLoading} = this.state;
+    const {sp} = selectedProduct;
     const {currVendorId} = tool.vendor(this.props.global);
     return (
-      <View style={{flex: 1}}>
+      <>
         {this.renderHeader()}
-        <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
         <View style={styles.container}>
-
-          <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
-            {this.showstatusSelect()}
-          </Dialog>
           <If condition={this.state.shouldShowNotificationBar}>
             <View style={styles.notificationBar}>
               <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
               <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
-                <Text style={{color: 'white'}}>查看 </Text>
+                <Text style={{color: 'white'}}>查看</Text>
               </TouchableOpacity>
             </View>
           </If>
@@ -368,17 +360,16 @@ class StoreGoodsList extends Component {
                 {this.renderChildrenCategories()}
               </View>
               <FlatList
-                style={{flex: 1}}
-                data={this.state.goods}
+                data={goods}
                 legacyImplementation={false}
                 directionalLockEnabled={true}
-                onEndReachedThreshold={0.3}
+                onEndReachedThreshold={0.1}
                 onEndReached={this.onEndReached}
                 onMomentumScrollBegin={this.onMomentumScrollBegin}
                 onTouchMove={(e) => this.onTouchMove(e)}
                 renderItem={this.renderItem}
-                onRefresh={this.onRefresh.bind(this)}
-                refreshing={this.state.isLoading}
+                onRefresh={this.onRefresh}
+                refreshing={isLoading}
                 keyExtractor={this._keyExtractor}
                 shouldItemUpdate={this._shouldItemUpdate}
                 getItemLayout={this._getItemLayout}
@@ -387,20 +378,20 @@ class StoreGoodsList extends Component {
             </View>
           </View>
           <If condition={sp}>
-            <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
-                                productName={p.name}
+            <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)}
+                                modalType={this.state.modalType}
+                                skuName={selectedProduct.sku_name}
+                                productName={selectedProduct.name}
                                 strictProviding={false} accessToken={accessToken}
                                 storeId={Number(this.props.global.currStoreId)}
                                 currStatus={Number(sp.status)}
                                 vendor_id={currVendorId}
-                                doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                onClose={() => this.setState({modalType: ''}, () => {
-                                  this.search()
-                                })}
+                                doneProdUpdate={this.doneProdUpdate}
+                                onClose={() => this.setState({modalType: ''})}
                                 spId={Number(sp.id)}
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                 navigation={this.props.navigation}
-                                storePro={p}
+                                storePro={selectedProduct}
                                 beforePrice={Number(sp.supply_price)}/>
           </If>
           <Modal
@@ -501,8 +492,10 @@ class StoreGoodsList extends Component {
           </Modal>
 
         </View>
-
-      </View>
+        <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
+          {this.showstatusSelect()}
+        </Dialog>
+      </>
     )
   }
 
@@ -568,7 +561,7 @@ class StoreGoodsList extends Component {
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
+            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate})
           }}>
           <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
         </TouchableOpacity>
@@ -655,24 +648,24 @@ class StoreGoodsList extends Component {
         </If>
         <If condition={onStrict}>
           <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+                            onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
             <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
           </TouchableOpacity>
         </If>
         <If condition={!onStrict}>
           <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.onOpenModal('set_price', item)}>
-            <Text style={styles.goodsOperationBtn}>报价 </Text>
+                            onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+            <Text style={styles.goodsOperationBtn}>价格 </Text>
           </TouchableOpacity>
         </If>
-        {/*{onOpen &&*/}
-        {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
-        {/*                      onPress={() => this.onOpenModal('set_price', item)}>*/}
-        {/*      <Text style={{color: colors.color333}}>报价 </Text>*/}
-        {/*    </TouchableOpacity>}*/}
-
       </View>
     )
+  }
+
+  jumpToNewRetailPriceScene = (id) => {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {
+      productId: id
+    })
   }
 
   renderItem = (order) => {

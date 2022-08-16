@@ -4,7 +4,7 @@ import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {fetchSgTagTree, productSave, uploadImg} from "../../../reducers/product/productActions";
+import {fetchSgTagTree, productSave} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -45,7 +45,6 @@ function mapDispatchToProps(dispatch) {
     dispatch,
     ...bindActionCreators(
       {
-        uploadImg,
         productSave,
         fetchSgTagTree,
         ...globalActions
@@ -191,7 +190,7 @@ class GoodsEditScene extends PureComponent {
           const uri = res + newImageKey
           const file_id = Object.keys(upload_files) + 1;
           list_img[file_id] = {url: uri, name: newImageKey}
-          upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
+          upload_files[file_id] = {id: 0, name: newImageKey, path: uri};
           hideModal()
           this.setState({
             list_img: list_img,
@@ -570,7 +569,7 @@ class GoodsEditScene extends PureComponent {
       formData.inventory = {
         actualNum: actualNum,
         differenceType: 2,
-        totalRemain: '0',
+        totalRemain: actualNum,
         remark: '',
         store_id: currStoreId
       }
@@ -775,7 +774,7 @@ class GoodsEditScene extends PureComponent {
       QNEngine.setParams(params)
       QNEngine.startTask()
     }).catch(error => {
-      Alert.alert('error', '图片上传失败！')
+      Alert.alert('图片上传失败！')
     })
   }
 
@@ -970,11 +969,12 @@ class GoodsEditScene extends PureComponent {
             <LineView/>
           </If>
           <If condition={this.isStoreProdEditable()}>
-            <TouchableOpacity style={styles.baseRowCenterWrap} onPress={() => this.setState({
-              visible: true,
-              selectHeaderText: '商品类目',
-              isSelectCategory: true
-            })}>
+            <TouchableOpacity style={styles.baseRowCenterWrap}
+                              onPress={() => this.setState({
+                                visible: true,
+                                selectHeaderText: '商品类目',
+                                isSelectCategory: true
+                              })}>
               <Text style={styles.leftText}>
                 <Text style={styles.leftFlag}>
                   *

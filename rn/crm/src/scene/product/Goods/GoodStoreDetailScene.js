@@ -27,13 +27,12 @@ import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../../pubilc/util/http";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import {Provider} from "@ant-design/react-native";
 import Mapping from "../../../pubilc/Mapping";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import {hideModal, showModal, showSuccess, showError} from "../../../pubilc/util/ToastUtils";
+import {showSuccess, showError} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
@@ -54,20 +53,10 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 const MORE_ITEM = [
   {
     value: '1',
-    label: '报价'
+    label: '价格'
   },
   {
     value: '2',
@@ -131,30 +120,18 @@ class GoodStoreDetailScene extends PureComponent {
       },
       stallVisible: false
     };
-    GlobalUtil.setGoodsFresh(2)
-    this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
+
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
   }
 
-  componentDidUpdate() {
-    let {key, params} = this.props.route;
-    let {isRefreshing} = (params || {});
-    if (isRefreshing) {
-      this.setState({isRefreshing: isRefreshing})
-      const setRefresh = this.props.navigation.setParams({
-        isRefreshing: false,
-        key: key
-      });
-      this.props.navigation.dispatch(setRefresh);
-      this.getStoreProdWithProd();
-    }
-  }
 
   componentDidMount() {
-    const {fn_stall} = this.props.global.simpleStore
+    GlobalUtil.setGoodsFresh(2)
+    const {global, navigation} = this.props
+    const {fn_stall} = global.simpleStore
     this.handleAuthItem('fn_stall', fn_stall ? fn_stall : '0')
     //showModal('加载中')
-    const {accessToken} = this.props.global;
+    const {accessToken} = global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
       //hideModal()
       this.handleAuthItem('strict_providing', store.strict_providing ? store.strict_providing : '0')
@@ -168,7 +145,11 @@ class GoodStoreDetailScene extends PureComponent {
     }).catch(() => {
       //hideModal()
     })
-    this.getStoreProdWithProd();
+    this.focus = navigation.addListener('focus', this.getStoreProdWithProd)
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   handleAuthItem = (authName, value) => {
@@ -228,7 +209,7 @@ class GoodStoreDetailScene extends PureComponent {
     }
   }
 
-  getStoreProdWithProd() {
+  getStoreProdWithProd = () => {
     this.getproduct()
     const {accessToken} = this.props.global;
     const storeId = this.state.store_id || 0;
@@ -315,8 +296,8 @@ class GoodStoreDetailScene extends PureComponent {
 
   onDoneProdUpdate = (pid, prodFields, spFields) => {
 
-    const {updatedCallback} = (this.props.route.params || {})
-    updatedCallback && updatedCallback(pid, prodFields, spFields)
+    // const {updatedCallback} = (this.props.route.params || {})
+    // updatedCallback && updatedCallback(pid, prodFields, spFields)
 
     const {product, store_prod} = this.state;
     const _p = {...product, ...prodFields}
@@ -351,144 +332,143 @@ class GoodStoreDetailScene extends PureComponent {
     const onSale = (store_prod || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (store_prod || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     const {accessToken} = this.props.global;
-    const sp = store_prod
-    const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
+    const applyingPrice = parseInt(store_prod.applying_price || store_prod.supply_price)
     return (
-      <Provider>
-        <View style={styles.page}>
-          <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
-          <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
-            {
-              product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
-            }
-            <View style={[styles.goods_info, styles.top_line]}>
-              <View style={[styles.goods_view]}>
-                <If condition={product_id != 0}>
-                  <Text style={styles.goods_name}> {product.name} <Text
-                    style={styles.goods_id}> (#{product.id}) </Text>
-                  </Text>
-                </If>
-                <If condition={product_id == 0}>
-                  <Text style={styles.goods_name}> {product.name} <Text
-                    style={styles.goods_id}> (#{product.id}) </Text>
-                  </Text>
-                </If>
-                {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
-                  return (
-                    <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
-                  );
-                })}
-              </View>
+      <View style={styles.page}>
+        <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
+          {
+            product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
+          }
+          <View style={[styles.goods_info, styles.top_line]}>
+            <View style={[styles.goods_view]}>
+              <If condition={product_id != 0}>
+                <Text style={styles.goods_name}> {product.name} <Text
+                  style={styles.goods_id}> (#{product.id}) </Text>
+                </Text>
+              </If>
+              <If condition={product_id == 0}>
+                <Text style={styles.goods_name}> {product.name} <Text
+                  style={styles.goods_id}> (#{product.id}) </Text>
+                </Text>
+              </If>
+              {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
+                return (
+                  <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
+                );
+              })}
             </View>
-            <If condition={vendorId != 68}>
-              <View style={{margin: 10}}>
-                <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
-                  <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
-                </View>
+          </View>
+          <If condition={vendorId != 68}>
+            <View style={{margin: 10}}>
+              <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
+                <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
+              </View>
+              <View style={{
+                flexDirection: "column",
+                justifyContent: "space-between",
+                backgroundColor: colors.white,
+                width: '98%',
+                borderRadius: pxToDp(10),
+                marginBottom: 10
+              }}>
                 <View style={{
-                  flexDirection: "column",
+                  paddingLeft: 10,
+                  flexDirection: "row",
                   justifyContent: "space-between",
-                  backgroundColor: colors.white,
-                  width: '98%',
-                  borderRadius: pxToDp(10),
-                  marginBottom: 10
+                  alignItems: "center",
                 }}>
-                  <View style={{
-                    paddingLeft: 10,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}>
-                    <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
-                    <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
-                      <Text style={styles.normalText}>
-                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}
-                      </Text>
-                      <Text style={styles.normalText}>{this.renderIcon(parseInt(store_prod.status))} </Text>
-                    </View>
+                  <Text style={{fontWeight: "bold", color: colors.color333}}>售卖状态</Text>
+                  <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
+                    <Text style={styles.normalText}>
+                      {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}
+                    </Text>
+                    <Text style={styles.normalText}>{this.renderIcon(parseInt(store_prod.status))} </Text>
                   </View>
-                  <View style={{flexDirection: "row"}}>
-                    <TouchableOpacity style={[activity === 'offer' ? styles.tabActivity : styles.tab]}
-                                      onPress={() => this.setState({activity: 'offer'})}>
-                      <Text style={activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
-                        报价
+                </View>
+                <View style={{flexDirection: "row"}}>
+                  <TouchableOpacity style={[activity === 'offer' ? styles.tabActivity : styles.tab]}
+                                    onPress={() => this.setState({activity: 'offer'})}>
+                    <Text style={activity === 'offer' ? styles.tabTextActivity : styles.tabText}>
+                      价格
+                    </Text>
+                  </TouchableOpacity>
+                  <If condition={onStrict}>
+                    <TouchableOpacity style={activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                                      onPress={() => this.setState({activity: 'inventory_num'})}>
+                      <Text style={activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
+                        库存数量
                       </Text>
                     </TouchableOpacity>
-                    <If condition={onStrict}>
-                      <TouchableOpacity style={activity === 'inventory_num' ? styles.tabActivity : styles.tab}
-                                        onPress={() => this.setState({activity: 'inventory_num'})}>
-                        <Text style={activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>
-                          库存数量
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
-                        onPress={() => this.setState({activity: 'inventory_attribute'})}>
-                        <Text style={activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
-                          库存属性
-                        </Text>
-                      </TouchableOpacity>
-                    </If>
-                  </View>
-                  {this.renderRuleStatusTab()}
+                    <TouchableOpacity
+                      style={activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
+                      onPress={() => this.setState({activity: 'inventory_attribute'})}>
+                      <Text style={activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>
+                        库存属性
+                      </Text>
+                    </TouchableOpacity>
+                  </If>
                 </View>
+                {this.renderRuleStatusTab()}
               </View>
-              {this.renderStall()}
-            </If>
-          </ScrollView>
-          <If condition={vendorId != 68}>
-            <View style={styles.bottomWrap}>
-              <If condition={onSale}>
-                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
-                  <Text style={styles.bottomText}>下架 </Text>
-                </TouchableOpacity>
-              </If>
-              <If condition={!onSale}>
-                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
-                  <Text style={styles.bottomText}>上架 </Text>
-                </TouchableOpacity>
-              </If>
-              <If condition={MORE_ITEM.length > 1}>
-                <ModalSelector style={[styles.toOnlineBtn]}
-                               data={MORE_ITEM}
-                               skin="customer"
-                               defaultKey={-999}
-                               onChange={value => this.onChange(value, store_prod)}>
-                  <Text style={styles.moreText}>
-                    {selectItem.label}
-                  </Text>
-                </ModalSelector>
-              </If>
-              <If condition={MORE_ITEM.length < 2}>
-                <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('set_price')}>
-                  <Text style={styles.moreText}>报价 </Text>
-                </TouchableOpacity>
-              </If>
             </View>
-            {this.renderModalStall()}
+            {this.renderStall()}
           </If>
-          <If condition={sp && product.id && vendorId != 68}>
-            <GoodItemEditBottom modalType={this.state.modalType}
-                                productName={product.name}
-                                pid={Number(sp.product_id)}
-                                skuName={product.sku_name}
-                                strictProviding={this.state.fnProviding}
-                                accessToken={accessToken}
-                                storeId={Number(sp.store_id)}
-                                currStatus={Number(sp.status)}
-                                doneProdUpdate={this.onDoneProdUpdate}
-                                onClose={() => this.setState({modalType: ''})}
-                                spId={Number(sp.id)}
-                                applyingPrice={applyingPrice}
-                                storePro={{...product, ...store_prod}}
-                                navigation={this.props.navigation}
-                                beforePrice={Number(sp.supply_price)}/>
-          </If>
-        </View>
-      </Provider>
+        </ScrollView>
+        <If condition={vendorId != 68}>
+          <View style={styles.bottomWrap}>
+            <If condition={onSale}>
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
+                <Text style={styles.bottomText}>下架 </Text>
+              </TouchableOpacity>
+            </If>
+            <If condition={!onSale}>
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
+                <Text style={styles.bottomText}>上架 </Text>
+              </TouchableOpacity>
+            </If>
+            <If condition={MORE_ITEM.length > 1}>
+              <ModalSelector style={[styles.toOnlineBtn]}
+                             data={MORE_ITEM}
+                             skin="customer"
+                             defaultKey={-999}
+                             onChange={value => this.onChange(value, store_prod)}>
+                <Text style={styles.moreText}>
+                  {selectItem.label}
+                </Text>
+              </ModalSelector>
+            </If>
+            <If condition={MORE_ITEM.length < 2}>
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                <Text style={styles.moreText}>价格 </Text>
+              </TouchableOpacity>
+            </If>
+          </View>
+          {this.renderModalStall()}
+        </If>
+        <If condition={store_prod && product.id && vendorId != 68}>
+          <GoodItemEditBottom modalType={this.state.modalType}
+                              productName={product.name}
+                              pid={Number(store_prod.product_id)}
+                              skuName={product.sku_name}
+                              strictProviding={this.state.fnProviding}
+                              accessToken={accessToken}
+                              storeId={Number(store_prod.store_id)}
+                              currStatus={Number(store_prod.status)}
+                              doneProdUpdate={this.onDoneProdUpdate}
+                              onClose={() => this.setState({modalType: ''})}
+                              spId={Number(store_prod.id)}
+                              applyingPrice={applyingPrice}
+                              storePro={{...product, ...store_prod}}
+                              navigation={this.props.navigation}
+                              beforePrice={Number(store_prod.supply_price)}/>
+        </If>
+      </View>
     );
   }
 
+  jumpToNewRetailPriceScene = (id) => {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {productId: id})
+  }
   renderStall = () => {
     const {selectedSpecArray} = this.state
     return (
@@ -628,10 +608,10 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
   onChange = (selectItem, store_prod) => {
-    const {ext_stores, selectedSpecArray} = this.state
+    const {ext_stores, selectedSpecArray,product} = this.state
     switch (selectItem.value) {
       case '1':
-        this.onOpenModal('set_price')
+        this.jumpToNewRetailPriceScene(product.id)
         break
       case '2':
         this.gotoStockCheck(store_prod)
@@ -716,7 +696,7 @@ class GoodStoreDetailScene extends PureComponent {
   };
 
   renderRuleStatusTab() {
-    let {activity, product, store_prod, fn_price_controlled} = this.state;
+    let {activity, product, store_prod} = this.state;
     return (
       <View style={{
         flexDirection: "column",
@@ -729,14 +709,15 @@ class GoodStoreDetailScene extends PureComponent {
           <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>
             {product.name}{product.sku_name && `[${product.sku_name}]`}
           </Text>
-          <View style={typeof store_prod.applying_price !== "undefined" && {
+          <View style={store_prod?.applying_price && {
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-around", flex: 1
+            justifyContent: "space-around",
+            flex: 1
           }}>
             <If condition={activity && activity === 'offer'}>
               <Text style={styles.normalText}>
-                {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
+                {`¥ ${store_prod?.show_price}`}
               </Text>
             </If>
             <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
@@ -749,7 +730,7 @@ class GoodStoreDetailScene extends PureComponent {
             </If>
             <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
               <Text style={styles.normalText}>
-                {`${store_prod.shelf_no ? store_prod.shelf_no : '无'}`}
+                {`${store_prod.shelf_no ?? '无'}`}
               </Text>
             </If>
           </View>
@@ -764,7 +745,7 @@ class GoodStoreDetailScene extends PureComponent {
               </Text>
               <If condition={activity === 'offer'}>
                 <Text style={styles.normalText}>
-                  {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`}
+                  {`¥ ${info.show_price}`}
                 </Text>
               </If>
               <If condition={typeof info.applying_price !== "undefined" && activity === 'offer'}>
@@ -779,7 +760,7 @@ class GoodStoreDetailScene extends PureComponent {
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
                 <Text style={styles.normalText}>
-                  {`${info.shelf_no ? info.shelf_no : '无'}`}
+                  {`${info.shelf_no ?? '无'}`}
                 </Text>
               </If>
             </View>

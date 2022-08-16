@@ -52,10 +52,10 @@ class StoreGoodsSearch extends Component {
 
   search = (showLoading = false) => {
     tool.debounces(() => {
-      const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+      const {searchKeywords} = this.state
       const {type, limit_store, prod_status} = this.props.route.params;
-      let params;
-      if (term) {
+      let params = {};
+      if (searchKeywords) {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
@@ -68,14 +68,15 @@ class StoreGoodsSearch extends Component {
           pageSize: this.state.pageNum,
           storeId: storeId,
         }
-        if ('upc' === codeType)
-          params['upc'] = term
-        else params['name'] = term
+        if ('upc' === codeType || !isNaN(parseFloat(searchKeywords)) && isFinite(searchKeywords))
+          params['upc'] = searchKeywords
+        else params['name'] = searchKeywords
         if (limit_store) {
           params['hideAreaHot'] = 1;
           params['limit_status'] = (prod_status || []).join(",");
         }
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+
           const totalPage = res.count / res.pageSize
           const isLastPage = res.page >= totalPage
           const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
@@ -102,7 +103,7 @@ class StoreGoodsSearch extends Component {
   }
 
   onLoadMore() {
-    let page = this.state.page
+    let {page} = this.state
     this.setState({page: page + 1}, () => this.search(true))
   }
 
@@ -122,11 +123,12 @@ class StoreGoodsSearch extends Component {
   }
 
   doneProdUpdate = (pid, prodFields, spFields) => {
-    const idx = this.state.goods.findIndex(g => `${g.id}` === `${pid}`);
-    const item = this.state.goods[idx];
+    const {goods} = this.state
+    const idx = goods.findIndex(g => `${g.id}` === `${pid}`);
+    const item = goods[idx];
     const removal = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
     if (removal) {
-      this.state.goods.splice(idx, 1)
+      goods.splice(idx, 1)
     } else {
       Object.keys(prodFields).map(k => {
         item[k] = prodFields[k]
@@ -134,9 +136,9 @@ class StoreGoodsSearch extends Component {
       Object.keys(spFields).map(k => {
         item['sp'][k] = spFields[k]
       })
-      this.state.goods[idx] = item;
+      goods[idx] = item;
     }
-    this.setState({goods: this.state.goods})
+    this.setState({goods: goods})
   }
 
   onOpenModal(modalType, product) {
@@ -195,18 +197,20 @@ class StoreGoodsSearch extends Component {
 
                            {onStrict ?
                              <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                               onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                               <Text style={{color: colors.color333}}>报价/库存 </Text>
+                                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                               <Text style={{color: colors.color333}}>价格/库存 </Text>
                              </TouchableOpacity> :
                              <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                               onPress={() => this.onOpenModal('set_price', product)}>
-                               <Text style={{color: colors.color333}}>报价 </Text>
+                                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                               <Text style={{color: colors.color333}}>价格 </Text>
                              </TouchableOpacity>
                            }
 
                          </View>}/>
   }
-
+  jumpToNewRetailPriceScene = (id) => {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {productId: id})
+  }
   gotoGoodDetail = (pid) => {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,

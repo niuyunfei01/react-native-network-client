@@ -35,6 +35,7 @@ class HttpUtils {
 
   static getOptions(method, params) {
     const options = {
+      credential: "include", //带上cookie发送请求请求
       method: method,
       headers: {
         request_time: new Date().toISOString(),
@@ -43,7 +44,7 @@ class HttpUtils {
         device_id: DeviceInfo.getUniqueId(),
         store_id: 0,
         vendor_id: 0,
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json'
       }
     }
@@ -145,7 +146,7 @@ class HttpUtils {
     }
   }
 
-  static get(url, params, getNetworkDelay = false) {
+  static get(url, params, getNetworkDelay = false,) {
     const props = this
     return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay)
   }

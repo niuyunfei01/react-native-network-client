@@ -348,12 +348,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ONLINE_STORE_PRODUCT} options={{headerTitle: '上架商品'}}
                       getComponent={() => require('../../scene/product/Goods/OnlineStoreProduct').default}
         />
-        <Stack.Screen name={Config.ROUTE_NEW_PRODUCT} options={{headerTitle: '新增商品'}}
-                      getComponent={() => require('../../scene/product/Goods/NewProduct').default}
-        />
-        <Stack.Screen name={Config.ROUTE_NEW_PRODUCT_DETAIL} options={{headerTitle: '新增商品'}}
-                      getComponent={() => require('../../scene/product/Goods/NewProductDetail').default}
-        />
+
         <Stack.Screen name={Config.ROUTE_CREATE_NEW_GOOD_REMIND} options={{headerTitle: '申请上新'}}
                       getComponent={() => require('../../scene/product/Goods/CreateApplyNewProductRemindScene').default}
         />
@@ -499,6 +494,9 @@ export const AppNavigator = (props) => {
                       options={{headerTitle: '自动呼叫配送介绍'}}
                       getComponent={() => require('../../scene/home/Delivery/AutoCallDelivery').default}
         />
+        <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE_NEW}
+                      options={{headerTitle: '零售价格'}}
+                      getComponent={() => require('../../scene/order/NewRetailPriceScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

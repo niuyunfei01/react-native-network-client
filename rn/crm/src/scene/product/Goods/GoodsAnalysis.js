@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
@@ -113,10 +113,9 @@ class GoodsAnalysis extends Component {
       <View style={styles.goodsRow} key={idx}>
         <View style={styles.goodsImageBox}>
           <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
-            <CachedImage
-              style={styles.goodsImage}
-              source={{uri: product.coverimg}}
-            />
+            <FastImage style={styles.goodsImage}
+                       resizeMode={FastImage.resizeMode.contain}
+                       source={{uri: product.coverimg}}/>
           </TouchableOpacity>
         </View>
         <View style={styles.goodsInfo}>

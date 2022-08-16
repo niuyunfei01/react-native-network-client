@@ -11,7 +11,7 @@ import color from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import Mapping from "../../../pubilc/Mapping";
 
@@ -196,8 +196,9 @@ class SearchGoods extends Component {
     return (
       <View style={styles.productRow} key={product.id}>
         <TouchableOpacity onPress={() => this.showBigImage(product)}>
-          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+          <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                     resizeMode={FastImage.resizeMode.contain}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         </TouchableOpacity>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>

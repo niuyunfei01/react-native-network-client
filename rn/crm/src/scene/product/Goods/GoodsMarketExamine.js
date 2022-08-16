@@ -9,7 +9,7 @@ import LoadMore from "react-native-loadmore";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import BigImage from "../../common/component/BigImage";
 import Config from "../../../pubilc/common/config";
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import pxToDp from "../../../pubilc/util/pxToDp";
 import color from "../../../pubilc/styles/colors";
 import JbbInput from "../../common/component/JbbInput";
@@ -161,10 +161,9 @@ class GoodsMarketExamine extends BaseComponent {
           onPress={() => this.showBigImage(product)}
           style={{width: pxToDp(150), height: pxToDp(150)}}
         >
-          <CachedImage
-            source={{uri: Config.staticUrl(product.coverimg)}}
-            style={{width: pxToDp(150), height: pxToDp(150)}}
-          />
+          <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                     resizeMode={FastImage.resizeMode.contain}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         </TouchableOpacity>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>

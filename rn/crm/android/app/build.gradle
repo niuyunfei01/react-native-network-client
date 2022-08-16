@@ -15,7 +15,7 @@ def enableProguardInReleaseBuilds = true
 
 def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", true);
-def enableSeparateBuildPerCPUArchitecture = true
+def enableSeparateBuildPerCPUArchitecture = false
 
 
 apply plugin: 'com.android.application'
@@ -56,12 +56,11 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION") {
         exclude group: 'com.google.code.gson'
     }
-    implementation ('com.squareup.okhttp3:logging-interceptor:3.10.0') {
-        exclude (group: 'com.squareup.okhttp3', module: 'okhttp')
+    implementation('com.squareup.okhttp3:logging-interceptor:3.10.0') {
+        exclude(group: 'com.squareup.okhttp3', module: 'okhttp')
     }
     implementation 'com.google.code.gson:gson:2.7'
     compileOnly 'com.github.bumptech.glide:glide:3.7.0'
-
     implementation 'com.squareup.picasso:picasso:2.5.2'
     compileOnly 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation 'org.xutils:xutils:3.3.36'
@@ -74,11 +73,11 @@ dependencies {
 
     //支持扫码时引入的，忘记用来干嘛的，先注释掉
     //implementation("com.google.zxing:core:3.3.3")
-
+    
     implementation('io.reactivex.rxjava2:rxjava:2.2.19')
     implementation 'id.zelory:compressor:2.1.1'
 
-    implementation ('com.xdandroid:hellodaemon:+') {
+    implementation('com.xdandroid:hellodaemon:+') {
         exclude module: 'io.reactivex.rxjava2'
     }
 
@@ -88,9 +87,9 @@ dependencies {
 
     implementation 'com.llew.huawei:verifier:1.1.1'
     implementation "com.newrelic.agent.android:android-agent:5.28.1"
-    implementation ("com.qiniu:qiniu-android-sdk:7.3.15") {
-        exclude (group: 'com.squareup.okhttp3', module: 'okhttp')
-        exclude (group: 'com.squareup.okio', module: 'okio')
+    implementation("com.qiniu:qiniu-android-sdk:7.3.15") {
+        exclude(group: 'com.squareup.okhttp3', module: 'okhttp')
+        exclude(group: 'com.squareup.okio', module: 'okio')
     }
     implementation project(':@react-native-community_geolocation')
     implementation project(':@react-native-community_clipboard')
@@ -115,6 +114,7 @@ dependencies {
     implementation (project(":react-native-ble-manager"))
     implementation (project(':react-native-svg'))
     implementation (project(':mixpanel-react-native'))
+    implementation project(':react-native-fast-image')
     implementation fileTree(dir: "../../node_modules/jpush-react-native/android/libs", include: ["*.jar"])
     implementation fileTree(dir: "../../node_modules/jcore-react-native/android/libs", include: ["*.jar"])
     implementation project(':jpush-react-native')  // 添加 jpush 依赖
@@ -149,8 +149,8 @@ android {
     splits {
         abi {
             reset()
-            enable false
-            universalApk false
+            enable enableSeparateBuildPerCPUArchitecture
+            universalApk enableSeparateBuildPerCPUArchitecture
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
@@ -161,7 +161,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
-        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
+        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
 
         packagingOptions {
             exclude '/lib/mips64/**'
