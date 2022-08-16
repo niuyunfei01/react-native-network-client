@@ -295,6 +295,7 @@ class RootScene extends PureComponent {
   }
 
   getRootView = () => {
+    global.isLoginToOrderList = false
     const {launchProps} = this.props;
     const {orderId, backPage, currStoreId} = launchProps;
     let initialRouteName = launchProps["_action"];
@@ -321,7 +322,7 @@ class RootScene extends PureComponent {
       }
     }
     nrRecordMetric("restore_redux", {
-      redux_time: this.passed_ms,
+      time: this.passed_ms,
       store_id: currStoreId ?? '未登录',
       login_user: currentUser ?? '未登录'
     })

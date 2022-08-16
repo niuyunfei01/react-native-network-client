@@ -57,10 +57,32 @@ import native from "../../../pubilc/util/native";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/util/tool";
 import {Dialog} from "../../../weui";
-import SearchStore from "../../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {SvgXml} from "react-native-svg";
+import {
+  achievement,
+  commodityAdjustment,
+  contactCustomerService,
+  dataAnalysis,
+  deliveryManagement,
+  employeeManagement, expenseBill,
+  help, messageRingtone,
+  notice,
+  operatingIncome,
+  orderCompensation,
+  orderSearch,
+  platformSettings,
+  priceAdjustmentRecord,
+  printSettings,
+  pushSettings,
+  settings,
+  settlementRecord,
+  shareActivity, shopManagement, stallIcon,
+  versionInformation,
+  wallet
+} from "../../../svg/svg";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -1162,10 +1184,8 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={this.distributionAnalysis}
             activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/distribution_analysis.png")}
-            />
+            <SvgXml xml={dataAnalysis()} width={28} height={28} style={[block_styles.block_img]}/>
+
             <Text style={[block_styles.block_name]}>数据分析 </Text>
           </TouchableOpacity>
         </If>
@@ -1173,14 +1193,15 @@ class MineScene extends PureComponent {
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/jiesuanjilu_.png")}/>
+            <SvgXml xml={settlementRecord()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>结算记录</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/dingdansousuo_.png")}/>
+            <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
+
             <Text style={[block_styles.block_name]}>调价记录</Text>
           </TouchableOpacity>
         </If>
@@ -1198,7 +1219,7 @@ class MineScene extends PureComponent {
               }
             }}
             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
+            <SvgXml xml={achievement()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         </If>
@@ -1207,10 +1228,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
             activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/yunyingshouyi_.png")}
-            />
+            <SvgXml xml={orderCompensation()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>订单补偿</Text>
           </TouchableOpacity>
         </If>
@@ -1218,7 +1236,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={this.storeManager}
           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/dianpu_.png")}/>
+          <SvgXml xml={shopManagement()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
@@ -1231,7 +1249,7 @@ class MineScene extends PureComponent {
           });
         }}
                           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/yuangong_.png")}/>
+          <SvgXml xml={employeeManagement()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
         <If condition={currVersion === Cts.VERSION_DIRECT}>
@@ -1264,7 +1282,7 @@ class MineScene extends PureComponent {
             }}
             activeOpacity={customerOpacity}
           >
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
+            <SvgXml xml={achievement()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         </If>
@@ -1274,10 +1292,8 @@ class MineScene extends PureComponent {
             onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
             activeOpacity={customerOpacity}
           >
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/yunyingshouyi_.png")}
-            />
+            <SvgXml xml={operatingIncome()} width={28} height={28} style={[block_styles.block_img]}/>
+
             <Text style={[block_styles.block_name]}>运营收益</Text>
           </TouchableOpacity>
         </If>
@@ -1285,8 +1301,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/yunyingshouyi_.png")}/>
+            <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>钱包</Text>
           </TouchableOpacity>
         </If>
@@ -1294,8 +1309,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/yunyingshouyi_.png")}/>
+            <SvgXml xml={expenseBill()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>费用账单</Text>
           </TouchableOpacity>
         </If>
@@ -1303,30 +1317,27 @@ class MineScene extends PureComponent {
         <TouchableOpacity style={[block_styles.block_box]}
                           onPress={this.platformSetting}
                           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-                 source={require("../../../img/My/yunyingshouyi_.png")}/>
+          <SvgXml xml={platformSettings()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>平台设置</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.deliverySetting}
                           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-                 source={require("../../../img/My/yunyingshouyi_.png")}/>
+          <SvgXml xml={deliveryManagement()} width={28} height={28} style={[block_styles.block_img]}/>
+
           <Text style={[block_styles.block_name]}>配送管理</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.printerSetting}
                           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-                 source={require("../../../img/My/PrintSetting.png")}/>
+          <SvgXml xml={printSettings()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>打印设置</Text>
         </TouchableOpacity>
         <If condition={Platform.OS !== 'ios'}>
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_INFORM)}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/inform.png")}/>
+            <SvgXml xml={messageRingtone()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>消息与铃声</Text>
           </TouchableOpacity>
         </If>
@@ -1351,8 +1362,7 @@ class MineScene extends PureComponent {
         <TouchableOpacity style={[block_styles.block_box]}
                           onPress={this.orderSearch}
                           activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-                 source={require("../../../img/My/dingdansousuo_.png")}/>
+          <SvgXml xml={orderSearch()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
         <If condition={show_goods_monitor}>
@@ -1361,16 +1371,13 @@ class MineScene extends PureComponent {
             onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
             activeOpacity={customerOpacity}>
             {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../../img/My/shangpinqingbao_.png")}
-            />
+            <SvgXml xml={commodityAdjustment()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>商品调整</Text>
           </TouchableOpacity>
         </If>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.pushSetting} activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/push.png")}/>
+          <SvgXml xml={pushSettings()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
@@ -1381,7 +1388,7 @@ class MineScene extends PureComponent {
           <If condition={have_not_read_advice > 0}>
             <View style={[block_styles.notice_point]}/>
           </If>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/inform.png")}/>
+          <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>公告通知</Text>
         </TouchableOpacity>
         <If condition={fn_stall === '1'}>
@@ -1389,9 +1396,8 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
             activeOpacity={customerOpacity}>
-            <View style={block_styles.iconWrap}>
-              <FontAwesome5 name={'wallet'} size={16} color={colors.white}/>
-            </View>
+
+            <SvgXml xml={stallIcon()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>摊位结算 </Text>
           </TouchableOpacity>
         </If>
@@ -1400,7 +1406,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={{uri: activity_img}}/>
+            <SvgXml xml={shareActivity()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>老带新活动</Text>
           </TouchableOpacity>
         </If>
@@ -1427,12 +1433,12 @@ class MineScene extends PureComponent {
         </If>
 
         <TouchableOpacity style={[block_styles.block_box]} activeOpacity={customerOpacity} onPress={this.helpPage}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/help_.png")}/>
+          <SvgXml xml={help()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.oncallservice} activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/fuwu_.png")}/>
+          <SvgXml xml={contactCustomerService()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>联系客服</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -1440,11 +1446,11 @@ class MineScene extends PureComponent {
           activeOpacity={customerOpacity}
           onPress={this.versionInfo}
         >
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/banben_.png")}/>
+          <SvgXml xml={versionInformation()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.settingPage} activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]} source={require("../../../img/My/shezhi_.png")}/>
+          <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
@@ -1458,7 +1464,6 @@ class MineScene extends PureComponent {
       <View style={[css]}>
         <Text style={{color: colors.colorDDD}}>@版权所有</Text>
         <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
-        {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../../pubilc/img/Login/ic_launcher.png")} />*/}
       </View>
     );
   }
@@ -1583,33 +1588,6 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>反馈与业绩</Text>
         </TouchableOpacity>
-        {/* TODO 该页面闪退影响发布，修复后再上线 */}
-        {/*<TouchableOpacity*/}
-        {/*  style={[block_styles.block_box]}*/}
-        {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}*/}
-        {/*  activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*  <Image*/}
-        {/*    style={[block_styles.block_img]}*/}
-        {/*    source={require("../../../pubilc/img/My/sppingjia_.png")}*/}
-        {/*  />*/}
-        {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
-        {/*</TouchableOpacity>*/}
-        {/*<TouchableOpacity*/}
-        {/*  style={[block_styles.block_box]}*/}
-        {/*  onPress={() => {*/}
-        {/*    let path = `/stores/quick_task_list.html${token}`;*/}
-        {/*    let url = Config.serverUrl(path, Config.https);*/}
-        {/*    this.onPress(Config.ROUTE_WEB, {url: url});*/}
-        {/*  }}*/}
-        {/*  activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*  <Image*/}
-        {/*    style={[block_styles.block_img]}*/}
-        {/*    source={require("../../../pubilc/img/Mine/icon_mine_collection_2x.png")}*/}
-        {/*  />*/}
-        {/*  <Text style={[block_styles.block_name]}>老的提醒</Text>*/}
-        {/*</TouchableOpacity>*/}
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
@@ -1927,16 +1905,6 @@ const block_styles = StyleSheet.create({
     borderColor: colors.main_back,
     borderWidth: pxToDp(1),
     alignItems: "center"
-  },
-  iconWrap: {
-    borderRadius: 4,
-    marginTop: pxToDp(30),
-    marginBottom: pxToDp(16),
-    width: pxToDp(60),
-    height: pxToDp(60),
-    backgroundColor: '#F5A61B',
-    alignItems: 'center',
-    justifyContent: 'center'
   },
   block_img: {
     marginTop: pxToDp(30),

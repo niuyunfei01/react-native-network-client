@@ -8,7 +8,7 @@ import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import Mapping from "../../../pubilc/Mapping";
 
@@ -154,8 +154,9 @@ class InventoryItems extends Component {
     return (
       <View style={styles.productRow} key={item.product_id}>
         <TouchableOpacity onPress={() => this.showBigImage(item)}>
-          <CachedImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
-                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+          <FastImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
+                     resizeMode={FastImage.resizeMode.contain}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         </TouchableOpacity>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>

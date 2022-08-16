@@ -25,15 +25,14 @@ class NextSchedule extends React.Component {
     }
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.fetchSchedule()
   }
 
   fetchSchedule() {
-    const self = this
-    const uri = `/api/user_today_schedule?access_token=${self.props.global.accessToken}`
+    const uri = `/api/user_today_schedule?access_token=${this.props.global.accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
-      self.setState({schedule: res})
+      this.setState({schedule: res})
     })
   }
 
@@ -62,22 +61,22 @@ class NextSchedule extends React.Component {
         <View style={styles.title}>
           <Text style={styles.mainTitle}>今天安排 </Text>
           <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_WORKER_SCHEDULE)}>
-            <View>
-              <Text style={styles.link}>查看全部> </Text>
-            </View>
+
+            <Text style={styles.link}>查看全部> </Text>
+
           </TouchableOpacity>
         </View>
         <View style={styles.scheduleContainer}>
           {this.state.schedule.schedules.length ? (
-            <View>
-              <For of={this.state.schedule.schedules} each='item' index='idx'>
-                <Text key={idx}>{item} </Text>
-              </For>
-            </View>
+
+            <For of={this.state.schedule.schedules} each='item' index='idx'>
+              <Text key={idx}>{item} </Text>
+            </For>
+
           ) : (
-            <View>
-              <Text style={{color: colors.color333}}>未知今日安排 </Text>
-            </View>
+
+            <Text style={{color: colors.color333}}>未知今日安排 </Text>
+
           )}
 
           {this.renderWeather()}

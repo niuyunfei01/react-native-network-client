@@ -30,7 +30,7 @@ export function jsonWithTpl2(url, data, okFn, failFn) {
 
 /**
  *
- * @deprecated 请优先使用 getWithTpl2
+ *  请优先使用 getWithTpl2
  * @param url
  * @param okFn
  * @param failFn
