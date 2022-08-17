@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = {...(Text.defaultProps || {}), fontFamily: '', color: '#333', allowFontScaling: false};
+Text.defaultProps = {...(Text.defaultProps || {}), fontFamily: '', color: '#333', allowFontScaling: true};
 TextInput.defaultProps = {...(TextInput.defaultProps || {}), allowFontScaling: false};
 
 class RootScene extends PureComponent {

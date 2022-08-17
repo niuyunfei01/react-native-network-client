@@ -1064,7 +1064,7 @@ class MineScene extends PureComponent {
             <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
                               activeOpacity={customerOpacity}>
               <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
-                <Text style={block_styles.deliveryTipText}>
+                <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
                   {content}
                 </Text>
               </View>
@@ -1195,7 +1195,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
                             activeOpacity={customerOpacity}>
             <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
-              <Text style={block_styles.deliveryTipText}>
+              <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
                 {content}
               </Text>
             </View>

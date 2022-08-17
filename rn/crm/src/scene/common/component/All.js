@@ -189,7 +189,7 @@ class Yuan extends Component {
           {icon ? <Icon name={icon} color={ic} size={size}/> : null}
 
           {t ? (
-            <Text style={fontStyle}>
+            <Text style={fontStyle} allowFontScaling={false}>
               {t}
             </Text>
           ) : null}
@@ -259,7 +259,7 @@ class Button extends Component {
         onPress={onPress}
       >
         {t ? (
-          <Text style={fontStyle}>
+          <Text style={fontStyle} allowFontScaling={false}>
             {t}
           </Text>
         ) : (
@@ -289,7 +289,7 @@ class Line extends Component {
         }}
       >
         {this.props.t ? (
-          <Text style={fontStyle}>
+          <Text style={fontStyle} allowFontScaling={false}>
             {t}
           </Text>
         ) : null}
@@ -348,7 +348,7 @@ class Button1 extends Component {
         onPress={onPress}
       >
         {t ? (
-          <Text style={fontStyle}>
+          <Text style={fontStyle} allowFontScaling={false}>
             {t}
           </Text>
         ) : (
