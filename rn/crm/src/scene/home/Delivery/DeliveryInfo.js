@@ -13,6 +13,7 @@ import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
+import native from "../../../pubilc/util/native";
 
 let width = Dimensions.get("window").width;
 
