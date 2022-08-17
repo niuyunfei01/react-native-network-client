@@ -8,6 +8,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View
 } from "react-native";
 
@@ -47,8 +48,8 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
-
+Text.defaultProps = {...(Text.defaultProps || {}), fontFamily: '', color: '#333', allowFontScaling: false};
+TextInput.defaultProps = {...(TextInput.defaultProps || {}), allowFontScaling: false};
 
 class RootScene extends PureComponent {
   constructor() {

@@ -609,9 +609,7 @@ class MineScene extends PureComponent {
 
   getHuichuan = (currStoreId, accessToken) => {
     const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {
-      store_id: currStoreId
-    }).then(res => {
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then(res => {
       this.setState({
         title: res.title,
         label: res.sync_info.label,
@@ -1011,7 +1009,9 @@ class MineScene extends PureComponent {
   }
 
   renderOftenUse = () => {
-    const {is_service_mgr, fnPriceControlled, allow_analys, wsb_store_account} = this.state
+    const {
+      is_service_mgr, fnPriceControlled, allow_analys, wsb_store_account, color, content, showComesback
+    } = this.state
     const {global} = this.props
     let {co_type} = tool.vendor(global);
     if (!allow_analys && is_service_mgr && fnPriceControlled > 0)
@@ -1060,9 +1060,14 @@ class MineScene extends PureComponent {
               <Text style={[block_styles.block_name]}>调价记录</Text>
             </TouchableOpacity>
           </If>
-          <If condition={co_type === 'peisong'}>
+          <If condition={co_type === 'peisong' && showComesback}>
             <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
                               activeOpacity={customerOpacity}>
+              <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
+                <Text style={block_styles.deliveryTipText}>
+                  {content}
+                </Text>
+              </View>
               <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
               <Text style={[block_styles.block_name]}>配送回传</Text>
             </TouchableOpacity>
@@ -1089,7 +1094,7 @@ class MineScene extends PureComponent {
 
     nrInteraction(MineScene.name)
 
-    let {currVersion, is_mgr, is_helper, showComesback} = this.state;
+    let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, simpleStore} = global
     const {added_service} = simpleStore
@@ -1110,10 +1115,6 @@ class MineScene extends PureComponent {
           {this.renderHeader()}
           {this.renderStoreStatus()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
-
-          <If condition={showComesback}>
-            {this.renderHuichuan()}
-          </If>
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
@@ -1175,49 +1176,33 @@ class MineScene extends PureComponent {
     this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
 
   }
-  renderHuichuan = () => {
-    let {title, label, content, color, footer} = this.state;
-    return (
-      <TouchableOpacity onPress={this.jumpToHuiChuan} style={{
-        backgroundColor: colors.white,
-        paddingVertical: 12,
-        paddingHorizontal: 15,
-        flexDirection: 'row',
-        marginBottom: 12,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <View>
-          <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>
-            {label}
-            <Text style={{fontSize: 14, color: color, fontWeight: 'bold'}}>
-              {content}
-            </Text>
-          </Text>
-          <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
-        </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
-      </TouchableOpacity>
-    )
-  }
+
 
   renderStoreBlock = () => {
     const {currentUser, accessToken, config, simpleStore} = this.props.global;
     const {show_goods_monitor = false, enabled_good_mgr = false} = config;
     let token = `?access_token=${accessToken}`;
     let {
-      currVendorId,
-      currVersion,
-      is_mgr,
-      is_helper,
-      is_service_mgr,
-      fnPriceControlled,
-      fnProfitControlled,activity_url, activity_img, wsb_store_account
+      currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled, activity_url,
+      activity_img, wsb_store_account, color, content, showComesback
     } = this.state
+    const {global} = this.props
+    let {co_type} = tool.vendor(global);
     const {fn_stall} = simpleStore
     return (
       <View style={[block_styles.bottomWrap]}>
+        <If condition={co_type !== 'peisong' && showComesback}>
+          <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
+                            activeOpacity={customerOpacity}>
+            <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
+              <Text style={block_styles.deliveryTipText}>
+                {content}
+              </Text>
+            </View>
+            <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>配送回传</Text>
+          </TouchableOpacity>
+        </If>
         <TouchableOpacity style={[block_styles.block_box]} onPress={this.orderSearch} activeOpacity={customerOpacity}>
           <SvgXml xml={orderSearch()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
@@ -2040,6 +2025,18 @@ const block_styles = StyleSheet.create({
     right: pxToDp(60),
     top: pxToDp(20),
     zIndex: 99
+  },
+  deliveryTip: {
+    width: 41,
+    height: 11,
+    borderRadius: 7,
+    right: 12,
+    top: pxToDp(20),
+    position: 'absolute',
+    zIndex: 99,
+  },
+  deliveryTipText: {
+    fontSize: 7, fontWeight: '400', color: colors.white, lineHeight: 9, textAlign: 'center'
   }
 });
 

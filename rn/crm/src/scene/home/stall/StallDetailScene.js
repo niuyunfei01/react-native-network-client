@@ -445,7 +445,7 @@ class StallDetailScene extends PureComponent {
               金额
             </Text>
             <TextInput style={styles.modalContentRightTextInput}
-                       allowFontScaling={false}
+
                        value={modalContentObj.money}
                        placeholderTextColor={colors.colorDDD}
                        onChangeText={text => this.onChangeText(text, 'money')}
@@ -457,7 +457,7 @@ class StallDetailScene extends PureComponent {
               备注
             </Text>
             <TextInput style={styles.modalContentRightMultipleTextInput}
-                       allowFontScaling={false}
+
                        placeholderTextColor={colors.colorDDD}
                        multiline={true}
                        onChangeText={text => this.onChangeText(text, 'remark')}
