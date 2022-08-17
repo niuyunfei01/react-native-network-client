@@ -526,7 +526,7 @@ class SettingScene extends PureComponent {
             <Text style={styles.item_title}>自动打包 </Text>
           </View>
           <For index='idx' each='item' of={auto_pack_setting_labels}>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity key={idx} onPress={() => {
               if (auto_pack_done !== Number(idx)) {
                 this.save_auto_pack_done(Number(idx))
               }
@@ -611,29 +611,25 @@ class SettingScene extends PureComponent {
   }
 
   renderServer = () => {
-    const host = Config.hostPort();
+    const host = Config.hostPort()
     let {servers} = this.state;
     return (
-      <View>
-        <View style={styles.item_body}>
-          <View style={styles.item_head}>
-            <Text style={styles.item_title}>选择服务器 </Text>
-          </View>
-          <For index='idx' each='item' of={servers}>
-            <TouchableOpacity onPress={() => {
-              this.onServerSelected(item.host)
-            }}
-                              style={styles.item_row}>
-              <Text style={styles.row_label}>{item.name} </Text>
-              <If condition={host === item.host}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
-              </If>
-            </TouchableOpacity>
-          </For>
+
+      <View style={styles.item_body}>
+        <View style={styles.item_head}>
+          <Text style={styles.item_title}>选择服务器 </Text>
         </View>
+        <For index='idx' each='item' of={servers}>
+          <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
+            <Text style={styles.row_label}>{item.name} </Text>
+            <If condition={host === item.host}>
+              <Entypo name={'check'} style={{
+                fontSize: 22,
+                color: colors.main_color,
+              }}/>
+            </If>
+          </TouchableOpacity>
+        </For>
       </View>
     )
   }

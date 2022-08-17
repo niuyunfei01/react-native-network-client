@@ -36,7 +36,6 @@ import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import JPush from "jpush-react-native";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
@@ -65,24 +64,25 @@ import {
   achievement,
   commodityAdjustment,
   contactCustomerService,
-  dataAnalysis,
+  dataAnalysis, delivery,
   deliveryManagement,
   employeeManagement, expenseBill,
   help, messageRingtone,
   notice,
   operatingIncome,
   orderCompensation,
-  orderSearch,
+  orderSearch, pencilIcon,
   platformSettings,
   priceAdjustmentRecord,
   printSettings,
-  pushSettings,
+  pushSettings, rightArrow,
   settings,
   settlementRecord,
-  shareActivity, shopManagement, stallIcon,
+  shareActivity, shopManagement, stallIcon, switchStore,
   versionInformation,
   wallet
 } from "../../../svg/svg";
+import {LineView, Styles} from "../GoodsIncrementService/GoodsIncrementServiceStyle";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -124,6 +124,8 @@ function FetchView({navigation, onRefresh}) {
 
 const customerOpacity = 0.6;
 const time = dayjs().format('YYYY-MM-DD')
+let hasPriceControl = false
+let hasAllowAnalys = true
 
 class MineScene extends PureComponent {
   constructor(props) {
@@ -607,9 +609,7 @@ class MineScene extends PureComponent {
 
   getHuichuan = (currStoreId, accessToken) => {
     const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {
-      store_id: currStoreId
-    }).then(res => {
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then(res => {
       this.setState({
         title: res.title,
         label: res.sync_info.label,
@@ -823,168 +823,139 @@ class MineScene extends PureComponent {
     }
   }
 
-  renderHeader = () => {
+  jumpToAddStore = () => {
     const {navigation} = this.props
-    const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
-    let {currStoreName, is_mgr} = this.state
-    let currStoreNameStr = ''
+    let {is_mgr} = this.state
+    InteractionManager.runAfterInteractions(() => {
+      navigation.navigate(Config.ROUTE_STORE_ADD, {
+        btn_type: "edit",
+        is_mgr: is_mgr,
+        editStoreId: this.props.global.currStoreId
+      });
+    });
+  }
+
+  renderHeader = () => {
+
+    let {currStoreName} = this.state
+    let currStoreNameStr
     if (currStoreName && currStoreName.length >= 13) {
       currStoreNameStr = currStoreName.substring(0, 13) + '...'
     } else {
       currStoreNameStr = currStoreName
     }
     return (
-      <View style={[styles.between, header_styles.container, {position: "relative"}]}>
-        <View style={[header_styles.main_box]}>
-          <View style={{flexDirection: 'row'}}>
-            <JbbText style={header_styles.shop_name}>
-              {currStoreNameStr}
-            </JbbText>
-            <TouchableOpacity
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  navigation.navigate(Config.ROUTE_STORE_ADD, {
-                    btn_type: "edit",
-                    is_mgr: is_mgr,
-                    editStoreId: this.props.global.currStoreId,
-                    actionBeforeBack: resp => {
-                    }
-                  });
-                });
-              }}>
-
-              <FontAwesome name='pencil-square-o' style={{
-                color: colors.title_color,
-                fontSize: pxToEm(30),
-                fontWeight: "bold",
-                marginVertical: pxToDp(30),
-                lineHeight: pxToDp(36),
-                width: pxToDp(42),
-                height: pxToDp(36),
-                marginLeft: pxToDp(35),
-              }}/>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={{height: pxToDp(85), width: 200}}
-                            onPress={() => this.onPress(Config.ROUTE_STORE_SELECT)}>
-            <View style={{flexDirection: "row"}}>
-              <FontAwesome name="exchange" style={header_styles.change_shop}/>
-              <Text style={header_styles.change_shop}>切换门店 </Text>
-            </View>
+      <View style={[header_styles.main_box]}>
+        <View style={header_styles.row}>
+          <JbbText style={header_styles.shop_name}>
+            {currStoreNameStr}
+          </JbbText>
+          <TouchableOpacity onPress={this.jumpToAddStore}>
+            <SvgXml xml={pencilIcon(colors.color333, 18, 18)} style={styles.modifyStore}/>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{position: "absolute", right: 0, top: "20%"}}
-                          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                            updateStoreStatusCb: (storeStatus) => {
-                              this.setState({storeStatus: storeStatus})
-                            }
-                          })}>
-          <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
-            <Text style={[statusColorStyle, {
-              fontSize: pxToEm(40),
-              fontWeight: 'bold'
-            }]}>{this.state.storeStatus.all_status_text} </Text>
+
+        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_STORE_SELECT)}>
+          <View style={header_styles.row}>
+            <SvgXml xml={switchStore(colors.main_color, 18, 18)}/>
+            <Text style={header_styles.change_shop}>切换门店 </Text>
           </View>
         </TouchableOpacity>
       </View>
     );
   }
 
+  jumpToStoreStatus = () => {
+    this.onPress(Config.ROUTE_STORE_STATUS, {
+      updateStoreStatusCb: (storeStatus) => {
+        this.setState({storeStatus: storeStatus})
+      }
+    })
+  }
+  renderStoreStatus = () => {
+    let {storeStatus} = this.state
+    const statusColorStyle = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
+    const statusFlag = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.closeFlag : styles.noExtStoreFlag) : styles.openStoreFlag;
+    const storeStatusWrap = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? header_styles.closeStoreStatusWrap : header_styles.noExtStoreStatusWrap) : header_styles.openStoreStatusWrap;
+    const rightStatus = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? '#EE2626' : '#409EFF') : colors.main_color
+    return (
+      <TouchableOpacity style={storeStatusWrap} onPress={this.jumpToStoreStatus}>
+        <View style={header_styles.row}>
+          <View style={statusFlag}/>
+          <View style={[header_styles.icon_open]}>
+            <Text style={[statusColorStyle, {fontSize: 14, fontWeight: 'bold'}]}>
+              {storeStatus.all_status_text}
+            </Text>
+          </View>
+        </View>
+        <SvgXml xml={rightArrow(rightStatus)}/>
+      </TouchableOpacity>
+    )
+  }
+
+  jumpToUser = () => {
+    const {global} = this.props;
+    const {currentUser} = global;
+    this.onPress(Config.ROUTE_USER, {
+      type: "mine",
+      currentUser: currentUser,
+      currVendorId: this.state.currVendorId,
+      screen_name: this.state.screen_name,
+      mobile_phone: this.state.mobile_phone,
+      cover_image: this.state.cover_image
+    })
+  }
+
+  jumpToAccountFill = () => {
+    const {navigation} = this.props;
+    this.mixpanel.track('我的_充值')
+    navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+  }
+
   renderManager = () => {
     let {
-      turnover,
-      fnPriceControlled,
-      fnProfitControlled,
-      turnover_new,
-      title_new,
-      order_num_new,
-      cover_image
+      turnover, fnPriceControlled, fnProfitControlled, turnover_new, title_new, order_num_new, cover_image,
+      wsb_store_account
     } = this.state;
-    const {navigation, global} = this.props;
-    // let CurrentDistributionBalance = {}
-    // DistributionBalance && DistributionBalance.map((item, index) => {
-    //   if (index === 0) {
-    //     CurrentDistributionBalance = item
-    //   }
-    // })
-    const {currentUser} = global;
+
     return (
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={() =>
-          this.onPress(Config.ROUTE_USER, {
-            type: "mine",
-            currentUser: currentUser,
-            currVendorId: this.state.currVendorId,
-            screen_name: this.state.screen_name,
-            mobile_phone: this.state.mobile_phone,
-            cover_image: this.state.cover_image
-          })
-        }
-      >
+      <TouchableOpacity activeOpacity={1} onPress={this.jumpToUser}>
 
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
             source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
           />
-          <View style={[worker_styles.worker_box]}>
+
+          <View style={[worker_styles.sales_box]}>
             <Text style={worker_styles.worker_name}>
               {(this.state.screen_name || "").substring(0, 4)}
             </Text>
-          </View>
-          <View style={[worker_styles.sales_box]}>
             <Text style={[worker_styles.sale_text]}>
               {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
             </Text>
             {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
-                <TouchableOpacity
-                  activeOpacity={1}
-                  onPress={() => {
-                    this.setState({FnPriceMsg: true});
-                  }}
-                >
+                <TouchableOpacity activeOpacity={1} onPress={() => this.setState({FnPriceMsg: true})}>
                   <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
                     预计最低收益: {!isNaN(turnover) && "¥"}{turnover}&nbsp;
-                    <FontAwesome
-                      name="question-circle"
-                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
-                    />
+                    <FontAwesome name="question-circle" color={'#00aeff'} size={16}/>
                   </Text>
                 </TouchableOpacity>
               ) :
-              <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
+              <Text style={[worker_styles.sale_text]}>
                 {title_new}: ¥{turnover_new}
               </Text>
             }
           </View>
-          <If condition={this.state.wsb_store_account === 1}>
-            <TouchableOpacity onPress={() => {
-              this.mixpanel.track('我的_充值')
-              navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
-            }}
-                              style={{
-                                marginTop: pxToDp(45),
-                                marginLeft: pxToDp(25),
-                                position: "absolute",
-                                top: 0,
-                                right: 40
-                              }}>
-              <View style={{
-                width: pxToDp(96),
-                height: pxToDp(46),
-                backgroundColor: colors.main_color,
-                marginRight: 8,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
+          <If condition={wsb_store_account === 1}>
+            <TouchableOpacity onPress={this.jumpToAccountFill} style={worker_styles.accountBill}>
+              <View style={worker_styles.accountBillWrap}>
                 <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
               </View>
             </TouchableOpacity>
           </If>
           <View style={[worker_styles.chevron_right]}>
-            <Entypo name="chevron-thin-right" style={[worker_styles.right_btn]}/>
+            <SvgXml xml={rightArrow(colors.main_color)} style={[worker_styles.right_btn]}/>
           </View>
         </View>
       </TouchableOpacity>
@@ -995,19 +966,7 @@ class MineScene extends PureComponent {
     const {currentUser} = this.props.global;
     const {cover_image} = this.state
     return (
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={() =>
-          this.onPress(Config.ROUTE_USER, {
-            type: "mine",
-            currentUser: currentUser,
-            currVendorId: this.state.currVendorId,
-            screen_name: this.state.screen_name,
-            mobile_phone: this.state.mobile_phone,
-            cover_image: this.state.cover_image
-          })
-        }
-      >
+      <TouchableOpacity activeOpacity={1} onPress={this.jumpToUser}>
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
@@ -1044,11 +1003,98 @@ class MineScene extends PureComponent {
     );
   }
 
+  selfDelivery = () => {
+    this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+    this.mixpanel.track('我的_查看回传率')
+  }
+
+  renderOftenUse = () => {
+    const {
+      is_service_mgr, fnPriceControlled, allow_analys, wsb_store_account, color, content, showComesback
+    } = this.state
+    const {global} = this.props
+    let {co_type} = tool.vendor(global);
+    if (!allow_analys && is_service_mgr && fnPriceControlled > 0)
+      hasPriceControl = true
+    if (fnPriceControlled > 0)
+      hasAllowAnalys = false
+    return (
+      <View style={[Styles.zoneWrap, {marginBottom: 8}]}>
+        <Text style={Styles.headerTitleText}>
+          常用功能
+        </Text>
+        <LineView/>
+        <View style={header_styles.row}>
+          <If condition={wsb_store_account === 1}>
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
+                              activeOpacity={customerOpacity}>
+              <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
+              <Text style={[block_styles.block_name]}>钱包</Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={wsb_store_account !== 1 && fnPriceControlled > 0}>
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
+                              activeOpacity={customerOpacity}>
+              <SvgXml xml={settlementRecord()} width={28} height={28} style={[block_styles.block_img]}/>
+              <Text style={[block_styles.block_name]}>结算记录</Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={allow_analys || is_service_mgr}>
+            <TouchableOpacity
+              style={[block_styles.block_box]}
+              onPress={this.distributionAnalysis}
+              activeOpacity={customerOpacity}>
+              <SvgXml xml={dataAnalysis()} width={28} height={28} style={[block_styles.block_img]}/>
+
+              <Text style={[block_styles.block_name]}>数据分析 </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={!hasAllowAnalys}>
+            <TouchableOpacity
+              style={[block_styles.block_box]}
+              onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
+              activeOpacity={customerOpacity}>
+              <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
+              <Text style={[block_styles.block_name]}>调价记录</Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={co_type === 'peisong' && showComesback}>
+            <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
+                              activeOpacity={customerOpacity}>
+              <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
+                <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
+                  {content}
+                </Text>
+              </View>
+              <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
+              <Text style={[block_styles.block_name]}>配送回传</Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={co_type !== 'peisong'}>
+            <TouchableOpacity style={[block_styles.block_box]} onPress={this.settingPage}
+                              activeOpacity={customerOpacity}>
+              <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
+              <Text style={[block_styles.block_name]}>设置</Text>
+            </TouchableOpacity>
+          </If>
+          <TouchableOpacity style={[block_styles.block_box]} onPress={this.oncallservice}
+                            activeOpacity={customerOpacity}>
+            <SvgXml xml={contactCustomerService()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>联系客服</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
+    )
+  }
+
   render() {
 
     nrInteraction(MineScene.name)
 
-    let {currVersion, is_mgr, is_helper, showComesback} = this.state;
+    let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, simpleStore} = global
     const {added_service} = simpleStore
@@ -1067,18 +1113,15 @@ class MineScene extends PureComponent {
           style={{backgroundColor: colors.main_back}}
         >
           {this.renderHeader()}
+          {this.renderStoreStatus()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
-
-          <If condition={showComesback}>
-            {this.renderHuichuan()}
-          </If>
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
           <If condition={added_service === '1'}>
             <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
           </If>
-
+          {this.renderOftenUse()}
           {this.renderStoreBlock()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             {this.renderDirectBlock()}
@@ -1087,8 +1130,6 @@ class MineScene extends PureComponent {
           {this.renderVersionBlock()}
           {this.renderCopyRight()}
           <Dialog
-            onRequestClose={() => {
-            }}
             visible={this.state.FnPriceMsg}
             buttons={[
               {
@@ -1130,80 +1171,61 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderHuichuan = () => {
-    let {title, label, content, color, footer} = this.state;
-    return (
-      <TouchableOpacity onPress={() => {
-        this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
-        this.mixpanel.track('我的_查看回传率')
-      }} style={{
-        backgroundColor: colors.white,
-        paddingVertical: 12,
-        paddingHorizontal: 15,
-        flexDirection: 'row',
-        marginBottom: 12,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <View>
-          <Text style={{fontSize: 14, color: colors.color333}}>{title} </Text>
-          <Text style={{fontSize: 14, color: colors.color333, marginVertical: 5}}>
-            {label}
-            <Text style={{fontSize: 14, color: color, fontWeight: 'bold'}}>
-              {content}
-            </Text>
-          </Text>
-          <Text style={{fontSize: 12, color: colors.color999}}>{footer} </Text>
-        </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>
-      </TouchableOpacity>
-    )
+  jumpToHuiChuan = () => {
+    this.mixpanel.track('我的_查看回传率')
+    this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
+
   }
+
 
   renderStoreBlock = () => {
     const {currentUser, accessToken, config, simpleStore} = this.props.global;
     const {show_goods_monitor = false, enabled_good_mgr = false} = config;
     let token = `?access_token=${accessToken}`;
     let {
-      currVendorId,
-      currVersion,
-      is_mgr,
-      is_helper,
-      is_service_mgr,
-      fnPriceControlled,
-      fnProfitControlled,
-      have_not_read_advice,
-      activity_url,
-      activity_img
+      currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled, activity_url,
+      activity_img, wsb_store_account, color, content, showComesback
     } = this.state
+    const {global} = this.props
+    let {co_type} = tool.vendor(global);
     const {fn_stall} = simpleStore
     return (
-      <View style={[block_styles.container]}>
-        <If condition={this.state.allow_analys || is_service_mgr}>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={this.distributionAnalysis}
-            activeOpacity={customerOpacity}>
-            <SvgXml xml={dataAnalysis()} width={28} height={28} style={[block_styles.block_img]}/>
-
-            <Text style={[block_styles.block_name]}>数据分析 </Text>
+      <View style={[block_styles.bottomWrap]}>
+        <If condition={co_type !== 'peisong' && showComesback}>
+          <TouchableOpacity style={[block_styles.block_box]} onPress={this.selfDelivery}
+                            activeOpacity={customerOpacity}>
+            <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
+              <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
+                {content}
+              </Text>
+            </View>
+            <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>配送回传</Text>
           </TouchableOpacity>
         </If>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this.orderSearch} activeOpacity={customerOpacity}>
+          <SvgXml xml={orderSearch()} width={28} height={28} style={[block_styles.block_img]}/>
+          <Text style={[block_styles.block_name]}>订单搜索</Text>
+        </TouchableOpacity>
         <If condition={fnPriceControlled > 0}>
-          <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-                            activeOpacity={customerOpacity}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
+            activeOpacity={customerOpacity}>
             <SvgXml xml={settlementRecord()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>结算记录</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
-            activeOpacity={customerOpacity}>
-            <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
+          <If condition={!hasPriceControl && hasAllowAnalys}>
+            <TouchableOpacity
+              style={[block_styles.block_box]}
+              onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
+              activeOpacity={customerOpacity}>
+              <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
 
-            <Text style={[block_styles.block_name]}>调价记录</Text>
-          </TouchableOpacity>
+              <Text style={[block_styles.block_name]}>调价记录</Text>
+            </TouchableOpacity>
+          </If>
+
         </If>
         <If condition={fnPriceControlled <= 0}>
           <TouchableOpacity
@@ -1297,14 +1319,7 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>运营收益</Text>
           </TouchableOpacity>
         </If>
-        <If condition={this.state.wsb_store_account === 1}>
-          <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
-                            activeOpacity={customerOpacity}>
-            <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>钱包</Text>
-          </TouchableOpacity>
-        </If>
+
         <If condition={this.state.wsb_store_account !== 1}>
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})}
@@ -1358,13 +1373,6 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
         </If>
-
-        <TouchableOpacity style={[block_styles.block_box]}
-                          onPress={this.orderSearch}
-                          activeOpacity={customerOpacity}>
-          <SvgXml xml={orderSearch()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>订单搜索</Text>
-        </TouchableOpacity>
         <If condition={show_goods_monitor}>
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -1381,16 +1389,6 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[block_styles.block_box, {position: "relative"}]}
-          onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
-          activeOpacity={customerOpacity}>
-          <If condition={have_not_read_advice > 0}>
-            <View style={[block_styles.notice_point]}/>
-          </If>
-          <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>公告通知</Text>
-        </TouchableOpacity>
         <If condition={fn_stall === '1'}>
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -1398,10 +1396,10 @@ class MineScene extends PureComponent {
             activeOpacity={customerOpacity}>
 
             <SvgXml xml={stallIcon()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>摊位结算 </Text>
+            <Text style={[block_styles.block_name]}>摊位结算</Text>
           </TouchableOpacity>
         </If>
-        <If condition={activity_img.length > 0}>
+        <If condition={wsb_store_account === 1 && activity_img.length > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
@@ -1411,18 +1409,58 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         </If>
 
-
       </View>
     );
   }
 
   renderVersionBlock = () => {
-    const {
-      show_expense_center = false,
-    } = this.props.global.config;
+    const {have_not_read_advice, activity_url, activity_img, wsb_store_account} = this.state
+    const {show_expense_center = false} = this.props.global.config;
+    const {global} = this.props
+    let {co_type} = tool.vendor(global);
     return (
-      <View style={[block_styles.container]}>
+      <View style={[block_styles.bottomWrap]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
+          activeOpacity={customerOpacity}>
+          <If condition={have_not_read_advice > 0}>
+            <View style={[block_styles.notice_point]}/>
+          </If>
+          <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
+          <Text style={[block_styles.block_name]}>公告</Text>
+        </TouchableOpacity>
+        <If condition={wsb_store_account !== 1 && activity_img.length > 0}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
+            activeOpacity={customerOpacity}>
+            <SvgXml xml={shareActivity()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>老带新活动</Text>
+          </TouchableOpacity>
+        </If>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+          onPress={this.versionInfo}
+        >
+          <SvgXml xml={versionInformation()} width={28} height={28} style={[block_styles.block_img]}/>
+          <Text style={[block_styles.block_name]}>版本信息</Text>
+        </TouchableOpacity>
 
+
+        <TouchableOpacity style={[block_styles.block_box]} activeOpacity={customerOpacity} onPress={this.helpPage}>
+          <SvgXml xml={help()} width={28} height={28} style={[block_styles.block_img]}/>
+          <Text style={[block_styles.block_name]}>帮助</Text>
+        </TouchableOpacity>
+
+        <If condition={co_type === 'peisong'}>
+          <TouchableOpacity style={[block_styles.block_box]} onPress={this.settingPage}
+                            activeOpacity={customerOpacity}>
+            <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>设置</Text>
+          </TouchableOpacity>
+        </If>
         <If condition={show_expense_center}>
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -1432,27 +1470,6 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         </If>
 
-        <TouchableOpacity style={[block_styles.block_box]} activeOpacity={customerOpacity} onPress={this.helpPage}>
-          <SvgXml xml={help()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>帮助</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[block_styles.block_box]} onPress={this.oncallservice} activeOpacity={customerOpacity}>
-          <SvgXml xml={contactCustomerService()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>联系客服</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          activeOpacity={customerOpacity}
-          onPress={this.versionInfo}
-        >
-          <SvgXml xml={versionInformation()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>版本信息</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={this.settingPage} activeOpacity={customerOpacity}>
-          <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
-          <Text style={[block_styles.block_name]}>设置</Text>
-        </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
@@ -1471,7 +1488,6 @@ class MineScene extends PureComponent {
   renderDirectBlock = () => {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currStoreId, currVendorId} = this.state;
-    let {global, dispatch} = this.props;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity
@@ -1734,6 +1750,9 @@ class MineScene extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  modifyStore: {
+    paddingLeft: 10
+  },
   fn_price_msg: {
     fontSize: pxToEm(30),
     color: colors.color333
@@ -1744,12 +1763,36 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     color: "#00aeff"
   },
+  closeFlag: {
+    marginLeft: 12,
+    marginRight: 4,
+    backgroundColor: colors.warn_color,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5
+  },
+  noExtStoreFlag: {
+    marginLeft: 12,
+    marginRight: 4,
+    backgroundColor: '#409EFF',
+    width: 7,
+    height: 7,
+    borderRadius: 3.5
+  },
+  openStoreFlag: {
+    marginLeft: 12,
+    marginRight: 4,
+    backgroundColor: colors.main_color,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5
+  },
   close_text: {
     color: colors.warn_red,
     textAlign: "center"
   },
   noExtStoreText: {
-    color: colors.fontGray,
+    color: '#409EFF',
     textAlign: "center"
   },
   open_text: {
@@ -1772,22 +1815,29 @@ const header_styles = StyleSheet.create({
     backgroundColor: colors.white,
     marginBottom: pxToDp(14)
   },
+  row: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
   main_box: {
-    marginTop: pxToDp(15),
-    height: pxToDp(170)
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingTop: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 11
   },
   shop_name: {
     color: colors.title_color,
-    fontSize: pxToEm(30),
+    fontSize: 18,
     fontWeight: "bold",
-    marginVertical: pxToDp(30),
-    lineHeight: pxToDp(36)
+    lineHeight: 25
   },
   change_shop: {
+    paddingLeft: 4,
     color: colors.main_color,
-    fontSize: pxToEm(30),
-    fontWeight: "bold",
-    lineHeight: pxToDp(36)
+    fontSize: 12,
+    fontWeight: "400",
+    lineHeight: 17
   },
   icon_box: {
     position: "absolute",
@@ -1795,20 +1845,43 @@ const header_styles = StyleSheet.create({
     top: 0
   },
   icon_open: {
-    width: pxToDp(200),
-    height: pxToDp(140)
+    height: 39,
+    justifyContent: 'center'
+  },
+  openStoreStatusWrap: {
+    backgroundColor: '#EAFAED',
+    borderRadius: 4,
+    margin: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  closeStoreStatusWrap: {
+    backgroundColor: '#FAEAEA',
+    borderRadius: 4,
+    margin: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  noExtStoreStatusWrap: {
+    backgroundColor: '#EAF2FA',
+    borderRadius: 4,
+    margin: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });
 
 const worker_styles = StyleSheet.create({
   container: {
-    borderTopWidth: pxToDp(1),
-    borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
+    borderRadius: 8,
     backgroundColor: colors.white,
-    height: pxToDp(140),
     flexDirection: "row",
-    marginBottom: pxToDp(22)
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10
   },
   icon_head: {
     marginHorizontal: pxToDp(20),
@@ -1823,7 +1896,8 @@ const worker_styles = StyleSheet.create({
   },
   worker_name: {
     color: colors.title_color,
-    fontSize: pxToDp(30),
+    lineHeight: 17,
+    fontSize: 12,
     fontWeight: "bold"
   },
   order_box: {
@@ -1862,18 +1936,34 @@ const worker_styles = StyleSheet.create({
     color: colors.main_color
   },
   sales_box: {
-    marginLeft: pxToDp(28),
-    marginTop: pxToDp(30),
-    width: ScreenWidth,
+    marginLeft: 12,
+    marginTop: 11,
     position: "relative"
   },
   sale_text: {
-    fontSize: pxToEm(28),
-    lineHeight: pxToDp(35),
-    color: "#555"
+    fontSize: 12,
+    lineHeight: 17,
+    color: colors.color000
   },
   sales_money: {
-    marginTop: pxToDp(15)
+    marginTop: 9,
+    marginBottom: 6
+  },
+  accountBill: {
+    marginTop: pxToDp(45),
+    marginLeft: pxToDp(25),
+    position: "absolute",
+    top: 0,
+    right: 40
+  },
+  accountBillWrap: {
+    width: pxToDp(96),
+    height: pxToDp(46),
+    backgroundColor: colors.main_color,
+    marginRight: 8,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 
@@ -1884,13 +1974,21 @@ const block_styles = StyleSheet.create({
     flexWrap: "wrap",
     backgroundColor: colors.white
   },
+  bottomWrap: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    flexWrap: "wrap",
+    borderRadius: 8,
+    backgroundColor: colors.white
+  },
   block_box: {
     //剩1个格子用正常样式占位
     // width: pxToDp(239),
     // height: pxToDp(188),
-    width: ScreenWidth / 4,
-    height: ScreenWidth / 4,
-    backgroundColor: colors.white,
+    width: ScreenWidth / 4 - 5,
+    height: ScreenWidth / 4 - 5,
 
     // borderColor: colors.main_back,
     // borderWidth: pxToDp(1),
@@ -1927,6 +2025,18 @@ const block_styles = StyleSheet.create({
     right: pxToDp(60),
     top: pxToDp(20),
     zIndex: 99
+  },
+  deliveryTip: {
+    width: 41,
+    height: 11,
+    borderRadius: 7,
+    right: 12,
+    top: pxToDp(20),
+    position: 'absolute',
+    zIndex: 99,
+  },
+  deliveryTipText: {
+    fontSize: 7, fontWeight: '400', color: colors.white, lineHeight: 9, textAlign: 'center'
   }
 });
 

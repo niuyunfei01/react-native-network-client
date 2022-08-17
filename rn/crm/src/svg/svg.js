@@ -373,3 +373,48 @@ export const stallIcon = () => {
     </svg>`
   )
 }
+
+export const switchStore = (fill = '#333', width = 24, height = 24) => {
+  return (
+    `
+    <svg width="${width}" height="${height}" viewBox="0 0 48 48" fill="${fill}">
+    <path d="M42 19H5.99998" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M30 7L42 19" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6.79897 29H42.799" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6.79895 29L18.799 41" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`
+  )
+}
+
+export const rightArrow = (fill = '#333', width = 24, height = 24) => {
+  return (
+    `
+    <svg width="${width}" height="${height}" viewBox="0 0 48 48">
+    <path d="M19 12L31 24L19 36" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`
+  )
+}
+
+export const pencilIcon = (fill = '#333', width = 24, height = 24) => {
+  return (
+    `
+    <svg width="${width}" height="${height}" viewBox="0 0 48 48">
+    <path d="M42 26V40C42 41.1046 41.1046 42 40 42H8C6.89543 42 6 41.1046 6 40V8C6 6.89543 6.89543 6 8 6L22 6" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 26.7199V34H21.3172L42 13.3081L34.6951 6L14 26.7199Z" fill="none" stroke="${fill}" stroke-width="2" stroke-linejoin="round"/>
+    </svg>`
+  )
+}
+
+export const delivery = (stroke = '#333333', width = 24, height = 24) => {
+  return (
+    `
+    <svg width="${width}" height="${height}" viewBox="0 0 48 48" fill="none" >
+    <path d="M36 8H9C7.34315 8 6 9.34315 6 11V39C6 40.6569 7.34315 42 9 42H39C40.6569 42 42 40.6569 42 39V25V18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M32.2427 12.4854L36.4853 8.24271L32.2427 4.00007" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 17V34" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M32 24V34" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M16 24V34" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    `
+  )
+}

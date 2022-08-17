@@ -434,17 +434,14 @@ class NewRetailPriceScene extends React.PureComponent {
         params.price = selectPriceType === 1 ? editPrice : editAlonePrice
         break
     }
-    showModal('提交中')
+
     HttpUtils.post(url, params).then(() => {
-      hideModal()
       showSuccess('修改成功')
       this.getProductDetail()
     }, res => {
-      hideModal()
       showError('修改失败' + res.reason)
     })
       .catch(error => {
-        hideModal()
         showError('修改失败' + error.reason)
       })
     this.setState({modalVisible: false, openModalFrom: ''})

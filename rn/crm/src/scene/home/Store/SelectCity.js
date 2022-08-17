@@ -143,10 +143,7 @@ class SelectCity extends Component {
                           backgroundColor: colors.main_back
                         }}
                       >
-                        <Text
-                          style={[{paddingLeft: 18}, styles.n2grey6]}
-                          allowFontScaling={false}
-                        >
+                        <Text style={[{paddingLeft: 18}, styles.n2grey6]}>
                           {item.key}
                         </Text>
                       </View>
@@ -196,10 +193,7 @@ class SelectCity extends Component {
           {cityList.map((item, index) => {
             return (
               <TouchableOpacity onPress={() => this.goTo(index)}>
-                <Text
-                  style={{textAlign: "center", fontSize: 10, lineHeight: 21}}
-                  allowFontScaling={false}
-                >
+                <Text style={{textAlign: "center", fontSize: 10, lineHeight: 21}}>
                   {item.key}
                 </Text>
               </TouchableOpacity>
