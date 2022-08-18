@@ -65,7 +65,7 @@ class StockCheck extends BaseComponent {
         return (
           <TouchableOpacity
             onPress={() => navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId})}
-            style={{marginRight: 10}}>
+            style={{padding: 10}}>
             <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>
           </TouchableOpacity>
         )
@@ -86,7 +86,10 @@ class StockCheck extends BaseComponent {
       productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
+      const { product } = res
       self.setState({
+        productName: product.name,
+        main_sku_name: product.sku_name,
         productInfo: res,
         remainNum: res.left_since_last_stat,
         orderUse: res.orderUse,
@@ -170,7 +173,7 @@ class StockCheck extends BaseComponent {
   }
 
   renderInfo() {
-    const {storeName, storeCity, storeVendor, productName, shelfNo, productId, storeProd} = this.state
+    const {storeName, storeCity, storeVendor, productName, shelfNo, productId, storeProd, main_sku_name} = this.state
     return (
       <View>
         <View style={{margin: 10}}>
@@ -178,7 +181,7 @@ class StockCheck extends BaseComponent {
         </View>
         <View style={styles.infoContainer}>
           {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-          {this.renderInfoItem(`商品ID(#${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
+          {this.renderInfoItem(`商品ID(#${productId})`, `${productName}[${main_sku_name}]`, `货架号:${shelfNo ? shelfNo : '无'}`)}
           <If condition={storeProd !== undefined}>
             <For each="info" index="i" of={storeProd}>
               <View style={{marginVertical: 5}} key={i}>
@@ -203,7 +206,8 @@ class StockCheck extends BaseComponent {
       actualNum = 0,
       loading = false,
       productName,
-      storeProd
+      storeProd,
+      main_sku_name
     } = this.state
     let width = Dimensions.get("window").width
     return (
@@ -223,7 +227,7 @@ class StockCheck extends BaseComponent {
               paddingVertical: 10,
               paddingLeft: 5
             }}>
-              <Text style={{fontWeight: "bold", width: '70%'}}>{productName} </Text>
+              <Text style={{fontWeight: "bold", width: '70%'}}>{productName}[{main_sku_name}] </Text>
               <TouchableOpacity
                 onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
                   productId: this.state.productId,
