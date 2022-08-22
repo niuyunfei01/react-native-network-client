@@ -29,7 +29,6 @@ export default function createIconSet(glyphMap, fontFamily, fontFile) {
 
     static defaultProps = {
       size: DEFAULT_ICON_SIZE,
-      allowFontScaling: false,
     };
 
     setNativeProps(nativeProps) {

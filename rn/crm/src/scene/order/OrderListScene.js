@@ -204,7 +204,7 @@ class OrderListScene extends Component {
       if (flag) {
         const startAppEndTime = dayjs().valueOf()
         const duration = startAppEndTime - parseInt(startAppTime)
-        if (duration > 30000)
+        if (global.isLoginToOrderList)
           return
         const {currStoreId, currentUser} = this.props.global
 

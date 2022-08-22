@@ -3,7 +3,7 @@ import {Alert, DeviceEventEmitter, Modal, ScrollView, StyleSheet, Text, Touchabl
 import SearchInputBar from "../../common/component/SearchInput";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import Drawer from 'react-native-drawer'
-import color from '../../../pubilc/styles/colors'
+import colors from '../../../pubilc/styles/colors'
 import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../../pubilc/common/config";
@@ -541,7 +541,7 @@ class MaterialList extends React.Component {
         shadowOpacity: 0.8,
         shadowRadius: 3,
         borderLeftWidth: 1,
-        borderLeftColor: color.theme
+        borderLeftColor: colors.theme
       }
     }
 
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   drawerItemTagLight: {
-    backgroundColor: color.theme,
+    backgroundColor: colors.theme,
     color: '#fff',
   },
   filterInput: {
@@ -688,7 +688,7 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   itemSupplier: {
-    backgroundColor: color.theme,
+    backgroundColor: colors.theme,
     color: '#fff',
     fontSize: 10,
     borderRadius: 5,
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
   },
   itemMoreOperation: {
     fontSize: 12,
-    color: color.theme
+    color: colors.theme
   }
 })
 export default connect(mapStateToProps)(MaterialList)

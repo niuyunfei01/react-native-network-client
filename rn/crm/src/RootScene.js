@@ -8,6 +8,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View
 } from "react-native";
 
@@ -46,8 +47,8 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
-
+Text.defaultProps = {...(Text.defaultProps || {}), fontFamily: '', color: '#333', allowFontScaling: true};
+TextInput.defaultProps = {...(TextInput.defaultProps || {}), allowFontScaling: false};
 
 class RootScene extends PureComponent {
   constructor() {
@@ -147,7 +148,7 @@ class RootScene extends PureComponent {
       this.store.dispatch(setCheckVersionAt(currentTs))
       this.checkVersion({global: this.store.getState().global});
     }
-    GlobalUtil.setHostPortNoDef(this.store.getState().global, native).then()
+
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       this.store.dispatch(setDeviceInfo(deviceInfo))
     })
@@ -247,6 +248,7 @@ class RootScene extends PureComponent {
   }
 
   getRootView = () => {
+    global.isLoginToOrderList = false
     const {launchProps} = this.props;
     const {orderId, backPage, currStoreId} = launchProps;
     let initialRouteName = launchProps["_action"];
@@ -255,7 +257,7 @@ class RootScene extends PureComponent {
     }
     let initialRouteParams = launchProps["_action_params"] || {};
 
-    let {accessToken, currentUser} = this.store.getState().global;
+    let {accessToken, currentUser, host} = this.store.getState().global;
 
     if (!accessToken) {
       // showError("请您先登录")
@@ -263,6 +265,7 @@ class RootScene extends PureComponent {
       initialRouteName = Config.ROUTE_LOGIN;
       initialRouteParams = {next: "", nextParams: {}};
     } else {
+      GlobalUtil.setHostPort(host)
       if (!initialRouteName) {
         if (orderId) {
           initialRouteName = Config.ROUTE_ORDER;
@@ -273,7 +276,7 @@ class RootScene extends PureComponent {
       }
     }
     nrRecordMetric("restore_redux", {
-      redux_time: this.passed_ms,
+      time: this.passed_ms,
       store_id: currStoreId ?? '未登录',
       login_user: currentUser ?? '未登录'
     })

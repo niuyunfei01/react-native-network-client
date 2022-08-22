@@ -26,6 +26,15 @@ PODS:
     - React
   - JPush (2.8.7):
     - React
+  - libwebp (1.2.3):
+    - libwebp/demux (= 1.2.3)
+    - libwebp/mux (= 1.2.3)
+    - libwebp/webp (= 1.2.3)
+  - libwebp/demux (1.2.3):
+    - libwebp/webp
+  - libwebp/mux (1.2.3):
+    - libwebp/demux
+  - libwebp/webp (1.2.3)
   - Mixpanel-swift (3.0.0.beta.5):
     - Mixpanel-swift/Complete (= 3.0.0.beta.5)
   - Mixpanel-swift/Complete (3.0.0.beta.5)
@@ -309,6 +318,10 @@ PODS:
     - React-Core
   - RNDeviceInfo (8.3.3):
     - React-Core
+  - RNFastImage (8.5.11):
+    - React-Core
+    - SDWebImage (~> 5.11.1)
+    - SDWebImageWebPCoder (~> 0.8.4)
   - RNGestureHandler (1.10.3):
     - React-Core
   - RNImageCropPicker (0.36.2):
@@ -357,10 +370,16 @@ PODS:
     - RNSound/Core (= 0.11.0)
   - RNSound/Core (0.11.0):
     - React
-  - RNSVG (12.1.1):
-    - React
+  - RNSVG (12.4.4):
+    - React-Core
   - RNVectorIcons (7.1.0):
     - React
+  - SDWebImage (5.11.1):
+    - SDWebImage/Core (= 5.11.1)
+  - SDWebImage/Core (5.11.1)
+  - SDWebImageWebPCoder (0.8.5):
+    - libwebp (~> 1.0)
+    - SDWebImage/Core (~> 5.10)
   - SSZipArchive (2.2.3)
   - TOCropViewController (2.6.0)
   - UTDID (1.0.0)
@@ -421,6 +440,7 @@ DEPENDENCIES:
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
+  - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -436,9 +456,12 @@ SPEC REPOS:
   trunk:
     - boost-for-react-native
     - HappyDNS
+    - libwebp
     - Mixpanel-swift
     - NewRelicAgent
     - Qiniu
+    - SDWebImage
+    - SDWebImageWebPCoder
     - SSZipArchive
     - TOCropViewController
     - UTDID
@@ -544,6 +567,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
+  RNFastImage:
+    :path: "../node_modules/react-native-fast-image"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNImageCropPicker:
@@ -572,6 +597,7 @@ SPEC CHECKSUMS:
   HappyDNS: 848ef73e24f2b0e2752064223ce2dc0dd88900ea
   JCore: b5c4eadf996070ce05748c52851db9bc70eba33b
   JPush: a010513626e67900f284aff6db8578b23145a5d9
+  libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   Mixpanel-swift: 4e367aaff204bf7262e9ed665e7b380580cc06c1
   MixpanelReactNative: 01bb2866a68ed5debdda9377e53dee4b24946f21
   NewRelicAgent: 61d6dd0ac7d6b5587ec2a64cc23d5a8a1e7eb675
@@ -617,13 +643,16 @@ SPEC CHECKSUMS:
   RNCPicker: 6724ab5fcca83c34fe1f18a89baa13e9885f0393
   RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
   RNDeviceInfo: cc7de0772378f85d8f36ae439df20f05c590a651
+  RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   RNReanimated: d9da990fc90123f4ffbfdda93d00fc15174863a8
   RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
   RNSound: da030221e6ac7e8290c6b43f2b5f2133a8e225b0
-  RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
+  RNSVG: ecd661f380a07ba690c9c5929c475a44f432d674
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
+  SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TOCropViewController: 3105367e808b7d3d886a74ff59bf4804e7d3ab38
   UTDID: 05c4737c8cf5c210e86d0235570816ed00e023e8
@@ -631,4 +660,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 25cf21a91e1b74e2cba7ebc313278ca5a9e91acf
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

@@ -656,14 +656,20 @@ class OrderListItem extends React.PureComponent {
         <If condition={item.btn_list && item.btn_list.btn_ignore_delivery}>
           <Button title={'忽略配送'}
                   onPress={() => this.loseDelivery(item.id)}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.colorCCC}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.colorCCC,
+                    width: width * 0.27
+                  }]}
                   titleStyle={{color: colors.colorCCC, fontSize: 16}}
           />
         </If>
         <If condition={item.btn_list && item.btn_list.transfer_self}>
           <Button title={'我自己送'}
                   onPress={() => this.myselfSend(item)}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: item.btn_list.btn_ignore_delivery ? width * 0.27 : width * 0.40
+                  }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
@@ -673,14 +679,18 @@ class OrderListItem extends React.PureComponent {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('订单列表页_呼叫配送')
                   }}
-                  buttonStyle={styles.callDeliveryBtn}
+                  buttonStyle={[styles.callDeliveryBtn, {
+                    width: item.btn_list.btn_ignore_delivery ? width * 0.27 : width * 0.40
+                  }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
         <If condition={item.btn_list && item.btn_list.btn_contact_rider}>
           <Button title={'联系骑手'}
                   onPress={() => this.dialNumber(item.ship_worker_mobile)}
-                  buttonStyle={styles.callDeliveryBtn}
+                  buttonStyle={[styles.callDeliveryBtn, {
+                    width: width * 0.40
+                  }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
@@ -690,7 +700,10 @@ class OrderListItem extends React.PureComponent {
                     this.setState({showDeliveryModal: false})
                     this.cancelDelivery(item.id)
                   }}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: width * 0.40
+                  }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
@@ -1181,18 +1194,18 @@ const styles = StyleSheet.create({
   },
   modalBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.white,
     borderWidth: 1
   },
   callDeliveryBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.main_color,
   },
   veriFicationBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.main_color,
     marginRight: 10
   },

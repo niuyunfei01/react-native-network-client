@@ -5,6 +5,7 @@ import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -19,10 +20,10 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +32,7 @@ import androidx.multidex.MultiDex;
 
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -120,7 +122,6 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
-import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -178,7 +179,7 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     private DisplayMetrics displayMetrics = null;
 
-    private ImageLoader imageLoader;
+    //private ImageLoader imageLoader;
 
     //image memory cache
     private LruCache<String, Bitmap> appBitmapCache = null;
@@ -262,13 +263,13 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
-    public ImageLoader getImageLoader() {
-        return imageLoader;
-    }
+//    public ImageLoader getImageLoader() {
+//        return imageLoader;
+//    }
 
-    public void setImageLoader(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
-    }
+//    public void setImageLoader(ImageLoader imageLoader) {
+//        this.imageLoader = imageLoader;
+//    }
 
     private volatile boolean imageLoaderInited = false;
 
@@ -338,7 +339,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new ClipboardPackage(),
                     new RNZipArchivePackage(),
                     new RestartPackage(),
-                    new RNViewShotPackage()
+                    new RNViewShotPackage(),
+                    new FastImageViewPackage()
             );
         }
     };
@@ -348,14 +350,33 @@ public class GlobalCtx extends Application implements ReactApplication {
         return mReactNativeHost;
     }
 
+    public static String getProcessName(Context ctx, int pid) {
+        //获取ActivityManager对象
+        ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        //在运行的进程的
+        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) {
+            return null;
+        }
+        for (ActivityManager.RunningAppProcessInfo procInfo : runningApps) {
+            if (procInfo.pid == pid) {
+                return procInfo.processName;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        startAppTime = System.currentTimeMillis();
-        MultiDex.install(this);
 
-        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
-        application = this;
+        String processName = getProcessName(this, android.os.Process.myPid());
+        if ("cn.cainiaoshicai.crm".equals(processName)) {
+            startAppTime = System.currentTimeMillis();
+            MultiDex.install(this);
+
+            Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
+            application = this;
 
         String myId = SettingUtility.getMyUUID();
         if ("".equals(myId)) {
@@ -368,22 +389,22 @@ public class GlobalCtx extends Application implements ReactApplication {
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
         updateAfterGap(24 * 60 * 60 * 1000);
 
-        try {
-            Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
-            field.setAccessible(true);
-            field.set(null, 100 * 1024 * 1024); //100MB
-        } catch (Exception e) {
-            if (BuildConfig.DEBUG) {
-                e.printStackTrace();
+            try {
+                Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
+                field.setAccessible(true);
+                field.set(null, 100 * 1024 * 1024); //100MB
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
+            NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
 
 //        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
 //        AudioUtils.getInstance().init(getApplicationContext());
-        this.soundManager = new SoundManager();
-        this.soundManager.load(this);
+            this.soundManager = new SoundManager();
+            this.soundManager.load(this);
 
         startKeepAlive();
 
@@ -592,7 +613,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
         return accountBean;
     }
-
 
 
     public String getCurrentAccountId() {

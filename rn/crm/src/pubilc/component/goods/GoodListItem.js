@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import Config from "../../common/config";
 import colors from "../../styles/colors";
 import Cts from "../../common/Cts";
@@ -48,10 +48,9 @@ class GoodListItem extends React.PureComponent {
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
         <View style={{flexDirection: "row"}}>
-          <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
-          </Text>
+          <Text style={[styles.n2grey6, offSaleTxtStyle]}>零售价格：</Text>
           <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-            {this.supplyPriceInYuan(product)}
+            ￥{product?.sp?.show_price}
           </Text>
           <If condition={product.sp && product.sp.is_fix_price === 1}>
             <View style={{
@@ -101,10 +100,10 @@ class GoodListItem extends React.PureComponent {
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
               <View style={{flexDirection: "row"}}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  报价：
+                  零售价格：
                 </Text>
                 <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  {parseFloat((item || {}).supply_price / 100).toFixed(2)}
+                  ￥{item.show_price}
                 </Text>
               </View>
 
@@ -135,7 +134,10 @@ class GoodListItem extends React.PureComponent {
                              onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <View>
-          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[styles.listImageSize, offSaleImg]}/>
+          <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                     style={[styles.listImageSize, offSaleImg]}
+                     resizeMode={FastImage.resizeMode.contain}/>
+
           <If condition={!onSale}>
             <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>
               <Text style={{color: colors.white}}>暂 停</Text>

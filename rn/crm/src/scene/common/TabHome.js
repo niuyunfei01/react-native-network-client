@@ -80,7 +80,7 @@ class TabHome extends React.Component {
         <If condition={co_type !== 'peisong'}>
           <Tab.Screen
             name="Home"
-            getComponent={() => require("../Remind/RemindScene").default}
+            getComponent={() => require("../notice/NoticeList").default}
             options={
               {
                 tabBarLabel: "提醒",

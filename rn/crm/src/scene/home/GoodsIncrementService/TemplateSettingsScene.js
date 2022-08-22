@@ -176,7 +176,6 @@ export default class TemplateSettingsScene extends PureComponent {
                 </TouchableOpacity>
                 <If condition={selectItem === item.id}>
                   <TextInput style={styles.textInput}
-                             allowFontScaling={false}
                              value={tempValue[item.name]}
                              editable={item.id !== '1'}
                              onChangeText={text => this.onChangeText(text, item.name)}

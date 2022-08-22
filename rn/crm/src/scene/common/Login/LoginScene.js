@@ -85,6 +85,10 @@ class LoginScene extends PureComponent {
     this.nextParams = params.nextParams;
   }
 
+  componentDidMount() {
+    global.isLoginToOrderList = true
+  }
+
   componentWillUnmount = () => {
     this.clearTimeouts();
   }
@@ -464,7 +468,11 @@ class LoginScene extends PureComponent {
             <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
               style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
             <Text
-              style={{fontSize: 14, color: colors.color333, marginVertical: 6}}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
+              style={{
+                fontSize: 14,
+                color: colors.color333,
+                marginVertical: 6
+              }}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
             <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
           </View>
         </BottomModal>

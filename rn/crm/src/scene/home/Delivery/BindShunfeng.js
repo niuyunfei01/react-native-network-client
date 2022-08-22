@@ -158,7 +158,7 @@ class BindShunfeng extends PureComponent {
     const {res} = this.props.route.params
     return (
       <SafeAreaView style={styles.content}>
-        <Text style={styles.title} allowFontScaling={false}>
+        <Text style={styles.title}>
           {CONTENT.title}
         </Text>
         <FlatList data={res.bind_way}
