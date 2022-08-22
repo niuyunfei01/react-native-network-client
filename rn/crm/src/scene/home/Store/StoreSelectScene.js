@@ -1,11 +1,14 @@
 import React, {PureComponent} from 'react'
 import {
-  Text,
+  DeviceEventEmitter,
   InteractionManager,
-  View,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
-  TouchableOpacity, DeviceEventEmitter, TextInput, Keyboard
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -112,22 +115,20 @@ class StoreSelect extends PureComponent {
   }
 
   fetchData = (options = {}) => {
-    const self = this
     const {page, page_size, access_token} = this.state
-    let token = access_token
-    const api = `/v1/new_api/stores/get_can_read_stores?access_token=${token}`;
+    const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
 
     let params = {
-      keywords: self.state.searchKeywords,
+      keywords: this.state.searchKeywords,
       page: options.page ? options.page : page,
       page_size: page_size
     }
-    self.setState({
+    this.setState({
       isLoading: true
     });
 
     HttpUtils.get(api, params).then(obj => {
-      self.setState({isLoading: false});
+      this.setState({isLoading: false});
 
       let isLastPage = true
       if (obj.lists && obj.page * obj.pageSize < obj.count) {
@@ -143,9 +144,9 @@ class StoreSelect extends PureComponent {
         dataSource.push(item);
       })
 
-      dataSource = obj.page != 1 ? this.state.dataSource.concat(dataSource) : dataSource
+      dataSource = obj.page !== 1 ? this.state.dataSource.concat(dataSource) : dataSource
 
-      self.setState({
+      this.setState({
         dataSource: dataSource,
         page: obj.page + 1,
         page_size: obj.pageSize,

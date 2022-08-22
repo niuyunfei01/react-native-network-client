@@ -182,7 +182,7 @@ class BadReviewReminderScene extends PureComponent {
           <Text style={styles.rowDescriptionText}>
             手机号码(+86)：
           </Text>
-          <TextInput allowFontScaling={false}
+          <TextInput
                      style={[styles.rowDescriptionText, {flex: 1}]}
                      placeholder={'请输入手机号'}
                      placeholderTextColor={colors.colorEEE}

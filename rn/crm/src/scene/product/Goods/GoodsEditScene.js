@@ -840,7 +840,7 @@ class GoodsEditScene extends PureComponent {
               *
             </Text>商品名称
           </Text>
-          <TextInput allowFontScaling={false}
+          <TextInput
                      value={name}
                      style={styles.textInputStyle}
                      onChangeText={text => this.onNameChanged(text)}
@@ -897,7 +897,7 @@ class GoodsEditScene extends PureComponent {
                 *
               </Text>报价
             </Text>
-            <TextInput allowFontScaling={false}
+            <TextInput
                        style={styles.textInputStyle}
                        value={price}
                        keyboardType={'numeric'}
@@ -915,7 +915,7 @@ class GoodsEditScene extends PureComponent {
                 *
               </Text>重量
             </Text>
-            <TextInput allowFontScaling={false}
+            <TextInput
                        style={styles.textInputStyle}
                        value={weight}
                        keyboardType={'numeric'}
@@ -940,7 +940,7 @@ class GoodsEditScene extends PureComponent {
               <Text style={styles.leftText}>
                 商品条码
               </Text>
-              <TextInput allowFontScaling={false}
+              <TextInput
                          value={upc}
                          editable={this.isStoreProdEditable()}
                          onChangeText={upc => this.setState({upc: upc})}
@@ -958,7 +958,7 @@ class GoodsEditScene extends PureComponent {
                   *
                 </Text>库存
               </Text>
-              <TextInput allowFontScaling={false}
+              <TextInput
                          value={actualNum}
                          onChangeText={text => this.setState({actualNum: text})}
                          style={styles.textInputStyle}

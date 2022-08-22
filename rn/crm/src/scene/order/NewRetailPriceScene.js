@@ -166,14 +166,15 @@ class NewRetailPriceScene extends React.PureComponent {
     this.getProductDetail()
   }
 
-  getProductDetail = () => {
+  getProductDetail = (pid = '') => {
     const {productId} = this.props.route.params
+
     const {currStoreId, accessToken} = this.props.global
     const url = `api_products/get_prod_with_store_detail/${currStoreId}/${productId}?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
       const {sp, p} = res
       const skus = [{
-        id: sp.id,
+        product_id: sp.product_id,
         sku_name: p.sku_name,
         price: sp.price,
         es_alone_price: sp.es_alone_price,
@@ -182,11 +183,12 @@ class NewRetailPriceScene extends React.PureComponent {
         strict_providing: sp.strict_providing,
         supply_price: sp.supply_price
       }].concat(sp.skus)
+      const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : skus.length > 0 ? skus[0] : {sku_name: ''}
       this.setState({
         productInfo: res,
         skus: skus,
         editPrice: `${sp.price}`,
-        selectSku: skus.length > 0 ? skus[0] : {sku_name: ''},
+        selectSku: selectSku,
         editCostPrice: skus.length > 0 ? `${parseFloat(skus[0].supply_price / 100).toFixed(2)}` : '',
         editStock: skus.length > 0 ? skus[0].left_since_last_stat : '',
       })
@@ -304,6 +306,7 @@ class NewRetailPriceScene extends React.PureComponent {
       editAlonePrice: item.price
     })
   }
+
   getSinglePrice = () => {
     const {selectSku} = this.state
     return (
@@ -338,7 +341,6 @@ class NewRetailPriceScene extends React.PureComponent {
       </View>
     )
   }
-
 
   selectSku = (item) => {
     this.setState({
@@ -416,14 +418,13 @@ class NewRetailPriceScene extends React.PureComponent {
       selectPriceType,
       editAlonePrice
     } = this.state
-    const {productId} = this.props.route.params
     const {currStoreId, accessToken} = this.props.global
     let url = `new_api/store_product/set_store_price?access_token=${accessToken}`,
-      params = {pid: productId, store_id: currStoreId, price: editPrice, type: 0, es_id: -1}
+      params = {pid: selectSku.product_id, store_id: currStoreId, price: editPrice, type: 0, es_id: -1}
     switch (openModalFrom) {
       case 'cost_price':
         url = `/v1/new_api/store_product/save_supply_price?access_token=${accessToken}`
-        params = {pid: productId, store_id: currStoreId, supply_price: editCostPrice}
+        params = {pid: selectSku.product_id, store_id: currStoreId, supply_price: editCostPrice}
         if (selectSku.strict_providing === '1')
           params.actualNum = editStock
         break
@@ -434,18 +435,14 @@ class NewRetailPriceScene extends React.PureComponent {
         params.price = selectPriceType === 1 ? editPrice : editAlonePrice
         break
     }
-    showModal('提交中')
     HttpUtils.post(url, params).then(() => {
-      hideModal()
       showSuccess('修改成功')
-      this.getProductDetail()
+      this.getProductDetail(selectSku.product_id)
     }, res => {
-      hideModal()
-      showError('修改失败' + res.reason)
+      showError('修改失败：' + res.reason)
     })
       .catch(error => {
-        hideModal()
-        showError('修改失败' + error.reason)
+        showError('修改失败：' + error.reason)
       })
     this.setState({modalVisible: false, openModalFrom: ''})
 
@@ -512,6 +509,7 @@ class NewRetailPriceScene extends React.PureComponent {
             </Text>
             <TextInput keyboardType={'numeric'}
                        onChangeText={text => this.onChangePrice(text)}
+                       autoFocus={true}
                        value={editPrice}
                        textAlign={'right'}
                        style={styles.textInput}
@@ -551,6 +549,7 @@ class NewRetailPriceScene extends React.PureComponent {
             </TouchableOpacity>
 
             <TextInput onChangeText={text => this.onChangeAlonePrice(text)}
+                       autoFocus={true}
                        textAlign={'right'}
                        value={editAlonePrice}
                        placeholderTextColor={colors.color999}

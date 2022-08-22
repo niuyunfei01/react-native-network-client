@@ -124,19 +124,13 @@ class WorkerSchedule extends React.Component {
     return (
       <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
         <If condition={day}>
-          <Text
-            allowFontScaling={false}
-            style={styles.dayNum}>
+          <Text style={styles.dayNum}>
             {day ? dayjs(new Date(day.dateString)).format('MM') : '未知'}
           </Text>
-          <Text
-            allowFontScaling={false}
-            style={styles.dayNum}>
+          <Text style={styles.dayNum}>
             {day ? dayjs(new Date(day.dateString)).format('DD') : '未知'}
           </Text>
-          <Text
-            allowFontScaling={false}
-            style={styles.dayText}>
+          <Text style={styles.dayText}>
             {day ? TimeUtil.getWeek(new Date(day.dateString)) : '未知'}
           </Text>
         </If>
