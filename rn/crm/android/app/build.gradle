@@ -73,7 +73,7 @@ dependencies {
 
     //支持扫码时引入的，忘记用来干嘛的，先注释掉
     //implementation("com.google.zxing:core:3.3.3")
-    
+
     implementation('io.reactivex.rxjava2:rxjava:2.2.19')
     implementation 'id.zelory:compressor:2.1.1'
 
@@ -115,6 +115,7 @@ dependencies {
     implementation (project(':react-native-svg'))
     implementation (project(':mixpanel-react-native'))
     implementation project(':react-native-fast-image')
+    implementation project(':react-native-amap3d')
     implementation fileTree(dir: "../../node_modules/jpush-react-native/android/libs", include: ["*.jar"])
     implementation fileTree(dir: "../../node_modules/jcore-react-native/android/libs", include: ["*.jar"])
     implementation project(':jpush-react-native')  // 添加 jpush 依赖

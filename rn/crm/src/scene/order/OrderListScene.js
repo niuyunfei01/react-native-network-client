@@ -16,14 +16,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
 import * as globalActions from '../../reducers/global/globalActions'
-import {setExtStore, setUserCfg} from '../../reducers/global/globalActions'
+import {getSimpleStore, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import tool from "../../pubilc/util/tool";
-import {getSimpleStore} from "../../reducers/global/globalActions";
 import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
 import Dialog from "../common/component/Dialog";
@@ -42,6 +41,7 @@ import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
 import Swiper from 'react-native-swiper'
 import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
+import {AMapSdk} from "react-native-amap3d";
 
 const {width} = Dimensions.get("window");
 
@@ -238,6 +238,14 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
     calcMs(timeObj, accessToken)
+
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

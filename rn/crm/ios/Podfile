@@ -25,6 +25,9 @@ target 'APTest' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'react-native-amap3d', path: '../node_modules/react-native-amap3d/'
+
+
   target 'APTestTests' do
     inherit! :complete
     # Pods for testing

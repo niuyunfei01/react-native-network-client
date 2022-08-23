@@ -484,6 +484,8 @@
             android:name="com.fanjun.keeplive.service.RemoteService"
             android:process=":remote" />
 
+        <meta-data android:name="com.amap.api.v2.apikey"  android:value="1d669aafc6970cb991f9baf252bcdb66" />
+
     </application>
 
 </manifest>
