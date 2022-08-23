@@ -437,6 +437,10 @@ class GoodsEditScene extends PureComponent {
     this.setState({name})
     if (name && type !== 'edit') {
       this.recommendProdByName(name)
+    } else {
+      this.setState({name: ''}, () => {
+        this.recommendProdByName(name)
+      })
     }
   }
 
