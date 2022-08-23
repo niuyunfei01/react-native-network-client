@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 
+import qiuxiang.amap3d.AMap3DPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
@@ -329,7 +330,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new JPushPackage(),
                     new NewRelicPackage(),
                     new LinearGradientPackage(),
-                    new qiuxiang.amap3d.AMap3DPackage(),
+                    new AMap3DPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage(),
                     new ClipboardPackage(),
