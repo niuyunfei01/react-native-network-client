@@ -196,8 +196,8 @@ class SearchShop extends Component {
   }
 
   renderMap() {
-    let lng = this.state.shopmsg.location.split(",")[1];
     let lat = this.state.shopmsg.location.split(",")[1];
+    let lng = this.state.shopmsg.location.split(",")[0];
     if (!lat || !lng) {
       return null
     }
