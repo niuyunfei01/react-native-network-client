@@ -30,7 +30,7 @@ import {MixpanelInstance} from '../../pubilc/util/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
-import {showError} from "../../pubilc/util/ToastUtils";
+import {showError, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {Badge, Button} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
@@ -43,6 +43,7 @@ import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 import {AMapSdk} from "react-native-amap3d";
 import FastImage from "react-native-fast-image";
+import Scanner from "../../pubilc/component/Scanner";
 
 const {width} = Dimensions.get("window");
 
@@ -107,7 +108,8 @@ const initState = {
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
-  isadditional: ''
+  isadditional: '',
+  scanBoolean: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -544,45 +546,6 @@ class OrderListScene extends Component {
     this.onPress(Config.PLATFORM_BIND)
   }
 
-  render() {
-    const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
-    const {
-      showSortModal, ext_store_list, searchStoreVisible, ext_store_name, showTabs, show_hint, ListData, hint_msg
-    } = this.state
-    return (
-      <View style={styles.flex1}>
-        <FloatServiceIcon fromComponent={'订单列表'}/>
-        {this.renderTabsHead()}
-        <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
-          <View style={styles.extStore}>
-            <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
-              {ext_store_name}
-            </Text>
-            <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-          </View>
-        </If>
-        <SearchExtStore visible={searchStoreVisible}
-                        data={ext_store_list}
-                        onClose={() => this.searchExtStoreOnClose()}
-                        onSelect={item => this.searchExtStoreOnSelect(item)}/>
-        {showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}
-        <If condition={show_hint}>
-          <TouchableOpacity style={styles.cell_row}>
-            <Text style={styles.cell_body_text}>
-              {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}
-            </Text>
-            <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
-          </TouchableOpacity>
-        </If>
-        <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
-        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {this.showSortSelect()}
-        </Dialog>
-      </View>
-    );
-  }
-
   openNotifySetting = () => {
     if (this.state.hint_msg === 1) {
       native.toOpenNotifySettings().then()
@@ -619,6 +582,109 @@ class OrderListScene extends Component {
     const {navigation} = this.props
     navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
   }
+
+
+  onSelect = (e) => {
+    if (e === 0) {
+      this.mixpanel.track('新建订单')
+      this.onPress(Config.ROUTE_ORDER_SETTING)
+    } else if (e === 1) {
+      this.setState({showSortModal: !this.state.showSortModal})
+    } else {
+      this.setState({
+        scanBoolean: true,
+      })
+    }
+  }
+
+
+  showImage = (info) => {
+    this.setState({
+      show_img: false
+    }, () => this.closeActivity(info))
+  }
+
+
+  onPressActivity = (info) => {
+    const {currStoreId, accessToken} = this.props.global;
+    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
+    this.mixpanel.track("act_user_ref_ad_click", {
+      img_name: info.name,
+      pos: info.pos_name,
+      store_id: currStoreId,
+    });
+  }
+
+
+  onScanSuccess = (code) => {
+    if (code) {
+      ToastLong('加载中')
+      const {accessToken} = this.props.global;
+      const api = `/v1/new_api/orders/barcode_decode/${code}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then((res) => {
+        if (res.order_id && Number(res.order_id) > 0) {
+          this.onPress(Config.ROUTE_ORDER, {orderId: res.order_id})
+        }
+      })
+    }
+  }
+
+  onScanFail = () => {
+    ToastLong('编码不合法，请重新扫描')
+  }
+
+  render() {
+    const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+    const {
+      showSortModal,
+      ext_store_list,
+      searchStoreVisible,
+      ext_store_name,
+      showTabs,
+      show_hint,
+      ListData,
+      hint_msg,
+      scanBoolean
+    } = this.state
+    return (
+      <View style={styles.flex1}>
+        <FloatServiceIcon fromComponent={'订单列表'}/>
+        {this.renderTabsHead()}
+        <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
+          <View style={styles.extStore}>
+            <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
+              {ext_store_name}
+            </Text>
+            <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
+          </View>
+        </If>
+        <SearchExtStore visible={searchStoreVisible}
+                        data={ext_store_list}
+                        onClose={() => this.searchExtStoreOnClose()}
+                        onSelect={item => this.searchExtStoreOnSelect(item)}/>
+        {showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}
+        <If condition={show_hint}>
+          <TouchableOpacity style={styles.cell_row}>
+            <Text style={styles.cell_body_text}>
+              {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}
+            </Text>
+            <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
+          </TouchableOpacity>
+        </If>
+        <HotUpdateComponent/>
+        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
+        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
+          {this.showSortSelect()}
+        </Dialog>
+
+        <Scanner visible={scanBoolean} title="返回"
+                 onClose={() => this.setState({scanBoolean: false})}
+                 onScanSuccess={code => this.onScanSuccess(code)}
+                 onScanFail={code => this.onScanFail(code)}/>
+      </View>
+    );
+  }
+
   renderTabsHead = () => {
     return (
       <View style={styles.tabsHeader}>
@@ -638,7 +704,7 @@ class OrderListScene extends Component {
           dropdownStyle={styles.modalDropDown}
           dropdownTextStyle={styles.modalDropDownText}
           dropdownTextHighlightStyle={{color: '#fff'}}
-          options={['新 建', '排 序']}
+          options={['新 建', '排 序', '扫 描']}
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
         >
@@ -648,15 +714,6 @@ class OrderListScene extends Component {
         </ModalDropdown>
       </View>
     )
-  }
-
-  onSelect = (e) => {
-    if (e === 0) {
-      this.mixpanel.track('新建订单')
-      this.onPress(Config.ROUTE_ORDER_SETTING)
-    } else {
-      this.setState({showSortModal: !this.state.showSortModal})
-    }
   }
 
   renderStatusTabs = () => {
@@ -758,6 +815,19 @@ class OrderListScene extends Component {
     return item.id.toString();
   }
 
+  setOrderBy = (order_by) => {
+    let {user_config} = this.props.global
+    let {dispatch} = this.props
+    user_config.order_list_by = order_by
+    dispatch(setUserCfg(user_config));
+    this.setState({
+      showSortModal: false,
+      sort: order_by
+    }, () => {
+      this.onRefresh(this.state.orderStatus)
+    })
+  }
+
   showSortSelect = () => {
     let {user_config} = this.props.global;
     let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
@@ -777,18 +847,7 @@ class OrderListScene extends Component {
       </View>
     )
   }
-  setOrderBy = (order_by) => {
-    let {user_config} = this.props.global
-    let {dispatch} = this.props
-    user_config.order_list_by = order_by
-    dispatch(setUserCfg(user_config));
-    this.setState({
-      showSortModal: false,
-      sort: order_by
-    }, () => {
-      this.onRefresh(this.state.orderStatus)
-    })
-  }
+
 
   renderItem = (order) => {
     let {item, index} = order;
@@ -807,12 +866,6 @@ class OrderListScene extends Component {
                      orderStatus={orderStatus}
                      onPress={this.onPress}/>
     );
-  }
-
-  showImage = (info) => {
-    this.setState({
-      show_img: false
-    }, () => this.closeActivity(info))
   }
 
   renderSwiper = () => {
@@ -852,16 +905,6 @@ class OrderListScene extends Component {
         </If>
       </View>
     )
-  }
-
-  onPressActivity = (info) => {
-    const {currStoreId, accessToken} = this.props.global;
-    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
-    this.mixpanel.track("act_user_ref_ad_click", {
-      img_name: info.name,
-      pos: info.pos_name,
-      store_id: currStoreId,
-    });
   }
 
   renderTopImg = () => {
@@ -1073,24 +1116,23 @@ const styles = StyleSheet.create({
   },
   tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
   modalDropDown: {
-    marginRight: pxToDp(10),
-    width: pxToDp(150),
-    height: pxToDp(180),
+    marginRight: 10,
+    width: 70,
+    height: 120,
     backgroundColor: '#5f6660',
     marginTop: -StatusBar.currentHeight,
   },
   modalDropDownText: {
     textAlignVertical: 'center',
     textAlign: 'center',
-    fontSize: pxToDp(28),
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
-    height: pxToDp(90),
+    height: 40,
     backgroundColor: '#5f6660',
-    borderRadius: pxToDp(3),
+    borderRadius: 2,
     borderColor: '#5f6660',
     borderWidth: 1,
-    shadowRadius: pxToDp(3),
   },
   modalDropDownIcon: {marginRight: 16, marginLeft: 18},
   modalDropDownIconMenu: {fontSize: 24, color: colors.color666},
