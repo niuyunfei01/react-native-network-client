@@ -38,9 +38,9 @@ class StoreGoodsList extends Component {
       page: 1,
       statusList: [
         {label: '全部商品', value: 'all'},
-        {label: '售罄商品', value: 'out_of_stock'},
+        {label: '下架商品', value: 'out_of_stock'},
         {label: '最近上新', value: 'new_arrivals'},
-        {label: '在售商品', value: 'in_stock'},
+        {label: '上架商品', value: 'in_stock'},
       ],
       pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
       categories: [],
@@ -107,18 +107,18 @@ class StoreGoodsList extends Component {
           {label: '全部商品 - ' + res.all, value: 'all'},
           {label: '总部供货 - ' + res.common_provided, value: 'common_provided'},
           {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
-          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
+          {label: '回收站 - ' + res.off_stock, value: 'off_stock'},
         ]
       } else {
         newStatusList = [
           {label: '全部商品 - ' + res.all, value: 'all'},
-          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
+          {label: '回收站 - ' + res.off_stock, value: 'off_stock'},
         ]
       }
       this.setState({
