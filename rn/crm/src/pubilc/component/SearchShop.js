@@ -208,7 +208,7 @@ class SearchShop extends Component {
         style={StyleSheet.absoluteFill}
         initialCameraPosition={{
           target: {latitude: Number(lat), longitude: Number(lng)},
-          zoom: 13
+          zoom: 18
         }}>
         <Marker
           position={{latitude: Number(lat), longitude: Number(lng)}}

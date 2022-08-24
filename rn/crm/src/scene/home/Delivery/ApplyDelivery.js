@@ -227,7 +227,7 @@ class ApplyDelivery extends PureComponent {
               <MapView
                 initialCameraPosition={{
                   target: {latitude: Number(lat), longitude: Number(lng)},
-                  zoom: 18
+                  zoom: 16
                 }}>
                 <Marker
                   draggable
