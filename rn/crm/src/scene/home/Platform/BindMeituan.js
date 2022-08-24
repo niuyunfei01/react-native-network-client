@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Alert, InteractionManager, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {InteractionManager, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,6 +14,8 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {Button} from "react-native-elements";
+import BottomModal from "../../../pubilc/component/BottomModal";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -53,6 +55,7 @@ class BindMeituan extends PureComponent {
       url: '',
       mobile: '',
       is_chosed: false,
+      modal: false,
     }
     this.fetchData()
   }
@@ -76,6 +79,12 @@ class BindMeituan extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
+  }
+
+  closeModal = () => {
+    this.setState({
+      modal: false
+    })
   }
 
   renderList() {
@@ -215,20 +224,21 @@ class BindMeituan extends PureComponent {
                   ToastLong("请先绑定打印机")
                   return;
                 }
-                Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团众包”配送；\n' +
-                  '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
-                  '•兼容模式不支持自动接单\t\t\t',
-                  [
-                    {text: '取消'},
-                    {
-                      text: '去授权',
-                      onPress: () => {
-                        let url = config.apiUrl(this.state.url);
-                        this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
-                      }
-                    }
-                  ]
-                )
+                this.setState({modal: true})
+                // Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团众包”配送；\n' +
+                //   '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
+                //   '•兼容模式不支持自动接单\t\t\t',
+                //   [
+                //     {text: '取消'},
+                //     {
+                //       text: '去授权',
+                //       onPress: () => {
+                //         let url = config.apiUrl(this.state.url);
+                //         this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
+                //       }
+                //     }
+                //   ]
+                // )
                 return;
               }
 
@@ -245,6 +255,47 @@ class BindMeituan extends PureComponent {
               borderWidth: pxToDp(0)
             }}/>
         </View>
+        <BottomModal
+          title={'提示'}
+          actionText={'确定'}
+          closeText={'取消'}
+          onPress={() => {
+            let url = config.apiUrl(this.state.url);
+            this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
+          }}
+          visible={this.state.modal} onPressClose={this.closeModal}
+          onClose={this.closeModal}
+          btnBottomStyle={{
+            borderTopWidth: 1,
+            borderTopColor: "#E5E5E5",
+          }}
+          closeBtnStyle={{
+            borderWidth: 0,
+            borderRadius: 0,
+            borderRightWidth: 1,
+            borderColor: "#E5E5E5",
+          }}
+          btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
+          closeBtnTitleStyle={{color: colors.color333}}
+          btnTitleStyle={{color: colors.main_color}}>
+          <View style={{paddingVertical: 10, paddingHorizontal: 10}}>
+            <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+            </View>
+
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
+            </View>
+
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式不支持自动接单 </Text>
+            </View>
+          </View>
+        </BottomModal>
       </View>
     )
   }
