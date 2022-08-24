@@ -3,6 +3,7 @@
 // 引入 JPush 功能所需头文件
 #import <RCTJPushModule.h>
 #import "IFlyMSC/IFlyMSC.h"
+#import <AMapFoundationKit/AMapFoundationKit.h>
 #import "Definition.h"
 #import "TTSConfig.h"
 
@@ -63,6 +64,7 @@ static void InitializeFlipper(UIApplication *application) {
    forKey:[IFlySpeechConstant ENGINE_TYPE]];
 
   [NewRelic startWithApplicationToken:@"AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA"];
+  [AMapServices sharedServices].apiKey = @"48148de470831f4155abda953888a487";
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
 #endif
@@ -77,16 +79,16 @@ static void InitializeFlipper(UIApplication *application) {
     }
   [JPUSHService registerForRemoteNotificationConfig:entity delegate:self];
   [launchOptions objectForKey: UIApplicationLaunchOptionsRemoteNotificationKey];
-  
+
   // 自定义消息
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   [defaultCenter addObserver:self selector:@selector(networkDidReceiveMessage:) name:kJPFNetworkDidReceiveMessageNotification object:nil];
-  
+
   [JPUSHService registrationIDCompletionHandler:^(int resCode, NSString *registrationID) {
       NSLog(@"resCode : %d,registrationID: %@",resCode,registrationID);
   }];
 
-  
+
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"crm"

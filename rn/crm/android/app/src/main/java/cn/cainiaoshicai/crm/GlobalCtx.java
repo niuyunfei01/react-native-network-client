@@ -20,7 +20,6 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
@@ -30,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 
+import qiuxiang.amap3d.AMap3DPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
@@ -333,6 +333,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new JPushPackage(),
                     new NewRelicPackage(),
                     new LinearGradientPackage(),
+                    new AMap3DPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage(),
                     new ClipboardPackage(),

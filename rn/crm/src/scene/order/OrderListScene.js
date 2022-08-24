@@ -41,6 +41,7 @@ import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import Swiper from 'react-native-swiper'
 import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
+import {AMapSdk} from "react-native-amap3d";
 import FastImage from "react-native-fast-image";
 
 const {width} = Dimensions.get("window");
@@ -225,6 +226,14 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
     calcMs(timeObj, accessToken)
+
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
