@@ -1,28 +1,19 @@
 import React, {Component} from 'react';
-import {
-  Dimensions,
-  FlatList,
-  InteractionManager,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {Dimensions, FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Button, SearchBar} from 'react-native-elements';
 import Cts from "../common/Cts";
 import tool from "../util/tool";
 import Config from "../common/config";
 import {ToastLong} from "../util/ToastUtils";
-import {WebView} from "react-native-webview";
-import 'react-native-get-random-values';
 import pxToDp from "../util/pxToDp";
 import {Cell, CellBody, CellHeader} from "../../weui";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../styles/colors";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import {MapType, MapView, Marker} from "react-native-amap3d";
+import Entypo from "react-native-vector-icons/Entypo";
 
 let height = Dimensions.get("window").height;
 
@@ -44,7 +35,6 @@ class SearchShop extends Component {
     let map = {};
     let isMap = false;
     let is_default = false
-    console.log(cityName, typeof cityName)
     let cityNames = cityName !== undefined && tool.length(cityName) > 0 ? cityName : "北京市"
     if (tool.length(center) > 0) {
       map.name = '';
@@ -178,7 +168,7 @@ class SearchShop extends Component {
                 fontSize: 16
               }}
       />
-      <View style={{flex: 1}}></View>
+      <View style={{flex: 1}}/>
       <Button title={'确定地址'}
               onPress={() => {
 
@@ -204,28 +194,40 @@ class SearchShop extends Component {
   }
 
   renderMap() {
-    let gdkey = "85e66c49898d2118cc7805f484243909"
-    let uri = "https://m.amap.com/navi/?dest=" +
-      this.state.shopmsg.location +
-      "&destName=" + "" +
-      "&hideRouteIcon=1&key=" + gdkey
-    if (Platform.OS === "ios") {
-      uri = "https://m.amap.com/navi/?dest=" +
-        this.state.shopmsg.location +
-        "&destName=" + this.state.shopmsg.name +
-        "&hideRouteIcon=1&key=" + gdkey
+    let lat = this.state.shopmsg.location.split(",")[1];
+    let lng = this.state.shopmsg.location.split(",")[0];
+    if (!lat || !lng) {
+      return null
     }
+
     return (
-      <WebView
-        source={{uri}}
-        style={{
-          width: '100%',
-          height: this.state.isMap ? '100%' : 0,
-          opacity: 0.99,
-          zIndex: 999,
-        }}
-      />
-    );
+      <MapView
+        mapType={MapType.Standard}
+        style={StyleSheet.absoluteFill}
+        initialCameraPosition={{
+          target: {latitude: Number(lat), longitude: Number(lng)},
+          zoom: 18
+        }}>
+        <Marker
+          position={{latitude: Number(lat), longitude: Number(lng)}}
+          onPress={() => alert("onPress")}
+        >
+          <View style={{alignItems: 'center'}}>
+            <Text style={{
+              color: colors.white,
+              fontSize: 18,
+              zIndex: 999,
+              backgroundColor: colors.main_color,
+              marginBottom: 15,
+              padding: 3,
+            }}>终点 </Text>
+            <Entypo name={'triangle-down'}
+                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 20}}/>
+          </View>
+        </Marker>
+      </MapView>
+    )
+
   }
 
   renderSearchBar() {

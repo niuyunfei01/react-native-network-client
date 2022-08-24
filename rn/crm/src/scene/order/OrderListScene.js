@@ -16,14 +16,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
 import * as globalActions from '../../reducers/global/globalActions'
-import {setExtStore, setUserCfg} from '../../reducers/global/globalActions'
+import {getSimpleStore, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import tool from "../../pubilc/util/tool";
-import {getSimpleStore} from "../../reducers/global/globalActions";
 import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
 import Dialog from "../common/component/Dialog";
@@ -33,15 +32,17 @@ import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
 import {showError} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {Badge, Button, Image} from "react-native-elements";
+import {Badge, Button} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import RemindModal from "../../pubilc/component/remindModal";
-import {HotUpdateComponent} from "../../pubilc/component/HotUpdateComponent";
+import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import Swiper from 'react-native-swiper'
 import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
+import {AMapSdk} from "react-native-amap3d";
+import FastImage from "react-native-fast-image";
 
 const {width} = Dimensions.get("window");
 
@@ -57,24 +58,6 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-
-function FetchInform({navigation, onRefresh}) {
-  React.useEffect(() => {
-    onRefresh()
-  }, [navigation])
-  return null;
-}
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 
 const initState = {
   isLoading: false,
@@ -148,7 +131,6 @@ class OrderListScene extends Component {
     }
 
     this.mixpanel.track("orderpage_view", {})
-    this.renderItem = this.renderItem.bind(this);
     this.getActivity();
     GlobalUtil.setOrderFresh(1)
   }
@@ -192,9 +174,7 @@ class OrderListScene extends Component {
         }
       }).then()
 
-      native.xunfeiIdentily((resp) => {
-        console.log(resp, 'kedaxunfei');
-      }).then()
+      native.xunfeiIdentily().then()
 
     }
   }
@@ -215,6 +195,10 @@ class OrderListScene extends Component {
         })
       }
     }).then()
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   componentDidMount() {
@@ -260,18 +244,23 @@ class OrderListScene extends Component {
     )
 
     const {global, dispatch} = this.props
+    const {global, dispatch, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
     }
     getSimpleStore(global, dispatch)
     this.openAndroidNotification();
+    this.focus = navigation.addListener('focus', () => {
+      this.getVendor()
+      this.onRefresh()
+    })
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {deviceInfo} = device
+    const {currStoreId, currentUser, accessToken, config} = global;
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
@@ -279,6 +268,14 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
     calcMs(timeObj, accessToken)
+
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -346,8 +343,7 @@ class OrderListScene extends Component {
   closeActivity = (info) => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/close_user_refer_ad?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
-    })
+    HttpUtils.get.bind(this.props)(api).then()
     this.mixpanel.track("close_user_refer_ad", {
       img_name: info.name,
       pos: info.pos_name,
@@ -412,7 +408,7 @@ class OrderListScene extends Component {
             text: '去充值',
             onPress: () => {
               this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
-                onBack: (res) => {
+                onBack: () => {
                   Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
                     {
                       text: '确定'
@@ -428,31 +424,32 @@ class OrderListScene extends Component {
   }
 
   onRefresh = (status) => {
+
     tool.debounces(() => {
-      if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
+      const {isLoading, query} = this.state
+      if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
         GlobalUtil.setOrderFresh(1)
-        if (this.state.isLoading) this.state.isLoading = true;
-        return null;
+        if (isLoading)
+          this.setState({isLoading: true})
+        return;
       }
-      this.state.query.page = 1;
-      this.state.query.isAdd = true;
-      this.state.query.offset = 0;
-      this.fetchOrders(status)
+      this.setState({
+          query: {...query, page: 1, isAdd: true, offset: 0}
+        },
+        () => this.fetchOrders(status))
     }, 600)
   }
 
   // 新订单1  待取货  106   配送中 1
   fetorderNum = () => {
-    let {currStoreId} = this.props.global;
+    let {currStoreId, accessToken, show_orderlist_ext_store} = this.props.global;
     let params = {
       search: `store:${currStoreId}`,
     }
 
-    if (this.state.ext_store_id > 0 && this.props.global.show_orderlist_ext_store) {
+    if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-
-    const accessToken = this.props.global.accessToken;
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params, true).then(res => {
       const {obj} = res
@@ -489,9 +486,9 @@ class OrderListScene extends Component {
     const {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
-    let initQueryType = "";
+    let initQueryType = queryType || this.state.orderStatus;
     const order_by = user_config !== undefined && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
-    initQueryType = queryType || this.state.orderStatus;
+
     this.setState({
       orderStatus: initQueryType,
       isLoading: true,
@@ -525,7 +522,7 @@ class OrderListScene extends Component {
             isLoading: false,
           })
           this.onRefresh()
-          return null
+          return
         }
         this.setState({
           categoryLabels: res.tabs,
@@ -570,6 +567,7 @@ class OrderListScene extends Component {
     }
     this.setState({
       query: {
+        ...this.state.query,
         page: 1,
         isAdd: true,
         offset: 0
@@ -590,26 +588,22 @@ class OrderListScene extends Component {
 
   render() {
     const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+    const {
+      showSortModal, ext_store_list, searchStoreVisible, ext_store_name, showTabs, show_hint, ListData, hint_msg
+    } = this.state
 
     JPush.isNotificationEnabled((enabled) => {
       console.log("JPush-is-notification enabled:", enabled)
     })
-
-    const {showSortModal, ext_store_list, searchStoreVisible} = this.state
     return (
       <View style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
         {this.renderTabsHead()}
-        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {this.showSortSelect()}
-        </Dialog>
         <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
           <View style={styles.extStore}>
-            <Text onPress={() => {
-              this.setState({searchStoreVisible: true})
-            }} style={styles.extStoreLabel}>{this.state.ext_store_name} </Text>
+            <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
+              {ext_store_name}
+            </Text>
             <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
           </View>
         </If>
@@ -617,58 +611,69 @@ class OrderListScene extends Component {
                         data={ext_store_list}
                         onClose={() => this.searchExtStoreOnClose()}
                         onSelect={item => this.searchExtStoreOnSelect(item)}/>
-        {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
-        <If condition={this.state.show_hint}>
+        {showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}
+        <If condition={show_hint}>
           <TouchableOpacity style={styles.cell_row}>
-            <Text
-              style={styles.cell_body_text}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
+            <Text style={styles.cell_body_text}>
+              {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}
+            </Text>
             <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
           </TouchableOpacity>
         </If>
         <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
+        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
+        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
+          {this.showSortSelect()}
+        </Dialog>
       </View>
     );
   }
 
   openNotifySetting = () => {
     if (this.state.hint_msg === 1) {
-      native.toOpenNotifySettings()
+      native.toOpenNotifySettings().then()
     }
     if (this.state.hint_msg === 2) {
       this.onPress(Config.ROUTE_SETTING);
     }
   }
 
+  inProcessOrder = () => {
+    this.setState({
+      showTabs: true,
+      ListData: [],
+      orderStatus: this.state.categoryLabels[0].status
+    }, () => {
+      this.onRefresh(this.state.categoryLabels[0].status)
+      this.mixpanel.track('处理中订单')
+    })
+  }
+
+  reserveOrder = () => {
+    this.setState({
+      showTabs: false,
+      orderStatus: 7,
+      ListData: [],
+    }, () => {
+      this.onRefresh(7)
+      this.mixpanel.track('预订单')
+    })
+  }
+
+  allOrders = () => {
+    this.mixpanel.track('全部的订单')
+    const {navigation} = this.props
+    navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
+  }
   renderTabsHead = () => {
     return (
       <View style={styles.tabsHeader}>
         <View style={styles.tabsHeader1}>
-          <Text onPress={() => {
-            this.setState({
-              showTabs: true,
-              ListData: [],
-              orderStatus: this.state.categoryLabels[0].status
-            }, () => {
-              this.onRefresh(this.state.categoryLabels[0].status)
-              this.mixpanel.track('处理中订单')
-            })
-          }} style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
-          <Text onPress={() => {
-            this.setState({
-              showTabs: false,
-              orderStatus: 7,
-              ListData: [],
-            }, () => {
-              this.onRefresh(7)
-              this.mixpanel.track('预订单')
-            })
-          }} style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
-          <Text onPress={() => {
-            this.mixpanel.track('全部的订单')
-            const {navigation} = this.props
-            navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
-          }} style={styles.tabsHeader3}> 全部订单 </Text>
+          <Text onPress={this.inProcessOrder}
+                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
+          <Text onPress={this.reserveOrder}
+                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
+          <Text onPress={this.allOrders} style={styles.tabsHeader3}> 全部订单 </Text>
         </View>
 
         <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)} style={styles.tabsHeaderRight}>
@@ -696,15 +701,14 @@ class OrderListScene extends Component {
       this.mixpanel.track('新建订单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
     } else {
-      let showSortModal = !this.state.showSortModal;
-      this.setState({showSortModal: showSortModal})
+      this.setState({showSortModal: !this.state.showSortModal})
     }
   }
 
   renderStatusTabs = () => {
     const tab_width = 1 / this.state.categoryLabels.length;
     if (!tool.length(this.state.categoryLabels) > 0) {
-      return null;
+      return;
     }
     return (
       <View style={styles.flex1}>
@@ -713,9 +717,7 @@ class OrderListScene extends Component {
             <TouchableOpacity
               key={i}
               style={{width: tab_width * width, alignItems: "center"}}
-              onPress={() => {
-                this.onRefresh(tab.status)
-              }}>
+              onPress={() => this.onRefresh(tab.status)}>
               <View style={styles.statusTabItem}>
                 <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>
                   {tab.tabname}
@@ -738,36 +740,39 @@ class OrderListScene extends Component {
     )
   }
 
+  onTouchStart = (e) => {
+    this.pageX = e.nativeEvent.pageX;
+    this.pageY = e.nativeEvent.pageY;
+  }
+  onEndReached = () => {
+    if (this.state.isCanLoadMore) {
+      this.setState({isCanLoadMore: false}, () => this.listmore())
+    }
+  }
+  onMomentumScrollBegin = () => {
+    this.setState({isCanLoadMore: true})
+  }
+  onTouchMove = (e) => {
+    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+      this.setState({scrollLocking: true});
+    } else {
+      this.setState({scrollLocking: false});
+    }
+  }
   renderContent = (orders) => {
     return (
       <SafeAreaView style={styles.orderListContent}>
         <FlatList
-          extraData={orders}
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
-          onTouchStart={(e) => {
-            this.pageX = e.nativeEvent.pageX;
-            this.pageY = e.nativeEvent.pageY;
-          }}
+          onTouchStart={(e) => this.onTouchStart(e)}
           onEndReachedThreshold={0.3}
-          onEndReached={() => {
-            if (this.state.isCanLoadMore) {
-              this.setState({isCanLoadMore: false}, () => this.listmore())
-            }
-          }}
-          onMomentumScrollBegin={() => {
-            this.setState({isCanLoadMore: true})
-          }}
-          onTouchMove={(e) => {
-            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-              this.setState({scrollLocking: true});
-            } else {
-              this.setState({scrollLocking: false});
-            }
-          }}
+          onEndReached={this.onEndReached}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
-          onRefresh={this.onRefresh.bind(this)}
+          onRefresh={this.onRefresh}
           refreshing={this.state.isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
@@ -837,17 +842,23 @@ class OrderListScene extends Component {
     return (
       <OrderListItem showBtn={showBtn}
                      key={index}
-                     fetchData={this.onRefresh.bind(this, orderStatus)}
+                     fetchData={() => this.onRefresh(orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}
-                     onRefresh={() => this.onRefresh()}
+                     onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}
-                     onPress={this.onPress.bind(this)}/>
+                     onPress={this.onPress}/>
     );
+  }
+
+  showImage = (info) => {
+    this.setState({
+      show_img: false
+    }, () => this.closeActivity(info))
   }
 
   renderSwiper = () => {
@@ -865,13 +876,9 @@ class OrderListScene extends Component {
         <For index='i' each='info' of={activity}>
           <View style={styles.slide1} key={i}>
             <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.topImgBottom}>
-              <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+              <FastImage style={styles.image} source={{uri: info.banner}} resizeMode={FastImage.resizeMode.contain}/>
             </TouchableOpacity>
-            <Entypo onPress={() => {
-              this.setState({
-                show_img: false
-              }, () => this.closeActivity(info))
-            }} name='cross' size={25} style={styles.topImgIcon}/>
+            <Entypo onPress={() => this.showImage(info)} name='cross' size={25} style={styles.topImgIcon}/>
           </View>
         </For>
       </Swiper>
@@ -904,10 +911,10 @@ class OrderListScene extends Component {
   }
 
   renderTopImg = () => {
-    let showTopImg = this.state.showImgType === 1 && this.state.show_img;
+    const {showImgType, show_img, isadditional, orderStatus} = this.state
     return (
-      <View>
-        <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
+      <>
+        <If condition={isadditional && orderStatus !== 7}>
           <TouchableOpacity
             onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})}
             style={styles.topImg}>
@@ -919,18 +926,18 @@ class OrderListScene extends Component {
             </Button>
           </TouchableOpacity>
         </If>
-        <If condition={showTopImg}>
+        <If condition={showImgType === 1 && show_img}>
           {this.renderSwiper()}
         </If>
 
-      </View>
+      </>
     )
   }
 
   renderBottomImg = () => {
-    let {activity} = this.state
+    let {activity, showImgType, show_img} = this.state
     return (
-      <If condition={this.state.showImgType === 0 && this.state.show_img}>
+      <If condition={showImgType === 0 && show_img}>
         <Swiper style={styles.wrapper}
                 showsButtons={false}
                 height={100}
@@ -942,10 +949,8 @@ class OrderListScene extends Component {
         >
           <For index='i' each='info' of={activity}>
             <View style={styles.slide1} key={i}>
-              <TouchableOpacity onPress={() => {
-                this.onPressActivity(info)
-              }} style={styles.bottomImg}>
-                <Image source={{uri: info.banner}} resizeMode={'contain'} style={styles.image}/>
+              <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.bottomImg}>
+                <FastImage style={styles.image} source={{uri: info.banner}} resizeMode={FastImage.resizeMode.contain}/>
               </TouchableOpacity>
             </View>
           </For>
@@ -1089,11 +1094,11 @@ const styles = StyleSheet.create({
   },
   tabsHeader2: {
     width: 0.24 * width,
-    justifyContent: 'center',
+
     paddingVertical: pxToDp(10),
-    alignItems: 'center',
+
     borderRadius: pxToDp(18),
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: "center",
     marginLeft: pxToDp(10),
@@ -1102,12 +1107,12 @@ const styles = StyleSheet.create({
   },
   tabsHeader3: {
     width: 0.24 * width,
-    justifyContent: 'center',
+
     fontWeight: 'bold',
     paddingVertical: pxToDp(10),
-    alignItems: 'center',
+
     borderRadius: pxToDp(18),
-    fontSize: pxToDp(26),
+    fontSize: 16,
     textAlign: "center",
     marginLeft: pxToDp(10),
     color: colors.title_color,

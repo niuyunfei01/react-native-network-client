@@ -42,9 +42,7 @@ export default class Dialog extends React.Component {
             {this.props.children}
           </View>
           <TouchableOpacity onPress={() => this.props.onRequestClose()} style={styles.modalCancel}>
-            <View>
-              <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
-            </View>
+            <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
           </TouchableOpacity>
         </View>
       </Modal>

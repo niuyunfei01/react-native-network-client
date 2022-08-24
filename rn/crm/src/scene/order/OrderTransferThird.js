@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import {Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
@@ -48,7 +48,7 @@ const timeObj = {
 }//记录耗时的对象
 
 
-class OrderTransferThird extends PureComponent {
+class OrderTransferThird extends Component {
   constructor(props: Object) {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})

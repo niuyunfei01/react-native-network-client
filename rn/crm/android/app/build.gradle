@@ -4,6 +4,7 @@ project.ext.react = [
         enableHermes: true,
 ]
 
+
 def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
@@ -11,11 +12,11 @@ def safeExtGet(prop, fallback) {
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = true
+def enableProguardInReleaseBuilds = false
 
 def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", true);
-def enableSeparateBuildPerCPUArchitecture = false
+def enableSeparateBuildPerCPUArchitecture = true
 
 
 apply plugin: 'com.android.application'
@@ -73,7 +74,7 @@ dependencies {
 
     //支持扫码时引入的，忘记用来干嘛的，先注释掉
     //implementation("com.google.zxing:core:3.3.3")
-    
+
     implementation('io.reactivex.rxjava2:rxjava:2.2.19')
     implementation 'id.zelory:compressor:2.1.1'
 
@@ -93,10 +94,13 @@ dependencies {
     }
     implementation project(':@react-native-community_geolocation')
     implementation project(':@react-native-community_clipboard')
+    implementation project(':@react-native-community_slider')
+    implementation project(':@react-native-community_cameraroll')
+    implementation project(':@react-native-community_datetimepicker')
+    implementation project(':@react-native-community_masked-view')
     implementation project(':react-native-linear-gradient')
     implementation project(':react-native-gesture-handler')
     implementation (project(':@react-native-async-storage'))
-    implementation (project(':@react-native-datetimepicker'))
     implementation (project(':react-native-vector-icons'))
     implementation (project(':react-native-splash-screen'))
     implementation (project(':RCTWeChat'))
@@ -115,6 +119,7 @@ dependencies {
     implementation (project(':react-native-svg'))
     implementation (project(':mixpanel-react-native'))
     implementation project(':react-native-fast-image')
+    implementation project(':react-native-amap3d')
     implementation fileTree(dir: "../../node_modules/jpush-react-native/android/libs", include: ["*.jar"])
     implementation fileTree(dir: "../../node_modules/jcore-react-native/android/libs", include: ["*.jar"])
     implementation project(':jpush-react-native')  // 添加 jpush 依赖
@@ -246,9 +251,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled true
+            minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
-
             resValue "string", "applicationId", "cn.cainiaoshicai.crm"
             resValue "string", "Cainiaoshicai.cn",
                     "cn.cainiaoshicai.crm" + ".mention://@Cainiao-CRM"

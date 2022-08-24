@@ -1,19 +1,19 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import {WebView} from "react-native-webview";
-import 'react-native-get-random-values';
 import Config from "../../../pubilc/common/config";
 import {Icon} from "../../../weui";
 import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {MapView, Marker} from "react-native-amap3d";
+import Entypo from "react-native-vector-icons/Entypo";
 
 
 const mapStateToProps = state => {
@@ -77,7 +77,7 @@ class ApplyDelivery extends PureComponent {
         lng: store.lng,
         lat: store.lat,
         user_mobile: store.mobile,
-      }, this.webview.reload());
+      });
     })
   }
 
@@ -120,7 +120,18 @@ class ApplyDelivery extends PureComponent {
   }
 
   render() {
-    let url = `https://m.amap.com/navi/?dest=${this.state.lng},${this.state.lat}&destName=${this.state.store_name}&hideRouteIcon=1&key=85e66c49898d2118cc7805f484243909`
+    let {
+      lng,
+      lat,
+      store_name,
+      delivery_name,
+      status,
+      apply_time,
+      can_call_worker,
+      err_msg,
+      address,
+      user_mobile
+    } = this.state;
     return (
       <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
         <ScrollView style={{flexGrow: 1}}>
@@ -128,18 +139,18 @@ class ApplyDelivery extends PureComponent {
             fontSize: pxToDp(35),
             color: colors.fontGray,
             marginTop: pxToDp(10)
-          }}>您正在申请开通“{this.state.delivery_name}”配送平台</Text>
+          }}>您正在申请开通“{delivery_name}”配送平台</Text>
 
-          <If condition={this.state.status < 2}>
+          <If condition={status < 2}>
             <Text style={{
               fontSize: pxToDp(35),
               color: colors.fontGray,
               marginTop: pxToDp(10)
-            }}>预计开通时间：{this.state.apply_time} </Text>
+            }}>预计开通时间：{apply_time} </Text>
           </If>
 
 
-          <If condition={this.state.status === 1}>
+          <If condition={status === 1}>
             <View style={{marginTop: pxToDp(100), marginBottom: pxToDp(50)}}>
               <Text style={{fontSize: pxToDp(65), textAlign: "center", marginTop: pxToDp(30)}}>已提交申请</Text>
             </View>
@@ -148,9 +159,9 @@ class ApplyDelivery extends PureComponent {
                 fontSize: pxToDp(35),
                 color: colors.fontBlack,
                 marginTop: pxToDp(30)
-              }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
+              }}>“{delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
             <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
-              {this.state.can_call_worker ? <TouchableOpacity
+              {can_call_worker ? <TouchableOpacity
                 onPress={() => {
                   this.callMobile();
                 }}
@@ -169,7 +180,7 @@ class ApplyDelivery extends PureComponent {
             </View>
           </If>
 
-          <If condition={this.state.status === 3}>
+          <If condition={status === 3}>
             <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
               <Icon name="warn"
                     size={pxToDp(100)}
@@ -183,12 +194,12 @@ class ApplyDelivery extends PureComponent {
                 fontSize: pxToDp(35),
                 color: colors.fontBlack,
                 marginTop: pxToDp(30)
-              }}>{this.state.err_msg} </Text>
+              }}>{err_msg} </Text>
 
           </If>
 
 
-          <If condition={this.state.status === 2}>
+          <If condition={status === 2}>
             <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
               <Icon name="success"
                     size={pxToDp(100)}
@@ -203,21 +214,39 @@ class ApplyDelivery extends PureComponent {
               fontSize: pxToDp(35),
               color: colors.fontBlack,
               marginTop: pxToDp(30)
-            }}>{this.state.address} </Text>
+            }}>{address} </Text>
           <Text style={{
             fontSize: pxToDp(35),
             color: colors.fontBlack,
             marginTop: pxToDp(25)
-          }}>联系电话： {this.state.user_mobile} </Text>
+          }}>联系电话： {user_mobile} </Text>
 
-          <If condition={this.state.status === 0}>
+          <If condition={status === 0 && lat && lng}>
             <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
-              <WebView
-                ref={(webview) => (this.webview = webview)}
-                automaticallyAdjustContentInsets={true}
-                source={{uri: url}}
-                scalesPageToFit
-              />
+              <MapView
+                initialCameraPosition={{
+                  target: {latitude: Number(lat), longitude: Number(lng)},
+                  zoom: 16
+                }}>
+                <Marker
+                  draggable
+                  position={{latitude: Number(lat), longitude: Number(lng)}}
+                  onPress={() => alert("onPress")}
+                >
+                  <View style={{alignItems: 'center'}}>
+                    <Text style={{
+                      color: colors.white,
+                      fontSize: 18,
+                      zIndex: 999,
+                      backgroundColor: colors.main_color,
+                      marginBottom: 15,
+                      padding: 3,
+                    }}>{store_name} </Text>
+                    <Entypo name={'triangle-down'}
+                            style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 20}}/>
+                  </View>
+                </Marker>
+              </MapView>
             </View>
           </If>
 
@@ -229,7 +258,7 @@ class ApplyDelivery extends PureComponent {
           marginBottom: pxToDp(70),
         }}>
 
-          <If condition={this.state.status === 0}>
+          <If condition={status === 0}>
             <TouchableOpacity
               type={'primary'}
               onPress={() => {
@@ -269,7 +298,7 @@ class ApplyDelivery extends PureComponent {
             </TouchableOpacity>
           </If>
 
-          <If condition={this.state.status === 3 && this.state.can_call_worker}>
+          <If condition={status === 3 && can_call_worker}>
             <TouchableOpacity
               style={{
                 width: '100%',
@@ -289,7 +318,4 @@ class ApplyDelivery extends PureComponent {
   }
 }
 
-const
-  styles = StyleSheet.create({});
-//make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyDelivery);
