@@ -1,30 +1,27 @@
 import React, {PureComponent} from "react";
 import {View, Text, StyleSheet, TouchableOpacity, Alert} from "react-native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
 import {connect} from "react-redux";
-import {LineView} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
+import {LineView, Styles} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
+import {autoPackage, autoReply, bell} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 const styles = StyleSheet.create({
-  page: {
-    backgroundColor: colors.white,
-    marginBottom: 14
-  },
+
   header: {
     paddingTop: 12,
     paddingBottom: 10,
     paddingRight: 21,
-    paddingLeft: 22,
+    paddingLeft: 12,
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   headerDescription: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 20
   },
@@ -44,49 +41,28 @@ const styles = StyleSheet.create({
   },
   row: {flexDirection: 'row'},
   contentWrap: {
-    paddingLeft: 29,
+    paddingLeft: 12,
     paddingTop: 17,
     paddingBottom: 20,
     flexDirection: 'row'
   },
-  notActiveIconWrap: {
+
+  iconZoneWrap: {
+    width: 65,
+    height: 82,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 8,
+    marginRight: 27,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconWrap: {
     width: 50,
     height: 50,
-    borderRadius: 8,
-    marginRight: 43,
-    backgroundColor: '#D8D8D8',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  activeBellIconWrap: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 43,
-    backgroundColor: '#1BB18A',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  activeAutoReplyIconWrap: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 43,
-    backgroundColor: '#11A20A',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  activeBoxIconWrap: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 43,
-    backgroundColor: '#0F6DA2',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  notActiveIcon: {fontSize: 24, color: colors.color000, padding: 13},
-  activeIcon: {fontSize: 24, color: colors.white, padding: 13},
   iconText: {fontSize: 12, fontWeight: '400', color: colors.color000, lineHeight: 17, marginTop: 12},
   expireDate: {fontSize: 12, color: colors.color999, paddingTop: 4}
 })
@@ -156,43 +132,39 @@ class GoodsIncrement extends PureComponent {
   }
 
   renderContent = () => {
-    const {increment} = this.props.mine
     return (
       <View style={styles.contentWrap}>
-        <View>
-          <TouchableOpacity
-            style={increment.incrementStatus ? styles.activeBellIconWrap : styles.notActiveIconWrap}
-            onPress={() => this.touchIcon(Config.ROUTE_BAD_REVIEW_REMINDER)}>
-            <FontAwesome5 name={'bell'} style={increment.incrementStatus ? styles.activeIcon : styles.notActiveIcon}/>
+        <View style={styles.iconZoneWrap}>
+          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_BAD_REVIEW_REMINDER)}>
+            <SvgXml xml={bell()} width={28} height={28}/>
+            <Text style={styles.iconText}>差评提醒</Text>
           </TouchableOpacity>
-          <Text style={styles.iconText}>差评提醒</Text>
         </View>
-        <View>
-          <TouchableOpacity
-            style={increment.incrementStatus ? styles.activeAutoReplyIconWrap : styles.notActiveIconWrap}
-            onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_FEEDBACK)}>
-            <FontAwesome name={'refresh'} style={increment.incrementStatus ? styles.activeIcon : styles.notActiveIcon}/>
+        <View style={styles.iconZoneWrap}>
+          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_FEEDBACK)}>
+            <SvgXml xml={autoReply()} width={28} height={28}/>
+            <Text style={styles.iconText}>自动回评</Text>
           </TouchableOpacity>
-          <Text style={styles.iconText}>自动回评</Text>
         </View>
-        <View>
-          <TouchableOpacity
-            style={increment.incrementStatus ? styles.activeBoxIconWrap : styles.notActiveIconWrap}
-            onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_PACKAGING)}>
-            <FontAwesome5 name={'box'} style={increment.incrementStatus ? styles.activeIcon : styles.notActiveIcon}/>
+        <View style={styles.iconZoneWrap}>
+          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_PACKAGING)}>
+            <SvgXml xml={autoPackage()} width={28} height={28}/>
+            <Text style={styles.iconText}>自动打包</Text>
           </TouchableOpacity>
-          <Text style={styles.iconText}>自动打包</Text>
         </View>
       </View>
     )
   }
 
   render() {
+    const {increment} = this.props.mine
     return (
-      <View style={styles.page}>
+      <View style={Styles.zoneWrap}>
         {this.renderHeader()}
-        <LineView/>
-        {this.renderContent()}
+        <If condition={increment.incrementStatus}>
+          <LineView/>
+          {this.renderContent()}
+        </If>
       </View>
     )
   }
