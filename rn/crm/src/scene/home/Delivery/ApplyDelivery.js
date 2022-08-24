@@ -6,7 +6,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import 'react-native-get-random-values';
 import Config from "../../../pubilc/common/config";
 import {Icon} from "../../../weui";
 import native from "../../../pubilc/util/native";

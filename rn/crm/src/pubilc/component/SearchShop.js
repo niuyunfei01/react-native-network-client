@@ -6,8 +6,6 @@ import Cts from "../common/Cts";
 import tool from "../util/tool";
 import Config from "../common/config";
 import {ToastLong} from "../util/ToastUtils";
-import {WebView} from "react-native-webview";
-import 'react-native-get-random-values';
 import pxToDp from "../util/pxToDp";
 import {Cell, CellBody, CellHeader} from "../../weui";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -229,17 +227,7 @@ class SearchShop extends Component {
         </Marker>
       </MapView>
     )
-    return (
-      <WebView
-        source={{uri}}
-        style={{
-          width: '100%',
-          height: this.state.isMap ? '100%' : 0,
-          opacity: 0.99,
-          zIndex: 999,
-        }}
-      />
-    );
+
   }
 
   renderSearchBar() {
