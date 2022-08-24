@@ -447,3 +447,53 @@ export const hotUpdateHeader = (width = 274, height = 105) => {
 </svg>`
   )
 }
+
+export const bell = () => {
+  return (
+    `
+    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+    <path d="M24 4C16.268 4 10 10.268 10 18V38H38V18C38 10.268 31.732 4 24 4Z" fill="none"/>
+    <path d="M10 38V18C10 10.268 16.268 4 24 4C31.732 4 38 10.268 38 18V38M4 38H44" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 44C26.7614 44 29 41.7614 29 39V38H19V39C19 41.7614 21.2386 44 24 44Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    `
+  )
+}
+
+export const autoReply = () => {
+  return (
+    `
+    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+    <path d="M33 38H22V30H36V22H44V38H39L36 41L33 38Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 6H36V30H17L13 34L9 30H4V6Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M19 18H20" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M26 18H27" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 18H13" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    `
+  )
+}
+
+export const autoPackage = () => {
+  return (
+    `
+    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+    <path d="M8 14C8 12.8954 8.89543 12 10 12H38C39.1046 12 40 12.8954 40 14V30C40 31.1046 39.1046 32 38 32H10C8.89543 32 8 31.1046 8 30V14Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M16 12V32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M32 12V32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28 12L36 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 12L20 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 32L20 32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28 32L36 32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 38L44 38" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M6 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M30 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M36 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M42 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+    <path d="M30 12V6H18V12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    `
+  )
+}
