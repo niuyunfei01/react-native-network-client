@@ -58,9 +58,11 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.reactnativerestart.RestartPackage;
@@ -80,6 +82,7 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import java.io.File;
 import java.io.IOException;
@@ -336,7 +339,10 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNZipArchivePackage(),
                     new RestartPackage(),
                     new RNViewShotPackage(),
-                    new FastImageViewPackage()
+                    new FastImageViewPackage(),
+                    new ReactSliderPackage(),
+                    new CameraRollPackage(),
+                    new RNCMaskedViewPackage()
             );
         }
     };

@@ -183,14 +183,19 @@ class NewRetailPriceScene extends React.PureComponent {
         strict_providing: sp.strict_providing,
         supply_price: sp.supply_price
       }].concat(sp.skus)
-      const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : skus.length > 0 ? skus[0] : {sku_name: ''}
+
+      const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : skus.length > 0 ? skus[0] : {
+        sku_name: '',
+        supply_price: '0',
+        left_since_last_stat: '0'
+      }
       this.setState({
         productInfo: res,
         skus: skus,
         editPrice: `${sp.price}`,
         selectSku: selectSku,
-        editCostPrice: skus.length > 0 ? `${parseFloat(skus[0].supply_price / 100).toFixed(2)}` : '',
-        editStock: skus.length > 0 ? skus[0].left_since_last_stat : '',
+        editCostPrice: `${parseFloat(selectSku.supply_price / 100).toFixed(2)}`,
+        editStock: selectSku.left_since_last_stat,
       })
     })
   }

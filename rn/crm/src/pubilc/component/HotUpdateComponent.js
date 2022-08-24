@@ -142,7 +142,7 @@ const Progress = (downloadFileProgress = 0) => {
   )
 }
 
-export class HotUpdateComponent extends PureComponent {
+export default class HotUpdateComponent extends PureComponent {
 
   constructor(props) {
     super(props);
