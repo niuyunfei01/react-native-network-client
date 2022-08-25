@@ -28,22 +28,23 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {onBack, isType, center, cityName} = this.props.route.params;
+    const {onBack, center, cityName} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
     let cityNames = cityName !== undefined && tool.length(cityName) > 0 ? cityName : "北京市"
-    if (tool.length(center) > 0) {
-      map.name = '';
-      map.location = center
-      isMap = is_default = true;
-    }
+
     if (tool.store(this.props.global)) {
       let citymsg = tool.store(this.props.global);
       cityNames = citymsg.city
       let location = citymsg.loc_lng + "," + citymsg.loc_lat;
       map.name = '';
       map.location = location
+    }
+    if (tool.length(center) > 0) {
+      map.name = '';
+      map.location = center
+      isMap = is_default = true;
     }
 
     this.state = {
@@ -216,7 +217,6 @@ class SearchShop extends Component {
           position={{latitude: Number(lat), longitude: Number(lng)}}
           onDragEnd={({nativeEvent}) => {
             this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
-            console.log(nativeEvent, 'nativeEvent')
           }}
         >
           <View style={{alignItems: 'center'}}>
