@@ -6,7 +6,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
+  Text, TextInput,
   TouchableOpacity,
   View
 } from 'react-native'
@@ -20,8 +20,6 @@ import {bindActionCreators} from "redux";
 import tool from "../../../pubilc/util/tool";
 import Icon from "react-native-vector-icons/Entypo";
 import config from "../../../pubilc/common/config";
-import {Cell, CellBody, Cells, Input} from "../../../weui";
-import JbbText from "../../common/component/JbbText";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -48,12 +46,11 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
-
 class DeliveryList extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      show_type: 0,
+      show_type: 1,
       platform_delivery_bind_list: [],
       platform_delivery_unbind_list: [],
       master_delivery_bind_list: [],
@@ -66,39 +63,55 @@ class DeliveryList extends PureComponent {
       count_down: -1,
       msg: [],
       show_unbind_all: false,
+      show_disable_all: false,
       unbind_id: 0,
+      disable_id: 0,
+      disable_name: "",
       unbind_name: "",
       unbind_url: null,
       show_modal: false,
-      modal_msg: ""
+      modal_msg: "",
+      delivery_way_state: ''
     }
+  }
 
-    const {navigation} = props;
-    navigation.setOptions(
-      {
-        headerRight: (() => (
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                marginRight: 10,
-                width: 100,
-              }}
-              onPress={() => {
-                this.setState({
-                  show_unbind_all: !this.state.show_unbind_all,
-                  unbind_url: null,
-                  unbind_name: "",
-                  show_type: 2,
-                  unbind_id: 0
-                })
-              }}
-            >
-              <Text style={{fontSize: 14, color: colors.color333}}>解绑</Text>
-            </TouchableOpacity>)
-        )
-      }
-    );
+  headerRight = () => {
+    let {show_unbind_all, show_disable_all, show_type} = this.state
+    return (
+      <TouchableOpacity
+        style={headerRightStyles.resetBind}
+        onPress={() => {
+          this.navigationOptions()
+          if (show_type === 1) {
+            this.setState({
+              show_disable_all: !show_disable_all,
+              disable_id: 0,
+              disable_name: ''
+            })
+          } else {
+            this.setState({
+              show_unbind_all: !show_unbind_all,
+              unbind_url: null,
+              unbind_name: "",
+              unbind_id: 0
+            })
+          }
+        }}
+      >
+        <Text style={headerRightStyles.text}>{show_type === 1 ? `禁用` : `解绑`}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  componentDidMount() {
+    this.navigationOptions()
+    this.fetchData()
+  }
+
+  navigationOptions = () => {
+    const {navigation} = this.props
+    const option = {headerRight: () => this.headerRight()}
+    navigation.setOptions(option);
   }
 
   fetchData = () => {
@@ -127,71 +140,51 @@ class DeliveryList extends PureComponent {
   }
 
   renderHeader = () => {
-    let show_type = this.state.show_type
+    let {show_unbind_all, show_disable_all, show_type} = this.state
     if (this.props.route.params && this.props.route.params.tab !== undefined) {
       this.setState({
         show_type: this.props.route.params.tab
-      })
+      }, () => this.navigationOptions())
     }
     return (
-      <View style={{
-        width: '100%',
-        flexDirection: 'row',
-        backgroundColor: colors.white,
-        height: 40,
-      }}>
-        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
-          if (this.state.show_unbind_all) {
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.headerTouch} onPress={() => {
+          if (show_unbind_all) {
             ToastShort("暂不支持解绑外送帮账户");
             return;
           }
           this.setState({
-            show_type: 1,
-          })
+            show_type: 1
+          }, () => this.navigationOptions())
         }}>
-          <View style={{
-            borderColor: colors.main_color,
-            borderBottomWidth: show_type === 1 ? 3 : 0,
-            height: 40,
-            justifyContent: 'center',
-          }}>
-            <Text style={{color: colors.color333}}>外送帮自带</Text>
+          <View style={[styles.headerTab, {borderBottomWidth: show_type === 1 ? 3 : 0}]}>
+            <Text style={styles.textNormal}>外送帮自带</Text>
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+        <TouchableOpacity style={styles.headerTouch} onPress={() => {
+          if (show_disable_all) {
+            ToastShort("暂不支持禁用商家自有账户");
+            return;
+          }
           this.setState({
-            show_type: 2,
-          })
+            show_type: 2
+          }, () => this.navigationOptions())
         }}>
-          <View style={{
-            borderColor: colors.main_color,
-            borderBottomWidth: show_type === 2 ? 3 : 0,
-            height: 40,
-            justifyContent: 'center',
-          }}>
-            <Text style={{color: colors.color333}}>商家自有</Text>
+          <View style={[styles.headerTab, {borderBottomWidth: show_type === 2 ? 3 : 0}]}>
+            <Text style={styles.textNormal}>商家自有</Text>
           </View>
         </TouchableOpacity>
       </View>
     )
   }
 
-  rendermsg = (type = []) => {
+  render_msg = (type = []) => {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: pxToDp(4),
-          marginEnd: pxToDp(10)
-        }}>
-          <Text style={{
-            color: '#595959',
-            fontSize: pxToDp(20)
-          }}>{msg} </Text>
+        items.push(<View style={styles.msgBox}>
+          <Text style={styles.msgText}>{msg} </Text>
         </View>)
       }
     }
@@ -202,22 +195,12 @@ class DeliveryList extends PureComponent {
     )
   }
 
-
-  rendererrormsg = (type = []) => {
+  render_error_msg = (type = []) => {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: pxToDp(4),
-          marginEnd: pxToDp(10)
-        }}>
-          <Text style={{
-            color: '#EE2626',
-            fontSize: pxToDp(20)
-          }}>{msg} </Text>
+        items.push(<View style={styles.errorMsg}>
+          <Text style={styles.errorMsgText}>{msg} </Text>
         </View>)
       }
     }
@@ -227,7 +210,6 @@ class DeliveryList extends PureComponent {
       </View>
     )
   }
-
 
   handleGrandAuth = (res) => {
     switch (res.alert) {
@@ -253,15 +235,13 @@ class DeliveryList extends PureComponent {
           return null;
         }
 
-
         this.onPress(res.route, {url: res.auth_url})
         break
       case 1:
-
+        ToastShort(res.alert_msg)
         break
       case 2:
         this.onPress('BindShunfeng', {res: res})
-
         break
       case 3:
         this.onPress(res.route, {url: res.auth_url});
@@ -281,6 +261,46 @@ class DeliveryList extends PureComponent {
       this.handleGrandAuth(res)
     }).catch(() => {
       hideModal()
+    })
+  }
+
+  noticeModalPress = () => {
+    if (this.state.unbind_url !== null && this.state.unbind_url !== undefined) {
+      this.setState({
+        show_modal: false,
+        show_unbind_all: false,
+      }, () => this.onPress(config.ROUTE_WEB, {url: this.state.unbind_url}))
+    } else {
+      this.setState({
+        show_modal: false,
+        show_unbind_all: false,
+      }, () => {
+        this.fetchData()
+      })
+    }
+  }
+
+  closeModal = () => {
+    this.setState({
+      show_modal: false,
+    })
+  }
+
+  closeUUModal = () => {
+    this.setState({
+      uuVisible: false
+    })
+  }
+
+  closeGXDModal = () => {
+    this.setState({
+      gxdVisible: false
+    })
+  }
+
+  closeKFWModal = () => {
+    this.setState({
+      kfwVisible: false
     })
   }
 
@@ -323,7 +343,6 @@ class DeliveryList extends PureComponent {
     }
   }
 
-
   getGxdAuthorizedToLog = () => {
     let {accessToken, currStoreId} = this.props.global
     let {phone, phone_code} = this.state
@@ -346,7 +365,6 @@ class DeliveryList extends PureComponent {
       ToastShort(reason.desc)
     })
   }
-
 
   getKfwAuthorizedToLog = () => {
     let {accessToken, currStoreId} = this.props.global
@@ -371,7 +389,6 @@ class DeliveryList extends PureComponent {
       ToastShort(reason.desc)
     })
   }
-
 
   getGxdPhoneCode = () => {
     let {accessToken, currStoreId} = this.props.global
@@ -408,6 +425,29 @@ class DeliveryList extends PureComponent {
     })
   }
 
+  undisable = () => {
+    let {accessToken, currStoreId} = this.props.global
+    let {currVendorId} = tool.vendor(this.props.global);
+    let {disable_id, delivery_way_state, show_type} = this.state
+    let params = {
+      store_id: currStoreId,
+      delivery_way_v2: disable_id,
+      state: delivery_way_state
+    }
+    HttpUtils.post.bind(this.props)(`/v1/new_api/Delivery/delivery_switch?vendorId=${currVendorId}&access_token=${accessToken}`, params).then(res => {
+      this.setState({
+        show_modal: true,
+        modal_msg: show_type === 1 ? '操作成功' : res.msg,
+        show_disable_all: false
+      })
+    }).catch((reason) => {
+      this.setState({
+        show_modal: true,
+        modal_msg: reason.desc
+      })
+    })
+  }
+
   getCountdown = () => {
     return this.state.count_down;
   }
@@ -430,126 +470,110 @@ class DeliveryList extends PureComponent {
           count_down: countdown
         })
       }
-    }, 3200)
+    }, 1000)
   }
 
+  unBindBtn = () => {
+    if (this.state.unbind_id !== 0) {
+      Alert.alert('提醒', '确定要解绑' + this.state.unbind_name + '[自有账户]吗？', [
+        {
+          text: '确定',
+          onPress: () => {
+            this.unbind();
+          },
+        }, {
+          text: '取消'
+        }
+      ])
+    }
+  }
+
+  unDisableBtn = (status) => {
+    if (this.state.disable_id !== 0) {
+      Alert.alert('提醒', `确定要${status}` + this.state.disable_name + '[外送帮自带账户]吗？', [
+        {
+          text: '确定',
+          onPress: () => {
+            this.undisable();
+          },
+        }, {
+          text: '取消'
+        }
+      ])
+    }
+  }
 
   renderItem = (info) => {
+    let {show_unbind_all, unbind_id, show_disable_all, disable_id} = this.state
     return (
-      <View style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingTop: pxToDp(14),
-        paddingBottom: pxToDp(14),
-        borderTopWidth: 1 / PixelRatio.get(),
-        borderTopColor: colors.colorDDD,
-        backgroundColor: colors.white
-      }}>
-        <If condition={this.state.show_unbind_all}>
-          <View style={{marginLeft: 6}}>
+      <View style={styles.listItem}>
+        <If condition={show_unbind_all}>
+          <View style={styles.ml6}>
             <If condition={info.id === undefined}>
-              <View style={{backgroundColor: colors.fontColor, borderRadius: 11}}>
-                <FontAwesome5 name={'circle'} style={{}}
-                              color={colors.fontColor} size={22}/>
+              <View style={styles.info_undefined}>
+                <FontAwesome5 name={'circle'} color={colors.fontColor} size={22}/>
               </View>
             </If>
 
             <If condition={info.id !== undefined}>
-              {info.v2_type === this.state.unbind_id ?
+              {info.v2_type === unbind_id ?
+                <FontAwesome5 name={'check-circle'} color={colors.main_color} size={22}/> :
+                <FontAwesome5 name={'circle'} color={colors.color333} size={22}/>}
+            </If>
+          </View>
+        </If>
+        <If condition={show_disable_all}>
+          <View style={styles.ml6}>
+            <If condition={info.id === undefined || info.is_forbidden === 1}>
+              <View style={styles.info_undefined}>
+                <FontAwesome5 name={'circle'} color={colors.fontColor} size={22}/>
+              </View>
+            </If>
+
+            <If condition={info.id !== undefined && info.is_forbidden === 0}>
+              {info.v2_type === disable_id ?
                 <FontAwesome5 name={'check-circle'} color={colors.main_color} size={22}/> :
                 <FontAwesome5 name={'circle'} color={colors.color333} size={22}/>}
             </If>
           </View>
         </If>
         <Image style={[styles.img]} source={{uri: info.img}}/>
-        <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-          <View style={{
-            flexDirection: "row",
-            // justifyContent: "space-between",
-            marginRight: pxToDp(20)
-          }}>
-            <Text style={{
-              fontSize: pxToDp(28),
-              color: colors.listTitleColor
-            }}>{info.name} </Text>
-            <If condition={this.state.show_unbind_all && info.id === undefined}>
-              <Text style={{
-                fontSize: pxToDp(28),
-                color: colors.red
-              }}>(未绑定)</Text>
+        <View style={styles.itemBox}>
+          <View style={styles.itemBtn}>
+            <Text style={styles.itemText}>{info.name} </Text>
+            <If condition={info.id === undefined && show_unbind_all}>
+              <Text style={styles.noBindText}>(未绑定)</Text>
+            </If>
+            <If condition={info.is_forbidden === 1}>
+              <Text style={styles.noBindText}>(已禁用)</Text>
             </If>
           </View>
-          <View style={{marginTop: pxToDp(10)}}>
-            {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
+          <View style={styles.mt10}>
+            {info.has_diff ? this.render_error_msg(info.diff_info) : this.render_msg([info.desc])}
           </View>
         </View>
 
+        <If condition={info.is_forbidden === 1 && !show_disable_all}>
+          <Text style={[styles.status_err]}>恢复使用</Text>
+        </If>
 
-        <If condition={!tool.length(info.id) > 0 && !this.state.show_unbind_all}>
+        <If condition={!tool.length(info.id) > 0 && !show_disable_all && !show_unbind_all}>
           {info.bind_type === 'wsb' ? <Text style={[styles.status_err]}>申请开通</Text> :
             <Text style={[styles.status_err]}>去授权</Text>}
         </If>
 
-        <If condition={tool.length(info.id) > 0 && !this.state.show_unbind_all}>
-          <View style={{
-            width: pxToDp(120),
-            marginRight: pxToDp(30),
-            flexDirection: 'row'
-          }}>
-            <Text
-              style={{
-                height: 30,
-                color: colors.main_color,
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlignVertical: 'center',
-                fontSize: pxToDp(26),
-                ...Platform.select({
-                  ios: {
-                    lineHeight: 30,
-                  },
-                  android: {}
-                }),
-              }}>已绑定</Text>
-            <Icon name='chevron-thin-right' style={{
-              color: colors.main_color,
-              fontSize: pxToDp(30),
-              paddingTop: pxToDp(12),
-              marginLeft: pxToDp(10),
-            }}/>
-          </View>
+        <If condition={tool.length(info.id) > 0 && !show_disable_all && !show_unbind_all}>
+          {info.bind_type === 'wsb' && info.is_forbidden === 1 ? null :
+            <View style={styles.bindBox}>
+              <Text style={styles.bindText}>已绑定</Text>
+              <Icon name='chevron-thin-right' style={styles.bindIcon}/>
+            </View>}
         </If>
 
-
-        <If condition={info.platform === '9' && !this.state.show_unbind_all}>
-          <View style={{
-            width: pxToDp(120),
-            marginRight: pxToDp(30),
-            flexDirection: 'row'
-          }}>
-            <Text
-              style={{
-                height: 30,
-                color: "#EE2626",
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlignVertical: 'center',
-                ...Platform.select({
-                  ios: {
-                    lineHeight: 30,
-                  },
-                  android: {}
-                }),
-              }}>已停用</Text>
-            <Icon name='chevron-thin-right' style={{
-              color: "#EE2626",
-              fontSize: pxToDp(40),
-              paddingTop: pxToDp(7),
-              marginLeft: pxToDp(10),
-            }}/>
+        <If condition={info.platform === '9' && !show_unbind_all && !show_unbind_all}>
+          <View style={styles.bind_block}>
+            <Text style={styles.bind_block_text}>已停用</Text>
+            <Icon name='chevron-thin-right' style={styles.bind_block_icon}/>
           </View>
         </If>
       </View>
@@ -557,6 +581,7 @@ class DeliveryList extends PureComponent {
   }
 
   renderList = (type = 1) => {
+    let {show_unbind_all, show_disable_all} = this.state
     let list = [];
     if (type === 1) {
       list = list.concat(this.state.platform_delivery_unbind_list)
@@ -570,14 +595,9 @@ class DeliveryList extends PureComponent {
       const info = list[i]
       items.push(
         <TouchableOpacity
-          style={{
-            borderBottomWidth: pxToDp(1),
-            borderBottomColor: colors.fontGray,
-            marginLeft: pxToDp(10),
-            marginRight: pxToDp(10),
-          }}
+          style={styles.listItemTouch}
           onPress={() => {
-            if (this.state.show_unbind_all) {
+            if (show_unbind_all) {
               if (info.id !== undefined) {
                 this.setState({
                   unbind_id: info.v2_type,
@@ -586,8 +606,28 @@ class DeliveryList extends PureComponent {
               }
               return;
             }
+            if (show_disable_all) {
+              if (info.id !== undefined && info.is_forbidden === 0) {
+                this.setState({
+                  disable_id: info.v2_type,
+                  disable_name: info.name,
+                  delivery_way_state: info.is_forbidden
+                })
+              }
+              return;
+            }
             if (tool.length(info.id) > 0) {
-              this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
+              if (info.is_forbidden === 1) {
+                this.setState({
+                  disable_id: info.v2_type,
+                  disable_name: info.name,
+                  delivery_way_state: info.is_forbidden
+                }, () => {
+                  this.unDisableBtn('启用')
+                })
+              } else {
+                this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
+              }
             } else {
               if (info.bind_type === 'wsb') {
                 this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.v2_type});
@@ -600,27 +640,25 @@ class DeliveryList extends PureComponent {
         </TouchableOpacity>)
     }
     return (
-      <ScrollView style={{
-        flex: 1,
-        margin: pxToDp(20),
-        borderRadius: pxToDp(10),
-        backgroundColor: colors.white
-      }}>
+      <ScrollView style={styles.container}>
         {items}
       </ScrollView>
     )
   }
 
-
   render() {
+    let {show_type, show_unbind_all, show_disable_all} = this.state
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
           {this.renderHeader()}
-          {this.renderList(this.state.show_type)}
-          <If condition={this.state.show_unbind_all}>
-            {this.rendenBtn()}
+          {this.renderList(show_type)}
+          <If condition={show_unbind_all}>
+            {this.renderBtn()}
+          </If>
+          <If condition={show_disable_all}>
+            {this.renderDisableBtn()}
           </If>
         </View>
         {this.renderModal()}
@@ -635,34 +673,11 @@ class DeliveryList extends PureComponent {
           title={'提示'}
           visible={this.state.show_modal}
           actionText={'确定'}
-          btnStyle={{
-            backgroundColor: colors.main_color
-          }}
-          onPress={() => {
-            if (this.state.unbind_url !== null && this.state.unbind_url !== undefined) {
-              this.setState({
-                show_modal: false,
-                show_unbind_all: false,
-              }, () => {
-                this.onPress(config.ROUTE_WEB, {url: this.state.unbind_url})
-              })
-
-            } else {
-              this.setState({
-                show_modal: false,
-                show_unbind_all: false,
-              }, () => {
-                this.fetchData()
-              })
-            }
-          }}
-          onClose={() => {
-            this.setState({
-              show_modal: false,
-            })
-          }}>
-          <View style={{padding: 20, justifyContent: "center", alignItems: "center"}}>
-            <Text style={{fontSize: 16, color: colors.color333}}>{this.state.modal_msg} </Text>
+          btnStyle={{backgroundColor: colors.main_color}}
+          onPress={() => this.noticeModalPress()}
+          onClose={() => this.closeModal()}>
+          <View style={styles.modalTitle}>
+            <Text style={styles.modalTitleText}>{this.state.modal_msg} </Text>
           </View>
         </BottomModal>
         <BottomModal
@@ -670,141 +685,98 @@ class DeliveryList extends PureComponent {
           actionText={'授权并登录'}
           onPress={() => this.getUUPTAuthorizedToLog()}
           visible={this.state.uuVisible}
-          btnStyle={{
-            backgroundColor: colors.main_color,
-            borderWidth: 0,
-          }}
-          onClose={() => this.setState({
-            uuVisible: false
-          })}
+          btnStyle={styles.bindModalBtn}
+          onClose={() => this.closeUUModal()}
         >
-          <Cells style={styles.deliverCellBorder}>
-            <Cell>
-              <CellBody>
-                <Input
-                  value={this.state.phone}
-                  editable={true}
-                  underlineColorAndroid={"transparent"}
-                  style={styles.phoneinput}
-                  clearButtonMode={true}
-                  onChangeText={(value) => {
-                    this.setState({
-                      phone: value
-                    })
-                  }}
-                  keyboardType="numeric"
-                  placeholder="请输入手机号"
-                />
-              </CellBody>
-            </Cell>
-            <Cell>
-              <CellBody>
-                <View style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginVertical: pxToDp(10)
-                }}>
-                  <Input
-                    value={this.state.phone_code}
-                    onChangeText={(code) => {
-                      this.setState({
-                        phone_code: code
-                      })
-                    }}
-                    underlineColorAndroid={"transparent"}
-                    style={styles.codeinput}
-                    clearButtonMode={true}
-                    keyboardType="numeric"
-                    placeholder="请输入验证码"
-                  />
-                  {this.state.count_down > 0 ?
-                    <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                      <JbbText style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</JbbText>
-                    </TouchableOpacity> :
-                    <TouchableOpacity onPress={() => {
-                      showSuccess('验证码发送成功！')
-                      this.getUUPTPhoneCode()
-                      this.setCountdown(60)
-                      this.startCountDown()
-                    }} style={{marginLeft: pxToDp(20)}}>
-                      <JbbText style={styles.btn_style}>获取验证码</JbbText>
-                    </TouchableOpacity>}
-                </View>
-              </CellBody>
-            </Cell>
-          </Cells>
+          <TextInput
+            style={styles.phone_input}
+            value={this.state.phone}
+            onChangeText={(value) => {
+              this.setState({
+                phone: value
+              })
+            }}
+            keyboardType="numeric"
+            placeholder="请输入手机号"
+            underlineColorAndroid={"transparent"}
+            clearButtonMode={"always"}
+          />
+          <View style={styles.uuModalBody}>
+            <TextInput
+              value={this.state.phone_code}
+              onChangeText={(code) => {
+                this.setState({
+                  phone_code: code
+                })
+              }}
+              underlineColorAndroid={"transparent"}
+              style={styles.code_input}
+              clearButtonMode={"always"}
+              keyboardType="numeric"
+              placeholder="请输入验证码"
+            />
+            {this.state.count_down > 0 ?
+              <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+              </TouchableOpacity> :
+              <TouchableOpacity onPress={() => {
+                showSuccess('验证码发送成功！')
+                this.getUUPTPhoneCode()
+                this.setCountdown(60)
+                this.startCountDown()
+              }}>
+                <Text style={styles.btn_style}>获取验证码</Text>
+              </TouchableOpacity>}
+          </View>
         </BottomModal>
         <BottomModal
           title={'绑定裹小递'}
           actionText={'授权并登录'}
           onPress={() => this.getGxdAuthorizedToLog()}
           visible={this.state.gxdVisible}
-          btnStyle={{
-            backgroundColor: colors.main_color,
-            borderWidth: 0,
-          }}
-          onClose={() => this.setState({
-            gxdVisible: false
-          })}
+          btnStyle={styles.bindModalBtn}
+          onClose={() => this.closeGXDModal()}
         >
-          <Cells style={styles.deliverCellBorder}>
-            <Cell>
-              <CellBody>
-                <Input
-                  value={this.state.phone}
-                  editable={true}
-                  underlineColorAndroid={"transparent"}
-                  style={styles.phoneinput}
-                  clearButtonMode={true}
-                  onChangeText={(value) => {
-                    this.setState({
-                      phone: value
-                    })
-                  }}
-                  keyboardType="numeric"
-                  placeholder="请输入手机号"
-                />
-              </CellBody>
-            </Cell>
-            <Cell>
-              <CellBody>
-                <View style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginVertical: pxToDp(10)
-                }}>
-                  <Input
-                    value={this.state.phone_code}
-                    onChangeText={(code) => {
-                      this.setState({
-                        phone_code: code
-                      })
-                    }}
-                    editable={true}
-                    underlineColorAndroid={"transparent"}
-                    style={styles.codeinput}
-                    clearButtonMode={true}
-                    keyboardType="numeric"
-                    placeholder="请输入验证码"
-                  />
-                  {this.state.count_down > 0 ?
-                    <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                      <JbbText style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</JbbText>
-                    </TouchableOpacity> :
-                    <TouchableOpacity onPress={() => {
-                      showSuccess('验证码发送成功！')
-                      this.getGxdPhoneCode()
-                      this.setCountdown(60)
-                      this.startCountDown()
-                    }} style={{marginLeft: pxToDp(20)}}>
-                      <JbbText style={styles.btn_style}>获取验证码</JbbText>
-                    </TouchableOpacity>}
-                </View>
-              </CellBody>
-            </Cell>
-          </Cells>
+          <TextInput
+            style={styles.phone_input}
+            value={this.state.phone}
+            onChangeText={(value) => {
+              this.setState({
+                phone: value
+              })
+            }}
+            keyboardType="numeric"
+            placeholder="请输入手机号"
+            underlineColorAndroid={"transparent"}
+            clearButtonMode={"always"}
+          />
+          <View style={styles.uuModalBody}>
+            <TextInput
+              style={styles.code_input}
+              value={this.state.phone_code}
+              onChangeText={(code) => {
+                this.setState({
+                  phone_code: code
+                })
+              }}
+              keyboardType="numeric"
+              placeholder="请输入验证码"
+              underlineColorAndroid={"transparent"}
+              clearButtonMode={"always"}
+            />
+            {this.state.count_down > 0 ?
+              <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+              </TouchableOpacity> :
+              <TouchableOpacity onPress={() => {
+                showSuccess('验证码发送成功！')
+                this.getGxdPhoneCode()
+                this.setCountdown(60)
+                this.startCountDown()
+              }}>
+                <Text style={styles.btn_style}>获取验证码</Text>
+              </TouchableOpacity>}
+          </View>
         </BottomModal>
 
         <BottomModal
@@ -812,44 +784,40 @@ class DeliveryList extends PureComponent {
           actionText={'授权并登录'}
           onPress={() => this.getKfwAuthorizedToLog()}
           visible={this.state.kfwVisible}
-          btnStyle={{
-            backgroundColor: colors.main_color,
-            borderWidth: 0,
-          }}
-          onClose={() => this.setState({
-            kfwVisible: false
-          })}
+          btnStyle={styles.bindModalBtn}
+          onClose={() => this.closeGXDModal()}
         >
           <View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333}}>账号： </Text>
-              <Input
+            <View style={styles.flexRow}>
+              <Text style={styles.f14}>账号： </Text>
+              <TextInput
+                style={[styles.phone_input, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
                 value={this.state.phone}
-                editable={true}
-                underlineColorAndroid={"transparent"}
-                style={[styles.phoneinput, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
-                clearButtonMode={true}
                 onChangeText={(value) => {
                   this.setState({
                     phone: value
                   })
                 }}
                 keyboardType="numeric"
+                placeholder="请输入验证码"
+                underlineColorAndroid={"transparent"}
+                clearButtonMode={"always"}
               />
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333}}>密码： </Text>
-              <Input
-                editable={true}
-                underlineColorAndroid={"transparent"}
-                style={[styles.phoneinput, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
-                clearButtonMode={true}
+            <View style={styles.flexRow}>
+              <Text style={styles.f14}>密码： </Text>
+              <TextInput
+                style={[styles.phone_input, {borderColor: colors.color999, borderBottomWidth: 1, width: 260}]}
                 value={this.state.phone_code}
                 onChangeText={(code) => {
                   this.setState({
                     phone_code: code
                   })
                 }}
+                keyboardType="numeric"
+                placeholder="请输入验证码"
+                underlineColorAndroid={"transparent"}
+                clearButtonMode={"always"}
               />
             </View>
           </View>
@@ -859,32 +827,31 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  rendenBtn = () => {
+  renderBtn = () => {
     return (
-      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+      <View style={styles.bottomBtn}>
         <Button title={'确认'}
-                onPress={() => {
-                  if (this.state.unbind_id !== 0) {
-                    Alert.alert('提醒', '确定要解绑' + this.state.unbind_name + '[自有账户]吗？', [
-                      {
-                        text: '确定',
-                        onPress: () => {
-                          this.unbind();
-                        },
-                      }, {
-                        text: '取消'
-                      }
-                    ])
-                  }
-                }}
+                onPress={() => this.unBindBtn()}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
                   backgroundColor: this.state.unbind_id !== 0 ? colors.main_color : colors.fontColor,
                 }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
+                titleStyle={styles.bottomBtnTitle}
+        />
+      </View>
+    )
+  }
+
+  renderDisableBtn = () => {
+    return (
+      <View style={styles.bottomBtn}>
+        <Button title={'确认'}
+                onPress={() => this.unDisableBtn('禁用')}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: this.state.disable_id !== 0 ? colors.main_color : colors.fontColor,
                 }}
+                titleStyle={styles.bottomBtnTitle}
         />
       </View>
     )
@@ -894,10 +861,60 @@ class DeliveryList extends PureComponent {
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeliveryList)
 
+const headerRightStyles = StyleSheet.create({
+  resetBind: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginRight: 10,
+    width: 100,
+    padding: 10
+  },
+  text: {fontSize: 14, color: colors.color333}
+})
 
 const styles = StyleSheet.create({
-
-  phoneinput: {
+  container: {
+    flex: 1,
+    margin: pxToDp(20),
+    borderRadius: pxToDp(10),
+    backgroundColor: colors.white
+  },
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    height: 40,
+  },
+  headerTouch: {width: '50%', alignItems: "center"},
+  headerTab: {
+    borderColor: colors.main_color,
+    height: 40,
+    justifyContent: 'center',
+  },
+  textNormal: {color: colors.color333},
+  msgBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: pxToDp(4),
+    marginEnd: pxToDp(10)
+  },
+  msgText: {
+    color: '#595959',
+    fontSize: pxToDp(20)
+  },
+  errorMsg: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: pxToDp(4),
+    marginEnd: pxToDp(10)
+  },
+  errorMsgText: {
+    color: '#EE2626',
+    fontSize: pxToDp(20)
+  },
+  phone_input: {
     height: 42,
     lineHeight: 20,
     fontSize: 15,
@@ -906,7 +923,17 @@ const styles = StyleSheet.create({
     color: colors.color999,
     width: 300,
   },
-  codeinput: {
+  listItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: pxToDp(14),
+    paddingBottom: pxToDp(14),
+    borderTopWidth: 1 / PixelRatio.get(),
+    borderTopColor: colors.colorDDD,
+    backgroundColor: colors.white
+  },
+  code_input: {
     height: 42,
     lineHeight: 20,
     fontSize: 15,
@@ -921,7 +948,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: pxToDp(30),
     textAlign: "center",
-    paddingTop: pxToDp(10),
+    paddingTop: pxToDp(15),
     paddingHorizontal: pxToDp(10),
     borderRadius: pxToDp(10)
   },
@@ -983,5 +1010,96 @@ const styles = StyleSheet.create({
     width: pxToDp(130),
     color: colors.f7,
   },
-
+  ml6: {marginLeft: 6},
+  info_undefined: {backgroundColor: colors.fontColor, borderRadius: 11},
+  itemBox: {flexDirection: 'column', paddingBottom: 5, flex: 1},
+  itemBtn: {
+    flexDirection: "row",
+    marginRight: pxToDp(20)
+  },
+  itemText: {
+    fontSize: pxToDp(28),
+    color: colors.listTitleColor
+  },
+  noBindText: {
+    fontSize: pxToDp(28),
+    color: colors.red
+  },
+  mt10: {marginTop: pxToDp(10)},
+  bindBox: {
+    width: pxToDp(120),
+    marginRight: pxToDp(30),
+    flexDirection: 'row'
+  },
+  bindText: {
+    height: 30,
+    color: colors.main_color,
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    fontSize: pxToDp(26),
+    ...Platform.select({
+      ios: {
+        lineHeight: 30,
+      },
+      android: {}
+    }),
+  },
+  bindIcon: {
+    color: colors.main_color,
+    fontSize: pxToDp(30),
+    paddingTop: pxToDp(12),
+    marginLeft: pxToDp(10),
+  },
+  bind_block: {
+    width: pxToDp(120),
+    marginRight: pxToDp(30),
+    flexDirection: 'row'
+  },
+  bind_block_text: {
+    height: 30,
+    color: "#EE2626",
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    ...Platform.select({
+      ios: {
+        lineHeight: 30,
+      },
+      android: {}
+    }),
+  },
+  bind_block_icon: {
+    color: "#EE2626",
+    fontSize: pxToDp(40),
+    paddingTop: pxToDp(7),
+    marginLeft: pxToDp(10),
+  },
+  listItemTouch: {
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: colors.fontGray,
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
+  bindModalBtn: {
+    backgroundColor: colors.main_color,
+    borderWidth: 0,
+  },
+  modalTitle: {padding: 20, justifyContent: "center", alignItems: "center"},
+  modalTitleText: {fontSize: 16, color: colors.color333},
+  uuModalBody: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: pxToDp(10)
+  },
+  flexRow: {flexDirection: 'row', alignItems: 'center'},
+  f14: {fontSize: 14, color: colors.color333},
+  bottomBtn: {backgroundColor: colors.white, padding: pxToDp(31)},
+  bottomBtnTitle: {
+    color: colors.white,
+    fontSize: 16
+  }
 });
