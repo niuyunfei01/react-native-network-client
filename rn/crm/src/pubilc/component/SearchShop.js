@@ -93,7 +93,7 @@ class SearchShop extends Component {
   }
 
   onChange = (searchKeywords) => {
-    this.setState(searchKeywords, () => {
+    this.setState({searchKeywords}, () => {
       this.search()
     });
   }
@@ -220,16 +220,20 @@ class SearchShop extends Component {
           }}
         >
           <View style={{alignItems: 'center'}}>
-            <Text style={{
-              color: colors.white,
-              fontSize: 18,
+            <View style={{
               zIndex: 999,
               backgroundColor: colors.main_color,
               marginBottom: 15,
-              padding: 3,
-            }}>标注点 </Text>
+              padding: 8,
+              borderRadius: 6,
+            }}>
+              <Text style={{
+                color: colors.white,
+                fontSize: 18,
+              }}>标注点 </Text>
+            </View>
             <Entypo name={'triangle-down'}
-                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 20}}/>
+                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
           </View>
         </Marker>
       </MapView>

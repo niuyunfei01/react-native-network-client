@@ -126,16 +126,20 @@ class RiderTrajectory extends Component {
               position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
             >
               <View style={{alignItems: 'center',}}>
-                <Text style={{
-                  color: colors.color666,
-                  fontSize: 18,
-                  zIndex: 99,
+                <View style={{
+                  zIndex: 90,
+                  backgroundColor: colors.main_color,
                   marginBottom: 50,
-                  padding: 3,
-                  backgroundColor: colors.white,
-                }}>{msg} </Text>
+                  padding: 8,
+                  borderRadius: 6,
+                }}>
+                  <Text style={{
+                    color: colors.white,
+                    fontSize: 18,
+                  }}>{msg} </Text>
+                </View>
                 <Entypo name={'triangle-down'}
-                        style={{color: colors.white, fontSize: 40, position: 'absolute', top: 15}}/>
+                        style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
               </View>
             </Marker>
           </If>
