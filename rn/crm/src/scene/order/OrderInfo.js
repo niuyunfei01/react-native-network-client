@@ -1660,11 +1660,9 @@ class OrderInfo extends Component {
   }
 
   canViewPosition = (info) => {
-    this.setState({showDeliveryModal: false})
-    const accessToken = this.props.global.accessToken
-    let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
-    const uri = Config.serverUrl(path);
-    this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.setState({showDeliveryModal: false},()=>{
+      this.onPress(Config.RIDER_TRSJECTORY,{delivery_id:info.ship_id})
+    })
     this.mixpanel.track('配送调度页_查看位置')
   }
 

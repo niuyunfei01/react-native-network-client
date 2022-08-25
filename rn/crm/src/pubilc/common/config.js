@@ -289,6 +289,9 @@ const C = {
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
   ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
 
+
+  RIDER_TRSJECTORY: 'RiderTrajectory',
+
   //wechat app_id
   APP_ID: "wx0ffb81c6dc194253",
   Program_id: "gh_ecf3cb98d5ef",
