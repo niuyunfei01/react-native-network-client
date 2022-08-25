@@ -28,22 +28,23 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {onBack, isType, center, cityName} = this.props.route.params;
+    const {onBack, center, cityName} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
     let cityNames = cityName !== undefined && tool.length(cityName) > 0 ? cityName : "北京市"
-    if (tool.length(center) > 0) {
-      map.name = '';
-      map.location = center
-      isMap = is_default = true;
-    }
+
     if (tool.store(this.props.global)) {
       let citymsg = tool.store(this.props.global);
       cityNames = citymsg.city
       let location = citymsg.loc_lng + "," + citymsg.loc_lat;
       map.name = '';
       map.location = location
+    }
+    if (tool.length(center) > 0) {
+      map.name = '';
+      map.location = center
+      isMap = is_default = true;
     }
 
     this.state = {
@@ -93,7 +94,7 @@ class SearchShop extends Component {
   }
 
   onChange = (searchKeywords) => {
-    this.setState(searchKeywords, () => {
+    this.setState({searchKeywords}, () => {
       this.search()
     });
   }
@@ -205,7 +206,7 @@ class SearchShop extends Component {
     }
     return (
       <MapView
-        mapType={MapType.Standard}
+        mapType={MapType.Navi}
         style={StyleSheet.absoluteFill}
         initialCameraPosition={{
           target: {latitude: Number(lat), longitude: Number(lng)},
@@ -216,20 +217,23 @@ class SearchShop extends Component {
           position={{latitude: Number(lat), longitude: Number(lng)}}
           onDragEnd={({nativeEvent}) => {
             this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
-            console.log(nativeEvent, 'nativeEvent')
           }}
         >
           <View style={{alignItems: 'center'}}>
-            <Text style={{
-              color: colors.white,
-              fontSize: 18,
+            <View style={{
               zIndex: 999,
               backgroundColor: colors.main_color,
               marginBottom: 15,
-              padding: 3,
-            }}>标注点 </Text>
+              padding: 8,
+              borderRadius: 6,
+            }}>
+              <Text style={{
+                color: colors.white,
+                fontSize: 18,
+              }}>标注点 </Text>
+            </View>
             <Entypo name={'triangle-down'}
-                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 20}}/>
+                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
           </View>
         </Marker>
       </MapView>
