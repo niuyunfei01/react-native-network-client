@@ -497,6 +497,12 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE_NEW}
                       options={{headerTitle: '零售价格'}}
                       getComponent={() => require('../../scene/order/NewRetailPriceScene').default}/>
+
+
+        <Stack.Screen name={Config.RIDER_TRSJECTORY}
+                      options={{headerTitle: '骑手轨迹'}}
+                      getComponent={() => require('../../scene/order/RiderTrajectory').default}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
