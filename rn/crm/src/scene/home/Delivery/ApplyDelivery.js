@@ -12,7 +12,7 @@ import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {MapView, Marker} from "react-native-amap3d";
+import {MapType, MapView, Marker} from "react-native-amap3d";
 import Entypo from "react-native-vector-icons/Entypo";
 
 
@@ -224,6 +224,7 @@ class ApplyDelivery extends PureComponent {
           <If condition={status === 0 && lat && lng}>
             <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
               <MapView
+                mapType={MapType.Navi}
                 initialCameraPosition={{
                   target: {latitude: Number(lat), longitude: Number(lng)},
                   zoom: 16

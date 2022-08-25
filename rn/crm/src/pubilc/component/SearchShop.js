@@ -205,7 +205,7 @@ class SearchShop extends Component {
     }
     return (
       <MapView
-        mapType={MapType.Standard}
+        mapType={MapType.Navi}
         style={StyleSheet.absoluteFill}
         initialCameraPosition={{
           target: {latitude: Number(lat), longitude: Number(lng)},

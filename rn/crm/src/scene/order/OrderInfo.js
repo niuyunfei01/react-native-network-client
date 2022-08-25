@@ -2,16 +2,16 @@ import React, {Component} from 'react'
 import {
   Alert,
   Dimensions,
+  InteractionManager,
   Modal,
   PermissionsAndroid,
   Platform,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  StyleSheet,
-  InteractionManager
+  View
 } from 'react-native'
 import Clipboard from '@react-native-community/clipboard'
 import native from '../../pubilc/util/native'
@@ -167,7 +167,7 @@ class OrderInfo extends Component {
         store_id: '',
         platform: '',
       },
-      reminds:[],
+      reminds: [],
       actionSheet: [],
       isFetching: false,
       shipCallHided: true,
@@ -1660,8 +1660,8 @@ class OrderInfo extends Component {
   }
 
   canViewPosition = (info) => {
-    this.setState({showDeliveryModal: false},()=>{
-      this.onPress(Config.RIDER_TRSJECTORY,{delivery_id:info.ship_id})
+    this.setState({showDeliveryModal: false}, () => {
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id})
     })
     this.mixpanel.track('配送调度页_查看位置')
   }

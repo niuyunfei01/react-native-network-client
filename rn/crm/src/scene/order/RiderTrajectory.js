@@ -104,7 +104,7 @@ class RiderTrajectory extends Component {
 
     return (
       <MapView
-        mapType={MapType.Standard}
+        mapType={MapType.Navi}
         style={StyleSheet.absoluteFill}
         initialCameraPosition={{
           target: {latitude: track_horseman_lat, longitude: track_horseman_lng},
