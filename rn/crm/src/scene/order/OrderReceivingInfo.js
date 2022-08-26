@@ -65,6 +65,7 @@ class OrderReceivingInfo extends Component {
       loc_lng: this.props.route.params.addItem && this.props.route.params.addItem['lng'],
       id: this.props.route.params.addItem && this.props.route.params.addItem['id'],
       type: this.props.route.params.type && this.props.route.params.type,
+      coordinates: this.props.route.params.addItem !== undefined && this.props.route.params.addItem['lng'] + ',' + this.props.route.params.addItem['lat'],
     })
   }
 
@@ -91,9 +92,9 @@ class OrderReceivingInfo extends Component {
   }
 
   toSetLocation() {
-    const {location_long, location_lat, coordinates} = this.state
+    const {loc_lng, loc_lat, coordinates} = this.state
     let center = ""
-    if (location_long && location_lat) {
+    if (loc_lng && loc_lat) {
       center = coordinates
     }
 
@@ -193,7 +194,7 @@ class OrderReceivingInfo extends Component {
   }
 
   render() {
-    const {location_long, location_lat, inputShow, street_block_address, type} = this.state
+    const {location_long, location_lat, inputShow, address, street_block_address, type} = this.state
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container, {flex: 1}]}>
@@ -219,7 +220,7 @@ class OrderReceivingInfo extends Component {
               <If condition={type == 'edit'}>
                 <Text style={[styles.body_text, {flex: 1}]}>
                   {((location_long !== undefined && location_lat !== undefined) && street_block_address !== undefined)
-                    ? `${location_long}(${location_lat})` : `${this.state.address}`}</Text>
+                    ? `${location_long}(${location_lat})` : `${address}(${street_block_address})`}</Text>
               </If>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>

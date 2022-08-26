@@ -4,7 +4,7 @@ import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {fetchSgTagTree, productSave} from "../../../reducers/product/productActions";
+import {fetchSgTagTree, productSave, getProdDetailByUpc} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -41,6 +41,7 @@ function mapDispatchToProps(dispatch) {
       {
         productSave,
         fetchSgTagTree,
+        getProdDetailByUpc,
         ...globalActions
       },
       dispatch
@@ -684,26 +685,25 @@ class GoodsEditScene extends PureComponent {
   }
 
   getProdDetailByUpc = (upc) => {
-    showModal("加载中...")
+    showModal("加载商品中...", 'loading', 20000)
+    const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
-    let data = {
-      store_id: currStoreId,
-      upc: upc
-    }
-    HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, data).then(p => {
-      hideModal();
-
-      if (p && p['id']) {
-        this.onReloadProd(p)
-      } else if (p && p['upc_data']) {
-        this.onReloadUpc(p['upc_data'])
-        if (p['upc_data'].category_id) {
-          this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+    dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
+      if (ok) {
+        hideModal()
+        if (p && p['id']) {
+          this.onReloadProd(p)
+        } else if (p && p['upc_data']) {
+          this.onReloadUpc(p['upc_data'])
+          if (p['upc_data'].category_id) {
+            this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+          }
         }
+      } else {
+        hideModal()
+        showError(`${desc}`)
       }
-    }).catch(() => {
-      hideModal()
-    })
+    }))
   }
 
   addProdToStore = (save_done_callback) => {
@@ -1338,7 +1338,7 @@ class GoodsEditScene extends PureComponent {
           </If>
           <If condition={!cover_img}>
             <View style={styles.imageIconWrap}>
-              <FontAwesome5 name={'images'} size={32} color={colors.color666}/>
+              <FontAwesome5 name={'images'} size={32} color={colors.colorCCC}/>
             </View>
           </If>
         </If>

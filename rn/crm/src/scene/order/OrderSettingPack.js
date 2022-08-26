@@ -86,7 +86,11 @@ class OrderSettingScene extends Component {
         name: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.name : '',
         mobile: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.phone : '',
         address: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.address : '',
+        street_block: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.street_block : '',
         addressId: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.id : '',
+        coordinates: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lng + ',' + props.route.params.addressItem.lat : '',
+        location_long: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lng : '',
+        location_lat: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lat : '',
       }
     }
   }
@@ -107,11 +111,7 @@ class OrderSettingScene extends Component {
     }
 
     const params = {
-      action: Config.LOC_PICKER,
       center: center,
-      loc_lat: tool.store(this.props.global).loc_lat,
-      loc_lng: tool.store(this.props.global).loc_lng,
-      isType: "orderSetting",
       onBack: resp => {
         let {name, address, location} = resp;
         let locate = name;
@@ -331,7 +331,9 @@ class OrderSettingScene extends Component {
       is_right_once,
       orderAmount,
       inputShow,
-      isSaveToBook
+      isSaveToBook,
+      street_block,
+      address
     } = this.state
     let time = datePickerValue
     let str = dayjs(time).format('YYYY-MM-DD HH:mm')
@@ -358,7 +360,7 @@ class OrderSettingScene extends Component {
               </View>
               <Text style={[styles.body_text, {flex: 1}]}>
                 {(location_long !== "" && location_lat !== "")
-                  ? `${location_long}(${location_lat})` : `请选择定位地址`}
+                  ? `${address}(${street_block})` : `请选择定位地址`}
               </Text>
               <Entypo name='chevron-thin-right'
                       style={styles.locationIcon}/>

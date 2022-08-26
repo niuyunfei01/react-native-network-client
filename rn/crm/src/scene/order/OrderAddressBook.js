@@ -10,7 +10,7 @@ import {Button, SearchBar} from 'react-native-elements';
 import pxToDp from "../../pubilc/util/pxToDp";
 import Config from "../../pubilc/common/config";
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -57,7 +57,6 @@ class OrderAddressBook extends Component {
   UNSAFE_componentWillMount() {
     this.fetchAddressBook()
   }
-
 
   onPress(route, params = {}) {
     let _this = this;
