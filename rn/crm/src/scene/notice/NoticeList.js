@@ -63,17 +63,22 @@ class NoticeList extends React.PureComponent {
       list: [],
       isCanLoadMore: false,
     }
-    this.fetchData(100)
   }
 
   UNSAFE_componentWillMount() {
   }
+  componentWillUnmount() {
+    this.focus()
+  }
 
   componentDidMount() {
+    this.fetchData(100)
+
+    this.focus = this.props.navigation.addListener('focus', () => {
+      this.fetchData()
+    })
   }
 
-  componentWillUnmount() {
-  }
 
   fetchData = (paramsStatus, setList = 1) => {
     showModal("加载中...")
@@ -136,9 +141,7 @@ class NoticeList extends React.PureComponent {
         return null;
       }
       if (checkStatus === 103) {
-        this.setState({
-          checkType: 3
-        })
+        that.state.checkType = 3;
       }
       that.state.queryParams.page = 1;
       that.state.queryParams.isAdd = true;
@@ -184,11 +187,7 @@ class NoticeList extends React.PureComponent {
   }
 
   onTouchMove = (e) => {
-    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-      this.setState({scrollLocking: true});
-    } else {
-      this.setState({scrollLocking: false});
-    }
+    this.setState({scrollLocking: Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)});
   }
 
   onPress = (route, params) => {

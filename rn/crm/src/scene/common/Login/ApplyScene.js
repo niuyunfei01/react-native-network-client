@@ -292,11 +292,14 @@ class ApplyScene extends PureComponent {
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      address: res.address,
+    let states = {
       location_long: Lng,
       location_lat: lat,
-    })
+    }
+    if (res.address) {
+      states.dada_address = res.address;
+    }
+    this.setState(states)
   }
 
   render() {

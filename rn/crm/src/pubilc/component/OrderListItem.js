@@ -384,11 +384,9 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
-    this.setState({showDeliveryModal: false})
-    const accessToken = this.props.accessToken
-    let path = '/rider_tracks.html?delivery_id=' + val + "&access_token=" + accessToken;
-    const uri = Config.serverUrl(path);
-    this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.setState({showDeliveryModal: false},()=>{
+      this.onPress(Config.RIDER_TRSJECTORY,{delivery_id:val})
+    })
     this.mixpanel.track('查看位置')
   }
 
@@ -742,14 +740,14 @@ class OrderListItem extends React.PureComponent {
 
   renderVerificationBtn = () => {
     return (
-        <View style={styles.btnContent}>
-          <View style={{flex: 1}}/>
-          <Button title={'到店核销'}
-                  onPress={() => this.openVeriFicationToShop()}
-                  buttonStyle={styles.veriFicationBtn}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </View>
+      <View style={styles.btnContent}>
+        <View style={{flex: 1}}/>
+        <Button title={'到店核销'}
+                onPress={() => this.openVeriFicationToShop()}
+                buttonStyle={styles.veriFicationBtn}
+                titleStyle={{color: colors.white, fontSize: 16}}
+        />
+      </View>
     )
   }
 

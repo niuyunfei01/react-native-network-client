@@ -248,13 +248,14 @@ class MineScene extends PureComponent {
     this.getNotifyCenter();
     this.getStoreDataOfMine()
     // this._doChangeStore(currStoreId)
-    this.registerJpush();
+
     this.getStoreTurnover();
     this.getHaveNotReadAdvice();
   }
 
   componentDidMount = () => {
     this.getActivity();
+    this.registerJpush();
     this.subscription = DeviceEventEmitter.addListener("EventChangeStore", (params) => {
       this.onCanChangeStore(params['id']);
     })
@@ -1099,8 +1100,8 @@ class MineScene extends PureComponent {
     const {currStoreId, accessToken, simpleStore} = global
     const {added_service} = simpleStore
     return (
-      <View>
-
+      <>
+        {this.renderHeader()}
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh}/>
         <ScrollView
           refreshControl={
@@ -1112,7 +1113,7 @@ class MineScene extends PureComponent {
           }
           style={{backgroundColor: colors.main_back}}
         >
-          {this.renderHeader()}
+
           {this.renderStoreStatus()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
           <If condition={currVersion === Cts.VERSION_DIRECT}>
@@ -1167,7 +1168,7 @@ class MineScene extends PureComponent {
         {/*               this.onCanChangeStore(item.id);*/}
         {/*               this.setState({searchStoreVisible: false})*/}
         {/*             }}/>*/}
-      </View>
+      </>
     );
   }
 
@@ -2012,8 +2013,8 @@ const block_styles = StyleSheet.create({
   },
   block_name: {
     color: colors.color666,
-    fontSize: pxToEm(26),
-    lineHeight: pxToDp(28),
+    fontSize: 12,
+    lineHeight: 17,
     textAlign: "center"
   },
   notice_point: {

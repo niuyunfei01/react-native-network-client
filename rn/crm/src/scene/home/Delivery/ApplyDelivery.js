@@ -12,7 +12,7 @@ import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {MapView, Marker} from "react-native-amap3d";
+import {MapType, MapView, Marker} from "react-native-amap3d";
 import Entypo from "react-native-vector-icons/Entypo";
 
 
@@ -224,6 +224,7 @@ class ApplyDelivery extends PureComponent {
           <If condition={status === 0 && lat && lng}>
             <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
               <MapView
+                mapType={MapType.Navi}
                 initialCameraPosition={{
                   target: {latitude: Number(lat), longitude: Number(lng)},
                   zoom: 16
@@ -234,16 +235,21 @@ class ApplyDelivery extends PureComponent {
                   onPress={() => alert("onPress")}
                 >
                   <View style={{alignItems: 'center'}}>
-                    <Text style={{
-                      color: colors.white,
-                      fontSize: 18,
+
+                    <View style={{
                       zIndex: 999,
                       backgroundColor: colors.main_color,
                       marginBottom: 15,
-                      padding: 3,
-                    }}>{store_name} </Text>
+                      padding: 8,
+                      borderRadius: 6,
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        fontSize: 18,
+                      }}>{store_name} </Text>
+                    </View>
                     <Entypo name={'triangle-down'}
-                            style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 20}}/>
+                            style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
                   </View>
                 </Marker>
               </MapView>

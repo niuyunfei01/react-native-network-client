@@ -51,14 +51,6 @@ const PAID_OK = 1;
 const PAID_FAIL = 2;
 const PAID_WAIT = 0;
 const width = Dimensions.get("window").width;
-const recharge_amount = [
-  {label: '100元', value: '100'},
-  {label: '200元', value: '200'},
-  {label: '500元', value: '500'},
-  {label: '1000元', value: '1000'},
-  {label: '2000元', value: '2000'},
-  {label: '其他金额', value: '0'}
-]
 
 class SeparatedAccountFill extends PureComponent {
 
@@ -76,7 +68,15 @@ class SeparatedAccountFill extends PureComponent {
       img: '',
       content: '',
       showImgMenus: false,
-      showAmountInput: false
+      showAmountInput: false,
+      recharge_amount: [
+        {label: '100元', value: '100'},
+        {label: '200元', value: '200'},
+        {label: '500元', value: '500'},
+        {label: '1000元', value: '1000'},
+        {label: '2000元', value: '2000'},
+        {label: '其他金额', value: '0'}
+      ]
     }
   }
 
@@ -230,20 +230,31 @@ class SeparatedAccountFill extends PureComponent {
     })
   }
 
-  fallInAmount = (val) => {
-    if (val === '0')
+  fallInAmount = (val, idx) => {
+    this.setState({
+      showAmountInput: false
+    })
+    let amountArrCopy = [...this.state.recharge_amount]
+    amountArrCopy.forEach(item => {
+      item.bgc = '#ffffff'
+      item.titleColor = '#333'
+    })
+    amountArrCopy[idx].bgc = '#59B26A'
+    amountArrCopy[idx].titleColor = '#fff'
+    this.setState({
+      recharge_amount: amountArrCopy,
+      to_fill_yuan: val
+    })
+    if (val === '0') {
       this.setState({
         showAmountInput: true,
         to_fill_yuan: ''
       })
-    else
-      this.setState({
-        to_fill_yuan: val
-      })
+    }
   }
 
   renderWechat() {
-    let { showAmountInput } = this.state
+    let { showAmountInput, recharge_amount } = this.state
     if (this.state.paid_done === PAID_WAIT && this.state.headerType === 1) {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
@@ -300,10 +311,10 @@ class SeparatedAccountFill extends PureComponent {
               <View style={style.btnList}>
                 <For each="item" index="idx" of={recharge_amount}>
                   <Button title={item.label} key={idx}
-                          onPress={() => this.fallInAmount(item.value)}
-                          buttonStyle={[style.modalBtn]}
+                          onPress={() => this.fallInAmount(item.value, idx)}
+                          buttonStyle={[style.modalBtn, {backgroundColor: item.bgc ? item.bgc : colors.white}]}
                           titleStyle={{
-                            color: this.state.funds_thresholds === item ? colors.white : colors.color333,
+                            color: item.titleColor ? item.titleColor : colors.color333,
                             fontSize: 16
                           }}
                   />
@@ -762,7 +773,6 @@ const style = StyleSheet.create({
     width: width * 0.25,
     marginTop: 8,
     borderRadius: pxToDp(10),
-    backgroundColor: colors.white,
     borderWidth: pxToDp(1),
     borderColor: colors.color999,
     flex: 1

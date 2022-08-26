@@ -2,16 +2,16 @@ import React, {Component} from 'react'
 import {
   Alert,
   Dimensions,
+  InteractionManager,
   Modal,
   PermissionsAndroid,
   Platform,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  StyleSheet,
-  InteractionManager
+  View
 } from 'react-native'
 import Clipboard from '@react-native-community/clipboard'
 import native from '../../pubilc/util/native'
@@ -127,6 +127,25 @@ const timeObj = {
   method: []
 }//记录耗时的对象
 
+const as = [
+  {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
+  {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+  {key: MENU_EDIT_STORE, label: '修改门店'},
+  {key: MENU_FEEDBACK, label: '客户反馈'},
+  {key: MENU_RECEIVE_QR, label: '收款码'},
+  {key: MENU_CALL_STAFF, label: '联系门店'},
+];
+const tipListTop = [
+  {label: '1元', value: 1},
+  {label: '2元', value: 2},
+  {label: '3元', value: 3}
+]
+const tipListBottom = [
+  {label: '4元', value: 4},
+  {label: '5元', value: 5},
+  {label: '10元', value: 10}
+]
+
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
@@ -140,7 +159,15 @@ class OrderInfo extends Component {
       showChangeLogList: true,
       showGoodsList: false,
       order_id: order_id,
-      order: {},
+      order: {
+        orderStatus: '',
+        id: '',
+        pickType: '',
+        printer_sn: '',
+        store_id: '',
+        platform: '',
+      },
+      reminds: [],
       actionSheet: [],
       isFetching: false,
       shipCallHided: true,
@@ -202,6 +229,52 @@ class OrderInfo extends Component {
   }
 
   componentDidMount() {
+    let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
+    let {wsb_store_account} = this.props.global.config.vendor
+    if (is_service_mgr) {
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
+    }
+    if (is_service_mgr || allow_merchants_cancel_order) {
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
+    }
+    if (is_service_mgr || wsb_store_account === "1") {
+      as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
+    }
+    if (this._fnProvidingOnway()) {
+      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
+      as.push({key: MENU_PROVIDING, label: '门店备货'});
+    }
+    if (order && order.fn_scan_items) {
+      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
+    }
+    if (order && order.fn_scan_ready) {
+      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+    }
+    if (is_service_mgr) {
+      as.push({key: MENU_SEND_MONEY, label: '发红包'});
+    }
+    if (order && order.cancel_to_entry) {
+      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
+    }
+    if (order && order.fn_coupon_redeem_good) {
+      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
+    }
+    this.setState({actionSheet: as})
+
+    if (Platform.OS === 'android' && Platform.Version >= 23) {
+      BleManager.enableBluetooth().then(() => {
+      }).catch((error) => {
+        this.setState({askEnableBle: true})
+      });
+
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+        if (!result) {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+          });
+        }
+      });
+    }
+
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -414,82 +487,24 @@ class OrderInfo extends Component {
   }
 
   setHeader = () => {
-    let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
-    let {wsb_store_account} = this.props.global.config.vendor
-
-    const moreOperationsStyles = {
-      ...Platform.select({
-        ios: {
-          marginTop: pxToDp(25),
-        },
-        android: {}
-      }),
-      marginRight: pxToDp(20),
-      height: pxToDp(60),
-      width: pxToDp(60),
-      fontSize: pxToDp(30),
-      color: colors.color666,
-      textAlign: 'center',
-      textAlignVertical: 'center',
-    }
-    const as = [
-      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
-      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
-      {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_RECEIVE_QR, label: '收款码'},
-      {key: MENU_CALL_STAFF, label: '联系门店'},
-    ];
-    if (is_service_mgr) {
-      as.push({key: MENU_SET_INVALID, label: '置为无效'});
-    }
-    if (is_service_mgr || allow_merchants_cancel_order) {
-      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
-    }
-    if (is_service_mgr || wsb_store_account === "1") {
-      as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
-    }
-    if (this._fnProvidingOnway()) {
-      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
-      as.push({key: MENU_PROVIDING, label: '门店备货'});
-    }
-    if (order && order.fn_scan_items) {
-      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
-    }
-    if (order && order.fn_scan_ready) {
-      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
-    }
-    if (is_service_mgr) {
-      as.push({key: MENU_SEND_MONEY, label: '发红包'});
-    }
-    if (order && order.cancel_to_entry) {
-      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
-    }
-    if (order && order.fn_coupon_redeem_good) {
-      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
-    }
-    this.setState({actionSheet: as})
     let {navigation} = this.props;
     navigation.setOptions({
       headerTitle: '订单详情',
       headerRight: () => (
         <View style={Styles.flexRowAlignCenter}>
-          <Text style={Styles.printText}
-                onPress={() => {
-                  this.onPrint()
-                }}>
+          <Text style={Styles.printText} onPress={this.onPrint}>
             打印
           </Text>
 
           <TouchableOpacity onPress={() => this.navigateToOrderOperation()}>
-            <Entypo name='dots-three-horizontal' style={moreOperationsStyles}/>
+            <Entypo name='dots-three-horizontal' style={Styles.moreOperationsStyles}/>
           </TouchableOpacity>
         </View>),
     });
   }
 
   onPrint = () => {
-    const order = this.state.order
+    const {order} = this.state
     if (order.printer_sn) {
       this.setState({showPrinterChooser: true})
     } else {
@@ -515,27 +530,15 @@ class OrderInfo extends Component {
   }
 
   _cloudPrinterSN = () => {
-    const order = this.state.order;
+    const {order} = this.state
     const printerName = order.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
   _doBluetoothPrint = () => {
     this._hidePrinterChooser()
-    if (Platform.OS === 'android' && Platform.Version >= 23) {
-      BleManager.enableBluetooth().then(() => {
-      }).catch((error) => {
-        this.setState({askEnableBle: true})
-      });
 
-      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (!result) {
-          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-          });
-        }
-      });
-    }
-    let order = this.state.order;
+    let {order} = this.state;
     const {printer_id} = this.props.global
     if (printer_id) {
       setTimeout(() => {
@@ -581,7 +584,7 @@ class OrderInfo extends Component {
   }
 
   _doSunMiPint = () => {
-    const {order} = this.state;
+    const {order} = this.state
     native.printSmPrinter(order, (ok, msg) => {
     });
     this._hidePrinterChooser();
@@ -611,37 +614,46 @@ class OrderInfo extends Component {
   }
 
   _doProcessRemind = (remind) => {
-    const {order} = this.state;
+    const {order} = this.state
     const {dispatch, global} = this.props;
+    const {accessToken} = global;
     const remindType = parseInt(remind.type);
-    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER || remindType === Cts.TASK_TYPE_AFS_SERVICE_BY_USER) {
-      this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
-    } else if (remindType === Cts.TASK_TYPE_REMIND) {
-      this.onPress(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
-    } else if (remindType === Cts.TASK_TYPE_DELIVERY_FAILED) {
-      this.onPress(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
-    } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
-      this.setState({onSubmitting: true});
-      showModal('处理中')
-      const token = global.accessToken;
-      dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
-        const state = {onSubmitting: false};
-        hideModal()
-        if (ok) {
-          showSuccess('已处理');
-          // state.onProcessed = true;
-          setTimeout(() => {
-            remind.status = Cts.TASK_STATUS_DONE;
-            // this.setState({onProcessed: false});
-          }, 2000);
-        } else {
-          ToastLong(msg)
-        }
-        this.setState(state);
-      }));
-    } else {
-      ToastLong('暂不支持该处理类型')
+    switch (remindType) {
+      case Cts.TASK_TYPE_REFUND_BY_USER:
+      case Cts.TASK_TYPE_AFS_SERVICE_BY_USER:
+        this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        break
+      case Cts.TASK_TYPE_REMIND:
+        this.onPress(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+        break
+      case Cts.TASK_TYPE_DELIVERY_FAILED:
+        this.onPress(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
+        break
+      case Cts.TASK_TYPE_ORDER_CHANGE:
+        this.setState({onSubmitting: true});
+        showModal('处理中')
+
+        dispatch(markTaskDone(accessToken, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
+          const state = {onSubmitting: false};
+          hideModal()
+          if (ok) {
+            showSuccess('已处理');
+            // state.onProcessed = true;
+            setTimeout(() => {
+              remind.status = Cts.TASK_STATUS_DONE;
+              // this.setState({onProcessed: false});
+            }, 2000);
+          } else {
+            ToastLong(msg)
+          }
+          this.setState(state);
+        }));
+        break
+      default:
+        ToastLong('暂不支持该处理类型')
+        break
     }
+
   }
 
   copyToClipboard = (val) => {
@@ -668,6 +680,14 @@ class OrderInfo extends Component {
     })
   }
 
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
   renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
@@ -677,22 +697,17 @@ class OrderInfo extends Component {
       {
         type: 'default',
         label: this._cloudPrinterSN(),
-        onPress: this._doCloudPrint.bind(this)
-      }, {
-        type: 'default',
-        label: '蓝牙打印',
-        onPress: this._doBluetoothPrint.bind(this)
-      }, {
-        type: 'default',
-        label: '商米打印',
-        onPress: this._doSunMiPint.bind(this)
-      }
-    ]
-    const printAction = [
+        onPress: this._doCloudPrint
+      },
       {
         type: 'default',
-        label: '取消',
-        onPress: this._hidePrinterChooser.bind(this)
+        label: '蓝牙打印',
+        onPress: this._doBluetoothPrint
+      },
+      {
+        type: 'default',
+        label: '商米打印',
+        onPress: this._doSunMiPint
       }
     ]
     return (
@@ -704,9 +719,9 @@ class OrderInfo extends Component {
                       processRemind={this._doProcessRemind.bind(this)}/>
         <ActionSheet
           visible={this.state.showPrinterChooser}
-          onRequestClose={() => this._hidePrinterChooser()}
+          onRequestClose={this._hidePrinterChooser}
           menus={menus}
-          actions={printAction}
+          actions={this.printAction}
         />
       </View>)
   }
@@ -717,8 +732,9 @@ class OrderInfo extends Component {
       <View style={Styles.headerBody}>
         <View style={Styles.headerBodyTitle}>
           <View style={Styles.flexRow}>
-            <Text
-              style={order.status_show === '订单已取消' ? Styles.orderStatus : Styles.orderStatusShow}>{order.status_show}  </Text>
+            <Text style={order.status_show === '订单已取消' ? Styles.orderStatus : Styles.orderStatusShow}>
+              {order.status_show}
+            </Text>
             <View style={styles.flex1}/>
             <Text style={Styles.orderSeq}>{order.show_seq}  </Text>
           </View>
@@ -796,14 +812,8 @@ class OrderInfo extends Component {
             <Text style={Styles.qrcodeLabel}>取货码：{this.state.qrcode} </Text>
             <MaterialCommunityIcons name={'focus-field'} style={Styles.qrcodeIcon}/>
           </TouchableOpacity>
-        </If>
-        <If condition={this.state.order.pickType === '1'}>
           <View style={Styles.qrcodeContent}>
-            <QRCode
-              value={this.state.qrcode}
-              color="black"
-              size={150}
-            />
+            <QRCode value={this.state.qrcode} color="black" size={150}/>
           </View>
         </If>
 
@@ -908,7 +918,9 @@ class OrderInfo extends Component {
         <View style={Styles.flexRow}>
           <Text style={Styles.clientLabel}>姓名</Text>
           <Text style={Styles.clientNameValue}>{order.userName} </Text>
-          <Text style={Styles.clientOrderTimes}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
+          <Text style={Styles.clientOrderTimes}>
+            {order.order_times === '1' ? "新客户" : `第${order.order_times}次`}
+          </Text>
           <Text onPress={() => this.onPress(Config.ROUTE_ORDER_EDIT, {order: order})}
                 style={Styles.clientChangeInfoTitle}>修改订单</Text>
         </View>
@@ -1063,7 +1075,7 @@ class OrderInfo extends Component {
   }
 
   _totalEditingCents = () => {
-    const {order} = this.state;
+    const {order} = this.state
     const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
       : 0;
@@ -1098,7 +1110,7 @@ class OrderInfo extends Component {
   }
 
   _doRefund = () => {
-    const {order} = this.state;
+    const {order} = this.state
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
     }`
@@ -1648,38 +1660,24 @@ class OrderInfo extends Component {
   }
 
   canViewPosition = (info) => {
-    this.setState({showDeliveryModal: false})
-    const accessToken = this.props.global.accessToken
-    let path = '/rider_tracks.html?delivery_id=' + info.ship_id + "&access_token=" + accessToken;
-    const uri = Config.serverUrl(path);
-    this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.setState({showDeliveryModal: false}, () => {
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id})
+    })
     this.mixpanel.track('配送调度页_查看位置')
   }
 
   renderAddTipModal = () => {
     let {is_merchant_add_tip} = this.state
-    const tipListTop = [
-      {label: '1元', value: 1},
-      {label: '2元', value: 2},
-      {label: '3元', value: 3}
-    ]
-    const tipListBottom = [
-      {label: '4元', value: 4},
-      {label: '5元', value: 5},
-      {label: '10元', value: 10}
-    ]
+
     return (
-      <Modal
-        visible={this.state.addTipModal}
-        onRequestClose={() => this.closeAddTipModal()}
-        animationType={'slide'}
-        transparent={true}
-      >
+      <Modal visible={this.state.addTipModal}
+             onRequestClose={this.closeAddTipModal}
+             animationType={'slide'}
+             transparent={true}>
         <View style={Styles.modalBackground}>
           <View style={[Styles.container]}>
             <TouchableOpacity onPress={() => this.closeAddTipModal()} style={Styles.addTipRightIcon}>
-              <Entypo name={"circle-with-cross"}
-                      style={Styles.addTipRightIconStyle}/>
+              <Entypo name={"circle-with-cross"} style={Styles.addTipRightIconStyle}/>
             </TouchableOpacity>
             <Text style={Styles.addTipTitleText}>加小费</Text>
             <Text style={Styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
@@ -1708,9 +1706,7 @@ class OrderInfo extends Component {
                   placeholder={'请输入其他金额'}
                   defaultValue={`${this.state.addMoneyNum}`}
                   keyboardType='numeric'
-                  onChangeText={(value) =>
-                    this.onChangeAccount(value)
-                  }
+                  onChangeText={(value) => this.onChangeAccount(value)}
                 />
                 <Text style={Styles.addTipInputRight}>元</Text>
               </View>
@@ -1729,9 +1725,7 @@ class OrderInfo extends Component {
                 </TouchableOpacity>
               </View>
               <View style={styles.flex1}>
-                <TouchableOpacity style={Styles.marginH10} onPress={() => {
-                  this.onConfirmAddTip()
-                }}>
+                <TouchableOpacity style={Styles.marginH10} onPress={() => this.onConfirmAddTip()}>
                   <Text style={Styles.btnText}>确定</Text>
                 </TouchableOpacity>
               </View>
@@ -1753,7 +1747,7 @@ class OrderInfo extends Component {
   }
 
   render() {
-    const order = this.state.order;
+    const {order} = this.state;
     const orderId = (this.props.route.params || {}).orderId;
     const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
 
@@ -1795,6 +1789,21 @@ class OrderInfo extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(OrderInfo)
 
 const Styles = StyleSheet.create({
+  moreOperationsStyles: {
+    ...Platform.select({
+      ios: {
+        marginTop: pxToDp(25),
+      },
+      android: {}
+    }),
+    marginRight: pxToDp(20),
+    height: pxToDp(60),
+    width: pxToDp(60),
+    fontSize: pxToDp(30),
+    color: colors.color666,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
   contentContainer: {
     alignItems: 'center',
     justifyContent: 'space-around',
