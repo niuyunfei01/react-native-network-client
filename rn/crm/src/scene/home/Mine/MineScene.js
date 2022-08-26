@@ -851,8 +851,8 @@ class MineScene extends PureComponent {
           <JbbText style={header_styles.shop_name}>
             {currStoreNameStr}
           </JbbText>
-          <TouchableOpacity onPress={this.jumpToAddStore}>
-            <SvgXml xml={pencilIcon(colors.color333, 18, 18)} style={styles.modifyStore}/>
+          <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
+            <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
           </TouchableOpacity>
         </View>
 
@@ -1111,7 +1111,7 @@ class MineScene extends PureComponent {
               tintColor="gray"
             />
           }
-          style={{backgroundColor: colors.main_back}}
+          style={{backgroundColor: colors.main_back, marginTop: 4}}
         >
 
           {this.renderStoreStatus()}
@@ -1761,7 +1761,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', height: pxToDp(300)
   },
   modifyStore: {
-    paddingLeft: 10
+    padding: 10,
   },
   fn_price_msg: {
     fontSize: pxToEm(30),
@@ -1831,10 +1831,11 @@ const header_styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.white,
-    paddingTop: 8,
+    paddingTop: 11,
     paddingLeft: 10,
     paddingRight: 10,
-    paddingBottom: 11
+    paddingBottom: 11,
+
   },
   shop_name: {
     color: colors.title_color,
@@ -1845,7 +1846,7 @@ const header_styles = StyleSheet.create({
   change_shop: {
     paddingLeft: 4,
     color: colors.main_color,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "400",
     lineHeight: 17
   },

@@ -405,8 +405,8 @@ export const pencilIcon = (fill = '#333', width = 24, height = 24) => {
   return (
     `
     <svg width="${width}" height="${height}" viewBox="0 0 48 48">
-    <path d="M42 26V40C42 41.1046 41.1046 42 40 42H8C6.89543 42 6 41.1046 6 40V8C6 6.89543 6.89543 6 8 6L22 6" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M14 26.7199V34H21.3172L42 13.3081L34.6951 6L14 26.7199Z" fill="none" stroke="${fill}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M42 26V40C42 41.1046 41.1046 42 40 42H8C6.89543 42 6 41.1046 6 40V8C6 6.89543 6.89543 6 8 6L22 6" stroke="${fill}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 26.7199V34H21.3172L42 13.3081L34.6951 6L14 26.7199Z" fill="none" stroke="${fill}" stroke-width="4" stroke-linejoin="round"/>
     </svg>`
   )
 }
