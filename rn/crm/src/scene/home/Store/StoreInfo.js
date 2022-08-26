@@ -479,16 +479,23 @@ class StoreInfo extends Component {
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      selectCity: {
-        name: res.cityname,
-        cityId: res.citycode
-      },
-      district: res.adname,
-      dada_address: res.address,
+    let states = {
       location_long: Lng,
       location_lat: lat,
-    })
+    }
+    if (res.cityname && res.citycode) {
+      states.selectCity = {
+        name: res.cityname,
+        cityId: res.citycode
+      }
+    }
+    if (res.address) {
+      states.dada_address = res.address;
+    }
+    if (res.adname) {
+      states.district = res.adname
+    }
+    this.setState(states)
   }
 
   doUploadImg = qualification => {
@@ -670,19 +677,18 @@ class StoreInfo extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-              if (btn_type === "edit" && !resp.obj.can_edit) {
+              if (btn_type === "edit" && resp.obj.can_edit) {
                 Alert.alert('提示', '您的门店信息发生改变，请同步配送平台信息。如果是自有账号，请联系对应配送方业务经理。', [{
-                  text: '确定',
+                  text: '去同步',
                   onPress: () => {
                     this.onPress(Config.ROUTE_DELIVERY_LIST);
                   },
                 }])
               }
-              const {goBack, state} = _this.props.navigation;
               if (this.props.route.params.actionBeforeBack) {
                 this.props.route.params.actionBeforeBack({shouldRefresh: true});
               }
-              goBack();
+              _this.props.navigation.goBack();
 
             }
           })
@@ -1034,13 +1040,11 @@ class StoreInfo extends Component {
               center = `${location_long},${location_lat}`;
             }
             const params = {
+              center: center,
               keywords: this.state.dada_address,
               onBack: (res) => {
                 this.setAddress.bind(this)(res)
               },
-              action: Config.LOC_PICKER,
-              center: center,
-              isType: 'fixed',
             };
             this.onPress(Config.ROUTE_SEARC_HSHOP, params);
           }} style={{
