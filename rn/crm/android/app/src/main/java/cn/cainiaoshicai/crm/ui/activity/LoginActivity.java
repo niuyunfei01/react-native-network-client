@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,9 +34,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 
 public class LoginActivity extends AbstractActionBarActivity {

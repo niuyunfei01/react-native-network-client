@@ -6,11 +6,12 @@ import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.IdRes;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.annotation.IdRes;
 
 import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.util.MQEmotionUtil;

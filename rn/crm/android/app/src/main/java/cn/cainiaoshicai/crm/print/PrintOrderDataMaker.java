@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.print;
 
 import android.content.Context;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

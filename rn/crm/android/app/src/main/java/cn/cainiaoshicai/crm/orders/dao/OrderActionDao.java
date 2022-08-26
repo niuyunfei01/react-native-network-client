@@ -1,7 +1,14 @@
 package cn.cainiaoshicai.crm.orders.dao;
 
-import androidx.annotation.Nullable;
+import static cn.cainiaoshicai.crm.ListType.DONE;
+import static cn.cainiaoshicai.crm.ListType.INVALID;
+import static cn.cainiaoshicai.crm.ListType.WAITING_ARRIVE;
+import static cn.cainiaoshicai.crm.ListType.WAITING_READY;
+import static cn.cainiaoshicai.crm.ListType.WAITING_SENT;
+
 import android.text.TextUtils;
+
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,12 +32,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
-
-import static cn.cainiaoshicai.crm.ListType.DONE;
-import static cn.cainiaoshicai.crm.ListType.INVALID;
-import static cn.cainiaoshicai.crm.ListType.WAITING_ARRIVE;
-import static cn.cainiaoshicai.crm.ListType.WAITING_READY;
-import static cn.cainiaoshicai.crm.ListType.WAITING_SENT;
 
 /**
  * Date: 13-2-14

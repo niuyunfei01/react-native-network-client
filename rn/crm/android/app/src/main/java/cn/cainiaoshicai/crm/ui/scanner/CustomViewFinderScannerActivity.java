@@ -14,10 +14,10 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import cn.cainiaoshicai.crm.R;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import cn.cainiaoshicai.crm.R;
 public class CustomViewFinderScannerActivity extends BaseScannerActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
 

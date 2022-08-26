@@ -3,8 +3,6 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +11,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,8 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
 import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
-import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.adapter.NewOrderReminderAdapter;

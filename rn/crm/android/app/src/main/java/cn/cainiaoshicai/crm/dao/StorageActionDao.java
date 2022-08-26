@@ -1,8 +1,9 @@
 package cn.cainiaoshicai.crm.dao;
 
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
+
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

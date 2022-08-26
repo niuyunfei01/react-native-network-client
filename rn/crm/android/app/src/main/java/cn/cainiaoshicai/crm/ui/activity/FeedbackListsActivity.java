@@ -2,9 +2,10 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 

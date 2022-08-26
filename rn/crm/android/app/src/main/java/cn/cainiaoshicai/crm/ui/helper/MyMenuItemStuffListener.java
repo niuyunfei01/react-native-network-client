@@ -1,13 +1,10 @@
 package cn.cainiaoshicai.crm.ui.helper;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
-
-import cn.cainiaoshicai.crm.GlobalCtx;
 
 abstract public class MyMenuItemStuffListener implements View.OnClickListener, View.OnLongClickListener {
     private String hint;

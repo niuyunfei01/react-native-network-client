@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
-
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;

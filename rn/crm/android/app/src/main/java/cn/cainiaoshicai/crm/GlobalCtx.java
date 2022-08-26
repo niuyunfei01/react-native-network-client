@@ -82,6 +82,7 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
+import org.xutils.common.util.MD5;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import java.io.File;
@@ -99,6 +100,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -141,6 +143,8 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.customer_serv.core.callback.OnInitCallback;
+import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
@@ -381,11 +385,16 @@ public class GlobalCtx extends Application implements ReactApplication {
             Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
             application = this;
 
-            @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-            agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
-            dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-            updateAfterGap(24 * 60 * 60 * 1000);
+        String myId = SettingUtility.getMyUUID();
+        if ("".equals(myId)) {
+            myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+            SettingUtility.setMyUUID(myId);
+        }
+
+        @SuppressLint("HardwareIds") String android_id = myId;
+        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
+        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
+        updateAfterGap(24 * 60 * 60 * 1000);
 
             try {
                 Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
@@ -404,13 +413,9 @@ public class GlobalCtx extends Application implements ReactApplication {
             this.soundManager = new SoundManager();
             this.soundManager.load(this);
 
-            //初始化蓝牙管理
-            AppInfo.init(this);
-            startKeepAlive();
+        startKeepAlive();
 
-            SoLoader.init(this, /* native exopackage */ false);
-            JPushModule.registerActivityLifecycle(this);
-        }
+        SoLoader.init(this, /* native exopackage */ false);
 
 
     }

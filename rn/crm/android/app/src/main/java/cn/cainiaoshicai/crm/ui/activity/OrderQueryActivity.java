@@ -3,7 +3,6 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +10,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 

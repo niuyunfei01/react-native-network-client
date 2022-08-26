@@ -48,8 +48,8 @@ import Scanner from "../../pubilc/component/Scanner";
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
-  const {remind, global, device} = state;
-  return {remind: remind, global: global, device: device}
+  const {global, device} = state;
+  return {global: global, device: device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -204,6 +204,47 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+    JPush.init();
+    //连接状态
+    this.connectListener = result => {
+      console.log("connectListener:" + JSON.stringify(result))
+    };
+    JPush.addConnectEventListener(this.connectListener);
+    //通知回调
+    this.notificationListener = result => {
+      console.log("notificationListener:" + JSON.stringify(result))
+    };
+    JPush.addNotificationListener(this.notificationListener);
+    //本地通知回调
+    this.localNotificationListener = result => {
+      console.log("localNotificationListener:" + JSON.stringify(result))
+    };
+    JPush.addLocalNotificationListener(this.localNotificationListener);
+    //自定义消息回调
+    this.customMessageListener = result => {
+      console.log("customMessageListener:" + JSON.stringify(result))
+    };
+    // JPush.addCustomMessagegListener(this.customMessageListener);
+    //tag alias事件回调
+    this.tagAliasListener = result => {
+      console.log("tagAliasListener:" + JSON.stringify(result))
+    };
+    JPush.addTagAliasListener(this.tagAliasListener);
+    //手机号码事件回调
+    this.mobileNumberListener = result => {
+      console.log("mobileNumberListener:" + JSON.stringify(result))
+    };
+    JPush.addMobileNumberListener(this.mobileNumberListener);
+
+    JPush.addConnectEventListener((connectEnable) => {
+      console.log("connectEnable:" + connectEnable)
+    })
+
+    JPush.setLoggerEnable(true);
+    JPush.getRegistrationID(result =>
+      console.log("registerID:" + JSON.stringify(result))
+    )
+
     const {global, dispatch, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
@@ -646,6 +687,10 @@ class OrderListScene extends Component {
       hint_msg,
       scanBoolean
     } = this.state
+
+    JPush.isNotificationEnabled((enabled) => {
+      console.log("JPush-is-notification enabled:", enabled)
+    })
     return (
       <View style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
