@@ -133,30 +133,30 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         p.resolve(getDeviceSync());
     }
 
-//    @ReactMethod(isBlockingSynchronousMethod = true)
-//    public String getDeviceNameSync() {
-//        try {
-//            String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
-//            if (bluetoothName != null) {
-//                return bluetoothName;
-//            }
-//
-//            if (Build.VERSION.SDK_INT >= 25) {
-//                String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
-//                if (deviceName != null) {
-//                    return deviceName;
-//                }
-//            }
-//        } catch (Exception e) {
-//            // same as default unknown return
-//        }
-//        return "unknown";
-//    }
+   @ReactMethod(isBlockingSynchronousMethod = true)
+   public String getDeviceNameSync() {
+       try {
+           String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
+           if (bluetoothName != null) {
+               return bluetoothName;
+           }
 
-//    @ReactMethod
-//    public void getDeviceName(Promise p) {
-//        p.resolve(getDeviceNameSync());
-//    }
+           if (Build.VERSION.SDK_INT >= 25) {
+               String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
+               if (deviceName != null) {
+                   return deviceName;
+               }
+           }
+       } catch (Exception e) {
+           // same as default unknown return
+       }
+       return "unknown";
+   }
+
+   @ReactMethod
+   public void getDeviceName(Promise p) {
+       p.resolve(getDeviceNameSync());
+   }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public float getFontScaleSync() { return getReactApplicationContext().getResources().getConfiguration().fontScale; }
