@@ -7,6 +7,7 @@ import Config from "./config";
 import {Dimensions} from "react-native";
 //import LoginScene from "../../scene/common/Login/LoginScene";
 import TabHome from "../../scene/common/TabHome";
+import native from "../util/native";
 
 let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
@@ -38,8 +39,16 @@ export const AppNavigator = (props) => {
                            (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
                          }
                          onStateChange={async () => {
+                           const previousRouteName = routeNameRef.current;
+                           const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+                           if (previousRouteName !== currentRouteName) {
+                             await native.reportRoute(currentRouteName);
+                           }
+                           global.currentRouteName = currentRouteName
+
                            // Save the current route name for later comparison
-                           routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+                           routeNameRef.current = currentRouteName;
                          }}>
       <Stack.Navigator
         initialRouteName={initialRouteName}

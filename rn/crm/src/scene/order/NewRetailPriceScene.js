@@ -17,7 +17,7 @@ import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import InputBoard from "../../pubilc/component/InputBoard";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
 
 const styles = StyleSheet.create({
   baseRowCenterWrap: {
@@ -173,17 +173,18 @@ class NewRetailPriceScene extends React.PureComponent {
     const url = `api_products/get_prod_with_store_detail/${currStoreId}/${productId}?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
       const {sp, p} = res
-      const skus = [{
+      let skus = [{
         product_id: sp.product_id,
-        sku_name: p.sku_name,
+        sku_name: p.sku_name ?? '',
         price: sp.price,
         es_alone_price: sp.es_alone_price,
         es_unify_price: sp.es_unify_price,
         left_since_last_stat: sp.left_since_last_stat,
         strict_providing: sp.strict_providing,
         supply_price: sp.supply_price
-      }].concat(sp.skus)
-
+      }]
+      if (Array.isArray(sp.skus))
+        skus = skus.concat(sp.skus)
       const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : skus.length > 0 ? skus[0] : {
         sku_name: '',
         supply_price: '0',
@@ -359,7 +360,7 @@ class NewRetailPriceScene extends React.PureComponent {
   }
 
   renderItem = ({item}) => {
-    const {sku_name} = item
+    const {sku_name = ''} = item
     return (
       <>
         <TouchableOpacity onPress={() => this.selectSku(item)}>

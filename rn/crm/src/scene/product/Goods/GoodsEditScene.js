@@ -28,6 +28,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import {CheckBox} from 'react-native-elements'
 import AntDesign from "react-native-vector-icons/AntDesign";
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -799,7 +800,7 @@ class GoodsEditScene extends PureComponent {
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, likeProds, store_has, showRecommend,
-      store_tags, editable_upc, price, selectWeight, actualNum, store_categories_obj
+      store_tags, editable_upc, price, selectWeight, actualNum, store_categories_obj, store_categories
     } = this.state
     return (
       <View style={Styles.zoneWrap}>
@@ -966,14 +967,33 @@ class GoodsEditScene extends PureComponent {
                   *
                 </Text>商品分类
               </Text>
-              <TouchableOpacity style={styles.textInputStyle}
-                                onPress={() => this.setSelectHeaderText('商品分类', false)}>
-                <Text style={styles.selectTipText}>
-                  {store_categories_obj.name_path ?? '请选择分类'}
-                </Text>
+              {/*<TouchableOpacity style={styles.textInputStyle}*/}
+              {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
+              {/*  <Text style={styles.selectTipText}>*/}
+              {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
+              {/*  </Text>*/}
 
-              </TouchableOpacity>
-              <MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>
+              {/*</TouchableOpacity>*/}
+              {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
+              <View style={styles.textInputStyle}>
+                <SectionedMultiSelect
+                  items={store_tags}
+                  IconRenderer={MaterialIcons}
+                  uniqueKey="id"
+                  subKey="children"
+                  selectText="请选择分类"
+                  showDropDowns={true}
+                  readOnlyHeadings={true}
+                  onSelectedItemsChange={this.onSelectedItemsChange}
+                  selectChildren={true}
+                  highlightChildren={true}
+                  selectedItems={store_categories}
+                  selectedText={"个已选中"}
+                  searchPlaceholderText='搜索门店分类'
+                  confirmText={"确认选择"}
+                  colors={{primary: colors.main_color}}
+                />
+              </View>
             </View>
             <LineView/>
           </If>
@@ -1359,17 +1379,17 @@ class GoodsEditScene extends PureComponent {
 
 const ITEM_HEIGHT = 48
 const styles = StyleSheet.create({
-  imageIconWrap:{
+  imageIconWrap: {
     height: pxToDp(170),
     width: pxToDp(170),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center"
   },
-  plusIconWrap:{
+  plusIconWrap: {
     height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"
   },
-  plusIcon:{
+  plusIcon: {
     fontSize: pxToDp(36),
     color: "#bfbfbf",
     textAlignVertical: "center",

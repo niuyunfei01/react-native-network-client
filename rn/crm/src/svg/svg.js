@@ -13,10 +13,10 @@ export const checkIcon = (fill = '#000') => {
 export const notice = () => {
   return `
   <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-  <rect x="4" y="15" width="40" height="26" rx="2" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M24 7L16 15H32L24 7Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M12 24H30" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M12 32H20" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="4" y="15" width="40" height="26" rx="2" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M24 7L16 15H32L24 7Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 24H30" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 32H20" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
   `
 }
@@ -25,12 +25,12 @@ export const dataAnalysis = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<rect x="4" y="6" width="40" height="30" rx="3" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24 36V43" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M32 14L16 28" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M10 43H38" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="15" cy="17" r="3" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="33" cy="25" r="3" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="4" y="6" width="40" height="30" rx="3" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 36V43" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32 14L16 28" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10 43H38" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="15" cy="17" r="3" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="33" cy="25" r="3" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`
   )
 }
@@ -39,12 +39,12 @@ export const settlementRecord = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<rect x="9" y="8" width="30" height="36" rx="2" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M18 4V10" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M30 4V10" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 19L32 19" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 27L28 27" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 35H24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="9" y="8" width="30" height="36" rx="2" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M18 4V10" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M30 4V10" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 19L32 19" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 27L28 27" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16 35H24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`
   )
 }
@@ -53,14 +53,14 @@ export const priceAdjustmentRecord = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M19 16L24 22L29 16" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M9 13.9999C9 13.9999 16.5 2.49984 29.5 6.99986C42.5 11.4999 42 24.4999 42 24.4999" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M39 34C39 34 33 45 19.5 41.5C6 38 6 24 6 24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M42 8V24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M6 24L6 40" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 28H30" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 22H30" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24 22V34" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 16L24 22L29 16" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M9 13.9999C9 13.9999 16.5 2.49984 29.5 6.99986C42.5 11.4999 42 24.4999 42 24.4999" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 34C39 34 33 45 19.5 41.5C6 38 6 24 6 24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M42 8V24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6 24L6 40" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 28H30" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 22H30" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 22V34" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 `
   )
@@ -111,11 +111,11 @@ export const orderCompensation = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M38 4H10C8.89543 4 8 4.89543 8 6V42C8 43.1046 8.89543 44 10 44H38C39.1046 44 40 43.1046 40 42V6C40 4.89543 39.1046 4 38 4Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 30L31 30" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 36H24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 17L29 17" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24 22V12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M38 4H10C8.89543 4 8 4.89543 8 6V42C8 43.1046 8.89543 44 10 44H38C39.1046 44 40 43.1046 40 42V6C40 4.89543 39.1046 4 38 4Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 30L31 30" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 36H24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 17L29 17" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 22V12" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -125,8 +125,8 @@ export const achievement = () => {
   return (
     `
     <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-    <path d="M6 6V42H42" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M14 34L22 18L32 27L42 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6 6V42H42" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 34L22 18L32 27L42 6" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     `
   )
@@ -135,8 +135,8 @@ export const shopManagement = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M40.0391 22V42H8.03906V22" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5.84231 13.7766C4.31276 17.7377 7.26307 22 11.5092 22C14.8229 22 17.5276 19.3137 17.5276 16C17.5276 19.3137 20.2139 22 23.5276 22H24.546C27.8597 22 30.546 19.3137 30.546 16C30.546 19.3137 33.2518 22 36.5655 22C40.8139 22 43.767 17.7352 42.2362 13.7723L39.2337 6H8.84523L5.84231 13.7766Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
+<path d="M40.0391 22V42H8.03906V22" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5.84231 13.7766C4.31276 17.7377 7.26307 22 11.5092 22C14.8229 22 17.5276 19.3137 17.5276 16C17.5276 19.3137 20.2139 22 23.5276 22H24.546C27.8597 22 30.546 19.3137 30.546 16C30.546 19.3137 33.2518 22 36.5655 22C40.8139 22 43.767 17.7352 42.2362 13.7723L39.2337 6H8.84523L5.84231 13.7766Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
 </svg>
   `
   )
@@ -145,10 +145,10 @@ export const shopManagement = (fill = '#000') => {
 export const expenseBill = (fill = '#000') => {
   return (`
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M10 6C10 4.89543 10.8954 4 12 4H36C37.1046 4 38 4.89543 38 6V44L31 39L24 44L17 39L10 44V6Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 22L30 22" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 30L30 30" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 14L30 14" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10 6C10 4.89543 10.8954 4 12 4H36C37.1046 4 38 4.89543 38 6V44L31 39L24 44L17 39L10 44V6Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 22L30 22" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 30L30 30" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 14L30 14" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 
   `)
@@ -158,9 +158,9 @@ export const messageRingtone = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M24 6V42C17 42 11.7985 32.8391 11.7985 32.8391H6C4.89543 32.8391 4 31.9437 4 30.8391V17.0108C4 15.9062 4.89543 15.0108 6 15.0108H11.7985C11.7985 15.0108 17 6 24 6Z" fill="none" stroke="${fill}" stroke-width="2" stroke-linejoin="round"/>
-<path d="M32 15L32 15C32.6232 15.5565 33.1881 16.1797 33.6841 16.8588C35.1387 18.8504 36 21.3223 36 24C36 26.6545 35.1535 29.1067 33.7218 31.0893C33.2168 31.7885 32.6391 32.4293 32 33" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M34.2359 41.1857C40.0836 37.6953 44 31.305 44 24C44 16.8085 40.2043 10.5035 34.507 6.97906" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+<path d="M24 6V42C17 42 11.7985 32.8391 11.7985 32.8391H6C4.89543 32.8391 4 31.9437 4 30.8391V17.0108C4 15.9062 4.89543 15.0108 6 15.0108H11.7985C11.7985 15.0108 17 6 24 6Z" fill="none" stroke="${fill}" stroke-width="4" stroke-linejoin="round"/>
+<path d="M32 15L32 15C32.6232 15.5565 33.1881 16.1797 33.6841 16.8588C35.1387 18.8504 36 21.3223 36 24C36 26.6545 35.1535 29.1067 33.7218 31.0893C33.2168 31.7885 32.6391 32.4293 32 33" stroke="${fill}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M34.2359 41.1857C40.0836 37.6953 44 31.305 44 24C44 16.8085 40.2043 10.5035 34.507 6.97906" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
 </svg>
     `
   )
@@ -170,10 +170,10 @@ export const platformSettings = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M18 6H8C6.89543 6 6 6.89543 6 8V18C6 19.1046 6.89543 20 8 20H18C19.1046 20 20 19.1046 20 18V8C20 6.89543 19.1046 6 18 6Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M18 28H8C6.89543 28 6 28.8954 6 30V40C6 41.1046 6.89543 42 8 42H18C19.1046 42 20 41.1046 20 40V30C20 28.8954 19.1046 28 18 28Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M40 6H30C28.8954 6 28 6.89543 28 8V18C28 19.1046 28.8954 20 30 20H40C41.1046 20 42 19.1046 42 18V8C42 6.89543 41.1046 6 40 6Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M40 28H30C28.8954 28 28 28.8954 28 30V40C28 41.1046 28.8954 42 30 42H40C41.1046 42 42 41.1046 42 40V30C42 28.8954 41.1046 28 40 28Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
+<path d="M18 6H8C6.89543 6 6 6.89543 6 8V18C6 19.1046 6.89543 20 8 20H18C19.1046 20 20 19.1046 20 18V8C20 6.89543 19.1046 6 18 6Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M18 28H8C6.89543 28 6 28.8954 6 30V40C6 41.1046 6.89543 42 8 42H18C19.1046 42 20 41.1046 20 40V30C20 28.8954 19.1046 28 18 28Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M40 6H30C28.8954 6 28 6.89543 28 8V18C28 19.1046 28.8954 20 30 20H40C41.1046 20 42 19.1046 42 18V8C42 6.89543 41.1046 6 40 6Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M40 28H30C28.8954 28 28 28.8954 28 30V40C28 41.1046 28.8954 42 30 42H40C41.1046 42 42 41.1046 42 40V30C42 28.8954 41.1046 28 40 28Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -183,10 +183,10 @@ export const wallet = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<rect x="5" y="13" width="38" height="26" rx="2" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="25" y="20" width="18" height="11" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M43 18L43 33" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M32 13C32 8 28.5 7 27 7C23.6667 7 16.1 7 12.5 7C8.9 7 8 9.86567 8 11.2985V13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="5" y="13" width="38" height="26" rx="2" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="25" y="20" width="18" height="11" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M43 18L43 33" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32 13C32 8 28.5 7 27 7C23.6667 7 16.1 7 12.5 7C8.9 7 8 9.86567 8 11.2985V13" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="33.5" cy="25.5" r="1.5" fill="#333"/>
 </svg>
   `)
@@ -196,10 +196,10 @@ export const deliveryManagement = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M12 39C14.2091 39 16 37.2091 16 35C16 32.7909 14.2091 31 12 31C9.79086 31 8 32.7909 8 35C8 37.2091 9.79086 39 12 39Z" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M35 39C37.2091 39 39 37.2091 39 35C39 32.7909 37.2091 31 35 31C32.7909 31 31 32.7909 31 35C31 37.2091 32.7909 39 35 39Z" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M8 35H2V11H31V35H16" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M31 35V18H39.5714L46 26.5V35H39.8112" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 39C14.2091 39 16 37.2091 16 35C16 32.7909 14.2091 31 12 31C9.79086 31 8 32.7909 8 35C8 37.2091 9.79086 39 12 39Z" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M35 39C37.2091 39 39 37.2091 39 35C39 32.7909 37.2091 31 35 31C32.7909 31 31 32.7909 31 35C31 37.2091 32.7909 39 35 39Z" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M8 35H2V11H31V35H16" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31 35V18H39.5714L46 26.5V35H39.8112" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -209,10 +209,10 @@ export const printSettings = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M38 20V8C38 6.89543 37.1046 6 36 6H12C10.8954 6 10 6.89543 10 8V20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-<rect x="6" y="20" width="36" height="22" rx="2" stroke="#333" stroke-width="2"/>
-<path d="M20 34H35V42H20V34Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 26H15" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M38 20V8C38 6.89543 37.1046 6 36 6H12C10.8954 6 10 6.89543 10 8V20" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+<rect x="6" y="20" width="36" height="22" rx="2" stroke="#333" stroke-width="4"/>
+<path d="M20 34H35V42H20V34Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 26H15" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 `
   )
@@ -222,12 +222,12 @@ export const orderSearch = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M40 27V6C40 4.89543 39.1046 4 38 4H10C8.89543 4 8 4.89543 8 6V42C8 43.1046 8.89543 44 10 44H21" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 12L31 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 20L31 20" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M17 28H23" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M40 27V6C40 4.89543 39.1046 4 38 4H10C8.89543 4 8 4.89543 8 6V42C8 43.1046 8.89543 44 10 44H21" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 12L31 12" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 20L31 20" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 28H23" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M37 37C37 38.3807 36.4404 39.6307 35.5355 40.5355C34.6307 41.4404 33.3807 42 32 42C29.2386 42 27 39.7614 27 37C27 34.2386 29.2386 32 32 32C34.7614 32 37 34.2386 37 37Z" fill="none"/>
-<path d="M39 44L35.5355 40.5355M35.5355 40.5355C36.4404 39.6307 37 38.3807 37 37C37 34.2386 34.7614 32 32 32C29.2386 32 27 34.2386 27 37C27 39.7614 29.2386 42 32 42C33.3807 42 34.6307 41.4404 35.5355 40.5355Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 44L35.5355 40.5355M35.5355 40.5355C36.4404 39.6307 37 38.3807 37 37C37 34.2386 34.7614 32 32 32C29.2386 32 27 34.2386 27 37C27 39.7614 29.2386 42 32 42C33.3807 42 34.6307 41.4404 35.5355 40.5355Z" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -237,7 +237,7 @@ export const commodityAdjustment = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M24 16H29V4L44 19L29 34V24H18V13L4 28L18 44V32H23" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 16H29V4L44 19L29 34V24H18V13L4 28L18 44V32H23" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
   `
   )
@@ -247,15 +247,15 @@ export const pushSettings = (fill = '#000') => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M41.5 10H35.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M27.5 6V14" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M27.5 10L5.5 10" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M13.5 24H5.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M21.5 20V28" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M43.5 24H21.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M41.5 38H35.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M27.5 34V42" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M27.5 38H5.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M41.5 10H35.5" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M27.5 6V14" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M27.5 10L5.5 10" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.5 24H5.5" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.5 20V28" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M43.5 24H21.5" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M41.5 38H35.5" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M27.5 34V42" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M27.5 38H5.5" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -264,11 +264,11 @@ export const pushSettings = (fill = '#000') => {
 export const shareActivity = (fill = '#000') => {
   return (`
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-<path d="M41 44V20H7V44H41Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24 44V20" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M41 44H7" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="4" y="12" width="40" height="8" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M16 4L24 12L32 4" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M41 44V20H7V44H41Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 44V20" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M41 44H7" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="4" y="12" width="40" height="8" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M16 4L24 12L32 4" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 
   `)
@@ -278,8 +278,8 @@ export const help = (fill = '#000') => {
   return (`
 
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-<path d="M24 44C29.5228 44 34.5228 41.7614 38.1421 38.1421C41.7614 34.5228 44 29.5228 44 24C44 18.4772 41.7614 13.4772 38.1421 9.85786C34.5228 6.23858 29.5228 4 24 4C18.4772 4 13.4772 6.23858 9.85786 9.85786C6.23858 13.4772 4 18.4772 4 24C4 29.5228 6.23858 34.5228 9.85786 38.1421C13.4772 41.7614 18.4772 44 24 44Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M24 28.6248V24.6248C27.3137 24.6248 30 21.9385 30 18.6248C30 15.3111 27.3137 12.6248 24 12.6248C20.6863 12.6248 18 15.3111 18 18.6248" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 44C29.5228 44 34.5228 41.7614 38.1421 38.1421C41.7614 34.5228 44 29.5228 44 24C44 18.4772 41.7614 13.4772 38.1421 9.85786C34.5228 6.23858 29.5228 4 24 4C18.4772 4 13.4772 6.23858 9.85786 9.85786C6.23858 13.4772 4 18.4772 4 24C4 29.5228 6.23858 34.5228 9.85786 38.1421C13.4772 41.7614 18.4772 44 24 44Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M24 28.6248V24.6248C27.3137 24.6248 30 21.9385 30 18.6248C30 15.3111 27.3137 12.6248 24 12.6248C20.6863 12.6248 18 15.3111 18 18.6248" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M24 37.6248C25.3807 37.6248 26.5 36.5055 26.5 35.1248C26.5 33.7441 25.3807 32.6248 24 32.6248C22.6193 32.6248 21.5 33.7441 21.5 35.1248C21.5 36.5055 22.6193 37.6248 24 37.6248Z" fill="#333"/>
 </svg>
 
@@ -301,23 +301,23 @@ export const versionInformation = (fill = '#000') => {
   return (
     `
     <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-    <path d="M12 33H4V7H44V33H36H12Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M16 22V26" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M24 33V39" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M24 18V26" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M32 14V26" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 41H36" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 33H4V7H44V33H36H12Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M16 22V26" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 33V39" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 18V26" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M32 14V26" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 41H36" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     `
   )
 }
 
-export const settings = (fill = '#000') => {
+export const settings = (fill = '#000',width=24,height=24) => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-<path d="M18.2838 43.1713C14.9327 42.1736 11.9498 40.3213 9.58787 37.867C10.469 36.8227 11 35.4734 11 34.0001C11 30.6864 8.31371 28.0001 5 28.0001C4.79955 28.0001 4.60139 28.01 4.40599 28.0292C4.13979 26.7277 4 25.3803 4 24.0001C4 21.9095 4.32077 19.8938 4.91579 17.9995C4.94381 17.9999 4.97188 18.0001 5 18.0001C8.31371 18.0001 11 15.3138 11 12.0001C11 11.0488 10.7786 10.1493 10.3846 9.35011C12.6975 7.1995 15.5205 5.59002 18.6521 4.72314C19.6444 6.66819 21.6667 8.00013 24 8.00013C26.3333 8.00013 28.3556 6.66819 29.3479 4.72314C32.4795 5.59002 35.3025 7.1995 37.6154 9.35011C37.2214 10.1493 37 11.0488 37 12.0001C37 15.3138 39.6863 18.0001 43 18.0001C43.0281 18.0001 43.0562 17.9999 43.0842 17.9995C43.6792 19.8938 44 21.9095 44 24.0001C44 25.3803 43.8602 26.7277 43.594 28.0292C43.3986 28.01 43.2005 28.0001 43 28.0001C39.6863 28.0001 37 30.6864 37 34.0001C37 35.4734 37.531 36.8227 38.4121 37.867C36.0502 40.3213 33.0673 42.1736 29.7162 43.1713C28.9428 40.752 26.676 39.0001 24 39.0001C21.324 39.0001 19.0572 40.752 18.2838 43.1713Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-<path d="M24 31C27.866 31 31 27.866 31 24C31 20.134 27.866 17 24 17C20.134 17 17 20.134 17 24C17 27.866 20.134 31 24 31Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
+<path d="M18.2838 43.1713C14.9327 42.1736 11.9498 40.3213 9.58787 37.867C10.469 36.8227 11 35.4734 11 34.0001C11 30.6864 8.31371 28.0001 5 28.0001C4.79955 28.0001 4.60139 28.01 4.40599 28.0292C4.13979 26.7277 4 25.3803 4 24.0001C4 21.9095 4.32077 19.8938 4.91579 17.9995C4.94381 17.9999 4.97188 18.0001 5 18.0001C8.31371 18.0001 11 15.3138 11 12.0001C11 11.0488 10.7786 10.1493 10.3846 9.35011C12.6975 7.1995 15.5205 5.59002 18.6521 4.72314C19.6444 6.66819 21.6667 8.00013 24 8.00013C26.3333 8.00013 28.3556 6.66819 29.3479 4.72314C32.4795 5.59002 35.3025 7.1995 37.6154 9.35011C37.2214 10.1493 37 11.0488 37 12.0001C37 15.3138 39.6863 18.0001 43 18.0001C43.0281 18.0001 43.0562 17.9999 43.0842 17.9995C43.6792 19.8938 44 21.9095 44 24.0001C44 25.3803 43.8602 26.7277 43.594 28.0292C43.3986 28.01 43.2005 28.0001 43 28.0001C39.6863 28.0001 37 30.6864 37 34.0001C37 35.4734 37.531 36.8227 38.4121 37.867C36.0502 40.3213 33.0673 42.1736 29.7162 43.1713C28.9428 40.752 26.676 39.0001 24 39.0001C21.324 39.0001 19.0572 40.752 18.2838 43.1713Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
+<path d="M24 31C27.866 31 31 27.866 31 24C31 20.134 27.866 17 24 17C20.134 17 17 20.134 17 24C17 27.866 20.134 31 24 31Z" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round"/>
 </svg>
     `
   )
@@ -338,8 +338,8 @@ export const employeeManagement = () => {
   return (
     `
     <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-    <path d="M24 20C27.866 20 31 16.866 31 13C31 9.13401 27.866 6 24 6C20.134 6 17 9.13401 17 13C17 16.866 20.134 20 24 20Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6 40.8V42H42V40.8C42 36.3196 42 34.0794 41.1281 32.3681C40.3611 30.8628 39.1372 29.6389 37.6319 28.8719C35.9206 28 33.6804 28 29.2 28H18.8C14.3196 28 12.0794 28 10.3681 28.8719C8.86278 29.6389 7.63893 30.8628 6.87195 32.3681C6 34.0794 6 36.3196 6 40.8Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 20C27.866 20 31 16.866 31 13C31 9.13401 27.866 6 24 6C20.134 6 17 9.13401 17 13C17 16.866 20.134 20 24 20Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6 40.8V42H42V40.8C42 36.3196 42 34.0794 41.1281 32.3681C40.3611 30.8628 39.1372 29.6389 37.6319 28.8719C35.9206 28 33.6804 28 29.2 28H18.8C14.3196 28 12.0794 28 10.3681 28.8719C8.86278 29.6389 7.63893 30.8628 6.87195 32.3681C6 34.0794 6 36.3196 6 40.8Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     `
   )
@@ -349,13 +349,13 @@ export const operatingIncome = () => {
   return (
     `
     <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-    <path d="M35 38L30 33L34.9996 28" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M43 38L38 33L42.9996 28" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M43 22V9C43 7.89543 42.1046 7 41 7H7C5.89543 7 5 7.89543 5 9V39C5 40.1046 5.89543 41 7 41H28.4706" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M13 15L18 21L23 15" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 27H24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 21H24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M18 21V33" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M35 38L30 33L34.9996 28" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M43 38L38 33L42.9996 28" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M43 22V9C43 7.89543 42.1046 7 41 7H7C5.89543 7 5 7.89543 5 9V39C5 40.1046 5.89543 41 7 41H28.4706" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13 15L18 21L23 15" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 27H24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 21H24" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 21V33" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     `
   )
@@ -365,10 +365,10 @@ export const stallIcon = () => {
   return (
     `
     <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >
-    <path d="M4 5H44V13L42.6015 13.8391C40.3847 15.1692 37.6153 15.1692 35.3985 13.8391L34 13L32.6015 13.8391C30.3847 15.1692 27.6153 15.1692 25.3985 13.8391L24 13L22.6015 13.8391C20.3847 15.1692 17.6153 15.1692 15.3985 13.8391L14 13L12.6015 13.8391C10.3847 15.1692 7.61531 15.1692 5.39853 13.8391L4 13V5Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="6" y="25" width="36" height="18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9 16V25" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M39 16V25" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 5H44V13L42.6015 13.8391C40.3847 15.1692 37.6153 15.1692 35.3985 13.8391L34 13L32.6015 13.8391C30.3847 15.1692 27.6153 15.1692 25.3985 13.8391L24 13L22.6015 13.8391C20.3847 15.1692 17.6153 15.1692 15.3985 13.8391L14 13L12.6015 13.8391C10.3847 15.1692 7.61531 15.1692 5.39853 13.8391L4 13V5Z" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="6" y="25" width="36" height="18" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M9 16V25" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M39 16V25" stroke="#333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`
   )
 }
@@ -376,12 +376,19 @@ export const stallIcon = () => {
 export const switchStore = (fill = '#333', width = 24, height = 24) => {
   return (
     `
-    <svg width="${width}" height="${height}" viewBox="0 0 48 48" fill="${fill}">
-    <path d="M42 19H5.99998" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M30 7L42 19" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6.79897 29H42.799" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6.79895 29L18.799 41" stroke="${fill}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`
+<svg width="${width}" height="${height}" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+   
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-295.000000, -59.000000)" fill-rule="nonzero">
+            <g  transform="translate(295.000000, 58.000000)">
+                <g  transform="translate(0.000000, 1.000000)">
+                    <rect  fill="${fill}" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M11.4775,9.0005 C11.5738562,8.99588599 11.6692131,9.02178105 11.75,9.0745 C11.87,9.1515 11.9505,9.276 11.9835,9.414 C12.018137,9.55544208 12.000375,9.70464269 11.9335,9.834 L10.4335,11.722 C10.295,11.988 9.989,12.079 9.75,11.9255 C9.511,11.772 9.429,11.432 9.567,11.166 L10.417,10.096 L4.5485,10.096 C4.24584796,10.096 4.0005,9.85065204 4.0005,9.548 C4.0005,9.24534796 4.24584796,8.99997505 4.5485,8.99997505 L11.4525,8.99997505 L11.478,9.0005 L11.4775,9.0005 Z M4.5225,7 C4.42614375,7.00461401 4.33078693,6.97871895 4.25,6.926 C4.1311894,6.84728971 4.04749803,6.72560568 4.0165,6.5865 C3.98186302,6.44505792 3.999625,6.29585731 4.0665,6.1665 L5.567,4.2785 C5.705,4.0125 6.011,3.9215 6.25,4.075 C6.489,4.2285 6.571,4.5685 6.433,4.8345 L5.583,5.9045 L11.452,5.9045 C11.6477815,5.90449999 11.8286912,6.0089482 11.9265819,6.17849999 C12.0244727,6.34805179 12.0244727,6.55694821 11.9265819,6.72650001 C11.8286912,6.8960518 11.6477815,7.00052495 11.452,7.00052495 L4.548,7.00052495 L4.523,7 L4.5225,7 Z M1,1.995 C1,1.4455 1.45,1 1.9955,1 L14.005,1 C14.5545,1 15,1.45 15,1.9955 L15,14.005 C15,14.555 14.55,15.0005 14.0045,15.0005 L1.995,15.0005 C1.4455,15 1,14.55 1,14.0045 L1,1.995 Z M1.999999,2.5 L1.999999,13.499 C1.99973444,13.6317814 2.0522956,13.7592154 2.14609259,13.8532 C2.23988957,13.9471846 2.36721831,14 2.499999,14 L13.499999,14 C13.7761424,14 13.999999,13.7761424 13.999999,13.5 L13.999999,2.5 C13.999999,2.22385763 13.7761424,2 13.499999,2 L2.499999,2 C2.22385763,2 1.999999,2.22385763 1.999999,2.5 Z" id="形状" fill="#59B26A"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>`
   )
 }
 
@@ -422,7 +429,6 @@ export const hotUpdateHeader = (width = 274, height = 105) => {
   return (
     `
 <svg width="${width}" height="${height}" viewBox="0 0 274 105" >
-    <title>编组 17</title>
     <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g  transform="translate(-52.000000, -240.000000)">
             <g  transform="translate(52.000000, 240.000000)">
@@ -451,24 +457,101 @@ export const hotUpdateHeader = (width = 274, height = 105) => {
 export const bell = () => {
   return (
     `
-    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-    <path d="M24 4C16.268 4 10 10.268 10 18V38H38V18C38 10.268 31.732 4 24 4Z" fill="none"/>
-    <path d="M10 38V18C10 10.268 16.268 4 24 4C31.732 4 38 10.268 38 18V38M4 38H44" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M24 44C26.7614 44 29 41.7614 29 39V38H19V39C19 41.7614 21.2386 44 24 44Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    `
+<svg width="92" height="108" viewBox="0 0 92 108" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter x="-17.9%" y="-14.3%" width="135.8%" height="128.6%" filterUnits="objectBoundingBox" id="filter-1">
+            <feGaussianBlur stdDeviation="4" in="SourceGraphic"/>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#EAC991" offset="0%"/>
+            <stop stop-color="#EAC991" stop-opacity="0" offset="100%"/>
+        </linearGradient>
+        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-3">
+            <feGaussianBlur stdDeviation="0" in="SourceGraphic"/>
+        </filter>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(12.000000, 12.000000)">
+            <g >
+                <rect  fill-opacity="0.09" fill="#000000" filter="url(#filter-1)" x="0" y="0" width="67.120097" height="84" rx="8"/>
+                <rect  fill="#FFFFFF" x="1" y="1" width="65.1200968" height="82" rx="8"/>
+                <rect  x="9" y="10" width="50" height="64"/>
+                <rect  x="9" y="10" width="50" height="50"/>
+                <rect  fill="url(#linearGradient-2)" filter="url(#filter-3)" transform="translate(38.000000, 38.000000) rotate(90.000000) translate(-38.000000, -38.000000) " x="35" y="32" width="6" height="12"/>
+                <path d="M34,25 C30.134,25 27,28.134 27,32 L27,42 L41,42 L41,32 C41,28.134 37.866,25 34,25 Z" />
+                <path d="M27,42 L27,32 C27,28.134 30.134,25 34,25 C37.866,25 41,28.134 41,32 L41,42 M24,42 L44,42" id="形状" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M34,45 C35.3807,45 36.5,43.8807 36.5,42.5 L36.5,42 L31.5,42 L31.5,42.5 C31.5,43.8807 32.6193,45 34,45 Z"  stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <text  font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="10" y="70">差评提醒</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
+
+   `
   )
 }
 
 export const autoReply = () => {
   return (
     `
-    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-    <path d="M33 38H22V30H36V22H44V38H39L36 41L33 38Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4 6H36V30H17L13 34L9 30H4V6Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M19 18H20" stroke="#333" stroke-width="2" stroke-linecap="round"/><path d="M26 18H27" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M12 18H13" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    </svg>
+<svg width="100px" height="116px" viewBox="0 0 100 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="0" y="0" width="67.120097" height="84" rx="8"></rect>
+        <filter x="-23.8%" y="-19.0%" width="147.7%" height="138.1%" filterUnits="objectBoundingBox" id="filter-2">
+            <feGaussianBlur stdDeviation="4" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-26.8%" y="-21.4%" width="153.6%" height="142.9%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.116408982 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-4">
+            <stop stop-color="#EAC991" offset="0%"></stop>
+            <stop stop-color="#EAC991" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-5">
+            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(16.000000, 16.000000)">
+            <g  filter="url(#filter-2)">
+                <use fill="black" fill-opacity="0.09" filter="url(#filter-3)" xlink:href="#path-1"></use>
+                <use fill-opacity="0.05" fill="#000000" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+            <rect  fill="#FFFFFF" x="1" y="1" width="65.1200968" height="82" rx="8"></rect>
+            <g  transform="translate(8.000000, 10.000000)">
+                <rect  x="0" y="0" width="50" height="64"></rect>
+                <rect  x="0" y="0" width="50" height="50"></rect>
+                <text id="自动打包" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#333333">
+                    <tspan x="1" y="60">自动打包</tspan>
+                </text>
+                <circle  fill="url(#linearGradient-4)" filter="url(#filter-5)" cx="16.4444444" cy="31" r="5"></circle>
+                <g  transform="translate(15.000000, 17.000000)" stroke="#333333" stroke-width="2">
+                    <path d="M2,4 C2,3.4477 2.447715,3 3,3 L17,3 C17.5523,3 18,3.4477 18,4 L18,12 C18,12.5523 17.5523,13 17,13 L3,13 C2.447715,13 2,12.5523 2,12 L2,4 Z"  stroke-linejoin="round"></path>
+                    <line x1="6" y1="3" x2="6" y2="13"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="14" y1="3" x2="14" y2="13"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="12" y1="3" x2="16" y2="3"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="4" y1="3" x2="8" y2="3"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="4" y1="13" x2="8" y2="13"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="12" y1="13" x2="16" y2="13"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="0" y1="16" x2="20" y2="16"  stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="7" y1="16" x2="7" y2="17"  stroke-linecap="round"></line>
+                    <line x1="4" y1="16" x2="4" y2="17"  stroke-linecap="round"></line>
+                    <line x1="1" y1="16" x2="1" y2="17"  stroke-linecap="round"></line>
+                    <line x1="10" y1="16" x2="10" y2="17"  stroke-linecap="round"></line>
+                    <line x1="13" y1="16" x2="13" y2="17"  stroke-linecap="round"></line>
+                    <line x1="16" y1="16" x2="16" y2="17"  stroke-linecap="round"></line>
+                    <line x1="19" y1="16" x2="19" y2="17"  stroke-linecap="round"></line>
+                    <polyline  stroke-linecap="round" stroke-linejoin="round" points="13 3 13 0 7 0 7 3"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
     `
   )
 }
@@ -476,24 +559,67 @@ export const autoReply = () => {
 export const autoPackage = () => {
   return (
     `
-    <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-    <path d="M8 14C8 12.8954 8.89543 12 10 12H38C39.1046 12 40 12.8954 40 14V30C40 31.1046 39.1046 32 38 32H10C8.89543 32 8 31.1046 8 30V14Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M16 12V32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M32 12V32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M28 12L36 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 12L20 12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 32L20 32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M28 32L36 32" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4 38L44 38" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M18 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M12 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M6 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M24 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M30 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M36 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M42 38V40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <path d="M30 12V6H18V12" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+<svg width="92" height="108" viewBox="0 0 92 108" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  
+    <defs>
+        <filter x="-17.9%" y="-14.3%" width="135.8%" height="128.6%" filterUnits="objectBoundingBox" id="filter-1">
+            <feGaussianBlur stdDeviation="4" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#EAC991" offset="0%"></stop>
+            <stop stop-color="#EAC991" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-3">
+            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="自动回评" transform="translate(12.500000, 12.000000)">
+            <rect id="矩形备份-8" fill-opacity="0.09" fill="#000000" filter="url(#filter-1)" x="0" y="0" width="67.120097" height="84" rx="8"></rect>
+            <rect id="矩形备份-8" fill="#FFFFFF" x="1" y="1" width="65.1200968" height="82" rx="8"></rect>
+            <g id="编组-15" transform="translate(9.000000, 10.000000)">
+                <rect  x="0" y="0" width="50" height="64"></rect>
+                <rect  x="0" y="0" width="50" height="50"></rect>
+                <text id="自动回评" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#333333">
+                    <tspan x="1" y="60">自动回评</tspan>
+                </text>
+                <circle id="椭圆形备份-5" fill="url(#linearGradient-2)" filter="url(#filter-3)" cx="33.2222222" cy="19" r="5"></circle>
+                <g id="沟通_communication" transform="translate(15.000000, 16.000000)" stroke="#333333" stroke-linecap="round" stroke-width="2">
+                    <polygon  stroke-linejoin="round" points="14.5 16 9 16 9 12 16 12 16 8 20 8 20 16 17.5 16 16 17.5"></polygon>
+                    <polygon  stroke-linejoin="round" points="0 0 16 0 16 12 6.5 12 4.5 14 2.5 12 0 12"></polygon>
+                    <line x1="7.5" y1="6" x2="8" y2="6" ></line>
+                    <line x1="11" y1="6" x2="11.5" y2="6" ></line>
+                    <line x1="4" y1="6" x2="4.5" y2="6" ></line>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const errorPage = () => {
+  return (
+    `
+<svg width="167" height="194" viewBox="0 0 167 194" version="1.1" xmlns="http://www.w3.org/2000/svg">
+   
+    <g id="出错页面" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iPhone-11-Pro" transform="translate(-104.000000, -241.000000)">
+            <g id="无数据图标" transform="translate(104.000000, 241.000000)">
+                <g id="编组-2" transform="translate(21.000000, 0.000000)">
+                    <path d="M89.8571429,0 C96.5634577,0 102,5.40989261 102,12.0833333 L102,12.0833333 L102,27.9204492 C102,29.2551374 100.912692,30.3371159 99.5714286,30.3371159 C98.2301656,30.3371159 97.1428571,29.2551374 97.1428571,27.9204492 L97.1428571,27.9204492 L97.1428571,12.0833333 C97.1428571,8.0792689 93.8809317,4.83333333 89.8571429,4.83333333 L89.8571429,4.83333333 L12.1428571,4.83333333 C8.11906825,4.83333333 4.85714286,8.0792689 4.85714286,12.0833333 L4.85714286,12.0833333 L4.85714286,103.916667 C4.85714286,107.920731 8.11906825,111.166667 12.1428571,111.166667 L12.1428571,111.166667 L40.3084101,111.166667 C41.6496731,111.166667 42.7369816,112.248645 42.7369816,113.583333 C42.7369816,114.918021 41.6496731,116 40.3084101,116 L40.3084101,116 L12.1428571,116 C5.43654232,116 0,110.590107 0,103.916667 L0,103.916667 L0,12.0833333 C0,5.40989261 5.43654232,0 12.1428571,0 L12.1428571,0 Z M51,72.5 C52.341263,72.5 53.4285714,73.5819785 53.4285714,74.9166667 C53.4285714,76.2513548 52.341263,77.3333333 51,77.3333333 L51,77.3333333 L17,77.3333333 C15.658737,77.3333333 14.5714286,76.2513548 14.5714286,74.9166667 C14.5714286,73.5819785 15.658737,72.5 17,72.5 L17,72.5 Z M51,48.3333333 C52.341263,48.3333333 53.4285714,49.4153119 53.4285714,50.75 C53.4285714,52.0846881 52.341263,53.1666667 51,53.1666667 L51,53.1666667 L17,53.1666667 C15.658737,53.1666667 14.5714286,52.0846881 14.5714286,50.75 C14.5714286,49.4153119 15.658737,48.3333333 17,48.3333333 L17,48.3333333 Z M80.1428571,24.1666667 C81.4841201,24.1666667 82.5714286,25.2486452 82.5714286,26.5833333 C82.5714286,27.9180215 81.4841201,29 80.1428571,29 L80.1428571,29 L17,29 C15.658737,29 14.5714286,27.9180215 14.5714286,26.5833333 C14.5714286,25.2486452 15.658737,24.1666667 17,24.1666667 L17,24.1666667 Z" id="形状结合" fill="#DDDDDD" fill-rule="nonzero"></path>
+                    <path d="M122,50 C124.209139,50 126,51.790861 126,54 L126,111.090718 C126,113.299857 124.209139,115.090718 122,115.090718 L90.425,115.09 L80.1570756,122 L80.498,115.09 L63,115.090718 C60.790861,115.090718 59,113.299857 59,111.090718 L59,54 C59,51.790861 60.790861,50 63,50 L122,50 Z" id="形状结合" fill="#D4D4D4"></path>
+                    <path d="M89.875,58 L95.125,58 C95.9534271,58 96.625,58.6715729 96.625,59.5 L96.625,92.9285714 C96.625,93.7569986 95.9534271,94.4285714 95.125,94.4285714 L89.875,94.4285714 C89.0465729,94.4285714 88.375,93.7569986 88.375,92.9285714 L88.375,59.5 C88.375,58.6715729 89.0465729,58 89.875,58 Z M92.5,109 C95.5375661,109 98,106.825383 98,104.142857 C98,101.460331 95.5375661,99.2857143 92.5,99.2857143 C89.4624339,99.2857143 87,101.460331 87,104.142857 C87,106.825383 89.4624339,109 92.5,109 Z" id="形状结合" fill="#FFFFFF"></path>
+                    <ellipse id="椭圆形" fill="#CCCCCC" cx="63.5" cy="141.5" rx="53.5" ry="8.5"></ellipse>
+                </g>
+                <text  font-size="20" font-weight="normal" fill="#666666">
+                    <tspan x="0" y="192">很遗憾!页面出错了</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
     `
   )
 }

@@ -1020,7 +1020,7 @@ class MineScene extends PureComponent {
     if (fnPriceControlled > 0)
       hasAllowAnalys = false
     return (
-      <View style={[Styles.zoneWrap, {marginBottom: 8}]}>
+      <View style={[styles.zoneWrap]}>
         <Text style={Styles.headerTitleText}>
           常用功能
         </Text>
@@ -1477,9 +1477,9 @@ class MineScene extends PureComponent {
   }
 
   renderCopyRight = () => {
-    const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
+
     return (
-      <View style={[css]}>
+      <View style={styles.companyInfoWrap}>
         <Text style={{color: colors.colorDDD}}>@版权所有</Text>
         <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
       </View>
@@ -1747,10 +1747,19 @@ class MineScene extends PureComponent {
     )
   }
 
-
 }
 
 const styles = StyleSheet.create({
+  zoneWrap: {
+    backgroundColor: colors.white,
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 8
+  },
+  companyInfoWrap: {
+    justifyContent: 'center', alignItems: 'center', height: pxToDp(300)
+  },
   modifyStore: {
     paddingLeft: 10
   },
@@ -1882,7 +1891,6 @@ const worker_styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: 10
   },
   icon_head: {
     marginHorizontal: pxToDp(20),
@@ -2012,8 +2020,9 @@ const block_styles = StyleSheet.create({
     height: pxToDp(60)
   },
   block_name: {
-    color: colors.color666,
-    fontSize: 12,
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: '400',
     lineHeight: 17,
     textAlign: "center"
   },
