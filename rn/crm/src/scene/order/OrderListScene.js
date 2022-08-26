@@ -48,8 +48,8 @@ import Scanner from "../../pubilc/component/Scanner";
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
-  const {remind, global, device} = state;
-  return {remind: remind, global: global, device: device}
+  const {global, device} = state;
+  return {global: global, device: device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -245,7 +245,6 @@ class OrderListScene extends Component {
       console.log("registerID:" + JSON.stringify(result))
     )
 
-    const {global, dispatch} = this.props
     const {global, dispatch, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
