@@ -1,15 +1,17 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.STORE_UNKNOWN;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -30,6 +32,11 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.common.collect.Maps;
 
@@ -61,12 +68,6 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.STORE_UNKNOWN;
-import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
-import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
-import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
 
 public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged, RefreshStorageData {
 

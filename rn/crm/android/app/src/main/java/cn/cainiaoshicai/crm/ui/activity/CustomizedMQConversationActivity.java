@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import cn.cainiaoshicai.crm.R;
 
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.activity.MQConversationActivity;
 import cn.customer_serv.customer_servsdk.model.Agent;
 import cn.customer_serv.customer_servsdk.model.BaseMessage;

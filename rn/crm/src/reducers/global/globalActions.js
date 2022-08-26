@@ -348,10 +348,11 @@ export function signIn(mobile, password, props, callback) {
           if (Platform.OS === 'ios') {
             doAuthLogin(access_token, expire, props, authCallback)
           } else {
-            native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
-              const profile = ok ? JSON.parse(strProfile) : {};
-              authCallback(ok, msg, profile)
-            });
+            doAuthLogin(access_token, expire, props, authCallback)
+            // native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+            //   const profile = ok ? JSON.parse(strProfile) : {};
+            //   authCallback(ok, msg, profile)
+            // });
           }
         } else {
           //fixme: 需要给出明确提示

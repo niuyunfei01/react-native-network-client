@@ -9,32 +9,35 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings.Secure;
-import android.webkit.WebSettings;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
+import android.webkit.WebSettings;
 
-//import com.google.android.gms.iid.InstanceID;
-import android.provider.Settings;
-
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.Promise;
+
+import org.xutils.common.util.MD5;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+
 
 public class RNDeviceModule extends ReactContextBaseJavaModule {
 
@@ -130,30 +133,30 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         p.resolve(getDeviceSync());
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public String getDeviceNameSync() {
-        try {
-            String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
-            if (bluetoothName != null) {
-                return bluetoothName;
-            }
+   @ReactMethod(isBlockingSynchronousMethod = true)
+   public String getDeviceNameSync() {
+       try {
+           String bluetoothName = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "bluetooth_name");
+           if (bluetoothName != null) {
+               return bluetoothName;
+           }
 
-            if (Build.VERSION.SDK_INT >= 25) {
-                String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
-                if (deviceName != null) {
-                    return deviceName;
-                }
-            }
-        } catch (Exception e) {
-            // same as default unknown return
-        }
-        return "unknown";
-    }
+           if (Build.VERSION.SDK_INT >= 25) {
+               String deviceName = Settings.Global.getString(getReactApplicationContext().getContentResolver(), Settings.Global.DEVICE_NAME);
+               if (deviceName != null) {
+                   return deviceName;
+               }
+           }
+       } catch (Exception e) {
+           // same as default unknown return
+       }
+       return "unknown";
+   }
 
-    @ReactMethod
-    public void getDeviceName(Promise p) {
-        p.resolve(getDeviceNameSync());
-    }
+   @ReactMethod
+   public void getDeviceName(Promise p) {
+       p.resolve(getDeviceNameSync());
+   }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public float getFontScaleSync() { return getReactApplicationContext().getResources().getConfiguration().fontScale; }
@@ -216,7 +219,6 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     public @Nullable
     Map<String, Object> getConstants() {
         HashMap<String, Object> constants = new HashMap<String, Object>();
-
         PackageManager packageManager = this.reactContext.getPackageManager();
         String packageName = this.reactContext.getPackageName();
 
@@ -256,7 +258,14 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
         constants.put("apiLevel", Build.VERSION.SDK_INT);
         constants.put("deviceLocale", this.getCurrentLanguage());
         constants.put("deviceCountry", this.getCurrentCountry());
-        constants.put("uniqueId", Secure.getString(this.reactContext.getContentResolver(), Secure.ANDROID_ID));
+
+        String myId = SettingUtility.getMyUUID();
+        if ("".equals(myId)) {
+            myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+            SettingUtility.setMyUUID(myId);
+        }
+
+        constants.put("uniqueId", myId);
         constants.put("systemManufacturer", Build.MANUFACTURER);
         constants.put("bundleId", packageName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {

@@ -4,19 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.format.DateUtils;
 
-import cn.cainiaoshicai.crm.R;
-
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import cn.cainiaoshicai.crm.R;
+
 /**
- *  Helper class, extending the standard DateUtils of Android. 
- *  It has an advanced logic, that for timestamps of today,
- *  it would display the seconds or minutes or hours,
- *  while for other timestamps it would display the date.
- *  
+ * Helper class, extending the standard DateUtils of Android.
+ * It has an advanced logic, that for timestamps of today,
+ * it would display the seconds or minutes or hours,
+ * while for other timestamps it would display the date.
+ * <p>
  * http://stackoverflow.com/questions/3910042/javaandroid-convert-sqlite-date-to-x-days-ago
  */
 public class DateTimeUtils extends DateUtils {

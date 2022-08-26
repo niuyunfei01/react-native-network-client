@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import {
   check_is_bind_ext,
   customerApply,
-  getCommonConfig,
+  getCommonConfig, logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 
@@ -29,6 +29,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
 import geolocation from "@react-native-community/geolocation";
+import {setDeviceInfo} from "../../../reducers/device/deviceActions";
 
 
 /**
@@ -177,8 +178,11 @@ class ApplyScene extends PureComponent {
       lng: this.state.location_long
     };
 
-
     const {dispatch} = this.props;
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      dispatch(setDeviceInfo(deviceInfo))
+    })
+    dispatch(logout());
     dispatch(customerApply(data, (success, msg, res) => {
       hideModal();
       this.setState({doingApply: false})
@@ -288,11 +292,14 @@ class ApplyScene extends PureComponent {
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      address: res.address,
+    let states = {
       location_long: Lng,
       location_lat: lat,
-    })
+    }
+    if (res.address) {
+      states.dada_address = res.address;
+    }
+    this.setState(states)
   }
 
   render() {

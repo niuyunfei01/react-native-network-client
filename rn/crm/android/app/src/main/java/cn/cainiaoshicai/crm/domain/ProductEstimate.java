@@ -2,8 +2,6 @@ package cn.cainiaoshicai.crm.domain;
 
 import java.util.List;
 
-import static android.R.attr.id;
-
 /**
  * Created by liuzhr on 10/27/16.
  */

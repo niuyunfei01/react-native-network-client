@@ -35,6 +35,7 @@ import {CheckBox} from "react-native-elements";
 import JPush from "jpush-react-native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import BottomModal from "../../../pubilc/component/BottomModal";
+import {setDeviceInfo} from "../../../reducers/device/deviceActions";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 let {height, width} = Dimensions.get('window')
@@ -79,10 +80,6 @@ class LoginScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount = () => {
-
-    const {dispatch} = this.props;
-    dispatch(logout());
-
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
@@ -223,6 +220,11 @@ class LoginScene extends PureComponent {
 
   _signIn = (mobile, password, name) => {
     const {dispatch} = this.props;
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      dispatch(setDeviceInfo(deviceInfo))
+    })
+    dispatch(logout());
+
     dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);

@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.wxapi;
 import android.os.Bundle;
 
 import com.theweflex.react.WeChatModule;
+
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 
 public class WXEntryActivity extends AbstractActionBarActivity {

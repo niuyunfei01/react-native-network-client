@@ -28,7 +28,7 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {onBack, center, cityName} = this.props.route.params;
+    const {center, cityName, keywords} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
@@ -37,27 +37,25 @@ class SearchShop extends Component {
     if (tool.store(this.props.global)) {
       let citymsg = tool.store(this.props.global);
       cityNames = citymsg.city
-      let location = citymsg.loc_lng + "," + citymsg.loc_lat;
-      map.name = '';
-      map.location = location
+      map.location = citymsg.loc_lng + "," + citymsg.loc_lat;
     }
     if (tool.length(center) > 0) {
-      map.name = '';
       map.location = center
       isMap = is_default = true;
     }
 
+    if (keywords) {
+      map.address = keywords
+      this.search()
+    }
+
     this.state = {
       shops: [],
-      searchKeywords: this.props.route.params.keywords,
+      searchKeywords: keywords,
       isMap: isMap, //控制显示搜索还是展示地图
       is_default: is_default,
-      onBack,
       cityname: cityNames,
       shopmsg: map,
-    }
-    if (this.props.route.params.keywords) {
-      this.search()
     }
   }
 

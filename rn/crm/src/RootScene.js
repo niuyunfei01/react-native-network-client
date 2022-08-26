@@ -12,7 +12,6 @@ import {
   View
 } from "react-native";
 
-import {setDeviceInfo} from "./reducers/device/deviceActions";
 import {setBleStarted, setCheckVersionAt} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
@@ -66,47 +65,6 @@ class RootScene extends PureComponent {
 
   componentDidMount() {
 
-    JPush.init();
-    //连接状态
-    this.connectListener = result => {
-      console.log("connectListener:" + JSON.stringify(result))
-    };
-    JPush.addConnectEventListener(this.connectListener);
-    //通知回调
-    this.notificationListener = result => {
-      console.log("notificationListener:" + JSON.stringify(result))
-    };
-    JPush.addNotificationListener(this.notificationListener);
-    //本地通知回调
-    this.localNotificationListener = result => {
-      console.log("localNotificationListener:" + JSON.stringify(result))
-    };
-    JPush.addLocalNotificationListener(this.localNotificationListener);
-    //自定义消息回调
-    this.customMessageListener = result => {
-      console.log("customMessageListener:" + JSON.stringify(result))
-    };
-    // JPush.addCustomMessagegListener(this.customMessageListener);
-    //tag alias事件回调
-    this.tagAliasListener = result => {
-      console.log("tagAliasListener:" + JSON.stringify(result))
-    };
-    JPush.addTagAliasListener(this.tagAliasListener);
-    //手机号码事件回调
-    this.mobileNumberListener = result => {
-      console.log("mobileNumberListener:" + JSON.stringify(result))
-    };
-    JPush.addMobileNumberListener(this.mobileNumberListener);
-
-    JPush.addConnectEventListener((connectEnable) => {
-      console.log("connectEnable:" + connectEnable)
-    })
-
-    JPush.setLoggerEnable(true);
-    JPush.getRegistrationID(result =>
-      console.log("registerID:" + JSON.stringify(result))
-    )
-
     if (this.ptListener) {
       this.ptListener.remove()
     }
@@ -119,7 +77,7 @@ class RootScene extends PureComponent {
       }
     }).then()
 
-    let {currentUser, lastCheckVersion = 0} = this.store.getState().global;
+    let {lastCheckVersion = 0} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
       const {printer_id, bleStarted} = this.store.getState().global
@@ -140,7 +98,6 @@ class RootScene extends PureComponent {
           BleManager.retrieveServices(printer_id).then((peripheral) => {
             print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
           }).catch((error) => {
-
             //蓝牙尚未启动时，会导致App崩溃
             if (!bleStarted) {
               this.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '蓝牙尚未启动'})
@@ -151,8 +108,6 @@ class RootScene extends PureComponent {
             BleManager.connect(printer_id).then(() => {
               BleManager.retrieveServices(printer_id).then((peripheral) => {
                 print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
-              }).catch((error) => {
-                //忽略第二次的结果
               })
             }).catch((error2) => {
               // noinspection JSIgnoredPromiseFromCall
@@ -181,13 +136,12 @@ class RootScene extends PureComponent {
       }
     })
 
+    const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
       this.sendDeviceStatus(state, obj)
     })
-
-
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
     const currentTs = dayjs(new Date()).unix();
     if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
@@ -205,7 +159,6 @@ class RootScene extends PureComponent {
       const alias = `uid_${currentUser}`;
       JPush.setAlias({alias: alias, sequence: dayjs().unix()})
       JPush.isPushStopped((isStopped) => {
-
         if (isStopped) {
           JPush.resumePush();
         }
@@ -225,7 +178,6 @@ class RootScene extends PureComponent {
     //const launchProps = this.props.launchProps;
 
     const current_ms = dayjs().valueOf();
-
     this.store = configureStore(
       function (store) {
 
@@ -351,10 +303,6 @@ class RootScene extends PureComponent {
     }
     return rootView
   }
-  // common_state_expired(last_get_cfg_ts) {
-  //   let current_time = dayjs(new Date()).unix();
-  //   return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
-  // }
 
   checkVersion(props) {
     HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
