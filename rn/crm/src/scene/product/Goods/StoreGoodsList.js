@@ -101,7 +101,7 @@ class StoreGoodsList extends Component {
     const {currStoreId, accessToken} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
-      let newStatusList = []
+      let newStatusList
       if (res.strict_providing === '1') {
         newStatusList = [
           {label: '全部商品 - ' + res.all, value: 'all'},
@@ -109,16 +109,15 @@ class StoreGoodsList extends Component {
           {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
           {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
           {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '售罄商品 - ' + res.in_stock_but_nil, value: 'in_stock_but_nil'},
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '回收站 - ' + res.off_stock, value: 'off_stock'},
         ]
       } else {
         newStatusList = [
           {label: '全部商品 - ' + res.all, value: 'all'},
           {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
           {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '回收站 - ' + res.off_stock, value: 'off_stock'},
+          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'}
         ]
       }
       this.setState({

@@ -639,15 +639,8 @@ class GoodStoreDetailScene extends PureComponent {
       case Cts.STORE_PROD_ON_SALE:
         return <FontAwesome name={'cart-arrow-down'} style={styles.iconSaleStyle}/>;
       case Cts.STORE_PROD_OFF_SALE:
-        return <FontAwesome name={'cart-arrow-down'} style={styles.iconOffSaleStyle}/>;
       case Cts.STORE_PROD_SOLD_OUT:
-        return (
-          <View style={[styles.prodStatusIcon]}>
-            <Text style={{color: colors.white, fontSize: 12}}>
-              缺
-            </Text>
-          </View>
-        )
+        return <FontAwesome name={'cart-arrow-down'} style={styles.iconOffSaleStyle}/>;
     }
   };
 
