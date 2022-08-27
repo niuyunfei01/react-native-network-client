@@ -677,7 +677,7 @@ class StoreInfo extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-              if (btn_type === "edit" && resp.obj.can_edit) {
+              if (btn_type === "edit" && resp.obj.is_pop_sync_window) {
                 Alert.alert('提示', '您的门店信息发生改变，请同步配送平台信息。如果是自有账号，请联系对应配送方业务经理。', [{
                   text: '去同步',
                   onPress: () => {
