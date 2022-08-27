@@ -647,18 +647,12 @@ class GoodsPriceDetails extends PureComponent {
             <TouchableOpacity
               onPress={() => this.reduce('setUpperLimit')}
             >
-              {
-                setUpperLimit <= 100 ? <Entypo name={"circle-with-minus"}
-                                               style={{
-                                                 marginLeft: pxToDp(10),
-                                                 fontSize: pxToDp(50),
-                                                 color: colors.gray
-                                               }}></Entypo> : <Entypo name={"circle-with-minus"} style={{
-                  marginLeft: pxToDp(10),
-                  fontSize: pxToDp(50),
-                  color: colors.fontBlue
-                }}></Entypo>
-              }
+              <Entypo name={"circle-with-minus"}
+                      style={{
+                        marginLeft: pxToDp(10),
+                        fontSize: pxToDp(50),
+                        color: setUpperLimit <= 100 ? colors.gray : colors.fontBlue
+                      }}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setUpperLimit}% </Text>
 
@@ -668,7 +662,7 @@ class GoodsPriceDetails extends PureComponent {
               }}
             >
               <Entypo name={"circle-with-plus"}
-                      style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}></Entypo>
+                      style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}/>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setUpperLimit)
@@ -679,34 +673,22 @@ class GoodsPriceDetails extends PureComponent {
             <TouchableOpacity
               onPress={() => this.reduce('setLowerLimit')}
             >
-              {
-                setLowerLimit < 1 ? <Entypo name={"circle-with-minus"}
-                                            style={{
-                                              marginLeft: pxToDp(10),
-                                              fontSize: pxToDp(50),
-                                              color: colors.gray
-                                            }}></Entypo> : <Entypo name={"circle-with-minus"} style={{
-                  marginLeft: pxToDp(10),
-                  fontSize: pxToDp(50),
-                  color: colors.fontBlue
-                }}></Entypo>
-              }
+              <Entypo name={"circle-with-minus"}
+                      style={{
+                        marginLeft: pxToDp(10),
+                        fontSize: pxToDp(50),
+                        color: setLowerLimit < 1 ? colors.gray : colors.fontBlue
+                      }}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setLowerLimit}%</Text>
             <TouchableOpacity
               onPress={() => this.add('setLowerLimit')}
             >
-              {
-                setLowerLimit >= 100 ? <Entypo name={"circle-with-plus"} style={{
-                  marginLeft: pxToDp(10),
-                  fontSize: pxToDp(50),
-                  color: colors.gray
-                }}></Entypo> : <Entypo name={"circle-with-plus"} style={{
-                  marginLeft: pxToDp(10),
-                  fontSize: pxToDp(50),
-                  color: colors.fontBlue
-                }}></Entypo>
-              }
+              <Entypo name={"circle-with-plus"} style={{
+                marginLeft: pxToDp(10),
+                fontSize: pxToDp(50),
+                color: setLowerLimit >= 100 ? colors.gray : colors.fontBlue
+              }}/>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setLowerLimit)

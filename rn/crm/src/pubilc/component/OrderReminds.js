@@ -69,7 +69,7 @@ class OrderReminds extends PureComponent {
 
     const {reminds, task_types, remindNicks, processRemind} = this.props;
 
-    return <View>{(reminds || []).map((remind, idx) => {
+    return <View>{reminds.map((remind, idx) => {
       const type = parseInt(remind.type);
       const taskType = task_types['' + type];
       const status = parseInt(remind.status);
@@ -84,12 +84,7 @@ class OrderReminds extends PureComponent {
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
           <Text style={Styles.color333}>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)} </Text>}
           {status === Cts.TASK_STATUS_WAITING &&
-          <TouchableOpacity
-            style={Styles.orderStatus}
-            onPress={() => {
-              processRemind(remind)
-            }}
-          >
+          <TouchableOpacity style={Styles.orderStatus} onPress={() => processRemind(remind)}>
             <Text style={Styles.colorWhite}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'} </Text>
           </TouchableOpacity>
           }

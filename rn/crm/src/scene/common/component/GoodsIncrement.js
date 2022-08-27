@@ -5,12 +5,18 @@ import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
 import {connect} from "react-redux";
-import {LineView, Styles} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
+import {LineView} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
 import {autoPackage, autoReply, bell} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 
 const styles = StyleSheet.create({
-
+  zoneWrap: {
+    backgroundColor: colors.white,
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 8
+  },
   header: {
     paddingTop: 12,
     paddingBottom: 10,
@@ -48,22 +54,15 @@ const styles = StyleSheet.create({
   },
 
   iconZoneWrap: {
-    width: 65,
-    height: 82,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.12)',
-    borderRadius: 8,
-    marginRight: 27,
+
+    marginRight: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconWrap: {
-    width: 50,
-    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconText: {fontSize: 12, fontWeight: '400', color: colors.color000, lineHeight: 17, marginTop: 12},
   expireDate: {fontSize: 12, color: colors.color999, paddingTop: 4}
 })
 
@@ -136,35 +135,38 @@ class GoodsIncrement extends PureComponent {
       <View style={styles.contentWrap}>
         <View style={styles.iconZoneWrap}>
           <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_BAD_REVIEW_REMINDER)}>
-            <SvgXml xml={bell()} width={28} height={28}/>
-            <Text style={styles.iconText}>差评提醒</Text>
+            <SvgXml xml={bell()}/>
           </TouchableOpacity>
         </View>
         <View style={styles.iconZoneWrap}>
           <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_FEEDBACK)}>
-            <SvgXml xml={autoReply()} width={28} height={28}/>
-            <Text style={styles.iconText}>自动回评</Text>
+            <SvgXml xml={autoReply()} />
           </TouchableOpacity>
         </View>
         <View style={styles.iconZoneWrap}>
           <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_PACKAGING)}>
-            <SvgXml xml={autoPackage()} width={28} height={28}/>
-            <Text style={styles.iconText}>自动打包</Text>
+            <SvgXml xml={autoPackage()} />
           </TouchableOpacity>
         </View>
       </View>
     )
   }
 
+  renderIcon = () => {
+    return (
+      <>
+        <LineView/>
+        {this.renderContent()}
+      </>
+    )
+  }
+
   render() {
     const {increment} = this.props.mine
     return (
-      <View style={Styles.zoneWrap}>
+      <View style={styles.zoneWrap}>
         {this.renderHeader()}
-        <If condition={increment.incrementStatus}>
-          <LineView/>
-          {this.renderContent()}
-        </If>
+        {increment.incrementStatus ? this.renderIcon() : null}
       </View>
     )
   }

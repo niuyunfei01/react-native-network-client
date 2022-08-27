@@ -453,3 +453,21 @@ export function queryProductByKey(key_word, token, callback) {
       });
   };
 }
+
+export function getProdDetailByUpc(token, storeId, upc, vendorId, callback) {
+  let data = {
+    store_id: storeId,
+    upc: upc
+  }
+  return dispatch => {
+    let url = `api/get_product_by_upc?access_token=${token}&store_id=${storeId}&vendor_id=${vendorId}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp.ok, resp.desc, resp.obj);
+      })
+      .catch(error => {
+        callback({ok: false, desc: error.message});
+      });
+  };
+}

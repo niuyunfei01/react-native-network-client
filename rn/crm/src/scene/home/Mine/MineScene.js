@@ -851,8 +851,8 @@ class MineScene extends PureComponent {
           <JbbText style={header_styles.shop_name}>
             {currStoreNameStr}
           </JbbText>
-          <TouchableOpacity onPress={this.jumpToAddStore}>
-            <SvgXml xml={pencilIcon(colors.color333, 18, 18)} style={styles.modifyStore}/>
+          <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
+            <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
           </TouchableOpacity>
         </View>
 
@@ -1020,7 +1020,7 @@ class MineScene extends PureComponent {
     if (fnPriceControlled > 0)
       hasAllowAnalys = false
     return (
-      <View style={[Styles.zoneWrap, {marginBottom: 8}]}>
+      <View style={[styles.zoneWrap]}>
         <Text style={Styles.headerTitleText}>
           常用功能
         </Text>
@@ -1111,7 +1111,7 @@ class MineScene extends PureComponent {
               tintColor="gray"
             />
           }
-          style={{backgroundColor: colors.main_back}}
+          style={{backgroundColor: colors.main_back, marginTop: 4}}
         >
 
           {this.renderStoreStatus()}
@@ -1477,9 +1477,9 @@ class MineScene extends PureComponent {
   }
 
   renderCopyRight = () => {
-    const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
+
     return (
-      <View style={[css]}>
+      <View style={styles.companyInfoWrap}>
         <Text style={{color: colors.colorDDD}}>@版权所有</Text>
         <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
       </View>
@@ -1747,12 +1747,21 @@ class MineScene extends PureComponent {
     )
   }
 
-
 }
 
 const styles = StyleSheet.create({
+  zoneWrap: {
+    backgroundColor: colors.white,
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 8
+  },
+  companyInfoWrap: {
+    justifyContent: 'center', alignItems: 'center', height: pxToDp(300)
+  },
   modifyStore: {
-    paddingLeft: 10
+    padding: 10,
   },
   fn_price_msg: {
     fontSize: pxToEm(30),
@@ -1822,10 +1831,11 @@ const header_styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.white,
-    paddingTop: 8,
+    paddingTop: 11,
     paddingLeft: 10,
     paddingRight: 10,
-    paddingBottom: 11
+    paddingBottom: 11,
+
   },
   shop_name: {
     color: colors.title_color,
@@ -1836,7 +1846,7 @@ const header_styles = StyleSheet.create({
   change_shop: {
     paddingLeft: 4,
     color: colors.main_color,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "400",
     lineHeight: 17
   },
@@ -1882,7 +1892,6 @@ const worker_styles = StyleSheet.create({
     flexDirection: "row",
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: 10
   },
   icon_head: {
     marginHorizontal: pxToDp(20),
@@ -2012,8 +2021,9 @@ const block_styles = StyleSheet.create({
     height: pxToDp(60)
   },
   block_name: {
-    color: colors.color666,
-    fontSize: 12,
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: '400',
     lineHeight: 17,
     textAlign: "center"
   },

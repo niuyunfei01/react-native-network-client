@@ -4,7 +4,7 @@ import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {fetchSgTagTree, productSave} from "../../../reducers/product/productActions";
+import {fetchSgTagTree, productSave, getProdDetailByUpc} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -28,6 +28,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import {CheckBox} from 'react-native-elements'
 import AntDesign from "react-native-vector-icons/AntDesign";
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -41,6 +42,7 @@ function mapDispatchToProps(dispatch) {
       {
         productSave,
         fetchSgTagTree,
+        getProdDetailByUpc,
         ...globalActions
       },
       dispatch
@@ -684,26 +686,25 @@ class GoodsEditScene extends PureComponent {
   }
 
   getProdDetailByUpc = (upc) => {
-    showModal("加载中...")
+    showModal("加载商品中...", 'loading', 20000)
+    const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
-    let data = {
-      store_id: currStoreId,
-      upc: upc
-    }
-    HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, data).then(p => {
-      hideModal();
-
-      if (p && p['id']) {
-        this.onReloadProd(p)
-      } else if (p && p['upc_data']) {
-        this.onReloadUpc(p['upc_data'])
-        if (p['upc_data'].category_id) {
-          this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+    dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
+      if (ok) {
+        hideModal()
+        if (p && p['id']) {
+          this.onReloadProd(p)
+        } else if (p && p['upc_data']) {
+          this.onReloadUpc(p['upc_data'])
+          if (p['upc_data'].category_id) {
+            this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+          }
         }
+      } else {
+        hideModal()
+        showError(`${desc}`)
       }
-    }).catch(() => {
-      hideModal()
-    })
+    }))
   }
 
   addProdToStore = (save_done_callback) => {
@@ -799,7 +800,7 @@ class GoodsEditScene extends PureComponent {
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, likeProds, store_has, showRecommend,
-      store_tags, editable_upc, price, selectWeight, actualNum, store_categories_obj
+      store_tags, editable_upc, price, selectWeight, actualNum, store_categories_obj, store_categories
     } = this.state
     return (
       <View style={Styles.zoneWrap}>
@@ -966,14 +967,33 @@ class GoodsEditScene extends PureComponent {
                   *
                 </Text>商品分类
               </Text>
-              <TouchableOpacity style={styles.textInputStyle}
-                                onPress={() => this.setSelectHeaderText('商品分类', false)}>
-                <Text style={styles.selectTipText}>
-                  {store_categories_obj.name_path ?? '请选择分类'}
-                </Text>
+              {/*<TouchableOpacity style={styles.textInputStyle}*/}
+              {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
+              {/*  <Text style={styles.selectTipText}>*/}
+              {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
+              {/*  </Text>*/}
 
-              </TouchableOpacity>
-              <MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>
+              {/*</TouchableOpacity>*/}
+              {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
+              <View style={styles.textInputStyle}>
+                <SectionedMultiSelect
+                  items={store_tags}
+                  IconRenderer={MaterialIcons}
+                  uniqueKey="id"
+                  subKey="children"
+                  selectText="请选择分类"
+                  showDropDowns={true}
+                  readOnlyHeadings={true}
+                  onSelectedItemsChange={this.onSelectedItemsChange}
+                  selectChildren={true}
+                  highlightChildren={true}
+                  selectedItems={store_categories}
+                  selectedText={"个已选中"}
+                  searchPlaceholderText='搜索门店分类'
+                  confirmText={"确认选择"}
+                  colors={{primary: colors.main_color}}
+                />
+              </View>
             </View>
             <LineView/>
           </If>
@@ -1338,7 +1358,7 @@ class GoodsEditScene extends PureComponent {
           </If>
           <If condition={!cover_img}>
             <View style={styles.imageIconWrap}>
-              <FontAwesome5 name={'images'} size={32} color={colors.color666}/>
+              <FontAwesome5 name={'images'} size={32} color={colors.colorCCC}/>
             </View>
           </If>
         </If>
@@ -1359,17 +1379,17 @@ class GoodsEditScene extends PureComponent {
 
 const ITEM_HEIGHT = 48
 const styles = StyleSheet.create({
-  imageIconWrap:{
+  imageIconWrap: {
     height: pxToDp(170),
     width: pxToDp(170),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center"
   },
-  plusIconWrap:{
+  plusIconWrap: {
     height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"
   },
-  plusIcon:{
+  plusIcon: {
     fontSize: pxToDp(36),
     color: "#bfbfbf",
     textAlignVertical: "center",
