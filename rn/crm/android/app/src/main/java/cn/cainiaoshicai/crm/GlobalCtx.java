@@ -30,6 +30,7 @@ import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 
 import qiuxiang.amap3d.AMap3DPackage;
+
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
@@ -143,9 +144,6 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.customer_serv.core.callback.OnInitCallback;
-import cn.customer_serv.customer_servsdk.util.MQConfig;
-import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
@@ -290,7 +288,8 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         public boolean getUseDeveloperSupport() {
             return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-       }
+        }
+
         //如果是debug模式，最优先加载getJSMainModuleName
         //如果是release模式，优先加载getJSBundleFile
         //如果getJSBundleFile为null，加载getBundleAssetName
@@ -385,16 +384,16 @@ public class GlobalCtx extends Application implements ReactApplication {
             Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
             application = this;
 
-        String myId = SettingUtility.getMyUUID();
-        if ("".equals(myId)) {
-            myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
-            SettingUtility.setMyUUID(myId);
-        }
+            String myId = SettingUtility.getMyUUID();
+            if ("".equals(myId)) {
+                myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+                SettingUtility.setMyUUID(myId);
+            }
 
-        @SuppressLint("HardwareIds") String android_id = myId;
-        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
-        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        updateAfterGap(24 * 60 * 60 * 1000);
+            @SuppressLint("HardwareIds") String android_id = myId;
+            agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
+            dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
+            updateAfterGap(24 * 60 * 60 * 1000);
 
             try {
                 Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
@@ -413,11 +412,12 @@ public class GlobalCtx extends Application implements ReactApplication {
             this.soundManager = new SoundManager();
             this.soundManager.load(this);
 
-        startKeepAlive();
+            startKeepAlive();
 
-        SoLoader.init(this, /* native exopackage */ false);
+            SoLoader.init(this, /* native exopackage */ false);
 
 
+        }
     }
 
     public static long startAppTime = 0;
@@ -1465,28 +1465,6 @@ public class GlobalCtx extends Application implements ReactApplication {
             }
 
             return false;
-        }
-
-        private boolean play_three_sound(final int storeSound, final int numberSound, final int suffixSound) {
-            if (check_disabled()) return false;
-            if (soundLoaded) {
-                new MyAsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(STORE_SOUND_LEN);
-                        soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(NUMBER_SOUND_LENGTH);
-                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(4000);
-                        return null;
-                    }
-                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
-                return true;
-            } else {
-                AppLogger.e("no sound");
-                return false;
-            }
         }
 
         private void pause(int time) {

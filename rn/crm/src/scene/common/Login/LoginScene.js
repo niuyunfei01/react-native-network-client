@@ -170,10 +170,9 @@ class LoginScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
-        let only_store_id = currStoreId;
-        if (only_store_id > 0) {
-          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: only_store_id}, (binded) => {
-            this.doneSelectStore(only_store_id, !binded);
+        if (currStoreId > 0) {
+          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: currStoreId}, (binded) => {
+            this.doneSelectStore(currStoreId, !binded);
           }));
         } else {
           let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];

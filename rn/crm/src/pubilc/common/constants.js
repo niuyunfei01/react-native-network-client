@@ -1,6 +1,7 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_NO_LOGIN_INFO: null,
   SET_DEVICE_INFO: null,
   SET_PLATFORM: null,
   SET_VERSION: null,
