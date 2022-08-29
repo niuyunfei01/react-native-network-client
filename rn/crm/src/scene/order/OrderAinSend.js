@@ -36,6 +36,7 @@ class OrderAinSend extends Component {
     this.state = {
       orderId: this.props.route.params.orderId,
       storeId: this.props.route.params.storeId,
+      sync_order: this.props.route.params.sync_order,
       accessToken: this.props.global.accessToken,
       workerList: [],
       worker: 0,
@@ -63,6 +64,7 @@ class OrderAinSend extends Component {
     HttpUtils.get.bind(this.props.navigation)(api, {
       orderId: this.state.orderId,
       userId: this.state.worker,
+      sync_order: this.state.sync_order
     }).then(res => {
       ToastShort('操作成功');
       this.props.route.params.onBack && this.props.route.params.onBack(1);
