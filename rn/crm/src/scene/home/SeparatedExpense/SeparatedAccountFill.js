@@ -780,8 +780,7 @@ const style = StyleSheet.create({
     marginTop: 8,
     borderRadius: pxToDp(10),
     borderWidth: pxToDp(1),
-    borderColor: colors.color999,
-    flex: 1
+    borderColor: colors.color999
   },
   payBtn: {
     width: width * 0.9,
