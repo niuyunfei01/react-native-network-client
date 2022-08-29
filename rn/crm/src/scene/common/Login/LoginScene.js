@@ -30,9 +30,7 @@ import Config from '../../../pubilc/common/config'
 import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from '../../../pubilc/util/analytics';
-import dayjs from "dayjs";
 import {CheckBox} from "react-native-elements";
-import JPush from "jpush-react-native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {setDeviceInfo} from "../../../reducers/device/deviceActions";
@@ -132,7 +130,7 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    let {loginType,authorization,mobile,verifyCode,password} = this.state;
+    let {loginType, authorization, mobile, verifyCode, password} = this.state;
     if (!authorization) {
       return this.setState({
         show_auth_modal: true
@@ -182,13 +180,6 @@ class LoginScene extends PureComponent {
             }
           })
           this.mixpanel.identify(uid);
-          const alias = `uid_${uid}`;
-          JPush.setAlias({alias: alias, sequence: dayjs().unix()})
-          JPush.isPushStopped((isStopped) => {
-            if (isStopped) {
-              JPush.resumePush();
-            }
-          })
         }
       } else {
         if (msg.indexOf("注册") !== -1) {
@@ -452,6 +443,13 @@ class LoginScene extends PureComponent {
               textDecorationLine: 'underline',
               marginLeft: pxToDp(10)
             }} onPress={() => {
+
+              if (!this.state.authorization) {
+                return this.setState({
+                  show_auth_modal: true
+                })
+              }
+
               this.mixpanel.track("info_customerservice_click", {});
               JumpMiniProgram("/pages/service/index", {place: 'login'});
               // native.dialNumber('18910275329');
