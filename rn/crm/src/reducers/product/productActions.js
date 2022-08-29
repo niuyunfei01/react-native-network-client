@@ -351,7 +351,7 @@ export function fetchListVendorTags(vendor_id, token, callback) {
 
 export function fetchSgTagTree(props, token, callback, errorCallback) {
   return dispatch => {
-    let url = `/dataDictionary/get_sg_tags/key/text.json?access_token=${token}`;
+    let url = `/api/product_save_new?access_token=${token}`;
     HttpUtils.get.bind(props)(url).then((tree) => {
       dispatch({type: GET_SG_TAG_TREE, sg_tag_tree: tree, sg_tag_tree_at: dayjs().unix()})
       callback(tree)

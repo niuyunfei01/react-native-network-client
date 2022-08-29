@@ -53,6 +53,7 @@ const {
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
+  SET_NO_LOGIN_INFO
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
@@ -63,6 +64,13 @@ export function setAccessToken(oauthToken) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: oauthToken
+  }
+}
+
+export function setNoLoginInfo(info) {
+  return {
+    type: SET_NO_LOGIN_INFO,
+    payload: info
   }
 }
 
@@ -255,13 +263,13 @@ export function getCommonConfig(token, storeId, callback) {
           cfg.simpleStore = simpleStore
         }
         dispatch(updateCfg(cfg));
-        callback(true, '获取配置成功', cfg)
+        callback && callback(true, '获取配置成功', cfg)
       } else {
-        callback(false, json.reason)
+        callback && callback(false, json.reason)
       }
     }, (error) => {
       let msg = "获取服务器端配置错误: " + error;
-      callback(false, msg)
+      callback && callback(false, msg)
     })
   }
 }

@@ -163,7 +163,7 @@ export default class HotUpdateComponent extends PureComponent {
 
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
-    const version = __DEV__ ? '5' : Cts.BUNDLE_VERSION;
+    const version = Cts.BUNDLE_VERSION;
     const params = {platform: platform, version: version}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
