@@ -35,6 +35,9 @@ class VersionScene extends PureComponent {
       curr_version: '未知',
       curr_version_name: '未知',
     };
+  }
+
+  componentDidMount() {
     this._check_version();
   }
 
