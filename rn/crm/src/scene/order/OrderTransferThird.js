@@ -501,7 +501,7 @@ class OrderTransferThird extends Component {
   update_default_product_weight = () => {
     if (!this.state.set_default_product_weight) return null;
     let {currStoreId, accessToken} = this.props.global;
-    const api = `/v1/new_api/stores/update_default_product _weight?access_token=${accessToken}`;
+    const api = `/v1/new_api/stores/update_default_product_weight?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {store_id: currStoreId, weight: this.state.weight}, true).then(res => {
       ToastLong("设置默认重量成功");
     })
