@@ -33,6 +33,12 @@ const rootReducer = combineReducers({
   device,
   global,
   mine,
+  product,
+  remind,
+  order,
+  store,
+  user,
+  invoicing
 });
 
 export default rootReducer;
