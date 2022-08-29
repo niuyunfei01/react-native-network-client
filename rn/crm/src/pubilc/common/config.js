@@ -209,7 +209,7 @@ const C = {
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
-  ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',//设置配送方式
+  ROUTE_SEETING_DELIVERY_INFO: 'SettingDeliveryInfo',//设置配送方式
   ROUTE_AUTO_CALL_DELIVERY: 'AutoCallDelivery',
   ROUTE_ORDER_RETAIL_PRICE_NEW: 'NewRetailPrice',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单

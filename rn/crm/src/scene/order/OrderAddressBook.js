@@ -185,9 +185,8 @@ class OrderAddressBook extends Component {
               borderRadius: 10,
               backgroundColor: colors.white
             }} onPress={() => {
-              this.onPress(Config.ROUTE_ORDER_SETTING, {addressItem: info}, () => {
-                this.onHeaderRefresh()
-              })
+              this.props.route.params.onBack(info)
+              this.props.navigation.goBack()
             }}>
               <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin: 15}}>
                 <View style={{flexDirection: "row"}}>

@@ -104,7 +104,7 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}
         />
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
-                      getComponent={() => require("../../scene/home/Delivery/SeetingDeliveryInfo").default}
+                      getComponent={() => require("../../scene/home/Delivery/SettingDeliveryInfo").default}
         />
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_ORDER} options={{headerTitle: '就近分配订单'}}
                       getComponent={() => require("../../scene/home/Delivery/DistributionOrder").default}

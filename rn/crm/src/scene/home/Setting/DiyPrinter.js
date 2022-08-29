@@ -95,6 +95,7 @@ class DiyPrinter extends PureComponent {
         show_distribution_distance,
         show_goods_code,
         invoice_serial_set,
+        upc
       } = this.state;
       let fromData = {
         font_size: font_size,
@@ -105,6 +106,7 @@ class DiyPrinter extends PureComponent {
         show_goods_code: show_goods_code,
         invoice_serial_set: invoice_serial_set,
         store_id: currStoreId,
+        upc: upc
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {

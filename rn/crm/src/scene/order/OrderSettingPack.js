@@ -73,26 +73,8 @@ class OrderSettingScene extends Component {
       smartText: '',
       isSaveToBook: false,
       addressId: '',
-      refreshDom: false
     };
     this._toSetLocation = this._toSetLocation.bind(this);
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.refreshDom) {
-      return null;
-    } else {
-      return {
-        name: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.name : '',
-        mobile: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.phone : '',
-        address: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.address : '',
-        street_block: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.street_block : '',
-        addressId: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.id : '',
-        coordinates: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lng + ',' + props.route.params.addressItem.lat : '',
-        location_long: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lng : '',
-        location_lat: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.lat : '',
-      }
-    }
   }
 
   getCurrentStoreName = () => {
@@ -104,9 +86,9 @@ class OrderSettingScene extends Component {
 
   _toSetLocation = () => {
     this.mixpanel.track('请选择收货地址')
-    const {location_long, location_lat, coordinates} = this.state
+    const {loc_lng, loc_lat, coordinates} = this.state
     let center = ""
-    if (location_long && location_lat) {
+    if (loc_lng && loc_lat) {
       center = coordinates
     }
 
@@ -220,7 +202,6 @@ class OrderSettingScene extends Component {
         name: res.name,
         address: res.address,
         mobile: res.phone,
-        refreshDom: true,
         smartText: ''
       })
     })
@@ -292,7 +273,7 @@ class OrderSettingScene extends Component {
           showError('保存失败请重试！')
         }
       }
-    })
+    }).catch(() => {hideModal()})
   }
 
   orderToSaveAndIssue = () => {
@@ -323,6 +304,20 @@ class OrderSettingScene extends Component {
     });
   }
 
+  setAddress = (resp) => {
+    this.setState({
+      name: resp !== undefined ? resp?.name : '',
+      mobile: resp !== undefined ? resp?.phone : '',
+      address: resp !== undefined ? resp?.address : '',
+      addressId: resp !== undefined ? resp?.id : '',
+      coordinates: resp !== undefined ? resp?.lng + ',' + resp?.lat : '',
+      loc_lng: resp !== undefined ? resp?.lng : '',
+      location_long: resp !== undefined ? resp?.street_block : '',
+      location_lat: resp !== undefined ? resp?.address : '',
+      loc_lat: resp !== undefined ? resp?.lat : ''
+    })
+  }
+
   render() {
     const {
       location_long,
@@ -331,9 +326,7 @@ class OrderSettingScene extends Component {
       is_right_once,
       orderAmount,
       inputShow,
-      isSaveToBook,
-      street_block,
-      address
+      isSaveToBook
     } = this.state
     let time = datePickerValue
     let str = dayjs(time).format('YYYY-MM-DD HH:mm')
@@ -360,7 +353,7 @@ class OrderSettingScene extends Component {
               </View>
               <Text style={[styles.body_text, {flex: 1}]}>
                 {(location_long !== "" && location_lat !== "")
-                  ? `${address}(${street_block})` : `请选择定位地址`}
+                  ? `${location_lat}(${location_long})` : `请选择定位地址`}
               </Text>
               <Entypo name='chevron-thin-right'
                       style={styles.locationIcon}/>
@@ -375,7 +368,7 @@ class OrderSettingScene extends Component {
                          placeholderTextColor={'#999'}
                          value={this.state.address}
                          onChangeText={value => {
-                           this.setState({address: value, refreshDom: true});
+                           this.setState({address: value});
                          }}
               />
               <TouchableOpacity style={{
@@ -385,10 +378,11 @@ class OrderSettingScene extends Component {
                 alignItems: 'center'
               }}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK)
-                                  this.setState({
-                                    refreshDom: false
-                                  })
+                                  const params = {
+                                    onBack: resp => {
+                                      this.setAddress(resp)
+                                  }}
+                                  this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK, params)
                                 }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
             </View>
             <View style={styles.containerInfoName}>
@@ -399,7 +393,7 @@ class OrderSettingScene extends Component {
                          placeholderTextColor={'#999'}
                          value={this.state.name}
                          onChangeText={value => {
-                           this.setState({name: value, refreshDom: true});
+                           this.setState({name: value});
                          }}
               />
             </View>
@@ -414,7 +408,7 @@ class OrderSettingScene extends Component {
                          value={this.state.mobile}
                          onChangeText={value => {
                            const newText = value.replace(/[^\d]+/, '');
-                           this.setState({mobile: newText, refreshDom: true});
+                           this.setState({mobile: newText});
                          }}
               />
               <TextInput placeholder="分机号(选填)"
