@@ -272,24 +272,6 @@ class ApplyScene extends PureComponent {
     }
   }
 
-  onRequestSmsCode() {
-    const {dispatch} = this.props;
-    if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
-      this.setState({canAskReqSmsCode: true});
-      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
-        if (success) {
-          ToastShort("短信验证码已发送")
-        } else {
-          this.setState({canAskReqSmsCode: false});
-          ToastShort("短信验证码发送失败")
-        }
-      }));
-    } else {
-      this.setState({canAskReqSmsCode: false});
-      ToastShort('手机号有误')
-    }
-  }
-
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));

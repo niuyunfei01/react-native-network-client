@@ -251,20 +251,16 @@ class OrderListScene extends Component {
     let {lastCheckVersion = 0, printer_id, bleStarted} = global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-
       if (printer_id) {
-
         if (!bleStarted) {
           BleManager.start({showAlert: false}).then();
           store.dispatch(setBleStarted(true));
         }
-
         setTimeout(() => {
           const clb = (msg, error) => {
             // noinspection JSIgnoredPromiseFromCall
             sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
           };
-
           BleManager.retrieveServices(printer_id).then((peripheral) => {
             print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
           }).catch((error) => {
@@ -273,7 +269,6 @@ class OrderListScene extends Component {
               sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
               return;
             }
-
             //重新连接
             BleManager.connect(printer_id).then(() => {
               BleManager.retrieveServices(printer_id).then((peripheral) => {
@@ -292,7 +287,6 @@ class OrderListScene extends Component {
         }, 300);
       } else {
         // noinspection JSIgnoredPromiseFromCall
-
         sendDeviceStatus(accessToken, {...obj, btConnected: '未连接'})
         Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
           text: '确定', onPress: () => {

@@ -12,8 +12,8 @@ import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 
 const mapStateToProps = state => {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {global} = state;
+  return {global: global};
 }
 const mapDispatchToProps = dispatch => {
   return {

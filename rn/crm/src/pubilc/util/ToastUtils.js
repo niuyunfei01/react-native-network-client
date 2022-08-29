@@ -6,10 +6,12 @@ import {Icon} from "../../weui/Icon";
 import tool from "./tool";
 
 export function ToastShort(content) {
+  WModal.hide()
   WToast.show({data: content, duration: WToast.duration.SHORT})
 }
 
 export function ToastLong(content) {
+  WModal.hide()
   WToast.show({data: content, duration: WToast.duration.LONG})
 }
 

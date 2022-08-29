@@ -35,6 +35,7 @@ class VersionScene extends PureComponent {
       curr_version: '未知',
       curr_version_name: '未知',
     };
+
   }
 
   componentDidMount() {
@@ -49,9 +50,10 @@ class VersionScene extends PureComponent {
 
     const version_name = DeviceInfo.getVersion();
     const version_code = DeviceInfo.getBuildNumber();
+
     let is_newest_version = false;
-    if (version_code >= newest_version) {
-      is_newest_version = true;
+    if (parseInt(version_code) >= newest_version) {
+
       is_newest_version = true;
       newest_version = version_code;
       newest_version_name = version_name;
@@ -75,7 +77,6 @@ class VersionScene extends PureComponent {
       newest_version,
       newest_version_name,
     } = this.state;
-
     return (
       <ScrollView
         refreshControl={
@@ -151,6 +152,5 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(18),
   },
 });
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(VersionScene)
