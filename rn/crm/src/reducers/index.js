@@ -10,16 +10,9 @@
  *
  * our 4 reducers
  */
-import product from "./product/productReducer";
 import device from "./device/deviceReducer";
 import global from "./global/globalReducer";
-import order from "./order/orderReducer";
-import remind from "./remind/remindReducer";
-import store from "./store/storeReducer";
 import mine from "./mine/mineReducer";
-import user from "./user/userReducer";
-import activity from "./activity/activityReducer";
-import invoicing from "./invoicing/invoicingReducer";
 
 import {combineReducers} from "redux";
 
