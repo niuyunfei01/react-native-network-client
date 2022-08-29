@@ -536,6 +536,7 @@ class StoreStatusScene extends PureComponent {
                      btnBottomStyle={{
                        borderTopWidth: 1,
                        borderTopColor: "#E5E5E5",
+                       paddingBottom: 0,
                      }}
                      closeBtnStyle={{
                        borderWidth: 0,

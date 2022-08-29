@@ -136,31 +136,6 @@ class OrderListItem extends React.PureComponent {
     this.mixpanel.track("配送页")
   }
 
-  onCallSelf = () => {
-    Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
-      {
-        text: '确定',
-        onPress: () => {
-          this.onTransferSelf()
-        },
-      }, {
-        text: '取消'
-      }
-    ])
-  }
-
-  onTransferSelf = () => {
-    const api = `/api/order_transfer_self?access_token=${this.props.accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
-      orderId: this.props.item.id
-    }).then(res => {
-      ToastShort('操作成功');
-      this.props.fetchData();
-    }).catch(e => {
-      ToastLong('操作失败:' + e.desc);
-    })
-  }
-
   onChangeAccount = (text) => {
     this.setState({...this.state, addMoneyNum: text.toString()})
   }
@@ -268,10 +243,11 @@ class OrderListItem extends React.PureComponent {
     })
   }
 
-  onAinSend = (order_id, store_id) => {
+  onAinSend = (order_id, store_id, sync_order = 0) => {
     this.onPress(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
+      sync_order: sync_order,
       onBack: (res) => {
         if (res) {
           this.props.fetchData()
@@ -646,6 +622,7 @@ class OrderListItem extends React.PureComponent {
     this.onAinSend(item.id, item.store_id)
     this.mixpanel.track('订单列表页_我自己送')
   }
+
   renderButton = () => {
     let {item} = this.props;
     return (
@@ -710,7 +687,7 @@ class OrderListItem extends React.PureComponent {
                   onPress={() => {
                     this.mixpanel.track('配送回传详情页_重新上传')
                     this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id)
+                    this.onAinSend(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     width: width * 0.86,
