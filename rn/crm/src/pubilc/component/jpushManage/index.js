@@ -5,42 +5,9 @@ import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
 
 export const initJPush = () => {
-  JPush.setLoggerEnable(__DEV__)
+  JPush.setLoggerEnable(false)
   JPush.init()
-//连接状态
-  this.connectListener = result => {
-    console.log("connectListener:" + JSON.stringify(result))
-  };
-  JPush.addConnectEventListener(this.connectListener);
-  //通知回调
-  this.notificationListener = result => {
-    console.log("notificationListener:" + JSON.stringify(result))
-  };
-  JPush.addNotificationListener(this.notificationListener);
-  //本地通知回调
-  this.localNotificationListener = result => {
-    console.log("localNotificationListener:" + JSON.stringify(result))
-  };
-  JPush.addLocalNotificationListener(this.localNotificationListener);
 
-  //tag alias事件回调
-  this.tagAliasListener = result => {
-    console.log("tagAliasListener:" + JSON.stringify(result))
-  };
-  JPush.addTagAliasListener(this.tagAliasListener);
-  //手机号码事件回调
-  this.mobileNumberListener = result => {
-    console.log("mobileNumberListener:" + JSON.stringify(result))
-  };
-  JPush.addMobileNumberListener(this.mobileNumberListener);
-
-  JPush.addConnectEventListener((connectEnable) => {
-    console.log("connectEnable:" + connectEnable)
-  })
-
-  JPush.getRegistrationID(result =>
-    console.log("registerID:" + JSON.stringify(result))
-  )
 }
 
 export const doJPushSetAlias = (currentUser) => {
@@ -48,7 +15,7 @@ export const doJPushSetAlias = (currentUser) => {
     const alias = `uid_${currentUser}`;
     JPush.setAlias({alias: alias, sequence: dayjs().unix()})
     JPush.isPushStopped((isStopped) => {
-
+      console.log('doJPushSetAlias:', isStopped)
       if (isStopped) {
         JPush.resumePush();
       }
@@ -77,11 +44,11 @@ export const doJPushSetAlias = (currentUser) => {
  // 省电模式：开启/未开启
  // [已重复] 语音播报是否开启：开启/未开启 (disable_sound_notify)
  // [已重复] 新订单通知：开启/未开启
- * @param props
+ * @param accessToken
  * @param data
  */
 
-export const sendDeviceStatus = (props, data) => {
+export const sendDeviceStatus = (accessToken, data) => {
 
   //系统通知
   JPush.isNotificationEnabled((enabled) => {
@@ -96,12 +63,8 @@ export const sendDeviceStatus = (props, data) => {
       data.auto_print = settings.autoPrint;
       data.Volume = settings.currentSoundVolume > 0
       data.isRun = settings.isRunInBg;
-      data.isRinger = settings.isRinger;
-      const {accessToken} = props.global
-      console.log('data', data)
-      HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-        console.log('res', res)
-      })
+      data.isRinger = settings.isRinger
+      HttpUtils.post(`/api/log_push_status/?access_token=${accessToken}`, data).then()
     }).then()
   })
 

@@ -18,8 +18,12 @@ class OrderBottom extends PureComponent {
   static propTypes = {
     mobile: PropTypes.string,
     label: PropTypes.string,
+    token: PropTypes.string,
     onPress: PropTypes.func,
+    fetchData: PropTypes.func,
     style: PropTypes.object,
+    order: PropTypes.object,
+    btn_list: PropTypes.object,
   }
 
   constructor(props) {
@@ -91,6 +95,7 @@ class OrderBottom extends PureComponent {
     this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
+      sync_order: 0,
       onBack: (res) => {
         if (res) {
           this.props.fetchData()
@@ -106,19 +111,6 @@ class OrderBottom extends PureComponent {
 
   _onToProvide() {
     this.props.navigation.navigate(Config.ROUTE_ORDER_PACK, {order: this.state.order});
-  }
-
-
-  onTransferSelf() {
-    const api = `/api/order_transfer_self?access_token=${this.props.token}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
-      orderId: this.state.order.id
-    }).then(res => {
-      ToastShort('操作成功');
-      this.props.fetchData();
-    }).catch(e => {
-      this.props.fetchData();
-    })
   }
 
   render() {

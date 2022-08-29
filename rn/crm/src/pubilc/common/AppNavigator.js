@@ -53,7 +53,9 @@ export const AppNavigator = (props) => {
       <Stack.Navigator
         initialRouteName={initialRouteName}
         screenOptions={screenOptions}>
-        <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
+        <Stack.Screen name="Tab"
+                      options={{headerShown: false}}
+                      initialParams={initialRouteParams}
                       component={TabHome}
         />
         <Stack.Screen name="Login"

@@ -27,6 +27,7 @@ const {
   SET_SHOW_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
+  SET_NO_LOGIN_INFO
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -63,6 +64,17 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_NO_LOGIN_INFO:
+      if (action.payload) {
+        return {
+          ...state,
+          currentUser: action.payload.currentUser,
+          accessToken: action.payload.accessToken,
+          currStoreId: action.payload.currStoreId,
+          host: action.payload.host
+        }
+      }
+      break
     case LOGIN_PROFILE_SUCCESS:
       if (action.payload && action.payload.id) {
         return {

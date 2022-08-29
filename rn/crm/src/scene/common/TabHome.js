@@ -41,11 +41,15 @@ class TabHome extends React.Component {
 
   componentDidMount() {
     this.fetchShowRecordFlag()
-    store.subscribe(() => {
+    this.unSubscribe = store.subscribe(() => {
       this.setState({
         showFlag: store.getState().payload
       })
     })
+  }
+
+  componentWillUnmount() {
+    this.unSubscribe()
   }
 
   fetchShowRecordFlag() {
@@ -62,11 +66,12 @@ class TabHome extends React.Component {
 
   render() {
     let isBlx = false;
-    let {global, remind, route} = this.props
-    let {co_type, currVendorId} = tool.vendor(global);
+    let {remind = [], route} = this.props
+    let {co_type} = tool.vendor(this.props.global) ?? global.noLoginInfo.co_type;
+    let storeVendorId = Number(this.props?.global?.config?.vendor?.id !== undefined ? this.props.global.config.vendor.id : global.noLoginInfo.storeVendorId || 0)
 
-    let enabledGoodMgr = Number(global.config?.enabled_good_mgr)
-    if (currVendorId && (currVendorId === Cts.STORE_TYPE_BLX || currVendorId === Cts.STORE_TYPE_SELF)) {
+    let enabledGoodMgr = Number(this.props.global?.config?.enabled_good_mgr !== undefined ? this.props.global.config.enabled_good_mgr : global.noLoginInfo.enabledGoodMgr)
+    if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
 
@@ -102,7 +107,7 @@ class TabHome extends React.Component {
             }
           />
         </If>
-        <If condition={global.simpleStore.fn_stall === '1'}>
+        <If condition={this.props.global.simpleStore.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{

@@ -156,25 +156,24 @@ class StoreSelect extends PureComponent {
     })
   }
 
-  renderItem = (item, sectionID, rowID) => {
-    return (<SearchStoreItem rowID={rowID} onPress={() => {
-      this.props.navigation.goBack()
-      DeviceEventEmitter.emit("EventChangeStore", {
-        id: item['id']
-      })
-    }} item={item} rowHeight={rowHeight}/>)
+  renderList = () => {
+
+    const {dataSource} = this.state
+
+    return  dataSource.map((item, index) => {
+      if(dataSource[index]){
+        return (
+          <SearchStoreItem key={index} onPress={() => this.selectStore(item)} item={item} rowHeight={rowHeight}/>
+        )
+      }
+    })
   }
 
-  renderList = () => {
-    let _this = this
-    const {dataSource} = _this.state
-    let items = []
-    for (let i in dataSource) {
-      if (dataSource[i]) {
-        items.push(_this.renderItem(dataSource[i], i))
-      }
-    }
-    return items
+  selectStore = (item) => {
+    this.props.navigation.goBack()
+    DeviceEventEmitter.emit("EventChangeStore", {
+      id: item['id']
+    })
   }
 
   listEmptyComponent = () => {
