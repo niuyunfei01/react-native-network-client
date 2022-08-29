@@ -85,7 +85,7 @@ class BottomModal extends React.Component {
               {this.props.children}
             </View>
 
-            <View style={{height: 10}}></View>
+            <View style={{height: 10}}/>
             <View style={[{
               flexDirection: 'row',
               justifyContent: 'center',
