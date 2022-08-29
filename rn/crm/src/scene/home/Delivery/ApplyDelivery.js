@@ -230,7 +230,7 @@ class ApplyDelivery extends PureComponent {
                   zoom: 16
                 }}>
                 <Marker
-                  draggable
+                  draggable={false}
                   position={{latitude: Number(lat), longitude: Number(lng)}}
                   onPress={() => alert("onPress")}
                 >
