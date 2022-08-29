@@ -723,7 +723,7 @@ class MineScene extends PureComponent {
 
   deliverySetting = () => {
     this.mixpanel.track('配送管理')
-    this.onPress(Config.ROUTE_DELIVERY_LIST)
+    this.onPress(Config.ROUTE_DELIVERY_LIST, {dispatch: this.props.dispatch})
   }
 
   settingPage = () => {
