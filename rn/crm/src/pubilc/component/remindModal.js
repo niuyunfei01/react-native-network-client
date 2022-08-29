@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, View, StyleSheet, Text, TouchableOpacity, ScrollView} from 'react-native'
+import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../util/http";
 import Config from "../common/config";
-import {showError} from "../util/ToastUtils";
 import pxToDp from "../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
@@ -20,12 +19,11 @@ const initState = {
 }
 
 class RemindModal extends React.Component {
-  state = initState
-
   static propTypes = {
     accessToken: PropTypes.string,
     onPress: PropTypes.func
   }
+  state = initState
 
   componentDidMount() {
     this.getAdvicesInfo()

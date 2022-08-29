@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, TouchableOpacity, Alert} from "react-native";
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
@@ -140,12 +140,12 @@ class GoodsIncrement extends PureComponent {
         </View>
         <View style={styles.iconZoneWrap}>
           <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_FEEDBACK)}>
-            <SvgXml xml={autoReply()} />
+            <SvgXml xml={autoReply()}/>
           </TouchableOpacity>
         </View>
         <View style={styles.iconZoneWrap}>
           <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_PACKAGING)}>
-            <SvgXml xml={autoPackage()} />
+            <SvgXml xml={autoPackage()}/>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Text, View, StyleSheet, ScrollView, TextInput, TouchableOpacity} from "react-native";
+import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {Styles} from "./GoodsIncrementServiceStyle";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";

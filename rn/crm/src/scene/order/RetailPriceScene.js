@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, TextInput, TouchableOpacity} from "react-native";
+import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../pubilc/styles/colors";
 import ModalSelector from "../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";

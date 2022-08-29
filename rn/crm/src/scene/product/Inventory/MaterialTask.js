@@ -12,6 +12,7 @@ import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
+
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
 

@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react'
 import {
-  Alert, Dimensions,
+  Alert,
+  Dimensions,
   Image,
   InteractionManager,
   Platform,
@@ -254,7 +255,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   renderWechat() {
-    let { showAmountInput, recharge_amount } = this.state
+    let {showAmountInput, recharge_amount} = this.state
     if (this.state.paid_done === PAID_WAIT && this.state.headerType === 1) {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
@@ -326,7 +327,12 @@ class SeparatedAccountFill extends PureComponent {
                              onChange={to_fill_yuan => {
                                this.setState({to_fill_yuan});
                              }}
-                             style={{width: width * 0.5, borderBottomWidth: 1, borderColor: colors.color999, borderRadius: 2}}
+                             style={{
+                               width: width * 0.5,
+                               borderBottomWidth: 1,
+                               borderColor: colors.color999,
+                               borderRadius: 2
+                             }}
                              extra="元"
                              placeholder=" 其他金额">
                   </InputItem>
@@ -417,7 +423,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   renderUploadImg = () => {
-    return <View style={[style.area_cell,style.uploadImg]}>
+    return <View style={[style.area_cell, style.uploadImg]}>
       <View style={style.uploadInfo}>
         <TouchableOpacity
           style={style.showImgMenus}
@@ -610,33 +616,33 @@ class SeparatedAccountFill extends PureComponent {
         {this.renderWechat()}
         {this.renderBankCard()}
         {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
-          <View style={{flex: 1, justifyContent: 'space-between'}}>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{color: colors.color333}}>支付完成! </Text>
-            </View>
-            <Button onPress={() => this.onToExpense()}
-                    title={"查看余额"}
-                    titleStyle={{fontSize: 16, color: colors.white}}
-                    buttonStyle={style.payBtn}/>
-          </View>}
+        <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text style={{color: colors.color333}}>支付完成! </Text>
+          </View>
+          <Button onPress={() => this.onToExpense()}
+                  title={"查看余额"}
+                  titleStyle={{fontSize: 16, color: colors.white}}
+                  buttonStyle={style.payBtn}/>
+        </View>}
         {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
-          <View style={{flex: 1, justifyContent: 'space-between'}}>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{color: colors.color333}}>支付失败! </Text>
-            </View>
-            <Button onPress={() => {
-                              if (this.props.route.params.onBack) {
-                                this.props.route.params.onBack(false)
-                              }
-                              this.props.navigation.goBack()
-                            }}
-                    title={"返回"}
-                    titleStyle={{fontSize: 16, color: colors.white}}
-                    buttonStyle={{
-                      backgroundColor: colors.warn_color,
-                      borderWidth: 0
-                    }}/>
-          </View>}
+        <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text style={{color: colors.color333}}>支付失败! </Text>
+          </View>
+          <Button onPress={() => {
+            if (this.props.route.params.onBack) {
+              this.props.route.params.onBack(false)
+            }
+            this.props.navigation.goBack()
+          }}
+                  title={"返回"}
+                  titleStyle={{fontSize: 16, color: colors.white}}
+                  buttonStyle={{
+                    backgroundColor: colors.warn_color,
+                    borderWidth: 0
+                  }}/>
+        </View>}
       </View>
     );
   }

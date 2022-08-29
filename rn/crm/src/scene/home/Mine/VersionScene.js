@@ -40,7 +40,7 @@ class VersionScene extends PureComponent {
 
   _check_version() {
     let platform = Platform.OS === 'ios' ? 'ios' : 'android';
-    let plat_version = this.props.global.config.v_b;
+    let plat_version = this.props.global?.config?.v_b;
     let newest_version = plat_version ? plat_version[platform] : '';
     let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
 

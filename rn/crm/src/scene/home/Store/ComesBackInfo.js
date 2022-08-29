@@ -213,6 +213,8 @@ class OrderQueryResultScene extends PureComponent {
 
   renderItem = (order) => {
     let {item, index} = order;
+    let {currVendorId} = tool.vendor(this.props.global);
+
     return (
       <OrderListItem showBtn={false} comesBackBtn={true}
                      fetchData={() => this.onSearch('', false)}
@@ -221,7 +223,7 @@ class OrderQueryResultScene extends PureComponent {
                      key={index}
                      onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
+                     vendorId={currVendorId}
                      setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}

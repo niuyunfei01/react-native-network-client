@@ -218,7 +218,7 @@ class Detail extends BaseComponent {
           {this.renderListBox()}
         </If>
         <If condition={!this.state.lists.length}>
-          <EmptyData />
+          <EmptyData/>
         </If>
         {this.showDatePicker()}
       </View>

@@ -67,6 +67,7 @@ class NoticeList extends React.PureComponent {
 
   UNSAFE_componentWillMount() {
   }
+
   componentWillUnmount() {
     this.focus()
   }

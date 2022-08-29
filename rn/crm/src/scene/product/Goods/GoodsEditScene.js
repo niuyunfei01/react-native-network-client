@@ -1,10 +1,10 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList} from "react-native";
+import {Alert, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {fetchSgTagTree, productSave, getProdDetailByUpc} from "../../../reducers/product/productActions";
+import {fetchSgTagTree, getProdDetailByUpc, productSave} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -72,6 +72,12 @@ const pickImageOptions = (cropping) => {
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
+  actions = [
+    {
+      label: '取消', onPress: () => this.setState({showImgMenus: false})
+    }
+  ]
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -136,7 +142,6 @@ class GoodsEditScene extends PureComponent {
     };
 
   }
-
 
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
@@ -660,6 +665,15 @@ class GoodsEditScene extends PureComponent {
 
   }
 
+  menus = [
+    {
+      label: '拍照', onPress: this.pickCameraImg
+    },
+    {
+      label: '从相册选择', onPress: this.pickSingleImg
+    }
+  ]
+
   getSgTagTree() {
     const {dispatch, global, product} = this.props;
     const {accessToken} = global;
@@ -774,21 +788,6 @@ class GoodsEditScene extends PureComponent {
     }
     return false
   }
-
-  menus = [
-    {
-      label: '拍照', onPress: this.pickCameraImg
-    },
-    {
-      label: '从相册选择', onPress: this.pickSingleImg
-    }
-  ]
-
-  actions = [
-    {
-      label: '取消', onPress: () => this.setState({showImgMenus: false})
-    }
-  ]
 
   setSelectHeaderText = (showHeaderText, isSelectCategory) => {
     this.setState({

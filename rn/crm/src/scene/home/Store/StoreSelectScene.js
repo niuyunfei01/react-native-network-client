@@ -219,7 +219,7 @@ class StoreSelect extends PureComponent {
             />
             <If condition={searchKeywords !== ''}>
               <Text onPress={this.clearHandle}>
-                <Entypo name="circle-with-cross" size={16} color={colors.color999} />
+                <Entypo name="circle-with-cross" size={16} color={colors.color999}/>
               </Text>
             </If>
           </View>

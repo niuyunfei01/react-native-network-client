@@ -384,8 +384,8 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
-    this.setState({showDeliveryModal: false},()=>{
-      this.onPress(Config.RIDER_TRSJECTORY,{delivery_id:val})
+    this.setState({showDeliveryModal: false}, () => {
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val})
     })
     this.mixpanel.track('查看位置')
   }

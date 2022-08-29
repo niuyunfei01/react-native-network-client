@@ -2,13 +2,13 @@ import React, {PureComponent} from 'react';
 import {
   Image,
   InteractionManager,
+  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
   TouchableOpacity,
-  Modal,
   View
 } from 'react-native';
 import {connect} from "react-redux";
@@ -32,7 +32,7 @@ import NoFoundDataView from "../../common/component/NoFoundDataView";
 import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import {showSuccess, showError} from "../../../pubilc/util/ToastUtils";
+import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
@@ -81,8 +81,8 @@ class GoodStoreDetailScene extends PureComponent {
   constructor(props: Object) {
     super(props);
     let {pid, storeId, item} = (this.props.route.params || {});
-    let {is_service_mgr, is_helper, allow_merchants_edit_prod} = tool.vendor(this.props.global);
-    let vendorId = this.props.global.config.vendor.id
+    let {is_service_mgr, is_helper, allow_merchants_edit_prod, currVendorId} = tool.vendor(this.props.global);
+
     this.state = {
       ext_stores: [],
       isRefreshing: false,
@@ -102,7 +102,7 @@ class GoodStoreDetailScene extends PureComponent {
       batch_edit_supply: false,
       fn_price_controlled: true,
       errorMsg: '',
-      vendorId: vendorId,
+      vendorId: currVendorId,
       AffiliatedInfo: item,
       activity: 'offer',
       selectItem: {
@@ -140,10 +140,6 @@ class GoodStoreDetailScene extends PureComponent {
         fnProviding: Number(store['strict_providing']) > 0
       })
 
-    }, (res) => {
-      //hideModal()
-    }).catch(() => {
-      //hideModal()
     })
     this.focus = navigation.addListener('focus', this.getStoreProdWithProd)
   }
@@ -608,7 +604,7 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
   onChange = (selectItem, store_prod) => {
-    const {ext_stores, selectedSpecArray,product} = this.state
+    const {ext_stores, selectedSpecArray, product} = this.state
     switch (selectItem.value) {
       case '1':
         this.jumpToNewRetailPriceScene(product.id)

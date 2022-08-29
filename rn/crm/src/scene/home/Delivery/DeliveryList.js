@@ -6,7 +6,8 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text, TextInput,
+  Text,
+  TextInput,
   TouchableOpacity,
   View
 } from 'react-native'

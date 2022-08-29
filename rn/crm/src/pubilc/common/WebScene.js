@@ -4,14 +4,14 @@ import {connect} from "react-redux";
 import {
   Alert,
   BackHandler,
+  Image,
   InteractionManager,
+  Modal,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  Modal,
-  SafeAreaView,
-  Image
+  View
 } from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
@@ -269,7 +269,7 @@ class WebScene extends PureComponent {
   onLoadEnd(e: any) {
     if (e.nativeEvent.title.length > 0 && e.nativeEvent.title.length < 10) {
       this.props.navigation.setOptions({
-        headerTitle:  <Text style={{color: colors.color333}}>{e.nativeEvent.title} </Text>
+        headerTitle: <Text style={{color: colors.color333}}>{e.nativeEvent.title} </Text>
       })
       this.setState({title: e.nativeEvent.title})
     }

@@ -1,11 +1,10 @@
 import React, {PureComponent} from "react";
 import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import config from "../../pubilc/common/config";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Config from "../../pubilc/common/config";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
-import {showError} from "../../pubilc/util/ToastUtils";
 import {format} from "../../pubilc/util/TimeUtil";
 
 const BUTTON_LIST = [
@@ -22,6 +21,13 @@ const BUTTON_LIST = [
 ]
 
 class ConsoleScene extends PureComponent {
+
+  state = {
+    sigInInfo: {
+      sign_status: 0,
+      records: []
+    }
+  }
 
   componentDidMount() {
     this.handleSignInIcon()
@@ -42,12 +48,6 @@ class ConsoleScene extends PureComponent {
     }
     if (show_sign_center === false && signInIndex !== -1)
       BUTTON_LIST.splice(signInIndex, 1)
-  }
-  state = {
-    sigInInfo: {
-      sign_status: 0,
-      records: []
-    }
   }
 
   getLogList = (start_day) => {

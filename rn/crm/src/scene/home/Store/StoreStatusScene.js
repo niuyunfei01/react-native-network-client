@@ -54,16 +54,15 @@ class StoreStatusScene extends PureComponent {
     const {navigation} = this.props
 
 
-    let {is_service_mgr,} = tool.vendor(this.props.global);
+    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
     let store_id = this.props.global.currStoreId
-    let vendor_id = this.props.global.config.vendor.id;
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, currVendorId});
                                    }}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
@@ -113,13 +112,12 @@ class StoreStatusScene extends PureComponent {
   componentDidMount() {
     let {total_wm_stores} = this.state
     let store_id = this.props.global.currStoreId
-    let vendor_id = this.props.global.config.vendor.id;
-    this.mixpanel.track("mine.wm_store_list", {store_id, vendor_id, total_wm_stores});
+    let {currVendorId,} = tool.vendor(this.props.global);
+    this.mixpanel.track("mine.wm_store_list", {store_id, currVendorId, total_wm_stores});
   }
 
   fetchData() {
     const self = this
-    let {currVendorId,} = tool.vendor(this.props.global);
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
@@ -218,7 +216,8 @@ class StoreStatusScene extends PureComponent {
   renderBody() {
     const business_status = this.state.business_status
     const store_id = this.props.global.currStoreId
-    const vendor_id = this.props.global.config.vendor.id
+    let {currVendorId} = tool.vendor(this.props.global);
+
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
@@ -232,7 +231,7 @@ class StoreStatusScene extends PureComponent {
       items.push(
         <TouchableOpacity onPress={() => {
 
-          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
+          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, currVendorId});
 
           this.onPress(Config.ROUTE_SEETING_DELIVERY, {
             ext_store_id: store.id,

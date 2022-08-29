@@ -63,10 +63,10 @@ class TabHome extends React.Component {
   render() {
     let isBlx = false;
     let {global, remind, route} = this.props
-    let {co_type} = tool.vendor(global);
-    let storeVendorId = Number(global.config?.vendor?.id)
+    let {co_type, currVendorId} = tool.vendor(global);
+
     let enabledGoodMgr = Number(global.config?.enabled_good_mgr)
-    if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
+    if (currVendorId && (currVendorId === Cts.STORE_TYPE_BLX || currVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
 
