@@ -21,7 +21,7 @@ const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
 class HttpUtils {
   static urlFormat(url, params = {}) {
     let paramsArray = [];
-    url = url[0] == '/' ? url.substring(1) : url
+    url = url[0] === '/' ? url.substring(1) : url
     url = AppConfig.apiUrl(url)
     //拼接参数
     Object.keys(params).forEach(key => paramsArray.push(key + '=' + params[key]))
@@ -130,7 +130,7 @@ class HttpUtils {
   }
 
   static logout(navigation) {
-    native.logout().then(r => {})
+    native.logout().then()
     if (navigation !== HttpUtils) {
       if (navigation != null) {
         const resetAction = CommonActions.reset({

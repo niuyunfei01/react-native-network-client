@@ -86,7 +86,7 @@ class StockCheck extends BaseComponent {
       productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
-      const { product } = res
+      const {product} = res
       self.setState({
         productName: product.name,
         main_sku_name: product.sku_name,

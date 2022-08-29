@@ -230,7 +230,7 @@ class OrderInfo extends Component {
 
   componentDidMount() {
     let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
-    let {wsb_store_account} = this.props.global.config.vendor
+    let {wsb_store_account} = this.props.global?.config?.vendor
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
@@ -516,6 +516,14 @@ class OrderInfo extends Component {
     this.setState({showPrinterChooser: false})
   }
 
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
   _doCloudPrint = () => {
     const {dispatch, global} = this.props;
     this._hidePrinterChooser()
@@ -680,18 +688,10 @@ class OrderInfo extends Component {
     })
   }
 
-  printAction = [
-    {
-      type: 'default',
-      label: '取消',
-      onPress: this._hidePrinterChooser
-    }
-  ]
-
   renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
-    const task_types = this.props.global.config.task_types || {};
+    const task_types = this.props.global?.config?.task_types || {};
     let {order = {}, modalTip} = this.state;
     const menus = [
       {

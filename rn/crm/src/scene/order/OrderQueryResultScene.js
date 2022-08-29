@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {FlatList, Text, InteractionManager, View, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native'
+import {FlatList, InteractionManager, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -119,6 +119,8 @@ class OrderQueryResultScene extends PureComponent {
 
   renderItem = (order) => {
     let {item, index} = order;
+    let {currVendorId} = tool.vendor(this.props.global);
+
     return (
       <OrderListItem showBtn={false}
                      fetchData={this.getOrderList}
@@ -127,7 +129,7 @@ class OrderQueryResultScene extends PureComponent {
                      key={index}
                      onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
+                     vendorId={currVendorId}
                      setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}

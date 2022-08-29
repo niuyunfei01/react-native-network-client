@@ -897,6 +897,8 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
+    let {currVendorId} = tool.vendor(this.props.global);
+
     return (
       <OrderListItem showBtn={showBtn}
                      key={index}
@@ -905,7 +907,7 @@ class OrderListScene extends Component {
                      accessToken={this.props.global.accessToken}
                      onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
+                     vendorId={currVendorId}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}

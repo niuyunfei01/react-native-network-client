@@ -1,7 +1,7 @@
 import React from 'react'
 import {errorPage} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
-import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../styles/colors";
 import HttpUtils from "../util/http";
 import {connect} from "react-redux";

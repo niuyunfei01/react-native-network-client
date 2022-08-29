@@ -1,11 +1,11 @@
 import React, {PureComponent} from "react";
-import {Modal, Platform, Text, TouchableOpacity, View, StyleSheet} from 'react-native'
+import {Modal, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
 import Cts from "../common/Cts";
 import HttpUtils from "../util/http";
 import {showError} from "../util/ToastUtils";
 import RNRestart from "./react-native-restart";
-import {bundleFilePath, createDirectory, deleteFile, exists, calcFileHash} from "../util/FileUtil";
+import {bundleFilePath, calcFileHash, createDirectory, deleteFile, exists} from "../util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
 import {unzip} from "./react-native-zip/RNZip";
 import {MixpanelInstance} from "../util/analytics";
@@ -144,17 +144,17 @@ const Progress = (downloadFileProgress = 0) => {
 
 export default class HotUpdateComponent extends PureComponent {
 
-  constructor(props) {
-    super(props);
-    this.mixpanel = MixpanelInstance;
-  }
-
   state = {
     showNewVersionVisible: false,
     newVersionInfo: {},
     downloadFileProgress: 0,
     downloadFileFinish: false,
     errorMsg: ''
+  }
+
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
   }
 
   componentDidMount() {

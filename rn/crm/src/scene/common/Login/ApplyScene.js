@@ -6,7 +6,8 @@ import {bindActionCreators} from "redux";
 import {
   check_is_bind_ext,
   customerApply,
-  getCommonConfig, logout,
+  getCommonConfig,
+  logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 

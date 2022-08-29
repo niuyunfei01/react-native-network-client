@@ -312,7 +312,7 @@ export const versionInformation = (fill = '#000') => {
   )
 }
 
-export const settings = (fill = '#000',width=24,height=24) => {
+export const settings = (fill = '#000', width = 24, height = 24) => {
   return (
     `
 <svg width="24" height="24" viewBox="0 0 48 48" fill="none" >

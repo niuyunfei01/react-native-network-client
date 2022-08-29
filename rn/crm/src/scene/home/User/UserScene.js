@@ -57,17 +57,17 @@ class UserScene extends PureComponent {
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
               onPress={() => {
-                  navigation.navigate(Config.ROUTE_USER_ADD, {
-                    type: 'edit',
-                    user_id: params.currentUser,
-                    user_name: params.user_name,
-                    mobile: params.mobile,
-                    user_status: params.user_status,
-                    store_id: params.store_id,
-                    worker_id: params.worker_id,
-                    worker_nav_key: params.navigation_key,
-                    user_info_key: key,
-                  });
+                navigation.navigate(Config.ROUTE_USER_ADD, {
+                  type: 'edit',
+                  user_id: params.currentUser,
+                  user_name: params.user_name,
+                  mobile: params.mobile,
+                  user_status: params.user_status,
+                  store_id: params.store_id,
+                  worker_id: params.worker_id,
+                  worker_nav_key: params.navigation_key,
+                  user_info_key: key,
+                });
               }}
             >
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>

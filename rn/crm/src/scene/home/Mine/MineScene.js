@@ -64,21 +64,29 @@ import {
   achievement,
   commodityAdjustment,
   contactCustomerService,
-  dataAnalysis, delivery,
+  dataAnalysis,
+  delivery,
   deliveryManagement,
-  employeeManagement, expenseBill,
-  help, messageRingtone,
+  employeeManagement,
+  expenseBill,
+  help,
+  messageRingtone,
   notice,
   operatingIncome,
   orderCompensation,
-  orderSearch, pencilIcon,
+  orderSearch,
+  pencilIcon,
   platformSettings,
   priceAdjustmentRecord,
   printSettings,
-  pushSettings, rightArrow,
+  pushSettings,
+  rightArrow,
   settings,
   settlementRecord,
-  shareActivity, shopManagement, stallIcon, switchStore,
+  shareActivity,
+  shopManagement,
+  stallIcon,
+  switchStore,
   versionInformation,
   wallet
 } from "../../../svg/svg";
@@ -263,7 +271,7 @@ class MineScene extends PureComponent {
 
   getStoreList = () => {
     const {accessToken, currStoreId} = this.props.global;
-    let {md5_read_stores} = this.props.global.config;
+    let {md5_read_stores} = this.props.global?.config;
     const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       if (!res) {
@@ -1416,7 +1424,7 @@ class MineScene extends PureComponent {
 
   renderVersionBlock = () => {
     const {have_not_read_advice, activity_url, activity_img, wsb_store_account} = this.state
-    const {show_expense_center = false} = this.props.global.config;
+    const {show_expense_center = false} = this.props.global?.config;
     const {global} = this.props
     let {co_type} = tool.vendor(global);
     return (

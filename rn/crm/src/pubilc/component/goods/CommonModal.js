@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Modal, View, StyleSheet} from "react-native";
+import {Modal, StyleSheet, View} from "react-native";
 import PropTypes from 'prop-types'
 
 const styles = StyleSheet.create({

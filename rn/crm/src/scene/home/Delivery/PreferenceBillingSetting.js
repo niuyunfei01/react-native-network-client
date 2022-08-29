@@ -117,6 +117,7 @@ class PreferenceBillingSetting extends PureComponent {
       this.props.navigation.navigate(route, params, callback);
     });
   }
+
   render() {
     const {menus, selectArr, checked_item, deploy_time} = this.state;
     return (
@@ -137,7 +138,7 @@ class PreferenceBillingSetting extends PureComponent {
             <Text style={styles.descriptionText}>
               偏好发单支持优先发起配送
             </Text>
-            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY,{showId: 2})}>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY, {showId: 2})}>
               了解更多
             </Text>
           </View>
@@ -184,7 +185,8 @@ class PreferenceBillingSetting extends PureComponent {
               </Cells>
             </For>
             <View style={{marginVertical: pxToDp(5)}}/>
-            <CellsTitle style={styles.cell_title}><Text style={styles.descriptionLabel}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
+            <CellsTitle style={styles.cell_title}><Text
+              style={styles.descriptionLabel}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
             <Cells style={styles.deployTime}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>

@@ -1,11 +1,11 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, Switch, TextInput, TouchableOpacity, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {Styles, LineView} from "./GoodsIncrementServiceStyle";
+import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 
 const styles = StyleSheet.create({
@@ -183,12 +183,12 @@ class BadReviewReminderScene extends PureComponent {
             手机号码(+86)：
           </Text>
           <TextInput
-                     style={[styles.rowDescriptionText, {flex: 1}]}
-                     placeholder={'请输入手机号'}
-                     placeholderTextColor={colors.colorEEE}
-                     keyboardType={'numeric'}
-                     onChangeText={text => this.onChangeText(text)}
-                     value={settings.mobile}/>
+            style={[styles.rowDescriptionText, {flex: 1}]}
+            placeholder={'请输入手机号'}
+            placeholderTextColor={colors.colorEEE}
+            keyboardType={'numeric'}
+            onChangeText={text => this.onChangeText(text)}
+            value={settings.mobile}/>
         </View>
       </View>
     )
@@ -240,7 +240,7 @@ class BadReviewReminderScene extends PureComponent {
         showError('结束时间应大于开始时间，并且间隔不小于30分钟')
         return;
       }
-    }catch (e) {
+    } catch (e) {
 
     }
     const {accessToken, currStoreId} = this.props.global;

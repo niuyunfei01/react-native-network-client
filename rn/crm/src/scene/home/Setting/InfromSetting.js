@@ -21,6 +21,7 @@ import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
 import native from "../../../pubilc/util/native";
 import Slider from "@react-native-community/slider";
+
 function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global}

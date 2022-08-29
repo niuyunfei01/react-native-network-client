@@ -105,7 +105,7 @@ class SeetingDeliveryInfo extends PureComponent {
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default_str: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0 ? true : false,
-        show_auto_confirm_order: this.props.global.config.vendor.wsb_store_account === '1',
+        show_auto_confirm_order: this.props.global?.config?.vendor?.wsb_store_account === '1',
         showBtn: showBtn,
         // ship_ways_name: ship_ways_name
       }, () => {
@@ -116,7 +116,7 @@ class SeetingDeliveryInfo extends PureComponent {
   }
 
   onBindDelivery = () => {
-    const {auto_call, ship_ways, zs_way, max_call_time, deploy_time,order_require_minutes,default_str} = this.state
+    const {auto_call, ship_ways, zs_way, max_call_time, deploy_time, order_require_minutes, default_str} = this.state
     if (auto_call && ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
@@ -136,7 +136,7 @@ class SeetingDeliveryInfo extends PureComponent {
         this.props.route.params.ext_store_id,
         {
           auto_call: auto_call ? 1 : 2,
-           ship_ways,
+          ship_ways,
           default: default_str,
           max_call_time,
           deploy_time,

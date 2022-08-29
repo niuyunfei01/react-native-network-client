@@ -262,7 +262,8 @@ class OrderTransferThird extends Component {
   onCallThirdShipRule = () => {
     let total_selected_ship = this.state.newSelected.length;
     let store_id = this.props.global.currStoreId;
-    let vendor_id = this.props.global.config.vendor.id;
+    let {currVendorId} = tool.vendor(this.props.global);
+
     let total_ok_ship = this.state.total_ok_ship;
     const self = this;
     const {orderId} = this.state;
@@ -275,7 +276,7 @@ class OrderTransferThird extends Component {
           this.onCallThirdShip()
           this.mixpanel.track("ship.list_to_call.call", {
             store_id,
-            vendor_id,
+            vendor_id: currVendorId,
             total_selected_ship,
             total_ok_ship
           });
@@ -286,7 +287,7 @@ class OrderTransferThird extends Component {
         this.onCallThirdShip()
         this.mixpanel.track("ship.list_to_call.call", {
           store_id,
-          vendor_id,
+          vendor_id: currVendorId,
           total_selected_ship,
           total_ok_ship
         });

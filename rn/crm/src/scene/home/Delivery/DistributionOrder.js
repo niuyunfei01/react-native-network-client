@@ -35,10 +35,8 @@ class DeliveryInfo extends PureComponent {
 
   onCanChangeStore(store_id) {
     const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
     let {currVendorId} = tool.vendor(this.props.global);
-    const vendorId = currVendorId
-    const api = `/v1/new_api/ext_stores/add_map_store_id_list/?access_token=${accessToken}&vendorId=${vendorId}`
+    const api = `/v1/new_api/ext_stores/add_map_store_id_list/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.post.bind(this.props)(api, {
       ext_store_id: this.state.ext_store_id, map_store_id: store_id
     }).then(res => {
@@ -84,8 +82,6 @@ class DeliveryInfo extends PureComponent {
 
   renderBody() {
     const business_status = this.state.business_status
-    const store_id = this.props.global.currStoreId
-    const vendor_id = this.props.global.config.vendor.id
     let items = []
     for (let i in business_status) {
       items.push(<View style={styles.shopItem}>

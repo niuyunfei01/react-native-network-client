@@ -1,4 +1,4 @@
-import React, {} from "react";
+import React from "react";
 import {Keyboard, Platform, View} from "react-native";
 
 export default class InputBoard extends React.PureComponent {

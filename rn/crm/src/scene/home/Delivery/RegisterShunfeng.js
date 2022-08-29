@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text,TextInput, View} from "react-native";
+import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {ActionSheet} from "../../../weui";
@@ -152,46 +152,46 @@ class RegisterShunfeng extends PureComponent {
               *店铺
             </Text>
             <TextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, storeName: text}})}
-                         value={store.storeName}
-                         underlineColorAndroid={'transparent'}/>
+                       onChangeText={text => this.setState({store: {...store, storeName: text}})}
+                       value={store.storeName}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
               *联系人
             </Text>
             <TextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, name: text}})}
-                         value={store.name}
-                         underlineColorAndroid={'transparent'}/>
+                       onChangeText={text => this.setState({store: {...store, name: text}})}
+                       value={store.name}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
               *联系人电话
             </Text>
             <TextInput style={styles.textInputStyle}
-                         keyboardType={'numeric'}
-                         onChangeText={text => this.setState({store: {...store, phone: text}})}
-                         value={store.phone}
-                         underlineColorAndroid={'transparent'}/>
+                       keyboardType={'numeric'}
+                       onChangeText={text => this.setState({store: {...store, phone: text}})}
+                       value={store.phone}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
               *店铺地址
             </Text>
             <TextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, address: text}})}
-                         value={store.address}
-                         underlineColorAndroid={'transparent'}/>
+                       onChangeText={text => this.setState({store: {...store, address: text}})}
+                       value={store.address}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
               *经纬度
             </Text>
             <TextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, location: text}})}
-                         value={store.location}
-                         underlineColorAndroid={'transparent'}/>
+                       onChangeText={text => this.setState({store: {...store, location: text}})}
+                       value={store.location}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
@@ -314,24 +314,24 @@ class RegisterShunfeng extends PureComponent {
               *负责人电话
             </Text>
             <TextInput style={styles.textInputStyle}
-                         placeholder={this.subjectTextTip}
-                         placeholderTextColor={'gray'}
-                         onChangeText={text => this.setState({subject: {...subject, phone: text}})}
-                         value={subject.phone}
-                         keyboardType={'numeric'}
-                         underlineColorAndroid={'transparent'}/>
+                       placeholder={this.subjectTextTip}
+                       placeholderTextColor={'gray'}
+                       onChangeText={text => this.setState({subject: {...subject, phone: text}})}
+                       value={subject.phone}
+                       keyboardType={'numeric'}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
             <Text style={styles.textStyle}>
               *负责人身份证号码
             </Text>
             <TextInput style={styles.textInputStyle}
-                         keyboardType={'numeric'}
-                         placeholder={this.subjectTextTip}
-                         placeholderTextColor={'gray'}
-                         onChangeText={text => this.setState({subject: {...subject, personNum: text}})}
-                         value={subject.personNum}
-                         underlineColorAndroid={'transparent'}/>
+                       keyboardType={'numeric'}
+                       placeholder={this.subjectTextTip}
+                       placeholderTextColor={'gray'}
+                       onChangeText={text => this.setState({subject: {...subject, personNum: text}})}
+                       value={subject.personNum}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.imageRowWrap}>
             {

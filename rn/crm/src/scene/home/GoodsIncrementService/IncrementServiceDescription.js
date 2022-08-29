@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet} from 'react-native'
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
