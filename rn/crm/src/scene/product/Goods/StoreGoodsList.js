@@ -109,7 +109,7 @@ class StoreGoodsList extends Component {
           {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
           {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
           {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '售罄商品 - ' + res.in_stock_but_nil, value: 'in_stock_but_nil'},
+          {label: '售罄商品 - ' + (res.in_stock_but_nil ?? '0'), value: 'in_stock_but_nil'},
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
         ]
       } else {

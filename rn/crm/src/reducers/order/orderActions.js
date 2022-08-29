@@ -403,8 +403,8 @@ export function deliveryFailedAudit(token, id, data, callback) {
   return jsonReqThenInvalidate(url, id, callback, data);
 }
 
-export function fetchPrintHexStr(wmId, callback) {
-  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${this.global.accessToken}`;
+export function fetchPrintHexStr(wmId, callback, accessToken) {
+  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${accessToken}`;
 
   if (typeof callback !== 'function') {
     callback = (ok, hex) => {

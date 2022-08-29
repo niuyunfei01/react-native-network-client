@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {
   Alert,
+  DeviceEventEmitter,
   Dimensions,
   FlatList,
   InteractionManager,
@@ -16,7 +17,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getSimpleStore, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
+import {getSimpleStore, setBleStarted, setCheckVersionAt, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
@@ -44,6 +45,14 @@ import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 import {AMapSdk} from "react-native-amap3d";
 import FastImage from "react-native-fast-image";
 import Scanner from "../../pubilc/component/Scanner";
+import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
+import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
+import BleManager from "react-native-ble-manager";
+import {setDeviceInfo} from "../../reducers/device/deviceActions";
+import store from "../../pubilc/util/configureStore";
+import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
+import DeviceInfo from "react-native-device-info";
+import {downloadApk} from "rn-app-upgrade";
 
 const {width} = Dimensions.get("window");
 
@@ -201,67 +210,118 @@ class OrderListScene extends Component {
 
   componentWillUnmount() {
     this.focus()
+    this.unSubscribe()
+    if (this.ptListener != null) {
+      this.ptListener.remove();
+    }
+    this.ptListener = null;
   }
 
   componentDidMount() {
-    JPush.init();
-    //连接状态
-    this.connectListener = result => {
-      console.log("connectListener:" + JSON.stringify(result))
-    };
-    JPush.addConnectEventListener(this.connectListener);
-    //通知回调
-    this.notificationListener = result => {
-      console.log("notificationListener:" + JSON.stringify(result))
-    };
-    JPush.addNotificationListener(this.notificationListener);
-    //本地通知回调
-    this.localNotificationListener = result => {
-      console.log("localNotificationListener:" + JSON.stringify(result))
-    };
-    JPush.addLocalNotificationListener(this.localNotificationListener);
-    //自定义消息回调
-    this.customMessageListener = result => {
-      console.log("customMessageListener:" + JSON.stringify(result))
-    };
-    // JPush.addCustomMessagegListener(this.customMessageListener);
-    //tag alias事件回调
-    this.tagAliasListener = result => {
-      console.log("tagAliasListener:" + JSON.stringify(result))
-    };
-    JPush.addTagAliasListener(this.tagAliasListener);
-    //手机号码事件回调
-    this.mobileNumberListener = result => {
-      console.log("mobileNumberListener:" + JSON.stringify(result))
-    };
-    JPush.addMobileNumberListener(this.mobileNumberListener);
-
-    JPush.addConnectEventListener((connectEnable) => {
-      console.log("connectEnable:" + connectEnable)
-    })
-
-    JPush.setLoggerEnable(true);
-    JPush.getRegistrationID(result =>
-      console.log("registerID:" + JSON.stringify(result))
-    )
+    initJPush()
 
     const {global, dispatch, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
     }
     getSimpleStore(global, dispatch)
-    this.openAndroidNotification();
-    this.focus = navigation.addListener('focus', () => {
-      this.getVendor()
-      this.onRefresh()
-    })
+
+
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {deviceInfo} = device
+
     const {currStoreId, currentUser, accessToken, config} = global;
+
+    if (this.ptListener) {
+      this.ptListener.remove()
+    }
+
+    native.getAutoBluePrint(() => {
+      if (!this.state.bleStarted) {
+        BleManager.start({showAlert: false}).then();
+        this.setState({bleStarted: true})
+        store.dispatch(setBleStarted(true));
+      }
+    }).then()
+
+
+    let {lastCheckVersion = 0, printer_id, bleStarted} = global;
+    //KEY_NEW_ORDER_NOT_PRINT_BT
+    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+
+      if (printer_id) {
+
+        if (!bleStarted) {
+          BleManager.start({showAlert: false}).then();
+          store.dispatch(setBleStarted(true));
+        }
+
+        setTimeout(() => {
+          const clb = (msg, error) => {
+            // noinspection JSIgnoredPromiseFromCall
+            sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+          };
+
+          BleManager.retrieveServices(printer_id).then((peripheral) => {
+            print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+          }).catch((error) => {
+            //蓝牙尚未启动时，会导致App崩溃
+            if (!bleStarted) {
+              sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
+              return;
+            }
+
+            //重新连接
+            BleManager.connect(printer_id).then(() => {
+              BleManager.retrieveServices(printer_id).then((peripheral) => {
+                print_order_to_bt(peripheral, clb, obj.wm_id, false, 1);
+              })
+            }).catch((error2) => {
+              // noinspection JSIgnoredPromiseFromCall
+              sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [{
+                text: '确定', onPress: () => {
+                  this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+                }
+              }, {'text': '取消'}]);
+            });
+          });
+        }, 300);
+      } else {
+        // noinspection JSIgnoredPromiseFromCall
+
+        sendDeviceStatus(accessToken, {...obj, btConnected: '未连接'})
+        Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
+          text: '确定', onPress: () => {
+            this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+          }
+        }, {'text': '取消'}]);
+      }
+    })
+
+    //KEY_NEW_ORDER_NOT_PRINT_BT
+    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
+      sendDeviceStatus(accessToken, obj)
+    })
+    doJPushSetAlias(currentUser);
+
+    const currentTs = dayjs(new Date()).unix();
+    if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+      store.dispatch(setCheckVersionAt(currentTs))
+      this.checkVersion();
+    }
+
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      store.dispatch(setDeviceInfo(deviceInfo))
+    })
+    this.focus = navigation.addListener('focus', () => {
+      this.getVendor()
+      this.onRefresh()
+    })
+    const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
@@ -269,14 +329,66 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = config.is_record_request_monitor
     calcMs(timeObj, accessToken)
-
+    this.whiteNoLoginInfo()
+    this.openAndroidNotification();
     AMapSdk.init(
       Platform.select({
         android: "1d669aafc6970cb991f9baf252bcdb66",
         ios: "48148de470831f4155abda953888a487",
       })
     );
+  }
 
+  whiteNoLoginInfo = () => {
+    this.unSubscribe = store.subscribe(() => {
+      const {co_type, currVendorId} = tool.vendor(store.getState().global)
+      if (currVendorId === undefined||store.getState().global.config?.vendor?.id === '') {
+        return;
+      }
+      const flag = store.getState().global.accessToken === global.noLoginInfo.accessToken &&
+        store.getState().global.currentUser === global.noLoginInfo.currentUser &&
+        store.getState().global.currStoreId === global.noLoginInfo.currStoreId &&
+        store.getState().global.host === global.noLoginInfo.host &&
+        co_type === global.noLoginInfo.co_type &&
+        currVendorId === global.noLoginInfo.currVendorId &&
+        store.getState().global.config?.vendor?.id === global.noLoginInfo.storeVendorId &&
+        store.getState().global.config?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr
+
+      if (flag) {
+        return
+      }
+      const noLoginInfo = {
+        accessToken: store.getState().global.accessToken,
+        currentUser: store.getState().global.currentUser,
+        currStoreId: store.getState().global.currStoreId,
+        host: store.getState().global.host || Config.defaultHost,
+        co_type: co_type || '',
+        storeVendorId: store.getState().global.config?.vendor?.id || '',
+        enabledGoodMgr: store.getState().global.config?.enabled_good_mgr || '',
+        currVendorId: currVendorId || ''
+      }
+      global.noLoginInfo = noLoginInfo
+      setNoLoginInfo(JSON.stringify(noLoginInfo))
+    })
+  }
+
+  checkVersion = () => {
+    HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+      if (res.yes) {
+        Alert.alert('新版本提示', res.desc, [
+          {text: '稍等再说', style: 'cancel'},
+          {
+            text: '现在更新', onPress: () => {
+              downloadApk({
+                interval: 250, // listen to upload progress event, emit every 666ms
+                apkUrl: res.download_url,
+                downloadInstall: true
+              }).then();
+            }
+          },
+        ])
+      }
+    })
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -399,8 +511,7 @@ class OrderListScene extends Component {
     const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props.navigation)(api).then(res => {
-      let balance = res.sum
-      if (balance < 0) {
+      if (res.sum < 0) {
         Alert.alert('提醒', '余额不足请充值', [
           {
             text: '取消'
@@ -452,7 +563,7 @@ class OrderListScene extends Component {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
+    HttpUtils.get(url, params, true).then(res => {
       const {obj} = res
       timeObj.method.push({
         interfaceName: url,
@@ -484,11 +595,11 @@ class OrderListScene extends Component {
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
-    const {currVendorId} = tool.vendor(this.props.global);
+    const {currVendorId = global.noLoginInfo.currVendorId} = tool.vendor(this.props.global);
     let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = queryType || this.state.orderStatus;
-    const order_by = user_config !== undefined && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
+    const order_by = user_config && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
 
     this.setState({
       orderStatus: initQueryType,
@@ -688,9 +799,6 @@ class OrderListScene extends Component {
       scanBoolean
     } = this.state
 
-    JPush.isNotificationEnabled((enabled) => {
-      console.log("JPush-is-notification enabled:", enabled)
-    })
     return (
       <View style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
@@ -898,7 +1006,6 @@ class OrderListScene extends Component {
     let {item, index} = order;
     let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
     let {currVendorId} = tool.vendor(this.props.global);
-
     return (
       <OrderListItem showBtn={showBtn}
                      key={index}
@@ -907,7 +1014,7 @@ class OrderListScene extends Component {
                      accessToken={this.props.global.accessToken}
                      onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
-                     vendorId={currVendorId}
+                     vendorId={currVendorId|| '0'}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}

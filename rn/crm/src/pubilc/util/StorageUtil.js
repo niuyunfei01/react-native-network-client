@@ -2,7 +2,6 @@
  * Function:全局的数据存储辅助类
  * Desc:
  */
-import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Storage from 'react-native-storage';
 

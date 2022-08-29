@@ -547,7 +547,7 @@ class OrderInfo extends Component {
     this._hidePrinterChooser()
 
     let {order} = this.state;
-    const {printer_id} = this.props.global
+    const {printer_id, accessToken} = this.props.global
     if (printer_id) {
       setTimeout(() => {
         const clb = (msg, error) => {
@@ -557,11 +557,11 @@ class OrderInfo extends Component {
           this._hidePrinterChooser();
         };
         BleManager.retrieveServices(printer_id).then((peripheral) => {
-          print_order_to_bt(this.props, peripheral, clb, order.id, order);
+          print_order_to_bt(accessToken, peripheral, clb, order.id, order);
         }).catch((error) => {
           BleManager.connect(printer_id).then(() => {
             BleManager.retrieveServices(printer_id).then((peripheral) => {
-              print_order_to_bt(this.props, peripheral, clb, order.id, order);
+              print_order_to_bt(accessToken, peripheral, clb, order.id, order);
             }).catch((error) => {
               //忽略第二次的结果
             })
@@ -593,8 +593,7 @@ class OrderInfo extends Component {
 
   _doSunMiPint = () => {
     const {order} = this.state
-    native.printSmPrinter(order, (ok, msg) => {
-    });
+    native.printSmPrinter(order);
     this._hidePrinterChooser();
   }
 
