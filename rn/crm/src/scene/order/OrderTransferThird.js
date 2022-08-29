@@ -1220,7 +1220,7 @@ class OrderTransferThird extends Component {
             <View style={{
               paddingHorizontal: 12, paddingVertical: 5,
             }}>
-              <Text style={{color: colors.color999, fontSize: 11,}}>
+              <Text style={{color: colors.color999, fontSize: 12,}}>
                 默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量
               </Text>
               <View style={{
@@ -1228,11 +1228,15 @@ class OrderTransferThird extends Component {
                 marginTop: 20,
                 justifyContent: 'space-between',
               }}>
-                <Text style={{color: colors.color333, fontSize: 14,}}>当前选择重量 </Text>
-                <Text style={{color: colors.color333, fontSize: 14,}}>{this.state.weight}千克 </Text>
+                <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
+                <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
+                  <Text style={{color: '#E32321', fontSize: 20}}>
+                    {this.state.weight}
+                  </Text>
+                  千克 </Text>
               </View>
 
-              <Text style={{color: colors.color999, fontSize: 11, marginTop: 3}}>
+              <Text style={{color: '#FB706E', fontSize: 12, marginTop: 3}}>
                 修改商品重量将使配送费发生变化，请在确认重量候修改。
               </Text>
               <View style={{
@@ -1243,27 +1247,25 @@ class OrderTransferThird extends Component {
                 alignItems: 'center'
               }}>
 
-                <Text style={{color: colors.color999, fontSize: 10, marginRight: 10}}>{this.state.weight_min}千克 </Text>
+                <Text style={{color: colors.color333, fontSize: 12, marginRight: 10}}>
+                  {this.state.weight_min}千克
+                </Text>
                 <View style={{flex: 1}}>
                   <Slider
                     value={this.state.weight}
                     maximumValue={this.state.weight_max}
                     minimumValue={this.state.weight_min}
                     step={this.state.weight_step}
-                    trackStyle={{height: 2, backgroundColor: 'red'}}
-                    thumbStyle={{height: 8, width: 8, backgroundColor: 'green'}}
+                    trackStyle={{height: 14, backgroundColor: 'red', borderRadius: 7}}
+                    thumbStyle={{height: 18, width: 18, borderRadius: 9, backgroundColor: 'green'}}
                     onValueChange={(value) => {
                       this.setState({weight: value})
                     }}
                   />
                 </View>
-                <Text
-                  style={{
-                    color: colors.color999,
-                    fontSize: 10,
-                    textAlign: 'right',
-                    marginLeft: 10
-                  }}>{this.state.weight_max}千克 </Text>
+                <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>
+                  {this.state.weight_max}千克
+                </Text>
               </View>
               <TouchableOpacity onPress={() => {
                 this.setState({
