@@ -95,18 +95,26 @@ class OrderSettingScene extends Component {
     const params = {
       center: center,
       onBack: resp => {
-        let {name, address, location} = resp;
-        let locate = name;
-        let locate1 = address === '' ? name : address;
+        let {location} = resp;
         let locationAll = location.split(',')
-        this.setState({
-          location_long: locate,
-          location_lat: locate1,
-          location: location,
-          loc_lng: locationAll[0],
-          loc_lat: locationAll[1],
-          coordinates: resp.location
-        });
+        if (resp?.id!==undefined) {
+          let {name, address} = resp;
+          this.setState({
+            location_long: name,
+            location_lat: address,
+            location: location,
+            loc_lng: locationAll[0],
+            loc_lat: locationAll[1],
+            coordinates: resp.location
+          });
+        } else {
+          this.setState({
+            location: location,
+            loc_lng: locationAll[0],
+            loc_lat: locationAll[1],
+            coordinates: resp.location
+          });
+        }
       }
     };
     this.onPress(Config.ROUTE_SEARC_HSHOP, params);
