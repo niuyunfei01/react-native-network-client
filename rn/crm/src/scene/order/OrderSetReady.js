@@ -9,8 +9,8 @@ import HttpUtils from "../../pubilc/util/http";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {global, user, mine} = state;
-  return {global, user, mine};
+  const {global} = state;
+  return {global};
 }
 
 class OrderSetReady extends BaseComponent {

@@ -14,8 +14,8 @@ import tool from "../../pubilc/util/tool";
 import {hideModal, showError, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, user, global, device} = state;
-  return {mine: mine, user: user, global: global, device: device}
+  const {global, device} = state;
+  return {global, device}
 }
 
 function mapDispatchToProps(dispatch) {

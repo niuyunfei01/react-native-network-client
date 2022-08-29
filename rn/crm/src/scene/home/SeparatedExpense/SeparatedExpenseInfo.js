@@ -13,8 +13,8 @@ import Config from "../../../pubilc/common/config";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

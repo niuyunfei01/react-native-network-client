@@ -75,10 +75,6 @@ class LoginScene extends PureComponent {
     this.mixpanel.track("openApp_page_view", {});
   }
 
-  clearTimeouts = () => {
-    this.timeouts.forEach(clearTimeout);
-  }
-
   UNSAFE_componentWillMount = () => {
     const params = (this.props.route.params || {});
     this.next = params.next;
@@ -97,12 +93,17 @@ class LoginScene extends PureComponent {
     return this.state.reRequestAfterSeconds;
   }
 
+  clearTimeouts = () => {
+    this.timeouts.forEach(clearTimeout);
+  }
+
+
   onRequestSmsCode = () => {
 
-    if (this.state.mobile && tool.length(this.state.mobile) > 10) {
-
+    let {mobile, reRequestAfterSeconds} = this.state
+    if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
-      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
+      dispatch(requestSmsCode(mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
         this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
@@ -110,7 +111,7 @@ class LoginScene extends PureComponent {
             this.setState({
               reRequestAfterSeconds: this.getCountdown() - 1
             })
-            if (this.state.reRequestAfterSeconds === 0) {
+            if (reRequestAfterSeconds === 0) {
               this.onCounterReReqEnd()
               clearInterval(this.interval)
             }
@@ -131,13 +132,13 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    const loginType = this.state.loginType;
-    if (!this.state.authorization) {
+    let {loginType,authorization,mobile,verifyCode,password} = this.state;
+    if (!authorization) {
       return this.setState({
         show_auth_modal: true
       })
     }
-    if (!this.state.mobile) {
+    if (!mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastShort(msg)
       return false;
@@ -145,75 +146,21 @@ class LoginScene extends PureComponent {
     showModal('登录中');
     switch (loginType) {
       case BY_SMS:
-        if (!this.state.verifyCode) {
+        if (!verifyCode) {
           showError('请输入短信验证码')
           return false;
         }
-        this._signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
+        this._signIn(mobile, verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
-        if (!this.state.password) {
+        if (!password) {
           showError('请输入登录密码')
           return false;
         }
-        this._signIn(this.state.mobile, this.state.password, "帐号和密码");
+        this._signIn(mobile, password, "帐号和密码");
         break;
       default:
         showError('登录类型错误')
-    }
-  }
-
-  queryCommonConfig = (uid) => {
-    let flag = false;
-    showModal()
-    let {accessToken, currStoreId} = this.props.global;
-    const {dispatch} = this.props;
-    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
-      if (ok) {
-        if (currStoreId > 0) {
-          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: currStoreId}, (binded) => {
-            this.doneSelectStore(currStoreId, !binded);
-          }));
-        } else {
-          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
-          this.doneSelectStore(store.id, flag);
-        }
-      } else {
-        showError(err_msg);
-      }
-    }));
-  }
-
-  doneSelectStore = (storeId, not_bind = false) => {
-    const {dispatch, navigation} = this.props;
-    let {accessToken} = this.props.global;
-    dispatch(getCommonConfig(accessToken, storeId, () => {
-    }));
-    const setCurrStoreIdCallback = (set_ok, msg) => {
-      if (set_ok) {
-
-        dispatch(setCurrentStore(storeId));
-        if (not_bind) {
-          hideModal()
-          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
-          return true;
-        }
-        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
-        return true;
-      } else {
-        showError(msg);
-        return false;
-      }
-    };
-    if (Platform.OS === 'ios') {
-      setCurrStoreIdCallback(true, '');
-    } else {
-      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
     }
   }
 
@@ -229,14 +176,12 @@ class LoginScene extends PureComponent {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
         if (uid) {
-
           this.mixpanel.getDistinctId().then(res => {
             if (res !== uid) {
               mergeMixpanelId(res, uid);
             }
           })
           this.mixpanel.identify(uid);
-
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: dayjs().unix()})
           JPush.isPushStopped((isStopped) => {
@@ -245,25 +190,79 @@ class LoginScene extends PureComponent {
             }
           })
         }
-        hideModal()
-        return true;
       } else {
-        if (msg.indexOf("注册") != -1) {
-
+        if (msg.indexOf("注册") !== -1) {
           this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
         }
         ToastShort(msg ? msg : "登录失败，请输入正确的" + name)
-        return false;
       }
     }));
   }
-
 
   doSaveUserInfo = (token) => {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
-    return true;
+  }
+
+  queryCommonConfig = (uid) => {
+    let {accessToken, currStoreId} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if (ok) {
+        if (currStoreId > 0) {
+          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: currStoreId}, (binded) => {
+            this.doneSelectStore(currStoreId, !binded);
+          }));
+        } else {
+          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
+          this.doneSelectStore(store.id, false);
+        }
+      } else {
+        showError(err_msg);
+      }
+    }));
+  }
+
+  doneSelectStore = (storeId, not_bind = false) => {
+    const {dispatch, navigation} = this.props;
+    const setCurrStoreIdCallback = (set_ok, msg) => {
+      if (set_ok) {
+        dispatch(setCurrentStore(storeId));
+        if (not_bind) {
+          hideModal()
+          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
+          return true;
+        }
+        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          initTab: Config.ROUTE_ORDERS,
+          initialRouteName: Config.ROUTE_ALERT
+        });
+        hideModal()
+      } else {
+        showError(msg);
+      }
+    };
+    if (Platform.OS === 'ios') {
+      setCurrStoreIdCallback(true, '');
+    } else {
+      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    }
+  }
+
+  closeModal = () => {
+    this.setState({
+      show_auth_modal: false
+    })
+    ToastShort("请手动勾选隐私政策")
+  }
+
+  onReadProtocol = () => {
+    this.closeModal()
+    this.mixpanel.track("openApp_privacy_click", {});
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 
   render() {
@@ -479,18 +478,6 @@ class LoginScene extends PureComponent {
     )
   }
 
-  closeModal = () => {
-    this.setState({
-      show_auth_modal: false
-    })
-    ToastShort("请手动勾选隐私政策")
-  }
-  onReadProtocol = () => {
-    this.closeModal()
-    this.mixpanel.track("openApp_privacy_click", {});
-    const {navigation} = this.props;
-    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
-  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScene)

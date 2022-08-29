@@ -11,7 +11,6 @@ import {getWithTpl2} from "../../pubilc/util/common";
 const {
   GET_CONTACT_REQUEST,
   GET_CONTACT_SUCCESS,
-  GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
   SET_RECORD_FLAG
@@ -25,12 +24,6 @@ export function getContactSucc(json) {
   }
 }
 
-export function getContactFailure(error) {
-  return {
-    type: GET_CONTACT_FAILURE,
-    payload: json
-  }
-}
 
 export function getContactRequest(data) {
   return {
@@ -74,15 +67,12 @@ export function getContacts(sessionToken, storeId, callback) {
       .then(json => {
         const ok = json.ok && json.obj;
         if (ok) {
-          dispatch(getContactSucc(json))
           callback(true, 'successfully', json.obj)
         } else {
           const error = json.reason ? json.reason : "返回数据错误";
-          dispatch(getContactFailure(error))
           callback(ok, error)
         }
       }).catch((error) => {
-      dispatch(getContactFailure(error))
       callback(false, "网络错误, 请稍后重试")
     });
   }

@@ -198,7 +198,7 @@ export function user_info(mine, currVendorId, currentUser) {
 
 export function user(reduxGlobal, reduxMine) {
   const {currentUser} = reduxGlobal
-  const {currVendorId} = this.vendor(reduxGlobal)
+  const {currVendorId} = vendor(reduxGlobal)
   return user_info(reduxMine, currVendorId, currentUser)
 }
 

@@ -32,14 +32,7 @@ import {combineReducers} from "redux";
 const rootReducer = combineReducers({
   device,
   global,
-  order,
-  remind,
-  store,
   mine,
-  product,
-  user,
-  activity,
-  invoicing
 });
 
 export default rootReducer;

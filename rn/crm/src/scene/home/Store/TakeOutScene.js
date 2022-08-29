@@ -16,8 +16,8 @@ import pxToEm from "../../../pubilc/util/pxToEm";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 function mapDispatchToProps(dispatch) {

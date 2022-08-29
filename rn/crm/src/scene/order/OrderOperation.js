@@ -1,16 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import {
-  addTipMoney,
-  clearLocalOrder,
-  getOrder,
-  getRemindForOrderPage,
-  orderCancelZsDelivery,
-  orderWayRecord,
-  printInCloud,
-  saveOrderDelayShip,
-  saveOrderItems,
-} from '../../reducers/order/orderActions'
+import {saveOrderDelayShip,} from '../../reducers/order/orderActions'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Cts from '../../pubilc/common/Cts'
@@ -28,7 +18,6 @@ import native from '../../pubilc/util/native'
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
-import {markTaskDone} from '../../reducers/remind/remindActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
@@ -57,15 +46,6 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       getContacts,
-      getOrder,
-      printInCloud,
-      getRemindForOrderPage,
-      saveOrderItems,
-      markTaskDone,
-      orderWayRecord,
-      clearLocalOrder,
-      orderCancelZsDelivery,
-      addTipMoney,
     }, dispatch)
   }
 }
@@ -73,10 +53,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
   return {
-    order: state.order,
     global: state.global,
-    store: state.store,
-
   }
 }
 
@@ -191,7 +168,7 @@ class OrderOperation extends Component {
   }
 
   _onToProvide() {
-    const {order, navigation} = this.props;
+    const {order, navigation} = this.state;
     if (order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
       return false;
@@ -201,18 +178,11 @@ class OrderOperation extends Component {
   }
 
   _onShowStoreCall() {
-    const {store, dispatch, global} = this.props;
+    const { dispatch, global} = this.props;
 
-    const store_id = this.state.order.store_id;
-    const contacts = (store.store_contacts || {}).store_id;
-    if (!contacts || contacts.length === 0) {
-      this.setState({showContactsLoading: true});
-      dispatch(getContacts(global.accessToken, store_id, (ok, msg, contacts) => {
-        this.setState({store_contacts: contacts, showContactsLoading: false, showCallStore: true})
-      }));
-    } else {
-      this.setState({showCallStore: true})
-    }
+    dispatch(getContacts(global.accessToken, this.state.order.store_id, (ok, msg, contacts) => {
+      this.setState({store_contacts: contacts, showCallStore: true})
+    }));
   }
 
   cancelOrder = () => {
@@ -403,7 +373,7 @@ class OrderOperation extends Component {
               )
             })
           }
-          <View style={{width: '100%', height: pxToDp(200)}}></View>
+          <View style={{width: '100%', height: pxToDp(200)}}/>
         </ScrollView>
 
       </View>
