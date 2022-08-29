@@ -16,8 +16,8 @@ import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

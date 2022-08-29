@@ -18,8 +18,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const { global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

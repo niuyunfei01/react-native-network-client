@@ -95,8 +95,8 @@ import {LineView, Styles} from "../GoodsIncrementService/GoodsIncrementServiceSt
 var ScreenWidth = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {mine,global} = state;
+  return {mine: mine, global: global};
 }
 
 
@@ -233,14 +233,12 @@ class MineScene extends PureComponent {
     this.onGetUserInfo = this.onGetUserInfo.bind(this);
     this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
-    this.onGetDutyUser = this.onGetDutyUser.bind(this);
     this.onRefresh = this.onRefresh.bind(this)
 
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
 
-    this.onGetDutyUser();
     this.getServiceStatus(currStoreId, accessToken)
     this.getHuichuan(currStoreId, accessToken)
   }
@@ -342,23 +340,6 @@ class MineScene extends PureComponent {
               sign_count: sign_count,
               bad_cases_of: bad_cases_of
             });
-          }
-          this.setState({isRefreshing: false});
-        })
-      );
-    });
-  }
-
-  onGetDutyUser = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const {dispatch} = this.props;
-    InteractionManager.runAfterInteractions(() => {
-      dispatch(
-        fetchDutyUsers(currStoreId, accessToken, resp => {
-          if (resp.ok) {
-            this.setState({
-              dutyUsers: resp.obj
-            })
           }
           this.setState({isRefreshing: false});
         })

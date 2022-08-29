@@ -14,8 +14,8 @@ import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
-  const {mine, user, global, store} = state;
-  return {mine: mine, user: user, global: global, store}
+  const {global} = state;
+  return { global}
 }
 
 function mapDispatchToProps(dispatch) {

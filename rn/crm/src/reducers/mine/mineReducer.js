@@ -25,7 +25,6 @@ const initialState = {
   turnover: {},
   wm_list: {},
   wage_data: {},
-  duty_users: [],
   increment: {
     auto_pack: {
       expire_date: '',
@@ -52,11 +51,6 @@ export default function mine(state = initialState, action) {
         ...state,
         sign_count: sign_count(state, action),
         bad_cases_of: bad_cases_of(state, action),
-      };
-    case GET_VENDOR_DUTY_USERS:
-      return {
-        ...state,
-        duty_users: action.users
       };
     case GET_WORKER:
       return {
