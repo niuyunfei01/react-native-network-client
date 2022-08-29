@@ -15,7 +15,6 @@ export const doJPushSetAlias = (currentUser) => {
     const alias = `uid_${currentUser}`;
     JPush.setAlias({alias: alias, sequence: dayjs().unix()})
     JPush.isPushStopped((isStopped) => {
-      console.log('doJPushSetAlias:', isStopped)
       if (isStopped) {
         JPush.resumePush();
       }
