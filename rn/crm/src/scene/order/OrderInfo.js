@@ -146,6 +146,19 @@ const tipListBottom = [
   {label: '10元', value: 10}
 ]
 
+
+const task_types = {
+  0: {'sort': 99, 'name': '其他'},
+  3: {'sort': 1, 'name': '其他重要'},
+  2: {'sort': 2, 'name': '门店退款'},
+  1: {'sort': 3, 'name': '疑似差评'},
+  4: {'sort': 4, 'name': '催单'},
+  5: {'sort': 5, 'name': '客户退款'},
+  6: {'sort': 6, 'name': '取消配送'},
+  7: {'sort': 7, 'name': '订单修改'},
+  12: {'sort': 12, 'name': '客户退款'},
+}
+
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
@@ -690,7 +703,6 @@ class OrderInfo extends Component {
   renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
-    const task_types = this.props.global?.config?.task_types || {};
     let {order = {}, modalTip} = this.state;
     const menus = [
       {

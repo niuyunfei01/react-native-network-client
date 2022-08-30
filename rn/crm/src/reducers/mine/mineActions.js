@@ -350,3 +350,22 @@ export function getUserWageData(token, month, callback) {
     })
   }
 }
+
+export function unDisable(token, storeId, disable_id, state, vendorId, callback) {
+  let params = {
+    store_id: storeId,
+    delivery_way_v2: disable_id,
+    state: state
+  }
+  return dispatch => {
+    let url = `/v1/new_api/Delivery/delivery_switch?vendorId=${vendorId}&access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, params))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp.ok, resp.desc, resp.obj);
+      })
+      .catch(error => {
+        callback({ok: false, desc: error.reason});
+      });
+  };
+}

@@ -5,7 +5,6 @@ import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOp
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
-import tool from "../../pubilc/util/tool";
 import {Button} from 'react-native-elements';
 import pxToDp from "../../pubilc/util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -55,23 +54,24 @@ class OrderReceivingInfo extends Component {
   }
 
   componentDidMount() {
+    this.setAddress()
+  }
+
+  setAddress = () => {
+    let Info = this.props.route.params.addItem
     this.setState({
-      name: this.props.route.params.addItem && this.props.route.params.addItem['name'],
-      mobile: this.props.route.params.addItem && this.props.route.params.addItem['phone'],
-      address: this.props.route.params.addItem && this.props.route.params.addItem['address'],
-      street_block: this.props.route.params.addItem && this.props.route.params.addItem['address'],
-      street_block_address: this.props.route.params.addItem && this.props.route.params.addItem['street_block'],
-      loc_lat: this.props.route.params.addItem && this.props.route.params.addItem['lat'],
-      loc_lng: this.props.route.params.addItem && this.props.route.params.addItem['lng'],
-      id: this.props.route.params.addItem && this.props.route.params.addItem['id'],
+      name: Info && Info['name'],
+      mobile: Info && Info['phone'],
+      address: Info && Info['address'],
+      street_block: Info && Info['address'],
+      street_block_address: Info && Info['street_block'],
+      loc_lat: Info && Info['lat'],
+      loc_lng: Info && Info['lng'],
+      id: Info && Info['id'],
       type: this.props.route.params.type && this.props.route.params.type,
-      coordinates: this.props.route.params.addItem !== undefined && this.props.route.params.addItem['lng'] + ',' + this.props.route.params.addItem['lat'],
+      coordinates: Info !== undefined && Info['lng'] + ',' + Info['lat'],
     })
   }
-
-  UNSAFE_componentWillMount() {
-  }
-
 
   onPress(route, params = {}) {
     let _this = this;
@@ -99,25 +99,28 @@ class OrderReceivingInfo extends Component {
     }
 
     const params = {
-      action: Config.LOC_PICKER,
       center: center,
-      cityname: tool.store(this.props.global).city,
-      loc_lat: tool.store(this.props.global).loc_lat,
-      loc_lng: tool.store(this.props.global).loc_lng,
-      isType: "orderSetting",
       onBack: resp => {
-        let {name, address, location} = resp;
-        let locate = name;
-        let locate1 = address;
+        let {location} = resp;
         let locationAll = location.split(',')
-        this.setState({
-          location_long: locate,
-          location_lat: locate1,
-          location: location,
-          loc_lng: locationAll[0],
-          loc_lat: locationAll[1],
-          coordinates: resp.location
-        });
+        if (resp?.id!==undefined) {
+          let {name, address} = resp;
+          this.setState({
+            location_long: name,
+            location_lat: address,
+            location: location,
+            loc_lng: locationAll[0],
+            loc_lat: locationAll[1],
+            coordinates: resp.location
+          });
+        } else {
+          this.setState({
+            location: location,
+            loc_lng: locationAll[0],
+            loc_lat: locationAll[1],
+            coordinates: resp.location
+          });
+        }
       }
     };
     this.onPress(Config.ROUTE_SEARC_HSHOP, params);
@@ -219,8 +222,9 @@ class OrderReceivingInfo extends Component {
               </If>
               <If condition={type == 'edit'}>
                 <Text style={[styles.body_text, {flex: 1}]}>
-                  {((location_long !== undefined && location_lat !== undefined) && street_block_address !== undefined)
-                    ? `${location_long}(${location_lat})` : `${address}(${street_block_address})`}</Text>
+                  {(location_long !== undefined && location_lat !== undefined)
+                    ? `${location_long}(${location_lat})` : `${address}(${street_block_address})`}
+                </Text>
               </If>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>

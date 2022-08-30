@@ -273,7 +273,7 @@ class MineScene extends PureComponent {
     const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       if (!res) {
-        this.getTimeoutCommonConfig(currStoreId, true, () => {
+        this.getTimeoutCommonConfig(currStoreId, () => {
         })
       }
     })
@@ -489,27 +489,8 @@ class MineScene extends PureComponent {
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
-    // this.renderStoreBlock()
-
-    const {dispatch, global} = this.props;
-    const {accessToken, currStoreId} = global;
+    const {accessToken, currStoreId} = this.props.global;
     this.getServiceStatus(currStoreId, accessToken)
-    dispatch(
-      upCurrentProfile(accessToken, currStoreId, (ok, desc, obj) => {
-        if (ok) {
-          this.setState({
-            prefer_store: obj.prefer_store,
-            screen_name: obj.screen_name,
-            mobile_phone: obj.mobilephone,
-            cover_image: !!obj.cover_image
-              ? Config.staticUrl(obj.cover_image)
-              : ""
-          });
-        } else {
-          ToastLong(desc);
-        }
-      })
-    );
   }
 
   registerJpush = () => {
@@ -535,7 +516,7 @@ class MineScene extends PureComponent {
     const {dispatch, global} = this.props;
     const callback = (ok, msg) => {
       if (ok) {
-        this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
+        this.getTimeoutCommonConfig(store_id, (getCfgOk, msg, obj) => {
           if (getCfgOk) {
             dispatch(setCurrentStore(store_id));
             let {
@@ -581,19 +562,11 @@ class MineScene extends PureComponent {
     }
   }
 
-  getTimeoutCommonConfig = (store_id,
-                            should_refresh = false,
-                            callback = () => {
-                            }) => {
-    const {accessToken, last_get_cfg_ts} = this.props.global;
-    let diff_time = dayjs(new Date()).unix() - last_get_cfg_ts;
-
-    if (should_refresh || diff_time > Config.STORE_VENDOR_CACHE_TS) {
-      const {dispatch} = this.props;
-      dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
+  getTimeoutCommonConfig = (store_id, callback = () => {}) => {
+    const {accessToken} = this.props.global;
+    this.props.dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
         callback(ok, msg, obj);
       }));
-    }
   }
 
 
@@ -612,7 +585,6 @@ class MineScene extends PureComponent {
   }
 
   getServiceStatus = (currStoreId, accessToken) => {
-
     const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
     const {dispatch} = this.props
     HttpUtils.get(api).then(res => {
@@ -723,7 +695,7 @@ class MineScene extends PureComponent {
 
   deliverySetting = () => {
     this.mixpanel.track('配送管理')
-    this.onPress(Config.ROUTE_DELIVERY_LIST)
+    this.onPress(Config.ROUTE_DELIVERY_LIST, {dispatch: this.props.dispatch})
   }
 
   settingPage = () => {

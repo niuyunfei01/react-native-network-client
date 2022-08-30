@@ -12,10 +12,8 @@ const {
   SET_CURR_STORE,
   SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
-
   CHECK_VERSION_AT,
   BLE_STARTED,
-
   LOGOUT_SUCCESS,
   UPDATE_CFG,
   HOST_UPDATED,
@@ -31,29 +29,36 @@ const {
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
-  currentUser: null,
   currStoreId: 0,
   simpleStore: {}, //使用前需校验是否与 currStoreId 对应, 没有则需要去服务器端获得; 默认随config等一起大批更新
-  accessToken: '',
-  refreshToken: '',
-  expireTs: 0,
   config: {},
-  currentUserProfile: {},
   canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
   canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
-  remindTags: null,
-  host: '',
   cfgOfKey: {},
-  last_get_cfg_ts: 0,
+
+  currentUser: null,
   currentNewProductStoreId: 0,
-  listeners: [],
-  printer_id: '',
-  mixpanel_id: '',
-  bleStarted: false,
+  expireTs: 0,
+  currentUserProfile: {},
+  host: '',
+  store_id: 0,
+  vendor_id: 0,
+  store_info: {},
+  vendor_info: {},
+  help_uid: [],
+  enabled_good_mgr: false,
+  show_goods_monitor: false,
+  show_sign_center: false,
+  float_kf_icon: false,
+  show_expense_center: false,
+  is_record_request_monitor: false,
+  customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {
     order_list_by: 'expectTime asc',
-  }
+  },
+  bleStarted: false,
+  printer_id: '',
 };
 
 /**
@@ -85,7 +90,6 @@ export default function globalReducer(state = initialState, action) {
       } else return state;
 
     case SET_CURR_PROFILE:
-
       return {...state, currentUserProfile: action.profile};
 
     case SET_CURR_STORE:
@@ -142,7 +146,6 @@ export default function globalReducer(state = initialState, action) {
         canReadStores: action.payload.canReadStores || state.canReadStores,
         canReadVendors: action.payload.canReadVendors || state.canReadVendors,
         config: action.payload.config || state.config,
-        last_get_cfg_ts: action.last_get_cfg_ts || state.last_get_cfg_ts,
       } : state;
 
       //有定义即可更新 simpleStore

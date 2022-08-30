@@ -53,6 +53,8 @@ import store from "../../pubilc/util/configureStore";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import DeviceInfo from "react-native-device-info";
 import {downloadApk} from "rn-app-upgrade";
+import {setRecordFlag} from "../../reducers/store/storeActions";
+import PropTypes from "prop-types";
 
 const {width} = Dimensions.get("window");
 
@@ -131,6 +133,11 @@ const timeObj = {
 
 class OrderListScene extends Component {
   state = initState;
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    device: PropTypes.object,
+  }
 
   constructor(props) {
     super(props);
@@ -220,21 +227,16 @@ class OrderListScene extends Component {
   componentDidMount() {
     initJPush()
 
-    const {global, dispatch, navigation, device} = this.props
+    const {global, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
     }
-    getSimpleStore(global, dispatch)
-
-
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-
     const {currStoreId, currentUser, accessToken, config} = global;
-
     if (this.ptListener) {
       this.ptListener.remove()
     }
@@ -311,6 +313,7 @@ class OrderListScene extends Component {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       store.dispatch(setDeviceInfo(deviceInfo))
     })
+
     this.focus = navigation.addListener('focus', () => {
       this.getVendor()
       this.onRefresh()
@@ -325,6 +328,7 @@ class OrderListScene extends Component {
     calcMs(timeObj, accessToken)
     this.whiteNoLoginInfo()
     this.openAndroidNotification();
+    this.fetchShowRecordFlag();
     AMapSdk.init(
       Platform.select({
         android: "1d669aafc6970cb991f9baf252bcdb66",
@@ -332,6 +336,16 @@ class OrderListScene extends Component {
       })
     );
   }
+
+
+  fetchShowRecordFlag() {
+    const {accessToken, currentUser} = this.props.global;
+    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
+      this.props.dispatch(setRecordFlag(res.ok))
+    })
+  }
+
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {

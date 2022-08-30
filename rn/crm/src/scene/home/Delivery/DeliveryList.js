@@ -25,6 +25,7 @@ import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
+import {unDisable} from "../../../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -33,7 +34,7 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = dispatch => {
   return {
-    actions: bindActionCreators({...globalActions}, dispatch)
+    actions: bindActionCreators({unDisable, ...globalActions}, dispatch)
   }
 }
 
@@ -67,7 +68,6 @@ class DeliveryList extends PureComponent {
       show_disable_all: false,
       unbind_id: 0,
       disable_id: 0,
-      disable_name: "",
       unbind_name: "",
       unbind_url: null,
       show_modal: false,
@@ -86,8 +86,7 @@ class DeliveryList extends PureComponent {
           if (show_type === 1) {
             this.setState({
               show_disable_all: !show_disable_all,
-              disable_id: 0,
-              disable_name: ''
+              disable_id: 0
             })
           } else {
             this.setState({
@@ -429,24 +428,22 @@ class DeliveryList extends PureComponent {
   undisable = () => {
     let {accessToken, currStoreId} = this.props.global
     let {currVendorId} = tool.vendor(this.props.global);
-    let {disable_id, delivery_way_state, show_type} = this.state
-    let params = {
-      store_id: currStoreId,
-      delivery_way_v2: disable_id,
-      state: delivery_way_state
-    }
-    HttpUtils.post.bind(this.props)(`/v1/new_api/Delivery/delivery_switch?vendorId=${currVendorId}&access_token=${accessToken}`, params).then(res => {
-      this.setState({
-        show_modal: true,
-        modal_msg: show_type === 1 ? '操作成功' : res.msg,
-        show_disable_all: false
-      })
-    }).catch((reason) => {
-      this.setState({
-        show_modal: true,
-        modal_msg: reason.desc
-      })
-    })
+    let {dispatch} = this.props.route.params;
+    let {disable_id, delivery_way_state} = this.state
+    dispatch(unDisable(accessToken, currStoreId, disable_id, delivery_way_state, currVendorId, async (ok, desc) => {
+      if (ok) {
+        this.setState({
+          show_modal: true,
+          modal_msg: desc,
+          show_disable_all: false
+        })
+      } else {
+        this.setState({
+          show_modal: true,
+          modal_msg: desc
+        })
+      }
+    }))
   }
 
   getCountdown = () => {
@@ -491,16 +488,20 @@ class DeliveryList extends PureComponent {
 
   unDisableBtn = (status) => {
     if (this.state.disable_id !== 0) {
-      Alert.alert('提醒', `确定要${status}` + this.state.disable_name + '[外送帮自带账户]吗？', [
-        {
-          text: '确定',
-          onPress: () => {
-            this.undisable();
-          },
-        }, {
-          text: '取消'
-        }
-      ])
+      if (status === '禁用') {
+        Alert.alert('提醒', `禁用后无法使用此配送发单，确定禁用吗？`, [
+          {
+            text: '确定',
+            onPress: () => {
+              this.undisable();
+            },
+          }, {
+            text: '取消'
+          }
+        ])
+      } else {
+        this.undisable();
+      }
     }
   }
 
@@ -611,7 +612,6 @@ class DeliveryList extends PureComponent {
               if (info.id !== undefined && info.is_forbidden === 0) {
                 this.setState({
                   disable_id: info.v2_type,
-                  disable_name: info.name,
                   delivery_way_state: info.is_forbidden
                 })
               }
@@ -621,7 +621,6 @@ class DeliveryList extends PureComponent {
               if (info.is_forbidden === 1) {
                 this.setState({
                   disable_id: info.v2_type,
-                  disable_name: info.name,
                   delivery_way_state: info.is_forbidden
                 }, () => {
                   this.unDisableBtn('启用')
@@ -668,17 +667,18 @@ class DeliveryList extends PureComponent {
   }
 
   renderModal = () => {
+    let {show_modal, modal_msg} = this.state
     return (
       <View>
         <BottomModal
           title={'提示'}
-          visible={this.state.show_modal}
+          visible={show_modal}
           actionText={'确定'}
           btnStyle={{backgroundColor: colors.main_color}}
           onPress={() => this.noticeModalPress()}
           onClose={() => this.closeModal()}>
           <View style={styles.modalTitle}>
-            <Text style={styles.modalTitleText}>{this.state.modal_msg} </Text>
+            <Text style={styles.modalTitleText}>{modal_msg} </Text>
           </View>
         </BottomModal>
         <BottomModal

@@ -5,9 +5,9 @@ import colors from "../styles/colors";
 import pxToDp from "../util/pxToDp";
 import Cts from "../common/Cts";
 import tool from "../util/tool";
-import styles from "../../scene/order/OrderStyles";
-import {Icon} from "../../weui";
 import pxToEm from "../util/pxToEm";
+import PropTypes from "prop-types";
+import Entypo from "react-native-vector-icons/Entypo";
 
 const {StyleSheet} = ReactNative
 
@@ -61,6 +61,14 @@ const Styles = StyleSheet.create({
 })
 
 class OrderReminds extends PureComponent {
+
+  static propTypes = {
+    reminds: PropTypes.any,
+    remindNicks: PropTypes.any,
+    task_types: PropTypes.object,
+    processRemind: PropTypes.func,
+  }
+
   constructor(props) {
     super(props)
   }
@@ -80,7 +88,7 @@ class OrderReminds extends PureComponent {
         <View style={Styles.Title}>
           <Text style={Styles.color333}>{taskType ? taskType.name : '待办'} </Text>
           <Text style={Styles.ml20}>{tool.shortTimeDesc(remind.created)} </Text>
-          <View style={styles.flex1}/>
+          <View style={{flex: 1}}/>
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
           <Text style={Styles.color333}>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)} </Text>}
           {status === Cts.TASK_STATUS_WAITING &&
@@ -92,7 +100,7 @@ class OrderReminds extends PureComponent {
             <Text style={Styles.color333}>{tool.shortTimeDesc(remind.resolved_at)} </Text>
             {remind.resolved_by &&
             <Text style={Styles.remindNicks}>{remindNicks['' + remind.resolved_by]} </Text>}
-            <Icon name='success_no_circle' size={16}/>
+            <Entypo name='check' size={16}/>
           </View>}
         </View>
         {type === Cts.TASK_TYPE_ORDER_CHANGE &&

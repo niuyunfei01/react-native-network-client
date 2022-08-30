@@ -253,7 +253,7 @@ class ApplyScene extends PureComponent {
         dispatch(setCurrentStore(storeId));
         if (not_bind) {
           hideModal()
-          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
+          navigation.navigate(Config.ROUTE_STORE_STATUS)
           return true;
         }
         navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
@@ -280,9 +280,9 @@ class ApplyScene extends PureComponent {
       location_lat: lat,
     }
     if (res.address) {
-      states.dada_address = res.address;
+      states.address = res.address;
     }
-    this.setState(states)
+    this.setState({...states})
   }
 
   render() {
