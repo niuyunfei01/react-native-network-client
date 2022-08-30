@@ -66,11 +66,11 @@ class LoginScene extends PureComponent {
     super(props);
     this.timeouts = [];
     this.state = {
-      mobile: '15507992268',
+      mobile: '',
       password: '',
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
-      verifyCode: '111111',
+      verifyCode: '',
       loginType: BY_SMS,
       doingSign: false,
       doingSignKey: '',
@@ -152,9 +152,7 @@ class LoginScene extends PureComponent {
           showError('请输入短信验证码')
           return false;
         }
-        tool.debounces(() => {
           this._signIn(mobile, verifyCode, "短信验证码");
-        }, 600)
         break;
       case BY_PASSWORD:
         if (!password) {
