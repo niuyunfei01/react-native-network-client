@@ -4,7 +4,6 @@ import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import JbbDateRangeDialog from "../../common/component/JbbDateRangeDialog";
 import tool from "../../../pubilc/util/tool";
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
@@ -41,7 +40,7 @@ class MaterialTaskFinish extends React.Component {
 
   componentDidMount() {
     const {params = {}} = this.props.route
-    const accessToken = this.props.global.accessToken
+    let {accessToken, currentUser} = this.props.global
     const api = `/api/is_sign_worker?access_token=${accessToken}`
     const data = {
       userId: this.props.global.currentUser ? this.props.global.currentUser : 0,
@@ -53,11 +52,11 @@ class MaterialTaskFinish extends React.Component {
       HttpUtils.get.bind(this.props)(api, {}).then(res => {
         //本店签到人员且非(店长、助理店长、运营人员)
         if (res) {
-          GlobalUtil.getUser().then(user => {
-            data.userId = user.id
-            data.username = user.screen_name
-            this.setState(data, () => this.onRefresh())
-          })
+
+          data.userId = currentUser
+          data.username = ''
+          this.setState(data, () => this.onRefresh())
+
         } else {
           this.setState(data, () => this.onRefresh())
         }

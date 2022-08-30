@@ -106,10 +106,9 @@ class OrderTodoScene extends Component {
       this.setState({onSubmitting: false});
       if (ok) {
         showSuccess('任务已创建')
-        // this.setState({doneSubmitting: true});
         setTimeout(() => {
-          // this.setState({doneSubmitting: false});
           navigation.goBack();
+          hideModal()
         }, 2000);
       } else {
         this.setState({errorHints: msg});

@@ -310,8 +310,7 @@ class SearchShop extends Component {
                                 style={{
                                   fontSize: 16,
                                   fontWeight: 'bold',
-                                  paddingTop: pxToDp(15),
-                                  paddingBottom: pxToDp(15),
+                                  paddingVertical: 10,
                                   paddingLeft: pxToDp(15),
                                   backgroundColor: 'white',
                                   borderBottomWidth: pxToDp(1),

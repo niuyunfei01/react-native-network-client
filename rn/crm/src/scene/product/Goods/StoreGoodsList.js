@@ -3,8 +3,6 @@ import {FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} f
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
-import tool from "../../../pubilc/util/tool"
-import {getSimpleStore} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http"
 import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
@@ -16,7 +14,7 @@ import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
-
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -30,6 +28,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsList extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -66,20 +69,17 @@ class StoreGoodsList extends Component {
       selectStatusItem: '',
       onStrict: false
     }
-
   }
 
   componentDidMount() {
-    const {global, dispatch, navigation} = this.props
-    const {currStoreId, accessToken} = global;
-    getSimpleStore(global, dispatch, currStoreId, (store) => {
-      this.setState({
-        fnPriceControlled: store['fn_price_controlled'],
-        fnProviding: Number(store['strict_providing']) > 0,
-        init: true
-      })
-      this.fetchUnreadPriceAdjustment(store.id, accessToken)
+    const {global, navigation} = this.props
+    const {accessToken, store_id, store_info} = global;
+    this.setState({
+      fnPriceControlled: store_info?.fn_price_controlled,
+      fnProviding: Number(store_info?.strict_providing) > 0,
+      init: true
     })
+    this.fetchUnreadPriceAdjustment(store_id, accessToken)
     this.restart()
     this.focus = navigation.addListener('focus', () => this.restart());
   }
@@ -169,14 +169,13 @@ class StoreGoodsList extends Component {
     if (isLoading) {
       return;
     }
-    const {accessToken, currStoreId} = this.props.global;
-    const {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken, currStoreId, vendor_id} = this.props.global;
     const {prod_status} = this.props.route.params || {};
     this.setState({
       isLoading: true,
     })
     const params = {
-      vendor_id: currVendorId,
+      vendor_id: vendor_id,
       status: selectedStatus.value,
       tagId: selectedChildTagId ? selectedChildTagId : selectedTagId,
       page: page,
@@ -331,10 +330,9 @@ class StoreGoodsList extends Component {
 
   render() {
 
-    const {accessToken, simpleStore} = this.props.global;
+    const {accessToken, store_info, currStoreId, vendor_id} = this.props.global;
     let {all_amount, all_count, inventorySummary, selectStatusItem, selectedProduct, goods, isLoading} = this.state;
     const {sp} = selectedProduct;
-    const {currVendorId} = tool.vendor(this.props.global);
     return (
       <>
         {this.renderHeader()}
@@ -382,9 +380,9 @@ class StoreGoodsList extends Component {
                                 skuName={selectedProduct.sku_name}
                                 productName={selectedProduct.name}
                                 strictProviding={false} accessToken={accessToken}
-                                storeId={Number(this.props.global.currStoreId)}
+                                storeId={Number(currStoreId)}
                                 currStatus={Number(sp.status)}
-                                vendor_id={currVendorId}
+                                vendor_id={vendor_id}
                                 doneProdUpdate={this.doneProdUpdate}
                                 onClose={() => this.setState({modalType: ''})}
                                 spId={Number(sp.id)}
@@ -409,7 +407,7 @@ class StoreGoodsList extends Component {
                 alignItems: 'center'
               }}>
                 <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>
-                  {simpleStore.name}
+                  {store_info?.name}
                 </Text>
                 <View style={{
                   flexDirection: "column",

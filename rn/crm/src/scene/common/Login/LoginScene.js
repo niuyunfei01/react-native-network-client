@@ -13,7 +13,7 @@ import {
 
 import {
   check_is_bind_ext,
-  getCommonConfig,
+  getConfig,
   logout,
   requestSmsCode,
   setCurrentStore,
@@ -22,7 +22,6 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../../pubilc/util/ToastUtils";
-import HttpUtils from "../../../pubilc/util/http";
 import colors from '../../../pubilc/styles/colors'
 import pxToDp from '../../../pubilc/util/pxToDp'
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
@@ -34,6 +33,7 @@ import {CheckBox} from "react-native-elements";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {setDeviceInfo} from "../../../reducers/device/deviceActions";
+import PropTypes from "prop-types";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 let {height, width} = Dimensions.get('window')
@@ -46,10 +46,22 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getCommonConfig, logout, signIn, requestSmsCode}, dispatch)}
+  return {
+    dispatch, ...bindActionCreators({
+      getConfig,
+      logout,
+      signIn,
+      setCurrentStore,
+      requestSmsCode
+    }, dispatch)
+  }
 }
 
 class LoginScene extends PureComponent {
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     this.timeouts = [];
@@ -73,12 +85,6 @@ class LoginScene extends PureComponent {
     this.mixpanel.track("openApp_page_view", {});
   }
 
-  UNSAFE_componentWillMount = () => {
-    const params = (this.props.route.params || {});
-    this.next = params.next;
-    this.nextParams = params.nextParams;
-  }
-
   componentDidMount() {
     global.isLoginToOrderList = true
   }
@@ -95,9 +101,7 @@ class LoginScene extends PureComponent {
     this.timeouts.forEach(clearTimeout);
   }
 
-
   onRequestSmsCode = () => {
-
     let {mobile, reRequestAfterSeconds} = this.state
     if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
@@ -148,7 +152,7 @@ class LoginScene extends PureComponent {
           showError('请输入短信验证码')
           return false;
         }
-        this._signIn(mobile, verifyCode, "短信验证码");
+          this._signIn(mobile, verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
         if (!password) {
@@ -164,22 +168,20 @@ class LoginScene extends PureComponent {
 
   _signIn = (mobile, password, name) => {
     const {dispatch} = this.props;
+    dispatch(logout());
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
-    dispatch(logout());
-
     dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
-        this.doSaveUserInfo(token);
-        this.queryCommonConfig(uid)
+        this.queryConfig(uid)
         if (uid) {
           this.mixpanel.getDistinctId().then(res => {
             if (res !== uid) {
               mergeMixpanelId(res, uid);
+              this.mixpanel.identify(uid);
             }
           })
-          this.mixpanel.identify(uid);
         }
       } else {
         if (msg.indexOf("注册") !== -1) {
@@ -190,27 +192,17 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  doSaveUserInfo = (token) => {
-    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
-      GlobalUtil.setUser(res)
-    })
-  }
-
-  queryCommonConfig = (uid) => {
+  queryConfig = (uid) => {
     let {accessToken, currStoreId} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
-        if (currStoreId > 0) {
-          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: currStoreId}, (binded) => {
-            this.doneSelectStore(currStoreId, !binded);
-          }));
-        } else {
-          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
-          this.doneSelectStore(store.id, false);
-        }
+        let store_id = cfg?.store_id || currStoreId;
+        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
+          this.doneSelectStore(store_id, !binded);
+        }));
       } else {
-        showError(err_msg);
+        ToastShort(err_msg);
       }
     }));
   }
@@ -221,9 +213,9 @@ class LoginScene extends PureComponent {
       if (set_ok) {
         dispatch(setCurrentStore(storeId));
         if (not_bind) {
+          navigation.navigate(Config.ROUTE_STORE_STATUS)
           hideModal()
-          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
-          return true;
+          return;
         }
         navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT, {

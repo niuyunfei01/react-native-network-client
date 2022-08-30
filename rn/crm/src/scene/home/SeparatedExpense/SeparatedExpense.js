@@ -138,7 +138,7 @@ class SeparatedExpense extends PureComponent {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "我的"
     timeObj['componentName'] = "SeparatedExpense"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 

@@ -1,4 +1,4 @@
-import React, {PureComponent} from "react";
+import React, {Component} from "react";
 import {
   DeviceEventEmitter,
   Dimensions,
@@ -14,7 +14,6 @@ import {
 } from "react-native";
 
 import {
-  fetchDutyUsers,
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
@@ -24,12 +23,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {
-  getCommonConfig,
-  getSimpleStore,
-  setCurrentStore,
-  upCurrentProfile
-} from "../../../reducers/global/globalActions";
+import {getConfig, upCurrentProfile} from "../../../reducers/global/globalActions";
 import {fetchUserInfo} from "../../../reducers/user/userActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import store from "../../../reducers/store/index"
@@ -95,7 +89,7 @@ import {LineView, Styles} from "../GoodsIncrementService/GoodsIncrementServiceSt
 var ScreenWidth = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
-  const {mine,global} = state;
+  const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
@@ -107,7 +101,6 @@ function mapDispatchToProps(dispatch) {
       {
         fetchUserCount,
         fetchWorkers,
-        fetchDutyUsers,
         fetchStoreTurnover,
         fetchUserInfo,
         upCurrentProfile,
@@ -135,7 +128,7 @@ const time = dayjs().format('YYYY-MM-DD')
 let hasPriceControl = false
 let hasAllowAnalys = true
 
-class MineScene extends PureComponent {
+class MineScene extends Component {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -231,7 +224,7 @@ class MineScene extends PureComponent {
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
     this.onGetUserInfo = this.onGetUserInfo.bind(this);
-    this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
+    this.getCommonConfig = this.getCommonConfig.bind(this);
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
     this.onRefresh = this.onRefresh.bind(this)
 
@@ -244,17 +237,9 @@ class MineScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
-    let {currStoreId, canReadStores} = this.props.global;
-    if (!(currStoreId > 0)) {
-      let first_store_id = tool.first_store_id(canReadStores);
-      if (first_store_id > 0) {
-        this._doChangeStore(first_store_id, false);
-      }
-    }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
     // this._doChangeStore(currStoreId)
-
     this.getStoreTurnover();
     this.getHaveNotReadAdvice();
   }
@@ -267,17 +252,17 @@ class MineScene extends PureComponent {
     })
   }
 
-  getStoreList = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    let {md5_read_stores} = this.props.global?.config;
-    const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
-      if (!res) {
-        this.getTimeoutCommonConfig(currStoreId, () => {
-        })
-      }
-    })
-  }
+  // getStoreList = () => {
+  //   const {accessToken, currStoreId} = this.props.global;
+  //   let {md5_read_stores} = this.props.global?.config;
+  //   const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
+  //   HttpUtils.get.bind(this.props)(api).then((res) => {
+  //     if (!res) {
+  //       this.getTimeoutCommonConfig(currStoreId, () => {
+  //       })
+  //     }
+  //   })
+  // }
 
   getStoreTurnover = () => {
     const {accessToken, currStoreId} = this.props.global;
@@ -306,7 +291,7 @@ class MineScene extends PureComponent {
   }
 
   onRefresh = () => {
-    this.getStoreList();
+    // this.getStoreList();
     this.getStoreTurnover();
     this.getHaveNotReadAdvice();
   }
@@ -513,36 +498,29 @@ class MineScene extends PureComponent {
     }
     this.setState({onStoreChanging: true});
     showModal('加载中...')
-    const {dispatch, global} = this.props;
+    const {global} = this.props;
     const callback = (ok, msg) => {
       if (ok) {
-        this.getTimeoutCommonConfig(store_id, (getCfgOk, msg, obj) => {
-          if (getCfgOk) {
-            dispatch(setCurrentStore(store_id));
+        this.getCommonConfig(store_id, (ok, msg, obj) => {
+          if (ok) {
             let {
-              currVendorId,
-              currVersion,
               is_mgr,
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-            this.registerJpush()
-            const {name, vendor} = tool.store(global, store_id)
+            let {vendor_info, store_info, vendor_id} = global;
             this.setState({
               currStoreId: store_id,
-              currStoreName: name,
-              currVendorId: currVendorId,
-              currVersion: currVersion,
-              currVendorName: vendor,
+              currStoreName: store_info?.name,
+              currVendorId: vendor_id,
+              currVersion: vendor_info?.currVersion,
+              currVendorName: vendor_info?.band_name,
               is_mgr: is_mgr,
               is_service_mgr: is_service_mgr,
               is_helper: is_helper,
               onStoreChanging: false
             });
-            hideModal()
             this.setState({onStoreChanging: false});
-            this.getStoreDataOfMine(store_id)
-            this.getStoreTurnover()
           } else {
             ToastLong(msg);
             hideModal()
@@ -562,11 +540,12 @@ class MineScene extends PureComponent {
     }
   }
 
-  getTimeoutCommonConfig = (store_id, callback = () => {}) => {
+  getCommonConfig = (store_id, callback = () => {
+  }) => {
     const {accessToken} = this.props.global;
-    this.props.dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
-        callback(ok, msg, obj);
-      }));
+    this.props.dispatch(getConfig(accessToken, store_id, (ok, msg, obj) => {
+      callback(ok, msg, obj);
+    }));
   }
 
 
@@ -624,8 +603,9 @@ class MineScene extends PureComponent {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          getSimpleStore(global, dispatch, store_id)
           this.getServiceStatus(store_id, accessToken)
+          this.getStoreDataOfMine(store_id)
+          this.getStoreTurnover()
           this.getHuichuan(store_id, accessToken)
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
@@ -1058,8 +1038,8 @@ class MineScene extends PureComponent {
 
     let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
-    const {currStoreId, accessToken, simpleStore} = global
-    const {added_service} = simpleStore
+    const {currStoreId, accessToken, store_info} = global
+    const added_service = store_info?.added_service;
     return (
       <>
         {this.renderHeader()}
@@ -1123,12 +1103,6 @@ class MineScene extends PureComponent {
           </Dialog>
           {this.renderModal()}
         </ScrollView>
-        {/*<SearchStore visible={this.state.searchStoreVisible}*/}
-        {/*             onClose={() => this.setState({searchStoreVisible: false})}*/}
-        {/*             onSelect={(item) => {*/}
-        {/*               this.onCanChangeStore(item.id);*/}
-        {/*               this.setState({searchStoreVisible: false})*/}
-        {/*             }}/>*/}
       </>
     );
   }
@@ -1141,16 +1115,22 @@ class MineScene extends PureComponent {
 
 
   renderStoreBlock = () => {
-    const {currentUser, accessToken, config, simpleStore} = this.props.global;
-    const {show_goods_monitor = false, enabled_good_mgr = false} = config;
+    const {global} = this.props
+    const {
+      currentUser,
+      accessToken,
+      vendor_info,
+      store_info,
+      show_goods_monitor = false,
+      enabled_good_mgr = false
+    } = this.props.global;
     let token = `?access_token=${accessToken}`;
     let {
       currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled, activity_url,
       activity_img, wsb_store_account, color, content, showComesback
     } = this.state
-    const {global} = this.props
-    let {co_type} = tool.vendor(global);
-    const {fn_stall} = simpleStore
+    const fn_stall = store_info?.fn_stall
+    const co_type = vendor_info?.co_type
     return (
       <View style={[block_styles.bottomWrap]}>
         <If condition={co_type !== 'peisong' && showComesback}>
@@ -1377,9 +1357,8 @@ class MineScene extends PureComponent {
 
   renderVersionBlock = () => {
     const {have_not_read_advice, activity_url, activity_img, wsb_store_account} = this.state
-    const {show_expense_center = false} = this.props.global?.config;
-    const {global} = this.props
-    let {co_type} = tool.vendor(global);
+    const {show_expense_center, vendor_info} = this.props.global;
+    let co_type = vendor_info?.co_type;
     return (
       <View style={[block_styles.bottomWrap]}>
         <TouchableOpacity

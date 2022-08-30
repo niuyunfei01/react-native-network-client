@@ -27,6 +27,7 @@ import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
+import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -126,6 +127,17 @@ class UserScene extends PureComponent {
   _onLogout() {
     const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      currentUser: 0,
+      currStoreId: 0,
+      host: '',
+      co_type: '',
+      storeVendorId: '',
+      enabledGoodMgr: '',
+      currVendorId: ''
+    }
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
       navigation.navigate(Config.ROUTE_LOGIN, {});

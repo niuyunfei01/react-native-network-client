@@ -59,33 +59,20 @@ export function fullDay(dt) {
   return dayjs(dt).format("YYYY-MM-DD");
 }
 
-export function vendorOfStoreId(storeId, global) {
-  const {canReadStores, canReadVendors} = global;
-
-  const vendorId = canReadStores[storeId] && canReadStores[storeId].type;
-  return canReadVendors && canReadVendors[vendorId]
-    ? canReadVendors[vendorId]
-    : null;
-}
 
 export function vendor(global) {
   const {
     currentUser,
-    currStoreId,
-    canReadStores,
-    canReadVendors,
-    config
+    store_info,
+    vendor_info,
+    vendor_id,
+    help_uid,
   } = global;
-  let currStore =
-    canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
-  let currVendorId = currStore["type"];
-  let currVendorName = currStore["vendor"];
-  let currStoreName = currStore["name"];
+  let currVendorId = vendor_id;
+  let currVendorName = vendor_info["brand_name"];
+  let currStoreName = store_info["name"];
 
-  let currVendor =
-    canReadVendors[currVendorId] === undefined
-      ? {}
-      : canReadVendors[currVendorId];
+  let currVendor = vendor_info;
   let currVersion = currVendor["version"];
   let fnProviding = currVendor["fnProviding"];
   let fnProvidingOnway = currVendor["fnProvidingOnway"];
@@ -107,13 +94,11 @@ export function vendor(global) {
   let service_manager = "," + service_ids.join(",") + ",";
   let is_service_mgr = service_manager.indexOf("," + currentUser + ",") !== -1;
 
-  let {help_uid} = config;
   let is_helper = false;
   if (help_uid) {
     let helper = "," + help_uid.join(",") + ",";
     is_helper = helper.indexOf("," + currentUser + ",") !== -1;
   }
-
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
@@ -149,9 +134,8 @@ export function server_info({global, user}) {
  * @returns {*}
  */
 export function store(global, store_id = null) {
-  const {canReadStores, currStoreId} = global;
-  store_id = store_id ? store_id : currStoreId
-  return canReadStores[store_id];
+  const {store_info} = global;
+  return store_info;
 }
 
 export function length(obj) {
@@ -198,8 +182,7 @@ export function user_info(mine, currVendorId, currentUser) {
 
 export function user(reduxGlobal, reduxMine) {
   const {currentUser} = reduxGlobal
-  const {currVendorId} = vendor(reduxGlobal)
-  return user_info(reduxMine, currVendorId, currentUser)
+  return user_info(reduxMine, reduxGlobal?.vendor_id, currentUser)
 }
 
 export function shortTimestampDesc(timestamp) {
@@ -283,83 +266,6 @@ function parameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-export function storeActionSheet(canReadStores, is_service_mgr = false) {
-  let by = function (name, minor) {
-    return function (o, p) {
-      let a, b;
-      if (o && p && typeof o === "object" && typeof p === "object") {
-        a = o[name];
-        b = p[name];
-        if (a === null || b === null) {
-          return a === null ? -1 : 1;
-        }
-        if (a === b) {
-          return typeof minor === "function" ? minor(o, p) : 0;
-        }
-        if (typeof a === typeof b && typeof a === "string") {
-          return a.localeCompare(b);
-        }
-        if (typeof a === typeof b) {
-          return a < b ? -1 : 1;
-        }
-        return typeof a < typeof b ? -1 : 1;
-      } else {
-        throw "error";
-      }
-    };
-  };
-
-  let storeActionSheet = [{key: -999, section: true, label: "选择门店"}];
-  let sortStores = Object.values(canReadStores).sort(
-    by("type", by("city", by("id")))
-  );
-  for (let store of sortStores) {
-    if (store.id > 0) {
-      let city = store.city ? store.city : "";
-      let item = {
-        key: store.id,
-        label:
-          is_service_mgr && !!store.vendor
-            ? store.vendor + city + ":" + store.name
-            : store.name
-      };
-      storeActionSheet.push(item);
-    }
-  }
-
-  return storeActionSheet;
-}
-
-function sortStores(canReadStores) {
-  let by = function (name, minor) {
-    return function (o, p) {
-      let a, b;
-      if (o && p && typeof o === "object" && typeof p === "object") {
-        a = o[name];
-        b = p[name];
-        if (a === null || b === null) {
-          return a === null ? -1 : 1;
-        }
-        if (a === b) {
-          return typeof minor === "function" ? minor(o, p) : 0;
-        }
-        if (typeof a === typeof b && typeof a === "string") {
-          return a.localeCompare(b);
-        }
-        if (typeof a === typeof b) {
-          return a < b ? -1 : 1;
-        }
-        return typeof a < typeof b ? -1 : 1;
-      } else {
-        throw "error";
-      }
-    };
-  };
-
-  return Object.values(canReadStores).sort(
-    by("vendor_id", by("city", by("district", by("name"))))
-  );
-}
 
 /**
  * 数组按指定字段排序
@@ -414,51 +320,6 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
   return myobj;
 }
 
-/**
- * 门店数据 格式化 -> React-Native-Modal-Selector
- * @param canReadStores
- */
-export function storeListOfModalSelector(canReadStores) {
-  const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
-  let return_data = []
-  let return_data_deep = 2
-
-  for (let i in storeListGroup) {
-    let storeListGroupByCity = storeListGroup[i]
-
-    if (storeListGroupByCity.label === 'undefined') {
-      storeListGroup.splice(i, 1)
-      continue
-    }
-
-    storeListGroupByCity.key = i
-    let storeDistrictCityValue = storeListGroupByCity.children
-
-    for (store of storeDistrictCityValue) {
-      store.label = store.vendor + '-' + store.district + '-' + store.name
-      store.key = store.id
-    }
-  }
-
-  return_data = storeListGroup
-
-  if (storeListGroup.length === 1) {
-    return_data_deep = 1
-    return_data = storeListGroup[0].children
-  }
-  return {return_data, return_data_deep}
-}
-
-export function first_store_id(canReadStores) {
-  let first_store_id = 0;
-  for (let store of Object.values(canReadStores)) {
-    if (store.id > 0) {
-      first_store_id = store.id;
-      break;
-    }
-  }
-  return first_store_id;
-}
 
 export function toFixed(num, type = "", abs = false) {
   if (abs) {
@@ -704,17 +565,14 @@ export default {
   intOf,
   vendor,
   user,
-  vendorOfStoreId,
   length,
   parameterByName,
   user_info,
-  storeActionSheet,
   fullDay,
   toFixed,
   billStatus,
   get_platform_name,
   ship_name,
-  zs_status,
   sellingStatus,
   headerSupply,
   deepClone,

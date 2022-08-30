@@ -417,7 +417,7 @@ class StallDetailScene extends PureComponent {
               门店
             </Text>
             <Text style={styles.modalContentRightText}>
-              {this.props.global.simpleStore.name}
+              {this.props.global?.store_info?.name}
             </Text>
           </View>
           <View style={styles.modalContentRowWrap}>

@@ -36,7 +36,7 @@ class ConsoleScene extends PureComponent {
 
   handleSignInIcon = () => {
     const {global} = this.props
-    const {show_sign_center} = global.config
+    let show_sign_center = global?.show_sign_center;
     const signInIndex = BUTTON_LIST.findIndex(item => item.title === '员工打卡')
     if (show_sign_center && signInIndex === -1) {
       BUTTON_LIST.push({
