@@ -280,9 +280,9 @@ class ApplyScene extends PureComponent {
       location_lat: lat,
     }
     if (res.address) {
-      states.dada_address = res.address;
+      states.address = res.address;
     }
-    this.setState(states)
+    this.setState({...states})
   }
 
   render() {
