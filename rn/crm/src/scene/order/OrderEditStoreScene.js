@@ -62,6 +62,11 @@ class OrderEditStoreScene extends Component {
   }
 
   render() {
+    return (
+      <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
+        <Text style={{fontSize:20,color:colors.color333}}>正在开发中，转单请联系客服 </Text>
+      </View>
+    )
     const {order} = (this.props.route.params || {});
     const {global} = this.props;
 

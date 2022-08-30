@@ -121,7 +121,7 @@ class SeetingDelivery extends PureComponent {
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default_str: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0,
-        show_auto_confirm_order: this.props.global?.config?.vendor?.wsb_store_account === '1',
+        show_auto_confirm_order: this.props.global?.vendor_info?.wsb_store_account === '1',
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
         isShowSettingText: JSON.parse(response.preference_ship_config).is_open === 1,

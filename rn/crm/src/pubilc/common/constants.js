@@ -17,6 +17,7 @@ export default keyMirror({
   SET_CURR_STORE: null,
   SET_SIMPLE_STORE: null,
   UPDATE_CFG: null,
+  UPDATE_CONFIG: null,
   UPDATE_CFG_ITEM: null,
   HOST_UPDATED: null,
   UPDATE_EDIT_PRODUCT_STORE_ID: null,

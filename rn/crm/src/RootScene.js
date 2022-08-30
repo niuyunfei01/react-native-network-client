@@ -1,20 +1,10 @@
 import React, {PureComponent} from "react";
-import {
-  LogBox,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from "react-native";
+import {LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getCommonConfig, setNoLoginInfo, setSimpleStore} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
-import HttpUtils from "./pubilc/util/http";
 import GlobalUtil from "./pubilc/util/GlobalUtil";
 import AppNavigator from "./pubilc/common/AppNavigator";
 import {nrInit, nrRecordMetric} from './pubilc/util/NewRelicRN.js';
@@ -69,6 +59,7 @@ class RootScene extends PureComponent {
     getNoLoginInfo().then(info => {
       const noLoginInfo = JSON.parse(info)
       if (noLoginInfo.accessToken) {
+        store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
         this.setState({
           rehydrated: true,

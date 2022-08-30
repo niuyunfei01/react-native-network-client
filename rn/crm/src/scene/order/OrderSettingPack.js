@@ -58,7 +58,7 @@ class OrderSettingScene extends Component {
       mobile_suffix: '',
       location_long: '',
       location_lat: '',
-      weight: 0,
+      weight: '0',
       orderAmount: 0,
       showDateModal: false,
       expect_time: Math.round(new Date() / 1000),
@@ -98,7 +98,7 @@ class OrderSettingScene extends Component {
       onBack: resp => {
         let {location} = resp;
         let locationAll = location.split(',')
-        if (resp?.id!==undefined) {
+        if (resp?.id !== undefined) {
           let {name, address} = resp;
           this.setState({
             location_long: name,
@@ -282,7 +282,9 @@ class OrderSettingScene extends Component {
           showError('保存失败请重试！')
         }
       }
-    }).catch(() => {hideModal()})
+    }).catch(() => {
+      hideModal()
+    })
   }
 
   orderToSaveAndIssue = () => {
@@ -391,7 +393,8 @@ class OrderSettingScene extends Component {
                                   const params = {
                                     onBack: resp => {
                                       this.setAddress(resp)
-                                  }}
+                                    }
+                                  }
                                   this.onPress(Config.ROUTE_ORDER_ADDRESS_BOOK, params)
                                 }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
             </View>

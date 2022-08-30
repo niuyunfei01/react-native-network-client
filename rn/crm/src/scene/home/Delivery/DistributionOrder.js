@@ -21,7 +21,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-class DeliveryInfo extends PureComponent {
+class DistributionOrder extends PureComponent {
   constructor(props) {
     super(props)
     let ext_store_id = this.props.route.params.ext_store_id
@@ -50,10 +50,8 @@ class DeliveryInfo extends PureComponent {
   get_map_store() {
     var that = this;
     const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
     let {currVendorId} = tool.vendor(this.props.global);
-    const vendorId = currVendorId
-    const api = `/v1/new_api/ext_stores/get_map_store_id_list/${this.state.ext_store_id}/?access_token=${accessToken}&vendorId=${vendorId}`
+    const api = `/v1/new_api/ext_stores/get_map_store_id_list/${this.state.ext_store_id}/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       that.setState({
         business_status: res
@@ -65,10 +63,8 @@ class DeliveryInfo extends PureComponent {
 
   deleFn(map_store_id) {
     const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
     let {currVendorId} = tool.vendor(this.props.global);
-    const vendorId = currVendorId
-    const api = `/v1/new_api/ext_stores/delete_from_map_store_id_list/?access_token=${accessToken}&vendorId=${vendorId}`
+    const api = `/v1/new_api/ext_stores/delete_from_map_store_id_list/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.post.bind(this.props)(api, {
       ext_store_id: this.state.ext_store_id, map_store_id: map_store_id
     }).then(res => {
@@ -140,7 +136,7 @@ class DeliveryInfo extends PureComponent {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeliveryInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(DistributionOrder)
 const styles = StyleSheet.create({
   footerContainer: {
     flexDirection: 'row', height: pxToDp(80), width: '80%', margin: '10%',

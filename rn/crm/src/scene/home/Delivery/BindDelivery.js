@@ -55,21 +55,19 @@ const data = [
   {value: '48', label: '成人用品'},
   {value: '99', label: '其他'}];
 
-let storename;
-
 class BindDelivery extends PureComponent {
 
   constructor(props) {
     super(props);
     const {
-      canReadStores,
-      currStoreId,
+      store_info,
     } = this.props.global;
     this.state = {
       value: [],
       app_key: '',
       app_secret: '',
       shop_id: '',
+      storename : store_info?.name
     }
 
     this.onChange = value => {
@@ -77,7 +75,6 @@ class BindDelivery extends PureComponent {
     };
 
     this.onBindDelivery = this.onBindDelivery.bind(this)
-    storename = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
   }
 
   onBindDelivery() {
@@ -113,7 +110,7 @@ class BindDelivery extends PureComponent {
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
       >
-        <Text style={{fontSize: 16, color: colors.color333, padding: 10}}>{storename} </Text>
+        <Text style={{fontSize: 16, color: colors.color333, padding: 10}}>{this.state.storename} </Text>
         <Text style={{
           fontSize: 16,
           color: colors.color333,

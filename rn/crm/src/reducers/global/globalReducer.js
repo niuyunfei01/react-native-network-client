@@ -16,6 +16,7 @@ const {
   BLE_STARTED,
   LOGOUT_SUCCESS,
   UPDATE_CFG,
+  UPDATE_CONFIG,
   HOST_UPDATED,
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
@@ -30,12 +31,6 @@ const {
 
 const initialState = {
   currStoreId: 0,
-  simpleStore: {}, //使用前需校验是否与 currStoreId 对应, 没有则需要去服务器端获得; 默认随config等一起大批更新
-  config: {},
-  canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
-  canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
-  cfgOfKey: {},
-
   currentUser: null,
   currentNewProductStoreId: 0,
   expireTs: 0,
@@ -94,16 +89,7 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_CURR_STORE:
       if (action.payload) {
-        if (typeof action.payload.store != 'undefined') {
-          return {...state, currStoreId: action.payload.id, simpleStore: action.payload.store}
-        } else {
           return {...state, currStoreId: action.payload.id}
-        }
-      } else return state;
-
-    case SET_SIMPLE_STORE:
-      if (action.payload) {
-        return {...state, simpleStore: action.payload}
       } else return state;
 
     case SESSION_TOKEN_SUCCESS:
@@ -134,26 +120,29 @@ export default function globalReducer(state = initialState, action) {
         currentUserProfile: {},
         accessToken: '',
         refreshToken: '',
-        canReadStores: {},
-        canReadVendors: {},
         currentNewProductStoreId: 0,
         bleStarted: false
       };
 
-    case UPDATE_CFG:
-      const newState = action.payload ? {
+
+    case UPDATE_CONFIG:
+      return action.payload ? {
         ...state,
-        canReadStores: action.payload.canReadStores || state.canReadStores,
-        canReadVendors: action.payload.canReadVendors || state.canReadVendors,
-        config: action.payload.config || state.config,
+        currStoreId: action.payload.store_id || state.currStoreId,
+        store_id: action.payload.store_id || state.store_id,
+        vendor_id: action.payload.vendor_id || state.vendor_id,
+        store_info: action.payload.store_info || state.store_info,
+        vendor_info: action.payload.vendor_info || state.vendor_info,
+        help_uid: action.payload.help_uid || state.help_uid,
+        enabled_good_mgr: action.payload.enabled_good_mgr || state.enabled_good_mgr,
+        show_goods_monitor: action.payload.show_goods_monitor || state.show_goods_monitor,
+        show_sign_center: action.payload.show_sign_center || state.show_sign_center,
+        float_kf_icon: action.payload.float_kf_icon || state.float_kf_icon,
+        show_expense_center: action.payload.show_expense_center || state.show_expense_center,
+        is_record_request_monitor: action.payload.is_record_request_monitor || state.is_record_request_monitor,
+        customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
       } : state;
 
-      //有定义即可更新 simpleStore
-      if (typeof (action.payload.simpleStore) != 'undefined') {
-        state.simpleStore = action.payload.simpleStore
-      }
-
-      return newState;
     case HOST_UPDATED:
       const host = action.host;
       return host ? {...state, host} : state;

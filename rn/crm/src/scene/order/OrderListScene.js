@@ -17,7 +17,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getSimpleStore, setBleStarted, setCheckVersionAt, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
+import {setBleStarted, setCheckVersionAt, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
@@ -217,7 +217,7 @@ class OrderListScene extends Component {
 
   componentWillUnmount() {
     this.focus()
-    this.unSubscribe()
+    // this.unSubscribe()
     if (this.ptListener != null) {
       this.ptListener.remove();
     }
@@ -236,7 +236,7 @@ class OrderListScene extends Component {
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken, config} = global;
+    const {currStoreId, currentUser, accessToken} = global;
     if (this.ptListener) {
       this.ptListener.remove()
     }
@@ -324,7 +324,7 @@ class OrderListScene extends Component {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderListScene"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
     this.whiteNoLoginInfo()
     this.openAndroidNotification();
@@ -350,17 +350,17 @@ class OrderListScene extends Component {
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
       const {co_type, currVendorId} = tool.vendor(store.getState().global)
-      if (currVendorId === undefined||store.getState().global.config?.vendor?.id === '') {
+      if (currVendorId === undefined || store.getState().global?.vendor_id === '') {
         return;
       }
       const flag = store.getState().global.accessToken === global.noLoginInfo.accessToken &&
         store.getState().global.currentUser === global.noLoginInfo.currentUser &&
-        store.getState().global.currStoreId === global.noLoginInfo.currStoreId &&
+        store.getState().global.store_id === global.noLoginInfo.store_id &&
         store.getState().global.host === global.noLoginInfo.host &&
         co_type === global.noLoginInfo.co_type &&
         currVendorId === global.noLoginInfo.currVendorId &&
-        store.getState().global.config?.vendor?.id === global.noLoginInfo.storeVendorId &&
-        store.getState().global.config?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr
+        store.getState().global?.vendor_id === global.noLoginInfo.storeVendorId &&
+        store.getState().global?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr
 
       if (flag) {
         return
@@ -368,11 +368,11 @@ class OrderListScene extends Component {
       const noLoginInfo = {
         accessToken: store.getState().global.accessToken,
         currentUser: store.getState().global.currentUser,
-        currStoreId: store.getState().global.currStoreId,
+        currStoreId: store.getState().global.store_id,
         host: store.getState().global.host || Config.defaultHost,
         co_type: co_type || '',
-        storeVendorId: store.getState().global.config?.vendor?.id || '',
-        enabledGoodMgr: store.getState().global.config?.enabled_good_mgr || '',
+        storeVendorId: store.getState().global?.vendor_id || '',
+        enabledGoodMgr: store.getState().global?.enabled_good_mgr || '',
         currVendorId: currVendorId || ''
       }
       global.noLoginInfo = noLoginInfo
@@ -599,11 +599,11 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType, setList = 1) => {
-    this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
-    const {currVendorId = global.noLoginInfo.currVendorId} = tool.vendor(this.props.global);
+    this.fetorderNum();
+    let vendor_id = this.props.global?.vendor_id
     let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = queryType || this.state.orderStatus;
@@ -616,7 +616,7 @@ class OrderListScene extends Component {
 
     let params = {
       status: initQueryType,
-      vendor_id: currVendorId,
+      vendor_id: vendor_id,
       offset: this.state.query.offset,
       limit: this.state.query.limit,
       max_past_day: 100,
@@ -628,7 +628,7 @@ class OrderListScene extends Component {
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-    if (currVendorId && accessToken) {
+    if (vendor_id && accessToken) {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
@@ -1022,7 +1022,7 @@ class OrderListScene extends Component {
                      accessToken={this.props.global.accessToken}
                      onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
-                     vendorId={currVendorId|| '0'}
+                     vendorId={currVendorId || '0'}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}

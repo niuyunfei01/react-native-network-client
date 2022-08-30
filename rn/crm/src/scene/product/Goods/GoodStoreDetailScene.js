@@ -128,7 +128,7 @@ class GoodStoreDetailScene extends PureComponent {
   componentDidMount() {
     GlobalUtil.setGoodsFresh(2)
     const {global, navigation} = this.props
-    const {fn_stall} = global.simpleStore
+    const {fn_stall} = global.store_info
     this.handleAuthItem('fn_stall', fn_stall ? fn_stall : '0')
     //showModal('加载中')
     const {accessToken} = global;

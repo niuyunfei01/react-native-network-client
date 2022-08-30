@@ -61,9 +61,9 @@ class TabHome extends React.Component {
     let remind = this.props.remind?.remindNum;
     let {route} = this.props
     let {co_type} = tool.vendor(this.props.global) ?? global.noLoginInfo.co_type;
-    let storeVendorId = Number(this.props?.global?.config?.vendor?.id !== undefined ? this.props.global.config.vendor.id : global.noLoginInfo.storeVendorId || 0)
+    let storeVendorId = Number(this.props?.global?.vendor_id !== undefined ? this.props?.global?.vendor_id : global.noLoginInfo.storeVendorId || 0)
 
-    let enabledGoodMgr = Number(this.props.global?.config?.enabled_good_mgr !== undefined ? this.props.global.config.enabled_good_mgr : global.noLoginInfo.enabledGoodMgr)
+    let enabledGoodMgr = Number(this.props.global?.enabled_good_mgr !== undefined ? this.props.global.enabled_good_mgr : global.noLoginInfo.enabledGoodMgr)
     if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
@@ -100,7 +100,7 @@ class TabHome extends React.Component {
             }
           />
         </If>
-        <If condition={this.props.global?.simpleStore?.fn_stall === '1'}>
+        <If condition={this.props.global?.store_info?.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{

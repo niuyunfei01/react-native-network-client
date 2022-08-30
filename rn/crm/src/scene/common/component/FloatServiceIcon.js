@@ -12,6 +12,7 @@ import native from "../../../pubilc/util/native";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+import PropTypes from "prop-types";
 
 
 function mapStateToProps(state) {
@@ -23,6 +24,11 @@ let height = Dimensions.get("window").height;
 let width = Dimensions.get("window").width;
 
 class FloatServiceIcon extends React.Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props)
     this.mixpanel = MixpanelInstance;
@@ -94,13 +100,13 @@ class FloatServiceIcon extends React.Component {
 
   render() {
     const {global, dispatch} = this.props
-    let {user_config, config, show_float_service_icon} = global;
+    let {user_config, show_float_service_icon} = global;
     let {top, left} = user_config !== undefined && user_config?.coordinate ? user_config?.coordinate : {
       top: height * 0.65,
       left: width * 0.82
     };
 
-    if (Number(config.float_kf_icon) !== 1 || !show_float_service_icon) {
+    if (Number(global?.float_kf_icon) !== 1 || !show_float_service_icon) {
       return null;
     }
     return (

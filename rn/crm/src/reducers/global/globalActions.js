@@ -17,13 +17,10 @@ import {
   checkBindExt,
   checkMessageCode,
   getStoreDelivery,
-  queryAddress,
-  queryPlatform,
   unbindExt,
   updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import tool from "../../pubilc/util/tool";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
 import HttpUtils from "../../pubilc/util/http";
@@ -40,9 +37,8 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
-  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
-  UPDATE_CFG,
+  UPDATE_CONFIG,
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
@@ -101,47 +97,11 @@ export function setUserProfile(profile) {
  * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
  * @returns {{payload: {id: *}, type: *}}
  */
-export function setCurrentStore(currStoreId, simpleStore = null) {
+export function setCurrentStore(currStoreId) {
   const payload = {id: currStoreId};
-  if (simpleStore !== null) {
-    payload.store = simpleStore
-  }
   return {
     type: SET_CURR_STORE,
     payload: payload
-  }
-}
-
-/**
- * 获取当前店铺信息；如果不存在，则需自行获取
- * @param global
- * @param dispatch if null, means don't do dispatch
- * @param storeId if null,使用currStoreId
- * @param callback
- * @returns {*}
- */
-export function getSimpleStore(global, dispatch = null, storeId = null, callback = (store) => {
-}) {
-  const {currStoreId, simpleStore} = global
-  const id = null === storeId ? currStoreId : storeId
-  if (simpleStore && simpleStore.id == id) {
-    callback(simpleStore)
-  } else {
-    const {accessToken} = global;
-    HttpUtils.get.bind({global})(`/api/read_store_simple/${id}?access_token=${accessToken}`).then(store => {
-      if (dispatch) {
-        dispatch(setSimpleStore(store))
-      }
-      callback(store)
-    }, (res) => {
-    })
-  }
-}
-
-export function setSimpleStore(store) {
-  return {
-    type: SET_SIMPLE_STORE,
-    payload: store
   }
 }
 
@@ -188,13 +148,14 @@ export function setUserCfg(info) {
   }
 }
 
-export function updateCfg(cfg) {
+
+export function updateConfig(config) {
   return {
-    type: UPDATE_CFG,
-    payload: cfg,
-    last_get_cfg_ts: dayjs(new Date()).unix(),
+    type: UPDATE_CONFIG,
+    payload: config,
   }
 }
+
 
 export function logout(callback) {
   return dispatch => {
@@ -244,26 +205,13 @@ export function check_is_bind_ext(params, callback) {
   }
 }
 
-export function getCommonConfig(token, storeId, callback) {
+export function getConfig(token, storeId, callback) {
   return dispatch => {
-    const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
+    const url = `api/get_app_config?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
-        let {can_read_vendors, can_read_stores, simpleStore} = trans_data_to_java(json.obj);
-        const config = json.obj
-        config.can_read_stores = undefined
-        config.can_read_vendors = undefined
-        let cfg = {
-          canReadStores: can_read_stores,
-          canReadVendors: can_read_vendors,
-          config: config,
-        };
-
-        if (simpleStore && simpleStore.id) {
-          cfg.simpleStore = simpleStore
-        }
-        dispatch(updateCfg(cfg));
-        callback && callback(true, '获取配置成功', cfg)
+        dispatch(updateConfig(json.obj));
+        callback && callback(true, '获取配置成功', json.obj)
       } else {
         callback && callback(false, json.reason)
       }
@@ -274,27 +222,6 @@ export function getCommonConfig(token, storeId, callback) {
   }
 }
 
-export function trans_data_to_java(obj) {
-  let {can_read_vendors} = obj;
-  let vendor_list = {};
-  for (let vendor of can_read_vendors) {
-    let vendor_id = vendor['id'];
-    vendor_list[vendor_id] = vendor;
-  }
-  obj.can_read_vendors = vendor_list;
-
-  tool.objectMap(obj.can_read_stores, function (stores) {
-    let vendor_id = stores['type'];
-    stores['vendor_id'] = vendor_id;
-    let vendor_info = vendor_list[vendor_id];
-    if (vendor_info !== undefined) {
-      stores['vendor'] = vendor_info['brand_name'];
-    }
-    return stores;
-  });
-
-  return obj;
-}
 
 /**
  *
@@ -395,21 +322,8 @@ export function checkPhone(params, callback) {
   }
 }
 
-export function platformList(stores_id, callback) {
-
-  return dispatch => {
-    return queryPlatform(stores_id)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
-}
 
 export function unBind(params, callback) {
-
   return dispatch => {
     return unbindExt(params)
       .then(response => {
@@ -422,22 +336,7 @@ export function unBind(params, callback) {
   }
 }
 
-export function getAddress(callback) {
-
-  return dispatch => {
-    return queryAddress()
-      .then(json => {
-        callback(true, json)
-      })
-      .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-
-  }
-}
-
 export function showStoreDelivery(ext_store_id, callback) {
-
   return dispatch => {
     return getStoreDelivery(ext_store_id)
       .then(response => {
@@ -481,13 +380,11 @@ export function customerApply(params, callback, props) {
         const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
         dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
         const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-
         const authCallback = (ok, msg, profile) => {
           if (ok) {
             dispatch(setUserProfile(profile));
           }
         };
-
         if (Platform.OS === 'ios') {
           doAuthLogin(access_token, expire, props, authCallback)
         } else {
@@ -496,19 +393,9 @@ export function customerApply(params, callback, props) {
             authCallback(ok, msg, profile)
           });
         }
-      })
-      .catch((error) => {
+      }).catch((error) => {
         callback(false, error.reason, [])
       })
   }
 }
 
-export function checkIsKf(token, callback) {
-  const url = `api/is_kf?access_token=${token}`;
-  getWithTpl(url, (json) => {
-      callback(json.ok, json.reason, json.obj)
-    }, (error) => {
-      callback(false, "网络错误, 请稍后重试")
-    }
-  )
-}

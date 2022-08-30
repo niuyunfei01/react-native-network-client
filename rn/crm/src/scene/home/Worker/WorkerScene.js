@@ -24,6 +24,7 @@ import {NavigationActions} from '@react-navigation/compat';
 import CallBtn from "../../order/CallBtn";
 import * as tool from "../../../pubilc/util/tool";
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -42,16 +43,21 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class WorkerScene extends PureComponent {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    mine: PropTypes.obj,
+    route: PropTypes.obj,
+  }
+
   constructor(props) {
     super(props);
     const {
       currentUser,
-      currStoreId,
-      canReadStores,
+      vendor_id,
+      vendor_info,
     } = this.props.global;
 
-    let currVendorId = canReadStores[currStoreId]['type'];
-    let currVendorName = canReadStores[currStoreId]['vendor'];
 
     const {mine, navigation} = this.props;
     navigation.setOptions({
@@ -64,10 +70,10 @@ class WorkerScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: currVendorName,
-      normal: mine.normal[currVendorId],
-      forbidden: mine.forbidden[currVendorId],
+      currVendorId: vendor_id,
+      currVendorName: vendor_info?.brand_name,
+      normal: mine?.normal[vendor_id],
+      forbidden: mine?.forbidden[vendor_id],
       limit_store: 0,
     };
 

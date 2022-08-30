@@ -79,7 +79,7 @@ class OrderSearchScene extends PureComponent {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
@@ -155,7 +155,7 @@ class OrderSearchScene extends PureComponent {
                      key={index}
                      onRefresh={() => this.onRefresh()}
                      navigation={navigation}
-                     vendorId={global.config.vendor.id}
+                     vendorId={global?.vendor_id}
                      setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}

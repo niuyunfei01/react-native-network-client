@@ -243,14 +243,13 @@ class OrderInfo extends Component {
 
   componentDidMount() {
     let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
-    let {wsb_store_account} = this.props.global?.config?.vendor
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
-    if (is_service_mgr || wsb_store_account === "1") {
+    if (is_service_mgr || this.props.global?.vendor_info?.wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
     if (this._fnProvidingOnway()) {
@@ -294,13 +293,13 @@ class OrderInfo extends Component {
     timeObj.method[0].interfaceName = ''
     timeObj.method[0].methodName = 'componentDidUpdate'
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {currStoreId, currentUser, accessToken} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderInfo"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
@@ -619,7 +618,7 @@ class OrderInfo extends Component {
   _fnProvidingOnway = () => {
     const {global} = this.props;
     const storeId = this.state.order.store_id;
-    return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+    return storeId && storeId > 0 && global?.vendor_info?.fnProvidingOnway;
   }
 
   _orderChangeLogQuery = () => {

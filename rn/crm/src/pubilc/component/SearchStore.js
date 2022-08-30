@@ -35,9 +35,12 @@ class SearchStore extends React.Component {
 
   componentDidMount() {
     const {
-      canReadStores
+      store_info
+      // canReadStores
     } = this.props.global;
     let dataSource = [];
+    let canReadStores = [store_info];
+
     for (let key in canReadStores) {
       let item = {...canReadStores[key]};
       item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
