@@ -131,11 +131,8 @@ class HelpScene extends PureComponent {
       if (resp.ok) {
         let {questions, types} = resp.obj
         this.setState({questions, types})
-      } else {
-
       }
       hideModal()
-      // this.setState({query: false});
     }))
   }
 

@@ -17,12 +17,6 @@ const {
 } = require('../../pubilc/common/constants').default
 
 
-export function getContactSucc(json) {
-  return {
-    type: GET_CONTACT_SUCCESS,
-    payload: json
-  }
-}
 
 
 export function getContactRequest(data) {

@@ -12,10 +12,7 @@ import dayjs from "dayjs";
  *
  */
 const {
-
-  GET_CONTACT_REQUEST,
   GET_CONTACT_SUCCESS,
-  GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
   SET_RECORD_FLAG
