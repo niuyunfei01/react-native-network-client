@@ -486,18 +486,22 @@ class DeliveryList extends PureComponent {
     }
   }
 
-  unDisableBtn = () => {
+  unDisableBtn = (status) => {
     if (this.state.disable_id !== 0) {
-      Alert.alert('提醒', `禁用后无法使用此配送发单，确定禁用吗？`, [
-        {
-          text: '确定',
-          onPress: () => {
-            this.undisable();
-          },
-        }, {
-          text: '取消'
-        }
-      ])
+      if (status === '禁用') {
+        Alert.alert('提醒', `禁用后无法使用此配送发单，确定禁用吗？`, [
+          {
+            text: '确定',
+            onPress: () => {
+              this.undisable();
+            },
+          }, {
+            text: '取消'
+          }
+        ])
+      } else {
+        this.undisable();
+      }
     }
   }
 
@@ -619,7 +623,7 @@ class DeliveryList extends PureComponent {
                   disable_id: info.v2_type,
                   delivery_way_state: info.is_forbidden
                 }, () => {
-                  this.unDisableBtn()
+                  this.unDisableBtn('启用')
                 })
               } else {
                 this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
@@ -843,7 +847,7 @@ class DeliveryList extends PureComponent {
     return (
       <View style={styles.bottomBtn}>
         <Button title={'确认'}
-                onPress={() => this.unDisableBtn()}
+                onPress={() => this.unDisableBtn('禁用')}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
                   backgroundColor: this.state.disable_id !== 0 ? colors.main_color : colors.fontColor,
