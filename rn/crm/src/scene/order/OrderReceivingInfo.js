@@ -5,7 +5,6 @@ import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOp
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
-import tool from "../../pubilc/util/tool";
 import {Button} from 'react-native-elements';
 import pxToDp from "../../pubilc/util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
