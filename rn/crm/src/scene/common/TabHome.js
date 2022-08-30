@@ -7,16 +7,15 @@ import colors from "../../pubilc/styles/colors";
 import {Badge} from 'react-native-elements'
 import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
-import {setRecordFlag} from "../../reducers/store/storeActions";
 import tool from "../../pubilc/util/tool";
 
 import OrderListScene from '../order/OrderListScene'
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
-  const {global, remind} = state;
-  return {global: global, remind: remind};
+  const {global} = state;
+  return {global: global};
 }
 
 const Tab = createBottomTabNavigator();
@@ -31,16 +30,20 @@ const tabBarOptions = {
 }
 
 class TabHome extends React.Component {
+
+  static propTypes = {
+    route: PropTypes.object,
+    remind: PropTypes.object,
+  }
+
   constructor(props) {
     super(props)
-
     this.state = {
       showFlag: false
     }
   }
 
   componentDidMount() {
-    this.fetchShowRecordFlag()
     this.unSubscribe = store.subscribe(() => {
       this.setState({
         showFlag: store.getState().payload
@@ -52,21 +55,11 @@ class TabHome extends React.Component {
     this.unSubscribe()
   }
 
-  fetchShowRecordFlag() {
-    const {accessToken, currentUser} = this.props.global;
-    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      if (res.ok) {
-        store.dispatch(setRecordFlag(true))
-      } else {
-        store.dispatch(setRecordFlag(false))
-      }
-    })
-  }
 
   render() {
     let isBlx = false;
-    let {remind = [], route} = this.props
+    let remind = this.props.remind?.remindNum;
+    let {route} = this.props
     let {co_type} = tool.vendor(this.props.global) ?? global.noLoginInfo.co_type;
     let storeVendorId = Number(this.props?.global?.config?.vendor?.id !== undefined ? this.props.global.config.vendor.id : global.noLoginInfo.storeVendorId || 0)
 
@@ -107,7 +100,7 @@ class TabHome extends React.Component {
             }
           />
         </If>
-        <If condition={this.props.global.simpleStore.fn_stall === '1'}>
+        <If condition={this.props.global?.simpleStore?.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
@@ -138,7 +131,6 @@ class TabHome extends React.Component {
         <Tab.Screen
           name="Orders"
           component={OrderListScene}
-          //getComponent={() => require('../order/OrderListScene').default}
           options={
             {
               tabBarLabel: "订单",

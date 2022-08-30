@@ -21,6 +21,7 @@ import {nrInit, nrRecordMetric} from './pubilc/util/NewRelicRN.js';
 import ErrorBoundary from "./pubilc/component/ErrorBoundary";
 import {getNoLoginInfo} from "./pubilc/common/noLoginInfo";
 import store from "./pubilc/util/configureStore";
+import PropTypes from "prop-types";
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   statusBar: {
-    height: Platform.OS === "ios" ? 20 : StatusBar.currentHeight,
+    height: StatusBar.currentHeight,
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
@@ -39,6 +40,11 @@ Text.defaultProps = {...(Text.defaultProps || {}), color: '#333', allowFontScali
 TextInput.defaultProps = {...(TextInput.defaultProps || {}), allowFontScaling: false};
 
 class RootScene extends PureComponent {
+
+  static propTypes = {
+    launchProps: PropTypes.object,
+  }
+
   constructor() {
     super();
     StatusBar.setBarStyle("light-content");
@@ -61,28 +67,14 @@ class RootScene extends PureComponent {
 
   getInfo = () => {
     getNoLoginInfo().then(info => {
-
       const noLoginInfo = JSON.parse(info)
-
       if (noLoginInfo.accessToken) {
-
-        store.dispatch(getCommonConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
-
-        HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {
-          GlobalUtil.setUser(res).then()
-        })
-        HttpUtils.get(`/api/read_store_simple/${noLoginInfo.currStoreId}?access_token=${noLoginInfo.accessToken}`).then(res => {
-          store.dispatch(setSimpleStore(res))
-        })
-
         this.setState({
           rehydrated: true,
           noLoginInfo: noLoginInfo
         });
-
       } else {
-        console.log('没有免登录信息')
         this.setState({
           rehydrated: true,
         });
@@ -98,12 +90,9 @@ class RootScene extends PureComponent {
 
   componentDidMount() {
     this.getInfo()
-
   }
 
-
   render() {
-
     return this.state.rehydrated ? this.getRootView() : this.getEmptyView()
   }
 
@@ -114,7 +103,6 @@ class RootScene extends PureComponent {
   getRootView = () => {
     global.isLoginToOrderList = false
     const {launchProps} = this.props;
-
     const {orderId, backPage} = launchProps;
     let initialRouteName = launchProps["_action"];
     if (backPage) {
@@ -123,10 +111,7 @@ class RootScene extends PureComponent {
     let initialRouteParams = launchProps["_action_params"] || {};
     const {noLoginInfo} = this.state;
     global.noLoginInfo = noLoginInfo
-    // console.log('getRootView noLoginInfo',noLoginInfo)
     if (!noLoginInfo.accessToken) {
-      // showError("请您先登录")
-
       initialRouteName = Config.ROUTE_LOGIN;
       initialRouteParams = {next: "", nextParams: {}};
     } else {
@@ -147,20 +132,17 @@ class RootScene extends PureComponent {
       login_user: noLoginInfo.currentUser ?? '未登录'
     })
 
-    // on Android, the URI prefix typically contains a host in addition to scheme
-    //const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     let rootView = (
       <Provider store={store}>
         <ErrorBoundary>
           <View style={styles.container}>
-            <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
+            <View style={styles.statusBar}>
               <StatusBar backgroundColor={"transparent"} translucent/>
             </View>
             <AppNavigator initialRouteName={initialRouteName}
                           initialRouteParams={initialRouteParams}/>
           </View>
         </ErrorBoundary>
-
       </Provider>
     )
     if (Platform.OS === 'ios') {
@@ -172,8 +154,6 @@ class RootScene extends PureComponent {
     }
     return rootView
   }
-
-
 }
 
 export default RootScene;

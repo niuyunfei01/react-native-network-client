@@ -66,14 +66,6 @@ export default class GlobalUtil {
     if (global.host) {
       this.setHostPort(global.host);
     }
-    /** 暂时先不使用native的host，避免错误
-     native.host((host) => {
-      if (host) {
-        this.setHostPort(host);
-        callback();
-      }
-    });
-     */
   }
 
   static async getUser() {
@@ -134,6 +126,7 @@ export default class GlobalUtil {
     }
     return `${parseFloat(num).toFixed(2)}KB`
   }
+
   static getDeviceInfo = async () => {
     const fontScale = await DeviceInfo.getFontScale();
     const freeDiskStorage = await DeviceInfo.getFreeDiskStorage()
