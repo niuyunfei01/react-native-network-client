@@ -73,6 +73,7 @@ class OrderSettingScene extends Component {
       smartText: '',
       isSaveToBook: false,
       addressId: '',
+      isType: false
     };
     this._toSetLocation = this._toSetLocation.bind(this);
   }
@@ -219,7 +220,7 @@ class OrderSettingScene extends Component {
     let {
       remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
-      is_right_once, loc_lng, loc_lat, location_long, location_lat, isSaveToBook, addressId
+      is_right_once, loc_lng, loc_lat, location_long, location_lat, isSaveToBook, addressId, isType
     } = this.state
     const self = this;
 
@@ -240,7 +241,7 @@ class OrderSettingScene extends Component {
       "is_right_once": is_right_once,
       "loc_lng": loc_lng,
       "loc_lat": loc_lat,
-      "address": `${location_long}(${location_lat}${address})`,
+      "address": isType ? `${location_lat}(${location_long})` : `${location_lat}(${location_long}${address})`,
       "mobile": mobile,
       "mobile_suffix": mobile_suffix,
       "weight": weight,
@@ -316,13 +317,14 @@ class OrderSettingScene extends Component {
     this.setState({
       name: resp !== undefined ? resp?.name : '',
       mobile: resp !== undefined ? resp?.phone : '',
-      address: resp !== undefined ? resp?.address : '',
+      address: resp !== undefined ? resp?.street_block : '',
       addressId: resp !== undefined ? resp?.id : '',
       coordinates: resp !== undefined ? resp?.lng + ',' + resp?.lat : '',
       loc_lng: resp !== undefined ? resp?.lng : '',
       location_long: resp !== undefined ? resp?.street_block : '',
       location_lat: resp !== undefined ? resp?.address : '',
-      loc_lat: resp !== undefined ? resp?.lat : ''
+      loc_lat: resp !== undefined ? resp?.lat : '',
+      isType: true
     })
   }
 

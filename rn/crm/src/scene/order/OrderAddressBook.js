@@ -10,7 +10,8 @@ import {Button, SearchBar} from 'react-native-elements';
 import pxToDp from "../../pubilc/util/pxToDp";
 import Config from "../../pubilc/common/config";
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
+import tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   return {
@@ -185,8 +186,11 @@ class OrderAddressBook extends Component {
               borderRadius: 10,
               backgroundColor: colors.white
             }} onPress={() => {
-              this.props.route.params.onBack(info)
-              this.props.navigation.goBack()
+              ToastShort('载入中')
+              tool.debounces(() => {
+                this.props.route.params.onBack(info)
+                this.props.navigation.goBack()
+              }, 1000)
             }}>
               <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin: 15}}>
                 <View style={{flexDirection: "row"}}>

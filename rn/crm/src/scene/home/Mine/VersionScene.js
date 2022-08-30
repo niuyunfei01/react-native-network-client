@@ -8,6 +8,8 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import Config from "../../../pubilc/common/config";
 import DeviceInfo from "react-native-device-info";
 import {Button} from "react-native-elements";
+import HttpUtils from "../../../pubilc/util/http";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -34,38 +36,50 @@ class VersionScene extends PureComponent {
       newest_version_name: '',
       curr_version: '未知',
       curr_version_name: '未知',
+      version: '',
+      build_number: ''
     };
-
   }
 
   componentDidMount() {
-    this._check_version();
+    this.setVersion()
   }
 
-  _check_version() {
-    let platform = Platform.OS === 'ios' ? 'ios' : 'android';
-    let plat_version = this.props.global?.config?.v_b;
-    let newest_version = plat_version ? plat_version[platform] : '';
-    let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
+  setVersion = () => {
+    showModal('获取版本信息中')
+    let { accessToken } = this.props.global;
+    const api = `/api/check_version?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      hideModal()
+      this.setState({
+        build_number: res?.build_number,
+        version: res?.version
+      })
+      let {version, build_number} = this.state
+      let platform = Platform.OS === 'ios' ? 'ios' : 'android';
+      let plat_version = version
 
-    const version_name = DeviceInfo.getVersion();
-    const version_code = DeviceInfo.getBuildNumber();
+      let newest_version = build_number;
+      let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
 
-    let is_newest_version = false;
-    if (parseInt(version_code) >= newest_version) {
+      const version_name = DeviceInfo.getVersion();
+      const version_code = DeviceInfo.getBuildNumber();
 
-      is_newest_version = true;
-      newest_version = version_code;
-      newest_version_name = version_name;
-    }
-    this.setState({
-      newest_version: newest_version,
-      newest_version_name: newest_version_name,
-      is_newest_version: is_newest_version,
-      curr_version: version_code,
-      curr_version_name: version_name,
-      isRefreshing: false
-    });
+      let is_newest_version = false;
+      if (parseInt(version_code) >= newest_version) {
+        is_newest_version = true;
+        newest_version = version_code;
+        newest_version_name = version_name;
+      }
+      this.setState({
+        newest_version: newest_version,
+        newest_version_name: newest_version_name,
+        is_newest_version: is_newest_version,
+        curr_version: version_code,
+        curr_version_name: version_name,
+        isRefreshing: false
+      })
+    }).catch(() => {})
   }
 
   render() {
@@ -88,7 +102,7 @@ class VersionScene extends PureComponent {
         style={{backgroundColor: colors.main_back}}>
         {is_newest_version ? (
           <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
-            <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version}) </Text>
+            <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version})    </Text>
             <Text style={styles.newest_version}>已是最新版本</Text>
           </View>
         ) : (
