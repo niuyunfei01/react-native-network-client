@@ -9,6 +9,7 @@ import Config from "../../../pubilc/common/config";
 import DeviceInfo from "react-native-device-info";
 import {Button} from "react-native-elements";
 import HttpUtils from "../../../pubilc/util/http";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -41,47 +42,44 @@ class VersionScene extends PureComponent {
   }
 
   componentDidMount() {
-    this.fetchVersion()
-    this._check_version();
+    this.setVersion()
   }
 
-  fetchVersion = () => {
+  setVersion = () => {
+    showModal('获取版本信息中')
     let { accessToken } = this.props.global;
     const api = `/api/check_version?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
+      hideModal()
       this.setState({
         build_number: res?.build_number,
         version: res?.version
       })
-    })
-  }
+      let {version, build_number} = this.state
+      let platform = Platform.OS === 'ios' ? 'ios' : 'android';
+      let plat_version = version
 
-  _check_version() {
-    let {version, build_number} = this.state
-    let platform = Platform.OS === 'ios' ? 'ios' : 'android';
-    let plat_version = version
+      let newest_version = build_number;
+      let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
 
-    let newest_version = build_number;
-    let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
+      const version_name = DeviceInfo.getVersion();
+      const version_code = DeviceInfo.getBuildNumber();
 
-    const version_name = DeviceInfo.getVersion();
-    const version_code = DeviceInfo.getBuildNumber();
-
-    let is_newest_version = false;
-    if (parseInt(version_code) >= newest_version) {
-
-      is_newest_version = true;
-      newest_version = version_code;
-      newest_version_name = version_name;
-    }
-    this.setState({
-      newest_version: newest_version,
-      newest_version_name: newest_version_name,
-      is_newest_version: is_newest_version,
-      curr_version: version_code,
-      curr_version_name: version_name,
-      isRefreshing: false
-    });
+      let is_newest_version = false;
+      if (parseInt(version_code) >= newest_version) {
+        is_newest_version = true;
+        newest_version = version_code;
+        newest_version_name = version_name;
+      }
+      this.setState({
+        newest_version: newest_version,
+        newest_version_name: newest_version_name,
+        is_newest_version: is_newest_version,
+        curr_version: version_code,
+        curr_version_name: version_name,
+        isRefreshing: false
+      })
+    }).catch(() => {})
   }
 
   render() {
