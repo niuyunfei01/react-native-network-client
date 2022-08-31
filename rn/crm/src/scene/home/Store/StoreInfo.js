@@ -996,30 +996,6 @@ class StoreInfo extends Component {
             underlineColorAndroid="transparent"
           />
         </View>
-        <View style={{
-          borderBottomWidth: 1,
-          borderColor: colors.colorCCC,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 8,
-        }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>门店地址 </Text>
-          <TextInput
-            onChangeText={dada_address => this.setState({dada_address})}
-            value={dada_address}
-            placeholder="请输入门店地址"
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
-            underlineColorAndroid="transparent"
-          />
-        </View>
 
         <View style={{
           borderBottomWidth: 1,
@@ -1064,6 +1040,31 @@ class StoreInfo extends Component {
           }}/>
 
         </View>
+        <View style={{
+          borderBottomWidth: 1,
+          borderColor: colors.colorCCC,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 8,
+        }}>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color333,
+          }}>门店地址 </Text>
+          <TextInput
+            onChangeText={dada_address => this.setState({dada_address})}
+            value={dada_address}
+            placeholder="请输入门店地址"
+            style={{
+              textAlign: 'right',
+              fontSize: 14,
+              flex: 1,
+              height: pxToDp(90),
+            }}
+            underlineColorAndroid="transparent"
+          />
+        </View>
+
 
         <View style={{
           borderBottomWidth: 1,
