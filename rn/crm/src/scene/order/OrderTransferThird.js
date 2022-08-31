@@ -794,6 +794,7 @@ class OrderTransferThird extends Component {
         }}>
           <TouchableOpacity onPress={() => {
             this.setState({showErr: !this.state.showErr})
+            this.mixpanel.track('呼叫配送页_ 查看原因')
           }} style={{
             flexDirection: "row",
             justifyContent: "space-between",
