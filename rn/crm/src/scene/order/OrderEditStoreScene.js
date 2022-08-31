@@ -1,14 +1,14 @@
 import React, {Component} from 'react'
-import {ScrollView, StyleSheet, Text, View} from 'react-native'
-import tool from '../../pubilc/util/tool'
-import {bindActionCreators} from "redux";
-import CommonStyle from '../../pubilc/util/CommonStyles'
-
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import {orderChgStore} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import colors from "../../pubilc/styles/colors";
-import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
-import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
+import Entypo from "react-native-vector-icons/Entypo";
+import {Button, Input} from "react-native-elements";
+import PropTypes from "prop-types";
+import Config from "../../pubilc/common/config";
 
 function mapStateToProps(state) {
   return {
@@ -21,129 +21,147 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderEditStoreScene extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props: Object) {
     super(props);
     this.state = {
-      reasons: [],
-      toStoreId: -1,
+      store_id: -1,
       why: '',
-      isChecked: false,
+      store_name: '',
     };
-    this._onStoreSelected = this._onStoreSelected.bind(this);
-    this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
   }
 
-  _onStoreSelected(toStoreId) {
-    this.setState({
-      toStoreId,
-      isChecked: true
-    });
-  }
-
-  _checkDisableSubmit() {
-    return !(this.state.toStoreId);
-  }
-
   _doReply() {
-    const {dispatch, global, navigation, route} = this.props;
+    const {dispatch, global, route, navigation} = this.props;
     const {order} = (route.params || {});
+    let {store_id, why} = this.state;
     if (order) {
       showModal('加载中')
-      dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
+      dispatch(orderChgStore(global.accessToken, order.id, store_id, order.store_id, why, (ok, msg) => {
         hideModal();
         if (ok) {
           showSuccess("订单已修改")
+          navigation.goBack();
         } else {
-          this.setState({errorHints: msg});
+          ToastLong(msg)
         }
       }))
     }
   }
 
+  selectStore = (item) => {
+    this.setState({
+      store_id: item?.id,
+      store_name: item?.name,
+    })
+  }
+
   render() {
-    return (
-      <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-        <Text style={{fontSize:20,color:colors.color333}}>正在开发中，转单请联系客服 </Text>
+    let {store_name} = this.state;
+    return <ScrollView style={{flex: 1, backgroundColor: colors.background, paddingHorizontal: 10}}>
+      <View style={{
+        backgroundColor: colors.white,
+        borderRadius: 8,
+        marginVertical: 10,
+        padding: 10,
+        paddingBottom: 4,
+      }}>
+        <View style={{
+          borderBottomWidth: 1,
+          paddingBottom: 2,
+          borderColor: colors.colorCCC
+        }}>
+          <Text style={{
+            color: colors.color333,
+            padding: 10,
+            paddingLeft: 8,
+            fontSize: 15,
+            fontWeight: 'bold',
+          }}>将订单转给 </Text>
+        </View>
+        <TouchableOpacity onPress={() => {
+          this.props.navigation.navigate(Config.ROUTE_STORE_SELECT, {
+            onBack: (item) => {
+              this.selectStore(item)
+            }
+          })
+        }}
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            paddingHorizontal: 8,
+                            height: 50,
+                            borderBottomWidth: 1,
+                            borderColor: colors.colorCCC
+                          }}>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color333,
+          }}>接收门店 </Text>
+          <Text style={[{
+            fontSize: 14,
+            color: colors.color666,
+            flex: 1,
+            textAlign: "right",
+          }]}>
+            {store_name ? store_name : '去添加'}
+          </Text>
+          <Entypo name="chevron-thin-right" style={{
+            color: colors.color999,
+            fontSize: 18,
+          }}/>
+        </TouchableOpacity>
+
+        <Input containerStyle={{
+          marginVertical: 8,
+          marginHorizontal: "4%",
+          width: '92%',
+          borderWidth: 1,
+          borderColor: colors.fontGray,
+          height: 120,
+        }}
+               inputContainerStyle={{
+                 borderWidth: 0,
+                 height: 118,
+               }}
+               inputStyle={{}}
+               placeholder="请输入改店原因（选填）" value={this.state.why}
+               onChangeText={(why) => this.setState({why})}/>
       </View>
-    )
-    const {order} = (this.props.route.params || {});
-    const {global} = this.props;
-
-    const orderStoreId = order.store_id;
-    const currVendorId = (tool.store(global, orderStoreId) || {}).type;
-
-    //菜鸟和菜鸟食材视作同一个品牌
-    //以后要在服务器端实现
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.type == currVendorId || (currVendorId == 1 && store.type == 2) || (currVendorId == 2 && store.type == 1)) && store.id != orderStoreId);
-
-    const availableOptions = Object.keys(availableStores).map(store_id => {
-      if (store_id > 0) {
-        return {label: availableStores[store_id].name, value: store_id};
-      }
-    });
-
-    return <ScrollView style={[styles.container, {flex: 1}]}>
-
-      <Dialog onRequestClose={() => {
-      }}
-              visible={!!this.state.errorHints}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => {
-                  this.setState({errorHints: ''})
-                }
-              }]}
-      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
-
-      <CellsTitle style={styles.cellsTitle}>将订单转给门店</CellsTitle>
-      <RadioCells
-        style={{marginTop: 2}}
-        options={availableOptions}
-        onChange={this._onStoreSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.toStoreId}
-      />
-
-      <View>
-        <CellsTitle style={styles.cellsTitle}>改单原因</CellsTitle>
-        <Cells style={{marginTop: 2}}>
-          <Cell>
-            <CellBody>
-              <TextArea
-                maxLength={20}
-                placeholder="请输入改店原因（选填）"
-                onChange={(v) => {
-                  this.setState({why: v})
-                }}
-                value={this.state.why}
-                underlineColorAndroid={'transparent'}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-      </View>
-
-      <ButtonArea style={{marginTop: 35}}>
-        {this.state.isChecked ?
-          <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                  style={{marginHorizontal: 15}}>确认修改</Button> :
-          <Button type="primary" disabled={this._checkDisableSubmit()} onPress={() => {
-            showError('请先选择店铺')
-          }
-          }
-                  style={{backgroundColor: 'gray'}}>确认修改</Button>}
-
-      </ButtonArea>
-
-
+      {this.renderBtn()}
     </ScrollView>
   }
-}
 
-const styles = StyleSheet.create({
-  container: {backgroundColor: '#f2f2f2'},
-});
+  renderBtn() {
+    return (
+      <View style={{padding: 16}}>
+        <Button title={'保存'}
+                onPress={() => {
+                  if (this.state.store_id !== -1) {
+                    this._doReply()
+                  } else {
+                    ToastLong('请选择门店')
+                  }
+                }}
+                buttonStyle={{
+                  borderRadius: 5,
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
+    )
+  }
+
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderEditStoreScene)
