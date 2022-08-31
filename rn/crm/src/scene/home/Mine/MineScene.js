@@ -597,14 +597,12 @@ class MineScene extends Component {
     HttpUtils.get.bind(this.props)(api, {
       user_id: currentUser,
       flag: flag
-    }).then((res) => {
-
-    })
+    }).then()
   }
 
   onPress = (route, params = {}) => {
     if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
+      native.toUserComments().then();
       return;
     }
     this.props.navigation.navigate(route, params);
@@ -1020,7 +1018,7 @@ class MineScene extends Component {
     let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, store_info} = global
-    const added_service = store_info?.added_service;
+    const {added_service} = store_info;
     return (
       <>
         {this.renderHeader()}

@@ -194,20 +194,34 @@ class StoreGoodsSearch extends Component {
                            {/*    <Text style={{color: colors.color333}}>报价 </Text>*/}
                            {/*  </TouchableOpacity>*/}
                            {/*}*/}
-
-                           {onStrict ?
-                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
-                               <Text style={{color: colors.color333}}>价格/库存 </Text>
-                             </TouchableOpacity> :
-                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
-                               <Text style={{color: colors.color333}}>价格 </Text>
-                             </TouchableOpacity>
-                           }
+                           <If condition={product.price_type === 1}>
+                             {onStrict ?
+                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                                 onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                                 <Text style={{color: colors.color333}}>价格/库存 </Text>
+                               </TouchableOpacity> :
+                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                                 onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                                 <Text style={{color: colors.color333}}>价格 </Text>
+                               </TouchableOpacity>
+                             }
+                           </If>
+                           <If condition={product.price_type===0}>
+                             {onStrict ?
+                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                                 onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
+                                 <Text style={{color: colors.color333}}>报价/库存 </Text>
+                               </TouchableOpacity> :
+                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                                 onPress={() => this.onOpenModal('set_price', product)}>
+                                 <Text style={{color: colors.color333}}>报价 </Text>
+                               </TouchableOpacity>
+                             }
+                           </If>
 
                          </View>}/>
   }
+
   jumpToNewRetailPriceScene = (id) => {
     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {productId: id})
   }
@@ -220,12 +234,11 @@ class StoreGoodsSearch extends Component {
   }
 
   renderList() {
-    const products = this.state.goods
-    let items = []
-    for (const idx in products) {
-      items.push(this.renderRow(products[idx], idx))
-    }
-    return items
+    const {goods} = this.state
+    return goods.map((goods, index) => {
+      return this.renderRow(goods, index)
+    })
+
   }
 
   onClose = () => {

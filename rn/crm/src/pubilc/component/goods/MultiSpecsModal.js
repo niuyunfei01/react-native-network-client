@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import Config from "../../common/config";
-import {showError, showSuccess} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import InputBoard from "../InputBoard";
@@ -187,12 +187,18 @@ export default class MultiSpecsModal extends PureComponent {
     if (inventory.length > 0)
       params = {...params, inventorys: inventory}
     if (prices.length > 0)
+      showModal('提交中','loading',1000)
       HttpUtils.post.bind(this.props)(url, params).then(() => {
-        showSuccess('已完成', 3)
-      }, res => showError(res.reason, 1)).catch(e => {
+        showSuccess('修改成功')
+        onClose()
+      }, res => {
+        showError(res.reason, 1)
+        onClose()
+      }).catch(e => {
         showError(e.reason, 1)
+        onClose()
       })
-    onClose()
+
   }
 
   getItemLayout = (data, index) => ({
@@ -208,7 +214,7 @@ export default class MultiSpecsModal extends PureComponent {
     const {onClose, visible} = this.props
     const {data} = this.state
     return (
-      <CommonModal visible={visible} position={'flex-end'} onShow={this.onShow}>
+      <CommonModal visible={visible} position={'flex-end'} onShow={this.onShow} onRequestClose={onClose}>
         <View style={styles.visibleArea}>
           <InputBoard>
             <View style={styles.btn}>
