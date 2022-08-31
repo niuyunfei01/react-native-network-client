@@ -118,7 +118,8 @@ class GoodStoreDetailScene extends PureComponent {
         value: '',
         label: '请选择商品的规格'
       },
-      stallVisible: false
+      stallVisible: false,
+      price_type: 0
     };
 
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
@@ -247,7 +248,8 @@ class GoodStoreDetailScene extends PureComponent {
           product: params.item,
           store_prod: data.sp,
           isRefreshing: false,
-          selectedSpecArray: selectedSpecArray
+          selectedSpecArray: selectedSpecArray,
+          price_type: data?.vendor?.price_type ?? 0
         })
       } else {
         this.setState({
@@ -255,7 +257,8 @@ class GoodStoreDetailScene extends PureComponent {
           product: data.p,
           store_prod: data.sp,
           isRefreshing: false,
-          selectedSpecArray: selectedSpecArray
+          selectedSpecArray: selectedSpecArray,
+          price_type: data?.vendor?.price_type ?? 0
         })
       }
 
@@ -314,7 +317,9 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   render() {
-    let {full_screen, product, store_prod, selectItem, errorMsg, vendorId, product_id, activity} = this.state;
+    let {
+      full_screen, product, store_prod, selectItem, errorMsg, vendorId, product_id, activity, price_type
+    } = this.state;
     if (full_screen) {
       if (product_id != 0)
         return this.renderImg(product.list_img, product.source_img);
@@ -329,6 +334,7 @@ class GoodStoreDetailScene extends PureComponent {
     const onStrict = (store_prod || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     const {accessToken} = this.props.global;
     const applyingPrice = parseInt(store_prod.applying_price || store_prod.supply_price)
+
     return (
       <View style={styles.page}>
         <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
@@ -433,10 +439,27 @@ class GoodStoreDetailScene extends PureComponent {
                 </Text>
               </ModalSelector>
             </If>
-            <If condition={MORE_ITEM.length < 2}>
-              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
-                <Text style={styles.moreText}>价格 </Text>
-              </TouchableOpacity>
+            <If condition={MORE_ITEM.length === 1}>
+              <If condition={onStrict}>
+                <TouchableOpacity style={styles.toOnlineBtn}
+                                  onPress={() => this.onOpenModal('set_price_add_inventory')}>
+                  <Text style={styles.moreText}>报价/库存 </Text>
+                </TouchableOpacity>
+              </If>
+              <If condition={!onStrict}>
+                <If condition={price_type === 0}>
+                  <TouchableOpacity style={styles.toOnlineBtn}
+                                    onPress={() => this.onOpenModal('set_price')}>
+                    <Text style={styles.moreText}>报价 </Text>
+                  </TouchableOpacity>
+                </If>
+              </If>
+              <If condition={price_type === 1}>
+                <TouchableOpacity style={[styles.toOnlineBtn]}
+                                  onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+                  <Text style={styles.moreText}>价格 </Text>
+                </TouchableOpacity>
+              </If>
             </If>
           </View>
           {this.renderModalStall()}
@@ -604,10 +627,18 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
   onChange = (selectItem, store_prod) => {
-    const {ext_stores, selectedSpecArray, product} = this.state
+    const {ext_stores, selectedSpecArray, product, price_type} = this.state
+    const onStrict = (store_prod || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     switch (selectItem.value) {
       case '1':
-        this.jumpToNewRetailPriceScene(product.id)
+        if (price_type === 1) {
+          this.jumpToNewRetailPriceScene(product.id)
+          return
+        }
+        if (onStrict)
+          this.onOpenModal('set_price_add_inventory')
+        else
+          this.onOpenModal('set_price')
         break
       case '2':
         this.gotoStockCheck(store_prod)
@@ -685,7 +716,7 @@ class GoodStoreDetailScene extends PureComponent {
   };
 
   renderRuleStatusTab() {
-    let {activity, product, store_prod} = this.state;
+    let {activity, product, store_prod, price_type} = this.state;
     return (
       <View style={{
         flexDirection: "column",
@@ -706,7 +737,7 @@ class GoodStoreDetailScene extends PureComponent {
           }}>
             <If condition={activity && activity === 'offer'}>
               <Text style={styles.normalText}>
-                {`¥ ${store_prod?.show_price}`}
+                {`¥ ${price_type === '1' ? store_prod?.show_price : parseFloat(store_prod.supply_price / 100).toFixed(2) || '0'}`}
               </Text>
             </If>
             <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>

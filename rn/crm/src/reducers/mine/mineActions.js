@@ -72,12 +72,12 @@ export function fetchWorkers(_v_id, token, callback) {
           dispatch(receiveWorker(_v_id, {}));
           ToastLong(resp.desc);
         }
-        callback(resp);
+        callback && callback(resp);
       })
       .catch(error => {
         dispatch(receiveWorker(_v_id, {}));
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
+        callback && callback({ok: false, desc: error.message});
       });
   };
 }
@@ -314,11 +314,11 @@ export function userCanChangeStore(store_id, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        callback(resp);
+        callback && callback(resp);
       })
       .catch(error => {
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
+        callback && callback({ok: false, desc: error.message});
       });
   };
 }
