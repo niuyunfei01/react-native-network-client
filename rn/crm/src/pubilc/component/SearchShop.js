@@ -1,22 +1,34 @@
 import React, {Component} from 'react';
+import {
+  Dimensions,
+  FlatList,
+  InteractionManager,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from "../../reducers/global/globalActions";
-import {Dimensions, FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Button, SearchBar} from 'react-native-elements';
+import Cts from "../common/Cts";
 import tool from "../util/tool";
 import Config from "../common/config";
-import pxToDp from "../util/pxToDp";
-import colors from "../styles/colors";
 import {ToastLong} from "../util/ToastUtils";
-import {Button, SearchBar} from 'react-native-elements';
-import {MapType, MapView, Marker} from "react-native-amap3d";
-import Entypo from "react-native-vector-icons/Entypo";
+import {WebView} from "react-native-webview";
+import 'react-native-get-random-values';
+import pxToDp from "../util/pxToDp";
+import {Cell, CellBody, CellHeader} from "../../weui";
+import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import colors from "../styles/colors";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../reducers/global/globalActions";
 
 let height = Dimensions.get("window").height;
 
 function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global};
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 const mapDispatchToProps = dispatch => {
@@ -28,34 +40,39 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {center, cityName, keywords} = this.props.route.params;
+    const {onBack, isType, center, cityName} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
     let cityNames = cityName !== undefined && tool.length(cityName) > 0 ? cityName : "北京市"
-
     if (tool.store(this.props.global)) {
       let citymsg = tool.store(this.props.global);
       cityNames = citymsg.city
-      map.location = citymsg.loc_lng + "," + citymsg.loc_lat;
+      let location = citymsg.loc_lng + "," + citymsg.loc_lat;
+      map.name = '';
+      map.location = location
     }
     if (tool.length(center) > 0) {
+      map.name = '';
       map.location = center
       isMap = is_default = true;
     }
 
-    if (keywords) {
-      map.address = keywords
-      this.search()
-    }
-
     this.state = {
       shops: [],
-      searchKeywords: keywords,
+      page_size: 1,
+      page_num: Cts.GOODS_SEARCH_PAGE_NUM,
+      searchKeywords: this.props.route.params.keywords,
       isMap: isMap, //控制显示搜索还是展示地图
       is_default: is_default,
+      onBack,
+      isType,
       cityname: cityNames,
       shopmsg: map,
+      weburl: Config.apiUrl('/map.html')
+    }
+    if (this.props.route.params.keywords) {
+      this.search()
     }
   }
 
@@ -65,6 +82,8 @@ class SearchShop extends Component {
 
   search = () => {   //submit 事件 (点击键盘的 enter)
     tool.debounces(() => {
+      ToastLong("加载中")
+      this.state.loading = true;
       const searchKeywords = this.state.searchKeywords ? this.state.searchKeywords : '';
       if (searchKeywords) {
         let header = 'https://restapi.amap.com/v5/place/text?parameters?'
@@ -72,6 +91,7 @@ class SearchShop extends Component {
           keywords: searchKeywords,
           key: '85e66c49898d2118cc7805f484243909',
           city: this.state.cityname,
+          radius: "50000",
         }
         Object.keys(params).forEach(key => {
             header += '&' + key + '=' + params[key]
@@ -79,6 +99,7 @@ class SearchShop extends Component {
         )
         //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
+          this.state.loading = false;
           if (data.status === "1") {
             this.setState({
               shops: data.pois,
@@ -92,8 +113,12 @@ class SearchShop extends Component {
   }
 
   onChange = (searchKeywords) => {
-    this.setState({searchKeywords}, () => {
-      this.search()
+    const toUpdate = {searchKeywords};
+    if (this.state.searchKeywords !== searchKeywords) {
+      toUpdate.page = 1
+    }
+    this.setState(toUpdate, () => {
+      this.search(true)
     });
   }
 
@@ -118,15 +143,6 @@ class SearchShop extends Component {
     )
   }
 
-  setLatLng = (latitude, longitude) => {
-    let shopmsg = this.state.shopmsg;
-    shopmsg.location = longitude + ',' + latitude
-    this.setState({
-      is_default: false,
-      shopmsg
-    })
-  }
-
 
   choseItem() {
     return <View style={{
@@ -134,181 +150,128 @@ class SearchShop extends Component {
       top: 0,
       zIndex: 999,
       width: "100%",
-      padding: 10,
-      backgroundColor: colors.background
+      padding: pxToDp(20),
+      flexDirection: 'row',
+      backgroundColor: colors.colorEEE
     }}>
-      <View style={{flexDirection: "row", justifyContent: 'center', paddingBottom: 8}}>
-        <Text
-          style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>所选经纬度：{this.state.shopmsg.location} </Text>
-      </View>
-      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingBottom: 8}}>
-        <Entypo name="help-with-circle"
-                style={{fontSize: 15, color: colors.warn_color}}/>
-        <Text style={{fontSize: 12, color: colors.color333}}> 标注点长按三秒后可拖拽到指定地点 </Text>
-      </View>
-      <View style={{flexDirection: 'row',}}>
-        <Button title={'重新选择'}
-                onPress={() => {
-                  InteractionManager.runAfterInteractions(() => {
-                    this.setState({
-                      isMap: false,
-                      is_default: false,
-                    }, () => {
-                      ToastLong('请重新选择')
-                    })
-                  })
-                }}
-                buttonStyle={{
-                  borderRadius: pxToDp(10),
-                  backgroundColor: colors.fontColor,
-                  width: pxToDp(250),
-                  marginLeft: pxToDp(30),
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-        <View style={{flex: 1}}/>
-        <Button title={'确定地址'}
-                onPress={() => {
+      <Button title={'重新选择'}
+              onPress={() => {
 
-                  InteractionManager.runAfterInteractions(() => {
-                    if (!this.state.is_default) {
-                      this.props.route.params.onBack(this.state.shopmsg);
-                    }
-                    this.props.navigation.goBack();
+                InteractionManager.runAfterInteractions(() => {
+                  this.setState({
+                    isMap: false,
+                    is_default: false,
+                  }, () => {
+                    ToastLong('请重新选择')
                   })
-                }}
-                buttonStyle={{
-                  borderRadius: pxToDp(10),
-                  backgroundColor: colors.main_color,
-                  width: pxToDp(250),
-                  marginRight: pxToDp(30),
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-      </View>
+                })
+              }}
+              buttonStyle={{
+                borderRadius: pxToDp(10),
+                backgroundColor: colors.fontColor,
+                width: pxToDp(250),
+                marginLeft: pxToDp(30),
+              }}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 16
+              }}
+      />
+      <View style={{flex: 1}}/>
+      <Button title={'确定地址'}
+              onPress={() => {
+
+                InteractionManager.runAfterInteractions(() => {
+                  if (!this.state.is_default) {
+                    this.props.route.params.onBack(this.state.shopmsg);
+                  }
+                  this.props.navigation.goBack();
+                })
+              }}
+              buttonStyle={{
+                borderRadius: pxToDp(10),
+                backgroundColor: colors.main_color,
+                width: pxToDp(250),
+                marginRight: pxToDp(30),
+              }}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 16
+              }}
+      />
     </View>
   }
 
-  getCenterLonLat = (oneLon, oneLat, twoLon, twoLat) => {
-    //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
-    let aLon = 0, aLat = 0;
-    let bLon = Number(oneLon) - Number(twoLon);
-    let bLat = Number(oneLat) - Number(twoLat);
-    //Math.abs()绝对值
-    if (bLon > 0) {
-      aLon = Number(oneLon) - Math.abs(bLon) / 2;
-    } else {
-      aLon = Number(twoLon) - Math.abs(bLon) / 2;
-    }
-    if (bLat > 0) {
-      aLat = Number(oneLat) - Math.abs(bLat) / 2;
-    } else {
-      aLat = Number(twoLat) - Math.abs(bLat) / 2;
-    }
-    return {aLon, aLat};
-  }
-
-
   renderMap() {
-    let lat = this.state.shopmsg.location.split(",")[1];
-    let lng = this.state.shopmsg.location.split(",")[0];
-    if (!lat || !lng) {
-      return null
+    let gdkey = "85e66c49898d2118cc7805f484243909"
+    let uri = "https://m.amap.com/navi/?dest=" +
+      this.state.shopmsg.location +
+      "&destName=" + "" +
+      "&hideRouteIcon=1&key=" + gdkey
+    if (Platform.OS === "ios") {
+      uri = "https://m.amap.com/navi/?dest=" +
+        this.state.shopmsg.location +
+        "&destName=" + this.state.shopmsg.name +
+        "&hideRouteIcon=1&key=" + gdkey
     }
+    console.log(uri,'uri')
     return (
-      <MapView
-        mapType={MapType.Navi}
-        style={StyleSheet.absoluteFill}
-        minZoom={12}
-        maxZoom={20}
-        // onPress={({nativeEvent}) => {
-        //   this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
-        // }}
-        onCameraIdle={({nativeEvent}) => {
-          let northeast = nativeEvent?.latLngBounds?.northeast;
-          let southwest = nativeEvent?.latLngBounds?.southwest;
-          let {
-            aLon,
-            aLat
-          } = this.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
-          if (aLon, aLat) {
-            this.setLatLng(aLat, aLon)
-          }
+      <WebView
+        source={{uri}}
+        style={{
+          width: '100%',
+          height: this.state.isMap ? '100%' : 0,
+          opacity: 0.99,
+          zIndex: 999,
         }}
-        initialCameraPosition={{
-          target: {latitude: Number(lat), longitude: Number(lng)},
-          zoom: 18
-        }}>
-        <Marker
-          draggable={true}
-          position={{latitude: Number(lat), longitude: Number(lng)}}
-          onDragEnd={({nativeEvent}) => {
-            this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
-          }}
-        >
-          <View style={{alignItems: 'center'}}>
-            <View style={{
-              zIndex: 999,
-              backgroundColor: colors.main_color,
-              marginBottom: 15,
-              padding: 8,
-              borderRadius: 6,
-            }}>
-              <Text style={{
-                color: colors.white,
-                fontSize: 18,
-              }}>标注点 </Text>
-            </View>
-            <Entypo name={'triangle-down'}
-                    style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
-          </View>
-        </Marker>
-      </MapView>
-    )
+      />
+    );
   }
 
   renderSearchBar() {
     return (
-      <View style={{height: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-        <TouchableOpacity
-          style={{width: "16%", flexDirection: 'row', justifyContent: 'center'}}
-          onPress={() =>
-            this.props.navigation.navigate(
-              Config.ROUTE_SELECT_CITY_LIST,
-              {
-                callback: (selectCity) => {
-                  this.setState({
-                    cityname: selectCity.name,
-                  })
+      <Cell first>
+        <CellHeader>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.navigation.navigate(
+                Config.ROUTE_SELECT_CITY_LIST,
+                {
+                  callback: (selectCity) => {
+                    this.setState({
+                      cityname: selectCity.name,
+                    })
+                  }
                 }
-              }
-            )
-          }
-        >
-          <Text style={{color: colors.color333}}>
-            <Entypo name={'location-pin'} style={styles.map_icon}/>
-            {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
-          </Text>
-        </TouchableOpacity>
-        <SearchBar
-          inputStyle={styles.containerstyle}
-          inputContainerStyle={styles.containerstyle}
-          containerStyle={styles.searchbox}
-          lightTheme={'false'}
-          placeholder="请输入您的店铺地址"
-          onChangeText={(v) => this.onChange(v)}
-          onCancel={this.onCancel}
-          value={this.state.searchKeywords}
-        />
-      </View>
+              )
+            }
+          >
+            <Text style={{color: colors.color333}}>
+              <MIcon name="map-marker-outline" style={styles.map_icon}/>
+              {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
+            </Text>
+          </TouchableOpacity>
+        </CellHeader>
+        <CellBody>
+          <SearchBar
+            inputStyle={styles.containerstyle}
+            inputContainerStyle={styles.containerstyle}
+            containerStyle={styles.searchbox}
+            lightTheme={'false'}
+            placeholder="请输入您的店铺地址"
+            onChangeText={(v) => {
+              this.setState({
+                searchKeywords: v
+              }, () => {
+                this.search(true)
+              })
+            }}
+            onCancel={this.onCancel}
+            value={this.state.searchKeywords}
+          />
+        </CellBody>
+      </Cell>
     )
-
   }
 
   renderList() {
@@ -345,7 +308,8 @@ class SearchShop extends Component {
                                 style={{
                                   fontSize: 16,
                                   fontWeight: 'bold',
-                                  paddingVertical: 10,
+                                  paddingTop: pxToDp(15),
+                                  paddingBottom: pxToDp(15),
                                   paddingLeft: pxToDp(15),
                                   backgroundColor: 'white',
                                   borderBottomWidth: pxToDp(1),
@@ -379,12 +343,14 @@ class SearchShop extends Component {
 
 const styles = StyleSheet.create({
   map_icon: {
-    fontSize: 15,
+    fontSize: pxToDp(30),
     color: colors.color666,
+    height: pxToDp(60),
+    width: pxToDp(40),
     textAlignVertical: "center"
   },
   searchbox: {
-    flex: 1,
+    width: '100%',
     padding: 0,
     margin: 0,
     backgroundColor: '#f7f7f7',
