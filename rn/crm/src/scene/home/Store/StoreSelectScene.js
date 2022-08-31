@@ -1,15 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  DeviceEventEmitter,
-  InteractionManager,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {Keyboard, SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions'
@@ -38,12 +28,8 @@ function mapDispatchToProps(dispatch) {
 class StoreSelect extends PureComponent {
 
   constructor(props) {
-
     super(props);
-
     const {global} = this.props
-    let token = global['accessToken']
-
     this.state = {
       dataSource: [],
       isLoading: false,
@@ -55,7 +41,7 @@ class StoreSelect extends PureComponent {
       lang: {
         cancel: '取消'
       },
-      access_token: token
+      access_token: global?.accessToken
     };
     this.clearHandle = this.clearHandle.bind(this)
     this.handleFocus = this.handleFocus.bind(this)
@@ -65,22 +51,6 @@ class StoreSelect extends PureComponent {
 
   UNSAFE_componentWillMount() {
     this.fetchData()
-  }
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{padding: 10}}>
-          <Entypo name="reply-all" style={{fontSize: 20, color: colors.white, marginLeft: 10}}/>
-        </TouchableOpacity>
-      )
-    });
-  };
-
-  onPress(route, params, callBack = {}) {
-    InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.navigate(route, params, callBack);
-    });
   }
 
   clearHandle = () => {
@@ -157,22 +127,16 @@ class StoreSelect extends PureComponent {
   }
 
   renderList = () => {
-
     const {dataSource} = this.state
-
-    return  dataSource.map((item, index) => {
-      if(dataSource[index]){
+    return dataSource.map((item, index) => {
+      if (dataSource[index]) {
         return (
-          <SearchStoreItem key={index} onPress={() => this.selectStore(item)} item={item} rowHeight={rowHeight}/>
+          <SearchStoreItem key={index} onPress={() => {
+            this.props.navigation.goBack()
+            this.props.route.params.onBack(item)
+          }} item={item} rowHeight={rowHeight}/>
         )
       }
-    })
-  }
-
-  selectStore = (item) => {
-    this.props.navigation.goBack()
-    DeviceEventEmitter.emit("EventChangeStore", {
-      id: item['id']
     })
   }
 
@@ -233,7 +197,6 @@ class StoreSelect extends PureComponent {
   }
 
   renderContent = () => {
-
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
         <Loadmore

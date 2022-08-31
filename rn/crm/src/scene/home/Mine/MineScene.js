@@ -780,7 +780,13 @@ class MineScene extends Component {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_STORE_SELECT)}>
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.ROUTE_STORE_SELECT, {
+            onBack: (item) => {
+              this.selectStore(item)
+            }
+          })
+        }}>
           <View style={header_styles.row}>
             <SvgXml xml={switchStore(colors.main_color, 18, 18)}/>
             <Text style={header_styles.change_shop}>切换门店 </Text>
@@ -788,6 +794,12 @@ class MineScene extends Component {
         </TouchableOpacity>
       </View>
     );
+  }
+
+  selectStore = (item) => {
+    DeviceEventEmitter.emit("EventChangeStore", {
+      id: item['id']
+    })
   }
 
   jumpToStoreStatus = () => {
