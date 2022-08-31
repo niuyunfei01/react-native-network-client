@@ -217,7 +217,7 @@ class OrderListScene extends Component {
 
   componentWillUnmount() {
     this.focus()
-    // this.unSubscribe()
+    this.unSubscribe()
     if (this.ptListener != null) {
       this.ptListener.remove();
     }

@@ -152,8 +152,6 @@ class MineScene extends Component {
     }
 
     let {
-      currStoreName,
-      currVendorName,
       currVendorId,
       currVersion,
       is_helper,
@@ -179,14 +177,12 @@ class MineScene extends Component {
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
-      currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
       is_helper: is_helper,
       is_service_mgr: is_service_mgr,
       fnPriceControlled: false,
       fnProfitControlled: false,
-      currVendorName: currVendorName,
       cover_image: cover_image ? cover_image : "",
       adjust_cnt: 0,
       dutyUsers: [],
@@ -442,8 +438,6 @@ class MineScene extends Component {
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     let {
-      currStoreName,
-      currVendorName,
       currVendorId,
       currVersion,
       is_helper,
@@ -462,11 +456,9 @@ class MineScene extends Component {
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
-      currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
       is_helper: is_helper,
-      currVendorName: currVendorName,
       cover_image: cover_image,
     });
   }
@@ -508,13 +500,11 @@ class MineScene extends Component {
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-            let {vendor_info, store_info, vendor_id} = global;
+            let {vendor_info, vendor_id} = global;
             this.setState({
               currStoreId: store_id,
-              currStoreName: store_info?.name,
               currVendorId: vendor_id,
               currVersion: vendor_info?.currVersion,
-              currVendorName: vendor_info?.band_name,
               is_mgr: is_mgr,
               is_service_mgr: is_service_mgr,
               is_helper: is_helper,
@@ -645,12 +635,12 @@ class MineScene extends Component {
 
   storeManager = () => {
     this.mixpanel.track('店铺页')
-    const {currentUser} = this.props.global;
-    const {is_mgr, currVendorId, currVendorName} = this.state
+    const {currentUser, vendor_info} = this.props.global;
+    const {is_mgr, currVendorId} = this.state
     this.onPress(Config.ROUTE_STORE, {
       currentUser: currentUser,
       currVendorId: currVendorId,
-      currVendorName: currVendorName,
+      currVendorName: vendor_info?.brand_name,
       is_mgr: is_mgr
     });
   }
@@ -778,19 +768,12 @@ class MineScene extends Component {
   }
 
   renderHeader = () => {
-
-    let {currStoreName} = this.state
-    let currStoreNameStr
-    if (currStoreName && currStoreName.length >= 13) {
-      currStoreNameStr = currStoreName.substring(0, 13) + '...'
-    } else {
-      currStoreNameStr = currStoreName
-    }
+    let {store_info} = this.props.global;
     return (
       <View style={[header_styles.main_box]}>
         <View style={header_styles.row}>
           <JbbText style={header_styles.shop_name}>
-            {currStoreNameStr}
+            {(store_info?.name || '').length > 12 ? store_info?.name.substring(0, 13) + '...' : store_info?.name}
           </JbbText>
           <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
             <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
@@ -1115,10 +1098,10 @@ class MineScene extends Component {
 
 
   renderStoreBlock = () => {
-    const {global} = this.props
     const {
       currentUser,
       accessToken,
+      vendor_id,
       vendor_info,
       store_info,
       show_goods_monitor = false,
@@ -1174,7 +1157,7 @@ class MineScene extends Component {
             style={[block_styles.block_box]}
             onPress={() => {
               if (is_mgr || is_helper) {
-                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                let path = `/stores/worker_stats.html${token}&&_v_id=${vendor_id}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
                 this.mixpanel.track('业绩页')
@@ -1208,8 +1191,8 @@ class MineScene extends Component {
           this.onPress(Config.ROUTE_WORKER, {
             type: "worker",
             currentUser: currentUser,
-            currVendorId: this.state.currVendorId,
-            currVendorName: this.state.currVendorName
+            currVendorId: vendor_id,
+            currVendorName: vendor_info?.brand_name
           });
         }}
                           activeOpacity={customerOpacity}>
@@ -1220,7 +1203,7 @@ class MineScene extends Component {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+              let path = `/stores/working_status.html${token}&&_v_id=${vendor_id}`;
               let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
@@ -1236,7 +1219,7 @@ class MineScene extends Component {
             style={[block_styles.block_box]}
             onPress={() => {
               if (is_service_mgr) {
-                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                let path = `/stores/worker_stats.html${token}&&_v_id=${vendor_id}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
                 this.mixpanel.track('业绩页')
@@ -1302,7 +1285,7 @@ class MineScene extends Component {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
+              let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${vendor_id}`;
               let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
