@@ -751,6 +751,8 @@ class OrderListScene extends Component {
     } else if (e === 1) {
       this.setState({showSortModal: !this.state.showSortModal})
     } else {
+
+      this.mixpanel.track('订单列表扫描')
       this.setState({
         scanBoolean: true,
       })
