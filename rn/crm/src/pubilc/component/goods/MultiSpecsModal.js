@@ -1,11 +1,11 @@
 import React, {PureComponent} from "react";
-import {Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Dimensions, FlatList, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import Config from "../../common/config";
 import {showError, showModal, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
-import InputBoard from "../InputBoard";
-import CommonModal from "./CommonModal";
+// import InputBoard from "../InputBoard";
+// import CommonModal from "./CommonModal";
 
 const {height} = Dimensions.get("window");
 let checkStatus = true
@@ -187,18 +187,18 @@ export default class MultiSpecsModal extends PureComponent {
     if (inventory.length > 0)
       params = {...params, inventorys: inventory}
     if (prices.length > 0)
-      showModal('提交中','loading',1000)
-      HttpUtils.post.bind(this.props)(url, params).then(() => {
-        showSuccess('修改成功')
-        onClose()
-      }, res => {
-        showError(res.reason, 1)
-        onClose()
-      }).catch(e => {
-        showError(e.reason, 1)
-        onClose()
-      })
-
+      showModal('提交中', 'loading', 1000)
+    HttpUtils.post.bind(this.props)(url, params).then(() => {
+      showSuccess('修改成功')
+      onClose()
+    }, res => {
+      showError(res.reason, 1)
+      onClose()
+    }).catch(e => {
+      showError(e.reason, 1)
+      onClose()
+    })
+    onClose()
   }
 
   getItemLayout = (data, index) => ({
@@ -214,9 +214,10 @@ export default class MultiSpecsModal extends PureComponent {
     const {onClose, visible} = this.props
     const {data} = this.state
     return (
-      <CommonModal visible={visible} position={'flex-end'} onShow={this.onShow} onRequestClose={onClose}>
-        <View style={styles.visibleArea}>
-          <InputBoard>
+      <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}
+             onShow={this.onShow}>
+        <View style={styles.container}>
+          <View style={styles.visibleArea}>
             <View style={styles.btn}>
               <TouchableOpacity style={styles.btnWrap} tyle={{padding: 8, backgroundColor: 'red'}} onPress={onClose}>
                 <Text style={styles.cancelBtn}>
@@ -235,15 +236,18 @@ export default class MultiSpecsModal extends PureComponent {
                       getItemLayout={(data, index) => this.getItemLayout(data, index)}
                       keyExtractor={(item, index) => `${index}`}
             />
-          </InputBoard>
-
+          </View>
         </View>
-      </CommonModal>
+      </Modal>
     );
   }
 }
 const styles = StyleSheet.create({
-
+  container: {
+    flexGrow: 1,
+    justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.25)'
+  },
   visibleArea: {
     backgroundColor: colors.white,
     padding: 10,
