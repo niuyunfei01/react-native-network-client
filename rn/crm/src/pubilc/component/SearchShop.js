@@ -195,6 +195,25 @@ class SearchShop extends Component {
     </View>
   }
 
+  getCenterLonLat = (oneLon, oneLat, twoLon, twoLat) => {
+    //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
+    let aLon = 0, aLat = 0;
+    let bLon = Number(oneLon) - Number(twoLon);
+    let bLat = Number(oneLat) - Number(twoLat);
+    //Math.abs()绝对值
+    if (bLon > 0) {
+      aLon = Number(oneLon) - Math.abs(bLon) / 2;
+    } else {
+      aLon = Number(twoLon) - Math.abs(bLon) / 2;
+    }
+    if (bLat > 0) {
+      aLat = Number(oneLat) - Math.abs(bLat) / 2;
+    } else {
+      aLat = Number(twoLat) - Math.abs(bLat) / 2;
+    }
+    return {aLon, aLat};
+  }
+
 
   renderMap() {
     let lat = this.state.shopmsg.location.split(",")[1];
@@ -206,6 +225,22 @@ class SearchShop extends Component {
       <MapView
         mapType={MapType.Navi}
         style={StyleSheet.absoluteFill}
+        minZoom={12}
+        maxZoom={20}
+        // onPress={({nativeEvent}) => {
+        //   this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
+        // }}
+        onCameraIdle={({nativeEvent}) => {
+          let northeast = nativeEvent?.latLngBounds?.northeast;
+          let southwest = nativeEvent?.latLngBounds?.southwest;
+          let {
+            aLon,
+            aLat
+          } = this.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
+          if (aLon, aLat) {
+            this.setLatLng(aLat, aLon)
+          }
+        }}
         initialCameraPosition={{
           target: {latitude: Number(lat), longitude: Number(lng)},
           zoom: 18
