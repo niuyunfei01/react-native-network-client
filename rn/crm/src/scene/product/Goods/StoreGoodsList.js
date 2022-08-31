@@ -384,7 +384,7 @@ class StoreGoodsList extends Component {
                                 currStatus={Number(sp.status)}
                                 vendor_id={vendor_id}
                                 doneProdUpdate={this.doneProdUpdate}
-                                onClose={() => this.setState({modalType: ''})}
+                                onClose={() => this.setState({modalType: ''}, () => this.onRefresh())}
                                 spId={Number(sp.id)}
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                 navigation={this.props.navigation}
@@ -517,7 +517,7 @@ class StoreGoodsList extends Component {
 
 
   renderHeader() {
-    let navigation = this.props.navigation;
+    let {navigation} = this.props;
     let {onStrict} = this.state
     return (
       <View style={{
@@ -653,7 +653,7 @@ class StoreGoodsList extends Component {
           <If condition={item?.price_type === 0 || item?.price_type === undefined}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-              <Text style={styles.moreText}>报价/库存 </Text>
+              <Text style={styles.goodsOperationBtn}>报价/库存 </Text>
             </TouchableOpacity>
           </If>
         </If>
@@ -667,7 +667,7 @@ class StoreGoodsList extends Component {
           <If condition={item?.price_type === 0}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price', item)}>
-              <Text style={styles.moreText}>报价 </Text>
+              <Text style={styles.goodsOperationBtn}>报价 </Text>
             </TouchableOpacity>
           </If>
         </If>
