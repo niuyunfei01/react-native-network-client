@@ -86,9 +86,8 @@ class OrderOperation extends Component {
   }
 
   order_reason() {
-    let {accessToken, config} = this.props.global
-    const {id} = config.vendor
-    HttpUtils.get(`/api/cancel_order_reason?access_token=${accessToken}&vendorId=${id}`).then(res => {
+    let {accessToken, vendor_id} = this.props.global
+    HttpUtils.get(`/api/cancel_order_reason?access_token=${accessToken}&vendorId=${vendor_id}`).then(res => {
       let arr = [];
       let obj
       res.map((v, i) => {
@@ -111,11 +110,10 @@ class OrderOperation extends Component {
   }
 
   toSetOrderComplete() {
-    let {accessToken, config} = this.props.global
-    const {id} = config.vendor
+    let {accessToken, vendor_id} = this.props.global
     Alert.alert('确认将订单置为完成', '订单置为完成后无法撤回，是否继续？', [{
       text: '确认', onPress: () => {
-        HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
+        HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${vendor_id}`).then(res => {
           ToastLong('订单已完成, 即将返回!')
           GlobalUtil.setOrderFresh(1)
           setTimeout(() => {
@@ -178,7 +176,7 @@ class OrderOperation extends Component {
   }
 
   _onShowStoreCall() {
-    const { dispatch, global} = this.props;
+    const {dispatch, global} = this.props;
 
     dispatch(getContacts(global.accessToken, this.state.order.store_id, (ok, msg, contacts) => {
       this.setState({store_contacts: contacts, showCallStore: true})
@@ -332,10 +330,9 @@ class OrderOperation extends Component {
   }
 
   openMiniprogarm = () => {
-    let {currStoreId, currentUser, currentUserProfile} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global)
+    let {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global;
     let data = {
-      v: currVendorId,
+      v: vendor_id,
       s: currStoreId,
       u: currentUser,
       m: currentUserProfile.mobilephone,
