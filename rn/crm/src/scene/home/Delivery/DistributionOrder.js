@@ -6,7 +6,6 @@ import {connect} from "react-redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import tool from "../../../pubilc/util/tool";
-import SearchStore from "../../../pubilc/component/SearchStore";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
@@ -30,7 +29,6 @@ class DistributionOrder extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
       show_body: true,
-      searchStoreVisible: false,
       ext_store_id: ext_store_id,
       accessToken: accessToken,
       currVendorId: currVendorId
@@ -110,16 +108,7 @@ class DistributionOrder extends PureComponent {
         <ScrollView style={styles.bodyContainer}>
           {items}
         </ScrollView>
-
-        <SearchStore visible={this.state.searchStoreVisible}
-                     onClose={() => this.setState({searchStoreVisible: false})}
-                     onSelect={(item) => {
-                       this.onCanChangeStore(item.id);
-                       this.setState({searchStoreVisible: false})
-                     }}/>
-
       </View>
-
     )
   }
 
