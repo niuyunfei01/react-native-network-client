@@ -58,6 +58,7 @@ class RootScene extends PureComponent {
   getInfo = () => {
     getNoLoginInfo().then(info => {
       const noLoginInfo = JSON.parse(info)
+      // GlobalUtil.setHostPort(noLoginInfo.host)
       if (noLoginInfo.accessToken) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))

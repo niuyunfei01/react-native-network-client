@@ -102,7 +102,7 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode = () => {
-    let {mobile, reRequestAfterSeconds} = this.state
+    let {mobile} = this.state
     if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
       dispatch(requestSmsCode(mobile, 0, (success) => {
@@ -112,11 +112,12 @@ class LoginScene extends PureComponent {
           this.interval = setInterval(() => {
             this.setState({
               reRequestAfterSeconds: this.getCountdown() - 1
+            },()=>{
+              if (this.state.reRequestAfterSeconds <= 0) {
+                this.onCounterReReqEnd()
+                clearInterval(this.interval)
+              }
             })
-            if (reRequestAfterSeconds === 0) {
-              this.onCounterReReqEnd()
-              clearInterval(this.interval)
-            }
           }, 1000)
           this.setState({canAskReqSmsCode: true});
           showSuccess(msg)
@@ -152,7 +153,7 @@ class LoginScene extends PureComponent {
           showError('请输入短信验证码')
           return false;
         }
-          this._signIn(mobile, verifyCode, "短信验证码");
+        this._signIn(mobile, verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
         if (!password) {

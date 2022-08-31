@@ -544,8 +544,7 @@ class OrderListScene extends Component {
   }
 
   onRefresh = (status) => {
-
-    tool.debounces(() => {
+    // tool.debounces(() => {
       const {isLoading, query} = this.state
       if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
         GlobalUtil.setOrderFresh(1)
@@ -557,7 +556,7 @@ class OrderListScene extends Component {
           query: {...query, page: 1, isAdd: true, offset: 0}
         },
         () => this.fetchOrders(status))
-    }, 600)
+    // }, 600)
   }
 
   // 新订单1  待取货  106   配送中 1
