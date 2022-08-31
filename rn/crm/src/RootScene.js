@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getConfig, setNoLoginInfo} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
@@ -12,6 +12,7 @@ import ErrorBoundary from "./pubilc/component/ErrorBoundary";
 import {getNoLoginInfo} from "./pubilc/common/noLoginInfo";
 import store from "./pubilc/util/configureStore";
 import PropTypes from "prop-types";
+import HttpUtils from "./pubilc/util/http";
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -62,6 +63,9 @@ class RootScene extends PureComponent {
       if (noLoginInfo.accessToken) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
+        HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {
+          store.dispatch(setUserProfile(res));
+        })
         this.setState({
           rehydrated: true,
           noLoginInfo: noLoginInfo

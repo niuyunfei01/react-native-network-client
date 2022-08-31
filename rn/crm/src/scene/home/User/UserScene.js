@@ -223,7 +223,8 @@ class UserScene extends PureComponent {
             <Text style={[styles.info_name]}>当月出勤天数 </Text>
           </View>
           <TouchableWithoutFeedback onPress={() => {
-            this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
+            ToastShort('正在开发中，尽请期待...')
+            // this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
           }}>
             <View style={[styles.info_item]}>
               <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
@@ -341,18 +342,6 @@ class UserScene extends PureComponent {
           });
         }
       }));
-    });
-  }
-
-  onRouteJump(route, params = {}) {
-    let _this = this;
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
-
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
     });
   }
 }

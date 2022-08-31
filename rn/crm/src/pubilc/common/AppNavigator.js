@@ -371,8 +371,8 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/Store/SelectCity').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_QUALIFICATION} options={{headerTitle: '提交资质'}}
                       getComponent={() => require('../../scene/home/Store/Qualification').default}/>
-        <Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} options={{headerTitle: '提成预估'}}
-                      getComponent={() => require('../../scene/home/User/SupplementWage').default}/>
+        {/*<Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} options={{headerTitle: '提成预估'}}*/}
+        {/*              getComponent={() => require('../../scene/home/User/SupplementWage').default}/>*/}
 
         <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} options={{headerTitle: '商品入库'}}
                       getComponent={() => require('../../scene/product/Inventory/ProductPutIn').default}

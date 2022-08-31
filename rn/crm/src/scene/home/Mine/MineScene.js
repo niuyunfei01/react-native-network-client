@@ -23,8 +23,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {getConfig, upCurrentProfile} from "../../../reducers/global/globalActions";
-import {fetchUserInfo} from "../../../reducers/user/userActions";
+import {getConfig} from "../../../reducers/global/globalActions";
 import {get_supply_orders} from "../../../reducers/settlement/settlementActions";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
@@ -102,8 +101,6 @@ function mapDispatchToProps(dispatch) {
         fetchUserCount,
         fetchWorkers,
         fetchStoreTurnover,
-        fetchUserInfo,
-        upCurrentProfile,
         userCanChangeStore,
         get_supply_orders,
         ...globalActions
@@ -141,12 +138,10 @@ class MineScene extends Component {
     } = this.props.global;
 
     let prefer_store = "";
-    let screen_name = "";
     let mobilephone = "";
     let cover_image = "";
     if (currentUserProfile !== null) {
       prefer_store = currentUserProfile.prefer_store;
-      screen_name = currentUserProfile.screen_name;
       mobilephone = currentUserProfile.mobilephone;
       cover_image = currentUserProfile.cover_image;
     }
@@ -174,7 +169,6 @@ class MineScene extends Component {
       order_num: order_num[currStoreId] || '',
       turnover: turnover[currStoreId] || '',
       prefer_store: prefer_store,
-      screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
       currVendorId: currVendorId,
@@ -295,11 +289,6 @@ class MineScene extends Component {
   onGetUserInfo = (uid) => {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchUserInfo(uid, accessToken, resp => {
-        })
-      );
-    });
 
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchWorkers(this.state.currVendorId, accessToken, resp => {
@@ -431,7 +420,6 @@ class MineScene extends Component {
 
     let {
       prefer_store,
-      screen_name,
       mobilephone,
       cover_image
     } = currentUserProfile;
@@ -453,7 +441,6 @@ class MineScene extends Component {
       bad_cases_of: bad_cases_of[currentUser],
       currentUser: currentUser,
       prefer_store: prefer_store,
-      screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
       currVendorId: currVendorId,
@@ -819,13 +806,12 @@ class MineScene extends Component {
   }
 
   jumpToUser = () => {
-    const {global} = this.props;
-    const {currentUser} = global;
+    const {currentUser, currentUserProfile} = this.props.global;
     this.onPress(Config.ROUTE_USER, {
       type: "mine",
       currentUser: currentUser,
       currVendorId: this.state.currVendorId,
-      screen_name: this.state.screen_name,
+      screen_name: currentUserProfile?.screen_name,
       mobile_phone: this.state.mobile_phone,
       cover_image: this.state.cover_image
     })
@@ -842,7 +828,7 @@ class MineScene extends Component {
       turnover, fnPriceControlled, fnProfitControlled, turnover_new, title_new, order_num_new, cover_image,
       wsb_store_account
     } = this.state;
-
+    let {currentUserProfile} = this.props.global
     return (
       <TouchableOpacity activeOpacity={1} onPress={this.jumpToUser}>
 
@@ -854,7 +840,7 @@ class MineScene extends Component {
 
           <View style={[worker_styles.sales_box]}>
             <Text style={worker_styles.worker_name}>
-              {(this.state.screen_name || "").substring(0, 4)}
+              {(currentUserProfile?.screen_name || "").substring(0, 4)}
             </Text>
             <Text style={[worker_styles.sale_text]}>
               {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
@@ -888,7 +874,7 @@ class MineScene extends Component {
   }
 
   renderWorker = () => {
-    const {currentUser} = this.props.global;
+    const {currentUser, currentUserProfile} = this.props.global;
     const {cover_image} = this.state
     return (
       <TouchableOpacity activeOpacity={1} onPress={this.jumpToUser}>
@@ -898,7 +884,7 @@ class MineScene extends Component {
             source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
-              {(this.state.screen_name || "").substring(0, 4)}
+              {(currentUserProfile?.screen_name || "").substring(0, 4)}
             </Text>
           </View>
           <View style={[worker_styles.order_box]}>
