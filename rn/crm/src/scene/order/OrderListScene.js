@@ -226,7 +226,7 @@ class OrderListScene extends Component {
 
   componentDidMount() {
     initJPush()
-
+    this.whiteNoLoginInfo()
     const {global, navigation, device} = this.props
     if (Platform.OS === 'android') {
       this.calcAppStartTime()
@@ -314,10 +314,7 @@ class OrderListScene extends Component {
       store.dispatch(setDeviceInfo(deviceInfo))
     })
 
-    this.focus = navigation.addListener('focus', () => {
-      this.getVendor()
-      this.onRefresh()
-    })
+
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
@@ -326,9 +323,13 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
-    this.whiteNoLoginInfo()
+
     this.openAndroidNotification();
     this.fetchShowRecordFlag();
+    this.focus = navigation.addListener('focus', () => {
+      this.getVendor()
+      this.onRefresh()
+    })
     AMapSdk.init(
       Platform.select({
         android: "1d669aafc6970cb991f9baf252bcdb66",
@@ -350,9 +351,13 @@ class OrderListScene extends Component {
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
       const {co_type, currVendorId} = tool.vendor(store.getState().global)
-      if (currVendorId === undefined || store.getState().global?.vendor_id === '') {
+      if (co_type === undefined || currVendorId === '' || currVendorId === undefined || store.getState().global?.vendor_id === '' || store.getState().global?.vendor_id === '0') {
         return;
       }
+      if (store.getState().global.store_id === 0)
+        return;
+      if (store.getState().global.vendor_id === 0)
+        return;
       const flag = store.getState().global.accessToken === global.noLoginInfo.accessToken &&
         store.getState().global.currentUser === global.noLoginInfo.currentUser &&
         store.getState().global.store_id === global.noLoginInfo.store_id &&
@@ -370,10 +375,10 @@ class OrderListScene extends Component {
         currentUser: store.getState().global.currentUser,
         currStoreId: store.getState().global.store_id,
         host: store.getState().global.host || Config.defaultHost,
-        co_type: co_type || '',
-        storeVendorId: store.getState().global?.vendor_id || '',
-        enabledGoodMgr: store.getState().global?.enabled_good_mgr || '',
-        currVendorId: currVendorId || ''
+        co_type: co_type,
+        storeVendorId: store.getState().global.vendor_id,
+        enabledGoodMgr: store.getState().global.enabled_good_mgr,
+        currVendorId: currVendorId
       }
       global.noLoginInfo = noLoginInfo
       setNoLoginInfo(JSON.stringify(noLoginInfo))
@@ -545,18 +550,18 @@ class OrderListScene extends Component {
 
   onRefresh = (status) => {
     // tool.debounces(() => {
-      const {isLoading, query} = this.state
-      if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
-        GlobalUtil.setOrderFresh(1)
-        if (isLoading)
-          this.setState({isLoading: true})
-        return;
-      }
-      this.setState({
-          query: {...query, page: 1, isAdd: true, offset: 0}
-        },
-        () => this.fetchOrders(status))
-    // }, 600)
+    const {isLoading, query} = this.state
+    if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
+      GlobalUtil.setOrderFresh(1)
+      if (isLoading)
+        this.setState({isLoading: true})
+      return;
+    }
+    this.setState({
+        query: {...query, page: 1, isAdd: true, offset: 0}
+      },
+      () => this.fetchOrders(status))
+    // }, 500)
   }
 
   // 新订单1  待取货  106   配送中 1
@@ -602,7 +607,7 @@ class OrderListScene extends Component {
       return null;
     }
     this.fetorderNum();
-    let vendor_id = this.props.global?.vendor_id
+    let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
     let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = queryType || this.state.orderStatus;

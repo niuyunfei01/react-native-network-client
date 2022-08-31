@@ -48,9 +48,9 @@ class GoodListItem extends React.PureComponent {
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
         <View style={{flexDirection: "row"}}>
-          <Text style={[styles.n2grey6, offSaleTxtStyle]}>零售价格：</Text>
+          <Text style={[styles.n2grey6, offSaleTxtStyle]}>{product.price_type === 1 ? '零售价格' : '报价'}：</Text>
           <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-            ￥{product?.sp?.show_price}
+            ￥{product.price_type === 1 ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
           </Text>
           <If condition={product.sp && product.sp.is_fix_price === 1}>
             <View style={{
@@ -100,10 +100,10 @@ class GoodListItem extends React.PureComponent {
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
               <View style={{flexDirection: "row"}}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  零售价格：
+                  {item.price_type === 1 ? '零售价格' : '报价'}：
                 </Text>
                 <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  ￥{item.show_price}
+                  ￥{item.price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
                 </Text>
               </View>
 

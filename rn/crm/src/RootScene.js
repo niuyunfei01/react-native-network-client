@@ -58,7 +58,7 @@ class RootScene extends PureComponent {
   getInfo = () => {
     getNoLoginInfo().then(info => {
       const noLoginInfo = JSON.parse(info)
-      // GlobalUtil.setHostPort(noLoginInfo.host)
+      GlobalUtil.setHostPort(noLoginInfo.host)
       if (noLoginInfo.accessToken) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
@@ -107,7 +107,7 @@ class RootScene extends PureComponent {
       initialRouteName = Config.ROUTE_LOGIN;
       initialRouteParams = {next: "", nextParams: {}};
     } else {
-      GlobalUtil.setHostPort(noLoginInfo.host)
+
       if (!initialRouteName) {
         if (orderId) {
           initialRouteName = Config.ROUTE_ORDER;

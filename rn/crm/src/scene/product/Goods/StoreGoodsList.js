@@ -644,16 +644,32 @@ class StoreGoodsList extends Component {
           </TouchableOpacity>
         </If>
         <If condition={onStrict}>
-          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
-            <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
-          </TouchableOpacity>
+          <If condition={item?.price_type === 1}>
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+              <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={item?.price_type === 0 || item?.price_type === undefined}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+              <Text style={styles.moreText}>报价/库存 </Text>
+            </TouchableOpacity>
+          </If>
         </If>
         <If condition={!onStrict}>
-          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
-            <Text style={styles.goodsOperationBtn}>价格 </Text>
-          </TouchableOpacity>
+          <If condition={item?.price_type === 1}>
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+              <Text style={styles.goodsOperationBtn}>价格 </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={item?.price_type === 0}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('set_price', item)}>
+              <Text style={styles.moreText}>报价 </Text>
+            </TouchableOpacity>
+          </If>
         </If>
       </View>
     )

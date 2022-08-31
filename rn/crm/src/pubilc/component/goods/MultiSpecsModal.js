@@ -1,9 +1,11 @@
 import React, {PureComponent} from "react";
-import {Dimensions, FlatList, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Dimensions, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import Config from "../../common/config";
 import {showError, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
+import InputBoard from "../InputBoard";
+import CommonModal from "./CommonModal";
 
 const {height} = Dimensions.get("window");
 let checkStatus = true
@@ -206,10 +208,9 @@ export default class MultiSpecsModal extends PureComponent {
     const {onClose, visible} = this.props
     const {data} = this.state
     return (
-      <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}
-             onShow={this.onShow}>
-        <View style={styles.container}>
-          <View style={styles.visibleArea}>
+      <CommonModal visible={visible} position={'flex-end'} onShow={this.onShow}>
+        <View style={styles.visibleArea}>
+          <InputBoard>
             <View style={styles.btn}>
               <TouchableOpacity style={styles.btnWrap} tyle={{padding: 8, backgroundColor: 'red'}} onPress={onClose}>
                 <Text style={styles.cancelBtn}>
@@ -228,18 +229,15 @@ export default class MultiSpecsModal extends PureComponent {
                       getItemLayout={(data, index) => this.getItemLayout(data, index)}
                       keyExtractor={(item, index) => `${index}`}
             />
-          </View>
+          </InputBoard>
+
         </View>
-      </Modal>
+      </CommonModal>
     );
   }
 }
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.25)'
-  },
+
   visibleArea: {
     backgroundColor: colors.white,
     padding: 10,

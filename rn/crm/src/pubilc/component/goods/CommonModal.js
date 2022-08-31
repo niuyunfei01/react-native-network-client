@@ -23,13 +23,14 @@ export default class CommonModal extends PureComponent {
   }
 
   render() {
-    const {visible, children, position, onClose} = this.props
+    const {visible, children, position, onClose, onShow} = this.props
     const positionStyle = position && position === 'flex-end' ? styles.flexEnd : styles.center
     return (
       <Modal hardwareAccelerated={true}
              transparent={true}
              visible={visible}
              animationType={'slide'}
+             onShow={onShow && onShow}
              onRequestClose={onClose}>
         <View style={[styles.page, positionStyle]}>
           {children}
