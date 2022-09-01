@@ -65,8 +65,7 @@ class FloatServiceIcon extends React.Component {
   }
 
   contactService = () => {
-    let {config} = this.props.global;
-    let {is_self_yy, contacts} = config.customer_service_auth;
+    let {is_self_yy, contacts} = this.props.global.customer_service_auth;
     if (!is_self_yy) {
       return this.setState({
         show_call_service_modal: true,
