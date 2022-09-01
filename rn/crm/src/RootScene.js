@@ -13,6 +13,7 @@ import {getNoLoginInfo} from "./pubilc/common/noLoginInfo";
 import store from "./pubilc/util/configureStore";
 import PropTypes from "prop-types";
 import HttpUtils from "./pubilc/util/http";
+import dayjs from "dayjs";
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -29,6 +30,7 @@ const styles = StyleSheet.create({
 nrInit('Root');
 Text.defaultProps = {...(Text.defaultProps || {}), color: '#333', allowFontScaling: true};
 TextInput.defaultProps = {...(TextInput.defaultProps || {}), allowFontScaling: false};
+this.passed_ms = 0
 
 class RootScene extends PureComponent {
 
@@ -57,7 +59,9 @@ class RootScene extends PureComponent {
   }
 
   getInfo = () => {
+    const startTime = dayjs().valueOf()
     getNoLoginInfo().then(info => {
+      this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
       if (noLoginInfo.accessToken) {
@@ -81,6 +85,7 @@ class RootScene extends PureComponent {
       this.setState({
         rehydrated: true,
       });
+      this.passed_ms = dayjs().valueOf() - startTime
     })
   }
 
