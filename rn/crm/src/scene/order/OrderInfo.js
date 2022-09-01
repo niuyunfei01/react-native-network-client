@@ -127,14 +127,7 @@ const timeObj = {
   method: []
 }//记录耗时的对象
 
-const as = [
-  {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
-  {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
-  {key: MENU_EDIT_STORE, label: '修改门店'},
-  {key: MENU_FEEDBACK, label: '客户反馈'},
-  {key: MENU_RECEIVE_QR, label: '收款码'},
-  {key: MENU_CALL_STAFF, label: '联系门店'},
-];
+
 const tipListTop = [
   {label: '1元', value: 1},
   {label: '2元', value: 2},
@@ -242,6 +235,15 @@ class OrderInfo extends Component {
   }
 
   componentDidMount() {
+    let as = [
+      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
+      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+      {key: MENU_EDIT_STORE, label: '修改门店'},
+      {key: MENU_FEEDBACK, label: '客户反馈'},
+      {key: MENU_RECEIVE_QR, label: '收款码'},
+      {key: MENU_CALL_STAFF, label: '联系门店'},
+    ];
+
     let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
