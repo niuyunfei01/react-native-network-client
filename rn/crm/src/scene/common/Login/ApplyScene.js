@@ -187,18 +187,16 @@ class ApplyScene extends PureComponent {
     dispatch(customerApply(data, (success, msg, res) => {
       hideModal();
       this.setState({doingApply: false})
-      if (success) {
+      if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");
-        if (res.user.access_token && res.user.user_id) {
-          this.queryConfig(res.user.user_id)
-          this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
-          this.mixpanel.getDistinctId().then(mixpanel_id => {
-            if (mixpanel_id !== res.user.user_id) {
-              mergeMixpanelId(mixpanel_id, res.user.user_id);
-            }
-          })
-          this.mixpanel.identify(res.user.user_id);
-        }
+        this.queryConfig(res?.user?.user_id, res?.user?.token?.access_token, res?.OfflineStore?.id)
+        this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
+        this.mixpanel.getDistinctId().then(mixpanel_id => {
+          if (mixpanel_id !== res.user.user_id) {
+            mergeMixpanelId(mixpanel_id, res.user.user_id);
+          }
+        })
+        this.mixpanel.identify(res.user.user_id);
       } else {
         this.mixpanel.track("info_locatestore_click", {msg: msg})
         ToastShort(msg)
@@ -206,8 +204,7 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (uid) => {
-    let {accessToken, currStoreId} = this.props.global;
+  queryConfig = (uid, accessToken, currStoreId) => {
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {

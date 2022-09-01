@@ -279,16 +279,7 @@ export function signIn(mobile, password, props, callback) {
               callback(false, msg, access_token)
             }
           };
-
-          if (Platform.OS === 'ios') {
-            doAuthLogin(access_token, expire, props, authCallback)
-          } else {
-            doAuthLogin(access_token, expire, props, authCallback)
-            // native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
-            //   const profile = ok ? JSON.parse(strProfile) : {};
-            //   authCallback(ok, msg, profile)
-            // });
-          }
+          doAuthLogin(access_token, expire, props, authCallback)
         } else {
           //fixme: 需要给出明确提示
           callback(false, "登录失败，请检查验证码是否正确")
@@ -385,14 +376,7 @@ export function customerApply(params, callback, props) {
             dispatch(setUserProfile(profile));
           }
         };
-        if (Platform.OS === 'ios') {
-          doAuthLogin(access_token, expire, props, authCallback)
-        } else {
-          native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
-            const profile = ok ? JSON.parse(strProfile) : {};
-            authCallback(ok, msg, profile)
-          });
-        }
+        doAuthLogin(access_token, expire, props, authCallback)
       }).catch((error) => {
         callback(false, error.reason, [])
       })
