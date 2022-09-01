@@ -29,6 +29,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
 import geolocation from "@react-native-community/geolocation";
 import PropTypes from "prop-types";
+import {AMapSdk} from "react-native-amap3d/lib/src/index";
 
 
 /**
@@ -76,7 +77,7 @@ class ApplyScene extends PureComponent {
       shelfNos: [],
       pickerName: "请选择",
       pickerValue: "",
-      cityname: '',
+      cityname: '北京市',
       referrer_id: '',
     };
     this.getTypeList()
@@ -99,6 +100,14 @@ class ApplyScene extends PureComponent {
   }
 
   autoGetgeolocation = () => {
+
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+
     let that = this
     geolocation.getCurrentPosition((pos) => {
       let coords = pos.coords;
