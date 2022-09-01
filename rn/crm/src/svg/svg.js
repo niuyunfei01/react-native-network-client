@@ -493,7 +493,7 @@ export const bell = () => {
   )
 }
 
-export const autoReply = () => {
+export const autoPackage = () => {
   return (
     `
 <svg width="100px" height="116px" viewBox="0 0 100 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -556,7 +556,7 @@ export const autoReply = () => {
   )
 }
 
-export const autoPackage = () => {
+export const autoReply = () => {
   return (
     `
 <svg width="92" height="108" viewBox="0 0 92 108" version="1.1" xmlns="http://www.w3.org/2000/svg">
