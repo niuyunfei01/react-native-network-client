@@ -41,7 +41,8 @@ class GoodListItem extends React.PureComponent {
     const {product, fnProviding} = this.props;
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-    let skus = product?.skus ? product.skus : []
+    let skus = product.skus || []
+    const {price_type} = this.props
     return (
       <ScrollView style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
@@ -100,10 +101,10 @@ class GoodListItem extends React.PureComponent {
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
               <View style={{flexDirection: "row"}}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  {item.price_type === 1 ? '零售价格' : '报价'}：
+                  {price_type === 1 ? '零售价格' : '报价'}：
                 </Text>
                 <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  ￥{item.price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
+                  ￥{price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
                 </Text>
               </View>
 

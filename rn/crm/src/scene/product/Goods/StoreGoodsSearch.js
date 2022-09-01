@@ -169,6 +169,7 @@ class StoreGoodsSearch extends Component {
     const onStrict = (product.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
                          modalType={this.state.modalType}
+                         price_type={product.price_type || 0}
                          onPressRight={() => this.gotoGoodDetail(product.id)}
                          fnProviding={onStrict}
                          opBar={<View style={[styles.row_center, {
@@ -206,7 +207,7 @@ class StoreGoodsSearch extends Component {
                                </TouchableOpacity>
                              }
                            </If>
-                           <If condition={product.price_type===0}>
+                           <If condition={product.price_type === 0}>
                              {onStrict ?
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price_add_inventory', product)}>

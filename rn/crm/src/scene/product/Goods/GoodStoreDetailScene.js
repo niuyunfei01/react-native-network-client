@@ -249,7 +249,7 @@ class GoodStoreDetailScene extends PureComponent {
           store_prod: data.sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type ?? 0
+          price_type: data?.vendor?.price_type || 0
         })
       } else {
         this.setState({
@@ -258,7 +258,7 @@ class GoodStoreDetailScene extends PureComponent {
           store_prod: data.sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type ?? 0
+          price_type: data?.vendor?.price_type || 0
         })
       }
 
@@ -737,7 +737,7 @@ class GoodStoreDetailScene extends PureComponent {
           }}>
             <If condition={activity && activity === 'offer'}>
               <Text style={styles.normalText}>
-                {`¥ ${price_type === '1' ? store_prod?.show_price : parseFloat(store_prod.supply_price / 100).toFixed(2) || '0'}`}
+                {`¥ ${price_type === 1 ? store_prod?.show_price : parseFloat(store_prod.supply_price / 100).toFixed(2) || '0'}`}
               </Text>
             </If>
             <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
@@ -765,7 +765,7 @@ class GoodStoreDetailScene extends PureComponent {
               </Text>
               <If condition={activity === 'offer'}>
                 <Text style={styles.normalText}>
-                  {`¥ ${info.show_price}`}
+                  {`¥ ${price_type === 1 ? info.show_price : parseFloat(info.supply_price / 100).toFixed(2) || '0'}`}
                 </Text>
               </If>
               <If condition={typeof info.applying_price !== "undefined" && activity === 'offer'}>
