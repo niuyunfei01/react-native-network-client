@@ -548,7 +548,8 @@ class GoodsEditScene extends PureComponent {
         differenceType: 2,
         totalRemain: actualNum,
         remark: '',
-        store_id: currStoreId
+        store_id: currStoreId,
+        skipCheckChange: 1
       }
     }
     const {dispatch, navigation} = this.props;
