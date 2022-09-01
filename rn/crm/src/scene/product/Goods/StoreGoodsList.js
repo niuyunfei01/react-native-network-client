@@ -688,6 +688,7 @@ class StoreGoodsList extends Component {
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
+                    price_type={item.price_type || 0}
                     opBar={this.opBar(onSale, onStrict, item)}
       />
     );
