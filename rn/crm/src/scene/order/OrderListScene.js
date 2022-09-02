@@ -391,7 +391,9 @@ class OrderListScene extends Component {
         Alert.alert('新版本提示', res.desc, [
           {text: '稍等再说', style: 'cancel'},
           {
-            text: '现在更新', onPress: () => {
+            text: '现在更新',
+            style: 'default',
+            onPress: () => {
               downloadApk({
                 interval: 250, // listen to upload progress event, emit every 666ms
                 apkUrl: res.download_url,
@@ -648,9 +650,9 @@ class OrderListScene extends Component {
           this.onRefresh()
           return
         }
-        this.setState({
-          categoryLabels: res.tabs,
-        })
+        // this.setState({
+        //   categoryLabels: res.tabs,
+        // })
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -661,7 +663,8 @@ class OrderListScene extends Component {
         this.setState({
           ListData: setList === 1 ? res.orders : ListData.concat(res.orders),
           isLoading: false,
-          query
+          query: query,
+          categoryLabels: res.tabs,
         })
       }, (res) => {
         showError(res.reason);

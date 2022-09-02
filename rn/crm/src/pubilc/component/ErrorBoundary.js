@@ -5,6 +5,8 @@ import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../styles/colors";
 import HttpUtils from "../util/http";
 import {connect} from "react-redux";
+import GlobalUtil from "../util/GlobalUtil";
+import {setDeviceInfo} from "../../reducers/device/deviceActions";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -36,6 +38,13 @@ class ErrorBoundary extends React.Component {
   static getDerivedStateFromError(error) {
     // 更新 state 使下一次渲染能够显示降级后的 UI
     return {hasError: true, error: error}
+  }
+
+  componentDidMount() {
+    const {dispatch} = this.props
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      dispatch(setDeviceInfo(deviceInfo))
+    })
   }
 
   componentDidCatch(error, errorInfo) {

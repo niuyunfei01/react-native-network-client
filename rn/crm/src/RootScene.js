@@ -139,8 +139,7 @@ class RootScene extends PureComponent {
             <View style={styles.statusBar}>
               <StatusBar backgroundColor={"transparent"} translucent/>
             </View>
-            <AppNavigator initialRouteName={initialRouteName}
-                          initialRouteParams={initialRouteParams}/>
+            <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
           </View>
         </ErrorBoundary>
       </Provider>

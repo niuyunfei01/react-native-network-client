@@ -431,15 +431,16 @@ class GoodsEditScene extends PureComponent {
   }
 
   onNameChanged = (name) => {
-    let {type} = this.props.route.params;
+    // let {type} = this.props.route.params;
     this.setState({name})
-    if (name && type !== 'edit') {
-      this.recommendProdByName(name)
-    } else {
-      this.setState({name: ''}, () => {
-        this.recommendProdByName(name)
-      })
-    }
+    this.recommendProdByName(name)
+    // if (name && type !== 'edit') {
+    //   this.recommendProdByName(name)
+    // } else {
+    //   this.setState({name: ''}, () => {
+    //     this.recommendProdByName(name)
+    //   })
+    // }
   }
 
   onNameClear = () => {
@@ -977,7 +978,7 @@ class GoodsEditScene extends PureComponent {
               {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
               <View style={styles.textInputStyle}>
                 <SectionedMultiSelect
-                  items={store_tags}
+                  items={store_tags || []}
                   IconRenderer={MaterialIcons}
                   uniqueKey="id"
                   subKey="children"

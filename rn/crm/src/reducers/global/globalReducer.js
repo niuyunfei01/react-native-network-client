@@ -89,7 +89,7 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_CURR_STORE:
       if (action.payload) {
-          return {...state, currStoreId: action.payload.id}
+        return {...state, currStoreId: action.payload.id}
       } else return state;
 
     case SESSION_TOKEN_SUCCESS:
@@ -134,7 +134,7 @@ export default function globalReducer(state = initialState, action) {
         store_info: action.payload.store_info || state.store_info,
         vendor_info: action.payload.vendor_info || state.vendor_info,
         help_uid: action.payload.help_uid || state.help_uid,
-        enabled_good_mgr: action.payload.enabled_good_mgr || state.enabled_good_mgr,
+        enabled_good_mgr: action.payload && action.payload.enabled_good_mgr,
         show_goods_monitor: action.payload.show_goods_monitor || state.show_goods_monitor,
         show_sign_center: action.payload.show_sign_center || state.show_sign_center,
         float_kf_icon: action.payload.float_kf_icon || state.float_kf_icon,
