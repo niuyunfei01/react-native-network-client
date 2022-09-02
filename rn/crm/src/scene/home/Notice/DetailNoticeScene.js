@@ -78,7 +78,7 @@ class HistoryNoticeScene extends PureComponent {
           }}
           automaticallyAdjustContentInsets={true}
           source={{html: `${content}`}}
-          scrollEnabled={false}
+          scrollEnabled={true}
           scalesPageToFit
         />
         <Text style={Styles.timeText}>{time} </Text>
