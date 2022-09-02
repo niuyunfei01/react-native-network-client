@@ -117,16 +117,6 @@ export function vendor(global) {
     co_type: currVendor.co_type,
   };
 }
-
-export function server_info({global, user}) {
-  if (user === undefined) {
-    return {};
-  }
-  let {service_uid} = vendor(global);
-  let {user_info} = user;
-  return user_info[service_uid] ? user_info[service_uid] : {};
-}
-
 /**
  * 当前店铺信息
  * @param global

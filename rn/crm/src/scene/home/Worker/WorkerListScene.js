@@ -22,7 +22,7 @@ class WorkerScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {currentUser,  vendor_id,vendor_info} = this.props.global;
+    const {currentUser, vendor_id, vendor_info} = this.props.global;
 
     this.state = {
       currentUser: currentUser,
@@ -56,7 +56,7 @@ class WorkerScene extends PureComponent {
         <CellHeader>
           <Image
             style={[styles.worker_img]}
-            source={user.image !== '' ? {uri: user.image} : require('../../../img/My/touxiang50x50_.png')}
+            source={user.image !== '' ? {uri: user.image.split("cai.cn")[1]} : require('../../../img/My/touxiang50x50_.png')}
           />
         </CellHeader>
         <CellBody>
@@ -162,7 +162,7 @@ class WorkerScene extends PureComponent {
         </View>
 
         <View style={styles.searchBox}>
-          <FontAwesome5 name={'search'} style={{fontSize: 26}}/>
+          <FontAwesome5 name={'search'} style={{fontSize: 22, marginHorizontal: 15}}/>
           <TextInput
             underlineColorAndroid='transparent'
             placeholder='搜索员工'
