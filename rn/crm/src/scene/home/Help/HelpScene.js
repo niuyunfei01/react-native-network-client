@@ -10,7 +10,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import {get_help_types} from '../../../reducers/help/helpActions'
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import * as tool from "../../../pubilc/util/tool";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToEm from "../../../pubilc/util/pxToEm";
 import colors from "../../../pubilc/styles/colors";
@@ -18,7 +17,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
-  const { global} = state;
+  const {global} = state;
   return {global: global}
 }
 
@@ -137,7 +136,7 @@ class HelpScene extends PureComponent {
   }
 
   render() {
-    let server_info = tool.server_info(this.props);
+    let mobile = this.props.global?.vendor_info?.mobile;
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(140)}}>
@@ -205,7 +204,7 @@ class HelpScene extends PureComponent {
         <View style={styles.call_btn_wrapper}>
           <TouchableOpacity
             onPress={() => {
-              native.dialNumber(server_info.mobilephone);
+              native.dialNumber(mobile);
             }}
           >
             <View style={styles.call_btn}>
