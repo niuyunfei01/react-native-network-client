@@ -2,14 +2,14 @@ import React, {PureComponent} from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
+  InteractionManager,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  StyleSheet,
-  InteractionManager
+  View
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";

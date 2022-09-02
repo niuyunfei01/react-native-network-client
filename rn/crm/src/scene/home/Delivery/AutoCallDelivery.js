@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
-import {ScrollView, View, Text} from "react-native";
-import {Styles, LineView} from '../GoodsIncrementService/GoodsIncrementServiceStyle'
+import {ScrollView, Text, View} from "react-native";
+import {LineView, Styles} from '../GoodsIncrementService/GoodsIncrementServiceStyle'
 
 const CONTENT = [
   {
@@ -89,6 +89,7 @@ export default class AutoCallDelivery extends PureComponent {
       <Text style={Styles.titleText}>{txt}</Text>
     )
   }
+
   render() {
     return (
       <ScrollView>

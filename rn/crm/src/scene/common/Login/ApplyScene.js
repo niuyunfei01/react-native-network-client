@@ -6,7 +6,8 @@ import {bindActionCreators} from "redux";
 import {
   check_is_bind_ext,
   customerApply,
-  getCommonConfig,
+  getConfig,
+  logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 
@@ -15,20 +16,20 @@ import stringEx from "../../../pubilc/util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from '../../../pubilc/util/pxToDp';
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
+import {setDeviceInfo} from "../../../reducers/device/deviceActions";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
-
-import dayjs from "dayjs";
-import JPush from "jpush-react-native";
+import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
 import geolocation from "@react-native-community/geolocation";
+import PropTypes from "prop-types";
+import {AMapSdk} from "react-native-amap3d/lib/src/index";
 
 
 /**
@@ -36,7 +37,6 @@ import geolocation from "@react-native-community/geolocation";
  */
 function mapStateToProps(state) {
   return {
-    userProfile: state.global.currentUserPfile,
     accessToken: state.global.accessToken
   }
 }
@@ -44,7 +44,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      getCommonConfig,
+      getConfig,
       customerApply,
       check_is_bind_ext,
       setCurrentStore
@@ -53,6 +53,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ApplyScene extends PureComponent {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    accessToken: PropTypes.string,
+  }
 
   constructor(props) {
     super(props)
@@ -72,7 +77,7 @@ class ApplyScene extends PureComponent {
       shelfNos: [],
       pickerName: "请选择",
       pickerValue: "",
-      cityname: '',
+      cityname: '北京市',
       referrer_id: '',
     };
     this.getTypeList()
@@ -95,6 +100,14 @@ class ApplyScene extends PureComponent {
   }
 
   autoGetgeolocation = () => {
+
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+
     let that = this
     geolocation.getCurrentPosition((pos) => {
       let coords = pos.coords;
@@ -160,7 +173,6 @@ class ApplyScene extends PureComponent {
     this.doApply();
   }
 
-
   doApply() {
     this.setState({doingApply: true});
     showModal("提交中")
@@ -176,37 +188,24 @@ class ApplyScene extends PureComponent {
       lat: this.state.location_lat,
       lng: this.state.location_long
     };
-
-
     const {dispatch} = this.props;
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      dispatch(setDeviceInfo(deviceInfo))
+    })
+    dispatch(logout());
     dispatch(customerApply(data, (success, msg, res) => {
       hideModal();
       this.setState({doingApply: false})
-      if (success) {
-        ToastShort("申请成功");
-        if (res.user.access_token && res.user.user_id) {
-          this.doSaveUserInfo(res.user.access_token);
-          this.queryCommonConfig(res.user.uid, res.user.access_token);
-          this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
-          if (res.user.user_id) {
-
-            this.mixpanel.getDistinctId().then(mixpanel_id => {
-              if (mixpanel_id !== res.user.user_id) {
-                mergeMixpanelId(mixpanel_id, res.user.user_id);
-              }
-            })
-            this.mixpanel.identify(res.user.user_id);
-
-            const alias = `uid_${res.user.user_id}`;
-            JPush.setAlias({alias: alias, sequence: dayjs().unix()})
-            JPush.isPushStopped((isStopped) => {
-              if (isStopped) {
-                JPush.resumePush();
-              }
-            })
+      if (success && res?.user?.token && res?.user?.user_id) {
+        ToastShort("注册成功");
+        this.queryConfig(res?.user?.user_id, res?.user?.token?.access_token, res?.OfflineStore?.id)
+        this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
+        this.mixpanel.getDistinctId().then(mixpanel_id => {
+          if (mixpanel_id !== res.user.user_id) {
+            mergeMixpanelId(mixpanel_id, res.user.user_id);
           }
-          return true;
-        }
+        })
+        this.mixpanel.identify(res.user.user_id);
       } else {
         this.mixpanel.track("info_locatestore_click", {msg: msg})
         ToastShort(msg)
@@ -214,50 +213,38 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  doSaveUserInfo(token) {
-    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
-      GlobalUtil.setUser(res)
-    })
-    return true;
-  }
-
-  queryCommonConfig(uid, accessToken, currStoreId = 0) {
-    let flag = false;
+  queryConfig = (uid, accessToken, currStoreId) => {
     const {dispatch} = this.props;
-    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
-        let only_store_id = currStoreId;
-        if (only_store_id > 0) {
-          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: only_store_id}, (binded) => {
-            this.doneSelectStore(only_store_id, !binded);
-          }));
-        } else {
-          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
-          this.doneSelectStore(store.id, flag);
-        }
+        let store_id = cfg?.store_id || currStoreId;
+        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
+          this.doneSelectStore(store_id, !binded);
+        }));
       } else {
         ToastShort(err_msg);
       }
     }));
   }
 
-  doneSelectStore(storeId, not_bind = false) {
+  doneSelectStore = (storeId, not_bind = false) => {
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
       if (set_ok) {
         dispatch(setCurrentStore(storeId));
         if (not_bind) {
+          navigation.navigate(Config.ROUTE_STORE_STATUS)
           hideModal()
-          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
-          return true;
+          return;
         }
         navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {initTab: Config.ROUTE_ORDERS});
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          initTab: Config.ROUTE_ORDERS,
+          initialRouteName: Config.ROUTE_ALERT
+        });
         hideModal()
-        return true;
       } else {
-        ToastShort(msg);
-        return false;
+        showError(msg);
       }
     };
     if (Platform.OS === 'ios') {
@@ -267,32 +254,17 @@ class ApplyScene extends PureComponent {
     }
   }
 
-  onRequestSmsCode() {
-    const {dispatch} = this.props;
-    if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
-      this.setState({canAskReqSmsCode: true});
-      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
-        if (success) {
-          ToastShort("短信验证码已发送")
-        } else {
-          this.setState({canAskReqSmsCode: false});
-          ToastShort("短信验证码发送失败")
-        }
-      }));
-    } else {
-      this.setState({canAskReqSmsCode: false});
-      ToastShort('手机号有误')
-    }
-  }
-
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      address: res.address,
+    let states = {
       location_long: Lng,
       location_lat: lat,
-    })
+    }
+    if (res.address) {
+      states.address = res.address;
+    }
+    this.setState({...states})
   }
 
   render() {

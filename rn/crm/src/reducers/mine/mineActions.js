@@ -12,7 +12,6 @@ const {
   GET_WM_STORES,
   GET_USER_WAGE_DATA,
   GET_INCREMENT,
-  GET_VENDOR_DUTY_USERS
 } = require("../../pubilc/common/constants").default;
 
 export function fetchUserCount(u_id, token, callback) {
@@ -47,36 +46,6 @@ function receiveUserCount(u_id, sign_count, bad_cases_of) {
   };
 }
 
-export function fetchDutyUsers(storeId, token, callback) {
-  return dispatch => {
-    const url = `api/get_duty_users/${storeId}.json?access_token=${token}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.ok) {
-          let users = resp.obj;
-          dispatch(receiveUserDutyUsers(users));
-        } else {
-          dispatch(receiveUserDutyUsers([]));
-          ToastLong(resp.desc);
-        }
-        callback(resp);
-      })
-      .catch(error => {
-        dispatch(receiveUserCount(0, 0));
-        ToastLong(error.message);
-        callback({ok: false, desc: error.message});
-      });
-  };
-}
-
-function receiveUserDutyUsers(users) {
-  return {
-    type: GET_VENDOR_DUTY_USERS,
-    users: users
-  };
-}
-
 export function fetchWorkers(_v_id, token, callback) {
   return dispatch => {
     const url = `api/get_vendor_workers/${_v_id}.json?access_token=${token}`;
@@ -103,12 +72,12 @@ export function fetchWorkers(_v_id, token, callback) {
           dispatch(receiveWorker(_v_id, {}));
           ToastLong(resp.desc);
         }
-        callback(resp);
+        callback && callback(resp);
       })
       .catch(error => {
         dispatch(receiveWorker(_v_id, {}));
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
+        callback && callback({ok: false, desc: error.message});
       });
   };
 }
@@ -345,11 +314,11 @@ export function userCanChangeStore(store_id, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        callback(resp);
+        callback && callback(resp);
       })
       .catch(error => {
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
+        callback && callback({ok: false, desc: error.message});
       });
   };
 }
@@ -380,4 +349,23 @@ export function getUserWageData(token, month, callback) {
       callback(ok, obj);
     })
   }
+}
+
+export function unDisable(token, storeId, disable_id, state, vendorId, callback) {
+  let params = {
+    store_id: storeId,
+    delivery_way_v2: disable_id,
+    state: state
+  }
+  return dispatch => {
+    let url = `/v1/new_api/Delivery/delivery_switch?vendorId=${vendorId}&access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, params))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp.ok, resp.desc, resp.obj);
+      })
+      .catch(error => {
+        callback({ok: false, desc: error.reason});
+      });
+  };
 }

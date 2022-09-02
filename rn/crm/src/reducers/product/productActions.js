@@ -138,7 +138,7 @@ export function fetchVendorTags(_v_id, token, callback) {
 }
 
 export function productSave(data, token, callback) {
-  let url = `api/product_save.json?access_token=${token}`;
+  let url = `api/product_save_new.json?access_token=${token}`;
   return jsonWithTpl2(
     url,
     data,
@@ -444,6 +444,24 @@ export function queryProductByKey(key_word, token, callback) {
   return dispatch => {
     let url = `/api/query_product_by_keyword.json?access_token=${token}&keyword=${key_word}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp.ok, resp.desc, resp.obj);
+      })
+      .catch(error => {
+        callback({ok: false, desc: error.message});
+      });
+  };
+}
+
+export function getProdDetailByUpc(token, storeId, upc, vendorId, callback) {
+  let data = {
+    store_id: storeId,
+    upc: upc
+  }
+  return dispatch => {
+    let url = `api/get_product_by_upc?access_token=${token}&store_id=${storeId}&vendor_id=${vendorId}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
         callback(resp.ok, resp.desc, resp.obj);

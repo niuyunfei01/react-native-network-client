@@ -5,7 +5,7 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import EmptyData from "../common/component/EmptyData";
 import colors from "../../pubilc/styles/colors";
-import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import native from "../../pubilc/util/native";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
@@ -100,7 +100,8 @@ class OrderTransferThird extends Component {
       datePickerOther: [],
       callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD'),
       callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`,
-      dateArray: []
+      dateArray: [],
+      set_default_product_weight: false,
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -199,7 +200,7 @@ class OrderTransferThird extends Component {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderTransferThird"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
@@ -261,7 +262,8 @@ class OrderTransferThird extends Component {
   onCallThirdShipRule = () => {
     let total_selected_ship = this.state.newSelected.length;
     let store_id = this.props.global.currStoreId;
-    let vendor_id = this.props.global.config.vendor.id;
+    let {currVendorId} = tool.vendor(this.props.global);
+
     let total_ok_ship = this.state.total_ok_ship;
     const self = this;
     const {orderId} = this.state;
@@ -274,7 +276,7 @@ class OrderTransferThird extends Component {
           this.onCallThirdShip()
           this.mixpanel.track("ship.list_to_call.call", {
             store_id,
-            vendor_id,
+            vendor_id: currVendorId,
             total_selected_ship,
             total_ok_ship
           });
@@ -285,7 +287,7 @@ class OrderTransferThird extends Component {
         this.onCallThirdShip()
         this.mixpanel.track("ship.list_to_call.call", {
           store_id,
-          vendor_id,
+          vendor_id: currVendorId,
           total_selected_ship,
           total_ok_ship
         });
@@ -496,6 +498,14 @@ class OrderTransferThird extends Component {
     }
 
     return getDates(new Date(), (new Date()).addDays(2))
+  }
+  update_default_product_weight = () => {
+    if (!this.state.set_default_product_weight) return null;
+    let {currStoreId, accessToken} = this.props.global;
+    const api = `/v1/new_api/stores/update_default_product_weight?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId, weight: this.state.weight}, true).then(res => {
+      ToastLong("设置默认重量成功");
+    })
   }
 
   render() {
@@ -784,6 +794,7 @@ class OrderTransferThird extends Component {
         }}>
           <TouchableOpacity onPress={() => {
             this.setState({showErr: !this.state.showErr})
+            this.mixpanel.track('呼叫配送页_ 查看原因')
           }} style={{
             flexDirection: "row",
             justifyContent: "space-between",
@@ -834,7 +845,6 @@ class OrderTransferThird extends Component {
   }
 
 
-
   renderBtn = () => {
     return (
       <View>
@@ -881,7 +891,7 @@ class OrderTransferThird extends Component {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
-            this.setState({showDeliveryModal: true})
+            this.setState({showDeliveryModal: true, set_default_product_weight: false})
             this.mixpanel.track('设置重量')
           }} style={{
             flexDirection: 'row',
@@ -1188,68 +1198,137 @@ class OrderTransferThird extends Component {
           </View>
         </JbbModal>
 
-        <JbbModal visible={this.state.showDeliveryModal} onClose={() => this.setState({
-          showDeliveryModal: false,
-        })} modal_type={'bottom'}>
+        <JbbModal visible={this.state.showDeliveryModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+                  onClose={() => this.setState({
+                    showDeliveryModal: false,
+                  })} modal_type={'bottom'}>
           <View>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
-              商品重量
-            </Text>
-            <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>
-              默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量
-            </Text>
-            <View style={{width: '100%', flexDirection: 'row'}}>
-              <Text style={{marginRight: pxToDp(20), lineHeight: pxToDp(60)}}>当前选择</Text>
-              <Text style={{textAlign: 'center', color: 'red', fontWeight: 'bold', fontSize: pxToDp(50)}}>
-                {this.state.weight}
-              </Text>
-              <Text style={{marginLeft: pxToDp(20), lineHeight: pxToDp(60)}}>千克
-              </Text>
-            </View>
             <View style={{
-              width: '100%',
               flexDirection: 'row',
-              marginTop: pxToDp(20),
-              marginBottom: pxToDp(20),
+              padding: 12,
+              justifyContent: 'space-between',
+              borderBottomWidth: 0.5,
+              borderColor: '#EEEEEE'
             }}>
 
-              <View style={{width: '20%', marginTop: pxToDp(20)}}>
-                <Text style={{color: colors.color333}}>{this.state.weight_min}千克</Text>
+              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+                商品重量
+              </Text>
+              <Entypo onPress={() => this.setState({
+                showDeliveryModal: false,
+              })} name="circle-with-cross"
+                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            </View>
+            <View style={{
+              paddingHorizontal: 12, paddingVertical: 5,
+            }}>
+              <Text style={{color: colors.color999, fontSize: 12,}}>
+                默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量
+              </Text>
+              <View style={{
+                flexDirection: 'row',
+                marginTop: 20,
+                justifyContent: 'space-between',
+              }}>
+                <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
+                <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
+                  <Text style={{color: '#E32321', fontSize: 20}}>
+                    {this.state.weight}
+                  </Text>
+                  千克 </Text>
               </View>
-              <View style={{width: '60%'}}>
-                <Slider
-                  value={this.state.weight}
-                  maximumValue={this.state.weight_max}
-                  minimumValue={this.state.weight_min}
-                  step={this.state.weight_step}
-                  trackStyle={{height: 10, backgroundColor: 'red'}}
-                  thumbStyle={{height: 20, width: 20, backgroundColor: 'green'}}
-                  onValueChange={(value) => {
-                    this.setState({weight: value})
-                  }}
+
+              <Text style={{color: '#FB706E', fontSize: 12, marginTop: 3}}>
+                修改商品重量将使配送费发生变化，请在确认重量候修改。
+              </Text>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+                marginVertical: 46,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+
+                <Text style={{color: colors.color333, fontSize: 12, marginRight: 10}}>
+                  {this.state.weight_min}千克
+                </Text>
+                <View style={{flex: 1}}>
+                  <Slider
+                    value={this.state.weight}
+                    maximumValue={this.state.weight_max}
+                    minimumValue={this.state.weight_min}
+                    step={this.state.weight_step}
+                    trackStyle={{height: 14, backgroundColor: 'red', borderRadius: 7}}
+                    thumbStyle={{height: 18, width: 18, borderRadius: 9, backgroundColor: 'green'}}
+                    onValueChange={(value) => {
+                      this.setState({weight: value})
+                    }}
+                  />
+                </View>
+                <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>
+                  {this.state.weight_max}千克
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  set_default_product_weight: !this.state.set_default_product_weight
+                })
+              }} style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+                <Text style={{color: colors.color333, fontSize: 14,}}>设为默认重量 </Text>
+                {this.state.set_default_product_weight ?
+                  <View style={{
+                    borderRadius: 10,
+                    width: 20,
+                    height: 20,
+                    backgroundColor: colors.main_color,
+                    justifyContent: "center",
+                    alignItems: 'center',
+                  }}>
+                    <Entypo name='check' style={{
+                      fontSize: pxToDp(25),
+                      color: colors.white,
+                    }}/></View> :
+                  <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
+              </TouchableOpacity>
+              <View style={{
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                marginVertical: 34,
+              }}>
+                <Button title={'取消'}
+                        onPress={() => {
+                          this.setState({showDeliveryModal: false})
+                        }}
+                        buttonStyle={{
+                          width: 170,
+                          backgroundColor: colors.color999,
+                        }}
+                        titleStyle={{
+                          color: colors.white,
+                          fontSize: 16
+                        }}
+                />
+                <Button title={'确定'}
+                        onPress={() => {
+                          this.fetchThirdWays()
+                          this.update_default_product_weight()
+                          this.setState({showDeliveryModal: false})
+                        }}
+                        buttonStyle={{
+                          width: 170,
+                          backgroundColor: colors.main_color,
+                        }}
+                        titleStyle={{
+                          color: colors.white,
+                          fontSize: 16
+                        }}
                 />
               </View>
-              <View style={{width: '20%', marginTop: pxToDp(20)}}>
-                <Text style={{textAlign: 'right'}}>{this.state.weight_max}千克</Text>
-              </View>
             </View>
-            <Text style={{color: colors.warn_color, lineHeight: pxToDp(40)}}>修改商品重量将使配送费发生变化，请在确认重量后修改。</Text>
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-            }}>
-              <Text
-                onPress={() => {
-                  this.setState({showDeliveryModal: false})
-                }}
-                style={[styles.footbtn2]}>取消</Text>
-              <Text
-                onPress={() => {
-                  this.fetchThirdWays()
-                  this.setState({showDeliveryModal: false})
-                }}
-                style={[styles.footbtn]}>确定</Text>
-            </View>
+
           </View>
         </JbbModal>
 

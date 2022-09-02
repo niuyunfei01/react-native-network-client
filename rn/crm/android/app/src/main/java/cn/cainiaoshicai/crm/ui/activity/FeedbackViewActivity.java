@@ -8,7 +8,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.util.List;
 
 import cn.cainiaoshicai.crm.GlobalCtx;

@@ -84,7 +84,7 @@ class PrinterRemark extends PureComponent {
       onProgress: (data) => {
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
-      onComplete: (data) => {
+      onComplete: () => {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           showSuccess('上传成功')
           const {newImageKey} = this.state;
@@ -137,7 +137,7 @@ class PrinterRemark extends PureComponent {
         store_id: currStoreId,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
-      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+      HttpUtils.post.bind(this.props)(api, fromData).then(() => {
         ToastShort('操作成功')
         this.props.navigation.goBack();
       }, () => {
@@ -259,7 +259,7 @@ class PrinterRemark extends PureComponent {
       }
       QNEngine.setParams(params)
       QNEngine.startTask()
-    }).catch(error => {
+    }).catch(() => {
       Alert.alert('error', '图片上传失败！')
     })
   }
@@ -295,7 +295,7 @@ class PrinterRemark extends PureComponent {
                      // height: 118,
                    }}
                    placeholder="支持输入广告/联系方式" value={this.state.remark}
-                   onChangeText={(remark) => this.setState({remark})}></Input>
+                   onChangeText={(remark) => this.setState({remark})}/>
             {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
             {/*  {this.renderUploadImg()}*/}
             {/*</View>*/}

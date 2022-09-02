@@ -18,7 +18,6 @@ import remind from "./remind/remindReducer";
 import store from "./store/storeReducer";
 import mine from "./mine/mineReducer";
 import user from "./user/userReducer";
-import activity from "./activity/activityReducer";
 import invoicing from "./invoicing/invoicingReducer";
 
 import {combineReducers} from "redux";
@@ -32,13 +31,12 @@ import {combineReducers} from "redux";
 const rootReducer = combineReducers({
   device,
   global,
-  order,
-  remind,
-  store,
   mine,
   product,
+  remind,
+  order,
+  store,
   user,
-  activity,
   invoicing
 });
 

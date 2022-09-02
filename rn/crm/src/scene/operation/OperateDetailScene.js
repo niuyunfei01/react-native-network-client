@@ -10,7 +10,7 @@ import tool, {toFixed} from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {Button, Dialog, Input} from "../../weui";
-import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
+import {fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
 import Header from "./OperateHeader";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../../pubilc/util/http";
@@ -25,7 +25,6 @@ function mapDispatchToProps(dispatch) {
     dispatch,
     ...bindActionCreators(
       {
-        fetchProfitDaily,
         fetchProfitOtherAdd,
         ...globalActions
       },

@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity} from "react-native";
+import {ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import {Styles, LineView} from "./GoodsIncrementServiceStyle";
+import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import Config from "../../../pubilc/common/config";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {connect} from "react-redux";

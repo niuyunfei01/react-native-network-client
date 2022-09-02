@@ -7,9 +7,6 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 
-import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.GlobalCtx;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,15 +22,18 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.R;
+
 public class ImageLoader {
 
-    MemoryCache memoryCache=new MemoryCache();
+    MemoryCache memoryCache = new MemoryCache();
     FileCache fileCache;
-    private Map<ImageView, String> imageViews= Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
+    private final Map<ImageView, String> imageViews = Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
     ExecutorService executorService;
 
-    public ImageLoader(Context context){
-        fileCache= GlobalCtx.getFileCache();
+    public ImageLoader(Context context) {
+        fileCache = GlobalCtx.getFileCache();
         executorService= Executors.newFixedThreadPool(5);
     }
 

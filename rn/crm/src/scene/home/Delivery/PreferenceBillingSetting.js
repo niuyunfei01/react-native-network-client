@@ -7,13 +7,13 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../../weui";
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from "../../../reducers/global/globalActions";
-import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 
 const mapStateToProps = state => {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+  const {global} = state;
+  return {global: global};
 }
 const mapDispatchToProps = dispatch => {
   return {
@@ -40,11 +40,11 @@ class PreferenceBillingSetting extends PureComponent {
     this.getPreferenceShipConfig()
   }
 
-  onHeaderRefresh() {
+  onHeaderRefresh = () => {
     this.getDeliveryConf();
   }
 
-  getPreferenceShipConfig() {
+  getPreferenceShipConfig = () => {
     let {ext_store_id} = this.state
     let access_token = this.props.global.accessToken
     const api = `/v1/new_api/ExtStores/get_preference_ship_config/${ext_store_id}?access_token=${access_token}`
@@ -61,7 +61,7 @@ class PreferenceBillingSetting extends PureComponent {
     })
   }
 
-  getDeliveryConf() {
+  getDeliveryConf = () => {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let arr = [];
       if (response !== undefined && response.menus.length > 0) {
@@ -81,15 +81,12 @@ class PreferenceBillingSetting extends PureComponent {
     })
   }
 
-  _onToSetDeliveryWays() {
+  _onToSetDeliveryWays = () => {
+    showModal('请求中...')
     const {navigation} = this.props;
     let access_token = this.props.global.accessToken
     let {selectArr, checked_item, ext_store_id, deploy_time, auto_call} = this.state
-    // if (selectArr && selectArr.length === 0) {
-    //   showError("需要勾选配送方式");
-    //   this.setState({isRefreshing: false});
-    //   return;
-    // }
+
     if (deploy_time && deploy_time == 0) {
       showError("请填写发单时间");
       this.setState({isRefreshing: false});
@@ -103,21 +100,24 @@ class PreferenceBillingSetting extends PureComponent {
       sync_all: checked_item ? 1 : 0,
       is_open: auto_call ? 1 : 0
     }).then(res => {
+      hideModal()
       showSuccess('设置成功,即将返回上一页')
       setTimeout(() => {
         navigation.navigate(Config.ROUTE_SEETING_DELIVERY, {
           isSetting: true
         })
-      }, 1000)
+      }, 500)
     }).catch((error) => {
+      hideModal()
       showError(`${error.reason}`)
     })
   }
-  onPress(route, params = {}, callback = {}) {
+  onPress = (route, params = {}, callback = {}) => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params, callback);
     });
   }
+
   render() {
     const {menus, selectArr, checked_item, deploy_time} = this.state;
     return (
@@ -138,24 +138,11 @@ class PreferenceBillingSetting extends PureComponent {
             <Text style={styles.descriptionText}>
               偏好发单支持优先发起配送
             </Text>
-            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY,{showId: 2})}>
+            <Text style={styles.touchMore} onPress={() => this.onPress(Config.ROUTE_AUTO_CALL_DELIVERY, {showId: 2})}>
               了解更多
             </Text>
           </View>
-          <View style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottomColor: colors.colorEEE,
-            borderBottomWidth: 1,
-            paddingHorizontal: 15,
-            paddingVertical: 10,
-            backgroundColor: colors.white,
-            width: '96%',
-            borderRadius: 10,
-            marginLeft: '2%',
-            marginTop: 10
-          }}>
+          <View style={styles.flagBox}>
 
             <Text style={{color: colors.color333}}>偏好发单设置 </Text>
             <Switch value={this.state.auto_call}
@@ -163,24 +150,15 @@ class PreferenceBillingSetting extends PureComponent {
                       this.setState({
                         auto_call: res
                       }, () => {
-                        setTimeout(() => {
-                          if (res === false) {
-                            this._onToSetDeliveryWays()
-                          }
-                        }, 3000);
+                        if (res === false)
+                          this._onToSetDeliveryWays()
                       })
                     }}/>
           </View>
 
           <If condition={this.state.auto_call}>
             <For index="idx" each='item' of={menus}>
-              <Cells style={{
-                marginLeft: "2%",
-                marginRight: "2%",
-                marginTop: 5,
-                borderRadius: pxToDp(20),
-                borderColor: colors.white
-              }} key={idx}>
+              <Cells style={styles.checkedItem} key={idx}>
                 <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                   <CellBody>
                     <Text style={{color: colors.color333}}>{item.name} </Text>
@@ -191,7 +169,7 @@ class PreferenceBillingSetting extends PureComponent {
                       checkedColor={colors.main_color}
                       onPress={() => {
                         let menu = [...this.state.menus]
-                        menu[idx].checked = menu[idx].checked ? false : true;
+                        menu[idx].checked = !menu[idx].checked;
                         this.setState({
                           menus: menu
                         })
@@ -206,19 +184,10 @@ class PreferenceBillingSetting extends PureComponent {
                 </Cell>
               </Cells>
             </For>
-            <View style={{marginVertical: pxToDp(5)}}></View>
-            <CellsTitle style={styles.cell_title}><Text style={{
-              fontSize: pxToDp(22),
-              color: colors.warn_color
-            }}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
-            <Cells style={{
-              marginLeft: "2%",
-              marginRight: "2%",
-              marginBottom: "2%",
-              marginTop: 5,
-              borderColor: colors.white,
-              borderRadius: pxToDp(20)
-            }}>
+            <View style={{marginVertical: pxToDp(5)}}/>
+            <CellsTitle style={styles.cell_title}><Text
+              style={styles.descriptionLabel}>优先发起勾选的配送，超过发单时间后，按自动发单规则呼叫配送</Text></CellsTitle>
+            <Cells style={styles.deployTime}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
                   发单时间
@@ -237,13 +206,7 @@ class PreferenceBillingSetting extends PureComponent {
               </Cell>
             </Cells>
 
-            <Cells style={{
-              marginLeft: "2%",
-              marginRight: "2%",
-              marginTop: 5,
-              borderRadius: pxToDp(20),
-              borderColor: colors.white
-            }}>
+            <Cells style={styles.bottomFlag}>
               <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                 <CellBody>
                   将发单偏好应用到所有的外卖店铺
@@ -335,6 +298,46 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(10),
     marginRight: pxToDp(10),
   },
+  flagBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: colors.white,
+    width: '96%',
+    borderRadius: 10,
+    marginLeft: '2%',
+    marginTop: 10
+  },
+  checkedItem: {
+    marginLeft: "2%",
+    marginRight: "2%",
+    marginTop: 5,
+    borderRadius: pxToDp(20),
+    borderColor: colors.white
+  },
+  descriptionLabel: {
+    fontSize: pxToDp(22),
+    color: colors.warn_color
+  },
+  deployTime: {
+    marginLeft: "2%",
+    marginRight: "2%",
+    marginBottom: "2%",
+    marginTop: 5,
+    borderColor: colors.white,
+    borderRadius: pxToDp(20)
+  },
+  bottomFlag: {
+    marginLeft: "2%",
+    marginRight: "2%",
+    marginTop: 5,
+    borderRadius: pxToDp(20),
+    borderColor: colors.white
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceBillingSetting);

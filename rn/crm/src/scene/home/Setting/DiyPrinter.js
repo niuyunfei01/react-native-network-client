@@ -40,6 +40,7 @@ class DiyPrinter extends PureComponent {
       show_product_discounts: false,
       show_distribution_distance: false,
       show_goods_code: false,
+      upc: false,
       invoice_serial_set: 0,
     }
     this.get_printer_custom_cfg()
@@ -56,6 +57,7 @@ class DiyPrinter extends PureComponent {
         show_product_discounts: res.show_product_discounts,
         show_distribution_distance: res.show_distribution_distance,
         show_goods_code: res.show_goods_code,
+        upc: res.upc !== undefined ? res.upc : false,
         invoice_serial_set: res.invoice_serial_set ? Number(res.invoice_serial_set) : 0,
         isRefreshing: false
       })
@@ -93,6 +95,7 @@ class DiyPrinter extends PureComponent {
         show_distribution_distance,
         show_goods_code,
         invoice_serial_set,
+        upc
       } = this.state;
       let fromData = {
         font_size: font_size,
@@ -103,6 +106,7 @@ class DiyPrinter extends PureComponent {
         show_goods_code: show_goods_code,
         invoice_serial_set: invoice_serial_set,
         store_id: currStoreId,
+        upc: upc
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
@@ -335,6 +339,35 @@ class DiyPrinter extends PureComponent {
                   show_goods_code: !this.state.show_goods_code
                 })
               }} value={this.state.show_goods_code}/>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                upc: !this.state.upc
+              })
+
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorEEE,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>显示UPC </Text>
+              <Switch color={colors.main_color} style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  upc: !this.state.upc
+                })
+              }} value={this.state.upc}/>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {

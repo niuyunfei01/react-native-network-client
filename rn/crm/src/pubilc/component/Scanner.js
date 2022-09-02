@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   rectangle: {
     height: 200,
-    width: 200,
+    width: 300,
     borderWidth: 1,
     borderColor: '#00FF00',
     backgroundColor: 'transparent'
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   border: {
     flex: 0,
-    width: 200,
+    width: 300,
     height: 2,
     backgroundColor: '#00FF00',
   }

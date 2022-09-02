@@ -1,16 +1,16 @@
 import React, {PureComponent} from "react";
-import {Modal, Platform, Text, TouchableOpacity, View, StyleSheet} from 'react-native'
-import AntDesign from "react-native-vector-icons/AntDesign";
-import {Image} from "react-native-elements";
+import {Modal, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
 import Cts from "../common/Cts";
 import HttpUtils from "../util/http";
 import {showError} from "../util/ToastUtils";
 import RNRestart from "./react-native-restart";
-import {bundleFilePath, createDirectory, deleteFile, exists, calcFileHash} from "../util/FileUtil";
+import {bundleFilePath, calcFileHash, createDirectory, deleteFile, exists} from "../util/FileUtil";
 import RNFetchBlob from "rn-fetch-blob";
 import {unzip} from "./react-native-zip/RNZip";
 import {MixpanelInstance} from "../util/analytics";
+import {SvgXml} from "react-native-svg";
+import {hotUpdateHeader} from "../../svg/svg";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -19,39 +19,142 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
-  modalContentWrap: {
-    width: '80%',
-    backgroundColor: colors.colorEEE,
-    borderRadius: 8,
-    padding: 12,
+  modalHeaderWrap: {
+    width: 274,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    backgroundColor: colors.white,
   },
-  closeNewVersionModal: {fontSize: 20, textAlign: 'right'},
+  modalContentWrap: {
+    width: 274,
+    backgroundColor: colors.white,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingBottom: 12
+  },
   center: {alignItems: 'center', justifyContent: 'center'},
   modalImgStyle: {width: 51.2, height: 51.2, marginTop: 12, borderRadius: 8},
-  modalContentText: {paddingTop: 12, paddingBottom: 16, marginLeft: 20, marginRight: 20, lineHeight: 25},
-  modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
-  modalBtnWrap: {
-    backgroundColor: colors.main_color,
+  modalContentText: {
+    fontSize: 14,
+    color: colors.color333,
+    paddingTop: 12,
+    paddingBottom: 16,
     marginLeft: 20,
     marginRight: 20,
-    borderRadius: 8
+    lineHeight: 17
   },
-  modalBtnText: {color: colors.white, fontSize: 20, padding: 12, textAlign: 'center'},
+  modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
+  modalNoUpdateBtnWrap: {
+    flex: 1,
+    backgroundColor: colors.colorCCC,
+    marginHorizontal: 5,
+    borderRadius: 2
+  },
+  modalUpdateBtnWrap: {
+    flex: 1,
+    backgroundColor: colors.main_color,
+    marginHorizontal: 5,
+    borderRadius: 2
+  },
+  modalBtnText: {
+    color: colors.white,
+    lineHeight: 22,
+    fontWeight: '400',
+    fontSize: 16,
+    paddingVertical: 7,
+    textAlign: 'center'
+  },
+  newVersionTipText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.white,
+    lineHeight: 22,
+    position: 'absolute',
+    zIndex: 11,
+    left: 13,
+    top: 13
+  },
+  newVersionTipCode: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: colors.white,
+    lineHeight: 17,
+    position: 'absolute',
+    zIndex: 11,
+    left: 13,
+    top: 35
+  },
+  newVersionTip: {
+    marginLeft: 20,
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: colors.color333,
+    lineHeight: 20
+  },
+  progressWrap: {
+    marginLeft: 12,
+    marginRight: 12,
+    borderRadius: 10,
+    height: 20,
+    backgroundColor: colors.main_color,
+    flexDirection: 'row'
+  },
+  progressLeftWrap: {
+    borderRadius: 10,
+  },
+  progressRightWrap: {
+    borderRadius: 10,
+    backgroundColor: '#ACD9B4',
+  },
+  btnWrap: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginLeft: 12, marginRight: 12, marginTop: 21
+  },
+  progressTipText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: colors.white,
+    lineHeight: 17,
+    right: 0,
+    position: 'absolute'
+  },
+  errorMessage: {
+    marginLeft: 20,
+    fontSize: 10,
+    fontWeight: '400',
+    color: '#FF2424',
+    lineHeight: 14,
+    marginBottom: 5
+  }
 })
 const platform = Platform.OS === 'android' ? 'Android-Bundle' : 'IOS-Bundle'
 
-export class HotUpdateComponent extends PureComponent {
+const Progress = (downloadFileProgress = 0) => {
+  return (
+    <View style={styles.progressWrap}>
+      <View style={[styles.progressLeftWrap, {width: `${downloadFileProgress}%`}]}/>
+      <View style={[styles.progressRightWrap, {width: `${(100 - downloadFileProgress)}%`}]}/>
+      <Text style={styles.progressTipText}>
+        {downloadFileProgress}%
+      </Text>
+    </View>
+  )
+}
 
-  constructor(props) {
-    super(props);
-    this.mixpanel = MixpanelInstance;
-  }
+export default class HotUpdateComponent extends PureComponent {
 
   state = {
     showNewVersionVisible: false,
     newVersionInfo: {},
-    downloadFileProgress: '',
+    downloadFileProgress: 0,
     downloadFileFinish: false,
+    errorMsg: ''
+  }
+
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
   }
 
   componentDidMount() {
@@ -60,19 +163,20 @@ export class HotUpdateComponent extends PureComponent {
 
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
-    const version = __DEV__ ? '5' : Cts.BUNDLE_VERSION;
+    const version = Cts.BUNDLE_VERSION;
     const params = {platform: platform, version: version}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
     })
   }
+
   closeNewVersionInfo = () => {
     this.setState({showNewVersionVisible: false})
   }
 
-  updateBundle = (newVersionInfo) => {
-    const {downloadFileFinish} = this.state
+  updateBundle = () => {
+    const {downloadFileFinish, newVersionInfo} = this.state
     if (downloadFileFinish) {
       this.mixpanel.track(Platform.OS === 'ios' ? 'iOS_立即体验' : 'Android_立即体验')
       RNRestart.Restart()
@@ -84,8 +188,8 @@ export class HotUpdateComponent extends PureComponent {
     RNFetchBlob.config({path: source})
       .fetch('GET', bundle_url)
       .progress({count: 10, fileCache: true}, (received, total) => {
-        const downloadFileProgress = parseInt(`${(received / total) * 100}`)
-        this.setState({downloadFileProgress: `${downloadFileProgress}%`})
+        const downloadFileProgress = parseInt((received / total) * 100)
+        this.setState({downloadFileProgress: downloadFileProgress})
       })
       .then(async (res) => {
         const status = res.info().status;
@@ -97,13 +201,14 @@ export class HotUpdateComponent extends PureComponent {
           if (md5 === fileHash) {
             await unzip(source, target)
             this.setState({
-              downloadFileProgress: '下载完成，立即体验新版本吧',
+              downloadFileProgress: 100,
               downloadFileFinish: true
             })
           } else {
 
             this.setState({
-              downloadFileProgress: '下载文件出错，请重新下载',
+              downloadFileProgress: 0,
+              errorMsg: '下载文件出错，请重新下载',
               downloadFileFinish: false
             })
           }
@@ -115,31 +220,51 @@ export class HotUpdateComponent extends PureComponent {
   }
 
   render() {
-    const {showNewVersionVisible, downloadFileFinish, newVersionInfo, downloadFileProgress} = this.state
+    const {showNewVersionVisible, downloadFileFinish, newVersionInfo, downloadFileProgress, errorMsg} = this.state
+    // console.log('downloadFileProgress', downloadFileProgress)
     return (
       <Modal visible={showNewVersionVisible} transparent={true} hardwareAccelerated={true}>
         <View style={styles.modalWrap}>
+          <View style={styles.modalHeaderWrap}>
+            <SvgXml xml={hotUpdateHeader()}/>
+            <Text style={styles.newVersionTipText}>
+              发现新版本
+            </Text>
+            <Text style={styles.newVersionTipCode}>
+              {newVersionInfo['name-android']}
+            </Text>
+          </View>
           <View style={styles.modalContentWrap}>
-            <If condition={newVersionInfo.force === 0}>
-              <AntDesign name={'close'} style={styles.closeNewVersionModal} allowFontScaling={false}
-                         onPress={this.closeNewVersionInfo}/>
-            </If>
-            <View style={styles.center}>
-              <Image source={require('../../img/Login/ic_launcher.png')} style={styles.modalImgStyle}/>
-            </View>
+            <Text style={styles.newVersionTip}>
+              更新内容
+            </Text>
             <Text style={styles.modalContentText}>
               {newVersionInfo.info}
             </Text>
-            <If condition={downloadFileProgress !== ''}>
-              <Text style={styles.modalTitleText}>
-                下载进度：{downloadFileProgress}
+            <If condition={errorMsg.length > 0}>
+              <Text style={styles.errorMessage}>
+                {errorMsg}
               </Text>
             </If>
-            <TouchableOpacity style={styles.modalBtnWrap} onPress={() => this.updateBundle(newVersionInfo)}>
-              <Text style={styles.modalBtnText}>
-                {downloadFileFinish ? '立即体验' : '立即更新'}
-              </Text>
-            </TouchableOpacity>
+            <If condition={downloadFileProgress > 0 && downloadFileProgress < 100}>
+              {Progress(downloadFileProgress)}
+            </If>
+            <If condition={downloadFileProgress === 0 || downloadFileProgress === 100}>
+              <View style={styles.btnWrap}>
+                <If condition={newVersionInfo.force === 0}>
+                  <TouchableOpacity style={styles.modalNoUpdateBtnWrap} onPress={this.closeNewVersionInfo}>
+                    <Text style={styles.modalBtnText}>
+                      暂不更新
+                    </Text>
+                  </TouchableOpacity>
+                </If>
+                <TouchableOpacity style={styles.modalUpdateBtnWrap} onPress={this.updateBundle}>
+                  <Text style={styles.modalBtnText}>
+                    {downloadFileFinish ? '立即体验' : '立即更新'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </If>
           </View>
         </View>
       </Modal>

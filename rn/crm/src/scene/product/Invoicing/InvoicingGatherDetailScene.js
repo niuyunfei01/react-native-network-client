@@ -26,8 +26,8 @@ const SkuUnitMap = {
 };
 
 function mapStateToProps(state) {
-  const {invoicing, global} = state;
-  return {invoicing: invoicing, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

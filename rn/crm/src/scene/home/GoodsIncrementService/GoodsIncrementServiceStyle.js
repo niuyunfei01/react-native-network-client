@@ -3,14 +3,27 @@ import colors from "../../../pubilc/styles/colors";
 import React from "react";
 
 export const LineView = () => {
+
   return (
     <View style={Styles.line}/>
+  )
+
+}
+export const ShortLineView = () => {
+  return (
+    <View style={Styles.shortLine}/>
   )
 }
 export const Styles = StyleSheet.create({
   line: {
     borderBottomColor: colors.colorEEE,
     borderBottomWidth: 1
+  },
+  shortLine: {
+    borderBottomColor: colors.colorEEE,
+    borderBottomWidth: 1,
+    marginLeft: 7,
+    marginRight: 7
   },
   rowWrap: {
     marginTop: 12,
@@ -42,7 +55,7 @@ export const Styles = StyleSheet.create({
     color: colors.color333,
     lineHeight: 21
   },
-  saveZoneWrap: {justifyContent: 'flex-end', backgroundColor: colors.white},
+  saveZoneWrap: {marginTop: 8, justifyContent: 'flex-end', backgroundColor: colors.white},
   saveWrap: {
     marginTop: 6,
     marginBottom: 6,

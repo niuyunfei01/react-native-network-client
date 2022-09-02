@@ -1,8 +1,8 @@
 import React, {PureComponent} from "react";
-import {View, StyleSheet, FlatList, Text, TouchableOpacity, Switch} from "react-native";
+import {FlatList, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import {getSimpleTime} from "../../pubilc/util/TimeUtil";
+import {format, getSimpleTime} from "../../pubilc/util/TimeUtil";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
@@ -10,7 +10,6 @@ import DatePicker from "rmc-date-picker/lib/DatePicker";
 import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
 import PopPicker from "rmc-date-picker/lib/Popup";
 import PopupStyles from 'rmc-picker/lib/PopupStyles';
-import {format} from "../../pubilc/util/TimeUtil";
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},

@@ -14,7 +14,3 @@ export function serviceSignIn(deviceId, mobile, password) {
 
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm('oauth/token', formData))
 }
-
-export function customerApplyRequest(applyData) {
-  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON('api/create_apply', applyData))
-}

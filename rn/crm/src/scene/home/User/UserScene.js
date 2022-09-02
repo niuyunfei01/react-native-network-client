@@ -27,6 +27,7 @@ import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
+import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -57,17 +58,17 @@ class UserScene extends PureComponent {
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
               onPress={() => {
-                  navigation.navigate(Config.ROUTE_USER_ADD, {
-                    type: 'edit',
-                    user_id: params.currentUser,
-                    user_name: params.user_name,
-                    mobile: params.mobile,
-                    user_status: params.user_status,
-                    store_id: params.store_id,
-                    worker_id: params.worker_id,
-                    worker_nav_key: params.navigation_key,
-                    user_info_key: key,
-                  });
+                navigation.navigate(Config.ROUTE_USER_ADD, {
+                  type: 'edit',
+                  user_id: params.currentUser,
+                  user_name: params.user_name,
+                  mobile: params.mobile,
+                  user_status: params.user_status,
+                  store_id: params.store_id,
+                  worker_id: params.worker_id,
+                  worker_nav_key: params.navigation_key,
+                  user_info_key: key,
+                });
               }}
             >
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -126,6 +127,17 @@ class UserScene extends PureComponent {
   _onLogout() {
     const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      currentUser: 0,
+      currStoreId: 0,
+      host: '',
+      co_type: '',
+      storeVendorId: '',
+      enabledGoodMgr: '',
+      currVendorId: ''
+    }
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
       navigation.navigate(Config.ROUTE_LOGIN, {});
@@ -211,7 +223,8 @@ class UserScene extends PureComponent {
             <Text style={[styles.info_name]}>当月出勤天数 </Text>
           </View>
           <TouchableWithoutFeedback onPress={() => {
-            this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
+            ToastShort('正在开发中，尽请期待...')
+            // this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
           }}>
             <View style={[styles.info_item]}>
               <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
@@ -329,18 +342,6 @@ class UserScene extends PureComponent {
           });
         }
       }));
-    });
-  }
-
-  onRouteJump(route, params = {}) {
-    let _this = this;
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
-
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
     });
   }
 }

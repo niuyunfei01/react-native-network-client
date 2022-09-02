@@ -19,8 +19,8 @@ import colors from "../../pubilc/styles/colors";
 let footerHeight = pxToDp(80);
 
 function mapStateToProps(state) {
-  const {global, user, mine} = state;
-  return {global, user, mine};
+  const {global} = state;
+  return {global};
 }
 
 class OrderScan extends BaseComponent {

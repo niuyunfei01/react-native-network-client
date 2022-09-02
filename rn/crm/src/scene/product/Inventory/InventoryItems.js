@@ -3,12 +3,11 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
-import {getSimpleStore} from "../../../reducers/global/globalActions";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import Mapping from "../../../pubilc/Mapping";
 
@@ -47,17 +46,6 @@ class InventoryItems extends Component {
       bigImageVisible: false,
       bigImageUri: [],
     }
-  }
-
-  UNSAFE_componentWillMount() {
-
-    const {global, dispatch} = this.props
-    getSimpleStore(global, dispatch, null, (store) => {
-      this.setState({fnPriceControlled: store['fn_price_controlled']})
-      this.search()
-    })
-
-    // this.fetchCategories(storeId, prod_status, accessToken)
   }
 
   fetchCategories(storeId, prod_status, accessToken) {
@@ -154,8 +142,9 @@ class InventoryItems extends Component {
     return (
       <View style={styles.productRow} key={item.product_id}>
         <TouchableOpacity onPress={() => this.showBigImage(item)}>
-          <CachedImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
-                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+          <FastImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
+                     resizeMode={FastImage.resizeMode.contain}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         </TouchableOpacity>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>

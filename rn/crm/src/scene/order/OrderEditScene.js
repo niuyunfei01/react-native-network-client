@@ -213,16 +213,10 @@ class OrderEditScene extends Component {
   }
 
   setAddress(res) {
-    // detailAddr  文字地址
-
-
     this.setState({
       loc_data: res.location,
       detailAddr: res.address,
-    }, () => {
-
     })
-
   }
 
   _toSetLocation() {

@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, Switch, TextInput, TouchableOpacity, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {Styles} from "./GoodsIncrementServiceStyle";
 import {connect} from "react-redux";
@@ -44,6 +44,11 @@ const styles = StyleSheet.create({
 
 class AutomaticPackagingScene extends PureComponent {
 
+  state = {
+    packageTime: '0',
+    packageStatus: 'off'
+  }
+
   constructor(props) {
     super(props);
     this.getSetting(props.global)
@@ -58,10 +63,6 @@ class AutomaticPackagingScene extends PureComponent {
     }).catch(error => showError('出错：' + error.reason))
   }
 
-  state = {
-    packageTime: '0',
-    packageStatus: 'off'
-  }
   onChangeText = (text) => {
     this.setState({packageTime: text})
   }

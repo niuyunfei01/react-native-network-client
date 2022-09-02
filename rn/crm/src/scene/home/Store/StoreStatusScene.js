@@ -20,10 +20,12 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from "../../../pubilc/styles/colors";
 import Icon from "react-native-vector-icons/Entypo";
+import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
 import * as tool from "../../../pubilc/util/tool";
 import {Button} from "react-native-elements";
+import BottomModal from "../../../pubilc/component/BottomModal";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -52,16 +54,15 @@ class StoreStatusScene extends PureComponent {
     const {navigation} = this.props
 
 
-    let {is_service_mgr,} = tool.vendor(this.props.global);
+    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
     let store_id = this.props.global.currStoreId
-    let vendor_id = this.props.global.config.vendor.id;
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, currVendorId});
                                    }}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
@@ -97,6 +98,7 @@ class StoreStatusScene extends PureComponent {
       suspend_confirm_order: false,
       total_wm_stores: 0,
       allow_store_mgr_call_ship: false,
+      modal: false,
       alert_msg: ''
     }
 
@@ -110,13 +112,12 @@ class StoreStatusScene extends PureComponent {
   componentDidMount() {
     let {total_wm_stores} = this.state
     let store_id = this.props.global.currStoreId
-    let vendor_id = this.props.global.config.vendor.id;
-    this.mixpanel.track("mine.wm_store_list", {store_id, vendor_id, total_wm_stores});
+    let {currVendorId,} = tool.vendor(this.props.global);
+    this.mixpanel.track("mine.wm_store_list", {store_id, currVendorId, total_wm_stores});
   }
 
   fetchData() {
     const self = this
-    let {currVendorId,} = tool.vendor(this.props.global);
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
@@ -132,7 +133,7 @@ class StoreStatusScene extends PureComponent {
         allow_self_open: res.allow_self_open,
         business_status: res.business_status,
         show_body: show_body,
-        allow_merchants_store_bind: res.allow_merchants_store_bind === '1' ,
+        allow_merchants_store_bind: res.allow_merchants_store_bind === '1',
         total_wm_stores: res.business_status.length,
         allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0',
         alert_msg: res.alert_msg,
@@ -215,7 +216,8 @@ class StoreStatusScene extends PureComponent {
   renderBody() {
     const business_status = this.state.business_status
     const store_id = this.props.global.currStoreId
-    const vendor_id = this.props.global.config.vendor.id
+    let {currVendorId} = tool.vendor(this.props.global);
+
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
@@ -229,7 +231,7 @@ class StoreStatusScene extends PureComponent {
       items.push(
         <TouchableOpacity onPress={() => {
 
-          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
+          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, currVendorId});
 
           this.onPress(Config.ROUTE_SEETING_DELIVERY, {
             ext_store_id: store.id,
@@ -263,7 +265,9 @@ class StoreStatusScene extends PureComponent {
                 marginTop: pxToDp(20),
               }} source={this.getPlatIcon(store.icon_name)}/>
 
-              <TouchableOpacity onPress={() => this.showAlert()} style={{
+              <TouchableOpacity onPress={() => this.setState({
+                modal: true
+              })} style={{
                 position: 'absolute',
                 left: pxToDp(82),
                 top: pxToDp(4),
@@ -337,6 +341,7 @@ class StoreStatusScene extends PureComponent {
               </If>
             </View>
           </View>
+
         </TouchableOpacity>)
     }
 
@@ -346,6 +351,13 @@ class StoreStatusScene extends PureComponent {
       </ScrollView>
     )
   }
+
+  closeModal = () => {
+    this.setState({
+      modal: false
+    })
+  }
+
 
   renderNoBody() {
     return (
@@ -385,7 +397,7 @@ class StoreStatusScene extends PureComponent {
     } else if (icon_name === 'jd') {
       return require(`../../../img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return {uri:'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}
+      return {uri: 'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}
     } else if (icon_name === 'txd') {
       return require(`../../../img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {
@@ -417,19 +429,6 @@ class StoreStatusScene extends PureComponent {
 
 
         <If condition={canClose}>
-          {/*<ModalSelector*/}
-          {/*  style={[styles.footerItem, {flex: 1}]}*/}
-          {/*  touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
-          {/*  childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
-          {/*  onModalClose={(option) => {*/}
-          {/*    this.closeStore(option.value);*/}
-          {/*  }}*/}
-          {/*  cancelText={'取消'}*/}
-          {/*  data={this.state.timeOptions}>*/}
-          {/*  <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>*/}
-          {/*    <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>*/}
-          {/*  </View>*/}
-          {/*</ModalSelector>*/}
           <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}
                             onPress={() => {
                               this.onPress(Config.ROUTE_STORE_CLOSE, {
@@ -531,6 +530,41 @@ class StoreStatusScene extends PureComponent {
           </View>
         </Dialog>
 
+        <BottomModal title={'提示'} actionText={'确定'} closeText={'取消'} onPress={this.closeModal}
+                     visible={this.state.modal} onPressClose={this.closeModal}
+                     onClose={this.closeModal}
+                     btnBottomStyle={{
+                       borderTopWidth: 1,
+                       borderTopColor: "#E5E5E5",
+                       paddingBottom: 0,
+                     }}
+                     closeBtnStyle={{
+                       borderWidth: 0,
+                       borderRadius: 0,
+                       borderRightWidth: 1,
+                       borderColor: "#E5E5E5",
+                     }}
+                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
+                     closeBtnTitleStyle={{color: colors.color333}}
+                     btnTitleStyle={{color: colors.main_color}}>
+          <View style={{paddingVertical: 10, paddingHorizontal: 10}}>
+            <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+            </View>
+
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
+            </View>
+
+            <View style={{flexDirection: 'row', marginTop: 4}}>
+              <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式不支持自动接单 </Text>
+            </View>
+          </View>
+        </BottomModal>
       </View>
     )
   }

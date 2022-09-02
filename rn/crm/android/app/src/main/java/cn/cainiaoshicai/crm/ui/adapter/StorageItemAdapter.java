@@ -1,10 +1,11 @@
 package cn.cainiaoshicai.crm.ui.adapter;
 
+import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -33,8 +36,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
-
-import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     public static final String PREFIX_NOT_FILTER = "@@";

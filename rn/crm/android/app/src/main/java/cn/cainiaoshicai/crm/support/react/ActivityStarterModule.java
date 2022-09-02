@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm.support.react;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.SearchManager;
@@ -15,6 +18,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
@@ -35,7 +40,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
-import com.xdandroid.hellodaemon.IntentWrapper;
 import com.xdandroid.hellodaemon.IntentWrapperReImpl;
 
 import java.io.IOException;
@@ -45,6 +49,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
@@ -72,14 +77,9 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
-import cn.jpush.android.api.JPushInterface;
+import cn.jiguang.plugins.push.JPushModule;
 import retrofit2.Call;
 import retrofit2.Response;
-
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
-import androidx.annotation.RequiresApi;
 
 /**
  * Expose Java to JavaScript.
@@ -120,7 +120,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
         //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
-        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
+//        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
     @ReactMethod
@@ -298,6 +298,10 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         String msg = "";
         if (activity != null) {
             try {
+
+                //初始化蓝牙管理
+                AppInfo.init(this.getReactApplicationContext());
+                JPushModule.registerActivityLifecycle(GlobalCtx.app());
 
                 // 初始化合成对象
                 SpeechUtility.createUtility(activity, SpeechConstant.APPID + "=58b571b2");

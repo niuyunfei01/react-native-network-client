@@ -13,8 +13,8 @@ import tool from "../../pubilc/util/tool";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

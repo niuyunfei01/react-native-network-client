@@ -1,12 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput, ScrollView
-} from "react-native";
+import {FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -129,7 +122,7 @@ const styles = StyleSheet.create({
     color: colors.color333,
     lineHeight: 20,
     width: '70%',
-    justifyContent:'center',
+    justifyContent: 'center',
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#979797',
@@ -293,6 +286,25 @@ const MODAL_DATA = [
 
 class StallDetailScene extends PureComponent {
 
+  state = {
+    selectType: 'income',
+    modalVisible: false,
+    modalContentObj: {
+      type: {
+        value: '',
+        label: ''
+      },
+      money: '',
+      remark: '',
+    },
+    stallInfo: {
+      income: [],
+      outcome: [],
+      other: []
+    },
+    selectItem: -1//展开某一项
+  }
+
   navigationOptions = () => {
     const {navigation} = this.props
     const option = {headerRight: () => this.headerRight()}
@@ -357,6 +369,7 @@ class StallDetailScene extends PureComponent {
       },
     })
   }
+
   closeModal = () => {
     this.setState({
       modalVisible: false,
@@ -370,6 +383,7 @@ class StallDetailScene extends PureComponent {
       },
     })
   }
+
   onChangeText = (value, attr) => {
     const {modalContentObj} = this.state
     modalContentObj[attr] = value
@@ -403,7 +417,7 @@ class StallDetailScene extends PureComponent {
               门店
             </Text>
             <Text style={styles.modalContentRightText}>
-              {this.props.global.simpleStore.name}
+              {this.props.global?.store_info?.name}
             </Text>
           </View>
           <View style={styles.modalContentRowWrap}>
@@ -445,7 +459,7 @@ class StallDetailScene extends PureComponent {
               金额
             </Text>
             <TextInput style={styles.modalContentRightTextInput}
-                       allowFontScaling={false}
+
                        value={modalContentObj.money}
                        placeholderTextColor={colors.colorDDD}
                        onChangeText={text => this.onChangeText(text, 'money')}
@@ -457,7 +471,7 @@ class StallDetailScene extends PureComponent {
               备注
             </Text>
             <TextInput style={styles.modalContentRightMultipleTextInput}
-                       allowFontScaling={false}
+
                        placeholderTextColor={colors.colorDDD}
                        multiline={true}
                        onChangeText={text => this.onChangeText(text, 'remark')}
@@ -566,25 +580,6 @@ class StallDetailScene extends PureComponent {
       </View>
 
     )
-  }
-
-  state = {
-    selectType: 'income',
-    modalVisible: false,
-    modalContentObj: {
-      type: {
-        value: '',
-        label: ''
-      },
-      money: '',
-      remark: '',
-    },
-    stallInfo: {
-      income: [],
-      outcome: [],
-      other: []
-    },
-    selectItem: -1//展开某一项
   }
 
   selectItem = (selectItem, index) => {

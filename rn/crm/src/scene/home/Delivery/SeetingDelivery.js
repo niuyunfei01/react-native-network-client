@@ -6,14 +6,13 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Switch as RNSwitch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {Cell, CellBody, CellFooter, Cells, Switch} from "../../../weui";
+import {Cell, CellBody, CellFooter, Cells} from "../../../weui";
 import Entypo from "react-native-vector-icons/Entypo"
 import * as globalActions from "../../../reducers/global/globalActions";
 import {showError, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -22,7 +21,7 @@ import native from "../../../pubilc/util/native";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import config from "../../../pubilc/common/config";
-import {Button} from "react-native-elements";
+import {Button, Switch} from "react-native-elements";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const mapStateToProps = state => {
@@ -81,18 +80,18 @@ class SeetingDelivery extends PureComponent {
     this.getDeliveryConf();
   }
 
-  onHeaderRefresh() {
+  onHeaderRefresh = () => {
     this.getDeliveryConf();
   }
 
-  onPress(route, params = {}, callback = {}) {
+  onPress = (route, params = {}, callback = {}) => {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
   }
 
-  getDeliveryConf() {
+  getDeliveryConf = () => {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let showBtn = this.props.route.params.showBtn;
       if (tool.length(response.bind_info) > 0) {
@@ -122,7 +121,7 @@ class SeetingDelivery extends PureComponent {
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default_str: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0,
-        show_auto_confirm_order: this.props.global.config.vendor.wsb_store_account === '1',
+        show_auto_confirm_order: this.props.global?.vendor_info?.wsb_store_account === '1',
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
         isShowSettingText: JSON.parse(response.preference_ship_config).is_open === 1,
@@ -132,7 +131,7 @@ class SeetingDelivery extends PureComponent {
     })
   }
 
-  onBindDelivery() {
+  onBindDelivery = () => {
 
     const {
       suspend_confirm_order,
@@ -144,7 +143,12 @@ class SeetingDelivery extends PureComponent {
       order_require_minutes,
       default_str,
     } = this.state
-    this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
+
+    this.setState({
+      isRefreshing: true,
+      suspend_confirm_order: !suspend_confirm_order
+    })
+
     if (auto_call && ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
@@ -164,7 +168,7 @@ class SeetingDelivery extends PureComponent {
         this.props.route.params.ext_store_id,
         {
           auto_call: auto_call ? 1 : 2,
-          suspend_confirm_order: suspend_confirm_order ? "0" : "1",
+          suspend_confirm_order: suspend_confirm_order ? "1" : "0",
           ship_ways: ship_ways,
           default: default_str,
           max_call_time: max_call_time,
@@ -199,6 +203,7 @@ class SeetingDelivery extends PureComponent {
         ship_ways: ship_ways_arr
       })
     }
+
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
@@ -291,9 +296,10 @@ class SeetingDelivery extends PureComponent {
                   <Text style={[styles.cell_body_text]}>自动接单 </Text>
                 </CellBody>
                 <CellFooter>
-                  <Switch value={this.state.suspend_confirm_order}
-                          onValueChange={(res) => {
-                            this.setState({suspend_confirm_order: res});
+                  <Switch color={colors.main_color} style={{
+                    fontSize: 16,
+                  }} value={this.state.suspend_confirm_order}
+                          onChange={() => {
                             this.onBindDelivery()
                           }}/>
                 </CellFooter>
@@ -314,9 +320,9 @@ class SeetingDelivery extends PureComponent {
                     <Text style={[{color: "#CACACA"}, styles.cell_body_text]}>自动接单</Text>
                   </CellBody>
                   <CellFooter>
-                    <RNSwitch
-                      disabled={true}
-                    />
+                    <Switch color={colors.main_color} disabled={true} style={{
+                      fontSize: 16,
+                    }}/>
                   </CellFooter>
                 </Cell>
               </Cells>

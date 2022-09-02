@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ScrollView, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../util/pxToDp";
@@ -7,12 +7,13 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 const height = Dimensions.get("window").height;
 
-class JbbModal extends React.Component {
+class JbbModal extends PureComponent {
   static propTypes = {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
     modal_type: PropTypes.string,
     modalStyle: PropTypes.object,
+    HighlightStyle: PropTypes.object,
   }
   static defaultProps = {
     visible: true
@@ -49,7 +50,7 @@ class JbbModal extends React.Component {
           borderTopRightRadius: pxToDp(30),
           padding: pxToDp(30),
           paddingBottom: pxToDp(50)
-        }]}>
+        }, this.props.HighlightStyle]}>
           <ScrollView style={[{
             padding: 10,
           }, this.props.modalStyle]}>

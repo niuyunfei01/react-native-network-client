@@ -151,10 +151,6 @@ export function orderSetReady(token, id, workerIdList, callback) {
   return getReqThenInvalidate(url, id, callback);
 }
 
-export function orderTransferSelf(token, orderId, callback) {
-  const url = `/api/order_transfer_self?access_token=${token}&orderId=${orderId}`;
-  return getReqThenInvalidate(url, orderId, callback);
-}
 
 /**
  *
@@ -403,8 +399,8 @@ export function deliveryFailedAudit(token, id, data, callback) {
   return jsonReqThenInvalidate(url, id, callback, data);
 }
 
-export function fetchPrintHexStr(wmId, callback) {
-  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${this.global.accessToken}`;
+export function fetchPrintHexStr(wmId, callback, accessToken) {
+  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${accessToken}`;
 
   if (typeof callback !== 'function') {
     callback = (ok, hex) => {

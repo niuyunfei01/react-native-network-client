@@ -149,6 +149,7 @@ const C = {
   ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
+  ROUTE_STORE_SELECT: 'StoreSelect',
   ROUTE_COMES_BACK: 'ComesBack',
   ROUTE_COMES_BACK_INFO: 'ComesBackInfo',
   ROUTE_STORE_CLOSE: 'StoreClose',
@@ -208,8 +209,9 @@ const C = {
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
-  ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',//设置配送方式
+  ROUTE_SEETING_DELIVERY_INFO: 'SettingDeliveryInfo',//设置配送方式
   ROUTE_AUTO_CALL_DELIVERY: 'AutoCallDelivery',
+  ROUTE_ORDER_RETAIL_PRICE_NEW: 'NewRetailPrice',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
   ROUTE_SEETING_PREFERENCE_DELIVERY: 'PreferenceBillingSetting',   //偏好发单设置
   ROUTE_SEETING_MININUM_DELIVERY: 'SeetingMiniNumDelivery',   //保底配送
@@ -233,8 +235,7 @@ const C = {
   ROUTE_STORE_GOODS_LIST: 'goods',
   ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
-  ROUTE_NEW_PRODUCT: 'NewProduct',
-  ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
+
   ROUTE_INVOICING: 'Invoicing',
   ROUTE_INVOICING_GATHER_DETAIL: 'InvoicingGatherDetail',
   ROUTE_INVOICING_SHIPPING_DETAIL: 'InvoicingShippingDetail',
@@ -287,6 +288,9 @@ const C = {
   ROUTE_DELIVERY_LIST: 'DeliveryList',
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
   ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
+
+
+  RIDER_TRSJECTORY: 'RiderTrajectory',
 
   //wechat app_id
   APP_ID: "wx0ffb81c6dc194253",

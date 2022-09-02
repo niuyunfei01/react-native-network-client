@@ -1,9 +1,11 @@
 import React, {PureComponent} from "react";
-import {FlatList, Modal, Platform, TouchableOpacity, Dimensions, StyleSheet, Text, TextInput, View} from 'react-native'
+import {Dimensions, FlatList, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import Config from "../../common/config";
-import {showError, showSuccess} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
+// import InputBoard from "../InputBoard";
+// import CommonModal from "./CommonModal";
 
 const {height} = Dimensions.get("window");
 let checkStatus = true
@@ -185,11 +187,17 @@ export default class MultiSpecsModal extends PureComponent {
     if (inventory.length > 0)
       params = {...params, inventorys: inventory}
     if (prices.length > 0)
-      HttpUtils.post.bind(this.props)(url, params).then(() => {
-        showSuccess('已完成', 3)
-      }, res => showError(res.reason, 1)).catch(e => {
-        showError(e.reason, 1)
-      })
+      showModal('提交中', 'loading', 1000)
+    HttpUtils.post.bind(this.props)(url, params).then(() => {
+      showSuccess('修改成功')
+      onClose()
+    }, res => {
+      showError(res.reason, 1)
+      onClose()
+    }).catch(e => {
+      showError(e.reason, 1)
+      onClose()
+    })
     onClose()
   }
 

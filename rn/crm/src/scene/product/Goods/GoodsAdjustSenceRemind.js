@@ -18,8 +18,8 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToDp from "../../../pubilc/util/pxToDp";
 
 function mapStateToProps(state) {
-  const {invoicing, global, batch} = state;
-  return {invoicing, global, batch}
+  const {global, batch} = state;
+  return {global, batch}
 }
 
 function mapDispatchToProps(dispatch) {

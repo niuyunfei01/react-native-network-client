@@ -4,7 +4,6 @@ import {
   InteractionManager,
   RefreshControl,
   ScrollView,
-  Slider,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,6 +20,7 @@ import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
 import native from "../../../pubilc/util/native";
+import Slider from "@react-native-community/slider";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -63,7 +63,7 @@ class InfromSetting extends PureComponent {
       isRun: false,
       error: 0,
     }
-    this.geterror();
+
   }
 
   geterror() {
@@ -83,7 +83,7 @@ class InfromSetting extends PureComponent {
     })
 
     native.isRunInBg((resp) => {
-      resp = resp === 1 ? true : false;
+      resp = resp === 1;
       if (!resp) {
         this.setState({
           error: this.state.error + 1,
@@ -105,7 +105,7 @@ class InfromSetting extends PureComponent {
         maxVolume: maxVolume,
         minVolume: minVolume < 0 ? 0 : minVolume,
       })
-    })
+    }).then()
 
 
     native.getDisableSoundNotify((disabled) => {
@@ -116,11 +116,12 @@ class InfromSetting extends PureComponent {
         })
       }
       this.setState({enable_notify: !disabled})
-    })
+    }).then()
 
   }
 
   componentDidMount() {
+    this.geterror();
   }
 
   componentWillUnmount() {
@@ -157,8 +158,7 @@ class InfromSetting extends PureComponent {
 
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text
-                style={[styles.cell_body_text]}>新消息通知 </Text>
+              <Text style={[styles.cell_body_text]}>新消息通知 </Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}

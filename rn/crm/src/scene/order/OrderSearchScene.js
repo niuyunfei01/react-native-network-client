@@ -1,13 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  FlatList, InteractionManager,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {FlatList, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,8 +14,8 @@ import tool from "../../pubilc/util/tool";
 import {hideModal, showError, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, user, global, device} = state;
-  return {mine: mine, user: user, global: global, device: device}
+  const {global, device} = state;
+  return {global, device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -86,7 +79,7 @@ class OrderSearchScene extends PureComponent {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
@@ -162,7 +155,7 @@ class OrderSearchScene extends PureComponent {
                      key={index}
                      onRefresh={() => this.onRefresh()}
                      navigation={navigation}
-                     vendorId={global.config.vendor.id}
+                     vendorId={global?.vendor_id}
                      setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}

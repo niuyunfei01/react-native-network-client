@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.support.print;
 
 import android.bluetooth.BluetoothDevice;
+
 import androidx.annotation.Nullable;
 
 import java.io.IOException;

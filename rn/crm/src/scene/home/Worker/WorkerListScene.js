@@ -22,14 +22,12 @@ class WorkerScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {currentUser, currStoreId, canReadStores} = this.props.global;
+    const {currentUser,  vendor_id,vendor_info} = this.props.global;
 
-    let currVendorId = canReadStores[currStoreId]['type'];
-    let currVendorName = canReadStores[currStoreId]['vendor'];
     this.state = {
       currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: currVendorName,
+      currVendorId: vendor_id,
+      currVendorName: vendor_info?.brand_name,
       lists: [],
       pageNum: 1,
       pageSize: 20,
