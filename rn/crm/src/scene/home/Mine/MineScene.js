@@ -30,7 +30,6 @@ import {setRecordFlag} from "../../../reducers/store/storeActions"
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
-import JPush from "jpush-react-native";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import dayjs from "dayjs";
 
@@ -84,6 +83,7 @@ import {
   wallet
 } from "../../../svg/svg";
 import {LineView, Styles} from "../GoodsIncrementService/GoodsIncrementServiceStyle";
+import {doJPushSetAlias} from "../../../pubilc/component/jpushManage";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -459,16 +459,7 @@ class MineScene extends Component {
 
   registerJpush = () => {
     const {currentUser} = this.props.global
-    let date = Math.round(new Date() / 1000)
-    if (currentUser) {
-      const alias = `uid_${currentUser}`;
-      JPush.setAlias({alias: alias, sequence: date})
-      JPush.isPushStopped((isStopped) => {
-        if (isStopped) {
-          JPush.resumePush();
-        }
-      })
-    }
+    doJPushSetAlias(currentUser)
   }
 
   _doChangeStore = (store_id) => {
@@ -513,7 +504,7 @@ class MineScene extends Component {
     if (Platform.OS === 'ios') {
       callback(true, '');
     } else {
-      native.setCurrStoreId(store_id, callback);
+      native.setCurrStoreId(store_id, callback).then();
     }
   }
 

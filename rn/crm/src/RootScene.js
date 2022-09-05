@@ -63,7 +63,7 @@ class RootScene extends PureComponent {
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
-      if (noLoginInfo.accessToken) {
+      if (noLoginInfo.accessToken && noLoginInfo.currStoreId && noLoginInfo.storeVendorId) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
         HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {

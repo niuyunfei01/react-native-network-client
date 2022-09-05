@@ -771,9 +771,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
             case R.id.menu_store_operation:
                 GlobalCtx.app().toOperationActivity(this);
                 return true;
-//            case R.id.menu_operation:
-//                startActivity(new Intent(this, DataActivity.class));
-//                return true;
+
             default:
         }
 

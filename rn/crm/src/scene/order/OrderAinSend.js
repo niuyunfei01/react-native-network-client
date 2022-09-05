@@ -17,17 +17,6 @@ function mapStateToProps(state) {
   }
 }
 
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class OrderAinSend extends Component {
   constructor(props: Object) {
     super(props);
@@ -43,14 +32,14 @@ class OrderAinSend extends Component {
     };
   }
 
-  UNSAFE_componentWillMount(): void {
+  componentDidMount() {
     this.fetchWorker();
   }
 
   fetchWorker() {
     const {dispatch, global} = this.props;
     dispatch(getContacts(global.accessToken, this.state.storeId, (ok, msg, contacts) => {
-      this.setState({workerList: contacts})
+      this.setState({workerList: contacts || []})
     }));
   }
 
@@ -96,17 +85,21 @@ class OrderAinSend extends Component {
     )
   }
 
+  selectWorker = (info) => {
+    this.setState({
+      worker: info.id
+    })
+  }
+
   renderWorkerList() {
     if (!this.state.workerList.length > 0) {
       return;
     }
     return (
       <For of={this.state.workerList} index="i" each="info">
-        <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}} onPress={() => {
-          this.setState({
-            worker: info.id
-          })
-        }}>
+        <TouchableOpacity key={i}
+                          style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}}
+                          onPress={() => this.selectWorker(info)}>
           <View style={info.id === this.state.worker ? {
             flexDirection: 'row',
             alignItems: 'center',
@@ -133,10 +126,9 @@ class OrderAinSend extends Component {
                 <Ionicons name={'radio-button-off-outline'}
                           style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
             </View>
-            <Text style={{
-              fontSize: 14,
-              lineHeight: pxToDp(42),
-            }}>{info.label}-{info.mobile} </Text>
+            <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>
+              {info.label}-{info.mobile}
+            </Text>
           </View>
         </TouchableOpacity>
       </For>
