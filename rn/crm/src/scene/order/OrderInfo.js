@@ -203,7 +203,6 @@ class OrderInfo extends Component {
       is_merchant_add_tip: 0,
       step: 0
     };
-    this.fetchOrder(order_id);
   }
 
   onPress = (route, params) => {
@@ -235,46 +234,7 @@ class OrderInfo extends Component {
   }
 
   componentDidMount() {
-    let as = [
-      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
-      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
-      {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_RECEIVE_QR, label: '收款码'},
-      {key: MENU_CALL_STAFF, label: '联系门店'},
-    ];
-
-    let {order, is_service_mgr, allow_merchants_cancel_order} = this.state
-    if (is_service_mgr) {
-      as.push({key: MENU_SET_INVALID, label: '置为无效'});
-    }
-    if (is_service_mgr || allow_merchants_cancel_order) {
-      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
-    }
-    if (is_service_mgr || this.props.global?.vendor_info?.wsb_store_account === "1") {
-      as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
-    }
-    if (this._fnProvidingOnway()) {
-      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
-      as.push({key: MENU_PROVIDING, label: '门店备货'});
-    }
-    if (order && order.fn_scan_items) {
-      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
-    }
-    if (order && order.fn_scan_ready) {
-      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
-    }
-    if (is_service_mgr) {
-      as.push({key: MENU_SEND_MONEY, label: '发红包'});
-    }
-    if (order && order.cancel_to_entry) {
-      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
-    }
-    if (order && order.fn_coupon_redeem_good) {
-      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
-    }
-    this.setState({actionSheet: as})
-
+    this.fetchData()
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth().then(() => {
       }).catch((error) => {
@@ -305,6 +265,47 @@ class OrderInfo extends Component {
     calcMs(timeObj, accessToken)
   }
 
+  handleActionSheet = (order, allow_merchants_cancel_order) => {
+    const as = [
+      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
+      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+      {key: MENU_EDIT_STORE, label: '修改门店'},
+      {key: MENU_FEEDBACK, label: '客户反馈'},
+      {key: MENU_RECEIVE_QR, label: '收款码'},
+      {key: MENU_CALL_STAFF, label: '联系门店'},
+    ];
+    const {is_service_mgr} = this.state
+    if (is_service_mgr) {
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
+    }
+    if (is_service_mgr || allow_merchants_cancel_order) {
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
+    }
+    if (is_service_mgr || this.props.global?.vendor_info?.wsb_store_account === "1") {
+      as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
+    }
+    if (this._fnProvidingOnway()) {
+      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
+      as.push({key: MENU_PROVIDING, label: '门店备货'});
+    }
+    if (order && order.fn_scan_items) {
+      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
+    }
+    if (order && order.fn_scan_ready) {
+      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+    }
+    if (is_service_mgr) {
+      as.push({key: MENU_SEND_MONEY, label: '发红包'});
+    }
+    if (order && order.cancel_to_entry) {
+      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
+    }
+    if (order && order.fn_coupon_redeem_good) {
+      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
+    }
+    this.setState({actionSheet: as})
+  }
+
   fetchOrder(order_id) {
     if (!order_id || this.state.isFetching) {
       return false;
@@ -325,6 +326,7 @@ class OrderInfo extends Component {
         methodName: 'fetchOrder',
         executeTime: res.endTime - res.startTime
       })
+      this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
       this.setState({
         order: obj,
         isFetching: false,
@@ -572,42 +574,38 @@ class OrderInfo extends Component {
         };
         BleManager.retrieveServices(printer_id).then((peripheral) => {
           print_order_to_bt(accessToken, peripheral, clb, order.id, order);
-        }).catch((error) => {
+        }).catch(() => {
           BleManager.connect(printer_id).then(() => {
             BleManager.retrieveServices(printer_id).then((peripheral) => {
               print_order_to_bt(accessToken, peripheral, clb, order.id, order);
-            }).catch((error) => {
+            }).catch(() => {
               //忽略第二次的结果
             })
-          }).catch((error) => {
-            Alert.alert('提示', '打印机已断开连接', [{
-              text: '确定', onPress: () => {
-                this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-              }
-            }, {
-              'text': '取消', onPress: () => {
-              }
-            }]);
+          }).catch(() => {
+            Alert.alert('提示', '打印机已断开连接', this.buttons);
             this._hidePrinterChooser();
           });
         });
       }, 300);
     } else {
-      Alert.alert('提示', '尚未连接到打印机', [{
-        text: '确定', onPress: () => {
-          this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-        }
-      }, {
-        'text': '取消', onPress: () => {
-        }
-      }]);
+      Alert.alert('提示', '尚未连接到打印机', this.buttons);
     }
 
   }
 
+  buttons = [
+    {
+      text: '确定',
+      onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+    },
+    {
+      text: '取消'
+    }
+  ]
+
   _doSunMiPint = () => {
     const {order} = this.state
-    native.printSmPrinter(order);
+    native.printSmPrinter(order).then();
     this._hidePrinterChooser();
   }
 

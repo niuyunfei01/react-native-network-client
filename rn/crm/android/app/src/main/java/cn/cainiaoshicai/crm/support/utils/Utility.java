@@ -1105,13 +1105,10 @@ public class Utility {
     }
 
     public static void toast(final String msg, final Activity activity, final Runnable uiCallback, final int toastLength) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity, msg, toastLength).show();
-                if (uiCallback != null) {
-                    uiCallback.run();
-                }
+        activity.runOnUiThread(() -> {
+            Toast.makeText(activity, msg, toastLength).show();
+            if (uiCallback != null) {
+                uiCallback.run();
             }
         });
     }

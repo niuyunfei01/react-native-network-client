@@ -132,9 +132,7 @@ public class MineActivity extends AbstractActionBarActivity {
                     } else if (item.getType() == TYPE_ORDER_SEARCH) {
                         onSearchRequested();
                     } else if (item.getType() == TYPE_TOTAL_SCORE) {
-                        MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
                     } else if (item.getType() == TYPE_ORDER_DELAYED) {
-                        MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
                     } else if (item.getType() == TYPE_ORDER_LIST) {
                         Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
                         intent.putExtra("list_type", ListType.INVALID.getValue());

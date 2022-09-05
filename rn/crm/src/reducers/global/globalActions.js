@@ -21,11 +21,10 @@ import {
   updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import {Alert, Platform} from "react-native";
-import JPush from "jpush-react-native";
+import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import Cts from "../../pubilc/common/Cts";
-import dayjs from "dayjs";
+import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
 
 /**
  * ## Imports
@@ -161,7 +160,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout().then();
-    JPush.deleteAlias({sequence: dayjs().unix()})
+    doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();
     }

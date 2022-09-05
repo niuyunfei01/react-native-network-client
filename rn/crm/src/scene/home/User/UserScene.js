@@ -21,7 +21,6 @@ import {hideModal, showModal, showSuccess, ToastShort} from "../../../pubilc/uti
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
-import native from "../../../pubilc/util/native";
 import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";

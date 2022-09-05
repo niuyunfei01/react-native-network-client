@@ -58,7 +58,7 @@ class BluePrinterSettings extends PureComponent {
 
   startScan = () => {
     if (!this.state.isScanning) {
-      BleManager.scan([], 10, false).then((results) => {
+      BleManager.scan([], 10, false).then(() => {
         this.setState({isScanning: true});
       }).catch(err => {
         console.error("scanning ", err);
@@ -143,7 +143,7 @@ class BluePrinterSettings extends PureComponent {
 
   testPrint = (peripheral) => {
     setTimeout(() => {
-      BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
+      BleManager.retrieveServices(peripheral.id).then(() => {
         const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
         const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
         setTimeout(() => {
@@ -152,15 +152,15 @@ class BluePrinterSettings extends PureComponent {
               const testData = this.testPrintData();
               BleManager.write(peripheral.id, service, bakeCharacteristic, testData).then(() => {
                 this.alert("打印成功，请查看小票")
-              }).catch((error) => {
+              }).catch(() => {
                 this.alert("蓝牙打印失败，请重试")
               });
             }, 500);
-          }).catch((error) => {
-            this.alert("蓝牙打印失败，请重试")
+          }).catch(() => {
+            this.alert("蓝牙打印失败，请重试",)
           });
         }, 200);
-      }).catch((error) => {
+      }).catch(() => {
         this.alert("蓝牙打印机连接失败")
       });
     })
@@ -169,7 +169,7 @@ class BluePrinterSettings extends PureComponent {
   connectPrinter = (peripheral) => {
     if (peripheral) {
       if (peripheral.connected) {
-        BleManager.disconnect(peripheral.id);
+        BleManager.disconnect(peripheral.id).then();
       } else {
         BleManager.connect(peripheral.id).then(() => {
           const peripherals = this.state.peripherals;
@@ -182,7 +182,7 @@ class BluePrinterSettings extends PureComponent {
           const {dispatch} = this.props
           dispatch(setPrinterId(peripheral.id))
           setTimeout(() => {
-            BleManager.retrieveServices(peripheral.id).then((peripheralData) => {
+            BleManager.retrieveServices(peripheral.id).then(() => {
               BleManager.readRSSI(peripheral.id).then((rssi) => {
                 let p = peripherals.get(peripheral.id);
                 if (p) {
@@ -193,26 +193,24 @@ class BluePrinterSettings extends PureComponent {
               });
             });
           }, 900);
-        }).catch((error) => {
+        }).catch(() => {
           this.alert("蓝牙连接失败，请重试")
         });
       }
-    } else {
     }
   }
 
   alert(text) {
     Alert.alert('提示', text, [{
-      text: '确定', onPress: () => {
-      }
+      text: '确定',
+      onPress: () => {}
     }]);
   }
 
 
   componentDidMount() {
 
-    BleManager.start({showAlert: false}).then(() => {
-    });
+    BleManager.start({showAlert: false}).then();
 
     // eslint-disable-next-line react/prop-types
     const {dispatch} = this.props
@@ -225,16 +223,13 @@ class BluePrinterSettings extends PureComponent {
 
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth()
-        .then(() => {
-        })
+        .then()
         .catch((error) => {
           this.setState({askEnableBle: true})
         });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (result) {
-          console.log("定位权限已获得");
-        } else {
+        if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
             if (result) {
               console.log("User 接受");
@@ -264,47 +259,33 @@ class BluePrinterSettings extends PureComponent {
             <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}  </Text>
           </View>
           <View style={[styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
-            {item.connected && <View style={[styles.between]}>
-              <View style={{marginEnd: 10}}>
-                <Button
-                  size="small"
-                  type={"primary"}
-                  style={{
-                    color: colors.white,
-                    paddingVertical: 2,
-                    height: pxToDp(70),
-                    paddingLeft: pxToDp(30),
-                    paddingRight: pxToDp(30),
-                  }}
-                  onPress={() => this.testPrint(item)}>
-                  测试打印
+            <If condition={item.connected}>
+              <View style={[styles.between]}>
+                <View style={{marginEnd: 10}}>
+                  <Button
+                    size="small"
+                    type={"primary"}
+                    style={styles.testPrintBtn}
+                    onPress={() => this.testPrint(item)}>
+                    测试打印
+                  </Button>
+                </View>
+                <Button size="small"
+                        type={"primary"}
+                        style={styles.disConnectBTBtn}
+                        onPress={() => this.handleDisconnectedPeripheral(item.id)}>
+                  断开
                 </Button>
               </View>
-              <Button size="small" type={"primary"} style={{
-                backgroundColor: '#818181',
-                paddingVertical: 2,
-                height: pxToDp(70),
-                paddingLeft: pxToDp(30),
-                borderWidth: 0,
-                paddingRight: pxToDp(30),
-              }}
-                      onPress={() => this.handleDisconnectedPeripheral(item.id)}> 断开</Button>
-            </View>}
-            {!item.connected &&
-            <Button type={"primary"}
-                    size="small"
-                    style={{
-                      borderWidth: 0,
-                      backgroundColor: colors.main_color,
-                      // paddingVertical: 2,
-                      // padding: pxToDp(30),
-                      textAlign: 'center',
-                      height: pxToDp(70),
-                      paddingLeft: pxToDp(30),
-                      paddingRight: pxToDp(30),
-                      fontSize: pxToDp(40),
-                    }}
-                    onPress={() => this.connectPrinter(item)}>连接</Button>}
+            </If>
+            <If condition={!item.connected}>
+              <Button type={'primary'}
+                      size={'small'}
+                      style={styles.connectBTBtn}
+                      onPress={() => this.connectPrinter(item)}>
+                连接
+              </Button>
+            </If>
           </View>
         </View>
       </TouchableHighlight>
@@ -327,15 +308,18 @@ class BluePrinterSettings extends PureComponent {
                     keyExtractor={item => item.id}/>
         </View>}
         {(this.state.list.length === 0 && !this.state.isScanning) &&
-        <View style={{flex: 1, margin: 20}}>
-          <Text style={{textAlign: 'center'}}>{this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}  </Text>
-        </View>}
+          <View style={{flex: 1, margin: 20}}>
+            <Text style={{textAlign: 'center'}}>
+              {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}
+            </Text>
+          </View>}
 
         <View style={{backgroundColor: colors.main_back}}>
-          {this.state.askEnableBle && <View style={{margin: 10}}>
-            <Button nPress={() => {
-            }}>开启蓝牙打印</Button>
-          </View>}
+          <If condition={this.state.askEnableBle}>
+            <View style={{margin: 10}}>
+              <Button>开启蓝牙打印</Button>
+            </View>
+          </If>
           <View style={{margin: 10}}>
             <Button
               type={'primary'}
@@ -346,8 +330,9 @@ class BluePrinterSettings extends PureComponent {
                 textAlign: 'center',
                 marginBottom: pxToDp(30),
               }}
-              onPress={() => this.startScan()}>搜索蓝牙打印机 {this.state.isScanning ? `(搜索中...${this.state.list.length})` :
-              `(共${this.state.list.length}个)`}</Button>
+              onPress={() => this.startScan()}>
+              搜索蓝牙打印机 {this.state.isScanning ? `(搜索中...${this.state.list.length})` : `(共${this.state.list.length}个)`}
+            </Button>
           </View>
         </View>
       </SafeAreaView>
@@ -356,6 +341,32 @@ class BluePrinterSettings extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  testPrintBtn:{
+    color: colors.white,
+    paddingVertical: 2,
+    height: pxToDp(70),
+    paddingLeft: pxToDp(30),
+    paddingRight: pxToDp(30),
+  },
+  disConnectBTBtn: {
+    backgroundColor: '#818181',
+    paddingVertical: 2,
+    height: pxToDp(70),
+    paddingLeft: pxToDp(30),
+    borderWidth: 0,
+    paddingRight: pxToDp(30),
+  },
+  connectBTBtn: {
+    borderWidth: 0,
+    backgroundColor: colors.main_color,
+    // paddingVertical: 2,
+    // padding: pxToDp(30),
+    textAlign: 'center',
+    height: pxToDp(70),
+    paddingLeft: pxToDp(30),
+    paddingRight: pxToDp(30),
+    fontSize: pxToDp(40),
+  },
   between: {
     flexDirection: "row",
     justifyContent: "space-between",

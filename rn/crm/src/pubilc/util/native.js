@@ -1,11 +1,8 @@
 import {Linking, NativeModules, Platform} from 'react-native'
 
 const {ActivityStarter} = NativeModules
-let _orderSearch = async function (term) {
-  if (ActivityStarter) {
-    await ActivityStarter.searchOrders(term);
-  }
-};
+
+
 export default {
 
   updateAfterTokenGot: async function (access_token, expire, callback = function () {
@@ -87,17 +84,9 @@ export default {
       await ActivityStarter.currentVersion(callback);
     }
   },
-
-  ordersSeriousDelay: async function () {
-    await _orderSearch('to_ship_late_serious:');
-  },
-
-  ordersInvalid: async function () {
-    await _orderSearch('invalid:');
-  },
-
   ordersSearch: async function (term) {
-    await _orderSearch(term);
+    if (ActivityStarter)
+      await ActivityStarter.searchOrders(term);
   },
 
   toGoods: async function (global = null, dispatch = null, navigation = null) {
@@ -106,8 +95,7 @@ export default {
   },
 
   toNativeOrder: async function (id) {
-    await (ActivityStarter &&
-      ActivityStarter.toOrder(id));
+    await (ActivityStarter && ActivityStarter.toOrder(id));
   },
 
   gotoPage: async function (page) {
@@ -121,13 +109,6 @@ export default {
       await ActivityStarter.navigateToNativeActivity(activityName, putStack, json);
     }
   },
-
-  gotoRNActivity: async function (action, json = '{}') {
-    if (ActivityStarter && action) {
-      await ActivityStarter.navigateToRnView(action, json);
-    }
-  },
-
   nativeBack: async function () {
     if (ActivityStarter) {
       await ActivityStarter.nativeBack();
@@ -159,29 +140,34 @@ export default {
    */
   setCurrStoreId: async function (storeId, callback = function () {
   }) {
-    await (ActivityStarter &&
-      ActivityStarter.setCurrStoreId(storeId, callback));
+    if (ActivityStarter)
+      await
+        ActivityStarter.setCurrStoreId(storeId, callback);
   },
 
   gotoLoginWithNoHistory: async function (mobile = '') {
-    await (ActivityStarter &&
-      ActivityStarter.gotoLoginWithNoHistory(mobile));
+    if (ActivityStarter)
+      await
+        ActivityStarter.gotoLoginWithNoHistory(mobile);
   },
 
   gotoActByUrl: async function (url) {
-    await (ActivityStarter &&
-      ActivityStarter.gotoActByUrl(url));
+    if (ActivityStarter)
+      await
+        ActivityStarter.gotoActByUrl(url);
   },
 
   logout: async function () {
-    await (ActivityStarter &&
-      ActivityStarter.logout());
+    if (ActivityStarter)
+      await
+        ActivityStarter.logout();
   },
 
   printBtPrinter: async function (order, callback = function () {
   }) {
-    await (ActivityStarter &&
-      ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
+    if (ActivityStarter)
+      await
+        ActivityStarter.printBtPrinter(JSON.stringify(order), callback);
   },
 
   printSmPrinter: async function (order, callback = function () {
@@ -208,14 +194,13 @@ export default {
   },
 
   dialNumber: async function (number) {
-    let phoneNumber = '';
+    let phoneNumber;
     if (Platform.OS === 'android') {
       phoneNumber = `tel:${number}`;
     } else {
       phoneNumber = `telprompt:${number}`;
     }
-    Linking.openURL(phoneNumber).then(r => {
-    });
+    Linking.openURL(phoneNumber).then();
   },
 
   clearScan: async function (code, callback = function () {

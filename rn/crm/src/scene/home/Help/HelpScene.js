@@ -136,7 +136,7 @@ class HelpScene extends PureComponent {
   }
 
   render() {
-    let mobile = this.props.global?.vendor_info?.mobile;
+
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(140)}}>
@@ -202,11 +202,7 @@ class HelpScene extends PureComponent {
 
         </ScrollView>
         <View style={styles.call_btn_wrapper}>
-          <TouchableOpacity
-            onPress={() => {
-              native.dialNumber(mobile);
-            }}
-          >
+          <TouchableOpacity onPress={this.dialNumber}>
             <View style={styles.call_btn}>
               <FontAwesome5 name={'phone-square'}
                             style={{fontSize: pxToDp(36), color: colors.main_color, marginRight: pxToDp(24)}}/>
@@ -218,6 +214,15 @@ class HelpScene extends PureComponent {
 
       </View>
     )
+  }
+
+  dialNumber = async () => {
+    try {
+      let mobile = this.props.global?.vendor_info?.mobile;
+      await native.dialNumber(mobile)
+    } catch (e) {
+
+    }
   }
 
 }
