@@ -178,13 +178,11 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   getproduct() {
-    //showModal('加载中')
     const {accessToken} = this.props.global;
     const {product_id, store_id, vendorId, allow_merchants_edit_prod} = this.state;
     if (allow_merchants_edit_prod) {
       const url = `/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(url).then(res => {
-        //hideModal()
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
             <TouchableOpacity
@@ -200,8 +198,6 @@ class GoodStoreDetailScene extends PureComponent {
             </TouchableOpacity>
           </View>),
         })
-      }).catch(error => {
-        //hideModal()
       })
     }
   }
@@ -557,7 +553,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
   renderModalStall = () => {
     const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
-    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec.label)
+    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec.label
     return (
       <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
              onShow={this.onShowStall}>
@@ -585,7 +581,7 @@ class GoodStoreDetailScene extends PureComponent {
                 </ModalSelector>
               </View>
             </View>
-            <If condition={tool.length(selectedSpecArray > 0}>
+            <If condition={tool.length(selectedSpecArray) > 0}>
               <View style={styles.modalRowWrap}>
                 <Text style={styles.modalRowText}>
                   规格

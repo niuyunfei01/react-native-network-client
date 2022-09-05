@@ -118,10 +118,9 @@ export function vendor(global) {
 /**
  * 当前店铺信息
  * @param global
- * @param store_id
  * @returns {*}
  */
-export function store(global, store_id = null) {
+export function store(global) {
   const {store_info} = global;
   return store_info;
 }
@@ -241,7 +240,6 @@ export function intOf(val) {
   if (typeof val === "string") {
     return parseInt(val);
   }
-
   return val;
 }
 
@@ -254,59 +252,6 @@ function parameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-
-/**
- * 数组按指定字段排序
- * @param itemlist
- * @param gby
- * @param keyName
- * @param valueName
- * @returns {Array}
- * @constructor
- */
-function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
-  var setGroupObj = function (noteObj, rule, gby, gIndex, maxIndex) {
-    var gname = rule[gby[gIndex]];
-    if (gIndex == maxIndex) {
-      if (noteObj[gname] == undefined)
-        noteObj[gname] = [];
-      if (noteObj[gname].indexOf(rule) < 0) {
-        noteObj[gname].push(rule);
-      }
-    } else {
-      if (noteObj[gname] == undefined) {
-        noteObj[gname] = {};
-      }
-      setGroupObj(noteObj[gname], rule, gby, gIndex + 1, maxIndex);
-    }
-  }
-
-  var noteObj = {};
-  for (var i = 0; i < length(itemlist); i++) {
-    setGroupObj(noteObj, itemlist[i], gby, 0, length(gby) - 1);
-  }
-
-  var getSubInfo = function (note, p, gIndex, maxIndex) {
-    var newobj = {}
-    newobj[keyName] = p;
-    newobj[valueName] = [];
-    if (gIndex == maxIndex) {
-      for (var k in note[p]) {
-        newobj[valueName].push(note[p][k]);
-      }
-    } else {
-      for (var k in note[p]) {
-        newobj[valueName].push(getSubInfo(note[p][k], k, gIndex + 1, maxIndex));
-      }
-    }
-    return newobj;
-  }
-  var myobj = [];
-  for (var p in noteObj) {
-    myobj.push(getSubInfo(noteObj, p, 0, length(gby) - 1));
-  }
-  return myobj;
-}
 
 
 export function toFixed(num, type = "", abs = false) {
@@ -344,18 +289,6 @@ export function ship_name(type) {
   return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
-export function zs_status(status) {
-  let znMap = {};
-  znMap[Cts.ZS_STATUS_NEVER_START] = "待召唤";
-  znMap[Cts.ZS_STATUS_TO_ACCEPT] = "待接单";
-  znMap[Cts.ZS_STATUS_TO_FETCH] = "待取货";
-  znMap[Cts.ZS_STATUS_ON_WAY] = "已在途";
-  znMap[Cts.ZS_STATUS_ARRIVED] = "已送达";
-  znMap[Cts.ZS_STATUS_CANCEL] = "已取消";
-  znMap[Cts.ZS_STATUS_ABNORMAL] = "异常";
-
-  return znMap[status] === undefined ? "未知状态" : znMap[status];
-}
 
 export function sellingStatus(sell_status) {
   let map = {};
@@ -454,24 +387,6 @@ function deepClone(obj) {
   return result;
 }
 
-function getVendorName(vendorId) {
-  let map = {};
-  map[Cts.STORE_TYPE_SELF] = "菜鸟食材";
-  map[Cts.STORE_TYPE_AFFILIATE] = "菜鸟";
-  map[Cts.STORE_TYPE_GZW] = "鲜果集";
-  map[Cts.STORE_TYPE_BLX] = "比邻鲜";
-  map[Cts.STORE_TYPE_HLCS] = "华联超市";
-  map[0] = "全部";
-  return map[vendorId];
-}
-
-function getSortName(sortId) {
-  let map = {};
-  map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
-  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
-  return map[sortId];
-}
-
 /**
  * 价格尾数优化（需要和mobileweb项目 __priceWithExtra 方法保持一致）
  * @param $spPrice 分
@@ -565,8 +480,6 @@ export default {
   headerSupply,
   deepClone,
   getOperateDetailsType,
-  getVendorName,
-  getSortName,
   isPreOrder,
   priceOptimize,
   debounces,
