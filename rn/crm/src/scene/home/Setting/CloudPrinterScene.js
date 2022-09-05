@@ -89,7 +89,7 @@ class CloudPrinterScene extends PureComponent {
       let check_key = this.state.check_key;
       let key = this.state.key;
       let sn = this.state.sn;
-      if (print_info.printer_cfg.length !== 0) {
+      if (tool.length(print_info.printer_cfg) !== 0) {
         printer_name = print_info.printer_cfg.name;
         printer = print_info.printer_cfg.printer;
         key = print_info.printer_cfg.key;
@@ -174,7 +174,7 @@ class CloudPrinterScene extends PureComponent {
         printer: that.state.printer,
       }
       let printer_list = that.state.cloud_printer_list;
-      for (let i = 0; i < printer_list.length; i++) {
+      for (let i = 0; i < tool.length(printer_list); i++) {
         if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
           ToastLong("参数缺失");
           return;

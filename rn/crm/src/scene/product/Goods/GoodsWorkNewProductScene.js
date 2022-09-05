@@ -24,6 +24,7 @@ import Config from "../../../pubilc/common/config";
 import Swiper from "react-native-swiper";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -199,7 +200,7 @@ class GoodsWorkNewProductScene extends PureComponent {
   }
 
   renderImg(images = []) {
-    if (images.length > 0) {
+    if (tool.length(images) > 0) {
       return (
         <View style={[styles.area_cell, styles.add_img_wrapper]}>
           {

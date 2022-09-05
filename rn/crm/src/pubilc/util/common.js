@@ -1,6 +1,7 @@
 "use strict";
 import FetchEx from "./fetchEx";
 import Config from "../common/config";
+import tool from "./tool";
 
 /**
  * @param url
@@ -95,7 +96,7 @@ export default {
     return new Promise(resolve => setTimeout(resolve, ms));
   },
   NaviGoBack(navigator) {
-    if (navigator && navigator.getCurrentRoutes().length > 1) {
+    if (navigator && tool.length(navigator.getCurrentRoutes()) > 1) {
       navigator.pop();
       return true;
     }
@@ -158,7 +159,7 @@ export function guid() {
 
 export function padNum(num, size) {
   var s = num + "";
-  while (s.length < size) s = "0" + s;
+  while (tool.length(s.length) < size) s = "0" + s;
   return s;
 }
 

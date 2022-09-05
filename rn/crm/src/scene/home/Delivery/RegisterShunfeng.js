@@ -240,7 +240,7 @@ class RegisterShunfeng extends PureComponent {
       }).then(image => {
         const image_path = image.path;
         const image_arr = image_path.split("/");
-        const image_name = image_arr[image_arr.length - 1];
+        const image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       })
     }, 1000)
@@ -278,7 +278,7 @@ class RegisterShunfeng extends PureComponent {
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         })
     }, 1000)
@@ -335,7 +335,7 @@ class RegisterShunfeng extends PureComponent {
           </View>
           <View style={styles.imageRowWrap}>
             {
-              imageUrl.length > 0 ?
+              tool.length(imageUrl) > 0 ?
                 <Image source={{uri: imageUrl}} style={styles.imageWrap}/> : (
                   <Pressable style={styles.imageWrap} onPress={this.uploadImageItem}>
                     <FontAwesome5 name={'plus'} size={24} color={'#666666'}/>
@@ -415,8 +415,8 @@ class RegisterShunfeng extends PureComponent {
 
   notSubmit = (store, subject) => {
 
-    this.enableSubmit = store.name.length > 0 && store.saleCategory.label.length > 0
-      && subject.personNum.length > 0 && subject.phone.length > 0 && this.state.imageUrl.length > 0;
+    this.enableSubmit = tool.length(store.name) > 0 && tool.length(store.saleCategory.label) > 0
+      && tool.length(subject.personNum) > 0 && tool.length(subject.phone) > 0 && tool.length(this.state.imageUrl) > 0;
     const style = this.enableSubmit ? styles.submitWrap : styles.cannotSubmitWrap
     return (
       <>

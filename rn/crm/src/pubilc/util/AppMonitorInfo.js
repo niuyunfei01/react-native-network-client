@@ -3,6 +3,7 @@ import {appendFile, deleteFile, logFilePath, readFile, readFileInfo} from "./Fil
 
 import {getDatetime, getTime} from "./TimeUtil";
 import HttpUtils from "./http";
+import tool from "./tool";
 
 const fileSize = 1024 * 100
 let executeStatus = {};
@@ -35,7 +36,7 @@ const uploadInfo = async (jsonContent, accessToken) => {
       const uploadContentArray = []
       dataArray.map((data, index) => {
 
-        if (index < dataArray.length - 1) {
+        if (index < tool.length(dataArray) - 1) {
           uploadContentArray.push(JSON.parse(data))
         }
       })
@@ -82,7 +83,7 @@ export const calcMs = (timeObj, access_token) => {
         methodObj.executeNumber = 1
       }
     }
-    if (index === timeObj.method.length - 1) {
+    if (index === tool.length(timeObj.method) - 1) {
       const recordTime = getDatetime(getTime())
       const info = {
         currentStoreId: timeObj.currentStoreId,

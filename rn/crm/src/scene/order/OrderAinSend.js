@@ -10,6 +10,7 @@ import {Button} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   return {
@@ -92,7 +93,7 @@ class OrderAinSend extends Component {
   }
 
   renderWorkerList() {
-    if (!this.state.workerList.length > 0) {
+    if (!tool.length(this.state.workerList) > 0) {
       return;
     }
     return (

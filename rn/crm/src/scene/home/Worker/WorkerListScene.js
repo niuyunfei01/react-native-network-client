@@ -12,6 +12,7 @@ import CallBtn from "../../order/CallBtn";
 import Loadmore from 'react-native-loadmore'
 import FetchEx from "../../../pubilc/util/fetchEx";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -116,7 +117,7 @@ class WorkerScene extends PureComponent {
       let {ok, reason, obj, error_code} = resp;
       if (ok) {
         let isLastPage = true
-        if (obj.lists.length && obj.page * obj.pageSize < obj.count) {
+        if (tool.length(obj.lists) && obj.page * obj.pageSize < obj.count) {
           isLastPage = false
         }
 

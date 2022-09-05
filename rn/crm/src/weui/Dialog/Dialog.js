@@ -15,6 +15,7 @@ import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 import pxToDp from "../../pubilc/util/pxToDp";
 import JbbText from "../../scene/common/component/JbbText";
+import tool from "../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   dialogWrapper: {
@@ -185,7 +186,7 @@ class Dialog extends Component {
   }
 
   _renderOtherButtons() {
-    let len = (this.props.left_buttons || {}).length;
+    let len = tool.length(this.props.left_buttons || {});
     return this.props.left_buttons.map((button, idx) => {
       const {
         type,
@@ -234,7 +235,7 @@ class Dialog extends Component {
       return child
     });
 
-    let o_len = (this.props.left_buttons || {}).length;
+    let o_len = tool.length(this.props.left_buttons || {});
 
     return (
       <Modal

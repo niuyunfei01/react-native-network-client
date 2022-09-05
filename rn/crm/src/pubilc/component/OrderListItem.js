@@ -1029,7 +1029,7 @@ class OrderListItem extends React.PureComponent {
                 <If condition={i !== 0}>
                   <View style={[styles.deliveryStatusTitleBottom, {backgroundColor: log.status_color}]}/>
                 </If>
-                <If condition={i !== list.length - 1}>
+                <If condition={i !== tool.length(list) - 1}>
                   <View style={[styles.deliveryStatusTitleTop, {backgroundColor: log.status_color}]}/>
                 </If>
               </View>

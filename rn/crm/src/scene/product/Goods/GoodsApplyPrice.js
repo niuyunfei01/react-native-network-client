@@ -15,6 +15,7 @@ import Cts from "../../../pubilc/common/Cts";
 import ReportErrorDialog from "../_GoodsApplyPrice/ReportErrorDialog";
 import _ from 'lodash'
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -214,7 +215,7 @@ class GoodsApplyPrice extends Component {
           <View style={{flex: 1}}>
             <View style={styles.tradeTitleRow}>
               <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
-              <If condition={this.state.trade_products.length > 0}>
+              <If condition={tool.length(this.state.trade_products) > 0}>
                 <ReportErrorDialog
                   storeId={this.state.store_id}
                   productId={this.state.product_id}
@@ -223,7 +224,7 @@ class GoodsApplyPrice extends Component {
                 />
               </If>
             </View>
-            <If condition={this.state.trade_products.length > 0}>
+            <If condition={tool.length(this.state.trade_products) > 0}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
@@ -240,7 +241,7 @@ class GoodsApplyPrice extends Component {
                 />
               </For>
             </If>
-            <If condition={this.state.trade_products.length == 0}>
+            <If condition={tool.length(this.state.trade_products) === 0}>
               <View style={styles.no_prod_tip}>
                 <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
               </View>

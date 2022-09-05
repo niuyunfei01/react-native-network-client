@@ -166,7 +166,7 @@ class OrderTransferThird extends Component {
       let params = {
         store_id: currStoreId,
         vendor_id: currVendorId,
-        total_available_ship: obj.length,
+        total_available_ship: tool.length(obj),
 
       }
       this.priceFn();
@@ -205,7 +205,7 @@ class OrderTransferThird extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -260,7 +260,7 @@ class OrderTransferThird extends Component {
   }
 
   onCallThirdShipRule = () => {
-    let total_selected_ship = this.state.newSelected.length;
+    let total_selected_ship = tool.length(this.state.newSelected);
     let store_id = this.props.global.currStoreId;
     let {currVendorId} = tool.vendor(this.props.global);
 

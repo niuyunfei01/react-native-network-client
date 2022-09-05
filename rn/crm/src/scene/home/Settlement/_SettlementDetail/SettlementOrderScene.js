@@ -60,7 +60,7 @@ class SettlementOrderScene extends PureComponent {
 
   toggleDropdown(key, listKey, item) {
     this.props[listKey][key].down = !item.down
-    for (let i = 0; i < this.props[listKey].length; i++) {
+    for (let i = 0; i < tool.length(this.props[listKey]); i++) {
       if (i !== key) {
         this.props[listKey][i].down = false
       }

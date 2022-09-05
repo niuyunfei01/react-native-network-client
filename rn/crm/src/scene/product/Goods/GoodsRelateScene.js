@@ -199,7 +199,7 @@ class GoodsRelatedScene extends PureComponent {
                       />
                     }>
           {
-            this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
+            tool.length(this.state.storesList) > 0 ? this.state.storesList.map((item, index) => {
               return (
                 <View style={styles.item} key={index}>
                   <Text style={[styles.name, {color: colors.color333}]}>{item.name} </Text>

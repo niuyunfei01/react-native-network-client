@@ -49,6 +49,7 @@ import numeral from "numeral";
 import native from "../../../pubilc/util/native";
 import dayjs from "dayjs";
 import Entypo from "react-native-vector-icons/Entypo";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -493,7 +494,7 @@ class InvoicingOrderGoodsScene extends Component {
     _.forEach(storeOrderData, function (item, val) {
       let supplierId = item['supplier_id'];
       tmp[supplierId]['isNew'] = false;
-      tmp[supplierId]['count'] = item['req_items'].length;
+      tmp[supplierId]['count'] = tool.length(item['req_items']);
       tmp[supplierId]['orderId'] = item['id'];
     });
     let r = [];
@@ -608,7 +609,7 @@ class InvoicingOrderGoodsScene extends Component {
       let id = val['id'];
       suppliersMap[id] = val;
     });
-    if (listData.length == 0) {
+    if (tool.length(listData) == 0) {
       return <EmptyListView/>
     }
     let self = this;

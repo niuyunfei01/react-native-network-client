@@ -25,6 +25,7 @@ import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import Cts from "../../pubilc/common/Cts";
 import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
+import tool from "../../pubilc/util/tool";
 
 /**
  * ## Imports
@@ -195,7 +196,7 @@ export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
       .then(response => {
-        callback(true, response.length > 0)
+        callback(true, tool.length(response) > 0)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

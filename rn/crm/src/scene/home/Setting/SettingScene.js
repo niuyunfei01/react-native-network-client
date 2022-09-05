@@ -602,7 +602,7 @@ class SettingScene extends PureComponent {
                           style={styles.item_row}>
           <Text style={styles.row_label}>销售经理 </Text>
           <Text style={styles.row_footer}>
-            {bd_mobile.length > 0 ? bd_mobile : '去设置'}
+            {tool.length(bd_mobile) > 0 ? bd_mobile : '去设置'}
           </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
         </TouchableOpacity>

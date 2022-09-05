@@ -16,6 +16,7 @@ import {
 import BaseComponent from './BaseComponent';
 import Icon from "../../../weui/Icon/Icon";
 import pxToDp from "../../util/pxToDp";
+import tool from "../../util/tool";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
@@ -169,7 +170,7 @@ export default class ModalSelector extends BaseComponent {
   }
 
   renderOptionList(styles) {
-    let last_item = this.props.data.length - 1;
+    let last_item = tool.length(this.props.data) - 1;
     let bottomLine = this.props.bottomLine;
     let options = this.props.data.map((item, key) => {
       let bottom_line = last_item !== key ? styles.bottom_line : (bottomLine ? styles.bottom_line : null);

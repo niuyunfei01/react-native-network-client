@@ -6,6 +6,7 @@ import {ToastLong} from "../../pubilc/util/ToastUtils";
 import md5 from "../../pubilc/util/md5";
 import HttpUtils from "../../pubilc/util/http";
 import dayjs from "dayjs";
+import tool from "../../pubilc/util/tool";
 
 const {
   GET_NAME_PRICES,
@@ -229,7 +230,7 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
   if (image_info && image_info.uri) {
     let {uri, name} = image_info;
     let fileInfo = name.split('.');
-    if (fileInfo.length > 1) {
+    if (tool.length(fileInfo) > 1) {
       let fileExt = fileInfo.pop();
       name = md5.hex_md5(fileInfo[0]) + "." + fileExt;
     } else {

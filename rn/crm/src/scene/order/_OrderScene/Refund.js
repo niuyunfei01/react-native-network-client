@@ -90,7 +90,7 @@ class Refund extends React.Component {
   }
 
   render() {
-    return this.state.refunds.length > 0 && <AccordionItem title={'退款信息'}> {this.renderItem()} </AccordionItem>
+    return tool.length(this.state.refunds) > 0 && <AccordionItem title={'退款信息'}> {this.renderItem()} </AccordionItem>
   }
 }
 

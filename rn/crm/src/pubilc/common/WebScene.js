@@ -267,7 +267,7 @@ class WebScene extends PureComponent {
   }
 
   onLoadEnd(e: any) {
-    if (e.nativeEvent.title.length > 0 && e.nativeEvent.title.length < 10) {
+    if (tool.length(e.nativeEvent.title) > 0 && tool.length(e.nativeEvent.title) < 10) {
       this.props.navigation.setOptions({
         headerTitle: <Text style={{color: colors.color333}}>{e.nativeEvent.title} </Text>
       })
@@ -343,7 +343,7 @@ class WebScene extends PureComponent {
   }
   shareWechat = async (scene) => {
     const uri = await captureRef(this.viewRef, options)
-    if (uri.length <= 0) {
+    if (tool.length(uri) <= 0) {
       showError('获取图片失败')
       return
     }

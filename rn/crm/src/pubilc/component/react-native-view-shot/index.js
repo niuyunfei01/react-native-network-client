@@ -3,6 +3,7 @@ import React, {Component} from "react";
 import {findNodeHandle, NativeModules, Platform, View} from "react-native";
 import type {ViewStyleProp} from "react-native/Libraries/StyleSheet/StyleSheet";
 import type {LayoutEvent} from "react-native/Libraries/Types/CoreEventTypes";
+import tool from "../../util/tool";
 
 const {RNViewShot} = NativeModules;
 
@@ -121,7 +122,7 @@ export function captureRef<T: React$ElementType>(view: number | ?View | React$Re
     view = node;
   }
   const {options, errors} = validateOptions(optionsObject);
-  if (__DEV__ && errors.length > 0) {
+  if (__DEV__ && tool.length(errors) > 0) {
     console.warn(
       "react-native-view-shot: bad options:\n" +
       errors.map(e => `- ${e}`).join("\n")
@@ -143,7 +144,7 @@ export function releaseCapture(uri: string): void {
 export function captureScreen(optionsObject?: Options): Promise<string> {
   ensureModuleIsLoaded();
   const {options, errors} = validateOptions(optionsObject);
-  if (__DEV__ && errors.length > 0) {
+  if (__DEV__ && tool.length(errors) > 0) {
     console.warn(
       "react-native-view-shot: bad options:\n" +
       errors.map(e => `- ${e}`).join("\n")

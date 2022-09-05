@@ -12,6 +12,7 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const width = Dimensions.get("window").width;
 
@@ -181,7 +182,7 @@ class Detail extends BaseComponent {
 
   renderItem = (val) => {
     let {item} = val
-    if (item.name && item.name.length >= 17) {
+    if (item.name && tool.length(item.name) >= 17) {
       item.name = item.name.substring(0, 17) + '...'
     }
     return (

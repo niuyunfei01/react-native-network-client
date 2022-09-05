@@ -65,7 +65,7 @@ class HttpUtils {
         options.headers.store_id = store.id
         options.headers.vendor_id = currVendorId
 
-        if (uri.substr(uri.length - 1) !== '&') {
+        if (uri.substr(tool.length(uri) - 1) !== '&') {
           uri += '&'
         }
         uri += `store_id=${store.id}&vendor_id=${currVendorId}`

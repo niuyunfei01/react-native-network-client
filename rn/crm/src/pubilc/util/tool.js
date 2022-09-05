@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
-  if (typeof keys === "undefined" || keys.length === 0) {
+  if (typeof keys === "undefined" || length(keys) === 0) {
     return [];
   }
 
@@ -130,11 +130,11 @@ export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
   } else {
-    if (typeof obj === "object" && obj.length === undefined) {
+    if (typeof obj === "object" && length(obj) === undefined) {
       obj = Object.values(obj);
     }
   }
-  return obj.length;
+  return length(obj);
 }
 
 export function curr_vendor(vendor_data, currVendorId) {
@@ -152,11 +152,11 @@ export function curr_vendor(vendor_data, currVendorId) {
 export function user_info(mine, currVendorId, currentUser) {
   let user_info = {};
   if (
-    Object.keys(mine.user_list).length > 0 &&
+    length(Object.keys(mine.user_list)) > 0 &&
     mine.user_list[currVendorId] &&
-    Object.keys(mine.user_list[currVendorId]).length > 0 &&
+    length(Object.keys(mine.user_list[currVendorId])) > 0 &&
     mine.user_list[currVendorId][currentUser] &&
-    Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
+    length(Object.keys(mine.user_list[currVendorId][currentUser])) > 0
   ) {
     // let {
     //   id, nickname, nameRemark, mobilephone, image, //user 表数据
@@ -282,8 +282,8 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
   }
 
   var noteObj = {};
-  for (var i = 0; i < itemlist.length; i++) {
-    setGroupObj(noteObj, itemlist[i], gby, 0, gby.length - 1);
+  for (var i = 0; i < length(itemlist); i++) {
+    setGroupObj(noteObj, itemlist[i], gby, 0, length(gby) - 1);
   }
 
   var getSubInfo = function (note, p, gIndex, maxIndex) {
@@ -303,7 +303,7 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
   }
   var myobj = [];
   for (var p in noteObj) {
-    myobj.push(getSubInfo(noteObj, p, 0, gby.length - 1));
+    myobj.push(getSubInfo(noteObj, p, 0, length(gby) - 1));
   }
   return myobj;
 }

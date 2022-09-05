@@ -1,3 +1,5 @@
+import tool from "./tool";
+
 export const getTime = () => {
   return new Date().getTime();
 }
@@ -51,7 +53,7 @@ export default class TimeUtil {
     }
     for (let k in o) {
       if (new RegExp(`(${k})`).test(format)) {
-        format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : (`00${o[k]}`).substr((`${o[k]}`).length))
+        format = format.replace(RegExp.$1, tool.length(RegExp.$1) === 1 ? o[k] : (`00${o[k]}`).substr((`${o[k]}`).length))
       }
     }
     return format

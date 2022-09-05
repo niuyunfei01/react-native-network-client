@@ -16,6 +16,7 @@ import {bindActionCreators} from "redux";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global, batch} = state;
@@ -147,7 +148,7 @@ class GoodsAdjustRemind extends PureComponent {
       )
     }
 
-    return items.length > 0 ? items : <EmptyListView/>
+    return tool.length(items) > 0 ? items : <EmptyListView/>
   }
 
   renderModifyPriceModal() {
@@ -229,7 +230,7 @@ class GoodsAdjustRemind extends PureComponent {
         } else {
           isLastPage = true
         }
-        if (data_list.length > 0) {
+        if (tool.length(data_list) > 0) {
           data_list.forEach(item => {
             data.push(item)
           })

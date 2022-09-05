@@ -281,7 +281,7 @@ class StoreGoodsSearch extends Component {
         {/*<ScrollView>*/}
         <View style={styles.goodsWrap}>
           {
-            goods && goods.length > 0 ?
+            goods && tool.length(goods) > 0 ?
               <View>
                 <LoadMore
                   loadMoreType={'scroll'}
@@ -304,7 +304,7 @@ class StoreGoodsSearch extends Component {
               </View> :
               <View style={styles.notGoodTip}>
                 {
-                  searchKeywords.length > 0 ?
+                  tool.length(searchKeywords) > 0 ?
                     <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
                     <Text style={{color: colors.color333}}>暂时没有商品</Text>
                 }

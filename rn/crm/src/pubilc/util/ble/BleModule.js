@@ -1,6 +1,7 @@
 import {NativeEventEmitter, NativeModules, Platform} from 'react-native';
 
 import BleManager from 'react-native-ble-manager';
+import tool from "../tool";
 
 const BleManagerModule = NativeModules.BleManager;
 //通过NativeAppEventEmitter.addListener添加监听的方法官方已不建议使用
@@ -149,11 +150,11 @@ export default class BleModule {
 
   fullUUID(uuid) {
 
-    if (uuid.length === 4) {
+    if (tool.length(uuid) === 4) {
       return '0000' + uuid.toUpperCase() + '-0000-1000-8000-00805F9B34FB'
     }
 
-    if (uuid.length === 8) {
+    if (tool.length(uuid) === 8) {
       return uuid.toUpperCase() + '-0000-1000-8000-00805F9B34FB'
     }
 
@@ -745,7 +746,7 @@ export default class BleModule {
 
   getHexByteLength(str) {
 
-    let length = parseInt(str.length / 2);
+    let length = parseInt(tool.length(str) / 2);
 
     let hexLength = this.addZero(length.toString(16));
 
@@ -761,7 +762,7 @@ export default class BleModule {
 
   addZero(str, bit = 2) {
 
-    for (let i = str.length; i < bit; i++) {
+    for (let i = tool.length(str); i < bit; i++) {
 
       str = '0' + str;
 
@@ -815,7 +816,7 @@ export default class BleModule {
 
     let format = '';
 
-    let len = str.length;
+    let len = tool.length(str);
 
     for (let j = 2; j <= len; j = j + 2) {
 

@@ -10,6 +10,7 @@ import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../../../pubilc/util/http";
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const {StyleSheet} = ReactNative
 
@@ -124,7 +125,7 @@ class HistoryNoticeScene extends PureComponent {
 
   cutAdvicesContent = (val) => {
     let str = val
-    if (str.length > 30) {
+    if (tool.length(str) > 30) {
       str = str.substr(0, 30) + '.....'
     }
     return str

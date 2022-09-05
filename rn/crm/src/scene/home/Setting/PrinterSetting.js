@@ -96,7 +96,7 @@ class PrinterSetting extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(store_info => {
       let printer_name = this.state.printer_name;
       let printers_name = [];
-      if (store_info.printer_cfg.length !== 0) {
+      if (tool.length(store_info.printer_cfg) !== 0) {
         printer_name = store_info.printer_cfg.name
         printers_name = store_info.printer_cfg;
       }

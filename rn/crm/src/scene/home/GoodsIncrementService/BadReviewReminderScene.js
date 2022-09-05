@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   notificationWrap: {
@@ -221,11 +222,11 @@ class BadReviewReminderScene extends PureComponent {
   saveSetting = () => {
     const {settings} = this.state
 
-    if (settings.notify_start_at.length === 0 || settings.notify_end_at.length === 0) {
+    if (tool.length(settings.notify_start_at) === 0 || tool.length(settings.notify_end_at) === 0) {
       showError('请选择通知开始时间或者结束时间')
       return;
     }
-    if (settings.mobile.length <= 10) {
+    if (tool.length(settings.mobile) <= 10) {
       showError('请输入正确的手机号')
       return
     }

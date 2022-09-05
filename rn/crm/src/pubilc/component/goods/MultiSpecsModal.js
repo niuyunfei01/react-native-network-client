@@ -4,6 +4,7 @@ import Config from "../../common/config";
 import {showError, showModal, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
+import tool from "../../util/tool";
 // import InputBoard from "../InputBoard";
 // import CommonModal from "./CommonModal";
 
@@ -19,7 +20,7 @@ export default class MultiSpecsModal extends PureComponent {
 
   componentDidMount() {
     const {storePro} = this.props
-    if (storePro?.skus?.length > 0 && storePro.sp?.product_id) {
+    if (tool.length(storePro?.skus) > 0 && storePro.sp?.product_id) {
       const data = [{...storePro.sp}].concat(storePro.skus)
       this.setState({
         data: data
@@ -36,7 +37,7 @@ export default class MultiSpecsModal extends PureComponent {
         left_since_last_stat: left_since_last_stat && left_since_last_stat || sp.left_since_last_stat,
         sku_name: sku_name && sku_name || sp?.sku_name && sp.sku_name || '',
       })
-      if (Array.isArray(skus) && skus.length > 0) {
+      if (Array.isArray(skus) && tool.length(skus) > 0) {
         data = data.concat(skus)
       }
       this.setState({
@@ -46,7 +47,7 @@ export default class MultiSpecsModal extends PureComponent {
   }
 
   onChangeText = (product_id, amount, totalRemain, price, before_price, strict_providing, type) => {
-    const amountLength = amount.length, priceLength = price.split('.')[0].length
+    const amountLength = tool.length(amount), priceLength = tool.length(price.split('.')[0])
     if ('amount' === type && amountLength > 4)
       amount = '9999'
     if ('price' === type && priceLength > 4)
@@ -149,7 +150,7 @@ export default class MultiSpecsModal extends PureComponent {
     const prices = [], inventory = []
     Object.keys(editGood).map((key) => {
       const obj = editGood[key]
-      if (obj.apply_price.length <= 0) {
+      if (tool.length(obj.apply_price) <= 0) {
         showError('金额不可为空', 1);
         checkStatus = false
         return
@@ -163,7 +164,7 @@ export default class MultiSpecsModal extends PureComponent {
         auto_on_sale: 0
       })
       if ('1' === obj.strict_providing) {
-        if (obj.actualNum.length <= 0) {
+        if (tool.length(obj?.actualNum) <= 0) {
           checkStatus = false
           showError('库存不可为空', 1);
           return
@@ -184,9 +185,9 @@ export default class MultiSpecsModal extends PureComponent {
     }
     const url = `/api_products/batch_update_store_price_inventory?access_token=${accessToken}&&store_id=${storeId}&&vendor_id=${vendor_id}`
     let params = {prices: prices}
-    if (inventory.length > 0)
+    if (tool.length(inventory) > 0)
       params = {...params, inventorys: inventory}
-    if (prices.length > 0)
+    if (tool.length(prices) > 0)
       showModal('提交中', 'loading', 1000)
     HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('修改成功')

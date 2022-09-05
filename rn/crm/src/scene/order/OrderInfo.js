@@ -216,7 +216,7 @@ class OrderInfo extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -864,7 +864,7 @@ class OrderInfo extends Component {
     return (
       <View style={styles.flex1}>
         <For each="item" index="i" of={this.state.logistics}>
-          <View key={i} style={this.state.logistics.length - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+          <View key={i} style={tool.length(this.state.logistics) - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
             <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={Styles.driverName}>
               <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
@@ -947,7 +947,7 @@ class OrderInfo extends Component {
           <Text style={Styles.clientPhoneCall}>拨打</Text>
         </TouchableOpacity>
 
-        <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
+        <If condition={order.backup_phones_readable !== undefined && tool.length(order.backup_phones_readable) > 0}>
           <For each="phone" index="idx" of={order.backup_phones_readable}>
             <TouchableOpacity style={Styles.mobileBody} onPress={() => this.dialPhone(order.backup_phones[idx])}
                               key={idx}>
@@ -1086,7 +1086,7 @@ class OrderInfo extends Component {
 
   _totalEditingCents = () => {
     const {order} = this.state
-    const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
+    const totalAdd = this.state.itemsAdded && tool.length(Object.keys(this.state.itemsAdded)) > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
       : 0;
     let totalEdit = 0;
@@ -1453,7 +1453,7 @@ class OrderInfo extends Component {
   }
 
   renderChangeLogList = () => {
-    if (!this.state.showChangeLogList && this.state.orderChangeLogs.length > 0) {
+    if (!this.state.showChangeLogList && tool.length(this.state.orderChangeLogs) > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
           <View key={index}
@@ -1471,7 +1471,7 @@ class OrderInfo extends Component {
           </View>
         )
       })
-    } else if (this.state.orderChangeLogs.length === 0 && !this.state.showChangeLogList) {
+    } else if (tool.length(this.state.orderChangeLogs) === 0 && !this.state.showChangeLogList) {
       return <View style={Styles.logNone}>
         <Text style={Styles.logNoneText}>没有相应的记录</Text>
       </View>
@@ -1488,7 +1488,7 @@ class OrderInfo extends Component {
                 <If condition={i !== 0}>
                   <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentBottom]}/>
                 </If>
-                <If condition={i !== list.length - 1}>
+                <If condition={i !== (tool.length(list) - 1)}>
                   <View style={[{backgroundColor: log.status_color}, Styles.deliveryStatusContentTop]}/>
                 </If>
               </View>
