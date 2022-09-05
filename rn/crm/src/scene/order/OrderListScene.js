@@ -350,7 +350,7 @@ class OrderListScene extends Component {
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
-     this.handleNoLoginInfo(store.getState().global)
+      this.handleNoLoginInfo(store.getState().global)
     })
   }
   handleNoLoginInfo = (reduxGlobal) => {
@@ -382,7 +382,7 @@ class OrderListScene extends Component {
       co_type: co_type,
       enabledGoodMgr: reduxGlobal.enabled_good_mgr,
       currVendorId: reduxGlobal.vendor_id,
-      printer_id: reduxGlobal.printer_id
+      printer_id: reduxGlobal.printer_id || '0'
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))

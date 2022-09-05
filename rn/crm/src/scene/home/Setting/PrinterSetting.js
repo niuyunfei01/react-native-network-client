@@ -205,7 +205,8 @@ class PrinterSetting extends PureComponent {
         </View>
 
         <If condition={Platform.OS === 'android'}>
-          <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
+          <View
+            style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
             <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
               <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold',}}>
                 蓝牙打印机
@@ -242,7 +243,7 @@ class PrinterSetting extends PureComponent {
                                 height: pxToDp(90),
                               }}>
               <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>
-                {printer_id !== '0' ? "打印机: " + this.state.printerName : '暂无打印机'}
+                {printer_id !== '0' && this.state.printerName !== undefined ? "打印机: " + this.state.printerName : '暂无打印机'}
               </Text>
               <Text style={[{
                 fontSize: 14,
