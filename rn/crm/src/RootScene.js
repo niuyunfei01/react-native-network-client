@@ -48,7 +48,6 @@ class RootScene extends PureComponent {
         currStoreId: -1,
         host: Config.defaultHost,
         co_type: '',
-        storeVendorId: -1,
         enabledGoodMgr: 0
       },
       rehydrated: false,
@@ -63,7 +62,7 @@ class RootScene extends PureComponent {
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
-      if (noLoginInfo.accessToken && noLoginInfo.currStoreId && noLoginInfo.storeVendorId) {
+      if (noLoginInfo.accessToken && noLoginInfo.currStoreId && noLoginInfo.currVendorId) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
         HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {

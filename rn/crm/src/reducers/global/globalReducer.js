@@ -53,7 +53,7 @@ const initialState = {
     order_list_by: 'expectTime asc',
   },
   bleStarted: false,
-  printer_id: '',
+  printer_id: '0',
 };
 
 /**
@@ -71,7 +71,8 @@ export default function globalReducer(state = initialState, action) {
           currentUser: action.payload.currentUser,
           accessToken: action.payload.accessToken,
           currStoreId: action.payload.currStoreId,
-          host: action.payload.host
+          host: action.payload.host,
+          printer_id: action.payload.printer_id
         }
       }
       break

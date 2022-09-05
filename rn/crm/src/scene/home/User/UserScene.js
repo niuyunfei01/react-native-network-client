@@ -132,7 +132,6 @@ class UserScene extends PureComponent {
       currStoreId: 0,
       host: '',
       co_type: '',
-      storeVendorId: '',
       enabledGoodMgr: '',
       currVendorId: ''
     }

@@ -223,38 +223,39 @@ class OrderTransferThird extends Component {
   }
 
   priceFn = () => {// 取最大价格和最小价格
-    let logistics = this.state.logistics;
-    this.state.logisticFeeMap = [];
-    this.state.maxPrice = 0;
-    this.state.minPrice = 10001;
+    let {logistics, logisticFeeMap, maxPrice, minPrice, wayNums} = this.state;
+    logisticFeeMap = [];
+    maxPrice = 0;
+    minPrice = 10001;
     // logisticFeeMap: [{logisticCode: '',paidPartnerId: ''},{logisticCode: '',paidPartnerId: ''}]
-    this.state.wayNums = 0;
+    wayNums = 0;
     for (let i in logistics) {
       let obiItem = {};
       if (logistics[i]?.est && logistics[i].est?.isChosed) {
         obiItem.logisticCode = logistics[i].logisticCode;
         obiItem.paidPartnerId = 0;
-        this.state.wayNums += 1;
-        this.state.maxPrice = logistics[i].est.delivery_fee > this.state.maxPrice ? logistics[i].est.delivery_fee : this.state.maxPrice
-        this.state.minPrice = logistics[i].est.delivery_fee < this.state.minPrice ? logistics[i].est.delivery_fee : this.state.minPrice
+        wayNums += 1;
+        maxPrice = logistics[i].est.delivery_fee > maxPrice ? logistics[i].est.delivery_fee : maxPrice
+        minPrice = logistics[i].est.delivery_fee < minPrice ? logistics[i].est.delivery_fee : minPrice
       }
       if (logistics[i]?.store_est && logistics[i].store_est?.isChosed) {
         obiItem.logisticCode = logistics[i].logisticCode;
         obiItem.paidPartnerId = -1;
-        this.state.wayNums += 1
-        this.state.maxPrice = logistics[i].store_est.delivery_fee > this.state.maxPrice ? logistics[i].store_est.delivery_fee : this.state.maxPrice
-        this.state.minPrice = logistics[i].store_est.delivery_fee < this.state.minPrice ? logistics[i].store_est.delivery_fee : this.state.minPrice
+        wayNums += 1
+        maxPrice = logistics[i].store_est.delivery_fee > maxPrice ? logistics[i].store_est.delivery_fee : maxPrice
+        minPrice = logistics[i].store_est.delivery_fee < minPrice ? logistics[i].store_est.delivery_fee : minPrice
       }
       if (obiItem.logisticCode) {
-        this.state.logisticFeeMap.push(obiItem)
+        logisticFeeMap.push(obiItem)
       }
 
     }
 
     this.setState({
-      maxPrice: this.state.maxPrice,
-      minPrice: this.state.minPrice,
-      wayNums: this.state.wayNums
+      maxPrice: maxPrice,
+      minPrice: minPrice,
+      wayNums: wayNums,
+      logisticFeeMap: logisticFeeMap
     })
 
   }
@@ -575,135 +576,111 @@ class OrderTransferThird extends Component {
 
   renderList = () => {
     const {logistics} = this.state;
-    let item = [];
-    if (tool.length(logistics) > 0) {
-      for (let i in logistics) {
-        let delivery = logistics[i];
-        item.push(
-          <View
-            style={{
-              backgroundColor: colors.white,
-              borderRadius: 8,
-              paddingHorizontal: 6,
-              margin: 10,
-              marginVertical: 4,
-            }} key={i}>
+    return (
+      <View style={{marginVertical: 8}}>
+        {
+          logistics && logistics.map((delivery, index) => {
+            return(
+              <View style={{
+                  backgroundColor: colors.white,
+                  borderRadius: 8,
+                  paddingHorizontal: 6,
+                  margin: 10,
+                  marginVertical: 4
+                }} key={index}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontSize: 16, padding: 10, color: colors.color333, fontWeight: 'bold'}}>
+                    {delivery.logisticName}-{delivery.logisticDesc}
+                  </Text>
 
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-              <Text style={{
-                fontSize: 16,
-                padding: 10,
-                color: colors.color333,
-                fontWeight: 'bold'
-              }}>{delivery.logisticName}-{delivery.logisticDesc} </Text>
+                  <View style={{marginTop: pxToDp(5)}}>
+                    <View style={{flexDirection: 'row'}}>
+                      {delivery.tips && delivery.tips[1] && <View style={{
+                        backgroundColor: colors.main_color,
+                        borderRadius: pxToDp(6),
+                        width: pxToDp(100),
+                      }}>
+                        <Text style={{color: colors.white, padding: pxToDp(8), fontSize: 8}}>
+                          {delivery.tips[1]}
+                        </Text>
+                      </View>}
+                      {delivery.tips && delivery.tips[0] && <View style={{
+                        borderRadius: pxToDp(6),
+                        backgroundColor: colors.main_color,
+                        marginLeft: pxToDp(20),
+                      }}>
+                        <Text style={{color: colors.white, textAlign: 'right', padding: pxToDp(8), fontSize: 8}}>
+                          {delivery.tips[0]}
+                        </Text>
+                      </View>}
+                    </View>
+                  </View>
+                </View>
 
-              <View style={{marginTop: pxToDp(5)}}>
-                <View style={{flexDirection: 'row'}}>
-                  {delivery.tips && delivery.tips[1] && <View style={{
-                    backgroundColor: colors.main_color,
-                    borderRadius: pxToDp(6),
-                    width: pxToDp(100),
-                  }}>
-                    <Text style={{
-                      color: colors.white,
-                      padding: pxToDp(8),
-                      fontSize: 8
-                    }}>{delivery.tips[1]} </Text>
-                  </View>}
-                  {delivery.tips && delivery.tips[0] && <View style={{
-                    borderRadius: pxToDp(6),
-                    backgroundColor: colors.main_color,
-                    marginLeft: pxToDp(20),
-                  }}>
-                    <Text style={{
-                      color: colors.white,
-                      textAlign: 'right',
-                      padding: pxToDp(8),
-                      fontSize: 8
-                    }}>{delivery.tips[0]} </Text>
-                  </View>}
+                <View>
+                  <If condition={delivery.est}>
+                    {this.renderItem(delivery.est, index)}
+                  </If>
+                  <If condition={delivery.store_est}>
+                    {this.renderItem(delivery.store_est, index)}
+                  </If>
                 </View>
               </View>
-            </View>
-
-            <View>
-              <If condition={delivery.est}>
-                {this.renderItem(delivery.est, i)}
-              </If>
-              <If condition={delivery.store_est}>
-                {this.renderItem(delivery.store_est, i)}
-              </If>
-            </View>
-          </View>
-        )
-      }
-    }
-    return (
-      <View style={{marginVertical: 8,}}>
-        {item}
+            )
+          })}
       </View>
     )
   }
 
-  renderItem = (info, i) => {
+  handle = (info, index) => {
+    const {logistics} = this.state
+    if (info.error_msg) {
+      return false;
+    }
+    if (info.name === '外送帮账号') {
+      let isChosed = logistics[index]?.est?.isChosed ? logistics[index]?.est?.isChosed : false;
+      logistics[index].est.isChosed = !isChosed;
+      if (logistics[index].store_est) {
+        logistics[index].store_est.isChosed = false;
+      }
+    } else {
+      let isChosed = logistics[index].store_est.isChosed ? logistics[index].store_est.isChosed : false;
+      logistics[index].store_est.isChosed = !isChosed;
+      if (logistics[index].est) {
+        logistics[index].est.isChosed = false;
+      }
+    }
+    this.setState({
+      logistics: logistics
+    })
+    this.priceFn();
+  }
+
+  renderItem = (info, index) => {
     return (
-      <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}} onPress={() => {
-        if (info.error_msg) {
-          return false;
-        }
-        if (info.name === '外送帮账号') {
-          let isChosed = this.state.logistics[i]?.est?.isChosed ? this.state.logistics[i]?.est?.isChosed : false;
-          this.state.logistics[i].est.isChosed = !isChosed;
-          if (this.state.logistics[i].store_est) {
-            this.state.logistics[i].store_est.isChosed = false;
-          }
-        } else {
-          let isChosed = this.state.logistics[i].store_est.isChosed ? this.state.logistics[i].store_est.isChosed : false;
-          this.state.logistics[i].store_est.isChosed = !isChosed;
-          if (this.state.logistics[i].est) {
-            this.state.logistics[i]?.est.isChosed = false;
-          }
-        }
-        this.setState({
-          logistics: this.state.logistics
-        })
-        this.priceFn();
-      }}>
+      <TouchableOpacity
+        style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}}
+        onPress={() => this.handle(info, index)}>
         <View style={styles.check}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            fontWeight: 'bold',
-            lineHeight: 56,
-          }}> {info.name} </Text>
+          <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold', lineHeight: 56}}>
+            {info.name}
+          </Text>
 
           <View style={{flex: 1}}></View>
 
           <View style={{alignItems: 'center'}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  lineHeight: pxToDp(42)
-                }}>
+              <Text style={{fontSize: 12, fontWeight: 'bold', lineHeight: pxToDp(42)}}>
                 预估
               </Text>
-              <Text style={{fontWeight: 'bold', fontSize: 20, color: colors.color333,}}> {info.delivery_fee} </Text>
+              <Text style={{fontWeight: 'bold', fontSize: 20, color: colors.color333}}>
+                {info.delivery_fee}
+              </Text>
             </View>
 
             {info && info.coupons_amount > 0 ?
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 'bold',
-                    lineHeight: pxToDp(42),
-                    color: colors.color999
-                  }}>
+                <Text style={{fontSize: 10, fontWeight: 'bold', lineHeight: pxToDp(42), color: colors.color999}}>
                   已优惠
                 </Text>
                 <Text style={{
@@ -725,10 +702,8 @@ class OrderTransferThird extends Component {
                 justifyContent: "center",
                 alignItems: 'center',
               }}>
-                <Entypo name='check' style={{
-                  fontSize: pxToDp(25),
-                  color: colors.white,
-                }}/></View> :
+                <Entypo name='check' style={{fontSize: pxToDp(25), color: colors.white}}/>
+              </View> :
               <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
           </View>
 
@@ -739,47 +714,45 @@ class OrderTransferThird extends Component {
 
   renderNoList = () => {
     const {not_exist} = this.state;
-    let item = [];
-    if (tool.length(not_exist) > 0) {
-      for (let i in not_exist) {
-        let delivery = not_exist[i];
-        item.push(
-          <View style={{
-            flexDirection: "row",
-            marginHorizontal: 10,
-            padding: pxToDp(20),
-            backgroundColor: colors.white,
-            justifyContent: "space-between",
-            borderRadius: pxToDp(15),
-            marginTop: pxToDp(10),
-            alignItems: "center",
-            // borderBottomWidth: pxToDp(1),
-          }} key={i}>
-            <Text style={{fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
-            <Text onPress={() => {
-              this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})
-            }}
-                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'} </Text>
-          </View>
-        )
-      }
-      return (
-        <View style={{marginBottom: pxToDp(20)}}>
-          <Text style={{
-            fontSize: 14,
-            marginBottom: pxToDp(10),
-            marginLeft: pxToDp(35),
-            color: colors.color333,
-            fontWeight: 'bold'
-          }}>待开通配送账号</Text>
-          <View>
-            {item}
-          </View>
+
+    return (
+      <View style={{marginBottom: pxToDp(20)}}>
+        <Text style={{
+          fontSize: 14,
+          marginBottom: pxToDp(10),
+          marginLeft: pxToDp(35),
+          color: colors.color333,
+          fontWeight: 'bold'
+        }}>
+          待开通配送账号
+        </Text>
+        <View>
+          {
+            not_exist && not_exist.map((delivery, index) => {
+              <View style={{
+                flexDirection: "row",
+                marginHorizontal: 10,
+                padding: pxToDp(20),
+                backgroundColor: colors.white,
+                justifyContent: "space-between",
+                borderRadius: pxToDp(15),
+                marginTop: pxToDp(10),
+                alignItems: "center",
+                // borderBottomWidth: pxToDp(1),
+              }} key={index}>
+                <Text style={{fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
+                <Text onPress={() => this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})}
+                      style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>
+                  {delivery.open_status === 0 ? "申请开通" : '查看进度'}
+                </Text>
+              </View>
+            })
+          }
         </View>
-      )
-    }
-    return null;
+      </View>
+    )
   }
+
 
   renderErrorList = () => {
     const {logistics_error} = this.state;
@@ -841,7 +814,6 @@ class OrderTransferThird extends Component {
         </View>
       )
     }
-    return null
   }
 
 
@@ -901,13 +873,9 @@ class OrderTransferThird extends Component {
             borderLeftWidth: pxToDp(1),
             flex: 1
           }}>
-            <Text
-              style={{
-                textAlign: 'right',
-                fontSize: pxToDp(30),
-                fontWeight: 'bold',
-                marginRight: 6
-              }}>{this.state.weight}千克 </Text>
+            <Text style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold', marginRight: 6}}>
+              {this.state.weight}千克
+            </Text>
             <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
           </TouchableOpacity>
 
@@ -940,19 +908,14 @@ class OrderTransferThird extends Component {
           </View>
           <View style={{flex: 1}}></View>
           <Button title={'呼叫配送'}
-                  onPress={() => {
-                    this.onCallThirdShipRule()
-                  }}
+                  onPress={this.onCallThirdShipRule}
                   buttonStyle={{
                     marginTop: pxToDp(10),
                     width: pxToDp(200),
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
+                    backgroundColor: colors.main_color
                   }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
+                  titleStyle={{color: colors.white, fontSize: 16}}
           />
         </View>
       </View>
@@ -1014,7 +977,7 @@ class OrderTransferThird extends Component {
                 this._scrollView = scrollView
               }}
               showsVerticalScrollIndicator={false}
-              directionalLockEnabled={!false}
+              directionalLockEnabled={true}
               scrollEventThrottle={16}
               bounces={false}
               onMomentumScrollEnd={(e) => {
@@ -1108,30 +1071,17 @@ class OrderTransferThird extends Component {
             </TouchableOpacity>
             <TextArea
               value={this.state.remark}
-              onChange={(remark) => {
-                this.setState({remark})
-              }}
+              onChange={(remark) => this.setState({remark})}
               showCounter={false}
               defaultValue={'请输入备注信息'}
               underlineColorAndroid="transparent" //取消安卓下划线
-              style={{
-                borderWidth: 1,
-                borderColor: colors.fontColor,
-                marginTop: 12,
-                height: 100,
-              }}
+              style={{borderWidth: 1, borderColor: colors.fontColor, marginTop: 12, height: 100}}
             >
             </TextArea>
 
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-              marginTop: 20,
-            }}>
+            <View style={{width: '100%', flexDirection: 'row', marginTop: 20}}>
               <Text
-                onPress={() => {
-                  this.setState({remark: '', showContentModal: false})
-                }}
+                onPress={() => this.setState({remark: '', showContentModal: false})}
                 style={{
                   height: 40,
                   width: "30%",
@@ -1146,9 +1096,7 @@ class OrderTransferThird extends Component {
                   lineHeight: 40,
                 }}>取消</Text>
               <Text
-                onPress={() => {
-                  this.setState({showContentModal: false})
-                }}
+                onPress={() => this.setState({showContentModal: false})}
                 style={{
                   height: 40,
                   width: "30%",
@@ -1176,20 +1124,19 @@ class OrderTransferThird extends Component {
             <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
             <View style={[styles.container1]}>
               <Text style={{fontSize: pxToDp(26)}}>{reason}
-                <TouchableOpacity onPress={() => {
-                  native.dialNumber(mobile)
-                }}><Text style={{color: colors.main_color}}>{mobile} </Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => native.dialNumber(mobile)}>
+                  <Text style={{color: colors.main_color}}>
+                    {mobile}
+                  </Text>
+                </TouchableOpacity>
               </Text>
             </View>
             <If condition={btn_visiable}>
               <View style={styles.btn1}>
                 <View style={{flex: 1}}>
                   <TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                    onPress={() => {
-                                      this.setState({is_mobile_visiable: false})
-                                    }}>
-                    <Text
-                      style={styles.btnText}>知道了</Text>
+                                    onPress={() => this.setState({is_mobile_visiable: false})}>
+                    <Text style={styles.btnText}>知道了</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1199,9 +1146,8 @@ class OrderTransferThird extends Component {
         </JbbModal>
 
         <JbbModal visible={this.state.showDeliveryModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                  onClose={() => this.setState({
-                    showDeliveryModal: false,
-                  })} modal_type={'bottom'}>
+                  onClose={() => this.setState({showDeliveryModal: false})}
+                  modal_type={'bottom'}>
           <View>
             <View style={{
               flexDirection: 'row',
@@ -1214,22 +1160,14 @@ class OrderTransferThird extends Component {
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
                 商品重量
               </Text>
-              <Entypo onPress={() => this.setState({
-                showDeliveryModal: false,
-              })} name="circle-with-cross"
+              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="circle-with-cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </View>
-            <View style={{
-              paddingHorizontal: 12, paddingVertical: 5,
-            }}>
+            <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
               <Text style={{color: colors.color999, fontSize: 12,}}>
                 默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量
               </Text>
-              <View style={{
-                flexDirection: 'row',
-                marginTop: 20,
-                justifyContent: 'space-between',
-              }}>
+              <View style={{flexDirection: 'row', marginTop: 20, justifyContent: 'space-between'}}>
                 <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
                 <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
                   <Text style={{color: '#E32321', fontSize: 20}}>
@@ -1299,17 +1237,9 @@ class OrderTransferThird extends Component {
                 marginVertical: 34,
               }}>
                 <Button title={'取消'}
-                        onPress={() => {
-                          this.setState({showDeliveryModal: false})
-                        }}
-                        buttonStyle={{
-                          width: 170,
-                          backgroundColor: colors.color999,
-                        }}
-                        titleStyle={{
-                          color: colors.white,
-                          fontSize: 16
-                        }}
+                        onPress={() => this.setState({showDeliveryModal: false})}
+                        buttonStyle={{width: 170, backgroundColor: colors.color999}}
+                        titleStyle={{color: colors.white, fontSize: 16}}
                 />
                 <Button title={'确定'}
                         onPress={() => {
@@ -1317,14 +1247,8 @@ class OrderTransferThird extends Component {
                           this.update_default_product_weight()
                           this.setState({showDeliveryModal: false})
                         }}
-                        buttonStyle={{
-                          width: 170,
-                          backgroundColor: colors.main_color,
-                        }}
-                        titleStyle={{
-                          color: colors.white,
-                          fontSize: 16
-                        }}
+                        buttonStyle={{width: 170, backgroundColor: colors.main_color}}
+                        titleStyle={{color: colors.white, fontSize: 16}}
                 />
               </View>
             </View>
@@ -1526,4 +1450,3 @@ const styles = StyleSheet.create({
 });
 
 export default connect(mapStateToProps)(OrderTransferThird)
-

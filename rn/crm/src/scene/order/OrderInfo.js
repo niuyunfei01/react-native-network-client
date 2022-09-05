@@ -235,19 +235,6 @@ class OrderInfo extends Component {
 
   componentDidMount() {
     this.fetchData()
-    if (Platform.OS === 'android' && Platform.Version >= 23) {
-      BleManager.enableBluetooth().then(() => {
-      }).catch((error) => {
-        this.setState({askEnableBle: true})
-      });
-
-      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (!result) {
-          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-          });
-        }
-      });
-    }
 
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -263,6 +250,24 @@ class OrderInfo extends Component {
     timeObj['componentName'] = "OrderInfo"
     timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
+    this.enableBluetooth()
+  }
+
+  enableBluetooth = () => {
+    const {printer_id} = this.props.global
+    if (Platform.OS === 'android' && Platform.Version >= 23 && printer_id !== '0') {
+      BleManager.enableBluetooth().then().catch((error) => {
+        this.setState({askEnableBle: true})
+      });
+
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+        if (!result) {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+          });
+        }
+      });
+    }
+
   }
 
   handleActionSheet = (order, allow_merchants_cancel_order) => {

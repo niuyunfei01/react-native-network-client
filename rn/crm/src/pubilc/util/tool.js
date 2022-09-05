@@ -115,6 +115,7 @@ export function vendor(global) {
     co_type: vendor_info.co_type,
   };
 }
+
 /**
  * 当前店铺信息
  * @param global
@@ -128,12 +129,22 @@ export function store(global) {
 export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
-  } else {
-    if (typeof obj === "object" && length(obj) === undefined) {
-      obj = Object.values(obj);
-    }
   }
-  return length(obj);
+  switch (typeof obj){
+    case "boolean":
+      return Number(obj)
+    case "number":
+      return obj
+    case "function":
+      return 0
+    case "string":
+      return obj.length
+    case "object":
+      return Object.values(obj).length;
+    default:
+      return 0
+  }
+
 }
 
 export function curr_vendor(vendor_data, currVendorId) {
@@ -251,7 +262,6 @@ function parameterByName(name, url) {
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
-
 
 
 export function toFixed(num, type = "", abs = false) {
