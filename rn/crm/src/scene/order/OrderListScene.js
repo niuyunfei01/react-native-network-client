@@ -480,11 +480,10 @@ class OrderListScene extends Component {
   }
 
   getVendor = () => {
-    let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind === '1',
-      showBtn: wsb_store_account,
     })
     this.getstore()
     this.clearStoreCache()
@@ -559,8 +558,10 @@ class OrderListScene extends Component {
         this.setState({isLoading: true})
       return;
     }
+    const {vendor_info} = this.props.global
     this.setState({
-        query: {...query, page: 1, isAdd: true, offset: 0}
+        query: {...query, page: 1, isAdd: true, offset: 0},
+        showBtn: vendor_info.wsb_store_account === '1'
       },
       () => this.fetchOrders(status))
     // }, 500)
@@ -577,7 +578,7 @@ class OrderListScene extends Component {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
-    HttpUtils.get(url, params, true).then(res => {
+    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
       const {obj} = res
       timeObj.method.push({
         interfaceName: url,
@@ -998,6 +999,11 @@ class OrderListScene extends Component {
     })
   }
 
+  onChange = (event, sortItem) => {
+    if (event.target.checked) {
+      this.setOrderBy(sortItem.value)
+    }
+  }
   showSortSelect = () => {
     let {user_config} = this.props.global;
     let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
@@ -1006,11 +1012,7 @@ class OrderListScene extends Component {
         <For index="index" each="sortItem" of={this.state.sortData}>
           <RadioItem key={index} style={styles.sortSelect}
                      checked={sort === sortItem.value}
-                     onChange={event => {
-                       if (event.target.checked) {
-                         this.setOrderBy(sortItem.value)
-                       }
-                     }}>
+                     onChange={event => this.onChange(event, sortItem)}>
             <Text style={{color: colors.fontBlack}}>{sortItem.label} </Text>
           </RadioItem>
         </For>

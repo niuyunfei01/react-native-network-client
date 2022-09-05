@@ -139,12 +139,12 @@ class WebScene extends PureComponent {
             let action = data['action'];
             let params = data['params'];
             if (action == 'nativeToGoods') {
-              native.toGoods.bind(this)()
-            } else {
-              InteractionManager.runAfterInteractions(() => {
-                this.props.navigation.navigate(action, params);
-              });
+              return
             }
+            InteractionManager.runAfterInteractions(() => {
+              this.props.navigation.navigate(action, params);
+            });
+
           } else {
             this._do_go_back(msg);
           }

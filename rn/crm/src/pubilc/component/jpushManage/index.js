@@ -23,6 +23,10 @@ export const doJPushSetAlias = (currentUser) => {
   }
 }
 
+export const doJPushDeleteAlias = () => {
+  JPush.deleteAlias({sequence: dayjs().unix()})
+}
+
 /**
  Map<String, Object> deviceStatus = Maps.newHashMap();
  deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知

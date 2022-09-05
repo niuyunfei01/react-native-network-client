@@ -30,7 +30,7 @@ export default class MultiSpecsModal extends PureComponent {
       const {strict_providing, product_id, left_since_last_stat, sku_name, supply_price, skus, sp} = storePro
       let data = []
       data.push({
-        strict_providing: strict_providing && strict_providing || sp.strict_providing,
+        strict_providing: strict_providing && strict_providing || sp?.strict_providing || '0',
         product_id: product_id && product_id || sp.product_id,
         supply_price: supply_price && supply_price || sp.supply_price,
         left_since_last_stat: left_since_last_stat && left_since_last_stat || sp.left_since_last_stat,

@@ -68,21 +68,19 @@ export function vendor(global) {
     vendor_id,
     help_uid,
   } = global;
-  let currVendorId = vendor_id;
   let currVendorName = vendor_info["brand_name"];
   let currStoreName = store_info["name"];
 
-  let currVendor = vendor_info;
-  let currVersion = currVendor["version"];
-  let fnProviding = currVendor["fnProviding"];
-  let fnProvidingOnway = currVendor["fnProvidingOnway"];
+  let currVersion = vendor_info["version"];
+  let fnProviding = vendor_info["fnProviding"];
+  let fnProvidingOnway = vendor_info["fnProvidingOnway"];
   let service_ids = [];
-  let service_uid = currVendor["service_uid"];
-  let service_mgr = currVendor["service_mgr"];
-  let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
-  let allow_merchants_edit_prod = currVendor["allow_merchants_edit_prod"];
-  let allow_store_mgr_call_ship = currVendor["allow_store_mgr_call_ship"];
-  let wsb_store_account = currVendor["wsb_store_account"] === '1';
+  let service_uid = vendor_info["service_uid"];
+  let service_mgr = vendor_info["service_mgr"];
+  let allow_merchants_store_bind = vendor_info["allow_merchants_store_bind"];
+  let allow_merchants_edit_prod = vendor_info["allow_merchants_edit_prod"];
+  let allow_store_mgr_call_ship = vendor_info["allow_store_mgr_call_ship"];
+  let wsb_store_account = vendor_info["wsb_store_account"] === '1';
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
     service_ids.push(service_uid);
   }
@@ -100,7 +98,7 @@ export function vendor(global) {
     is_helper = helper.indexOf("," + currentUser + ",") !== -1;
   }
   return {
-    currVendorId: currVendorId,
+    currVendorId: vendor_id,
     currVendorName: currVendorName,
     currVersion: currVersion,
     currStoreName: currStoreName,
@@ -114,7 +112,7 @@ export function vendor(global) {
     allow_store_mgr_call_ship: allow_store_mgr_call_ship,
     allow_merchants_edit_prod: allow_merchants_edit_prod,
     wsb_store_account,
-    co_type: currVendor.co_type,
+    co_type: vendor_info.co_type,
   };
 }
 /**
