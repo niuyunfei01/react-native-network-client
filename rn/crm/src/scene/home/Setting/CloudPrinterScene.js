@@ -105,7 +105,8 @@ class CloudPrinterScene extends PureComponent {
         sn: sn,
         submit_add: submit_add,
         check_key: check_key,
-      }, hideModal())
+      })
+      hideModal()
     })
   }
 
@@ -423,25 +424,30 @@ class CloudPrinterScene extends PureComponent {
     });
   }
   renderRrinter = () => {
-    let items = []
-    let that = this;
-    let printer = that.state.printer;
 
-    for (let i in this.state.cloud_printer_list) {
-      const cloud_printer = that.state.cloud_printer_list[i]
-      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
-                            checked={printer === cloud_printer.printer}
-                            onChange={event => {
-                              if (cloud_printer.printer === 'mdlj') {
-                                Alert.alert('提示', '绑定美达罗捷打印机请将小票上的MAC地址填入输入框内，如有问题请咨询打印机客服：4006-087-630', [{text: '确定'}])
-                              }
-                              if (event.target.checked) {
-                                this.onRrinterSelected(cloud_printer)
-                              }
-                            }}><JbbText>{cloud_printer.name}</JbbText></RadioItem>)
-    }
+    let {printer,cloud_printer_list} = this.state;
+
     return <List style={{marginTop: 12}}>
-      {items}
+      {
+        cloud_printer_list&&cloud_printer_list.map((cloud_printer,index)=>{
+          return(
+            <RadioItem key={index} style={{fontSize: 12, fontWeight: 'bold'}}
+                       checked={printer === cloud_printer.printer}
+                       onChange={event => {
+                         if (cloud_printer.printer === 'mdlj') {
+                           Alert.alert('提示', '绑定美达罗捷打印机请将小票上的MAC地址填入输入框内，如有问题请咨询打印机客服：4006-087-630', [{text: '确定'}])
+                         }
+                         if (event.target.checked) {
+                           this.onRrinterSelected(cloud_printer)
+                         }
+                       }}>
+              <JbbText>
+                {cloud_printer.name}
+              </JbbText>
+            </RadioItem>
+          )
+        })
+      }
     </List>
   }
 

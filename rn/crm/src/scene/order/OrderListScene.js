@@ -350,39 +350,42 @@ class OrderListScene extends Component {
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
-      const {co_type, currVendorId} = tool.vendor(store.getState().global)
-      if (co_type === undefined || currVendorId === '' || currVendorId === undefined || store.getState().global?.vendor_id === '' || store.getState().global?.vendor_id === '0') {
-        return;
-      }
-      if (store.getState().global.store_id === 0)
-        return;
-      if (store.getState().global.vendor_id === 0)
-        return;
-      const flag = store.getState().global.accessToken === global.noLoginInfo.accessToken &&
-        store.getState().global.currentUser === global.noLoginInfo.currentUser &&
-        store.getState().global.store_id === global.noLoginInfo.store_id &&
-        store.getState().global.host === global.noLoginInfo.host &&
-        co_type === global.noLoginInfo.co_type &&
-        currVendorId === global.noLoginInfo.currVendorId &&
-        store.getState().global?.vendor_id === global.noLoginInfo.storeVendorId &&
-        store.getState().global?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr
-
-      if (flag) {
-        return
-      }
-      const noLoginInfo = {
-        accessToken: store.getState().global.accessToken,
-        currentUser: store.getState().global.currentUser,
-        currStoreId: store.getState().global.store_id,
-        host: store.getState().global.host || Config.defaultHost,
-        co_type: co_type,
-        storeVendorId: store.getState().global.vendor_id,
-        enabledGoodMgr: store.getState().global.enabled_good_mgr,
-        currVendorId: currVendorId
-      }
-      global.noLoginInfo = noLoginInfo
-      setNoLoginInfo(JSON.stringify(noLoginInfo))
+      this.handleNoLoginInfo(store.getState().global)
     })
+  }
+  handleNoLoginInfo = (reduxGlobal) => {
+    const {co_type} = tool.vendor(reduxGlobal)
+    if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+      return;
+    }
+    if (reduxGlobal.store_id === 0)
+      return;
+    if (reduxGlobal.vendor_id === 0)
+      return;
+    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
+      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
+      reduxGlobal.store_id === global.noLoginInfo.store_id &&
+      reduxGlobal.host === global.noLoginInfo.host &&
+      co_type === global.noLoginInfo.co_type &&
+      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
+      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
+      reduxGlobal?.printer_id === global.noLoginInfo.printer_id
+
+    if (flag) {
+      return
+    }
+    const noLoginInfo = {
+      accessToken: reduxGlobal.accessToken,
+      currentUser: reduxGlobal.currentUser,
+      currStoreId: reduxGlobal.store_id,
+      host: reduxGlobal.host || Config.defaultHost,
+      co_type: co_type,
+      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
+      currVendorId: reduxGlobal.vendor_id,
+      printer_id: reduxGlobal.printer_id || '0'
+    }
+    global.noLoginInfo = noLoginInfo
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
   }
 
   checkVersion = () => {
@@ -490,9 +493,7 @@ class OrderListScene extends Component {
   }
 
   getstore = () => {
-    this.setState({
-      show_button: false,
-    })
+
     const {dispatch} = this.props
     const {accessToken, currStoreId} = this.props.global;
     if (currStoreId > 0) {
@@ -507,6 +508,7 @@ class OrderListScene extends Component {
           res.business_status.push(all_store)
           dispatch(setExtStore(res.business_status));
           this.setState({
+            show_button: false,
             ext_store_list: res.business_status,
             allow_edit_ship_rule: res.allow_edit_ship_rule
           })
@@ -1024,7 +1026,7 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
-    let {currVendorId} = tool.vendor(this.props.global);
+    let {vendor_id} = this.props.global
     return (
       <OrderListItem showBtn={showBtn}
                      key={index}
@@ -1033,7 +1035,7 @@ class OrderListScene extends Component {
                      accessToken={this.props.global.accessToken}
                      onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
-                     vendorId={currVendorId || '0'}
+                     vendorId={vendor_id || '0'}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}

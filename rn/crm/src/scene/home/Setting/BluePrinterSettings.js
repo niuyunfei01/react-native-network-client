@@ -75,22 +75,22 @@ class BluePrinterSettings extends PureComponent {
     let peripheral = this.state.peripherals.get(id);
     if (peripheral) {
       if (peripheral.connected) {
-        BleManager.disconnect(peripheral.id).then(r => console.log("do disconnected: ", peripheral.id, "return", r));
+        BleManager.disconnect(peripheral.id).then();
         peripheral.connected = false;
       }
 
       const {dispatch} = this.props
       const {printer_id} = this.props.global
       if (printer_id === id) {
-        dispatch(setPrinterId(''))
+        dispatch(setPrinterId('0'))
       }
 
-      let newPeripherals = this.state.peripherals;
-      newPeripherals.set(peripheral.id, peripheral)
+      let {peripherals} = this.state;
+      peripherals.set(peripheral.id, peripheral)
 
       this.setState({
-        list: Array.from(this.state.peripherals.values()),
-        peripherals: newPeripherals
+        list: Array.from(peripherals.values()),
+        peripherals: peripherals
       });
     }
   }
@@ -168,43 +168,42 @@ class BluePrinterSettings extends PureComponent {
   }
 
   connectPrinter = (peripheral) => {
-    if (peripheral) {
-      if (peripheral.connected) {
-        BleManager.disconnect(peripheral.id).then();
-      } else {
-        BleManager.connect(peripheral.id).then(() => {
-          const peripherals = this.state.peripherals;
-          let p = peripherals.get(peripheral.id);
-          if (p) {
-            p.connected = true;
-            peripherals.set(peripheral.id, p);
-            this.setState({list: Array.from(peripherals.values())});
-          }
-          const {dispatch} = this.props
-          dispatch(setPrinterId(peripheral.id))
-          setTimeout(() => {
-            BleManager.retrieveServices(peripheral.id).then(() => {
-              BleManager.readRSSI(peripheral.id).then((rssi) => {
-                let p = peripherals.get(peripheral.id);
-                if (p) {
-                  p.rssi = rssi;
-                  peripherals.set(peripheral.id, p);
-                  this.setState({list: Array.from(peripherals.values())});
-                }
-              });
-            });
-          }, 900);
-        }).catch(() => {
-          this.alert("蓝牙连接失败，请重试")
-        });
-      }
+    if (peripheral.connected) {
+      BleManager.disconnect(peripheral.id).then();
+      return
     }
+    BleManager.connect(peripheral.id).then(() => {
+      const {peripherals} = this.state;
+      let p = peripherals.get(peripheral.id);
+      if (p) {
+        p.connected = true;
+        peripherals.set(peripheral.id, p);
+        this.setState({list: Array.from(peripherals.values())});
+      }
+      const {dispatch} = this.props
+      dispatch(setPrinterId(peripheral.id))
+      setTimeout(() => {
+        BleManager.retrieveServices(peripheral.id).then(() => {
+          BleManager.readRSSI(peripheral.id).then((rssi) => {
+            let p = peripherals.get(peripheral.id);
+            if (p) {
+              p.rssi = rssi;
+              peripherals.set(peripheral.id, p);
+              this.setState({list: Array.from(peripherals.values())});
+            }
+          });
+        });
+      }, 900);
+    }).catch(() => {
+      this.alert("蓝牙连接失败，请重试")
+    });
   }
 
   alert(text) {
     Alert.alert('提示', text, [{
       text: '确定',
-      onPress: () => {}
+      onPress: () => {
+      }
     }]);
   }
 
@@ -216,7 +215,7 @@ class BluePrinterSettings extends PureComponent {
     // eslint-disable-next-line react/prop-types
     const {dispatch} = this.props
     dispatch(setBleStarted(true));
-
+    BleManager.checkState();
     bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
     bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);
     bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
@@ -302,10 +301,13 @@ class BluePrinterSettings extends PureComponent {
     return (<SafeAreaView style={{flex: 1}}>
         {this.state.list && <View style={[{flex: 1}, styles.columnStart]}>
           <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
-          <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}} data={connectedList}
-                    renderItem={({item}) => this.renderItem(item)} keyExtractor={item => item.id}/>
+          <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}}
+                    data={connectedList}
+                    renderItem={({item}) => this.renderItem(item)}
+                    keyExtractor={item => item.id}/>
           <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
-          <FlatList data={notConnectedList} renderItem={({item}) => this.renderItem(item)}
+          <FlatList data={notConnectedList}
+                    renderItem={({item}) => this.renderItem(item)}
                     keyExtractor={item => item.id}/>
         </View>}
         {(tool.length(this.state.list) === 0 && !this.state.isScanning) &&
@@ -342,7 +344,7 @@ class BluePrinterSettings extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  testPrintBtn:{
+  testPrintBtn: {
     color: colors.white,
     paddingVertical: 2,
     height: pxToDp(70),

@@ -356,7 +356,6 @@ class StoreStatusScene extends PureComponent {
   }
 
   getPlatIcon = (icon_name) => {
-    console.log('icon_name', icon_name)
     switch (icon_name) {
       case 'eleme':
         return platformLogoEleme()
