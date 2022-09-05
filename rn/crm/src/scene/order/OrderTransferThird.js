@@ -231,14 +231,14 @@ class OrderTransferThird extends Component {
     this.state.wayNums = 0;
     for (let i in logistics) {
       let obiItem = {};
-      if (logistics[i].est && logistics[i].est.isChosed) {
+      if (logistics[i]?.est && logistics[i].est?.isChosed) {
         obiItem.logisticCode = logistics[i].logisticCode;
         obiItem.paidPartnerId = 0;
         this.state.wayNums += 1;
         this.state.maxPrice = logistics[i].est.delivery_fee > this.state.maxPrice ? logistics[i].est.delivery_fee : this.state.maxPrice
         this.state.minPrice = logistics[i].est.delivery_fee < this.state.minPrice ? logistics[i].est.delivery_fee : this.state.minPrice
       }
-      if (logistics[i].store_est && logistics[i].store_est.isChosed) {
+      if (logistics[i]?.store_est && logistics[i].store_est?.isChosed) {
         obiItem.logisticCode = logistics[i].logisticCode;
         obiItem.paidPartnerId = -1;
         this.state.wayNums += 1
@@ -655,7 +655,7 @@ class OrderTransferThird extends Component {
           return false;
         }
         if (info.name === '外送帮账号') {
-          let isChosed = this.state.logistics[i].est.isChosed ? this.state.logistics[i].est.isChosed : false;
+          let isChosed = this.state.logistics[i]?.est?.isChosed ? this.state.logistics[i]?.est?.isChosed : false;
           this.state.logistics[i].est.isChosed = !isChosed;
           if (this.state.logistics[i].store_est) {
             this.state.logistics[i].store_est.isChosed = false;
@@ -664,7 +664,7 @@ class OrderTransferThird extends Component {
           let isChosed = this.state.logistics[i].store_est.isChosed ? this.state.logistics[i].store_est.isChosed : false;
           this.state.logistics[i].store_est.isChosed = !isChosed;
           if (this.state.logistics[i].est) {
-            this.state.logistics[i].est.isChosed = false;
+            this.state.logistics[i]?.est.isChosed = false;
           }
         }
         this.setState({
@@ -716,7 +716,7 @@ class OrderTransferThird extends Component {
           </View>
 
           <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
-            {info.isChosed ?
+            {info?.isChosed ?
               <View style={{
                 borderRadius: 10,
                 width: 20,
@@ -1044,7 +1044,7 @@ class OrderTransferThird extends Component {
               <For of={datePickerType === 'today' ? datePickerList : datePickerOther} index="idx" each='item'>
                 <TouchableOpacity
                   key={idx}
-                  style={item.isChosed ? styles.datePickerItemActive : styles.datePickerItem}
+                  style={item?.isChosed ? styles.datePickerItemActive : styles.datePickerItem}
                   onPress={() => {
                     let datePickerListCopy = datePickerType === 'today' ? datePickerList : datePickerOther
                     datePickerListCopy.forEach(checkedItem => {
@@ -1069,9 +1069,9 @@ class OrderTransferThird extends Component {
                       })
                     }
                   }}>
-                  <Text style={item.isChosed ? styles.dateTextActive : styles.dateText}>{item.label}</Text>
+                  <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label}</Text>
                   <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
-                    {item.isChosed ?
+                    {item?.isChosed ?
                       <View style={styles.datePickerIcon}>
                         <Entypo name='check' style={{
                           fontSize: pxToDp(25),
