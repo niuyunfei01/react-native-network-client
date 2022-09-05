@@ -140,7 +140,7 @@ class MaterialList extends React.Component {
     const api = `/api_products/inventory_entry_detail_v2/${item.id}?access_token=${accessToken}`
     this.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(api).then(res => {
-      if (res && Object.keys(res).length > 0) {
+      if (res && tool.length(Object.keys(res)) > 0) {
         this.setState({packDetailDialog: true, detailItems: res, selectedItem: item})
       } else {
         ToastShort('无打包任务详情')
@@ -449,7 +449,7 @@ class MaterialList extends React.Component {
             <View style={{flex: 1}}>
               <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name} </Text>
             </View>
-            {item.logs.length ? (
+            {tool.length(item.logs) ? (
               <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
                 <View>
                   <Text style={[styles.itemSupplier]}>修改记录 </Text>

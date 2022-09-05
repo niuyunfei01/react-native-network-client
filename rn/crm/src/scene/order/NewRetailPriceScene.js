@@ -10,6 +10,7 @@ import InputBoard from "../../pubilc/component/InputBoard";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import tool from "../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   baseRowCenterWrap: {
@@ -177,7 +178,7 @@ class NewRetailPriceScene extends React.PureComponent {
       }]
       if (Array.isArray(sp.skus))
         skus = skus.concat(sp.skus)
-      const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : skus.length > 0 ? skus[0] : {
+      const selectSku = pid !== '' ? skus.filter(item => item.product_id === pid)[0] : tool.length(skus) > 0 ? skus[0] : {
         sku_name: '',
         supply_price: '0',
         left_since_last_stat: '0'
@@ -207,7 +208,7 @@ class NewRetailPriceScene extends React.PureComponent {
             规格
           </Text>
           <Text style={styles.baseRowCenterText}>
-            {selectSku.sku_name.length > 0 ? selectSku.sku_name : skus.length > 0 ? skus[0].sku_name : ''}
+            {tool.length(selectSku.sku_name) > 0 ? selectSku.sku_name : tool.length(skus) > 0 ? skus[0].sku_name : ''}
           </Text>
           <AntDesign name={'right'} style={styles.baseRowRightText}/>
         </TouchableOpacity>

@@ -3,6 +3,7 @@ import {getDeviceUUID} from "../../../reducers/global/globalActions";
 import HttpUtils from "../http";
 import BleManager from "react-native-ble-manager";
 import {fetchPrintHexStr} from "../../../reducers/order/orderActions";
+import tool from "../tool";
 
 const _ = require('lodash');
 const MAX_TITLE_PART = 16;
@@ -74,9 +75,9 @@ function printOrder(order) {
     }
 
     if (item.price >= 0) {
-      for (let idx = 0; idx < name.length;) {
-        let text = name.substring(idx, _.min(name.length, idx + MAX_TITLE_PART))
-        const isEnd = idx + MAX_TITLE_PART >= name.length;
+      for (let idx = 0; idx < tool.length(name);) {
+        let text = name.substring(idx, _.min(tool.length(name), idx + MAX_TITLE_PART))
+        const isEnd = idx + MAX_TITLE_PART >= tool.length(name);
         if (isEnd) {
           text = text + " x" + item.num
         }

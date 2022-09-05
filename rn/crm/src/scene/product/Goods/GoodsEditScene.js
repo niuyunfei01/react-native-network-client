@@ -239,7 +239,7 @@ class GoodsEditScene extends PureComponent {
           let validImages = _.filter(images, function (o) {
             return checkImgURL(o);
           });
-          if (validImages && validImages.length > 0) {
+          if (validImages && tool.length(validImages) > 0) {
             let idx = 0;
             cover_img = validImages[0];
             validImages.forEach(function (imgUrl) {
@@ -617,7 +617,7 @@ class GoodsEditScene extends PureComponent {
     }
 
     if (!this.isAddProdToStore()) {
-      if (name.length <= 0) {
+      if (tool.length(name) <= 0) {
         ToastLong('请输入商品名称')
         return false
       }
@@ -631,7 +631,7 @@ class GoodsEditScene extends PureComponent {
         ToastLong('请输入正确的重量')
         return false
       }
-      if (store_categories.length <= 0) {
+      if (tool.length(store_categories) <= 0) {
         ToastLong('请选择门店分类')
         return false
       }
@@ -646,7 +646,7 @@ class GoodsEditScene extends PureComponent {
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         }).catch(() => {
       })
@@ -659,7 +659,7 @@ class GoodsEditScene extends PureComponent {
       ImagePicker.openCamera(pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       }).catch(() => {
       })
@@ -1111,10 +1111,10 @@ class GoodsEditScene extends PureComponent {
     let values, selectedIndex
     if (isSelectCategory) {
       values = basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']
-      selectedIndex = basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1
+      selectedIndex = basic_category_obj.name_path ? tool.length(basic_category_obj.name_path.split(",")) - 1 : 1
     } else {
       values = store_categories_obj.name_path ? store_categories_obj.name_path.split(",") : ['请选择']
-      selectedIndex = store_categories_obj.name_path ? store_categories_obj.name_path.split(",").length - 1 : 1
+      selectedIndex = store_categories_obj.name_path ? tool.length(store_categories_obj.name_path.split(",")) - 1 : 1
     }
     return (
       <If condition={visible}>
@@ -1184,15 +1184,15 @@ class GoodsEditScene extends PureComponent {
     let {isSelectCategory} = this.state
     if (Object.keys(category_obj).length) {
       let id_path = category_obj.id_path;
-      let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+      let arr = id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
       arr.pop();
-      if (arr.length >= 1) {
-        category_obj.id = arr[arr.length - 1]
+      if (tool.length(arr) >= 1) {
+        category_obj.id = arr[tool.length(arr) - 1]
         category_obj.id_path = ',' + arr.toString() + ',';
         let name_path = category_obj.name_path;
         name_path = name_path.split(',')
         name_path.pop()
-        category_obj.name = name_path[name_path.length - 1]
+        category_obj.name = name_path[tool.length(name_path) - 1]
         category_obj.name_path = name_path.toString();
       } else {
         category_obj = {};
@@ -1208,10 +1208,10 @@ class GoodsEditScene extends PureComponent {
     let name = ''
     if (isSelectCategory) {
       const arr = basic_category_obj?.name_path ? basic_category_obj?.name_path?.split(",") : ''
-      name = arr[arr.length - 1]
+      name = arr[tool.length(arr) - 1]
     } else {
       const arr = store_categories_obj?.name_path ? store_categories_obj?.name_path?.split(",") : ''
-      name = arr[arr.length - 1]
+      name = arr[tool.length(arr) - 1]
     }
     return (
       <>
@@ -1258,14 +1258,14 @@ class GoodsEditScene extends PureComponent {
       if (Object.keys(basic_category_obj).length) {
         let {id_path} = basic_category_obj
 
-        arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+        arr = id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
       }
       list = this.treeMenuList(basic_categories, arr);
     } else {
       if (Object.keys(store_categories_obj).length) {
         let {id_path} = store_categories_obj
 
-        arr = id_path && id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+        arr = id_path && id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
       }
       list = this.treeMenuList(store_tags, arr);
     }
@@ -1290,7 +1290,7 @@ class GoodsEditScene extends PureComponent {
     if (id !== undefined) {
       for (const item in children) {
         if (children[item].id === id) {
-          if (ids.length >= 0) {
+          if (tool.length(ids) >= 0) {
             if (children[item].children !== undefined) {
               return this.treeMenuList(children[item].children, ids)
             } else {

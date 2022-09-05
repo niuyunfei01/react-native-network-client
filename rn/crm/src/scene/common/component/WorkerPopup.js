@@ -66,7 +66,7 @@ class WorkerPopup extends React.Component {
     HttpUtils.get.bind(this.props)(url).then(workerList => {
       let list = [];
       list.push({name: '不任命任何人', id: '0'});
-      if (workerList && workerList.length > 0) {
+      if (workerList && tool.length(workerList) > 0) {
         workerList.forEach(function (item) {
           const user = item['user'];
           list.push({
@@ -230,7 +230,7 @@ class WorkerPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
-          {this.state.workerList.length > 0 ? <ScrollView>
+          {tool.length(this.state.workerList) > 0 ? <ScrollView>
               <List>
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>

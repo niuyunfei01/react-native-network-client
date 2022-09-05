@@ -351,7 +351,7 @@ class OrderEditScene extends Component {
     const ts = this.editFields.filter(
       edit => this.state[edit.key] !== edit.val(order)
     );
-    return ts.length === 0;
+    return tool.length(ts) === 0;
   }
 
   showTagPopup(multi) {

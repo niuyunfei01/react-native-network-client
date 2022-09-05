@@ -7,6 +7,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import color from '../../../pubilc/styles/colors'
 import EmptyData from "../../common/component/EmptyData";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -66,7 +67,7 @@ class StockCheckHistory extends BaseComponent {
   render(): React.ReactNode {
     return (
       <View style={{flex: 1}}>
-        {this.state.lists.length ? <LoadMore
+        {tool.length(this.state.lists) ? <LoadMore
           loadMoreType={'scroll'}
           onLoadMore={() => this.fetchData()}
           bottomLoadDistance={50}

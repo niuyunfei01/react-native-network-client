@@ -109,7 +109,7 @@ class OrderScan extends BaseComponent {
   handleScanProduct(prodCode, isStandard, num = 1) {
     const self = this
     let {currentOrder} = this.state
-    if (!currentOrder || Object.keys(currentOrder).length === 0) {
+    if (!currentOrder || tool.length(Object.keys(currentOrder)) === 0) {
       ToastShort('无订单数据！')
       native.speakText('无订单数据！')
       return
@@ -284,7 +284,7 @@ class OrderScan extends BaseComponent {
 
   render() {
     const {currentOrder} = this.state;
-    return currentOrder && Object.keys(currentOrder).length ? (
+    return currentOrder && tool.length(Object.keys(currentOrder)) ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
           <ScrollView refreshControl={

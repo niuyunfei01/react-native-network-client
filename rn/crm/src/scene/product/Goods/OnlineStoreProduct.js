@@ -8,6 +8,7 @@ import ResultDialog from "../../../pubilc/component/goods/ResultDialog";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from "../../../pubilc/styles/colors";
+import tool from "../../../pubilc/util/tool";
 
 
 function mapStateToProps(state) {
@@ -105,7 +106,7 @@ class OnlineStoreProduct extends Component {
           <View>
             <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
           </View>
-          <If condition={this.state.trade_products.length > 0}>
+          <If condition={tool.length(this.state.trade_products) > 0}>
             <ScrollView style={styles.scroll_view}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
@@ -121,7 +122,7 @@ class OnlineStoreProduct extends Component {
               </For>
             </ScrollView>
           </If>
-          <If condition={this.state.trade_products.length == 0}>
+          <If condition={tool.length(this.state.trade_products) === 0}>
             <View style={styles.no_prod_tip}>
               <Text style={styles.no_prod_tip_text}>暂无同行数据! </Text>
             </View>

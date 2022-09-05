@@ -255,7 +255,7 @@ class ApplyScene extends PureComponent {
   }
 
   setAddress(res) {
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, tool.length(res.location));
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
     let states = {
       location_long: Lng,

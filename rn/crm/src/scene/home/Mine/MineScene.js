@@ -749,7 +749,7 @@ class MineScene extends Component {
       <View style={[header_styles.main_box]}>
         <View style={header_styles.row}>
           <JbbText style={header_styles.shop_name}>
-            {(store_info?.name || '').length > 12 ? store_info?.name.substring(0, 13) + '...' : store_info?.name}
+            {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 13) + '...' : store_info?.name}
           </JbbText>
           <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
             <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
@@ -787,10 +787,10 @@ class MineScene extends Component {
   }
   renderStoreStatus = () => {
     let {storeStatus} = this.state
-    const statusColorStyle = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
-    const statusFlag = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.closeFlag : styles.noExtStoreFlag) : styles.openStoreFlag;
-    const storeStatusWrap = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? header_styles.closeStoreStatusWrap : header_styles.noExtStoreStatusWrap) : header_styles.openStoreStatusWrap;
-    const rightStatus = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? '#EE2626' : '#409EFF') : colors.main_color
+    const statusColorStyle = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
+    const statusFlag = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? styles.closeFlag : styles.noExtStoreFlag) : styles.openStoreFlag;
+    const storeStatusWrap = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? header_styles.closeStoreStatusWrap : header_styles.noExtStoreStatusWrap) : header_styles.openStoreStatusWrap;
+    const rightStatus = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? '#EE2626' : '#409EFF') : colors.main_color
     return (
       <TouchableOpacity style={storeStatusWrap} onPress={this.jumpToStoreStatus}>
         <View style={header_styles.row}>
@@ -836,7 +836,7 @@ class MineScene extends Component {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
+            source={tool.length(cover_image) > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
           />
 
           <View style={[worker_styles.sales_box]}>
@@ -882,7 +882,7 @@ class MineScene extends Component {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
+            source={tool.length(cover_image) > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(currentUserProfile?.screen_name || "").substring(0, 4)}
@@ -1311,7 +1311,7 @@ class MineScene extends Component {
             <Text style={[block_styles.block_name]}>摊位结算</Text>
           </TouchableOpacity>
         </If>
-        <If condition={wsb_store_account === 1 && activity_img.length > 0}>
+        <If condition={wsb_store_account === 1 && tool.length(activity_img) > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
@@ -1341,7 +1341,7 @@ class MineScene extends Component {
           <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>公告</Text>
         </TouchableOpacity>
-        <If condition={wsb_store_account !== 1 && activity_img.length > 0}>
+        <If condition={wsb_store_account !== 1 && tool.length(activity_img) > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}

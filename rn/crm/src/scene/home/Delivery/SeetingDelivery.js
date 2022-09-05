@@ -149,7 +149,7 @@ class SeetingDelivery extends PureComponent {
       suspend_confirm_order: !suspend_confirm_order
     })
 
-    if (auto_call && ship_ways.length === 0) {
+    if (auto_call && tool.length(ship_ways) === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
       return;

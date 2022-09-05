@@ -217,7 +217,7 @@ class NoticeList extends React.PureComponent {
         <For index="i" each='tab' of={categoryLabels}>
           <TouchableOpacity
             key={i}
-            style={{width: width / categoryLabels.length, alignItems: "center"}}
+            style={{width: width / tool.length(categoryLabels), alignItems: "center"}}
             onPress={() => {
               this.onRefresh(tab.status)
             }}>

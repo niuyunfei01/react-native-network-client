@@ -137,7 +137,7 @@ class UserAddScene extends PureComponent {
       user_info_key,
       worker_id
     } = this.state;
-    if (isNaN(mobile) || mobile.length !== 11) {
+    if (isNaN(mobile) || tool.length(mobile) !== 11) {
       ToastShort('手机号码格式有误');
       return false;
     } else if (user_name === '') {

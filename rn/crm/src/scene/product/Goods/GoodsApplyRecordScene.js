@@ -131,7 +131,7 @@ class GoodsApplyRecordScene extends Component {
   }
 
   renderTitle() {
-    if (this.state.list.length > 0) {
+    if (tool.length(this.state.list) > 0) {
       return (
         <View style={styles.title}>
           <Text style={[styles.title_text, {flex: 1}]}>图片</Text>

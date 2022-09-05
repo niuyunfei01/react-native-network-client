@@ -407,7 +407,7 @@ class OrderListScene extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -498,7 +498,7 @@ class OrderListScene extends Component {
     if (currStoreId > 0) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
-        if (res.business_status.length > 0) {
+        if (tool.length(res.business_status) > 0) {
           let all_store = {
             id: "0",
             name: "A所有外卖店铺",
@@ -821,7 +821,7 @@ class OrderListScene extends Component {
       <View style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
         {this.renderTabsHead()}
-        <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
+        <If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>
           <View style={styles.extStore}>
             <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
               {ext_store_name}
@@ -888,7 +888,7 @@ class OrderListScene extends Component {
   }
 
   renderStatusTabs = () => {
-    const tab_width = 1 / this.state.categoryLabels.length;
+    const tab_width = 1 / tool.length(this.state.categoryLabels);
     if (!tool.length(this.state.categoryLabels) > 0) {
       return;
     }

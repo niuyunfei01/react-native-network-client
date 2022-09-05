@@ -11,6 +11,7 @@ import {unzip} from "./react-native-zip/RNZip";
 import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {hotUpdateHeader} from "../../svg/svg";
+import tool from "../util/tool";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -241,7 +242,7 @@ export default class HotUpdateComponent extends PureComponent {
             <Text style={styles.modalContentText}>
               {newVersionInfo.info}
             </Text>
-            <If condition={errorMsg.length > 0}>
+            <If condition={tool.length(errorMsg) > 0}>
               <Text style={styles.errorMessage}>
                 {errorMsg}
               </Text>

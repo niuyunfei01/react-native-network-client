@@ -9,6 +9,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {connect} from "react-redux";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   rowCenter: {flexDirection: 'row', alignItems: 'center', marginRight: 8},
@@ -330,7 +331,7 @@ class StallDetailScene extends PureComponent {
   }
 
   submitSettlementInfo = (modalContentObj) => {
-    if (modalContentObj.type?.value?.length === 0 || modalContentObj.money.length === 0) {
+    if (tool.length(modalContentObj.type?.value) === 0 || tool.length(modalContentObj.money) === 0) {
       showError('请先选择类型和输入备注', 1);
       return
     }
@@ -498,7 +499,7 @@ class StallDetailScene extends PureComponent {
 
   renderOther = (list) => {
     return (
-      <If condition={list?.length > 0}>
+      <If condition={tool.length(list) > 0}>
         <For of={list} each="item" index="i">
           <View style={styles.modifySettlementWrap} key={i}>
             <View style={styles.modifySettlementTitleWrap}>

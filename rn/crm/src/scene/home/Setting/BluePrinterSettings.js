@@ -22,6 +22,7 @@ import BleManager from 'react-native-ble-manager';
 import ESC from "../../../pubilc/util/ble/Ecs"
 import {CellsTitle} from "../../../weui";
 import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 
 const _ = require('lodash');
 
@@ -97,10 +98,10 @@ class BluePrinterSettings extends PureComponent {
 
   retrieveConnected = () => {
     BleManager.getConnectedPeripherals([]).then((results) => {
-      if (results.length === 0) {
+      if (tool.length(results) === 0) {
         return
       }
-      for (let i = 0; i < results.length; i++) {
+      for (let i = 0; i < tool.length(results); i++) {
         const peripheral = results[i];
         peripheral.connected = true;
         this.state.peripherals.set(peripheral.id, peripheral);
@@ -301,13 +302,13 @@ class BluePrinterSettings extends PureComponent {
     return (<SafeAreaView style={{flex: 1}}>
         {this.state.list && <View style={[{flex: 1}, styles.columnStart]}>
           <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
-          <FlatList style={{height: 50 * connectedList.length, flexGrow: 0}} data={connectedList}
+          <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}} data={connectedList}
                     renderItem={({item}) => this.renderItem(item)} keyExtractor={item => item.id}/>
           <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
           <FlatList data={notConnectedList} renderItem={({item}) => this.renderItem(item)}
                     keyExtractor={item => item.id}/>
         </View>}
-        {(this.state.list.length === 0 && !this.state.isScanning) &&
+        {(tool.length(this.state.list) === 0 && !this.state.isScanning) &&
           <View style={{flex: 1, margin: 20}}>
             <Text style={{textAlign: 'center'}}>
               {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}

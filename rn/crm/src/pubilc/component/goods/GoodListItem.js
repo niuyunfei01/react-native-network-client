@@ -7,6 +7,7 @@ import colors from "../../styles/colors";
 import Cts from "../../common/Cts";
 import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
+import tool from "../../util/tool";
 
 class GoodListItem extends React.PureComponent {
   static propTypes = {
@@ -75,7 +76,7 @@ class GoodListItem extends React.PureComponent {
           <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>
         </If>
 
-        <If condition={skus?.length > 0}>
+        <If condition={tool.length(skus) > 0}>
           <TouchableOpacity onPress={() => {
             this.setState({
               showMore: !this.state.showMore
@@ -95,7 +96,7 @@ class GoodListItem extends React.PureComponent {
           </TouchableOpacity>
         </If>
 
-        <If condition={skus?.length > 0 && this.state.showMore}>
+        <If condition={tool.length(skus) > 0 && this.state.showMore}>
           <For each="item" index="idx" of={skus}>
             <View style={{flexDirection: "column"}} key={idx}>
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>

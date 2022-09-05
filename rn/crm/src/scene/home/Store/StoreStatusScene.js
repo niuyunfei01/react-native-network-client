@@ -124,7 +124,7 @@ class StoreStatusScene extends PureComponent {
     const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       let show_body = false;
-      if (res.business_status.length > 0) {
+      if (tool.length(res.business_status) > 0) {
         show_body = true
       }
 
@@ -135,7 +135,7 @@ class StoreStatusScene extends PureComponent {
         business_status: res.business_status,
         show_body: show_body,
         allow_merchants_store_bind: res.allow_merchants_store_bind === '1',
-        total_wm_stores: res.business_status.length,
+        total_wm_stores: tool.length(res.business_status),
         allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0',
         alert_msg: res.alert_msg,
       })
@@ -255,7 +255,7 @@ class StoreStatusScene extends PureComponent {
                       position: "relative"
                     }}>
                       <Text style={styles.wm_store_name}>
-                        {store.name && store.name.length >= 13 ? store.name.substring(0, 13) + '...' : store.name}
+                        {store.name && tool.length(store.name) >= 13 ? store.name.substring(0, 13) + '...' : store.name}
                       </Text>
                       <Text
                         style={[!store.open ? styles.close_text : styles.open_text, {
