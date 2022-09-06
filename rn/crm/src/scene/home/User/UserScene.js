@@ -124,7 +124,7 @@ class UserScene extends PureComponent {
   }
 
   _onLogout() {
-    const {dispatch, navigation} = this.props;
+    const {dispatch, navigation, global} = this.props;
     this.mixpanel.reset();
     const noLoginInfo = {
       accessToken: '',
@@ -133,7 +133,8 @@ class UserScene extends PureComponent {
       host: '',
       co_type: '',
       enabledGoodMgr: '',
-      currVendorId: ''
+      currVendorId: '',
+      printer_id: global.printer_id || '0'
     }
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
