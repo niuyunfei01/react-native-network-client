@@ -708,6 +708,7 @@ class GoodsEditScene extends PureComponent {
     dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
       if (ok) {
         hideModal()
+        console.log('p', p)
         if (p && p['id']) {
           this.onReloadProd(p)
         } else if (p && p['upc_data']) {
@@ -715,6 +716,8 @@ class GoodsEditScene extends PureComponent {
           if (p['upc_data'].category_id) {
             this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
           }
+          if (p['upc_data']['sg_tag_id'])
+            this.SearchCommodityCategories(p['upc_data']['sg_tag_id'], this.state.basic_categories, 'id')
         }
       } else {
         hideModal()
@@ -756,14 +759,15 @@ class GoodsEditScene extends PureComponent {
   }
 
   onSelectedItemsChange = (store_categories) => {
+    console.log('store_categories',store_categories)
     this.setState({store_categories: store_categories});
   };
 
-  SearchCommodityCategories(searchValue, basic_categories) {
+  SearchCommodityCategories(searchValue, basic_categories, key = 'name') {
     let result = this.searchCategories(basic_categories, function (category) {
-      if (undefined === category.name)
+      if (undefined === category[key])
         return false
-      return category.name.indexOf(searchValue) === 0
+      return category[key].indexOf(searchValue) === 0
     })
     const {isSelectCategory} = this.state
     if (result) {
