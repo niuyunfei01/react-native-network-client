@@ -708,7 +708,6 @@ class GoodsEditScene extends PureComponent {
     dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
       if (ok) {
         hideModal()
-        console.log('p', p)
         if (p && p['id']) {
           this.onReloadProd(p)
         } else if (p && p['upc_data']) {
@@ -759,7 +758,6 @@ class GoodsEditScene extends PureComponent {
   }
 
   onSelectedItemsChange = (store_categories) => {
-    console.log('store_categories',store_categories)
     this.setState({store_categories: store_categories});
   };
 
