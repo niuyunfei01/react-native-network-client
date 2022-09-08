@@ -580,14 +580,14 @@ class OrderTransferThird extends Component {
       <View style={{marginVertical: 8}}>
         {
           logistics && logistics.map((delivery, index) => {
-            return(
+            return (
               <View style={{
-                  backgroundColor: colors.white,
-                  borderRadius: 8,
-                  paddingHorizontal: 6,
-                  margin: 10,
-                  marginVertical: 4
-                }} key={index}>
+                backgroundColor: colors.white,
+                borderRadius: 8,
+                paddingHorizontal: 6,
+                margin: 10,
+                marginVertical: 4
+              }} key={index}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={{fontSize: 16, padding: 10, color: colors.color333, fontWeight: 'bold'}}>
                     {delivery.logisticName}-{delivery.logisticDesc}
@@ -818,6 +818,7 @@ class OrderTransferThird extends Component {
 
 
   renderBtn = () => {
+    let {vendor_id} = this.props.global;
     return (
       <View>
 
@@ -863,6 +864,9 @@ class OrderTransferThird extends Component {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
+            if (Number(vendor_id) === 13) {
+              return ToastLong('不支持修改商品重量');
+            }
             this.setState({showDeliveryModal: true, set_default_product_weight: false})
             this.mixpanel.track('设置重量')
           }} style={{
