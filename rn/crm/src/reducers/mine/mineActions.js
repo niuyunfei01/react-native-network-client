@@ -351,10 +351,10 @@ export function getUserWageData(token, month, callback) {
   }
 }
 
-export function unDisable(token, storeId, disable_id, state, vendorId, callback) {
+export function unDisable(token, storeId, multipleSelection, state, vendorId, callback) {
   let params = {
     store_id: storeId,
-    delivery_way_v2: disable_id,
+    delivery_way_v2: multipleSelection,
     state: state
   }
   return dispatch => {
