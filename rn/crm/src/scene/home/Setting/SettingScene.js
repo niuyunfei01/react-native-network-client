@@ -551,6 +551,7 @@ class SettingScene extends PureComponent {
 
   renderGoods = () => {
     let {hide_good_titles, use_real_weight} = this.state
+    let {vendor_id} = this.props.global;
     return (
       <View>
         <View style={styles.item_body}>
@@ -569,6 +570,7 @@ class SettingScene extends PureComponent {
             />
           </TouchableOpacity>
 
+          <If condition={Number(vendor_id) === 13}>
           <TouchableOpacity onPress={() => {
             let val = !use_real_weight;
             this.save_use_real_weight(val)
@@ -580,6 +582,7 @@ class SettingScene extends PureComponent {
             }} color={colors.main_color} value={use_real_weight}
             />
           </TouchableOpacity>
+          </If>
         </View>
       </View>
     )
