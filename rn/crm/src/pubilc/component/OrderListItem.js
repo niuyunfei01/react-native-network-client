@@ -665,7 +665,7 @@ class OrderListItem extends React.PureComponent {
   renderButton = () => {
     let {item} = this.props;
     return (
-      <View style={[styles.btnContent, item?.btn_list && item?.btn_list ? {flexWrap: "wrap"} : {}]}>
+      <View style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
@@ -697,7 +697,7 @@ class OrderListItem extends React.PureComponent {
                   onPress={() => this.myselfSend(item)}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.main_color,
-                    width: item?.btn_list.btn_ignore_delivery ? width * 0.27 : width * 0.40
+                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
                   }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
@@ -710,7 +710,7 @@ class OrderListItem extends React.PureComponent {
                     this.mixpanel.track('订单列表页_呼叫配送')
                   }}
                   buttonStyle={[styles.callDeliveryBtn, {
-                    width: item?.btn_list.btn_ignore_delivery ? width * 0.27 : width * 0.40
+                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
@@ -766,7 +766,7 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={item?.btn_list && item?.btn_list}>
+        <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
           <Button title={'加小费'}
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
