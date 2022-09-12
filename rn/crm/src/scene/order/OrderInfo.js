@@ -106,7 +106,6 @@ const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
 const MENU_SET_INVALID = 5; // 置为无效
 const MENU_ADD_TODO = 6;
-const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
@@ -282,6 +281,7 @@ class OrderInfo extends Component {
     const {is_service_mgr} = this.state
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
+      as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
@@ -298,9 +298,6 @@ class OrderInfo extends Component {
     }
     if (order && order.fn_scan_ready) {
       as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
-    }
-    if (is_service_mgr) {
-      as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});

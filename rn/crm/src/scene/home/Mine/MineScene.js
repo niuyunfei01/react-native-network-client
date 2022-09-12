@@ -592,10 +592,6 @@ class MineScene extends Component {
   }
 
   onPress = (route, params = {}) => {
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments().then();
-      return;
-    }
     this.props.navigation.navigate(route, params);
   }
 

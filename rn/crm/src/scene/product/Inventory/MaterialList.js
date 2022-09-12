@@ -25,7 +25,6 @@ import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-// import colors from "../../../pubilc/styles/colors";
 // import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -426,7 +425,7 @@ class MaterialList extends React.Component {
             this.onRefresh();
             this.closeControlPanel()
           }}
-          backgroundColor={color.theme}
+          backgroundColor={colors.theme}
           fontColor={'#fff'}
           fontWeight={'bold'}
         />
@@ -455,7 +454,7 @@ class MaterialList extends React.Component {
                   <Text style={[styles.itemSupplier]}>修改记录 </Text>
                 </View>
               </TouchableOpacity>) : (
-              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>
+              <Text style={[styles.itemSupplier, {backgroundColor: colors.fontGray}]}>无修改</Text>
             )}
           </View>
           <If condition={item.bar_code}>

@@ -3,30 +3,6 @@
 import GlobalUtil from "../util/GlobalUtil";
 import {Platform} from "react-native";
 
-const {HOST_UPDATED} = require("./constants").default;
-
-/**
- * if none in global, return the default host and try to update from settings into global
- * @param globalRed the reducer of global
- * @param dispatch
- * @param native
- * @returns {*}
- * @deprecated 直接使用 apiUrl
- */
-export function host(globalRed, dispatch, native) {
-  if (globalRed.host) {
-    return globalRed.host;
-  } else {
-    native.host(host => {
-      if (host) {
-        dispatch({type: HOST_UPDATED, host: host});
-      }
-    });
-
-    return C.defaultHost;
-  }
-}
-
 export function apiUrl(path) {
   const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
@@ -155,7 +131,6 @@ const C = {
   ROUTE_STORE_CLOSE: 'StoreClose',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
-  ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
@@ -177,7 +152,6 @@ const C = {
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',
-  ROUTE_GOODS_APPLY_NEW_PRODUCT: 'GoodsApplyNewProduct',
   ROUTE_GOODS_WORK_NEW_PRODUCT: 'GoodsWorkNewProduct',
   ROUTE_OPERATE_PROFIT: 'OperateProfit',
   ROUTE_OPERATE_DETAIL: 'OperateDetail',
@@ -300,10 +274,6 @@ const C = {
   serverUrl,
   apiUrl,
   staticUrl,
-  /**
-   * @see host
-   */
-  host,
   hostPort
 };
 

@@ -1,7 +1,5 @@
 import Cts from "../common/Cts";
 import {CommonActions} from '@react-navigation/native';
-import DeviceInfo from "react-native-device-info";
-import md5 from "./md5";
 import dayjs from "dayjs";
 
 export function objectMap(obj, fn) {
@@ -454,15 +452,6 @@ function throttle(fn, wait) {
 }
 
 
-/**
- * 图片上传key
- */
-function imageKey(imgName) {
-  let curTime = Date.now();
-  let UniqueId = DeviceInfo.getUniqueId();
-  return md5.hex_md5(UniqueId + curTime + imgName)
-}
-
 export default {
   objectMap,
   shortTimeDesc,
@@ -493,6 +482,5 @@ export default {
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle,
-  imageKey
+  throttle
 };

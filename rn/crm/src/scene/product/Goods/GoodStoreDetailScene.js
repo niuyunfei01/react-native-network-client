@@ -184,22 +184,26 @@ class GoodStoreDetailScene extends PureComponent {
       const url = `/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(url).then(res => {
         this.props.navigation.setOptions({
-          headerRight: () => (<View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                    type: 'edit',
-                    product_detail: res,
-                  });
-                });
-              }}>
-              <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-            </TouchableOpacity>
-          </View>),
+          headerRight: () => this.headerRight(res)
         })
       })
     }
+  }
+
+  headerRight = (res) => {
+    return (
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => InteractionManager.runAfterInteractions(() => {
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+              type: 'edit',
+              product_detail: res,
+            });
+          })}>
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   getStoreProdWithProd = () => {
@@ -290,9 +294,6 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   onDoneProdUpdate = (pid, prodFields, spFields) => {
-
-    // const {updatedCallback} = (this.props.route.params || {})
-    // updatedCallback && updatedCallback(pid, prodFields, spFields)
 
     const {product, store_prod} = this.state;
     const _p = {...product, ...prodFields}

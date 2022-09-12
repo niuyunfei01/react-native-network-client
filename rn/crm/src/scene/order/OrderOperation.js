@@ -29,7 +29,6 @@ const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
 const MENU_SET_INVALID = 5; // 置为无效
 const MENU_ADD_TODO = 6;
-const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
@@ -277,10 +276,6 @@ class OrderOperation extends Component {
         break
       case MENU_ADD_TODO:
         navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
-        break
-      case MENU_OLD_VERSION:
-        GlobalUtil.setOrderFresh(1)
-        native.toNativeOrder(order.id).then();
         break
       case MENU_PROVIDING:
         this._onToProvide();
