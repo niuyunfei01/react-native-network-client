@@ -202,9 +202,8 @@ class PrinterSetting extends PureComponent {
           </TouchableOpacity>
         </View>
 
-        <If condition={true}>
-          <View
-            style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
+        <If condition={Platform.OS === 'android'}>
+          <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
             <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
               <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold',}}>
                 蓝牙打印机
