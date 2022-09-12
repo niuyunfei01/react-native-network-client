@@ -86,14 +86,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     };
   };
 
-  back(type) {
-    if (type == "add") {
-      native.gotoPage(type);
-    } else {
-      this.props.navigation.goBack();
-    }
-  }
-
   getVendorStore() {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;

@@ -6,7 +6,6 @@ import {
   FlatList,
   InteractionManager,
   Platform,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -55,7 +54,7 @@ import DeviceInfo from "react-native-device-info";
 import {downloadApk} from "rn-app-upgrade";
 import {setRecordFlag} from "../../reducers/store/storeActions";
 import PropTypes from "prop-types";
-
+import {SafeAreaView} from 'react-native-safe-area-context';
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
@@ -820,7 +819,7 @@ class OrderListScene extends Component {
     } = this.state
 
     return (
-      <View style={styles.flex1}>
+      <SafeAreaView style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
         {this.renderTabsHead()}
         <If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>
@@ -854,7 +853,7 @@ class OrderListScene extends Component {
                  onClose={() => this.setState({scanBoolean: false})}
                  onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -945,7 +944,7 @@ class OrderListScene extends Component {
   }
   renderContent = (orders) => {
     return (
-      <SafeAreaView style={styles.orderListContent}>
+      <View style={styles.orderListContent}>
         <FlatList
           data={orders}
           legacyImplementation={false}
@@ -966,7 +965,7 @@ class OrderListScene extends Component {
           ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 

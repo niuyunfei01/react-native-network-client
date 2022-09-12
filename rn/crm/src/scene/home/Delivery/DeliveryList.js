@@ -515,7 +515,12 @@ class DeliveryList extends PureComponent {
   }
 
   concatWsbDeliveryList = () => {
-    let {show_disable_all, platform_delivery_forbidden_list, platform_delivery_bind_list, platform_delivery_unbind_list} = this.state
+    let {
+      show_disable_all,
+      platform_delivery_forbidden_list,
+      platform_delivery_bind_list,
+      platform_delivery_unbind_list
+    } = this.state
     let list = []
     if (!show_disable_all) {
       list = list.concat(platform_delivery_unbind_list)
@@ -587,7 +592,7 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  renderItemDisable = (info, idx) => {
+  renderItemDisable = (info = {}, idx) => {
     let {show_disable_all, multipleSelection} = this.state
     return (
       <View style={styles.listItem}>
@@ -653,10 +658,10 @@ class DeliveryList extends PureComponent {
   }
 
   renderListDisable = () => {
-    let {show_disable_all, multipleSelection} = this.state
+    let {show_disable_all, multipleSelection, wsbDeliveryList} = this.state
     return (
       <ScrollView style={styles.container}>
-        <For index="idx" each="info" of={this.state.wsbDeliveryList}>
+        <For index="idx" each="info" of={wsbDeliveryList}>
           <TouchableOpacity
             key={idx}
             style={styles.listItemTouch}

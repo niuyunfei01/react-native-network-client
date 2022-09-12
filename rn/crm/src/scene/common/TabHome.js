@@ -22,8 +22,8 @@ const Tab = createBottomTabNavigator();
 
 const tabBarOptions = {
   activeTintColor: colors.main_color,
-  inactiveTintColor: "#666",
-  style: {backgroundColor: "#ffffff"},
+  inactiveTintColor: colors.color666,
+  style: {backgroundColor: colors.white},
   animationEnabled: false,
   lazy: true,
   labelStyle: {fontSize: 15}
@@ -81,19 +81,13 @@ class TabHome extends React.Component {
             getComponent={() => require("../notice/NoticeList").default}
             options={
               {
+                tabBarBadge:remind > 99 ? '99+' : remind,
                 tabBarLabel: "提醒",
                 tabBarIcon: ({focused}) => (
                   <View style={{position: "relative"}}>
                     <FontAwesome5 name={'bell'} size={22}
                                   color={focused ? colors.main_color : colors.colorCCC}
                     />
-                    <If condition={remind > 0}>
-                      <Badge
-                        value={remind > 99 ? '99+' : remind}
-                        status="error"
-                        containerStyle={{position: 'absolute', top: -5, right: -25}}
-                      />
-                    </If>
                   </View>
                 )
               }

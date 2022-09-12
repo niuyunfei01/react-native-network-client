@@ -7,7 +7,6 @@ import {setPrinterName} from '../../../reducers/global/globalActions';
 
 import Config from "../../../pubilc/common/config";
 import native from "../../../pubilc/util/native";
-import tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
@@ -50,7 +49,7 @@ class PrinterSetting extends PureComponent {
 
   check_printer_connected = () => {
     const {printer_id} = this.props.global
-    if (printer_id !== '0' && this.state.checkingPrinter === false) {
+    if (printer_id !== '0' && !this.state.checkingPrinter) {
       this.setState({checkingPrinter: true})
       setTimeout(() => {
         BleManager.retrieveServices(printer_id).then((peripheralData) => {
@@ -88,8 +87,7 @@ class PrinterSetting extends PureComponent {
     this.focus()
   }
 
-  get_print_settings(callback = () => {
-  }) {
+  get_print_settings(callback = () => {}) {
     const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
@@ -204,7 +202,7 @@ class PrinterSetting extends PureComponent {
           </TouchableOpacity>
         </View>
 
-        <If condition={Platform.OS === 'android'}>
+        <If condition={true}>
           <View
             style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
             <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>

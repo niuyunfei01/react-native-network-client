@@ -32,6 +32,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Alipay from '@uiw/react-native-alipay';
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import {Button} from "react-native-elements";
+import {imageKey} from "../../../pubilc/util/md5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -493,7 +494,7 @@ class SeparatedAccountFill extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    this.setState({newImageKey: tool.imageKey(imgName)})
+    this.setState({newImageKey: imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {

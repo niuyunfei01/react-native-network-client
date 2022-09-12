@@ -47,19 +47,6 @@ export default class GlobalUtil {
     return global.hostPort;
   }
 
-  /**
-   * 启动时调用此方法更新全局host设置
-   *
-   * TODO: 以后需要将是否使用与发布的设置放在 RN 里，则可直接修改全局 global。
-   * @param global global reducer
-   * @param native
-   * @param callback execute when done getting from native
-   */
-  static async setHostPortNoDef(global, native, callback) {
-    if (global.host) {
-      this.setHostPort(global.host);
-    }
-  }
 
   static byteConvert = (num) => {
     if (num < 0)

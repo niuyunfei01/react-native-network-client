@@ -23,6 +23,7 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {ActionSheet, Cells, CellsTitle} from "../../../weui";
 import tool from "../../../pubilc/util/tool";
+import {imageKey} from "../../../pubilc/util/md5";
 
 
 function mapStateToProps(state) {
@@ -248,7 +249,7 @@ class PrinterRemark extends PureComponent {
 
   startUploadImg(imgPath, imgName) {
     showModal("图片上传中...")
-    this.setState({newImageKey: tool.imageKey(imgName)})
+    this.setState({newImageKey: imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {

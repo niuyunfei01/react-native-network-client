@@ -5,12 +5,6 @@ const {ActivityStarter} = NativeModules
 
 export default {
 
-  updateAfterTokenGot: async function (access_token, expire, callback = function () {
-  }) {
-    if (ActivityStarter) {
-      await ActivityStarter.updateAfterTokenGot(access_token, expire, callback)
-    }
-  },
 
   //打开通知设置
   toOpenNotifySettings: async function (callback = function () {
@@ -79,57 +73,9 @@ export default {
       await ActivityStarter.getStartAppTime(callback)
   },
 
-  currentVersion: async function (callback) {
-    if (ActivityStarter) {
-      await ActivityStarter.currentVersion(callback);
-    }
-  },
-  ordersSearch: async function (term) {
-    if (ActivityStarter)
-      await ActivityStarter.searchOrders(term);
-  },
-
   toGoods: async function (global = null, dispatch = null, navigation = null) {
     const _navigation = navigation || (this.props || {}).navigation
     _navigation.navigate("goods", {})
-  },
-
-  toNativeOrder: async function (id) {
-    await (ActivityStarter && ActivityStarter.toOrder(id));
-  },
-
-  gotoPage: async function (page) {
-    if (ActivityStarter && page) {
-      await ActivityStarter.gotoPage(page);
-    }
-  },
-
-  gotoNativeActivity: async function (activityName, putStack, json = '{}') {
-    if (ActivityStarter && activityName) {
-      await ActivityStarter.navigateToNativeActivity(activityName, putStack, json);
-    }
-  },
-  nativeBack: async function () {
-    if (ActivityStarter) {
-      await ActivityStarter.nativeBack();
-    }
-  },
-
-  host:
-    /**
-     * @param callback （host) => {}
-     * @returns {Promise.<void>}
-     */
-    async function (callback) {
-      if (ActivityStarter) {
-        await ActivityStarter.getHost(callback);
-      }
-    },
-
-  toUserComments: async function () {
-    if (ActivityStarter) {
-      await ActivityStarter.toUserComments();
-    }
   },
 
   /**
@@ -163,12 +109,6 @@ export default {
         ActivityStarter.logout();
   },
 
-  printBtPrinter: async function (order, callback = function () {
-  }) {
-    if (ActivityStarter)
-      await
-        ActivityStarter.printBtPrinter(JSON.stringify(order), callback);
-  },
 
   printSmPrinter: async function (order, callback = function () {
   }) {
@@ -188,10 +128,6 @@ export default {
       ActivityStarter.printSupplierSummaryOrder(callback));
   },
 
-  ordersByMobileTimes: async function (phone, times) {
-    await (ActivityStarter &&
-      ActivityStarter.ordersByMobileTimes('' + phone, parseInt(times)))
-  },
 
   dialNumber: async function (number) {
     let phoneNumber;
@@ -203,28 +139,11 @@ export default {
     Linking.openURL(phoneNumber).then();
   },
 
-  clearScan: async function (code, callback = function () {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.clearScan(code, callback))
-  },
 
   updatePidApplyPrice: async function (pid, applyPrice, cb = function () {
   }) {
     await (ActivityStarter &&
       ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
-  },
-
-  updatePidStorage: async function (pid, storage, clb = function () {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.updatePidStorage(pid, storage, clb))
-  },
-
-  listenScan: async function (callback = function (scan_items) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.listenScan(callback))
   },
 
   speakText: async function (text, callback = function (ok, msg) {
@@ -303,9 +222,9 @@ export default {
     await (ActivityStarter &&
       ActivityStarter.reportRoute(routeName))
   },
-
-  reportException: async function (msg) {
+  checkCanRunInBg: async (callback = function (ok, msg) {
+  }) => {
     await (ActivityStarter &&
-      ActivityStarter.reportException(msg))
+      ActivityStarter.checkCanRunInBg(callback))
   }
 }

@@ -11,7 +11,9 @@
  * Configurable variables. You may need to tweak these to be compatible with
  * the server-side, but the defaults work in most cases.
  */
-const tool = require("./tool");
+import tool from './tool'
+import DeviceInfo from "react-native-device-info"
+
 var hexcase = 0;
 /* hex output format. 0 - lowercase; 1 - uppercase        */
 var b64pad = "";
@@ -23,22 +25,27 @@ var chrsz = 8;
  * These are the functions you'll usually want to call
  * They take string arguments and return either hex or base-64 encoded strings
  */
-module.exports.hex_md5 = function (s) {
+export function hex_md5(s) {
   return binl2hex(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.b64_md5 = function (s) {
+
+export function b64_md5(s) {
   return binl2b64(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.str_md5 = function (s) {
+
+export function str_md5(s) {
   return binl2str(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.hex_hmac_md5 = function (key, data) {
+
+export function hex_hmac_md5(key, data) {
   return binl2hex(core_hmac_md5(key, data));
 }
-module.exports.b64_hmac_md5 = function (key, data) {
+
+export function b64_hmac_md5(key, data) {
   return binl2b64(core_hmac_md5(key, data));
 }
-module.exports.str_hmac_md5 = function (key, data) {
+
+export function str_hmac_md5(key, data) {
   return binl2str(core_hmac_md5(key, data));
 }
 
@@ -46,7 +53,7 @@ module.exports.str_hmac_md5 = function (key, data) {
  * Perform a simple self-test to see if the VM is working
  */
 function md5_vm_test() {
-  return hex_md5("abc") == "900150983cd24fb0d6963f7d28e17f72";
+  return hex_md5("abc") === "900150983cd24fb0d6963f7d28e17f72";
 }
 
 /*
@@ -255,3 +262,13 @@ function binl2b64(binarray) {
   }
   return str;
 }
+
+/**
+ * 图片上传key
+ */
+export function imageKey(imgName) {
+  let curTime = Date.now();
+  let UniqueId = DeviceInfo.getUniqueId();
+  return hex_md5(UniqueId + curTime + imgName)
+}
+

@@ -17,13 +17,11 @@ import {getGoodsProduct} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {markTaskDone} from '../../../reducers/remind/remindActions'
 import colors from "../../../pubilc/styles/colors";
-import native from "../../../pubilc/util/native";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Cts from '../../../pubilc/common/Cts'
 import Config from "../../../pubilc/common/config";
 import Swiper from "react-native-swiper";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
@@ -59,34 +57,10 @@ class GoodsWorkNewProductScene extends PureComponent {
       reason: '',
       visual: false //大图
     };
+
     this.renderBtn = this.renderBtn.bind(this);
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this);
   }
-
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
-      headerLeft: () => (<TouchableOpacity
-        style={{
-          width: pxToDp(48),
-          height: pxToDp(48),
-          marginLeft: pxToDp(31),
-          marginTop: pxToDp(20)
-        }}
-        onPress={() => {
-          if (type == 'add') {
-            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
-          } else {
-            navigation.goBack();
-          }
-        }
-        }
-      >
-        <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
-      </TouchableOpacity>)
-    };
-  };
 
   UNSAFE_componentWillMount() {
     this.getRemark();
@@ -99,14 +73,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {store_categories, tag_list} = (params || {});
     if (store_categories && tag_list) {
       this.setState({store_categories: store_categories, tag_list: tag_list});
-    }
-  }
-
-  back(type) {
-    if (type == 'add') {
-      native.gotoPage(type);
-    } else {
-      this.props.navigation.goBack();
     }
   }
 
@@ -141,7 +107,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     this.props.navigation.goBack();
   }
 
-  async changeTaskStatus(status, reason = '') {
+   changeTaskStatus(status, reason = '') {
     let {task_id} = this.props.route.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -189,7 +155,7 @@ class GoodsWorkNewProductScene extends PureComponent {
               }
               await this.setState({upReason: true});
               showModal('提交中..')
-              this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+               this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
             }}
           >
             <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新 </Text>

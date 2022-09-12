@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
+import {imageKey} from "../../../pubilc/util/md5";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
 
@@ -248,7 +249,7 @@ class RegisterShunfeng extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    const newImageKey = tool.imageKey(imgName) + imgName
+    const newImageKey = imageKey(imgName) + imgName
     this.setState({newImageKey: newImageKey})
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {

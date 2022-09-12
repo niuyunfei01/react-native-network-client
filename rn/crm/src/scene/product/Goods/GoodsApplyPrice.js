@@ -84,12 +84,7 @@ class GoodsApplyPrice extends Component {
   }
 
   onBack = () => {
-    let from = this.props.route.params.from;
-    if ('native' == from) {
-      native.nativeBack();
-    } else {
-      this.props.navigation.goBack();
-    }
+    this.props.navigation.goBack();
   }
 
   onSave() {
@@ -120,12 +115,7 @@ class GoodsApplyPrice extends Component {
           native.updatePidApplyPrice(product_id, supply_price * 100, () => {
           })
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
-          if (this.props.route.params.onBack) {
-            this.props.route.params.onBack()
-            this.props.navigation.goBack()
-          } else {
-            native.nativeBack();
-          }
+          this.props.navigation.goBack()
         } else {
           self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
         }

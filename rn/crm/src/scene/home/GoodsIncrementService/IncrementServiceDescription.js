@@ -1,11 +1,14 @@
 import React, {PureComponent} from "react";
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar} from 'react-native'
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import {receiveIncrement} from "../../../reducers/mine/mineActions";
 import colors from "../../../pubilc/styles/colors";
+import {SvgXml} from "react-native-svg";
+import {contactCustomerService} from "../../../svg/svg";
+import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 const styles = StyleSheet.create({
   saveZoneWrap: {justifyContent: 'flex-end', backgroundColor: colors.white, flexDirection: 'row'},
@@ -36,6 +39,9 @@ const styles = StyleSheet.create({
     paddingTop: 7,
     paddingBottom: 7,
     textAlign: 'center'
+  },
+  headerIcon: {
+    paddingRight: 15
   }
 })
 
@@ -62,6 +68,45 @@ class IncrementServiceDescription extends PureComponent {
   constructor(props) {
     super(props);
 
+  }
+
+  openMiniProgram = () => {
+    const {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global
+    let data = {
+      v: vendor_id,
+      s: currStoreId,
+      u: currentUser,
+      m: currentUserProfile.mobilephone,
+      place: 'mine'
+    }
+    JumpMiniProgram("/pages/service/index", data);
+  }
+
+  headerRight = () => {
+    return (
+      <TouchableOpacity style={styles.headerIcon} onPress={this.openMiniProgram}>
+        <SvgXml xml={contactCustomerService(24, 24, colors.white)}/>
+      </TouchableOpacity>
+    )
+  }
+
+
+  setHeader = () => {
+    const {navigation} = this.props
+    navigation.setOptions({
+      headerRight: this.headerRight,
+      headerStyle: {backgroundColor: '#40455A'},
+      headerTintColor: '#FFFFFF',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        color: '#FFFFFF'
+      }
+    })
+
+  }
+
+  componentDidMount() {
+    this.setHeader()
   }
 
   useIncrementService = (open_type = '2') => {
@@ -116,6 +161,7 @@ class IncrementServiceDescription extends PureComponent {
     const {increment} = this.props.mine
     return (
       <>
+        <StatusBar barStyle={'light-content'} backgroundColor={'#40455A'}/>
         <ScrollView>
           {
             DESCRIPTION_LIST.map((item, index) => {

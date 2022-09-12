@@ -59,16 +59,16 @@ class HttpUtils {
 
     if (props && props.global) {
       store = tool.store(props.global)
-      const {currVendorId = 0} = tool.vendor(props.global)
+      const {vendor_id = 0} = props.global
 
-      if (store && currVendorId) {
-        options.headers.store_id = store.id
-        options.headers.vendor_id = currVendorId
-
+      if (store && vendor_id) {
+        options.headers.store_id = store.id || global.noLoginInfo.store_id
+        options.headers.vendor_id = vendor_id || global.noLoginInfo.currVendorId
+        options.headers.vendorId = vendor_id || global.noLoginInfo.currVendorId
         if (uri.substr(tool.length(uri) - 1) !== '&') {
           uri += '&'
         }
-        uri += `store_id=${store.id}&vendor_id=${currVendorId}`
+        uri += `store_id=${store.id}&vendor_id=${vendor_id}`
       }
     }
     return new Promise((resolve, reject) => {

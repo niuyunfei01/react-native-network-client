@@ -437,9 +437,9 @@ class OrderListItem extends React.PureComponent {
     }, {'text': '取消'}]);
   }
 
-  cancelDelivery = (val) => {
+  cancelDelivery = (orderId) => {
     const token = this.props.accessToken
-    let orderId = val
+
     const api = `/api/pre_cancel_order?access_token=${token}`;
     let params = {
       order_id: orderId

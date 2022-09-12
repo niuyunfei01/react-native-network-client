@@ -444,10 +444,7 @@ class OrderTransferThird extends Component {
   }
 
   onPress = (route, params = {}) => {
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
+
     this.props.navigation.navigate(route, params);
   }
 

@@ -69,20 +69,15 @@ export const AppNavigator = (props) => {
         <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name="Web" options={{headerShown: true}}
-                      getComponent={() => require("./WebScene").default}/>
+        <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../../scene/notice/NoticeList").default}
                       options={{headerShown: false}}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
         <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
                       getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
-        <Stack.Screen name="User" options={{headerShown: true}}
-                      getComponent={() => require("../../scene/home/User/UserScene").default}/>
-        <Stack.Screen name="UserAdd" options={{headerShown: true}}
-                      getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
-        <Stack.Screen name="Mine" options={{headerShown: false}}
-                      getComponent={() => require("../../scene/home/Mine/MineScene").default}/>
+        <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
+        <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
@@ -250,9 +245,6 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_EDIT}
                       getComponent={() => require("../../scene/product/Goods/GoodsEditScene").default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_GOODS_APPLY_NEW_PRODUCT} options={{headerTitle: '我要上新'}}
-                      getComponent={() => require("../../scene/product/Goods/GoodsApplyNewProductScene").default}
-        />
         <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} options={{headerTitle: '申请工单上新'}}
                       getComponent={() => require("../../scene/product/Goods/GoodsWorkNewProductScene").default}
         />
@@ -458,7 +450,7 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/GoodsIncrementService/TemplateSettingsScene').default}
         />
         <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
-                      options={{headerTitle: '功能详情'}}
+                      options={{title: '开通会员权限'}}
                       getComponent={() => require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
         />
         <Stack.Screen name={Config.ROUTE_AUTO_CALL_DELIVERY}
