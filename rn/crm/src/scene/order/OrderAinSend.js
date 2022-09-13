@@ -11,6 +11,7 @@ import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import tool from "../../pubilc/util/tool";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   return {
@@ -19,6 +20,12 @@ function mapStateToProps(state) {
 }
 
 class OrderAinSend extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props: Object) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -51,7 +58,7 @@ class OrderAinSend extends Component {
       return;
     }
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
+    HttpUtils.get.bind(this.props)(api, {
       orderId: this.state.orderId,
       userId: this.state.worker,
       sync_order: this.state.sync_order
