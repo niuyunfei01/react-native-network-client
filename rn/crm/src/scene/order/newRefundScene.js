@@ -45,6 +45,16 @@ const refused_msgss = [
   {'label': '买家末按要求寄出货物', 'key': 11},
   {'label': '其他原因', 'key': -1},
 ]
+const refused_msgsss = [
+  {'label': '己和用户电话沟通', 'key': 12},
+  {'label': '商品己开始制作', 'key': 13},
+  {'label': '商品已经打包完成', 'key': 14},
+  {'label': '商品正在配送中', 'key': 15},
+  {'label': '商品无质量问题', 'key': 16},
+  {'label': '商品没有缺货少货问题', 'key': 17},
+  {'label': '商品打包完好', 'key': 18},
+  {'label': '其他原因', 'key': -1},
+]
 
 class newRefundScene extends Component {
   static propTypes = {
@@ -81,6 +91,8 @@ class newRefundScene extends Component {
       refund_reason: '',
       refund_delivery_desc: '',
       refund_delivery_code: '',
+      refund_type: 1,
+      reject_status: 1,
     };
   }
 
@@ -98,7 +110,9 @@ class newRefundScene extends Component {
         jd_ship_worker_mobile: res?.order_info?.jd_ship_worker_mobile,
         jd_ship_worker_name: res?.order_info?.jd_ship_worker_name,
         show_red_tips: res?.show_red_tips,
+        refund_type: res?.refund_type,
         status_list: res?.status_list,
+        reject_status: res?.reject_status,
         goods_list: res?.refund_info?.good_list,
         total_refund_price: res?.refund_info?.total_refund_price,
         refund_reason: res?.refund_info?.reason,
@@ -130,7 +144,7 @@ class newRefundScene extends Component {
 
   comfirmRefund = (type) => {
     this.closeModal()
-    let {order, refused_code, refused_msg_content, show_red_tips} = this.state;
+    let {order, refused_code, refused_msg_content, show_red_tips, refund_type} = this.state;
     const {accessToken} = this.props.global
     const api = `/api/sg_order_return_refund/${order?.id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
@@ -139,7 +153,7 @@ class newRefundScene extends Component {
       reject_other_reason: refused_msg_content
     }).then(() => {
       ToastShort("操作成功");
-      if (type === 2 || (show_red_tips && type === 1)) {
+      if (type === 2 || (show_red_tips && type === 1) || (refund_type === 2 && type === 3)) {
         return this.props.navigation.goBack()
       }
       this.fetchData();
@@ -492,9 +506,9 @@ class newRefundScene extends Component {
       show_zs_refused_refund_modal,
       refused_code,
       refused_msg_content,
-      show_red_tips
+      reject_status,
     } = this.state
-    let list = show_red_tips ? refused_msgs : refused_msgss;
+    let list = Number(reject_status) === 1 ? refused_msgs : Number(reject_status) === 2 ? refused_msgss : refused_msgsss;
     return (
       <View>
         <BottomModal title={'提示'} actionText={'退款'} closeText={'取消'} onPress={() => this.comfirmRefund(3)}
