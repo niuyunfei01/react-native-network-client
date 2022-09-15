@@ -1,18 +1,24 @@
 import React, {Component} from 'react'
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
-import PropTypes from "prop-types";
-import {Button, CheckBox, Image} from "react-native-elements";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import BottomModal from "../../pubilc/component/BottomModal";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import tool from '../../pubilc/util/tool'
 import native from '../../pubilc/util/native'
+import {bindActionCreators} from "redux";
+import Icons from 'react-native-vector-icons/FontAwesome';
+import {orderAuditRefund} from '../../reducers/order/orderActions'
+import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
-import {TextArea} from "../../weui/index";
-import * as globalActions from "../../reducers/global/globalActions";
-import Clipboard from "@react-native-community/clipboard";
-import {ToastShort} from "../../pubilc/util/ToastUtils";
+import pxToDp from "../../pubilc/util/pxToDp";
+import {Cell, CellBody, CellHeader, Cells, TextArea} from "../../weui/index";
+import MyBtn from '../../pubilc/util/MyBtn'
+import CellFooter from "../../weui/Cell/CellFooter";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import Cts from '../../pubilc/common/Cts'
+
+const reasons = {
+  custom_talked_ok: '已与用户协商一致',
+  custom: '自定义回复'
+};
+
 
 function mapStateToProps(state) {
   return {
@@ -20,601 +26,327 @@ function mapStateToProps(state) {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
+function mapDispatchToProps(dispatch) {
+  return {dispatch, ...bindActionCreators({orderAuditRefund}, dispatch)}
 }
 
-const refused_msgs = [
-  '已和用户沟通一致不退货',
-  '商品发出时完好',
-  '商品没问题，买家未举证',
-  '商品没问题，买家举证无效',
-  '商品已经影响二次销售',
-  '申请时间已经超过售后服务时限',
-  '不支持买家主观原因的退换货',
-  '其他原因',
-]
-
 class AuditRefundScene extends Component {
-  static propTypes = {
-    dispatch: PropTypes.func,
-    route: PropTypes.object,
-  }
 
   constructor(props) {
     super(props);
     let {remind, order} = this.props.route.params;
     this.state = {
+
       order: order,
       remind: remind,
-      isRefreshing: false,
-      show_good_list: true,
-      show_comfirm_refund_modal: false,
-      show_comfirm_agree_refund_modals: false,
-      show_refused_refund_modal: false,
-      show_zs_refused_refund_modal: false,
-      refused_msg: '',
-      refused_msg_content: '',
-      delivery_type: 1,
+      refund_yuan: '',
+      selected_action: '',
+      reason_key: '',
+      custom: '',
+      chevron: true,
+      tabNum: 0,
+      reason: '已与用户协商一致',
+      onSubmitting: false,
     };
+    this.renderReason = this.renderReason.bind(this)
   }
 
-  onHeaderRefresh = () => {
-    console.log('fetch')
+  tplAction(reason, agreeOrRefuse) {
+    const {remind} = (this.props.route.params || {});
+    const {dispatch, global} = this.props;
+    dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
+      0, (ok, msg, data) => {
+        hideModal();
+        if (ok) {
+          ToastLong('发送成功,即将返回上一页');
+          this.setState({onSubmitting: false});
+          setTimeout(() => {
+            this.props.navigation.goBack()
+          }, 1000)
+        } else {
+          this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
+        }
+      }));
   }
 
-  closeModal = () => {
-    this.setState({
-      show_comfirm_refund_modal: false,
-      show_comfirm_agree_refund_modals: false,
-      show_refused_refund_modal: false,
-      show_zs_refused_refund_modal: false,
-    })
+  renderPartRefundGood(goodList) {
+    return goodList.map((item, index) => {
+      return <Text key={index} style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price} </Text>
+    });
   }
 
-  comfirmRefund = () => {
-  }
+  renderReason() {
+    let {tabNum} = this.state;
+    if (tabNum === 1) {
+      return (
+        <View style={styles.bottom_box}>
+          <View style={{marginVertical: pxToDp(40)}}>
+            <Text style={[styles.bottom_box_text, {color: colors.editStatusAdd}]}>
+              同意退款后,货款立即原路退回，无法追回</Text>
+          </View>
+          <TouchableOpacity style={styles.handleAgreeWrap} onPress={async () => {
+            let {onSubmitting} = this.state;
+            if (onSubmitting) {
+              return false
+            }
+            await this.setState({onSubmitting: true});
+            showModal('提交中')
+            this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
+          }}>
+            <Text style={{color: colors.white, fontSize: 14}}>
+              同意退款
+            </Text>
+          </TouchableOpacity>
 
-  comfirmAgreeRefund = () => {
-  }
+        </View>
+      )
+    } else if (tabNum === 2) {
+      return (
+        <View style={styles.bottom_box}>
+          <TextArea
+            maxLength={20}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
+            underlineColorAndroid='transparent'
+            placeholder='一定要输入理由'
+            placeholderTextColor={colors.colorCCC}
+            style={{
+              borderWidth: pxToDp(1),
+              marginTop: pxToDp(30),
+              borderColor: colors.colorCCC,
+            }}
+          />
+          <TouchableOpacity style={styles.handleRefuseWrap} onPress={async () => {
+            let {onSubmitting, reason} = this.state;
+            if (onSubmitting || (tool.length(reason) <= 0)) {
+              ToastLong('一定要输入理由');
+              return false
+            }
+            await this.setState({onSubmitting: true})
+            showModal('提交中')
+            this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
+          }}>
+            <Text style={{color: colors.white, fontSize: 14}}>
+              已与用户沟通,拒绝退款
+            </Text>
+          </TouchableOpacity>
 
-  refusedRefund = () => {
-    let {delivery_type} = this.state;
-    if (delivery_type === 1) {
-      this.setState({
-        show_zs_refused_refund_modal: true,
-      })
-      return
+        </View>
+      )
     }
-    this.zsRefusedRefund();
+    return <View/>;
   }
-
-  zsRefusedRefund = () => {
-    console.log('拒绝')
-  }
-
 
   render() {
-    let {isRefreshing} = this.state
-    return (
-      <View style={{flex: 1}}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
-              tintColor='gray'
-            />}
-          style={styles.Content}>
-          {this.renderheader()}
-          {this.renderShip()}
-          {this.renderGoods()}
-          {this.renderDelivery()}
-          {/*<Text style={{fontSize: 12, color: colors.red,fontWeight:'bold', marginLeft: 14}}>超过(24小时)未初审，系统自动通过 </Text>*/}
-          {/*<Text style={{fontSize: 12, color: colors.color333,fontWeight:'bold', marginLeft: 14}}>商家驳回退货申请 </Text>*/}
-          <View style={{height: 100}}/>
-        </ScrollView>
-        {this.renderBtn()}
-        {this.renderModal()}
-      </View>
-    )
-  }
-
-
-  renderheader = () => {
     let {
+      id,
       dayId,
       store_name,
-      expectTime,
-    } = this.state.order;
-    return (
-      <View style={styles.item_body}>
-        <View style={[styles.item_head, {
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          paddingVertical: 10,
-          paddingBottom: 8
-        }]}>
-          <Image source={{uri: ''}}
-                 style={styles.platformIcon}/>
-          <Text style={{
-            color: colors.color333,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}># </Text>
-          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>{dayId} </Text>
-        </View>
-
-        <View style={styles.item_row}>
-          <Text style={styles.row_label}>店铺名称：{store_name} </Text>
-        </View>
-
-        <View style={styles.item_row}>
-          <Text style={styles.row_label}>期望送达时间：{tool.orderExpectTime(expectTime)} </Text>
-        </View>
-      </View>
-    )
-  }
-
-  renderShip = () => {
-    let {
+      platform,
+      platform_oid,
       ship_worker_mobile,
       ship_worker_name,
+      expectTime,
+      orderTime,
     } = this.state.order;
+    let {remind_id, refund_type} = this.state.remind;
+    try {
+      remind_id = JSON.parse(remind_id)
+    } catch (e) {
+      remind_id = {};
+    }
     return (
-      <TouchableOpacity onPress={() => {
-        native.dialNumber(ship_worker_mobile)
-      }} style={styles.item_body}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 14,
-          marginTop: 16
-        }}>
-          <View style={{flex: 1}}>
-            <Text style={{fontSize: 14, color: colors.color333}}>骑手姓名：{ship_worker_name} </Text>
-            <Text style={{fontSize: 14, color: colors.color333, marginTop: 11}}>骑手电话：{ship_worker_mobile} </Text>
-          </View>
-          <FontAwesome5 solid={false} onPress={() => {
-          }} name={'phone-alt'}
-                        style={{fontSize: 30, color: colors.main_color}}/>
-        </View>
-
-      </TouchableOpacity>
-    )
-  }
-
-  renderGoods = () => {
-    let {show_good_list} = this.state
-    return (
-      <View style={styles.item_body}>
-        <View style={{
-          justifyContent: 'center',
-          marginHorizontal: 14,
-          marginTop: 16
-        }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_good_list: !show_good_list
-            })
-          }} style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}>
-            <Text>退款方式：用户申请部分退款</Text>
-            <FontAwesome5 solid={false} onPress={() => {
-            }} name={show_good_list ? 'chevron-down' : 'chevron-up'}
-                          style={{fontSize: 14, color: colors.color666}}/>
-          </TouchableOpacity>
-          <If condition={show_good_list}>
-            <View>
-              <View style={{marginVertical: 8}}>
-                <Text style={{fontSize: 14, color: colors.color333}}>退款商品： </Text>
-                <View
-                  style={{
-                    marginVertical: 4,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: "space-between"
-                  }}>
-                  <Text style={{flex: 1, fontSize: 14, color: colors.color333}}>白心红薯月500g </Text>
-                  <Text style={{width: 30, fontSize: 14, color: colors.color333}}>x1 </Text>
-                  <Text style={{width: 60, textAlign: 'right', fontSize: 14, color: colors.color333}}>¥ 1.56 </Text>
-                </View>
-                <View
-                  style={{
-                    marginVertical: 4,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: "space-between"
-                  }}>
-                  <Text style={{flex: 1, fontSize: 14, color: colors.color333}}>白心红薯月500g </Text>
-                  <Text style={{width: 30, fontSize: 14, color: colors.color333}}>x1 </Text>
-                  <Text style={{width: 60, textAlign: 'right', fontSize: 14, color: colors.color333}}>¥ 1.56 </Text>
-                </View>
-                <View
-                  style={{
-                    marginVertical: 4,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: "space-between"
-                  }}>
-                  <Text style={{flex: 1, fontSize: 14, color: colors.color333}}>白心红薯月500g </Text>
-                  <Text style={{width: 30, fontSize: 14, color: colors.color333}}>x1 </Text>
-                  <Text style={{width: 60, textAlign: 'right', fontSize: 14, color: colors.color333}}>¥ 1.56 </Text>
-                </View>
-
+      <ScrollView style={{flex: 1}}>
+        <Cells style={{borderWidth: 0, marginLeft: 0, borderTopWidth: 0, marginTop: pxToDp(5), borderBottomWidth: 0}}>
+          <Cell customStyle={styles.my_cell}>
+            <CellHeader>
+              <Text style={styles.shop_name}>{id}#{dayId} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <Text style={styles.shop_name}>{store_name} </Text>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader>
+              <Text style={styles.text}>订单号:{id} </Text>
+              <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <View>
+                {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)} </Text>}
+                {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)} </Text>}
               </View>
-              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: "space-between"}}>
-                <Text style={{fontSize: 14, color: colors.color333}}>退货金额： </Text>
-                <Text style={{fontSize: 14, color: colors.color333}}>¥ 61.56</Text>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
-                <Text style={{fontSize: 14, color: colors.color333}}>退款原因： </Text>
-                <Text style={{fontSize: 14, color: colors.red}}>地址无法配送 </Text>
-              </View>
-            </View>
-          </If>
-        </View>
-        <View style={{
-          marginTop: 10,
-          borderTopWidth: 1,
-          borderColor: colors.colorCCC,
-          paddingHorizontal: 14,
-        }}>
-          <TouchableOpacity onPress={() => {
-            Clipboard.setString('222222')
-            ToastShort('已复制到剪切板')
-          }} style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 8}}>
-            <Text style={{fontSize: 14, color: colors.color333}}>物流单号： 222222</Text>
-            <Text style={{fontSize: 14, color: colors.main_color}}>复制 </Text>
-          </TouchableOpacity>
-
-          <View style={{marginTop: 10}}>
-            <Text style={{fontSize: 14, color: colors.color333}}>退货方式：跑腿送货/自行送货/商家取货 </Text>
-          </View>
-
-        </View>
-      </View>
-    )
-  }
-
-  renderDelivery = () => {
-    return (
-      <View style={styles.item_body}>
-        <View style={[styles.item_head, {
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          paddingVertical: 10,
-          paddingBottom: 8,
-        }]}>
-          <Text style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: colors.color333,
-            marginLeft: 14,
-          }}>配送状态 </Text>
-        </View>
-        <View style={{paddingHorizontal: 14}}>
-          {this.renderDeliveryStatus()}
-        </View>
-      </View>
-    )
-  }
-
-  renderDeliveryStatus = () => {
-    let list = [
-      {status_color: 'green', status_desc: '商家通过退货申请', status_desc_color: 'black'},
-      {status_color: 'green', status_desc: '商家通过退货申请', status_desc_color: 'black'},
-      {status_color: 'green', status_desc: '商家通过退货申请', status_desc_color: 'black'},
-      {status_color: 'green', status_desc: '商家通过退货申请', status_desc_color: 'black'},
-    ]
-    return (
-      <View>
-        <For each="log" index="i" of={list}>
-          <View key={i} style={styles.deliveryStatusContent}>
-            <View style={{width: 30}}>
-              <View style={[styles.deliveryStatusHeader, {backgroundColor: log.status_color,}]}>
-                <If condition={i !== 0}>
-                  <View style={[styles.deliveryStatusTitleBottom, {backgroundColor: log.status_color}]}/>
-                </If>
-                <If condition={i !== tool.length(list) - 1}>
-                  <View style={[styles.deliveryStatusTitleTop, {backgroundColor: log.status_color}]}/>
-                </If>
-              </View>
-            </View>
-            <View style={{flex: 1}}>
-              <Text style={{color: log.status_desc_color, fontSize: 14}}>{log.status_desc}  </Text>
-            </View>
-          </View>
-        </For>
-      </View>
-    )
-  }
-
-  renderBtn = () => {
-    return (
-      <View style={{backgroundColor: colors.white, padding: 20, flexDirection: 'row', justifyContent: 'space-between'}}>
-
-        <Button title={'拒绝'}
+            </CellFooter>
+          </Cell>
+          {!!ship_worker_mobile && !!ship_worker_name && <Cell customStyle={[styles.my_cell]}>
+            <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
+              <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name} </Text>
+              <Text style={styles.text}>{ship_worker_mobile} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <MyBtn
+                text={'呼叫'}
+                style={styles.btn}
                 onPress={() => {
-                  this.setState({
-                    show_refused_refund_modal: true
-                  })
+                  native.dialNumber(ship_worker_mobile);
                 }}
-                buttonStyle={{
-                  width: 150,
-                  borderRadius: 5,
-                  backgroundColor: colors.fontGray,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-
-        <Button title={'同意'}
+              />
+            </CellFooter>
+          </Cell>
+          }
+          <Cell customStyle={styles.my_cell}>
+            <CellHeader>
+              <Text style={{color: colors.color333}}>商品/金额明细</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <TouchableOpacity
+                style={{paddingLeft: pxToDp(20), paddingHorizontal: pxToDp(10)}}
                 onPress={() => {
-                  this.setState({
-                    show_comfirm_refund_modal: true
-                  })
-                }}
-                buttonStyle={{
-                  width: 150,
-                  borderRadius: 4,
-                  backgroundColor: colors.main_color,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-
-        {/*<Button title={'拒绝收货'}*/}
-        {/*        onPress={() => {*/}
-        {/*          console.log(111)*/}
-        {/*        }}*/}
-        {/*        buttonStyle={{*/}
-        {/*          width: 150,*/}
-        {/*          borderRadius: 4,*/}
-        {/*          backgroundColor: colors.fontGray,*/}
-        {/*        }}*/}
-        {/*        titleStyle={{*/}
-        {/*          color: colors.white,*/}
-        {/*          fontSize: 16*/}
-        {/*        }}*/}
-        {/*/>*/}
-
-        {/*<Button title={'确认收货'}*/}
-        {/*        onPress={() => {*/}
-        {/*          this.setState({*/}
-        {/*            show_comfirm_agree_refund_modals: true*/}
-        {/*          })*/}
-        {/*        }}*/}
-        {/*        buttonStyle={{*/}
-        {/*          width: 150,*/}
-        {/*          borderRadius: 4,*/}
-        {/*          backgroundColor: colors.main_color,*/}
-        {/*        }}*/}
-        {/*        titleStyle={{*/}
-        {/*          color: colors.white,*/}
-        {/*          fontSize: 16*/}
-        {/*        }}*/}
-        {/*/>*/}
-
-      </View>
-    )
-  }
-
-  renderModal = () => {
-    let {
-      show_comfirm_refund_modal,
-      show_comfirm_agree_refund_modals,
-      show_refused_refund_modal,
-      show_zs_refused_refund_modal,
-      refused_msg,
-      refused_msg_content,
-    } = this.state
-    return (
-      <View>
-        <BottomModal title={'提示'} actionText={'退款'} closeText={'取消'} onPress={() => this.comfirmRefund()}
-                     onPressClose={() => this.closeModal()}
-                     visible={show_comfirm_refund_modal}
-                     btnBottomStyle={{
-                       borderTopWidth: 1,
-                       borderTopColor: "#E5E5E5",
-                       paddingBottom: 0,
-                     }}
-                     closeBtnStyle={{
-                       borderWidth: 0,
-                       borderRadius: 0,
-                       borderRightWidth: 1,
-                       borderColor: "#E5E5E5",
-                     }}
-                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
-                     closeBtnTitleStyle={{color: colors.color333}}
-                     btnTitleStyle={{color: colors.main_color}} onClose={() => this.closeModal()}>
-          <View style={{
-            margin: 20,
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              fontSize: 16,
-              color: colors.color333,
-            }}>确认同意顾客退款吗？ </Text>
-          </View>
-        </BottomModal>
-
-        <BottomModal title={'提示'} actionText={'退款'} closeText={'取消'} onPress={() => this.comfirmAgreeRefund()}
-                     onPressClose={() => this.closeModal()}
-                     visible={show_comfirm_agree_refund_modals}
-                     btnBottomStyle={{
-                       borderTopWidth: 1,
-                       borderTopColor: "#E5E5E5",
-                       paddingBottom: 0,
-                     }}
-                     closeBtnStyle={{
-                       borderWidth: 0,
-                       borderRadius: 0,
-                       borderRightWidth: 1,
-                       borderColor: "#E5E5E5",
-                     }}
-                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
-                     closeBtnTitleStyle={{color: colors.color333}}
-                     btnTitleStyle={{color: colors.main_color}} onClose={() => this.closeModal()}>
-          <View style={{
-            margin: 20,
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              fontSize: 16,
-              color: colors.color333,
-            }}>确认同意退款吗？ </Text>
-          </View>
-        </BottomModal>
-
-        <BottomModal title={'请选择原因'} actionText={'保存'} onPress={() => this.refusedRefund()}
-                     visible={show_refused_refund_modal}
-                     btnStyle={{backgroundColor: colors.main_color}}
-                     onClose={() => this.closeModal()}>
-          <View style={{
-            marginVertical: 8
-          }}>
-            <For each='msg' index='idx' of={refused_msgs}>
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  refused_msg: msg
-                })
-              }} style={{flexDirection: 'row', alignItems: 'center'}}>
-                <CheckBox
-                  checked={refused_msg === msg}
-                  checkedColor={colors.main_color}
-                  checkedIcon='dot-circle-o'
-                  uncheckedIcon='circle-o'
-                  uncheckedColor='#979797'
-                  size={14}/>
-                <Text style={{fontSize: 14, color: colors.color333}}>{msg} </Text>
-              </TouchableOpacity>
-            </For>
-            <If condition={refused_msg === '其他原因'}>
-              <TextArea
-                value={refused_msg_content}
-                onChange={(refused_msg_content) => {
-                  this.setState({refused_msg_content})
-                }}
-                showCounter={false}
-                underlineColorAndroid="transparent" //取消安卓下划线
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.color666,
-                  height: 60,
-                  marginHorizontal: 20,
+                  this.setState((prevState) => {
+                    return {chevron: !prevState.chevron}
+                  });
                 }}
               >
-              </TextArea>
-            </If>
-          </View>
-        </BottomModal>
-
-        <BottomModal title={'提示'} actionText={'取消'} closeText={'取消'} onPress={() => this.zsRefusedRefund()}
-                     onPressClose={() => this.closeModal()}
-                     visible={show_zs_refused_refund_modal}
-                     btnBottomStyle={{
-                       borderTopWidth: 1,
-                       borderTopColor: "#E5E5E5",
-                       paddingBottom: 0,
+                <Icons name={this.state.chevron ? 'chevron-up' : 'chevron-down'}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+          {
+            this.state.chevron &&
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={{marginVertical: pxToDp(15)}}>
+                <Text style={{color: colors.editStatusAdd}}>
+                  {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
+                </Text>
+                {remind_id.hasOwnProperty("total_refund_price") &&
+                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
+                {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
+                {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
+                  : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""} </Text>}
+              </CellHeader>
+            </Cell>
+          }
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader>
+              <Text style={{color: colors.color333}}>长时间不处理,系统将自动退款</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter/>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader/>
+            <CellBody/>
+            <CellFooter>
+              <MyBtn style={
+                this.state.tabNum === 2
+                  ? [styles.btn, styles.btn_red, {
+                    backgroundColor: '#f40',
+                    color: colors.white
+                  }] : [styles.btn, styles.btn_red]
+              }
+                     text={'拒绝'}
+                     onPress={() => {
+                       this.setState({tabNum: 2});
                      }}
-                     closeBtnStyle={{
-                       borderWidth: 0,
-                       borderRadius: 0,
-                       borderRightWidth: 1,
-                       borderColor: "#E5E5E5",
-                     }}
-                     btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
-                     closeBtnTitleStyle={{color: colors.color333}}
-                     btnTitleStyle={{color: colors.main_color}} onClose={() => this.closeModal()}>
-          <View style={{
-            margin: 20,
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              fontSize: 16,
-              color: colors.color333,
-            }}>当前退货方式为自行送货，确定驳回顾客退款申请吗？ </Text>
-          </View>
-        </BottomModal>
-
-      </View>
+              />
+              <MyBtn
+                style={
+                  this.state.tabNum === 1 ?
+                    [styles.btn, styles.btn_green, {marginLeft: pxToDp(20)}]
+                    : [styles.btn, {marginLeft: pxToDp(20)}]
+                }
+                onPress={() => {
+                  this.setState({tabNum: 1});
+                }}
+                text={'同意'}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+        {
+          this.renderReason()
+        }
+      </ScrollView>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  Content: {
-    backgroundColor: colors.main_back,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    flexGrow: 1,
+  my_cell: {
+    marginLeft: pxToDp(30),
+    marginRight: pxToDp(30),
+    paddingRight: 0,
+    minHeight: pxToDp(90),
+    flexDirection: "row",
+    borderColor: colors.fontGray,
+    alignItems: "center",
   },
-  item_body: {
+  shop_name: {
+    fontSize: pxToDp(32),
+    color: colors.fontBlack,
+  },
+  text: {
+    fontSize: pxToDp(26),
+    color: colors.fontGray,
+    height: pxToDp(50),
+    textAlignVertical: 'center',
+  },
+  btn: {
+    paddingHorizontal: pxToDp(30),
+    borderWidth: 0.7,
+    borderColor: colors.main_color,
+    color: colors.main_color,
+    borderRadius: pxToDp(5),
+    paddingVertical: pxToDp(8)
+  },
+  bottom: {
+    marginBottom: pxToDp(10)
+  },
+  btn_red: {
+    color: colors.editStatusAdd,
+    borderColor: colors.editStatusAdd
+  },
+  agree: {
+    marginTop: pxToDp(30),
+    fontSize: pxToDp(30),
+    lineHeight: pxToDp(50),
+    textAlignVertical: 'center'
+  },
+  bottom_box: {
     backgroundColor: colors.white,
-    borderRadius: 8,
-    marginBottom: 10,
-    paddingBottom: 12,
+    paddingHorizontal: pxToDp(30),
+    paddingBottom: pxToDp(50),
+    marginTop: pxToDp(10),
+    justifyContent: 'center'
   },
-  platformIcon: {width: 24, height: 24, borderRadius: 12, marginLeft: 12, marginRight: 8},
-  item_head: {
-    borderBottomWidth: 1,
-    paddingBottom: 2,
-    borderColor: colors.colorCCC
+  bottom_box_text: {
+    lineHeight: pxToDp(40)
   },
-  item_title: {
-    color: colors.color333,
-    padding: 12,
-    fontSize: 14,
-    fontWeight: 'bold',
+  btn_green: {
+    color: colors.white,
+    backgroundColor: colors.main_color
   },
-  item_row: {
-    flexDirection: 'row',
+  handleAgreeWrap: {
+    width: '100%',
+    backgroundColor: colors.main_color,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingTop: 12,
+    height: pxToDp(90),
+    borderRadius: pxToDp(8),
   },
-  row_label: {
-    fontSize: 14,
-    color: colors.color333,
-  },
-
-  deliveryStatusContent: {
-    flexDirection: 'row',
+  handleRefuseWrap: {
+    width: '100%',
+    backgroundColor: colors.editStatusAdd,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 14
-  },
-  deliveryStatusHeader: {
-    width: 10,
-    height: 10,
-    borderRadius: 5
-  },
-  deliveryStatusTitleTop: {
-    width: 2,
-    height: 24,
-    position: 'absolute',
-    top: 10,
-    left: 4
-  },
-  deliveryStatusTitleBottom: {
-    width: 2,
-    height: 24,
-    position: 'absolute',
-    bottom: 10,
-    left: 4
-  },
+    height: pxToDp(90),
+    borderRadius: pxToDp(8),
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuditRefundScene)

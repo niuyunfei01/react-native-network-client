@@ -40,6 +40,7 @@ class DiyPrinter extends PureComponent {
       show_product_discounts: false,
       show_distribution_distance: false,
       show_goods_code: false,
+      show_shelves_code: false,
       upc: false,
       invoice_serial_set: 0,
     }
@@ -58,6 +59,7 @@ class DiyPrinter extends PureComponent {
         show_distribution_distance: res.show_distribution_distance,
         show_goods_code: res.show_goods_code,
         upc: res.upc !== undefined ? res.upc : false,
+        show_shelves_code: res.show_shelves_code !== undefined ? res.show_shelves_code : false,
         invoice_serial_set: res.invoice_serial_set ? Number(res.invoice_serial_set) : 0,
         isRefreshing: false
       })
@@ -95,7 +97,8 @@ class DiyPrinter extends PureComponent {
         show_distribution_distance,
         show_goods_code,
         invoice_serial_set,
-        upc
+        upc,
+        show_shelves_code
       } = this.state;
       let fromData = {
         font_size: font_size,
@@ -106,7 +109,8 @@ class DiyPrinter extends PureComponent {
         show_goods_code: show_goods_code,
         invoice_serial_set: invoice_serial_set,
         store_id: currStoreId,
-        upc: upc
+        upc: upc,
+        show_shelves_code: show_shelves_code,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
@@ -368,6 +372,40 @@ class DiyPrinter extends PureComponent {
                   upc: !this.state.upc
                 })
               }} value={this.state.upc}/>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                show_shelves_code: !this.state.show_shelves_code
+              })
+
+            }}
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorEEE,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <View style={{flex: 1,}}>
+                <Text style={{
+                  fontSize: 14,
+                  color: colors.color333,
+                }}>显示货架码 </Text>
+                <Text style={{
+                  fontSize: 10,
+                  color: colors.color999,
+                }}>开启后显示外送帮货架码，关闭后显示美团货架码</Text>
+              </View>
+              <Switch color={colors.main_color} style={{
+                fontSize: 16,
+              }} onChange={() => {
+                this.setState({
+                  show_shelves_code: !this.state.show_shelves_code
+                })
+              }} value={this.state.show_shelves_code}/>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => {

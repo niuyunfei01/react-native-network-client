@@ -113,6 +113,11 @@ class SettingDeliveryInfo extends PureComponent {
       return;
     }
 
+    if(Number(order_require_minutes) <= 0){
+      ToastLong("需要配置预订单自动呼叫骑手时间");
+      this.setState({isRefreshing: false});
+      return;
+    }
     let {accessToken} = this.props.global;
     tool.debounces(() => {
       this.props.actions.updateStoresAutoDelivery(

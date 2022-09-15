@@ -651,8 +651,11 @@ class OrderInfo extends Component {
     switch (remindType) {
       case Cts.TASK_TYPE_REFUND_BY_USER:
       case Cts.TASK_TYPE_AFS_SERVICE_BY_USER:
-        console.log(remind,order)
-        this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        if (remind?.new_refund_page) {
+          this.onPress(Config.ROUTE_NEW_REFUND_AUDIT, {remind: remind, order: order})
+        } else {
+          this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        }
         break
       case Cts.TASK_TYPE_REMIND:
         this.onPress(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
@@ -1140,7 +1143,6 @@ class OrderInfo extends Component {
       this.props.global.accessToken
     }`
     HttpUtils.get.bind(this.props)(url).then(() => {
-      console.log(order,'1231')
       navigation.navigate(Config.ROUTE_REFUND_DETAIL, {orderDetail: order})
     }, () => {
       ToastLong('获取数据失败')
@@ -1482,7 +1484,6 @@ class OrderInfo extends Component {
   }
 
   renderDeliveryStatus = (list) => {
-    console.log(list,'list');
     return (
       <View>
         <For each="log" index="i" of={list}>
