@@ -525,7 +525,7 @@ class OrderListScene extends Component {
   clearStoreCache = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
+    HttpUtils.get.bind(this.props)(api).then(res => {
       if (res.sum < 0) {
         Alert.alert('提醒', '余额不足请充值', [
           {
