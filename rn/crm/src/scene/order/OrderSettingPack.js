@@ -95,6 +95,7 @@ class OrderSettingScene extends Component {
 
     const params = {
       center: center,
+      placeholderText: '请输入客人的地址',
       onBack: resp => {
         let {location} = resp;
         let locationAll = location.split(',')
