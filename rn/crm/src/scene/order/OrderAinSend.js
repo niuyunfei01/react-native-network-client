@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Platform, ScrollView, Text, TouchableOpacity, StyleSheet, View} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -121,7 +121,7 @@ class OrderAinSend extends Component {
       [
         {
           text: '确定',
-          onPress: this.onTransferSelf
+          onPress: () => this.onTransferSelf()
         },
         {
           text: '取消'
@@ -137,7 +137,7 @@ class OrderAinSend extends Component {
         },
         {
           text: '确定',
-          onPress: this.clickOk
+          onPress: () => this.clickOk()
         }
       ])
   }
@@ -145,7 +145,7 @@ class OrderAinSend extends Component {
   renderBtn() {
     return (
       <Button title={'发起配送'}
-              onPress={this.clickAliSend}
+              onPress={() => this.clickAliSend()}
               buttonStyle={[{backgroundColor: this.state.worker > 0 ? colors.main_color : colors.fontGray}, styles.aLiSendBtn]}
               titleStyle={styles.styles}
       />
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(10),
     marginVertical: 11,
   },
-  header:{
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: pxToDp(20),
