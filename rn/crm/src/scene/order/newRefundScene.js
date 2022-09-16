@@ -91,7 +91,7 @@ class newRefundScene extends Component {
       refund_reason: '',
       refund_delivery_desc: '',
       refund_delivery_code: '',
-      refund_type: 1,
+      refund_type: 0,
       reject_status: 1,
     };
   }
@@ -144,7 +144,10 @@ class newRefundScene extends Component {
 
   comfirmRefund = (type) => {
     this.closeModal()
-    let {order, refused_code, refused_msg_content, show_red_tips, refund_type} = this.state;
+    let {order, refused_code, refused_msg_content, refund_type} = this.state;
+    if (type === 3 && Number(refund_type) !== 0) {
+      type = 1;
+    }
     const {accessToken} = this.props.global
     const api = `/api/sg_order_return_refund/${order?.id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
@@ -153,10 +156,8 @@ class newRefundScene extends Component {
       reject_other_reason: refused_msg_content
     }).then(() => {
       ToastShort("操作成功");
-      if (type === 2 || (show_red_tips && type === 1) || (refund_type === 2 && type === 3)) {
-        return this.props.navigation.goBack()
-      }
-      this.fetchData();
+      if (Number(refund_type) === 0 && type === 3) return this.fetchData();
+      this.props.navigation.goBack()
     }, (e) => {
       ToastShort("操作失败" + e.desc)
     })
@@ -307,7 +308,7 @@ class newRefundScene extends Component {
           </TouchableOpacity>
           <If condition={show_good_list}>
             <View>
-              <If condition={goods_list}>
+              <If condition={tool.length(goods_list) > 0}>
                 <View style={{marginTop: 8}}>
                   <Text style={{fontSize: 14, color: colors.color333}}>退款商品： </Text>
                   <For each='item' index='idx' of={goods_list}>
@@ -329,11 +330,12 @@ class newRefundScene extends Component {
                     </View>
                   </For>
                 </View>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, justifyContent: "space-between"}}>
+                  <Text style={{fontSize: 14, color: colors.color333}}>退货金额： </Text>
+                  <Text style={{fontSize: 14, color: colors.color333}}>¥ {total_refund_price}</Text>
+                </View>
               </If>
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, justifyContent: "space-between"}}>
-                <Text style={{fontSize: 14, color: colors.color333}}>退货金额： </Text>
-                <Text style={{fontSize: 14, color: colors.color333}}>¥ {total_refund_price}</Text>
-              </View>
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
                 <Text style={{fontSize: 14, color: colors.color333}}>退款原因： </Text>
                 <Text style={{fontSize: 14, color: colors.red}}>{refund_reason} </Text>
