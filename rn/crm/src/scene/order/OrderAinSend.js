@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Platform, ScrollView, Text, TouchableOpacity, StyleSheet, View} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -11,6 +11,7 @@ import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import tool from "../../pubilc/util/tool";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   return {
@@ -19,6 +20,12 @@ function mapStateToProps(state) {
 }
 
 class OrderAinSend extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props: Object) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -51,7 +58,7 @@ class OrderAinSend extends Component {
       return;
     }
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
+    HttpUtils.get.bind(this.props)(api, {
       orderId: this.state.orderId,
       userId: this.state.worker,
       sync_order: this.state.sync_order
@@ -114,7 +121,7 @@ class OrderAinSend extends Component {
       [
         {
           text: '确定',
-          onPress: this.onTransferSelf
+          onPress: () => this.onTransferSelf()
         },
         {
           text: '取消'
@@ -130,7 +137,7 @@ class OrderAinSend extends Component {
         },
         {
           text: '确定',
-          onPress: this.clickOk
+          onPress: () => this.clickOk()
         }
       ])
   }
@@ -138,7 +145,7 @@ class OrderAinSend extends Component {
   renderBtn() {
     return (
       <Button title={'发起配送'}
-              onPress={this.clickAliSend}
+              onPress={() => this.clickAliSend()}
               buttonStyle={[{backgroundColor: this.state.worker > 0 ? colors.main_color : colors.fontGray}, styles.aLiSendBtn]}
               titleStyle={styles.styles}
       />
@@ -180,7 +187,7 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(10),
     marginVertical: 11,
   },
-  header:{
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: pxToDp(20),

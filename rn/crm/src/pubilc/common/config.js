@@ -76,6 +76,7 @@ const C = {
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
+  ROUTE_NEW_REFUND_AUDIT: 'newAuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_ORDER_SETTING: 'SettingOrders',       // 新建订单
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',

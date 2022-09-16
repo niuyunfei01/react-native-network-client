@@ -143,6 +143,8 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Setting/PrinterRemark").default}/>
         <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} options={{headerTitle: '退单详情'}}
                       getComponent={() => require("../../scene/order/AuditRefundScene").default}/>
+        <Stack.Screen name={Config.ROUTE_NEW_REFUND_AUDIT} options={{headerTitle: '退单详情'}}
+                      getComponent={() => require("../../scene/order/newRefundScene").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_EDIT} options={{headerTitle: '修改订单信息'}}
                       getComponent={() => require("../../scene/order/OrderEditScene").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SETTING} options={{headerTitle: '创建订单'}}

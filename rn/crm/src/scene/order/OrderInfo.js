@@ -57,6 +57,7 @@ import OrderReminds from "../../pubilc/component/OrderReminds";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import PropTypes from "prop-types";
 
 const numeral = require('numeral');
 const {height} = Dimensions.get("window");
@@ -152,6 +153,14 @@ const task_types = {
 }
 
 class OrderInfo extends Component {
+
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+    device: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
@@ -255,13 +264,13 @@ class OrderInfo extends Component {
   enableBluetooth = () => {
     const {printer_id} = this.props.global
     if (Platform.OS === 'android' && Platform.Version >= 23 && printer_id !== '0') {
-      BleManager.enableBluetooth().then().catch((error) => {
+      BleManager.enableBluetooth().then().catch(() => {
         this.setState({askEnableBle: true})
       });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
         if (!result) {
-          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then(() => {
           });
         }
       });
@@ -430,7 +439,7 @@ class OrderInfo extends Component {
     let {orderStatus} = this.state.order;
     if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${this.state.order_id}?select=1&access_token=${this.props.global.accessToken}`;
-      HttpUtils.get.bind(this.props.navigation)(api, {}, true).then((res) => {
+      HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
         timeObj.method.push({
           interfaceName: api,
           executeStatus: res.executeStatus,
@@ -568,7 +577,7 @@ class OrderInfo extends Component {
     const {printer_id, accessToken} = this.props.global
     if (printer_id) {
       setTimeout(() => {
-        const clb = (msg, error) => {
+        const clb = (msg,) => {
           if (msg === 'ok') {
             ToastShort("已发送给蓝牙打印机！");
           }
@@ -642,7 +651,11 @@ class OrderInfo extends Component {
     switch (remindType) {
       case Cts.TASK_TYPE_REFUND_BY_USER:
       case Cts.TASK_TYPE_AFS_SERVICE_BY_USER:
-        this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        if (remind?.new_refund_page) {
+          this.onPress(Config.ROUTE_NEW_REFUND_AUDIT, {remind: remind, order: order})
+        } else {
+          this.onPress(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        }
         break
       case Cts.TASK_TYPE_REMIND:
         this.onPress(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
@@ -654,7 +667,7 @@ class OrderInfo extends Component {
         this.setState({onSubmitting: true});
         showModal('处理中')
 
-        dispatch(markTaskDone(accessToken, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
+        dispatch(markTaskDone(accessToken, remind.id, Cts.TASK_STATUS_DONE, (ok, msg,) => {
           const state = {onSubmitting: false};
           hideModal()
           if (ok) {
@@ -866,7 +879,8 @@ class OrderInfo extends Component {
     return (
       <View style={styles.flex1}>
         <For each="item" index="i" of={this.state.logistics}>
-          <View key={i} style={tool.length(this.state.logistics) - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
+          <View key={i}
+                style={tool.length(this.state.logistics) - 1 === i ? Styles.deliveryInfo : Styles.deliveryInfoOn}>
             <Text style={Styles.fwf14}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={Styles.driverName}>
               <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
@@ -1032,7 +1046,7 @@ class OrderInfo extends Component {
           {
             order: this.state.order,
             ship_id: val,
-            onCancelled: (ok, reason) => {
+            onCancelled: () => {
               this.fetchData()
             }
           });
@@ -1046,7 +1060,7 @@ class OrderInfo extends Component {
                 {
                   order: this.state.order,
                   ship_id: val,
-                  onCancelled: (ok, reason) => {
+                  onCancelled: () => {
                     this.fetchData()
                   }
                 });
@@ -1112,7 +1126,8 @@ class OrderInfo extends Component {
   }
 
   _onToProvide = () => {
-    const {order, navigation} = this.props;
+    const {navigation} = this.props;
+    const {order} = this.state;
     if (order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
       return false;
@@ -1123,11 +1138,12 @@ class OrderInfo extends Component {
 
   _doRefund = () => {
     const {order} = this.state
+    const {navigation} = this.props;
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
     }`
-    HttpUtils.get.bind(this.props.navigation)(url).then(() => {
-      this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL, {orderDetail: order})
+    HttpUtils.get.bind(this.props)(url).then(() => {
+      navigation.navigate(Config.ROUTE_REFUND_DETAIL, {orderDetail: order})
     }, () => {
       ToastLong('获取数据失败')
     })
@@ -1148,7 +1164,7 @@ class OrderInfo extends Component {
     showModal("处理中")
     const token = global.accessToken;
     const wmId = this.state.order.id;
-    dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
+    dispatch(saveOrderItems(token, wmId, items, (ok, msg,) => {
       hideModal()
       if (ok) {
         this.setState({
@@ -1172,19 +1188,6 @@ class OrderInfo extends Component {
     this.setState({isEditing: false,})
   }
 
-  _doAddItem = (item) => {
-    if (item.product_id && this.state.itemsAdded[item.product_id]) {
-      let msg;
-      if (item.num > 0) {
-        msg = `商品[${item['name']}]已更新`;
-      } else {
-        msg = `商品[${item['name']}]已撤销`
-      }
-      ToastShort(msg)
-    }
-    this._recordEdition(item)
-  }
-
   onChangeAccount = (text) => {
     this.setState({addMoneyNum: text})
   }
@@ -1193,7 +1196,7 @@ class OrderInfo extends Component {
     showModal("请求中 ")
     tool.debounces(() => {
       let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
-      HttpUtils.get(api).then(success => {
+      HttpUtils.get(api).then(() => {
         hideModal()
         showSuccess(`取消预约成功`)
         this.fetchData()
@@ -1235,7 +1238,7 @@ class OrderInfo extends Component {
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
     const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
     const pack_workers = order.pack_workers ? order.pack_workers : {};
-    let worker_nickname = tool.objectMap(pack_workers, (worker, idx) => {
+    let worker_nickname = tool.objectMap(pack_workers, (worker) => {
       return worker.nickname
     })
     if (tool.length(worker_nickname) > 0) {

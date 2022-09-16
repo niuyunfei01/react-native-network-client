@@ -180,7 +180,7 @@ class OrderListItem extends React.PureComponent {
             Alert.alert('提示', resp?.obj?.error_msg, [{text: '我知道了'}])
           } else {
             this.setState({addTipModal: false, addOrdersTip: false})
-            ToastShort(resp.reason)
+            ToastShort('操作成功')
           }
           await this.setState({addMoneyNum: ''});
         }));
@@ -189,7 +189,7 @@ class OrderListItem extends React.PureComponent {
       dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
           this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
-          ToastShort(resp.reason)
+          ToastShort('操作成功')
         } else {
           this.setState({respReason: resp.desc, ok: resp.ok})
         }
@@ -432,6 +432,7 @@ class OrderListItem extends React.PureComponent {
         const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
         HttpUtils.get.bind(this.props)(api, {}).then(res => {
           ToastShort(res.desc);
+          this.props.fetchData();
         })
       }
     }, {'text': '取消'}]);
