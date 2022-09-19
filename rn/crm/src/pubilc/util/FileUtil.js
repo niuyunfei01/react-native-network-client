@@ -31,6 +31,12 @@ export const createDirectory = async (filePath) => {
   return await RNFetchBlob.fs.mkdir(filePath)
 }
 
+
+export const filePathLs = async (filePath) => {
+  return await RNFetchBlob.fs.ls(filePath)
+}
+
+
 export const calcFileHash = async (filePath, algorithm) => {
   return await RNFetchBlob.fs.hash(filePath, algorithm)
 

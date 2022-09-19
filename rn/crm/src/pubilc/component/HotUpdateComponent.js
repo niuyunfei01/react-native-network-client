@@ -186,6 +186,8 @@ export default class HotUpdateComponent extends PureComponent {
     }
     this.mixpanel.track(Platform.OS === 'ios' ? 'iOS_立即更新' : 'Android_立即更新')
     const {md5, bundle_url} = newVersionInfo
+    // let bundle_url = Platform.OS === 'ios' ? 'https://cnsc-pics.cainiaoshicai.cn/crm-bundle/ios/649.ios.zip' : 'https://cnsc-pics.cainiaoshicai.cn/crm-bundle/android/649.android.zip';
+    // let md5 = Platform.OS === 'ios' ? 'd977947c46f89b1b976f40476e14b65a':'78673471bf4b71c7ab60801b9f78dd7d';
     const source = Platform.OS === 'ios' ? bundleFilePath + '/' + DeviceInfo.getBuildNumber() + '.ios.zip' : bundleFilePath + '/' + DeviceInfo.getBuildNumber() + '.android.zip';
     RNFetchBlob.config({path: source})
       .fetch('GET', bundle_url)
