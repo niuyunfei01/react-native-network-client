@@ -16,7 +16,6 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -28,8 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
-
-import qiuxiang.amap3d.AMap3DPackage;
 
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
@@ -83,8 +80,8 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
-import org.xutils.common.util.MD5;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import org.xutils.common.util.MD5;
 
 import java.io.File;
 import java.io.IOException;
@@ -148,6 +145,7 @@ import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import it.innove.BleManagerPackage;
+import qiuxiang.amap3d.AMap3DPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -297,7 +295,8 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         protected String getJSBundleFile() {
             String DocumentDir = GlobalCtx.this.getFilesDir().getAbsolutePath();
-            String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
+            String versionCode = Utility.getVersionCode(GlobalCtx.app());
+            String jsBundleFile = DocumentDir + "/last.android/" + versionCode + ".android.bundle";
             File file = new File(jsBundleFile);
             if (file.exists() && file.isFile()) {
                 return jsBundleFile;

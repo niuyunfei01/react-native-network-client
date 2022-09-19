@@ -12,6 +12,7 @@ import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {hotUpdateHeader} from "../../svg/svg";
 import tool from "../util/tool";
+import DeviceInfo from "react-native-device-info";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -165,7 +166,7 @@ export default class HotUpdateComponent extends PureComponent {
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
     const version = Cts.BUNDLE_VERSION;
-    const params = {platform: platform, version: version}
+    const params = {platform: platform, version: version, version_code: DeviceInfo.getBuildNumber()}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
@@ -185,7 +186,7 @@ export default class HotUpdateComponent extends PureComponent {
     }
     this.mixpanel.track(Platform.OS === 'ios' ? 'iOS_立即更新' : 'Android_立即更新')
     const {md5, bundle_url} = newVersionInfo
-    const source = Platform.OS === 'ios' ? bundleFilePath + '/last.ios.zip' : bundleFilePath + '/last.android.zip';
+    const source = Platform.OS === 'ios' ? bundleFilePath + '/' + DeviceInfo.getBuildNumber() + '.ios.zip' : bundleFilePath + '/' + DeviceInfo.getBuildNumber() + '.android.zip';
     RNFetchBlob.config({path: source})
       .fetch('GET', bundle_url)
       .progress({count: 10, fileCache: true}, (received, total) => {
