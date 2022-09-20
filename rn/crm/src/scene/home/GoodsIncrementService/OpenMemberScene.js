@@ -163,7 +163,8 @@ class OpenMemberScene extends PureComponent {
   componentDidMount() {
     this.setHeader()
     const {store_info} = this.props.global
-    store_info.vip_info.pay_type_items.map(item => {
+    const {vip_info = {}} = store_info
+    Array.isArray(vip_info.pay_type_items) && vip_info.pay_type_items.map(item => {
       if (12 === item.months) {
         this.setState({selectedOpenMember: item})
       }
@@ -208,7 +209,7 @@ class OpenMemberScene extends PureComponent {
 
   renderDescription = () => {
     const {store_info} = this.props.global
-    const {vip_info} = store_info
+    const {vip_info = {}} = store_info
     return (
       <View style={styles.memberDescription}>
         <View style={styles.rowCenterBetween}>
@@ -224,7 +225,7 @@ class OpenMemberScene extends PureComponent {
         </View>
         <View style={styles.memberItemWrap}>
           {
-            vip_info.rules_format.map((item, index) => {
+            Array.isArray(vip_info.rules_format) && vip_info.rules_format.map((item, index) => {
               return (
                 <Text style={styles.memberDescriptionText} key={index}>
                   {item}
@@ -243,7 +244,7 @@ class OpenMemberScene extends PureComponent {
     const {selectedOpenMember} = this.state
 
     const {store_info} = this.props.global
-    const {vip_info} = store_info
+    const {vip_info = {}} = store_info
     return (
       <View style={Styles.zoneWrap}>
         <Text style={Styles.memberTitleText}>
@@ -252,7 +253,7 @@ class OpenMemberScene extends PureComponent {
         <LineView/>
         <View style={styles.setMealWrap}>
           {
-            vip_info.pay_type_items.map((item, index) => {
+            Array.isArray(vip_info.pay_type_items) && vip_info.pay_type_items.map((item, index) => {
               return (
                 <TouchableOpacity key={index}
                                   onPress={() => this.setState({selectedOpenMember: item})}
@@ -295,7 +296,7 @@ class OpenMemberScene extends PureComponent {
   }
   renderMemberDescription = () => {
     const {store_info} = this.props.global
-    const {vip_info} = store_info
+    const {vip_info = {}} = store_info
     return (
       <View style={Styles.zoneWrap}>
         <View style={styles.memberExclusiveWrap}>
@@ -313,7 +314,7 @@ class OpenMemberScene extends PureComponent {
         <LineView/>
         <View style={styles.memberExclusiveItem}>
           {
-            vip_info.value_added_services_format.map((item, index) => {
+            Array.isArray(vip_info.value_added_services_format) && vip_info.value_added_services_format.map((item, index) => {
               return (
                 <View key={index} style={index > 0 ? {marginLeft: 43} : {}}>
                   {this.getIcon(item.value)}
