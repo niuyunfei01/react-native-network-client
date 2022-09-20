@@ -8,6 +8,8 @@ import Cts from "../../common/Cts";
 import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../util/tool";
+import {SvgXml} from "react-native-svg";
+import {noImage} from "../../../svg/svg";
 
 class GoodListItem extends React.PureComponent {
   static propTypes = {
@@ -77,11 +79,7 @@ class GoodListItem extends React.PureComponent {
         </If>
 
         <If condition={tool.length(skus) > 0}>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              showMore: !this.state.showMore
-            })
-          }}>
+          <TouchableOpacity onPress={() => this.setState({showMore: !this.state.showMore})}>
             {
               this.state.showMore ?
                 <View style={{flexDirection: "row"}}>
@@ -116,7 +114,7 @@ class GoodListItem extends React.PureComponent {
               </If>
               <If condition={fnProviding}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  库存：{item.left_since_last_stat ? item.left_since_last_stat : 0} 件
+                  库存：{item.left_since_last_stat || 0} 件
                 </Text>
               </If>
             </View>
@@ -136,9 +134,14 @@ class GoodListItem extends React.PureComponent {
                              onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <View>
-          <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
-                     style={[styles.listImageSize, offSaleImg]}
-                     resizeMode={FastImage.resizeMode.contain}/>
+          <If condition={product.coverimg}>
+            <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                       style={[styles.listImageSize, offSaleImg]}
+                       resizeMode={FastImage.resizeMode.contain}/>
+          </If>
+          <If condition={!product.coverimg}>
+            <SvgXml xml={noImage()} style={[styles.listImageSize, offSaleImg]}/>
+          </If>
 
           <If condition={!onSale}>
             <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>

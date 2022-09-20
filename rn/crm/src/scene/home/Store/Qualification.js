@@ -51,7 +51,9 @@ class Qualification extends Component {
     this.config = {
       cropping: false,
       includeExif: true,
-      includeBase64: true
+      includeBase64: true,
+      cropperChooseText: '选择图片',
+      cropperCancelText: '取消'
     };
 
   }

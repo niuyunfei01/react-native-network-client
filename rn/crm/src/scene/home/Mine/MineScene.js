@@ -17,7 +17,6 @@ import {
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
-  receiveIncrement,
   userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
 import {connect} from "react-redux";
@@ -221,8 +220,6 @@ class MineScene extends Component {
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
-
-    this.getServiceStatus(currStoreId, accessToken)
     this.getHuichuan(currStoreId, accessToken)
   }
 
@@ -454,7 +451,6 @@ class MineScene extends Component {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
     const {accessToken, currStoreId} = this.props.global;
-    this.getServiceStatus(currStoreId, accessToken)
   }
 
   registerJpush = () => {
@@ -531,39 +527,6 @@ class MineScene extends Component {
     })
   }
 
-  getServiceStatus = (currStoreId, accessToken) => {
-    const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
-    const {dispatch} = this.props
-    HttpUtils.get(api).then(res => {
-      const {is_new, expire_date} = res
-      const status = new Date(time) < new Date(expire_date)
-      dispatch(receiveIncrement({
-        ...res,
-        expire_date: is_new === 1 ? '未开通' : status ? expire_date : '已到期',
-        incrementStatus: status
-      }))
-    }).catch(error => {
-      dispatch(receiveIncrement({
-        auto_pack: {
-          expire_date: '',
-          status: 'off'
-        },
-        auto_reply: {
-          expire_date: '',
-          status: 'off'
-        },
-        bad_notify: {
-          expire_date: '',
-          status: 'off'
-        },
-        in_white_list: 0,
-        expire_date: '未开通',
-        incrementStatus: false
-      }))
-      showError(error.reason)
-    })
-  }
-
   onCanChangeStore = (store_id) => {
     const {dispatch, global} = this.props;
     const {accessToken} = global;
@@ -571,7 +534,6 @@ class MineScene extends Component {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          this.getServiceStatus(store_id, accessToken)
           this.getStoreDataOfMine(store_id)
           this.getStoreTurnover()
           this.getHuichuan(store_id, accessToken)
@@ -745,7 +707,7 @@ class MineScene extends Component {
       <View style={[header_styles.main_box]}>
         <View style={header_styles.row}>
           <JbbText style={header_styles.shop_name}>
-            {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 13) + '...' : store_info?.name}
+            {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 11) + '...' : store_info?.name}
           </JbbText>
           <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
             <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
@@ -1005,7 +967,7 @@ class MineScene extends Component {
     let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, store_info} = global
-    const {added_service} = store_info;
+    const {vip_info = {}} = store_info;
     return (
       <>
         {this.renderHeader()}
@@ -1026,7 +988,7 @@ class MineScene extends Component {
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
-          <If condition={added_service === '1'}>
+          <If condition={vip_info.exist_vip}>
             <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
           </If>
           {this.renderOftenUse()}

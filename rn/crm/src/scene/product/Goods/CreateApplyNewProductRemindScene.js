@@ -244,7 +244,9 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       compressImageMaxHeight: 480,
       compressImageQuality: 0.5,
       compressVideoPreset: "MediumQuality",
-      includeExif: true
+      includeExif: true,
+      cropperChooseText: '选择图片',
+      cropperCancelText: '取消'
     })
       .then(image => {
         let image_path = image.path;

@@ -56,16 +56,6 @@ function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-const pickImageOptions = (cropping) => {
-  return {
-    width: 800,
-    height: 800,
-    cropping: cropping,
-    cropperCircleOverlay: false,
-    includeExif: true
-  };
-}
-
 let category_obj_new = {}
 let basic_category_name_path = []
 
@@ -166,7 +156,7 @@ class GoodsEditScene extends PureComponent {
       }],
       isScanMultiSpecsUpc: false,
       scanMultiSpecsUpcIndex: 0,
-      allow_multi_spec: '0'
+      allow_multi_spec: 0
     };
 
   }
@@ -244,9 +234,9 @@ class GoodsEditScene extends PureComponent {
     const {accessToken} = this.props.global
     const url = `/vendor/get_settings?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
-      const {allow_multi_spec = '0'} = res
+      const {allow_multi_spec = 0} = res
       this.setState({
-        allow_multi_spec: '1' || '0'
+        allow_multi_spec: allow_multi_spec
       })
     })
   }
@@ -614,7 +604,7 @@ class GoodsEditScene extends PureComponent {
         sale_status: sale_status,
         provided: provided
       };
-      if (spec_type === 'single') {
+      if (spec_type === 'spec_single') {
         formData.store_goods_status.price = price
         formData.inventory = {
           actualNum: actualNum,
@@ -745,7 +735,7 @@ class GoodsEditScene extends PureComponent {
   pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker(pickImageOptions(true))
+      ImagePicker.openPicker(tool.pickImageOptions(true))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
@@ -759,7 +749,7 @@ class GoodsEditScene extends PureComponent {
   pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera(pickImageOptions(true)).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[tool.length(image_arr) - 1];
@@ -876,7 +866,8 @@ class GoodsEditScene extends PureComponent {
     if (result) {
       if (isSelectCategory)
         this.setState({
-          basic_category_obj: result
+          basic_category_obj: result,
+          sg_tag_id: result.id
         })
       else this.setState({
         store_categories_obj: result
@@ -1100,7 +1091,8 @@ class GoodsEditScene extends PureComponent {
                   selectedItems={store_categories}
                   selectedText={"个已选中"}
                   searchPlaceholderText='搜索门店分类'
-                  confirmText={"确认选择"}
+                  confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
+
                   colors={{primary: colors.main_color}}
                 />
               </View>
@@ -1144,7 +1136,7 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-          <If condition={allow_multi_spec === '1' && 'add' === type}>
+          <If condition={allow_multi_spec === 1 && 'add' === type}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品规格
@@ -1186,6 +1178,7 @@ class GoodsEditScene extends PureComponent {
   renderMultiSpecs = () => {
     const {multiSpecsList, weightList, fnProviding} = this.state
     const {type = 'add'} = this.props.route.params;
+    console.log('multiSpecsList', multiSpecsList)
     return (
       <>
         <Text style={styles.multiSpecsTip}>
@@ -1315,7 +1308,7 @@ class GoodsEditScene extends PureComponent {
             </Text>
             <TextInput
               keyboardType={'numeric'}
-              value={multiSpecsList[index]['inventory']['actualNum']}
+              value={multiSpecsList[index]?.inventory?.actualNum || '0'}
               //editable={this.isStoreProdEditable()}
               onChangeText={value => this.setMultiSpecsInfo(index, 'inventory', value)}
               style={styles.textInputStyle}
@@ -1534,7 +1527,7 @@ class GoodsEditScene extends PureComponent {
       <>
         <ScrollView>
           {this.renderBaseInfo()}
-          <If condition={spec_type === 'spec_multi' && allow_multi_spec === '1'}>
+          <If condition={spec_type === 'spec_multi' && allow_multi_spec === 1}>
             {this.renderMultiSpecs()}
           </If>
           {this.renderOtherInfo()}

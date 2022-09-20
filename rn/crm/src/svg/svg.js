@@ -896,3 +896,270 @@ export const radioUnSelected = (width = 14, height = 14, color = '#D5D8DE') => {
     `
   )
 }
+
+export const notActivateMemberIcon = (width = 32, height = 29) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 32 29"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="78.9883282%" y1="61.264924%" x2="15.6883778%" y2="20.963772%" id="linearGradient-1">
+            <stop stop-color="#FFDFB8" offset="0%"></stop>
+            <stop stop-color="#F4D334" offset="100%"></stop>
+        </linearGradient>
+        <path d="M20.6194044,11.736014 L11.8391914,21 L0,8.26048951 L0,5.42744755 L5.79804238,0 L18.0083956,0 L23.8,5.54982517 L23.8,8.38286713 L20.618,11.736 L18.918,11.736 L18.8684868,11.7893797 L20.5108494,11.8504818 L20.618,11.736 L20.6194044,11.736014 Z M17.0164633,1.60314073 L16.9524677,1.60314073 C18.5758363,3.13286101 20.1970589,4.66258129 21.8161355,6.19230157 L21.8161355,6.19230157 L21.8161355,8.57866521 C20.826339,9.63111684 19.8386774,10.6835664 18.8531507,11.736014 L18.8531507,11.736014 L17.4708387,13.2045455 L11.8264114,19.2255184 C8.45812096,15.6378144 5.0876845,12.0480708 1.71510205,8.45628759 L1.71510205,8.45628759 L1.71510205,6.25349038 L6.51477422,1.66432955 L6.48277641,1.63373514 L1.66388635,6.24125262 L1.66388635,8.45628759 L11.8264114,19.2867072 L18.9171463,11.736014 L18.918,11.736 L21.8801311,8.57866521 L21.8801311,6.19230157 L17.0164633,1.60314073 Z M8.87450844,6.29411765 L4.62310924,6.29411765 L11.710839,16.2941176 L18.9088235,6.29411765 L14.5348748,6.29411765 L14.8901673,7.29282945 L11.7047069,11.9166804 L8.51921592,7.41603954 L8.87450844,6.29411765 Z" id="path-2"></path>
+        <filter x="-29.4%" y="-23.8%" width="158.8%" height="166.7%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.206718818 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-35.000000, -262.000000)" fill-rule="nonzero">
+            <g  transform="translate(10.000000, 244.000000)">
+                <g  transform="translate(29.000000, 20.000000)">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                    <use fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const activateMemberIcon = (width = 16, height = 16) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 16 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-23.000000, -260.000000)" fill-rule="nonzero">
+            <g id="编组-4备份-4" transform="translate(10.000000, 244.000000)">
+                <g id="编组-20备份" transform="translate(13.000000, 16.000000)">
+                    <path d="M11.9551534,0 L3.84912057,0 L0,3.60309543 L0,5.48385438 L7.85963123,13.9411765 L13.6885122,7.79113534 L12.5584417,7.79113534 L7.85114708,12.8037804 L1.10459682,5.61383798 L1.10459682,4.14335258 L4.3036919,1.08458047 L4.32493415,1.10489104 L1.13859716,4.15147681 L1.13859716,5.61383798 C3.37753845,7.99829911 5.61505509,10.3814062 7.85114708,12.7631592 L11.5982879,8.76604278 L12.5159572,7.79113534 C13.1702144,7.09245167 13.8258889,6.39376664 14.4829807,5.69508027 L14.4829807,4.11085567 C13.4081315,3.09532708 12.3318577,2.07979849 11.2541592,1.0642699 L11.2966437,1.0642699 L14.5254652,4.11085567 L14.5254652,5.69508027 L12.5261383,7.82656297 L13.6164462,7.86712658 L15.8,5.56509667 L15.8,3.68433772 L11.9551534,0 Z" id="路径" fill="#C48530"></path>
+                    <polygon id="路径" fill="#FFFFFF" points="12.5529165 4.17844957 7.77442254 10.8171033 3.06912294 4.17844957 5.89148039 4.17844957 5.65561393 4.92325314 7.77035167 7.91107354 9.88506907 4.84145821 9.64920261 4.17844785"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const badReminderMember = (width = 48, height = 48) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <radialGradient cx="66.5401459%" cy="59.2171351%" fx="66.5401459%" fy="59.2171351%" r="51.5662518%" id="radialGradient-1">
+            <stop stop-color="#FBE2B6" offset="0%"></stop>
+            <stop stop-color="#F4D59B" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-27.000000, -481.000000)">
+            <g id="差评提醒" transform="translate(27.000000, 481.000000)">
+                <circle id="椭圆形" fill="url(#radialGradient-1)" cx="24" cy="24" r="24"></circle>
+                <g id="提醒_remind备份" transform="translate(14.000000, 14.000000)">
+                    <path d="M10,0 C6.134,0 3,3.134 3,7 L3,17 L17,17 L17,7 C17,3.134 13.866,0 10,0 Z" id="路径"></path>
+                    <path d="M3,17 L3,7 C3,3.134 6.134,0 10,0 C13.866,0 17,3.134 17,7 L17,17 M0,17 L20,17" id="形状" stroke="#5C3813" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M10,20 C11.3807,20 12.5,18.8807 12.5,17.5 L12.5,17 L7.5,17 L7.5,17.5 C7.5,18.8807 8.6193,20 10,20 Z" id="路径" stroke="#5C3813" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  `
+  )
+}
+
+export const autoPackMember = (width = 48, height = 48) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <radialGradient cx="66.5401459%" cy="59.2171351%" fx="66.5401459%" fy="59.2171351%" r="51.5662518%" id="radialGradient-1">
+            <stop stop-color="#FBE2B6" offset="0%"></stop>
+            <stop stop-color="#F4D59B" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-210.000000, -481.000000)">
+            <g id="自动打包" transform="translate(210.000000, 481.000000)">
+                <circle id="椭圆形备份-2" fill="url(#radialGradient-1)" cx="24" cy="24" r="24"></circle>
+                <g id="托运_consignment备份" transform="translate(14.000000, 16.000000)" stroke="#5C3813" stroke-width="2">
+                    <path d="M2,4 C2,3.4477 2.447715,3 3,3 L17,3 C17.5523,3 18,3.4477 18,4 L18,12 C18,12.5523 17.5523,13 17,13 L3,13 C2.447715,13 2,12.5523 2,12 L2,4 Z" id="路径" stroke-linejoin="round"></path>
+                    <line x1="6" y1="3" x2="6" y2="13" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="14" y1="3" x2="14" y2="13" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="12" y1="3" x2="16" y2="3" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="4" y1="3" x2="8" y2="3" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="4" y1="13" x2="8" y2="13" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="12" y1="13" x2="16" y2="13" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="0" y1="16" x2="20" y2="16" id="路径" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <line x1="7" y1="16" x2="7" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="4" y1="16" x2="4" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="1" y1="16" x2="1" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="10" y1="16" x2="10" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="13" y1="16" x2="13" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="16" y1="16" x2="16" y2="17" id="路径" stroke-linecap="round"></line>
+                    <line x1="19" y1="16" x2="19" y2="17" id="路径" stroke-linecap="round"></line>
+                    <polyline id="路径" stroke-linecap="round" stroke-linejoin="round" points="13 3 13 0 7 0 7 3"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  `
+  )
+}
+
+export const autoReplyMember = (width = 48, height = 48) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <radialGradient cx="66.5401459%" cy="59.2171351%" fx="66.5401459%" fy="59.2171351%" r="51.5662518%" id="radialGradient-1">
+            <stop stop-color="#FBE2B6" offset="0%"></stop>
+            <stop stop-color="#F4D59B" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-118.000000, -481.000000)">
+            <g id="自动回评" transform="translate(118.000000, 481.000000)">
+                <circle id="椭圆形备份" fill="url(#radialGradient-1)" cx="24" cy="24" r="24"></circle>
+                <g id="沟通_communication备份" transform="translate(14.000000, 15.000000)" stroke="#5C3813" stroke-linecap="round" stroke-width="2">
+                    <polygon id="路径" stroke-linejoin="round" points="14.5 16 9 16 9 12 16 12 16 8 20 8 20 16 17.5 16 16 17.5"></polygon>
+                    <polygon id="路径" stroke-linejoin="round" points="0 0 16 0 16 12 6.5 12 4.5 14 2.5 12 0 12"></polygon>
+                    <line x1="7.5" y1="6" x2="8" y2="6" id="路径"></line>
+                    <line x1="11" y1="6" x2="11.5" y2="6" id="路径"></line>
+                    <line x1="4" y1="6" x2="4.5" y2="6" id="路径"></line>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  `
+  )
+}
+
+export const memberBackground = (width = 355, height = 58) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 355 58" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="86.571718%" y1="50.9232924%" x2="2.34882363%" y2="49.1505434%" id="linearGradient-1">
+            <stop stop-color="#35A54B" offset="0%"/>
+            <stop stop-color="#064C50" offset="100%"/>
+        </linearGradient>
+        <path d="M8,0 L347,0 C351.418278,-1.69980292e-15 355,3.581722 355,8 L355,50 C355,54.418278 351.418278,58 347,58 L8,58 C3.581722,58 -3.47095419e-16,54.418278 0,50 L0,8 C-1.42926142e-15,3.581722 3.581722,-7.65539184e-17 8,0 Z" id="path-2"></path>
+        <filter x="-10.3%" y="-10.3%" width="120.6%" height="120.6%" filterUnits="objectBoundingBox" id="filter-4">
+            <feGaussianBlur stdDeviation="6" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-10.000000, -244.000000)">
+            <g  transform="translate(10.000000, 244.000000)">
+                <mask id="mask-3" fill="white">
+                    <use xlink:href="#path-2"></use>
+                </mask>
+                <use  fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                <path d="M277.5,11 C325.824916,11 365,50.1750844 365,98.5 C365,146.824916 325.824916,186 277.5,186 C229.175084,186 190,146.824916 190,98.5 C190,50.1750844 229.175084,11 277.5,11 Z M279.5,22 C236.145647,22 201,57.1456471 201,100.5 C201,143.854353 236.145647,179 279.5,179 C322.854353,179 358,143.854353 358,100.5 C358,57.1456471 322.854353,22 279.5,22 Z" fill="#2F7D49" filter="url(#filter-4)" mask="url(#mask-3)"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const activateNowIcon = (width = 16, height = 16) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="我的页面-配送商户" transform="translate(-330.000000, -266.000000)">
+            <g id="编组-4" transform="translate(10.000000, 244.000000)">
+                <g id="编组-9" transform="translate(240.000000, 15.000000)">
+                    <g id="右-圆_right-c备份" transform="translate(80.000000, 7.000000)">
+                        <path d="M8,16 C12.41828,16 16,12.41828 16,8 C16,3.58172 12.41828,0 8,0 C3.58172,0 0,3.58172 0,8 C0,12.41828 3.58172,16 8,16 Z" id="路径" fill="#5C3813" fill-rule="nonzero"></path>
+                        <polyline id="路径" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" points="6.8 11.6 10.4 8 6.8 4.4"></polyline>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const activateIcon = (width = 20, height = 20) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-334.000000, -257.000000)">
+            <g  transform="translate(10.000000, 244.000000)">
+                <g  transform="translate(324.000000, 13.000000)">
+                    <path d="M10,20 C15.52285,20 20,15.52285 20,10 C20,4.47715 15.52285,0 10,0 C4.47715,0 0,4.47715 0,10 C0,15.52285 4.47715,20 10,20 Z" id="路径" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <polyline id="路径" stroke="#35A54B" stroke-linecap="round" stroke-linejoin="round" points="8.5 14.5 13 10 8.5 5.5"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const noImage = (width = 80, height = 80) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <path d="M7.81622064,0 C3.51735346,0 0,3.34296379 0,7.42852239 L0,7.42852239 L0,44.5714776 C0,48.6572078 3.51735346,52 7.81622064,52 L7.81622064,52 L26.1839599,52 L34,33.057225 L33.2184863,31.5715205 L29.3105565,34.9141411 L23.4483008,27.8570019 L5.86207519,37.5143384 L5.86207519,9.28578171 C5.86207519,7.05713918 7.42528321,5.5714347 9.77018551,5.5714347 L9.77018551,5.5714347 L28.5288622,5.5714347 C28.9194385,3.71434701 29.7011328,1.48570448 30.0920703,0 L30.0920703,0 L7.81622064,0 Z" id="path-1"></path>
+        <linearGradient x1="49.9998897%" y1="-1.96220489%" x2="49.9998897%" y2="98.173605%" id="linearGradient-3">
+            <stop stop-color="#E3E7EE" offset="0%"></stop>
+            <stop stop-color="#EEF0F4" offset="100%"></stop>
+        </linearGradient>
+        <path d="M4.83344786,0 L2.97452195,5.5714347 L19.7051987,5.5714347 C21.9358754,5.5714347 23.4232223,7.05713918 23.4232223,9.28578171 L23.4232223,9.28578171 L23.4232223,30.4571992 L15.9871751,18.5713918 L5.20519868,28.2287283 L7.80762624,32.6856702 L0,52 L21.5641246,52 C25.653899,52 29,48.6572078 29,44.5714776 L29,44.5714776 L29,7.42852239 C29,3.34296379 25.653899,0 21.5641246,0 L21.5641246,0 L4.83344786,0 Z" id="path-4"></path>
+        <linearGradient x1="49.9998897%" y1="-1.96220489%" x2="49.9998897%" y2="98.173605%" id="linearGradient-6">
+            <stop stop-color="#E3E7EE" offset="0%"></stop>
+            <stop stop-color="#EEF0F4" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="商品主页" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="商品-缺失图片" transform="translate(-92.000000, -315.000000)">
+            <g id="编组-11备份" transform="translate(82.000000, 305.000000)">
+                <g id="暂无图片" transform="translate(10.000000, 10.000000)">
+                    <rect id="矩形" stroke-opacity="0.00608473558" stroke="#000000" x="0.5" y="0.5" width="79" height="79"></rect>
+                    <g id="编组" transform="translate(9.000000, 15.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="Clip-4"></g>
+                        <path d="M7.81622064,0 C3.51735346,0 0,3.34296379 0,7.42852239 L0,7.42852239 L0,44.5714776 C0,48.6572078 3.51735346,52 7.81622064,52 L7.81622064,52 L26.1839599,52 L34,33.057225 L33.2184863,31.5715205 L29.3105565,34.9141411 L23.4483008,27.8570019 L5.86207519,37.5143384 L5.86207519,9.28578171 C5.86207519,7.05713918 7.42528321,5.5714347 9.77018551,5.5714347 L9.77018551,5.5714347 L28.5288622,5.5714347 C28.9194385,3.71434701 29.7011328,1.48570448 30.0920703,0 L30.0920703,0 L7.81622064,0 Z" id="Fill-3" fill="url(#linearGradient-3)" mask="url(#mask-2)"></path>
+                    </g>
+                    <g id="编组" transform="translate(41.000000, 15.000000)">
+                        <mask id="mask-5" fill="white">
+                            <use xlink:href="#path-4"></use>
+                        </mask>
+                        <g id="Clip-6"></g>
+                        <path d="M4.83344786,0 L2.97452195,5.5714347 L19.7051987,5.5714347 C21.9358754,5.5714347 23.4232223,7.05713918 23.4232223,9.28578171 L23.4232223,9.28578171 L23.4232223,30.4571992 L15.9871751,18.5713918 L5.20519868,28.2287283 L7.80762624,32.6856702 L0,52 L21.5641246,52 C25.653899,52 29,48.6572078 29,44.5714776 L29,44.5714776 L29,7.42852239 C29,3.34296379 25.653899,0 21.5641246,0 L21.5641246,0 L4.83344786,0 Z" id="Fill-5" fill="url(#linearGradient-6)" mask="url(#mask-5)"></path>
+                    </g>
+                    <text id="暂无" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="-1.32" fill="#979A9F">
+                        <tspan x="17" y="37">暂无</tspan>
+                    </text>
+                    <text id="图片" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" letter-spacing="-1.32" fill="#979A9F">
+                        <tspan x="39" y="37">图片</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}

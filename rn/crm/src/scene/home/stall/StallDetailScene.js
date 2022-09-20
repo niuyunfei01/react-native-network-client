@@ -132,6 +132,17 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingBottom: 4
   },
+  selectContent:{
+    width: '70%',
+    justifyContent: 'center',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#979797',
+    borderStyle: 'solid',
+    paddingTop: 3,
+    paddingLeft: 7,
+    paddingBottom: 4
+  },
   modalContentRightText: {
     fontSize: 14,
     fontWeight: '400',
@@ -444,7 +455,7 @@ class StallDetailScene extends PureComponent {
             <ModalSelector onChange={value => this.onChangeText(value, 'type')}
                            data={MODAL_DATA}
                            skin="customer"
-                           style={styles.modalContentRightTextInput}
+                           style={styles.selectContent}
                            defaultKey={1}>
               <View style={styles.modalSelectWrap}>
                 <Text style={modalContentObj.type?.label ? styles.modalSelectText : styles.modalNotSelectText}>
@@ -598,19 +609,21 @@ class StallDetailScene extends PureComponent {
             完成时间：{order_time}
           </Text>
         </View>
-        <For of={items} each="item" index="i">
-          <View style={styles.extraContentWrap} key={i}>
-            <Text style={styles.extraContentText}>
-              {item.name}
-            </Text>
-            <Text style={styles.extraContentNumText}>
-              x{item.num}
-            </Text>
-            <Text style={styles.extraContentPriceText}>
-              ￥{item.price}
-            </Text>
-          </View>
-        </For>
+        <If condition={Array.isArray(items) && items.length > 0}>
+          <For of={items} each="item" index="i">
+            <View style={styles.extraContentWrap} key={i}>
+              <Text style={styles.extraContentText}>
+                {item.name}
+              </Text>
+              <Text style={styles.extraContentNumText}>
+                x{item.num}
+              </Text>
+              <Text style={styles.extraContentPriceText}>
+                ￥{item.price}
+              </Text>
+            </View>
+          </For>
+        </If>
       </View>
     )
   }

@@ -17,7 +17,7 @@ export const ShortLineView = () => {
 export const Styles = StyleSheet.create({
   line: {
     borderBottomColor: colors.colorEEE,
-    borderBottomWidth: 1
+    borderBottomWidth: 0.5
   },
   shortLine: {
     borderBottomColor: colors.colorEEE,
@@ -53,6 +53,13 @@ export const Styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: colors.color333,
+    lineHeight: 21
+  },
+  memberTitleText:{
+    padding: 12,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#5c1813',
     lineHeight: 21
   },
   saveZoneWrap: {marginTop: 8, justifyContent: 'flex-end', backgroundColor: colors.white},

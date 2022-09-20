@@ -38,7 +38,15 @@ const initialState = {
   host: '',
   store_id: 0,
   vendor_id: 0,
-  store_info: {},
+  store_info: {
+    vip_info: {
+      show_vip: false,
+      expire_time: '未开通',
+      is_free: false,
+      exist_vip: false,
+      vip_invalid: false
+    }
+  },
   vendor_info: {},
   help_uid: [],
   enabled_good_mgr: false,

@@ -232,13 +232,7 @@ class RegisterShunfeng extends PureComponent {
   pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(false)).then(image => {
         const image_path = image.path;
         const image_arr = image_path.split("/");
         const image_name = image_arr[tool.length(image_arr) - 1];
@@ -269,13 +263,7 @@ class RegisterShunfeng extends PureComponent {
   pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(false))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
