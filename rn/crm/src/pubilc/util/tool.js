@@ -145,6 +145,17 @@ export function length(obj) {
 
 }
 
+ const pickImageOptions = (cropping) => {
+  return {
+    width: 800,
+    height: 800,
+    cropping: cropping,
+    cropperCircleOverlay: false,
+    includeExif: true,
+    cropperChooseText: '选择图片',
+    cropperCancelText: '取消'
+  };
+}
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
@@ -474,6 +485,7 @@ export default {
   toFixed,
   billStatus,
   get_platform_name,
+  pickImageOptions,
   ship_name,
   sellingStatus,
   headerSupply,

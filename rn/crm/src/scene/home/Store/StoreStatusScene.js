@@ -67,14 +67,14 @@ class StoreStatusScene extends PureComponent {
     const {navigation} = this.props
 
     let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
-    let store_id = this.props.global.currStoreId
+    let {currStoreId} = this.props.global
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, currVendorId});
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
                                    }}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
@@ -162,9 +162,8 @@ class StoreStatusScene extends PureComponent {
 
   openStore() {
     showModal('请求中...')
-    const access_token = this.props.global.accessToken
-    const store_id = this.props.global.currStoreId
-    const api = `/api/open_store/${store_id}?access_token=${access_token}`
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/api/open_store/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       hideModal()
       this.fetchData()

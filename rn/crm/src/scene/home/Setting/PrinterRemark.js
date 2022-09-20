@@ -210,13 +210,7 @@ class PrinterRemark extends PureComponent {
   pickSingleImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(true))
         .then(image => {
 
 
@@ -232,13 +226,7 @@ class PrinterRemark extends PureComponent {
   pickCameraImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[tool.length(image_arr) - 1];

@@ -122,7 +122,7 @@ class BluePrinterSettings extends PureComponent {
     console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
   }
 
-  testPrintData = () => {
+  testPrintData = (data) => {
     ESC.resetByte()
     ESC.fontNormalHeightWidth();
     ESC.alignLeft();
@@ -131,7 +131,10 @@ class BluePrinterSettings extends PureComponent {
     ESC.text('   打印测试单');
     ESC.printAndNewLine();
     ESC.fontHeightTimes();
-    ESC.text("合计        X100");
+    if (data)
+      ESC.text(`   ${data}`);
+    else
+      ESC.text("合计        X100");
     ESC.printAndNewLine();
     ESC.startLine(32);
     ESC.fontNormalHeightWidth();
@@ -142,7 +145,7 @@ class BluePrinterSettings extends PureComponent {
     return ESC.getByte()
   }
 
-  testPrint = (peripheral) => {
+  testPrint = (peripheral, data = null) => {
     setTimeout(() => {
       BleManager.retrieveServices(peripheral.id).then(() => {
         const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
@@ -150,7 +153,7 @@ class BluePrinterSettings extends PureComponent {
         setTimeout(() => {
           BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
             setTimeout(() => {
-              const testData = this.testPrintData();
+              const testData = this.testPrintData(data);
               BleManager.write(peripheral.id, service, bakeCharacteristic, testData).then(() => {
                 this.alert("打印成功，请查看小票")
               }).catch(() => {
@@ -168,10 +171,12 @@ class BluePrinterSettings extends PureComponent {
   }
 
   connectPrinter = (peripheral) => {
+    BleManager.stopScan().then()
     if (peripheral.connected) {
       BleManager.disconnect(peripheral.id).then();
       return
     }
+
     BleManager.connect(peripheral.id).then(() => {
       const {peripherals} = this.state;
       let p = peripherals.get(peripheral.id);
@@ -182,6 +187,7 @@ class BluePrinterSettings extends PureComponent {
       }
       const {dispatch} = this.props
       dispatch(setPrinterId(peripheral.id))
+      this.peripheral = peripheral
       setTimeout(() => {
         BleManager.retrieveServices(peripheral.id).then(() => {
           BleManager.readRSSI(peripheral.id).then((rssi) => {
@@ -210,7 +216,21 @@ class BluePrinterSettings extends PureComponent {
 
   componentDidMount() {
 
-    BleManager.start({showAlert: false}).then();
+    switch (Platform.OS) {
+      case "android":
+        BleManager.start({}).then(() => {
+
+        })
+        break
+      case "ios":
+        BleManager.start({
+          showAlert: true,
+          restoreIdentifierKey: 'com.waisongbang.app.bt.restoreIdentifierKey',
+          queueIdentifierKey: 'com.waisongbang.app.bt.queueIdentifierKey'
+        }).then(() => {
+        })
+        break
+    }
 
     // eslint-disable-next-line react/prop-types
     const {dispatch} = this.props
@@ -224,7 +244,7 @@ class BluePrinterSettings extends PureComponent {
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth()
         .then()
-        .catch((error) => {
+        .catch(() => {
           this.setState({askEnableBle: true})
         });
 

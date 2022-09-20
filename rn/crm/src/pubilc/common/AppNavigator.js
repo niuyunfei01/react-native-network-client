@@ -452,9 +452,15 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/GoodsIncrementService/TemplateSettingsScene').default}
         />
         <Stack.Screen name={Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION}
-                      options={{title: '开通会员权限'}}
+                      options={{title: '功能详情'}}
                       getComponent={() => require('../../scene/home/GoodsIncrementService/IncrementServiceDescription').default}
         />
+        <Stack.Screen name={Config.ROUTE_OPEN_MEMBER}
+                      options={{title: '开通会员权限'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/OpenMemberScene').default}/>
+        <Stack.Screen name={Config.ROUTE_Member_Agreement}
+                      options={{title: '会员服务协议'}}
+                      getComponent={() => require('../../scene/home/GoodsIncrementService/MemberAgreementScene').default}/>
         <Stack.Screen name={Config.ROUTE_AUTO_CALL_DELIVERY}
                       options={{headerTitle: '自动呼叫配送介绍'}}
                       getComponent={() => require('../../scene/home/Delivery/AutoCallDelivery').default}
@@ -467,7 +473,9 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.RIDER_TRSJECTORY}
                       options={{headerTitle: '骑手轨迹'}}
                       getComponent={() => require('../../scene/order/RiderTrajectory').default}/>
-
+        <Stack.Screen name={Config.ROUTE_ADD_MISSING_PICTURE}
+                      options={{headerTitle:'添加图片'}}
+                      getComponent={()=>require('../../scene/product/Goods/AddMissingPictureScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -475,6 +483,3 @@ export const AppNavigator = (props) => {
 
 
 export default AppNavigator;
-
-
-

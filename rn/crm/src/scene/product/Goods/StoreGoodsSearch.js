@@ -14,6 +14,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Scanner from "../../../pubilc/component/Scanner";
+import {showError} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -27,6 +28,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 let codeType = 'search'
+let isLoading = false
 
 class StoreGoodsSearch extends Component {
   constructor(props) {
@@ -50,7 +52,7 @@ class StoreGoodsSearch extends Component {
     }
   }
 
-  search = (showLoading = false) => {
+  search = () => {
     tool.debounces(() => {
       const {searchKeywords} = this.state
       const {type, limit_store, prod_status} = this.props.route.params;
@@ -59,8 +61,8 @@ class StoreGoodsSearch extends Component {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        this.setState({isLoading: true, showLoading})
         //showModal('加载中')
+
         params = {
           vendor_id: currVendorId,
           tagId: this.state.selectTagId,
@@ -75,6 +77,7 @@ class StoreGoodsSearch extends Component {
           params['hideAreaHot'] = 1;
           params['limit_status'] = (prod_status || []).join(",");
         }
+        console.log('params', params)
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
 
           const totalPage = res.count / res.pageSize
@@ -84,11 +87,12 @@ class StoreGoodsSearch extends Component {
             goods: goods,
             isLastPage: isLastPage,
             isLoading: false,
-            showLoading: false,
             showNone: !res.lists
           })
+          isLoading = false
         })
       } else {
+        isLoading = false
         this.setState({goods: [], isLastPage: true})
         if (limit_store) {
           params['hideAreaHot'] = 1;
@@ -99,12 +103,18 @@ class StoreGoodsSearch extends Component {
   }
 
   onRefresh() {
-    this.setState({page: 1}, () => this.search(true))
+    this.setState({page: 1}, () => this.search())
   }
 
   onLoadMore() {
-    let {page} = this.state
-    this.setState({page: page + 1}, () => this.search(true))
+    let {page, isLastPage} = this.state
+    console.log('isLoading', isLoading, ' isLastPage', isLastPage)
+    if (isLoading || isLastPage) {
+      showError('没有更多商品')
+      return
+    }
+    isLoading = true
+    this.setState({page: page + 1}, () => this.search())
   }
 
   onChange = (searchKeywords: any) => {
@@ -163,7 +173,60 @@ class StoreGoodsSearch extends Component {
       </View>
     )
   }
+  gotoAddMissingPicture = (item) => {
+    this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
+  }
+  opBar = (onSale, onStrict, product) => {
+    if ('' === product.coverimg) {
+      return (
+        <View style={[styles.row_center, styles.btnWrap]}>
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.gotoAddMissingPicture(product)}>
+            <Text style={styles.goodsOperationBtn}>编辑</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
+    return (
+      <View style={[styles.row_center, styles.btnWrap]}>
 
+        {onSale ?
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.onOpenModal('off_sale', product)}>
+            <Text style={{color: colors.color333}}>下架 </Text>
+          </TouchableOpacity> :
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.onOpenModal('on_sale', product)}>
+            <Text style={{color: colors.color333}}>上架 </Text>
+          </TouchableOpacity>}
+        <If condition={product.price_type === 1}>
+          {onStrict ?
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+              <Text style={{color: colors.color333}}>价格/库存 </Text>
+            </TouchableOpacity> :
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
+              <Text style={{color: colors.color333}}>价格 </Text>
+            </TouchableOpacity>
+          }
+        </If>
+        <If condition={product.price_type === 0}>
+          {onStrict ?
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
+              <Text style={{color: colors.color333}}>报价/库存 </Text>
+            </TouchableOpacity> :
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.onOpenModal('set_price', product)}>
+              <Text style={{color: colors.color333}}>报价 </Text>
+            </TouchableOpacity>
+          }
+        </If>
+
+      </View>
+    )
+  }
   renderRow = (product, idx) => {
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (product.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
@@ -172,55 +235,7 @@ class StoreGoodsSearch extends Component {
                          price_type={product.price_type || 0}
                          onPressRight={() => this.gotoGoodDetail(product.id)}
                          fnProviding={onStrict}
-                         opBar={<View style={[styles.row_center, {
-                           flex: 1,
-                           backgroundColor: colors.white,
-                           borderTopWidth: pxToDp(1),
-                           borderColor: colors.colorDDD
-                         }]}>
-
-                           {onSale ?
-                             <TouchableOpacity style={[styles.toOnlineBtn]}
-                                               onPress={() => this.onOpenModal('off_sale', product)}>
-                               <Text style={{color: colors.color333}}>下架 </Text>
-                             </TouchableOpacity> :
-                             <TouchableOpacity style={[styles.toOnlineBtn]}
-                                               onPress={() => this.onOpenModal('on_sale', product)}>
-                               <Text style={{color: colors.color333}}>上架 </Text>
-                             </TouchableOpacity>}
-
-                           {/*{onOpen &&*/}
-                           {/*  <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
-                           {/*                    onPress={() => this.onOpenModal('set_price', product)}>*/}
-                           {/*    <Text style={{color: colors.color333}}>报价 </Text>*/}
-                           {/*  </TouchableOpacity>*/}
-                           {/*}*/}
-                           <If condition={product.price_type === 1}>
-                             {onStrict ?
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
-                                 <Text style={{color: colors.color333}}>价格/库存 </Text>
-                               </TouchableOpacity> :
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
-                                 <Text style={{color: colors.color333}}>价格 </Text>
-                               </TouchableOpacity>
-                             }
-                           </If>
-                           <If condition={product.price_type === 0}>
-                             {onStrict ?
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                                 <Text style={{color: colors.color333}}>报价/库存 </Text>
-                               </TouchableOpacity> :
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.onOpenModal('set_price', product)}>
-                                 <Text style={{color: colors.color333}}>报价 </Text>
-                               </TouchableOpacity>
-                             }
-                           </If>
-
-                         </View>}/>
+                         opBar={this.opBar(onSale, onStrict, product)}/>
   }
 
   jumpToNewRetailPriceScene = (id) => {
@@ -373,6 +388,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  btnWrap: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderTopWidth: pxToDp(1),
+    borderColor: colors.colorDDD
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch)
