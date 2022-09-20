@@ -102,6 +102,7 @@ class OrderTransferThird extends Component {
       callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`,
       dateArray: [],
       set_default_product_weight: false,
+      is_alone_pay_vendor: true,
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -160,6 +161,7 @@ class OrderTransferThird extends Component {
         logistics_error: obj.error_ways,
         is_merchant_ship: obj.is_merchant_ship,
         merchant_reship_tip: obj.merchant_reship_tip,
+        is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         isLoading: false,
       })
 
@@ -815,12 +817,10 @@ class OrderTransferThird extends Component {
 
 
   renderBtn = () => {
-    let {vendor_id} = this.props.global;
+    let {is_alone_pay_vendor} = this.state;
     return (
       <View>
-
         <View style={{
-
           backgroundColor: colors.white,
           flexDirection: 'row',
           padding: pxToDp(20),
@@ -861,7 +861,7 @@ class OrderTransferThird extends Component {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {
-            if (Number(vendor_id) === 13) {
+            if (is_alone_pay_vendor) {
               return ToastLong('不支持修改商品重量');
             }
             this.setState({showDeliveryModal: true, set_default_product_weight: false})
