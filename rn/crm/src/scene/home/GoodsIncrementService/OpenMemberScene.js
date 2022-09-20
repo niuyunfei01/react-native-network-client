@@ -179,7 +179,7 @@ class OpenMemberScene extends PureComponent {
 
     const api = `/v1/new_api/product_package/vip_open/${currStoreId}?access_token=${accessToken}`
     HttpUtils.post(api, params).then(() => {
-      showSuccess(vip_info.exist_vip?'续费成功':'开通成功')
+      showSuccess(vip_info.exist_vip ? '续费成功' : '开通成功')
       this.props.dispatch(getConfig(accessToken, currStoreId));
     }).catch(error => showError(error.reason))
 
@@ -340,7 +340,7 @@ class OpenMemberScene extends PureComponent {
   render() {
     const {store_info} = this.props.global
     const {vip_info} = store_info
-    const {selectedOpenMember} = this.state
+    const {selectedOpenMember = {}} = this.state
     return (
       <>
 

@@ -1098,7 +1098,7 @@ export const activateNowIcon = (width = 16, height = 16) => {
 export const activateIcon = (width = 20, height = 20) => {
   return (
     `
-<svg width="${width}" height="${height}" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="${width}" height="${height}" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g  transform="translate(-334.000000, -257.000000)">
             <g  transform="translate(10.000000, 244.000000)">
