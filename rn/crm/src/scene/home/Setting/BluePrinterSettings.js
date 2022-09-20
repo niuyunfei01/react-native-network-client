@@ -119,7 +119,7 @@ class BluePrinterSettings extends PureComponent {
   }
 
   handleUpdateValueForCharacteristic = (data) => {
-    console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
+    //console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
   }
 
   testPrintData = (data) => {
@@ -252,9 +252,9 @@ class BluePrinterSettings extends PureComponent {
         if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
             if (result) {
-              console.log("User 接受");
+              // console.log("User 接受");
             } else {
-              console.log("User 拒绝");
+              // console.log("User 拒绝");
             }
           });
         }

@@ -62,7 +62,6 @@ class RemindModal extends React.Component {
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken
     }).then((res) => {
-      console.log('recordAdvice  res =>', res)
     })
   }
 
