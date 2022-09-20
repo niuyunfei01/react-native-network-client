@@ -162,8 +162,8 @@ class StoreStatusScene extends PureComponent {
 
   openStore() {
     showModal('请求中...')
-    const {access_token, currStoreId} = this.props.global
-    const api = `/api/open_store/${currStoreId}?access_token=${access_token}`
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/api/open_store/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       hideModal()
       this.fetchData()
