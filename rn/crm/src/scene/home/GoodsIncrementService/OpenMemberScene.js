@@ -117,9 +117,12 @@ const styles = StyleSheet.create({
 
 class OpenMemberScene extends PureComponent {
 
-  state = {
-    selectedOpenMember: this.props.global.store_info.vip_info.pay_type_items[2],
-    agreementMember: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedOpenMember: {pay_money_actual: '0', months: 0},
+      agreementMember: false,
+    }
   }
 
   openMiniProgram = () => {
@@ -159,17 +162,35 @@ class OpenMemberScene extends PureComponent {
 
   componentDidMount() {
     this.setHeader()
-
+    const {store_info} = this.props.global
+    store_info.vip_info.pay_type_items.map(item => {
+      if (12 === item.months) {
+        this.setState({selectedOpenMember: item})
+      }
+    })
   }
 
   useIncrementService = () => {
-    const {currStoreId, accessToken, store_info} = this.props.global
     const {agreementMember, selectedOpenMember} = this.state
-    const {vip_info} = store_info
     if (!agreementMember) {
       showError('请先同意会员服务协议')
       return
     }
+    Alert.alert('提示', `会员费${selectedOpenMember.pay_money_actual}元将在外送帮余额中扣除，是否继续开通`, [
+      {
+        text: '取消'
+      },
+      {
+        text: '继续',
+        onPress: () => this.openMember()
+      }
+    ])
+
+  }
+  openMember = () => {
+    const {currStoreId, accessToken, store_info} = this.props.global
+    const {selectedOpenMember} = this.state
+    const {vip_info} = store_info
     const params = {
       store_id: currStoreId,
       pay_money: selectedOpenMember.pay_money_actual,
@@ -245,7 +266,7 @@ class OpenMemberScene extends PureComponent {
                   <Text style={styles.memberMonthOriginalPrice}>
                     ￥{item.pay_money}
                   </Text>
-                  <If condition={index + 1 === vip_info.pay_type_items.length && vip_info.pay_type_items.length > 0}>
+                  <If condition={12 === item.months}>
                     <View style={styles.memberMonthRecommendWrap}>
                       <Text style={styles.memberMonthRecommendText}>
                         立省{parseFloat(item.pay_money - item.pay_money_actual).toFixed(1)}元
