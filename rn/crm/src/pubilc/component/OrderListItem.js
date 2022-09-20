@@ -175,14 +175,13 @@ class OrderListItem extends React.PureComponent {
     const {dispatch, accessToken, item} = this.props;
     if (addMoneyNum > 0) {
       if (addOrdersTip) {
-        dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, async (resp) => {
+        dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
+          this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
           if (tool.length(resp?.obj?.error_msg) > 0) {
-            Alert.alert('提示', resp?.obj?.error_msg, [{text: '我知道了'}])
+            ToastShort(resp?.obj?.error_msg)
           } else {
-            this.setState({addTipModal: false, addOrdersTip: false})
             ToastShort('操作成功')
           }
-          await this.setState({addMoneyNum: ''});
         }));
         return;
       }
@@ -427,7 +426,7 @@ class OrderListItem extends React.PureComponent {
   cancelDeliverys = () => {
     let order = this.props.item
     let token = this.props.accessToken
-    Alert.alert('提示', `确定取消全部配送吗?`, [{
+    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
       text: '确定', onPress: () => {
         const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
         HttpUtils.get.bind(this.props)(api, {}).then(res => {
@@ -666,7 +665,8 @@ class OrderListItem extends React.PureComponent {
   renderButton = () => {
     let {item} = this.props;
     return (
-      <View style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
+      <View
+        style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
@@ -729,7 +729,15 @@ class OrderListItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
-                    this.cancelDelivery(item.id)
+
+                    Alert.alert('提示', `确定取消当前配送吗?`, [
+                      {text: '取消'},
+                      {
+                        text: '确定', onPress: () => {
+                          this.cancelDelivery(item.id)
+                        }
+                      }
+                    ])
                   }}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.main_color,
