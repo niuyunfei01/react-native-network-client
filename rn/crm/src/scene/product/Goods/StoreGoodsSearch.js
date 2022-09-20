@@ -1,11 +1,10 @@
 import React, {Component} from "react"
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
 import tool from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
 import NoFoundDataView from "../../common/component/NoFoundDataView"
-import LoadMore from 'react-native-loadmore'
 import {SearchBar} from "@ant-design/react-native"
 import Cts from "../../../pubilc/common/Cts";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
@@ -77,7 +76,7 @@ class StoreGoodsSearch extends Component {
           params['hideAreaHot'] = 1;
           params['limit_status'] = (prod_status || []).join(",");
         }
-        console.log('params', params)
+
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
 
           const totalPage = res.count / res.pageSize
@@ -102,13 +101,12 @@ class StoreGoodsSearch extends Component {
     }, 1000)
   }
 
-  onRefresh() {
+  onRefresh = () => {
     this.setState({page: 1}, () => this.search())
   }
 
-  onLoadMore() {
+  onLoadMore = () => {
     let {page, isLastPage} = this.state
-    console.log('isLoading', isLoading, ' isLastPage', isLastPage)
     if (isLoading || isLastPage) {
       showError('没有更多商品')
       return
@@ -227,15 +225,15 @@ class StoreGoodsSearch extends Component {
       </View>
     )
   }
-  renderRow = (product, idx) => {
-    const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-    const onStrict = (product.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
-    return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
+  renderRow = ({item}) => {
+    const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
+    return <GoodListItem onPressImg={() => this.gotoGoodDetail(item.id)} product={item}
                          modalType={this.state.modalType}
-                         price_type={product.price_type || 0}
-                         onPressRight={() => this.gotoGoodDetail(product.id)}
+                         price_type={item.price_type || 0}
+                         onPressRight={() => this.gotoGoodDetail(item.id)}
                          fnProviding={onStrict}
-                         opBar={this.opBar(onSale, onStrict, product)}/>
+                         opBar={this.opBar(onSale, onStrict, item)}/>
   }
 
   jumpToNewRetailPriceScene = (id) => {
@@ -247,14 +245,6 @@ class StoreGoodsSearch extends Component {
       storeId: this.state.storeId,
       updatedCallback: this.doneProdUpdate
     })
-  }
-
-  renderList() {
-    const {goods} = this.state
-    return goods.map((goods, index) => {
-      return this.renderRow(goods, index)
-    })
-
   }
 
   onClose = () => {
@@ -278,12 +268,30 @@ class StoreGoodsSearch extends Component {
   closeModal = () => {
     this.setState({modalType: ''})
   }
+  _keyExtractor = (item) => {
+    return item.id.toString();
+  }
+  _getItemLayout = (data, index) => {
+    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+  }
+  renderNoProduct = () => {
+    const {searchKeywords, goods} = this.state
+    return (
+      <View style={styles.notGoodTip}>
+        {
+          tool.length(searchKeywords) > 0 && tool.length(goods) <= 0 ?
+            <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
+            <Text style={{color: colors.color333}}>暂时没有商品</Text>
+        }
+      </View>
+    )
+  }
 
   render() {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
     const {accessToken} = this.props.global;
-    const {showScan, goods, searchKeywords, showNone, isLoading, modalType, isLastPage} = this.state
+    const {showScan, goods, showNone, isLoading, modalType} = this.state
     const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <View style={styles.page}>
@@ -295,36 +303,17 @@ class StoreGoodsSearch extends Component {
         {this.renderSearchBar()}
         {/*<ScrollView>*/}
         <View style={styles.goodsWrap}>
-          {
-            goods && tool.length(goods) > 0 ?
-              <View>
-                <LoadMore
-                  loadMoreType={'scroll'}
-                  renderList={this.renderList()}
-                  onRefresh={() => this.onRefresh()}
-                  onLoadMore={() => this.onLoadMore()}
-                  isLastPage={isLastPage}
-                  isLoading={isLoading}
-                  scrollViewStyle={{
-                    paddingBottom: 5,
-                    marginBottom: 0
-                  }}
-                  indicatorText={'加载中'}
-                  bottomLoadDistance={10}
-                />
-                <View style={styles.notMoreTip}>
-                  {isLastPage ? <Text style={{color: colors.color333}}>没有更多商品了 </Text> :
-                    <Text style={{color: colors.color333}}></Text>}
-                </View>
-              </View> :
-              <View style={styles.notGoodTip}>
-                {
-                  tool.length(searchKeywords) > 0 ?
-                    <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
-                    <Text style={{color: colors.color333}}>暂时没有商品</Text>
-                }
-              </View>
-          }
+          <FlatList data={goods}
+                    renderItem={this.renderRow}
+                    initialNumToRender={5}
+                    onRefresh={this.onRefresh}
+                    refreshing={isLoading}
+                    keyExtractor={this._keyExtractor}
+                    getItemLayout={this._getItemLayout}
+                    ListEmptyComponent={this.renderNoProduct()}
+                    onEndReachedThreshold={0.3}
+                    onEndReached={this.onLoadMore}
+          />
 
           <If condition={showNone && !isLoading}>
             <NoFoundDataView/>

@@ -186,7 +186,6 @@ export function getConfigItem(token, configKey, callback) {
       }
       callback(json.ok, json.reason, json.obj);
     }, (error) => {
-      console.log('获取服务器端配置错误：', error);
       callback(false)
     });
   }
