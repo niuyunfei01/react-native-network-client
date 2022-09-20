@@ -6,8 +6,6 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "android-bundle": "npx react-native bundle --platform android --dev true --entry-file index.js --bundle-output last/android-bundle/last.android.bundle --assets-dest last/android-bundle",
-    "ios-bundle": "npx react-native bundle --platform ios --dev true --entry-file index.ios.js --bundle-output last/ios-bundle/last.ios.bundle --assets-dest last/ios-bundle",
     "test": "jest",
     "lint": "eslint ."
   },
