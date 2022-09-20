@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   headerDescription: {
+    marginLeft: 4,
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.white,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  row: {flexDirection: 'row', alignItems: 'center'},
+  row: {flexDirection: 'row', alignItems: 'center',},
   contentWrap: {
     paddingTop: 4,
     paddingBottom: 14,
@@ -140,12 +141,12 @@ class GoodsIncrement extends PureComponent {
     return (
       <LinearGradient style={styles.notActivateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
         <View style={styles.row}>
-          <SvgXml xml={notActivateMemberIcon()}/>
+          <SvgXml xml={notActivateMemberIcon()} style={{paddingTop: 8}}/>
           <Text style={styles.headerDescription}>
             限时抢购年费包立减优惠
           </Text>
         </View>
-        <If condition={vip_info.in_white_list === 0}>
+        <If condition={!vip_info.exist_vip}>
           <TouchableOpacity style={[styles.activateNow, styles.row]} onPress={this.useIncrementService}>
             <Text style={styles.notServiceText}>
               {'立即开通'}
@@ -162,18 +163,28 @@ class GoodsIncrement extends PureComponent {
     return (
       <LinearGradient style={styles.activateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
         <View style={styles.row}>
-          <SvgXml xml={activateMemberIcon()}/>
+          <View>
+            <SvgXml xml={activateMemberIcon()}/>
+          </View>
           <Text style={styles.headerDescription}>
             会员版
           </Text>
         </View>
-        <If condition={true}>
+        <If condition={vip_info.expire_date}>
           <TouchableOpacity style={[styles.row]} onPress={this.useIncrementService}>
             <Text style={styles.expireDate}>
-              {vip_info.expire_date} 到期
+              {vip_info.expire_date}到期
             </Text>
             <SvgXml xml={activateIcon()}/>
           </TouchableOpacity>
+        </If>
+        <If condition={!vip_info.expire_date}>
+          <View style={[styles.row]} onPress={this.useIncrementService}>
+            <Text style={styles.expireDate}>
+              免费使用
+            </Text>
+
+          </View>
         </If>
       </LinearGradient>
     )

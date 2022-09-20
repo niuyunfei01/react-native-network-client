@@ -988,7 +988,7 @@ class MineScene extends Component {
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
-          <If condition={vip_info.exist_vip}>
+          <If condition={vip_info.show_vip}>
             <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
           </If>
           {this.renderOftenUse()}
