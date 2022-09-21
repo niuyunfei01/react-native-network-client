@@ -165,9 +165,18 @@ class StoreGoodsList extends Component {
   }
 
 
-  search = (setList = 1) => {
+  search = (setList = 1, isRefreshItem = false) => {
 
-    const {isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum} = this.state
+    const {
+      isLoading,
+      selectedStatus,
+      selectedChildTagId,
+      selectedTagId,
+      page,
+      pageNum,
+      selectedProduct,
+      goods
+    } = this.state
     if (isLoading) {
       return;
     }
@@ -188,10 +197,18 @@ class StoreGoodsList extends Component {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
+    if (isRefreshItem)
+      params.pid = selectedProduct.id
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      const goods = setList === 1 ? res.lists : this.state.goods.concat(res.lists)
-      this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+      if (isRefreshItem) {
+        const index = goods.findIndex(item => item.id === selectedProduct.id)
+        goods[index] = res.lists[0]
+        this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+        return
+      }
+      const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
+      this.setState({goods: goodList, isLastPage: res.isLastPage, isLoading: false})
     }, (res) => {
       ToastLong(res.reason)
       this.setState({isLoading: false})
@@ -388,7 +405,7 @@ class StoreGoodsList extends Component {
                                 doneProdUpdate={this.doneProdUpdate}
                                 onClose={() => {
                                   this.setState({modalType: ''})
-
+                                  this.search(1, true)
                                 }}
                                 spId={Number(sp.id)}
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
