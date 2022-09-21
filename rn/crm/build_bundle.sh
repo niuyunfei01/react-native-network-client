@@ -1,5 +1,5 @@
 #!/bin/bash
-
+this_dir=`pwd`
 echo 'build android'
 npx react-native bundle --platform android --dev false --entry-file index.js \
   --bundle-output last/android-bundle/$1.android.bundle \
@@ -17,4 +17,14 @@ echo 'build ios'
 npx react-native bundle --platform ios --dev false --entry-file index.ios.js  \
  --bundle-output last/ios-bundle/$1.ios.bundle  \
  --assets-dest last/ios-bundle
+echo 'bundle_zip'
+cd $this_dir/last/ios-bundle || exit
+zip -r $1.ios.zip ./
+mv $1.ios.zip  ../
+rm -rf *
+cd $this_dir/last/android-bundle/ || exit
+zip -r $1.android.zip ./
+mv $1.android.zip  ../
+rm -rf *
+cd $this_dir || exit
 echo 'build success';
