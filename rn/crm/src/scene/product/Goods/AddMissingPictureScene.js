@@ -305,8 +305,10 @@ class AddMissingPictureScene extends React.PureComponent {
       showError('请先上传图片！')
     }
     dispatch(productSave(formData, accessToken, (ok, reason, obj) => {
-      if (ok)
+      if (ok) {
         showSuccess('添加主图成功')
+        this.props.navigation.goBack()
+      }
       else showError(reason)
     }));
   }

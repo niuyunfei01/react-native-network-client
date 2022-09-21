@@ -1178,7 +1178,6 @@ class GoodsEditScene extends PureComponent {
   renderMultiSpecs = () => {
     const {multiSpecsList, weightList, fnProviding} = this.state
     const {type = 'add'} = this.props.route.params;
-    console.log('multiSpecsList', multiSpecsList)
     return (
       <>
         <Text style={styles.multiSpecsTip}>
@@ -1216,6 +1215,8 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type) => {
+    const {inventory = {}, upc, weight, price, sku_name} = multiSpecsList[index]
+    const {actualNum = '0'} = inventory
     return (
       <View style={Styles.zoneWrap} key={index}>
         <Text style={Styles.headerTitleText}>
@@ -1230,7 +1231,7 @@ class GoodsEditScene extends PureComponent {
           </Text>
           <TextInput
             maxLength={40}
-            value={multiSpecsList[index]['sku_name']}
+            value={sku_name}
             //editable={this.isStoreProdEditable()}
             onChangeText={value => this.setMultiSpecsInfo(index, 'sku_name', value)}
             style={styles.textInputStyle}
@@ -1248,7 +1249,7 @@ class GoodsEditScene extends PureComponent {
             </Text>
             <TextInput
               keyboardType={'numeric'}
-              value={multiSpecsList[index]['price']}
+              value={price}
               //editable={this.isStoreProdEditable()}
               onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
               style={styles.textInputStyle}
@@ -1266,7 +1267,7 @@ class GoodsEditScene extends PureComponent {
           </Text>
           <TextInput
             style={styles.textInputStyle}
-            value={multiSpecsList[index]['weight']}
+            value={weight}
             keyboardType={'numeric'}
             onChangeText={value => this.setMultiSpecsInfo(index, 'weight', value)}
             placeholderTextColor={colors.color999}
@@ -1289,7 +1290,7 @@ class GoodsEditScene extends PureComponent {
             商品条码
           </Text>
           <TextInput
-            value={multiSpecsList[index]['upc']}
+            value={upc}
             //editable={this.isStoreProdEditable()}
             onChangeText={value => this.setMultiSpecsInfo(index, 'upc', value)}
             style={styles.textInputStyle}
@@ -1308,7 +1309,7 @@ class GoodsEditScene extends PureComponent {
             </Text>
             <TextInput
               keyboardType={'numeric'}
-              value={multiSpecsList[index]?.inventory?.actualNum || '0'}
+              value={actualNum}
               //editable={this.isStoreProdEditable()}
               onChangeText={value => this.setMultiSpecsInfo(index, 'inventory', value)}
               style={styles.textInputStyle}
@@ -1373,12 +1374,31 @@ class GoodsEditScene extends PureComponent {
           },
           {
             text: '确定',
-            onPress: () => this.deletedSpecsInfo(index)
+            onPress: () => {
+              this.deleteSpecsInfoToServer(index)
+              this.deletedSpecsInfo(index)
+            }
           }
         ])
       return
     }
     this.deletedSpecsInfo(index)
+  }
+
+  deleteSpecsInfoToServer = (index) => {
+    const {currStoreId} = this.props.global;
+    const {multiSpecsList} = this.state
+    const {id} = multiSpecsList[index]
+    if (!id) {
+      showError('规格信息不完整，不可删除')
+      return
+    }
+    const url = `/v1/new_api/store_product/del_store_pro/${currStoreId}/${id}`
+    HttpUtils.get(url, {}, false, true).then((res) => {
+      showSuccess(`${res.reason}`)
+    }, error => {
+      showError(error.reason)
+    })
   }
 
   deletedSpecsInfo = (index) => {

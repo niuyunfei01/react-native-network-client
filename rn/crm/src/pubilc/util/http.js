@@ -52,7 +52,7 @@ class HttpUtils {
     return options
   }
 
-  static apiBase(method, url, params, props = this, getNetworkDelay = false) {
+  static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false) {
     let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -89,7 +89,10 @@ class HttpUtils {
               if (getNetworkDelay) {
                 const endTime = getTime();
                 resolve({obj: response.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
-              } else resolve(response.obj)
+              }
+              if (getMoreInfo)
+                resolve(response)
+              else resolve(response.obj)
             } else {
               this.error(response, props.navigation);
               if (getNetworkDelay) {
@@ -146,14 +149,14 @@ class HttpUtils {
     }
   }
 
-  static get(url, params, getNetworkDelay = false,) {
+  static get(url, params, getNetworkDelay = false, getMoreInfo = false) {
     const props = this
-    return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay)
+    return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay, getMoreInfo)
   }
 
-  static post(url, params, getNetworkDelay = false) {
+  static post(url, params, getNetworkDelay = false, getMoreInfo = false) {
     const props = this
-    return HttpUtils.apiBase('POST', url, params, props, getNetworkDelay)
+    return HttpUtils.apiBase('POST', url, params, props, getNetworkDelay, getMoreInfo)
   }
 
   static put(url, params) {

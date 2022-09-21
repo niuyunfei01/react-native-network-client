@@ -4,7 +4,6 @@ import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
-import {receiveIncrement} from "../../../reducers/mine/mineActions";
 import colors from "../../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {
@@ -18,6 +17,7 @@ import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
 import {getConfig} from "../../../reducers/global/globalActions";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const styles = StyleSheet.create({
   saveZoneWrap: {
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 34, marginRight: 15
   },
   rowCenter: {flexDirection: 'row', alignItems: 'center'},
-  setMealWrap: {flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 23},
+  setMealWrap: {flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 23, flexWrap: 'wrap'},
   setMealItemWrap: {
     paddingTop: 18,
     alignItems: 'center',
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     marginLeft: 12
   },
   selectMealItemWrap: {
+    marginBottom: 8,
     paddingTop: 18,
     alignItems: 'center',
     borderRadius: 8,
@@ -119,6 +120,8 @@ class OpenMemberScene extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('会员开通页面')
     this.state = {
       selectedOpenMember: {pay_money_actual: '0', months: 0},
       agreementMember: false,
@@ -177,9 +180,15 @@ class OpenMemberScene extends PureComponent {
       showError('请先同意会员服务协议')
       return
     }
+    const {store_info} = this.props.global
+    const {vip_info} = store_info
+    if (vip_info.exist_vip) {
+      this.mixpanel.track('会员_立即续费')
+    } else this.mixpanel.track('会员_立即开通')
     Alert.alert('提示', `会员费${selectedOpenMember.pay_money_actual}元将在外送帮余额中扣除，是否继续开通`, [
       {
-        text: '取消'
+        text: '取消',
+        onPress: () => this.mixpanel.track('会员_取消开通')
       },
       {
         text: '继续',
@@ -198,12 +207,31 @@ class OpenMemberScene extends PureComponent {
       pay_type: selectedOpenMember.months,
       product_package_id: vip_info.id,
     }
-
+    this.mixpanel.track('会员_继续开通')
     const api = `/v1/new_api/product_package/vip_open/${currStoreId}?access_token=${accessToken}`
     HttpUtils.post(api, params).then(() => {
       showSuccess(vip_info.exist_vip ? '续费成功' : '开通成功')
       this.props.dispatch(getConfig(accessToken, currStoreId));
-    }).catch(error => showError(error.reason))
+    }, error => {
+      if (-1 === error.obj.error_code) {
+        Alert.alert('提示', '余额不足，确定充值吗？', [
+          {
+            text: '取消',
+            onPress: () => this.mixpanel.track('会员_取消充值')
+          },
+          {
+            text: '去充值',
+            onPress: () => {
+              this.mixpanel.track('会员_去充值')
+              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+            }
+          }
+        ])
+        return
+      }
+      showError(error.reason)
+    }).catch(() => {
+    })
 
   }
 
@@ -240,6 +268,21 @@ class OpenMemberScene extends PureComponent {
     )
   }
 
+  selectMonth = (item) => {
+    switch (item.months) {
+      case 1:
+        this.mixpanel.track('会员_开通月费')
+        break
+      case 3:
+        this.mixpanel.track('会员_开通季费')
+        break
+      case 12:
+        this.mixpanel.track('会员_开通年费')
+        break
+    }
+
+    this.setState({selectedOpenMember: item})
+  }
   renderMember = () => {
     const {selectedOpenMember} = this.state
 
@@ -256,7 +299,7 @@ class OpenMemberScene extends PureComponent {
             Array.isArray(vip_info.pay_type_items) && vip_info.pay_type_items.map((item, index) => {
               return (
                 <TouchableOpacity key={index}
-                                  onPress={() => this.setState({selectedOpenMember: item})}
+                                  onPress={() => this.selectMonth(item)}
                                   style={item === selectedOpenMember ? styles.selectMealItemWrap : styles.setMealItemWrap}>
                   <Text style={styles.memberMonthText}>
                     {item.months}个月
