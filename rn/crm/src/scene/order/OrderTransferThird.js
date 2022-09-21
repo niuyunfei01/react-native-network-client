@@ -728,23 +728,25 @@ class OrderTransferThird extends Component {
         <View>
           {
             not_exist && not_exist.map((delivery, index) => {
-              <View style={{
-                flexDirection: "row",
-                marginHorizontal: 10,
-                padding: pxToDp(20),
-                backgroundColor: colors.white,
-                justifyContent: "space-between",
-                borderRadius: pxToDp(15),
-                marginTop: pxToDp(10),
-                alignItems: "center",
-                // borderBottomWidth: pxToDp(1),
-              }} key={index}>
-                <Text style={{fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
-                <Text onPress={() => this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})}
-                      style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>
-                  {delivery.open_status === 0 ? "申请开通" : '查看进度'}
-                </Text>
-              </View>
+              return(
+                <View style={{
+                  flexDirection: "row",
+                  marginHorizontal: 10,
+                  padding: pxToDp(20),
+                  backgroundColor: colors.white,
+                  justifyContent: "space-between",
+                  borderRadius: pxToDp(15),
+                  marginTop: pxToDp(10),
+                  alignItems: "center",
+                  // borderBottomWidth: pxToDp(1),
+                }} key={index}>
+                  <Text style={{fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
+                  <Text onPress={() => this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})}
+                        style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>
+                    {delivery.open_status === 0 ? "申请开通" : '查看进度'}
+                  </Text>
+                </View>
+              )
             })
           }
         </View>

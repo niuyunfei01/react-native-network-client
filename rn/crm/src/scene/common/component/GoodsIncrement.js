@@ -14,6 +14,7 @@ import {
 } from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import LinearGradient from 'react-native-linear-gradient'
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const styles = StyleSheet.create({
   zoneWrap: {
@@ -113,6 +114,11 @@ const member = [
 
 class GoodsIncrement extends PureComponent {
 
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
+
+  }
   componentDidMount() {
     const {store_info} = this.props.global
 
@@ -134,6 +140,7 @@ class GoodsIncrement extends PureComponent {
 
   useIncrementService = () => {
     const {navigation} = this.props
+    this.mixpanel.track('我的_立即开通')
     navigation.navigate(Config.ROUTE_OPEN_MEMBER)
   }
 

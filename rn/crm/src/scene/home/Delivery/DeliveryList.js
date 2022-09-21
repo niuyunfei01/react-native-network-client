@@ -689,7 +689,8 @@ class DeliveryList extends PureComponent {
                 if (info?.is_forbidden === 1) {
                   this.setState({
                     disable_id: info?.v2_type,
-                    delivery_way_state: info?.is_forbidden
+                    delivery_way_state: info?.is_forbidden,
+                    multipleSelection: info?.v2_type
                   }, () => {
                     this.unDisableBtn('启用')
                   })
@@ -961,13 +962,14 @@ class DeliveryList extends PureComponent {
   }
 
   renderDisableBtn = () => {
+    const {multipleSelection} = this.state
     return (
       <View style={styles.bottomBtn}>
         <Button title={'确认'}
                 onPress={() => this.unDisableBtn('禁用')}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: this.state.disable_id !== 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: multipleSelection.length > 0 ? colors.main_color : colors.fontColor,
                 }}
                 titleStyle={styles.bottomBtnTitle}
         />
