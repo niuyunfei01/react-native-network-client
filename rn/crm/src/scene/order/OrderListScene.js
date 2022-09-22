@@ -55,6 +55,7 @@ import {downloadApk} from "rn-app-upgrade";
 import {setRecordFlag} from "../../reducers/store/storeActions";
 import PropTypes from "prop-types";
 import {SafeAreaView} from 'react-native-safe-area-context';
+
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
@@ -105,7 +106,6 @@ const initState = {
   show_button: false,
   is_service_mgr: false,
   allow_merchants_store_bind: true,
-  showBtn: false,
   img: '',
   showImgType: 1,
   show_img: true,
@@ -561,8 +561,7 @@ class OrderListScene extends Component {
     }
     const {vendor_info} = this.props.global
     this.setState({
-        query: {...query, page: 1, isAdd: true, offset: 0},
-        showBtn: vendor_info.wsb_store_account === '1'
+        query: {...query, page: 1, isAdd: true, offset: 0}
       },
       () => this.fetchOrders(status))
     // }, 500)
@@ -1024,10 +1023,10 @@ class OrderListScene extends Component {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
-    let {vendor_id} = this.props.global
+    let {orderStatus, allow_edit_ship_rule} = this.state;
+    let {vendor_id, vendor_info} = this.props.global
     return (
-      <OrderListItem showBtn={showBtn}
+      <OrderListItem showBtn={'1' === vendor_info.wsb_store_account}
                      key={index}
                      fetchData={() => this.onRefresh(orderStatus)}
                      item={item}

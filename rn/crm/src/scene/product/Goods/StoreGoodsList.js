@@ -203,7 +203,8 @@ class StoreGoodsList extends Component {
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (isRefreshItem) {
         const index = goods.findIndex(item => item.id === selectedProduct.id)
-        goods[index] = res.lists[0]
+        if (Array.isArray(res.lists) && res.lists.length > 0)
+          goods[index] = res.lists[0]
         this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
         return
       }

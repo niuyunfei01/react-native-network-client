@@ -71,12 +71,13 @@ const styles = StyleSheet.create({
   rowCenter: {flexDirection: 'row', alignItems: 'center'},
   setMealWrap: {flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 23, flexWrap: 'wrap'},
   setMealItemWrap: {
+    marginBottom: 8,
     paddingTop: 18,
     alignItems: 'center',
     borderRadius: 8,
     borderColor: colors.colorEEE,
     borderWidth: 1,
-    width: 104,
+    width: 94,
     height: 129,
     marginLeft: 12
   },
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     borderColor: '#f64e30',
     backgroundColor: '#FFF6F0',
     borderWidth: 1,
-    width: 104,
+    width: 94,
     height: 129,
     marginLeft: 12
   },
@@ -198,7 +199,7 @@ class OpenMemberScene extends PureComponent {
 
   }
   openMember = () => {
-    const {currStoreId, accessToken, store_info} = this.props.global
+    const {currStoreId, accessToken, store_info, vendor_info} = this.props.global
     const {selectedOpenMember} = this.state
     const {vip_info} = store_info
     const params = {
@@ -209,10 +210,13 @@ class OpenMemberScene extends PureComponent {
     }
     this.mixpanel.track('会员_继续开通')
     const api = `/v1/new_api/product_package/vip_open/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post(api, params).then(() => {
+    HttpUtils.post(api, params, false, false, false).then(() => {
       showSuccess(vip_info.exist_vip ? '续费成功' : '开通成功')
       this.props.dispatch(getConfig(accessToken, currStoreId));
     }, error => {
+      if ('0' === vendor_info.wsb_store_account) {
+        showError('品牌余额不足，请先充值')
+      }
       if (-1 === error.obj.error_code) {
         Alert.alert('提示', '余额不足，确定充值吗？', [
           {
