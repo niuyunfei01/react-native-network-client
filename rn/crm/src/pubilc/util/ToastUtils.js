@@ -6,14 +6,16 @@ import {Icon} from "../../weui/Icon";
 import tool from "./tool";
 
 export function ToastShort(content) {
+  WModal.hide()
   WToast.show({data: content, duration: WToast.duration.SHORT})
 }
 
 export function ToastLong(content) {
+  WModal.hide()
   WToast.show({data: content, duration: WToast.duration.LONG})
 }
 
-export function showModal(content, icon = 'loading') {
+export function showModal(content, icon = 'loading', timeOut = 6000) {
 
   WModal.hide()
   const modalOpts = {
@@ -28,7 +30,7 @@ export function showModal(content, icon = 'loading') {
   WModal.show(modalOpts)
   tool.debounces(() => {
     WModal.hide()
-  }, 6000);
+  }, timeOut);
 }
 
 export function hideModal() {

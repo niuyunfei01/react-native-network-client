@@ -2,7 +2,7 @@ import React from 'react'
 import BaseComponent from "../common/BaseComponent"
 import {connect} from "react-redux";
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
-import {CachedImage} from "react-native-img-cache"
+import FastImage from 'react-native-fast-image'
 import Config from "../../pubilc/common/config";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -50,10 +50,9 @@ class OrderPackage extends BaseComponent {
   renderGoodsItem(item) {
     return item.items.map(goods => (
       <View style={styles.goodsContainer} key={goods.product_id}>
-        <CachedImage
-          source={{uri: Config.staticUrl(goods.product_img)}}
-          style={styles.goodsImage}
-        />
+        <FastImage style={styles.goodsImage}
+                   source={{uri: Config.staticUrl(goods.product_img)}}
+                   resizeMode={FastImage.resizeMode.contain}/>
         <View style={styles.goodsRight}>
           <Text style={{color: colors.color333}}>{goods.product_name} </Text>
           <View style={styles.goodsBottom}>

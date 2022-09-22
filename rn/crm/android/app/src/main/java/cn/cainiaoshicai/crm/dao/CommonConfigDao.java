@@ -3,27 +3,19 @@ package cn.cainiaoshicai.crm.dao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 

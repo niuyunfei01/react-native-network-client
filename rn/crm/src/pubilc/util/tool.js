@@ -1,12 +1,10 @@
 import Cts from "../common/Cts";
 import {CommonActions} from '@react-navigation/native';
-import DeviceInfo from "react-native-device-info";
-import md5 from "./md5";
 import dayjs from "dayjs";
 
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
-  if (typeof keys === "undefined" || keys.length === 0) {
+  if (typeof keys === "undefined" || length(keys) === 0) {
     return [];
   }
 
@@ -59,43 +57,28 @@ export function fullDay(dt) {
   return dayjs(dt).format("YYYY-MM-DD");
 }
 
-export function vendorOfStoreId(storeId, global) {
-  const {canReadStores, canReadVendors} = global;
-
-  const vendorId = canReadStores[storeId] && canReadStores[storeId].type;
-  return canReadVendors && canReadVendors[vendorId]
-    ? canReadVendors[vendorId]
-    : null;
-}
 
 export function vendor(global) {
   const {
     currentUser,
-    currStoreId,
-    canReadStores,
-    canReadVendors,
-    config
+    store_info,
+    vendor_info,
+    vendor_id,
+    help_uid,
   } = global;
-  let currStore =
-    canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
-  let currVendorId = currStore["type"];
-  let currVendorName = currStore["vendor"];
-  let currStoreName = currStore["name"];
+  let currVendorName = vendor_info["brand_name"];
+  let currStoreName = store_info["name"];
 
-  let currVendor =
-    canReadVendors[currVendorId] === undefined
-      ? {}
-      : canReadVendors[currVendorId];
-  let currVersion = currVendor["version"];
-  let fnProviding = currVendor["fnProviding"];
-  let fnProvidingOnway = currVendor["fnProvidingOnway"];
+  let currVersion = vendor_info["version"];
+  let fnProviding = vendor_info["fnProviding"];
+  let fnProvidingOnway = vendor_info["fnProvidingOnway"];
   let service_ids = [];
-  let service_uid = currVendor["service_uid"];
-  let service_mgr = currVendor["service_mgr"];
-  let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
-  let allow_merchants_edit_prod = currVendor["allow_merchants_edit_prod"];
-  let allow_store_mgr_call_ship = currVendor["allow_store_mgr_call_ship"];
-  let wsb_store_account = currVendor["wsb_store_account"] === '1';
+  let service_uid = vendor_info["service_uid"];
+  let service_mgr = vendor_info["service_mgr"];
+  let allow_merchants_store_bind = vendor_info["allow_merchants_store_bind"];
+  let allow_merchants_edit_prod = vendor_info["allow_merchants_edit_prod"];
+  let allow_store_mgr_call_ship = vendor_info["allow_store_mgr_call_ship"];
+  let wsb_store_account = vendor_info["wsb_store_account"] === '1';
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
     service_ids.push(service_uid);
   }
@@ -107,15 +90,13 @@ export function vendor(global) {
   let service_manager = "," + service_ids.join(",") + ",";
   let is_service_mgr = service_manager.indexOf("," + currentUser + ",") !== -1;
 
-  let {help_uid} = config;
   let is_helper = false;
   if (help_uid) {
     let helper = "," + help_uid.join(",") + ",";
     is_helper = helper.indexOf("," + currentUser + ",") !== -1;
   }
-
   return {
-    currVendorId: currVendorId,
+    currVendorId: vendor_id,
     currVendorName: currVendorName,
     currVersion: currVersion,
     currStoreName: currStoreName,
@@ -129,42 +110,52 @@ export function vendor(global) {
     allow_store_mgr_call_ship: allow_store_mgr_call_ship,
     allow_merchants_edit_prod: allow_merchants_edit_prod,
     wsb_store_account,
-    co_type: currVendor.co_type,
+    co_type: vendor_info.co_type,
   };
-}
-
-export function server_info({global, user}) {
-  if (user === undefined) {
-    return {};
-  }
-  let {service_uid} = vendor(global);
-  let {user_info} = user;
-  return user_info[service_uid] ? user_info[service_uid] : {};
 }
 
 /**
  * 当前店铺信息
  * @param global
- * @param store_id
  * @returns {*}
  */
-export function store(global, store_id = null) {
-  const {canReadStores, currStoreId} = global;
-  store_id = store_id ? store_id : currStoreId
-  return canReadStores[store_id];
+export function store(global) {
+  const {store_info} = global;
+  return store_info;
 }
 
 export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
-  } else {
-    if (typeof obj === "object" && obj.length === undefined) {
-      obj = Object.values(obj);
-    }
   }
-  return obj.length;
+  switch (typeof obj){
+    case "boolean":
+      return Number(obj)
+    case "number":
+      return obj
+    case "function":
+      return 0
+    case "string":
+      return obj.length
+    case "object":
+      return Object.values(obj).length;
+    default:
+      return 0
+  }
+
 }
 
+ const pickImageOptions = (cropping) => {
+  return {
+    width: 800,
+    height: 800,
+    cropping: cropping,
+    cropperCircleOverlay: false,
+    includeExif: true,
+    cropperChooseText: '选择图片',
+    cropperCancelText: '取消'
+  };
+}
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
@@ -180,11 +171,11 @@ export function curr_vendor(vendor_data, currVendorId) {
 export function user_info(mine, currVendorId, currentUser) {
   let user_info = {};
   if (
-    Object.keys(mine.user_list).length > 0 &&
+    length(Object.keys(mine.user_list)) > 0 &&
     mine.user_list[currVendorId] &&
-    Object.keys(mine.user_list[currVendorId]).length > 0 &&
+    length(Object.keys(mine.user_list[currVendorId])) > 0 &&
     mine.user_list[currVendorId][currentUser] &&
-    Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
+    length(Object.keys(mine.user_list[currVendorId][currentUser])) > 0
   ) {
     // let {
     //   id, nickname, nameRemark, mobilephone, image, //user 表数据
@@ -198,8 +189,7 @@ export function user_info(mine, currVendorId, currentUser) {
 
 export function user(reduxGlobal, reduxMine) {
   const {currentUser} = reduxGlobal
-  const {currVendorId} = this.vendor(reduxGlobal)
-  return user_info(reduxMine, currVendorId, currentUser)
+  return user_info(reduxMine, reduxGlobal?.vendor_id, currentUser)
 }
 
 export function shortTimestampDesc(timestamp) {
@@ -270,7 +260,6 @@ export function intOf(val) {
   if (typeof val === "string") {
     return parseInt(val);
   }
-
   return val;
 }
 
@@ -283,182 +272,6 @@ function parameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-export function storeActionSheet(canReadStores, is_service_mgr = false) {
-  let by = function (name, minor) {
-    return function (o, p) {
-      let a, b;
-      if (o && p && typeof o === "object" && typeof p === "object") {
-        a = o[name];
-        b = p[name];
-        if (a === null || b === null) {
-          return a === null ? -1 : 1;
-        }
-        if (a === b) {
-          return typeof minor === "function" ? minor(o, p) : 0;
-        }
-        if (typeof a === typeof b && typeof a === "string") {
-          return a.localeCompare(b);
-        }
-        if (typeof a === typeof b) {
-          return a < b ? -1 : 1;
-        }
-        return typeof a < typeof b ? -1 : 1;
-      } else {
-        throw "error";
-      }
-    };
-  };
-
-  let storeActionSheet = [{key: -999, section: true, label: "选择门店"}];
-  let sortStores = Object.values(canReadStores).sort(
-    by("type", by("city", by("id")))
-  );
-  for (let store of sortStores) {
-    if (store.id > 0) {
-      let city = store.city ? store.city : "";
-      let item = {
-        key: store.id,
-        label:
-          is_service_mgr && !!store.vendor
-            ? store.vendor + city + ":" + store.name
-            : store.name
-      };
-      storeActionSheet.push(item);
-    }
-  }
-
-  return storeActionSheet;
-}
-
-function sortStores(canReadStores) {
-  let by = function (name, minor) {
-    return function (o, p) {
-      let a, b;
-      if (o && p && typeof o === "object" && typeof p === "object") {
-        a = o[name];
-        b = p[name];
-        if (a === null || b === null) {
-          return a === null ? -1 : 1;
-        }
-        if (a === b) {
-          return typeof minor === "function" ? minor(o, p) : 0;
-        }
-        if (typeof a === typeof b && typeof a === "string") {
-          return a.localeCompare(b);
-        }
-        if (typeof a === typeof b) {
-          return a < b ? -1 : 1;
-        }
-        return typeof a < typeof b ? -1 : 1;
-      } else {
-        throw "error";
-      }
-    };
-  };
-
-  return Object.values(canReadStores).sort(
-    by("vendor_id", by("city", by("district", by("name"))))
-  );
-}
-
-/**
- * 数组按指定字段排序
- * @param itemlist
- * @param gby
- * @param keyName
- * @param valueName
- * @returns {Array}
- * @constructor
- */
-function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
-  var setGroupObj = function (noteObj, rule, gby, gIndex, maxIndex) {
-    var gname = rule[gby[gIndex]];
-    if (gIndex == maxIndex) {
-      if (noteObj[gname] == undefined)
-        noteObj[gname] = [];
-      if (noteObj[gname].indexOf(rule) < 0) {
-        noteObj[gname].push(rule);
-      }
-    } else {
-      if (noteObj[gname] == undefined) {
-        noteObj[gname] = {};
-      }
-      setGroupObj(noteObj[gname], rule, gby, gIndex + 1, maxIndex);
-    }
-  }
-
-  var noteObj = {};
-  for (var i = 0; i < itemlist.length; i++) {
-    setGroupObj(noteObj, itemlist[i], gby, 0, gby.length - 1);
-  }
-
-  var getSubInfo = function (note, p, gIndex, maxIndex) {
-    var newobj = {}
-    newobj[keyName] = p;
-    newobj[valueName] = [];
-    if (gIndex == maxIndex) {
-      for (var k in note[p]) {
-        newobj[valueName].push(note[p][k]);
-      }
-    } else {
-      for (var k in note[p]) {
-        newobj[valueName].push(getSubInfo(note[p][k], k, gIndex + 1, maxIndex));
-      }
-    }
-    return newobj;
-  }
-  var myobj = [];
-  for (var p in noteObj) {
-    myobj.push(getSubInfo(noteObj, p, 0, gby.length - 1));
-  }
-  return myobj;
-}
-
-/**
- * 门店数据 格式化 -> React-Native-Modal-Selector
- * @param canReadStores
- */
-export function storeListOfModalSelector(canReadStores) {
-  const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
-  let return_data = []
-  let return_data_deep = 2
-
-  for (let i in storeListGroup) {
-    let storeListGroupByCity = storeListGroup[i]
-
-    if (storeListGroupByCity.label === 'undefined') {
-      storeListGroup.splice(i, 1)
-      continue
-    }
-
-    storeListGroupByCity.key = i
-    let storeDistrictCityValue = storeListGroupByCity.children
-
-    for (store of storeDistrictCityValue) {
-      store.label = store.vendor + '-' + store.district + '-' + store.name
-      store.key = store.id
-    }
-  }
-
-  return_data = storeListGroup
-
-  if (storeListGroup.length === 1) {
-    return_data_deep = 1
-    return_data = storeListGroup[0].children
-  }
-  return {return_data, return_data_deep}
-}
-
-export function first_store_id(canReadStores) {
-  let first_store_id = 0;
-  for (let store of Object.values(canReadStores)) {
-    if (store.id > 0) {
-      first_store_id = store.id;
-      break;
-    }
-  }
-  return first_store_id;
-}
 
 export function toFixed(num, type = "", abs = false) {
   if (abs) {
@@ -495,18 +308,6 @@ export function ship_name(type) {
   return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
-export function zs_status(status) {
-  let znMap = {};
-  znMap[Cts.ZS_STATUS_NEVER_START] = "待召唤";
-  znMap[Cts.ZS_STATUS_TO_ACCEPT] = "待接单";
-  znMap[Cts.ZS_STATUS_TO_FETCH] = "待取货";
-  znMap[Cts.ZS_STATUS_ON_WAY] = "已在途";
-  znMap[Cts.ZS_STATUS_ARRIVED] = "已送达";
-  znMap[Cts.ZS_STATUS_CANCEL] = "已取消";
-  znMap[Cts.ZS_STATUS_ABNORMAL] = "异常";
-
-  return znMap[status] === undefined ? "未知状态" : znMap[status];
-}
 
 export function sellingStatus(sell_status) {
   let map = {};
@@ -605,24 +406,6 @@ function deepClone(obj) {
   return result;
 }
 
-function getVendorName(vendorId) {
-  let map = {};
-  map[Cts.STORE_TYPE_SELF] = "菜鸟食材";
-  map[Cts.STORE_TYPE_AFFILIATE] = "菜鸟";
-  map[Cts.STORE_TYPE_GZW] = "鲜果集";
-  map[Cts.STORE_TYPE_BLX] = "比邻鲜";
-  map[Cts.STORE_TYPE_HLCS] = "华联超市";
-  map[0] = "全部";
-  return map[vendorId];
-}
-
-function getSortName(sortId) {
-  let map = {};
-  map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
-  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
-  return map[sortId];
-}
-
 /**
  * 价格尾数优化（需要和mobileweb项目 __priceWithExtra 方法保持一致）
  * @param $spPrice 分
@@ -680,15 +463,6 @@ function throttle(fn, wait) {
 }
 
 
-/**
- * 图片上传key
- */
-function imageKey(imgName) {
-  let curTime = Date.now();
-  let UniqueId = DeviceInfo.getUniqueId();
-  return md5.hex_md5(UniqueId + curTime + imgName)
-}
-
 export default {
   objectMap,
   shortTimeDesc,
@@ -704,26 +478,21 @@ export default {
   intOf,
   vendor,
   user,
-  vendorOfStoreId,
   length,
   parameterByName,
   user_info,
-  storeActionSheet,
   fullDay,
   toFixed,
   billStatus,
   get_platform_name,
+  pickImageOptions,
   ship_name,
-  zs_status,
   sellingStatus,
   headerSupply,
   deepClone,
   getOperateDetailsType,
-  getVendorName,
-  getSortName,
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle,
-  imageKey
+  throttle
 };

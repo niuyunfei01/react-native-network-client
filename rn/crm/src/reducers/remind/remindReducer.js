@@ -1,6 +1,7 @@
 'use strict';
 
 import * as types from './ActionTypes';
+import tool from "../../pubilc/util/tool";
 
 const initialState = {
   isRefreshing: {100: false, 101: false, 102: false, 3: false, 0: false},
@@ -138,7 +139,7 @@ function loadMore(state, action) {
 
   _setWithPreventCheck(state, 'loading', action.typeId, false);
   _setWithPreventCheck(state, 'isLoadMore', action.typeId, false);
-  _setWithPreventCheck(state, 'noMore', action.typeId, action.remindList.length === 0);
+  _setWithPreventCheck(state, 'noMore', action.typeId, tool.length(action.remindList) === 0);
   _setWithPreventCheck(state, 'isRefreshing', action.typeId, false);
 
   return {
@@ -160,7 +161,7 @@ function getQuickNum(action) {
       num += parseInt(item.quick);
     }
     const keys = Object.keys(remindCount);
-    if (typeof keys === "undefined" || keys.length === 0) {
+    if (typeof keys === "undefined" || tool.length(keys) === 0) {
       return [];
     }
     keys.map(key => fn(remindCount[key], key));

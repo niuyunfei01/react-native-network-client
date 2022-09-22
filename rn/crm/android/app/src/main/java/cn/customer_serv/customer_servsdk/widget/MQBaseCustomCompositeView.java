@@ -2,10 +2,11 @@ package cn.customer_serv.customer_servsdk.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.annotation.IdRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.IdRes;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com

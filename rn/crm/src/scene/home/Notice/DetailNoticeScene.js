@@ -1,16 +1,16 @@
 import React, {PureComponent} from "react";
-import ReactNative, {ScrollView, Text, View} from "react-native";
+import {Dimensions, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import WebView from "react-native-webview";
+import 'react-native-get-random-values';
 import HttpUtils from "../../../pubilc/util/http";
 
-const {StyleSheet} = ReactNative
+let {width} = Dimensions.get('window');
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -37,14 +37,8 @@ class HistoryNoticeScene extends PureComponent {
       title: '',
       time: '',
       content: '',
-      height: Dimensions.get('window').height,
       id: 0,
-      webViewHeight: 0
     };
-  }
-
-  onWebViewMessage = (event) => {
-    this.setState({ webViewHeight: Number(event.nativeEvent.data) });
   }
 
   componentDidMount() {
@@ -68,43 +62,28 @@ class HistoryNoticeScene extends PureComponent {
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken
     }).then((res) => {
-      console.log(res, 'res')
     })
   }
 
   render() {
-    let {title, time, content, webViewHeight} = this.state
+    let {title, time, content} = this.state
     return (
-      <ScrollView style={Styles.scrollStyle}>
-        <View style={Styles.Content}>
-          <Text style={Styles.Title}>{title}</Text>
-          <WebView
-            style={{
-              width: Dimensions.get('window').width * 0.90,
-              height: webViewHeight
-            }}
-            originWhitelist={['*']}
-            onMessage={(event) => this.onWebViewMessage(event)}
-            injectedJavaScript='window.ReactNativeWebView.postMessage(document.documentElement.scrollHeight)'
-            automaticallyAdjustContentInsets={true}
-            source={{html: `${content}`}}
-            scalesPageToFit={true}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            scrollEnabled={false}
-          />
-          <Text style={Styles.timeText}>{time}</Text>
-        </View>
-      </ScrollView>
+      <View style={Styles.Content}>
+        <Text style={Styles.Title}>{title} </Text>
+        <WebView
+          style={{
+            width: width * 0.9,
+            flex: 1,
+            backgroundColor: 'white',
+          }}
+          automaticallyAdjustContentInsets={true}
+          source={{html: `${content}`}}
+          scrollEnabled={true}
+          scalesPageToFit
+        />
+        <Text style={Styles.timeText}>{time} </Text>
+      </View>
     );
-  }
-
-  cutAdvicesContent = (val) => {
-    let str = val
-    if (str.length > 30) {
-      str = str.substr(0, 30) + '.....'
-    }
-    return str
   }
 
 }
@@ -124,10 +103,7 @@ const Styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: pxToDp(20),
     padding: 20,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    position: "relative"
+    flex: 1
   },
   Title: {
     fontSize: 22,
@@ -141,7 +117,7 @@ const Styles = StyleSheet.create({
   },
   timeText: {
     position: "absolute",
-    bottom: 10, left: 25,
+    bottom: 10, right: 25,
     fontSize: 20,
     color: colors.color999,
     marginBottom: 10

@@ -1,6 +1,7 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_NO_LOGIN_INFO: null,
   SET_DEVICE_INFO: null,
   SET_PLATFORM: null,
   SET_VERSION: null,
@@ -16,6 +17,7 @@ export default keyMirror({
   SET_CURR_STORE: null,
   SET_SIMPLE_STORE: null,
   UPDATE_CFG: null,
+  UPDATE_CONFIG: null,
   UPDATE_CFG_ITEM: null,
   HOST_UPDATED: null,
   UPDATE_EDIT_PRODUCT_STORE_ID: null,

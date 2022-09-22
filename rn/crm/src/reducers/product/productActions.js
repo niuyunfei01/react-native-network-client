@@ -6,6 +6,7 @@ import {ToastLong} from "../../pubilc/util/ToastUtils";
 import md5 from "../../pubilc/util/md5";
 import HttpUtils from "../../pubilc/util/http";
 import dayjs from "dayjs";
+import tool from "../../pubilc/util/tool";
 
 const {
   GET_NAME_PRICES,
@@ -138,7 +139,7 @@ export function fetchVendorTags(_v_id, token, callback) {
 }
 
 export function productSave(data, token, callback) {
-  let url = `api/product_save.json?access_token=${token}`;
+  let url = `api/product_save_new.json?access_token=${token}`;
   return jsonWithTpl2(
     url,
     data,
@@ -229,7 +230,7 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
   if (image_info && image_info.uri) {
     let {uri, name} = image_info;
     let fileInfo = name.split('.');
-    if (fileInfo.length > 1) {
+    if (tool.length(fileInfo) > 1) {
       let fileExt = fileInfo.pop();
       name = md5.hex_md5(fileInfo[0]) + "." + fileExt;
     } else {
@@ -444,6 +445,24 @@ export function queryProductByKey(key_word, token, callback) {
   return dispatch => {
     let url = `/api/query_product_by_keyword.json?access_token=${token}&keyword=${key_word}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp.ok, resp.desc, resp.obj);
+      })
+      .catch(error => {
+        callback({ok: false, desc: error.message});
+      });
+  };
+}
+
+export function getProdDetailByUpc(token, storeId, upc, vendorId, callback) {
+  let data = {
+    store_id: storeId,
+    upc: upc
+  }
+  return dispatch => {
+    let url = `api/get_product_by_upc?access_token=${token}&store_id=${storeId}&vendor_id=${vendorId}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
         callback(resp.ok, resp.desc, resp.obj);

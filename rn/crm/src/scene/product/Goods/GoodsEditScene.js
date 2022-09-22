@@ -1,10 +1,10 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Alert, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {fetchSgTagTree, productSave, uploadImg} from "../../../reducers/product/productActions";
+import {fetchSgTagTree, getProdDetailByUpc, productSave} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -14,15 +14,11 @@ import tool from "../../../pubilc/util/tool";
 import Cts from "../../../pubilc/common/Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
-import {NavigationActions} from '@react-navigation/compat';
 //组件
-//import {Left} from "../../common/component/All";
 import _ from 'lodash';
 import Scanner from "../../../pubilc/component/Scanner";
 import HttpUtils from "../../../pubilc/util/http";
-import {List} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
-import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
@@ -30,10 +26,11 @@ import {LineView, Styles} from "../../home/GoodsIncrementService/GoodsIncrementS
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
-import {CheckBox} from 'react-native-elements'
 import AntDesign from "react-native-vector-icons/AntDesign";
-
-const Item = List.Item;
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import {SvgXml} from "react-native-svg";
+import {radioSelected, radioUnSelected} from "../../../svg/svg";
+import {imageKey} from "../../../pubilc/util/md5";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -45,9 +42,9 @@ function mapDispatchToProps(dispatch) {
     dispatch,
     ...bindActionCreators(
       {
-        uploadImg,
         productSave,
         fetchSgTagTree,
+        getProdDetailByUpc,
         ...globalActions
       },
       dispatch
@@ -59,17 +56,8 @@ function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-//const right = <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>;
-
-const pickImageOptions = (cropping) => {
-  return {
-    width: 800,
-    height: 800,
-    cropping: cropping,
-    cropperCircleOverlay: false,
-    includeExif: true
-  };
-}
+let category_obj_new = {}
+let basic_category_name_path = []
 
 /**
  * 导航带入的参数：
@@ -79,14 +67,21 @@ const pickImageOptions = (cropping) => {
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
+  actions = [
+    {
+      label: '取消', onPress: () => this.setState({showImgMenus: false})
+    }
+  ]
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
     const {currVendorId, fnProviding} = tool.vendor(props.global);
     const {scan, product_detail} = (props.route.params || {});
+    const {currStoreId} = this.props.global;
     this.state = {
       isSelectCategory: true,
-      selectHeaderText: '商品类目',
+      selectHeaderText: '闪购类目',
       actualNum: '',//库存
       visible: false,//modal
       weightList: [],//重量单位列表
@@ -102,9 +97,11 @@ class GoodsEditScene extends PureComponent {
       upload_files: {},
       price: "",//商品价格
       basic_category_obj: {},
-      basic_category: 0,
-      sku_tag_id: 0,
+      basic_category: [],
+      basic_categories: [],
+      sg_tag_id: '0',
       store_categories: [],
+      store_categories_obj: {},
       tag_list: "选择门店分类",
       id: 0,
       sku_unit: "个",
@@ -120,19 +117,13 @@ class GoodsEditScene extends PureComponent {
       showRecommend: false,
       showImgMenus: false,
       buttonDisabled: true,
-      //basic_cat_list: [],
-      basic_categories: [],
+
       store_tags: {},
       sg_tag_tree: [],
-      //sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}, {label: "份", key: 2}],
       head_supplies: [
         {label: "门店自采", key: Cts.STORE_SELF_PROVIDED},
         {label: "总部供货", key: Cts.STORE_COMMON_PROVIDED}
       ],
-      // selling_categories: [
-      //   {label: "上架", key: Cts.STORE_PROD_ON_SALE},
-      //   {label: "缺货", key: Cts.STORE_PROD_SOLD_OUT}
-      // ],
 
       scanBoolean: scan === true,
       goBackValue: false,
@@ -144,12 +135,31 @@ class GoodsEditScene extends PureComponent {
       fnProviding: fnProviding,
 
       store_has: false,
-      searchValue: ''//搜索内容
+      searchValue: '',//搜索内容
+      spec_type: 'spec_single',
+      multiSpecsList: [{
+        sku_name: '',//规格
+        price: '',//价格
+        weight: '',//重量
+        sku_unit: '克',
+        selectWeight: {value: 1, label: '克'},//选择重量
+        upc: '',//条形码
+        actualNum: '',//库存
+        inventory: {
+          actualNum: '',
+          differenceType: 2,
+          totalRemain: '',
+          remark: '',
+          store_id: currStoreId,
+          skipCheckChange: 1
+        }
+      }],
+      isScanMultiSpecsUpc: false,
+      scanMultiSpecsUpcIndex: 0,
+      allow_multi_spec: 0
     };
 
-    this.back = this.back.bind(this)
   }
-
 
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
@@ -180,6 +190,7 @@ class GoodsEditScene extends PureComponent {
     this.navigationOptions(this.props)
 
     this.getWeightUnitList()
+    this.getAllowMultiSpecs()
     //所有的原生通知统一管理
     QNEngine.eventEmitter({
       onProgress: (data) => {
@@ -191,7 +202,7 @@ class GoodsEditScene extends PureComponent {
           const uri = res + newImageKey
           const file_id = Object.keys(upload_files) + 1;
           list_img[file_id] = {url: uri, name: newImageKey}
-          upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
+          upload_files[file_id] = {id: 0, name: newImageKey, path: uri};
           hideModal()
           this.setState({
             list_img: list_img,
@@ -219,6 +230,16 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
+  getAllowMultiSpecs = () => {
+    const {accessToken} = this.props.global
+    const url = `/vendor/get_settings?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      const {allow_multi_spec = 0} = res
+      this.setState({
+        allow_multi_spec: allow_multi_spec
+      })
+    })
+  }
   getWeightUnitList = () => {
     const {accessToken} = this.props.global
     const url = `/api_products/weight_unit_lists?access_token=${accessToken}`
@@ -247,7 +268,7 @@ class GoodsEditScene extends PureComponent {
           let validImages = _.filter(images, function (o) {
             return checkImgURL(o);
           });
-          if (validImages && validImages.length > 0) {
+          if (validImages && tool.length(validImages) > 0) {
             let idx = 0;
             cover_img = validImages[0];
             validImages.forEach(function (imgUrl) {
@@ -292,12 +313,13 @@ class GoodsEditScene extends PureComponent {
 
   getCascaderCate() {
     const {accessToken} = this.props.global;
-    const url = `productSku/getCascaderSku?access_token=${accessToken}`;
+    let {vendor_id} = this.state;
+    const url = `/data_dictionary/get_app_sg_tags/${vendor_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((obj) => {
       this.setState({
         basic_categories: obj,
       });
-    })
+    }).catch()
   }
 
   getCatByVendor(_v_id) {
@@ -320,8 +342,11 @@ class GoodsEditScene extends PureComponent {
     this.setState({
       visible: false,
       basic_category_obj: {},
-      sku_tag_id: 0,
-
+      sg_tag_id: '0',
+      buttonDisabled: true,
+      searchValue: '',
+      store_categories: [],
+      store_categories_obj: {},
     });
   };
 
@@ -339,9 +364,10 @@ class GoodsEditScene extends PureComponent {
       upload_files: {},
       price: "",
       basic_category_obj: {},
-      basic_category: 0,
-      sku_tag_id: 0,
+      basic_category: [],
+      sg_tag_id: 0,
       store_categories: [],
+      store_categories_obj: {},
       tag_list: "选择门店分类",
       id: 0,
       sku_unit: "个",
@@ -372,8 +398,8 @@ class GoodsEditScene extends PureComponent {
 
   onReloadProd = (product_detail) => {
     const {
-      basic_category, sku_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
-      promote_name, mid_list_img, coverimg, upc, store_has
+      basic_category, sg_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
+      promote_name, mid_list_img, coverimg, upc, store_has, spec_list, series_id
     } = product_detail;
     let upload_files = {};
     if (tool.length(mid_list_img) > 0) {
@@ -384,6 +410,13 @@ class GoodsEditScene extends PureComponent {
         }
       }
     }
+    spec_list && spec_list.map(spec => {
+      spec.selectWeight = {
+        value: '0',
+        label: spec.sku_unit
+      }
+    })
+
     this.setState({
       upc,
       name, id, sku_unit, weight, sku_having_unit,
@@ -392,10 +425,12 @@ class GoodsEditScene extends PureComponent {
       list_img: mid_list_img,
       cover_img: coverimg,
       upload_files: upload_files,
-      sku_tag_id: sku_tag_id,
+      sg_tag_id: sg_tag_id,
       basic_category: basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list,
+      spec_type: parseInt(series_id) > 0 ? 'spec_multi' : 'spec_single',
+      multiSpecsList: spec_list,
       store_has: store_has === 1 && this.props.route.params.type === 'add',
     });
   }
@@ -421,7 +456,7 @@ class GoodsEditScene extends PureComponent {
     if (tool.length(upc_data.basic_category_obj) !== 0) {
       this.setState({
         basic_category_obj: upc_data.basic_category_obj,
-        sku_tag_id: upc_data.basic_category_obj.id
+        sg_tag_id: upc_data.basic_category_obj.id
       })
     }
     this.setState({
@@ -434,11 +469,16 @@ class GoodsEditScene extends PureComponent {
   }
 
   onNameChanged = (name) => {
-    let {type} = this.props.route.params;
+    // let {type} = this.props.route.params;
     this.setState({name})
-    if (name && type !== 'edit') {
-      this.recommendProdByName(name)
-    }
+    this.recommendProdByName(name)
+    // if (name && type !== 'edit') {
+    //   this.recommendProdByName(name)
+    // } else {
+    //   this.setState({name: ''}, () => {
+    //     this.recommendProdByName(name)
+    //   })
+    // }
   }
 
   onNameClear = () => {
@@ -457,7 +497,12 @@ class GoodsEditScene extends PureComponent {
   }
 
   onScanSuccess = (code) => {
+    const {isScanMultiSpecsUpc, scanMultiSpecsUpcIndex} = this.state
     if (code) {
+      if (isScanMultiSpecsUpc) {
+        this.setMultiSpecsInfo(scanMultiSpecsUpcIndex, 'upc', code)
+        return
+      }
       this.mixpanel.track('自动填入upc')
       this.initEmptyState({upc: code});
       this.getProdDetailByUpc(code)
@@ -481,52 +526,39 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  startScan = flag => {
+  startScan = (flag, isScanMultiSpecsUpc = false, index = 0) => {
     this.mixpanel.track('商品新增页_扫码新增')
-    this.setState({scanBoolean: flag, store_has: false});
+    this.setState({
+      scanBoolean: flag,
+      store_has: false,
+      isScanMultiSpecsUpc: isScanMultiSpecsUpc,
+      scanMultiSpecsUpcIndex: index
+    });
   };
 
-  back() {
-    this.props.navigation.goBack();
-  }
-
-  async setBeforeRefresh() {
-    let {state, dispatch} = this.props.navigation;
-    const setRefreshAction = NavigationActions.setParams({
-      params: {isLoading: true},
-      key: state.params.detail_key
-    });
-    dispatch(setRefreshAction);
-  }
-
-  // toModalData(obj) {
-  //   let arr = [];
-  //   Object.keys(obj).map(key => {
-  //     if (`${key}` !== Cts.TAG_HIDE) {
-  //       let json = {};
-  //       json.label = obj[key];
-  //       json.key = key;
-  //       arr.push(json);
-  //     }
-  //   });
-  //   return arr;
-  // }
-
   goBackButtons = () => {
-    const buttons = [{
-      type: "default", label: "商品主页", onPress: () => {
-        this.setState({selectToWhere: false});
-        this.props.navigation.goBack();
-      }
-    }, {
-      type: "primary", label: "继续添加", onPress: () => {
-        this.setState({selectToWhere: false});
-        this.onNameClear()
-      }
-    }];
+    const buttons = [
+      {
+        type: "default",
+        label: "商品主页",
+        onPress: () => {
+          this.setState({selectToWhere: false});
+          this.props.navigation.goBack();
+        }
+      },
+      {
+        type: "primary",
+        label: "继续添加",
+        onPress: () => {
+          this.setState({selectToWhere: false});
+          this.onNameClear()
+        }
+      }];
     if (this.state.task_id > 0) {
       buttons.push({
-        type: "default", label: "回申请页面", onPress: () => {
+        type: "default",
+        label: "回申请页面",
+        onPress: () => {
           this.setState({selectToWhere: false});
           this.props.navigation.navigate("Remind");
         }
@@ -541,8 +573,8 @@ class GoodsEditScene extends PureComponent {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
     let {
-      id, name, vendor_id, weight, sku_having_unit, sku_tag_id, store_categories, upload_files, price,
-      sale_status, provided, task_id, actualNum, selectWeight
+      id, name, vendor_id, weight, sku_having_unit, sg_tag_id, store_categories, upload_files, price,
+      sale_status, provided, task_id, actualNum, selectWeight, upc, spec_type, multiSpecsList
     } = this.state;
 
     const {accessToken, currStoreId} = this.props.global;
@@ -554,28 +586,38 @@ class GoodsEditScene extends PureComponent {
       sku_unit: selectWeight.label,
       weight,
       sku_having_unit,
-      sku_tag_id,
+      sg_tag_id,
       store_categories,
       upload_files,
       task_id,
-      upc: this.state.upc,
+      upc: upc,
+      sku_tag_id: 0,
       limit_stores: [currStoreId],
     };
+    formData.spec_type = spec_type
+    if (spec_type === 'spec_multi') {
+      formData.spec_list = multiSpecsList
+    }
     if (type === "add") {
       formData.store_goods_status = {
         price: price,
         sale_status: sale_status,
         provided: provided
       };
-      formData.inventory = {
-        actualNum: actualNum,
-        differenceType: 2,
-        totalRemain: '0',
-        remark: '',
-        store_id: currStoreId
+      if (spec_type === 'spec_single') {
+        formData.store_goods_status.price = price
+        formData.inventory = {
+          actualNum: actualNum,
+          differenceType: 2,
+          totalRemain: actualNum,
+          remark: '',
+          store_id: currStoreId,
+          skipCheckChange: 1
+        }
       }
     }
-    const {dispatch} = this.props;
+
+    const {dispatch, navigation} = this.props;
 
     if (this.dataValidate(formData)) {
       const save_done = async (ok, reason, obj) => {
@@ -587,9 +629,10 @@ class GoodsEditScene extends PureComponent {
             this.setState({selectToWhere: true});
           } else {
             showSuccess("修改成功");
-            this.back();
+            navigation.goBack();
           }
         } else {
+
           ToastLong(reason);
         }
       }
@@ -601,15 +644,16 @@ class GoodsEditScene extends PureComponent {
       if (this.isAddProdToStore()) {
         this.addProdToStore(save_done)
       } else {
+
         dispatch(productSave(formData, accessToken, save_done));
       }
     }
   };
 
   dataValidate = (formData) => {
-    let type = this.props.route.params.type;
+    let {type = 'add'} = this.props.route.params;
     const {
-      id, name, vendor_id, weight, store_categories, store_goods_status
+      id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type
     } = formData;
     if (type === "edit" && id <= 0) {
       ToastLong('数据异常, 无法保存')
@@ -618,26 +662,55 @@ class GoodsEditScene extends PureComponent {
     if (type === "add") {
       //增加商品
       let {price, sale_status, provided} = store_goods_status;
-      if (parseInt(price) < 0) {
-        ToastLong('请输入正确的商品价格')
-        return false
+      if ('spec_single' === spec_type) {
+        if (parseInt(price) < 0) {
+          ToastLong('请输入正确的商品价格')
+          return false
+        }
+        if (!price) {
+          ToastLong('请输入商品价格')
+          return false
+        }
       }
-      if (!price) {
-        ToastLong('请输入商品价格')
-        return false
-      }
+
       if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
-        ToastLong('请选择售卖状态')
+        ToastLong('请选择上架状态')
         return false
       }
       if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
         ToastLong('选择供货方式')
         return false
       }
+
     }
 
+    if ('spec_multi' === spec_type) {
+      if (!Array.isArray(spec_list) || spec_list.length <= 0) {
+        ToastLong('数据异常, 无法保存')
+        return false
+      }
+
+      for (let i = 0; i < spec_list.length; i++) {
+        if (!spec_list[i].sku_name) {
+          ToastLong('请输入多规格名称')
+          return false
+        }
+        if (!spec_list[i].price && type === 'add') {
+          ToastLong('请输入多规格价格')
+          return false
+        }
+        if (!spec_list[i].weight) {
+          ToastLong('请输入多规格重量')
+          return false
+        }
+        if (type === 'add' && !spec_list[i].inventory.actualNum) {
+          ToastLong('请输入多规格库存')
+          return false
+        }
+      }
+    }
     if (!this.isAddProdToStore()) {
-      if (name.length <= 0) {
+      if (tool.length(name) <= 0) {
         ToastLong('请输入商品名称')
         return false
       }
@@ -645,20 +718,13 @@ class GoodsEditScene extends PureComponent {
         ToastLong('无效的品牌商')
         return false
       }
-      // if (sku_unit.length <= 0) {
-      //   ToastLong('选择SKU单位')
-      //   return false
-      // }
-      // if (sku_having_unit <= 0) {
-      //   ToastLong('请输入正确的份含量')
-      //   return false
-      // }
-      if (!(weight > 0)) {
+
+      if (!(weight > 0) && 'spec_single' === spec_type) {
 
         ToastLong('请输入正确的重量')
         return false
       }
-      if (store_categories.length <= 0) {
+      if (tool.length(store_categories) <= 0) {
         ToastLong('请选择门店分类')
         return false
       }
@@ -669,11 +735,11 @@ class GoodsEditScene extends PureComponent {
   pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker(pickImageOptions(true))
+      ImagePicker.openPicker(tool.pickImageOptions(true))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         }).catch(() => {
       })
@@ -683,16 +749,25 @@ class GoodsEditScene extends PureComponent {
   pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera(pickImageOptions(true)).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       }).catch(() => {
       })
     }, 500)
 
   }
+
+  menus = [
+    {
+      label: '拍照', onPress: this.pickCameraImg
+    },
+    {
+      label: '从相册选择', onPress: this.pickSingleImg
+    }
+  ]
 
   getSgTagTree() {
     const {dispatch, global, product} = this.props;
@@ -720,31 +795,29 @@ class GoodsEditScene extends PureComponent {
   }
 
   getProdDetailByUpc = (upc) => {
-    showModal("加载中...")
+    showModal("加载商品中...", 'loading', 20000)
+    const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
-    let data = {
-      store_id: currStoreId,
-      upc: upc
-    }
-    HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, data).then(p => {
-      hideModal();
-      // if (p && p['store_has'] === 1) {
-      //   this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-      //     pid: p['id'],
-      //     storeId: currStoreId
-      //   });
-      // } else
-      if (p && p['id']) {
-        this.onReloadProd(p)
-      } else if (p && p['upc_data']) {
-        this.onReloadUpc(p['upc_data'])
-        if (p['upc_data'].category_id) {
-          this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+    dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
+      if (ok) {
+        hideModal()
+        if (p && p['id']) {
+          this.onReloadProd(p)
+        } else if (p && p['upc_data']) {
+          this.onReloadUpc(p['upc_data'])
+          if (p['upc_data'].category_id) {
+            this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+          }
+          if (p['upc_data']['sg_tag_id']) {
+            this.setState({sg_tag_id: `${p['upc_data']['sg_tag_id']}`})
+            this.SearchCommodityCategories(p['upc_data']['sg_tag_id'], 'id')
+          }
         }
+      } else {
+        hideModal()
+        showError(`${desc}`)
       }
-    }).catch(() => {
-      hideModal()
-    })
+    }))
   }
 
   addProdToStore = (save_done_callback) => {
@@ -763,7 +836,7 @@ class GoodsEditScene extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal('图片上传中')
-    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
+    this.setState({newImageKey: imageKey(imgName), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {
@@ -775,7 +848,7 @@ class GoodsEditScene extends PureComponent {
       QNEngine.setParams(params)
       QNEngine.startTask()
     }).catch(error => {
-      Alert.alert('error', '图片上传失败！')
+      Alert.alert('图片上传失败！')
     })
   }
 
@@ -783,14 +856,21 @@ class GoodsEditScene extends PureComponent {
     this.setState({store_categories: store_categories});
   };
 
-  SearchCommodityCategories(searchValue, basic_categories) {
+  SearchCommodityCategories = (searchValue, key = 'name') => {
+    const {isSelectCategory, basic_categories} = this.state
     let result = this.searchCategories(basic_categories, function (category) {
-      return category.name.indexOf(searchValue) === 0
+      if (undefined === category[key])
+        return false
+      return category[key].indexOf(searchValue) === 0
     })
-
     if (result) {
-      this.setState({
-        basic_category_obj: result
+      if (isSelectCategory)
+        this.setState({
+          basic_category_obj: result,
+          sg_tag_id: result.id
+        })
+      else this.setState({
+        store_categories_obj: result
       })
       this.renderSelectTag()
     } else {
@@ -798,7 +878,7 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  searchCategories(tree, func) {
+  searchCategories = (tree, func) => {
     for (const data of tree) {
       if (func(data)) return data
       if (data.children) {
@@ -809,26 +889,19 @@ class GoodsEditScene extends PureComponent {
     return false
   }
 
-  menus = [
-    {
-      label: '拍照', onPress: this.pickCameraImg
-    },
-    {
-      label: '从相册选择', onPress: this.pickSingleImg
-    }
-  ]
-
-  actions = [
-    {
-      label: '取消', onPress: () => this.setState({showImgMenus: false})
-    }
-  ]
-
+  setSelectHeaderText = (showHeaderText, isSelectCategory) => {
+    this.setState({
+      visible: true,
+      selectHeaderText: showHeaderText,
+      isSelectCategory: isSelectCategory
+    })
+  }
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, likeProds, store_has, showRecommend,
-      store_tags, editable_upc, store_categories, price, selectWeight, actualNum
+      store_tags, editable_upc, price, selectWeight, actualNum, store_categories, spec_type, allow_multi_spec
     } = this.state
+    const {type} = this.props.route.params;
     return (
       <View style={Styles.zoneWrap}>
         <Text style={Styles.headerTitleText}>
@@ -841,12 +914,12 @@ class GoodsEditScene extends PureComponent {
               *
             </Text>商品名称
           </Text>
-          <TextInput allowFontScaling={false}
-                     value={name}
-                     style={styles.textInputStyle}
-                     onChangeText={text => this.onNameChanged(text)}
-                     placeholderTextColor={colors.color999}
-                     placeholder={'不超过40个字符'}/>
+          <TextInput
+            value={name}
+            style={styles.textInputStyle}
+            onChangeText={text => this.onNameChanged(text)}
+            placeholderTextColor={colors.color999}
+            placeholder={'不超过40个字符'}/>
           <If condition={name}>
             <Text style={styles.clearBtn} onPress={this.onNameClear}>
               清除
@@ -888,97 +961,95 @@ class GoodsEditScene extends PureComponent {
           {
             this.renderUploadImg()
           }
-          <View style={styles.rightEmptyView}/>
         </View>
         <LineView/>
-        <If condition={this.isStoreProdEditable()}>
+        <If condition={this.isStoreProdEditable() && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               <Text style={styles.leftFlag}>
                 *
               </Text>报价
             </Text>
-            <TextInput allowFontScaling={false}
-                       style={styles.textInputStyle}
-                       value={price}
-                       keyboardType={'numeric'}
-                       onChangeText={text => this.setState({price: text})}
-                       placeholderTextColor={colors.color999}
-                       placeholder={'请输入商品报价'}/>
+            <TextInput
+              style={styles.textInputStyle}
+              value={price}
+              keyboardType={'numeric'}
+              onChangeText={text => this.setState({price: text})}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入商品报价'}/>
             <View style={styles.rightEmptyView}/>
           </View>
           <LineView/>
         </If>
         <If condition={!this.isAddProdToStore()}>
-          <View style={styles.baseRowCenterWrap}>
-            <Text style={styles.leftText}>
-              <Text style={styles.leftFlag}>
-                *
-              </Text>重量
-            </Text>
-            <TextInput allowFontScaling={false}
-                       style={styles.textInputStyle}
-                       value={weight}
-                       keyboardType={'numeric'}
-                       onChangeText={text => this.setState({weight: text})}
-                       placeholderTextColor={colors.color999}
-                       placeholder={'请输入商品重量'}/>
-            <ModalSelector style={styles.rightEmptyView}
-                           data={weightList}
-                           skin={'customer'}
-                           onChange={item => this.setState({selectWeight: item})}
-                           defaultKey={-999}>
-              <View style={styles.weightUnitWrap}>
-                <Text style={styles.weightUnit}>
-                  {`${selectWeight.label}>`}
-                </Text>
-              </View>
-            </ModalSelector>
-          </View>
-          <LineView/>
-          <If condition={editable_upc && this.isStoreProdEditable()}>
+          <If condition={spec_type === 'spec_single'}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>重量
+              </Text>
+              <TextInput
+                style={styles.textInputStyle}
+                value={weight}
+                keyboardType={'numeric'}
+                onChangeText={text => this.setState({weight: text})}
+                placeholderTextColor={colors.color999}
+                placeholder={'请输入商品重量'}/>
+              <ModalSelector style={styles.rightSelect}
+                             data={weightList}
+                             skin={'customer'}
+                             onChange={item => this.setState({selectWeight: item})}
+                             defaultKey={-999}>
+                <View style={styles.weightUnitWrap}>
+                  <Text style={styles.weightUnit}>
+                    {`${selectWeight.label}>`}
+                  </Text>
+                </View>
+              </ModalSelector>
+            </View>
+            <LineView/>
+          </If>
+          <If condition={editable_upc && this.isStoreProdEditable() && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品条码
               </Text>
-              <TextInput allowFontScaling={false}
-                         value={upc}
-                         editable={this.isStoreProdEditable()}
-                         onChangeText={upc => this.setState({upc: upc})}
-                         style={styles.textInputStyle}
-                         placeholderTextColor={colors.color999}
-                         placeholder={'请扫描或输入条形码'}/>
+              <TextInput
+                value={upc}
+                editable={this.isStoreProdEditable()}
+                onChangeText={upc => this.setState({upc: upc})}
+                style={styles.textInputStyle}
+                placeholderTextColor={colors.color999}
+                placeholder={'请扫描或输入条形码'}/>
               <View style={styles.rightEmptyView}/>
             </View>
             <LineView/>
           </If>
-          <If condition={fnProviding && this.isStoreProdEditable()}>
+          <If condition={fnProviding && this.isStoreProdEditable() && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 <Text style={styles.leftFlag}>
                   *
                 </Text>库存
               </Text>
-              <TextInput allowFontScaling={false}
-                         value={actualNum}
-                         onChangeText={text => this.setState({actualNum: text})}
-                         style={styles.textInputStyle}
-                         placeholderTextColor={colors.color999}
-                         placeholder={'请输入商品库存'}/>
+              <TextInput
+                value={actualNum}
+                onChangeText={text => this.setState({actualNum: text})}
+                style={styles.textInputStyle}
+                placeholderTextColor={colors.color999}
+                placeholder={'请输入商品库存'}/>
               <View style={styles.rightEmptyView}/>
             </View>
             <LineView/>
           </If>
           <If condition={this.isStoreProdEditable()}>
-            <TouchableOpacity style={styles.baseRowCenterWrap} onPress={() => this.setState({
-              visible: true,
-              selectHeaderText: '商品类目',
-              isSelectCategory: true
-            })}>
+            <TouchableOpacity style={styles.baseRowCenterWrap}
+                              onPress={() => this.setSelectHeaderText('闪购类目', true)}>
               <Text style={styles.leftText}>
                 <Text style={styles.leftFlag}>
                   *
-                </Text>商品类目
+                </Text>闪购类目
               </Text>
               <View style={styles.textInputStyle}>
                 <Text style={styles.selectTipText}>
@@ -998,21 +1069,16 @@ class GoodsEditScene extends PureComponent {
                 </Text>商品分类
               </Text>
               {/*<TouchableOpacity style={styles.textInputStyle}*/}
-              {/*                  onPress={() => this.setState({*/}
-              {/*                    visible: true,*/}
-              {/*                    selectHeaderText: '商品分类',*/}
-              {/*                    isSelectCategory: false*/}
-              {/*                  })}>*/}
+              {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
               {/*  <Text style={styles.selectTipText}>*/}
-              {/*    {store_categories.length > 0 ? store_categories : '请选择分类'}*/}
+              {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
               {/*  </Text>*/}
 
               {/*</TouchableOpacity>*/}
               {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
-
               <View style={styles.textInputStyle}>
                 <SectionedMultiSelect
-                  items={store_tags}
+                  items={store_tags || []}
                   IconRenderer={MaterialIcons}
                   uniqueKey="id"
                   subKey="children"
@@ -1025,7 +1091,8 @@ class GoodsEditScene extends PureComponent {
                   selectedItems={store_categories}
                   selectedText={"个已选中"}
                   searchPlaceholderText='搜索门店分类'
-                  confirmText={"确认选择"}
+                  confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
+
                   colors={{primary: colors.main_color}}
                 />
               </View>
@@ -1042,20 +1109,61 @@ class GoodsEditScene extends PureComponent {
               <View style={styles.saleStatusWrap}>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
                                   onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
-                  <CheckBox type={'material'} color={'green'} checkedIcon={'dot-circle-o'}
-                            uncheckedIcon={'circle-o'} checked={sale_status === Cts.STORE_PROD_ON_SALE}
-                            onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}/>
+                  <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
+                    <SvgXml xml={radioSelected(18, 18)}/>
+                  </If>
+                  <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
+                    <SvgXml xml={radioUnSelected(18, 18)}/>
+                  </If>
                   <Text style={styles.saleStatusText}>
                     上架
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
                                   onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
-                  <CheckBox type={'material'} color={'green'} checkedIcon={'dot-circle-o'}
-                            uncheckedIcon={'circle-o'} checked={sale_status === Cts.STORE_PROD_OFF_SALE}
-                            onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}/>
+                  <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
+                    <SvgXml xml={radioSelected(18, 18)}/>
+                  </If>
+                  <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
+                    <SvgXml xml={radioUnSelected(18, 18)}/>
+                  </If>
                   <Text style={styles.saleStatusText}>
                     下架
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.rightEmptyView}/>
+            </View>
+            <LineView/>
+          </If>
+          <If condition={allow_multi_spec === 1 && 'add' === type}>
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                商品规格
+              </Text>
+              <View style={styles.saleStatusWrap}>
+                <TouchableOpacity style={styles.saleStatusItemWrap}
+                                  onPress={() => this.setState({spec_type: 'spec_single'})}>
+                  <If condition={spec_type === 'spec_single'}>
+                    <SvgXml xml={radioSelected(18, 18)}/>
+                  </If>
+                  <If condition={spec_type !== 'spec_single'}>
+                    <SvgXml xml={radioUnSelected(18, 18)}/>
+                  </If>
+                  <Text style={styles.saleStatusText}>
+                    单规格
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saleStatusItemWrap}
+                                  onPress={() => this.setState({spec_type: 'spec_multi'})}>
+                  <If condition={spec_type === 'spec_multi'}>
+                    <SvgXml xml={radioSelected(18, 18)}/>
+                  </If>
+                  <If condition={spec_type !== 'spec_multi'}>
+                    <SvgXml xml={radioUnSelected(18, 18)}/>
+                  </If>
+                  <Text style={styles.saleStatusText}>
+                    多规格
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1065,6 +1173,241 @@ class GoodsEditScene extends PureComponent {
         </If>
       </View>
     )
+  }
+
+  renderMultiSpecs = () => {
+    const {multiSpecsList, weightList, fnProviding} = this.state
+    const {type = 'add'} = this.props.route.params;
+    return (
+      <>
+        <Text style={styles.multiSpecsTip}>
+          提示：当前添加商品为多规格，保存后商品至少有一个规格，不可更改为单规格
+        </Text>
+        {
+          multiSpecsList && multiSpecsList.map((item, index) => {
+            return this.renderMultiSpecsInfo(item, index, weightList, multiSpecsList, fnProviding, type)
+          })
+        }
+      </>
+    )
+  }
+
+  setMultiSpecsInfo = (index, key, value) => {
+    const {currStoreId} = this.props.global;
+    const {multiSpecsList} = this.state
+    const multiSpecsInfo = multiSpecsList[index]
+    multiSpecsInfo[key] = value
+    if ('selectWeight' === key)
+      multiSpecsInfo['sku_unit'] = multiSpecsInfo[key].label
+    if ('inventory' === key)
+      multiSpecsInfo['inventory'] = {
+        actualNum: value,//库存
+        differenceType: 2,
+        totalRemain: value,
+        remark: '',
+        store_id: currStoreId,
+        skipCheckChange: 1
+      }
+    this.setState({
+      multiSpecsList: multiSpecsList.concat([])
+    })
+
+  }
+
+  renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type) => {
+    const {inventory = {}, upc, weight, price, sku_name} = multiSpecsList[index]
+    const {actualNum = '0'} = inventory
+    return (
+      <View style={Styles.zoneWrap} key={index}>
+        <Text style={Styles.headerTitleText}>
+          规格信息
+        </Text>
+        <LineView/>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            <Text style={styles.leftFlag}>
+              *
+            </Text>规格名称
+          </Text>
+          <TextInput
+            maxLength={40}
+            value={sku_name}
+            //editable={this.isStoreProdEditable()}
+            onChangeText={value => this.setMultiSpecsInfo(index, 'sku_name', value)}
+            style={styles.textInputStyle}
+            placeholderTextColor={colors.color999}
+            placeholder={'请填写规格名称，例如200g'}/>
+          <View style={styles.rightEmptyView}/>
+        </View>
+        <LineView/>
+        <If condition={'add' === type}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              <Text style={styles.leftFlag}>
+                *
+              </Text>报价
+            </Text>
+            <TextInput
+              keyboardType={'numeric'}
+              value={price}
+              //editable={this.isStoreProdEditable()}
+              onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入商品报价'}/>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            <Text style={styles.leftFlag}>
+              *
+            </Text>重量
+          </Text>
+          <TextInput
+            style={styles.textInputStyle}
+            value={weight}
+            keyboardType={'numeric'}
+            onChangeText={value => this.setMultiSpecsInfo(index, 'weight', value)}
+            placeholderTextColor={colors.color999}
+            placeholder={'请输入商品重量'}/>
+          <ModalSelector style={styles.rightSelect}
+                         data={weightList}
+                         skin={'customer'}
+                         onChange={item => this.setMultiSpecsInfo(index, 'selectWeight', item)}
+                         defaultKey={-999}>
+            <View style={styles.weightUnitWrap}>
+              <Text style={styles.weightUnit}>
+                {`${item.selectWeight.label}>`}
+              </Text>
+            </View>
+          </ModalSelector>
+        </View>
+        <LineView/>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            商品条码
+          </Text>
+          <TextInput
+            value={upc}
+            //editable={this.isStoreProdEditable()}
+            onChangeText={value => this.setMultiSpecsInfo(index, 'upc', value)}
+            style={styles.textInputStyle}
+            placeholderTextColor={colors.color999}
+            placeholder={'请扫描或输入条形码'}/>
+          <Ionicons name={'scan-sharp'} style={styles.rightEmptyView} color={colors.color333} size={22}
+                    onPress={() => this.startScan(true, true, index)}/>
+        </View>
+        <LineView/>
+        <If condition={fnProviding && 'add' === type}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              <Text style={styles.leftFlag}>
+                *
+              </Text>库存
+            </Text>
+            <TextInput
+              keyboardType={'numeric'}
+              value={actualNum}
+              //editable={this.isStoreProdEditable()}
+              onChangeText={value => this.setMultiSpecsInfo(index, 'inventory', value)}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入商品库存'}/>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
+        <View style={multiSpecsList.length > 1 ? styles.operationSpecsBtnWrap : {}}>
+          <If condition={multiSpecsList.length === index + 1 && 'add' === type}>
+            <TouchableOpacity style={styles.addSpecsWrap} onPress={this.addSpecs}>
+              <AntDesign name={'plus'} size={12} color={colors.main_color}/>
+              <Text style={styles.addSpecsText}>
+                添加规格
+              </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={multiSpecsList.length > 1 && index !== 0}>
+            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index)}>
+              <AntDesign name={'delete'} size={22} color={colors.main_color}/>
+            </TouchableOpacity>
+          </If>
+        </View>
+      </View>
+    )
+  }
+  addSpecs = () => {
+    const {currStoreId} = this.props.global;
+    const {multiSpecsList} = this.state
+    const multiSpecsInfo = {
+      sku_name: '',//规格
+      price: '',//价格
+      weight: '',//重量
+      sku_unit: '克',
+      selectWeight: {value: 1, label: '克'},//选择重量
+      upc: '',//条形码
+      actualNum: '',
+      inventory: {
+        actualNum: '',//库存
+        differenceType: 2,
+        totalRemain: '',
+        remark: '',
+        store_id: currStoreId,
+        skipCheckChange: 1
+
+      }
+    }
+    multiSpecsList.push(multiSpecsInfo)
+    this.setState({
+      multiSpecsList: multiSpecsList.concat([])
+    })
+  }
+
+  deleteSpecs = (index) => {
+    const {type} = this.props.route.params;
+    if ('edit' === type) {
+      Alert.alert('删除规格', '将从商品库中删除规格信息，会从关联的门店中消失，确定是否要删除？',
+        [
+          {
+            text: '取消'
+          },
+          {
+            text: '确定',
+            onPress: () => {
+              this.deleteSpecsInfoToServer(index)
+              this.deletedSpecsInfo(index)
+            }
+          }
+        ])
+      return
+    }
+    this.deletedSpecsInfo(index)
+  }
+
+  deleteSpecsInfoToServer = (index) => {
+    const {currStoreId} = this.props.global;
+    const {multiSpecsList} = this.state
+    const {id} = multiSpecsList[index]
+    if (!id) {
+      showError('规格信息不完整，不可删除')
+      return
+    }
+    const url = `/v1/new_api/store_product/del_store_pro/${currStoreId}/${id}`
+    HttpUtils.get(url, {}, false, true).then((res) => {
+      showSuccess(`${res.reason}`)
+    }, error => {
+      showError(error.reason)
+    })
+  }
+
+  deletedSpecsInfo = (index) => {
+    const {multiSpecsList} = this.state
+    if (multiSpecsList.length > 1)
+      multiSpecsList.splice(index, 1)
+    this.setState({
+      multiSpecsList: multiSpecsList.concat([])
+    })
   }
 
   renderOtherInfo = () => {
@@ -1138,7 +1481,18 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderModal = () => {
-    const {searchValue, basic_categories, basic_category_obj, visible, buttonDisabled, selectHeaderText} = this.state
+    const {
+      searchValue, basic_category_obj, visible, buttonDisabled, isSelectCategory,
+      selectHeaderText, store_categories_obj
+    } = this.state
+    let values, selectedIndex
+    if (isSelectCategory) {
+      values = basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']
+      selectedIndex = basic_category_obj.name_path ? tool.length(basic_category_obj.name_path.split(",")) - 1 : 1
+    } else {
+      values = store_categories_obj.name_path ? store_categories_obj.name_path.split(",") : ['请选择']
+      selectedIndex = store_categories_obj.name_path ? tool.length(store_categories_obj.name_path.split(",")) - 1 : 1
+    }
     return (
       <If condition={visible}>
         <CommonModal position={'flex-end'} visible={visible} animationType={'slide-up'}>
@@ -1159,7 +1513,7 @@ class GoodsEditScene extends PureComponent {
                            onChangeText={value => this.setState({searchValue: value})}
                            style={{flex: 1, padding: 0}}/>
                 <TouchableOpacity style={styles.modalSearchIcon}
-                                  onPress={() => this.SearchCommodityCategories(searchValue, basic_categories)}>
+                                  onPress={() => this.SearchCommodityCategories(searchValue)}>
                   <Text style={styles.modalSearch}>搜索 </Text>
                 </TouchableOpacity>
               </View>
@@ -1167,11 +1521,11 @@ class GoodsEditScene extends PureComponent {
 
             <View style={styles.selectCateStyle}>
               <SegmentedControl
-                onValueChange={this.onValueChange}
+                onValueChange={() => this.onValueChange(isSelectCategory ? basic_category_obj : store_categories_obj)}
                 tintColor={colors.main_color}
-                values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
+                values={values}
                 style={{height: 30, width: "90%", marginLeft: "4%"}}
-                selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
+                selectedIndex={selectedIndex}
               />
             </View>
             {this.renderSelectTag()}
@@ -1188,10 +1542,14 @@ class GoodsEditScene extends PureComponent {
   }
 
   render() {
+    const {spec_type, allow_multi_spec} = this.state
     return (
       <>
         <ScrollView>
           {this.renderBaseInfo()}
+          <If condition={spec_type === 'spec_multi' && allow_multi_spec === 1}>
+            {this.renderMultiSpecs()}
+          </If>
           {this.renderOtherInfo()}
         </ScrollView>
         {this.renderSaveInfo()}
@@ -1203,77 +1561,122 @@ class GoodsEditScene extends PureComponent {
     )
   }
 
-  onValueChange = () => {
-    let {basic_category_obj} = this.state
-    if (Object.keys(basic_category_obj).length) {
-      let id_path = basic_category_obj.id_path;
-      let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+  onValueChange = (category_obj) => {
+    let {isSelectCategory} = this.state
+    if (Object.keys(category_obj).length) {
+      let id_path = category_obj.id_path;
+      let arr = id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
       arr.pop();
-      if (arr.length >= 1) {
-        basic_category_obj.id = arr[arr.length - 1]
-        basic_category_obj.id_path = ',' + arr.toString() + ',';
-        let name_path = basic_category_obj.name_path;
+      if (tool.length(arr) >= 1) {
+        category_obj_new.id = arr[tool.length(arr) - 1]
+        category_obj_new.id_path = ',' + arr.toString() + ',';
+        let name_path = category_obj.name_path;
         name_path = name_path.split(',')
         name_path.pop()
-        basic_category_obj.name = name_path[name_path.length - 1]
-        basic_category_obj.name_path = name_path.toString();
+        category_obj_new.name = name_path[tool.length(name_path) - 1]
+        category_obj_new.name_path = name_path.toString();
       } else {
-        basic_category_obj = {};
+        category_obj_new = {};
       }
-      this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
+      if (isSelectCategory)
+        this.setState({basic_category_obj: {...category_obj_new}, buttonDisabled: true})
+      else this.setState({store_categories_obj: {...category_obj_new}, buttonDisabled: true})
     }
   }
 
-  renderSelectTag = () => {
-    let arr = [];
-    let {basic_categories, basic_category_obj} = this.state
-    if (Object.keys(basic_category_obj).length) {
-      let {id_path} = basic_category_obj
-      arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
-    }
-    let list = this.treeMenuList(basic_categories, arr);
-    if (tool.length(list) === 0) {
-      return
+  renderItem = ({item}) => {
+    const {basic_category_obj, isSelectCategory, store_categories_obj} = this.state
+    if (isSelectCategory) {
+      basic_category_name_path = basic_category_obj?.name_path ? basic_category_obj?.name_path?.split(",") : ['']
+    } else {
+      basic_category_name_path = store_categories_obj?.name_path ? store_categories_obj?.name_path?.split(",") : ['']
     }
     return (
-      <ScrollView style={styles.modalStyle}>
-        <List>
-          {list.map((item, index) => {
-            return (
-              <View key={index}>
-                <If condition={tool.length(item.children) > 0}>
-                  <Item arrow="horizontal"
-                        onPress={() => this.setState({basic_category_obj: {...item}, sku_tag_id: item.id})}>
-                    {item.name}
-                  </Item>
-                </If>
-                <If condition={tool.length(item.children) <= 0}>
-                  <Item onPress={() => this.setState({basic_category_obj: {...item}, sku_tag_id: item.id})}>
-                    {item.name}
-                  </Item>
-                </If>
-              </View>
-            )
-          })}
-        </List>
-      </ScrollView>
+      <>
+        <If condition={tool.length(item.children) > 0}>
+          <TouchableOpacity style={styles.itemWrap} onPress={() => this.setSelectItem(item)}>
+            <Text style={styles.itemText}>
+              {item.name}
+            </Text>
+            <AntDesign name={'right'} color={colors.color999} size={16}/>
+          </TouchableOpacity>
+        </If>
+        <If condition={tool.length(item.children) <= 0}>
+          <TouchableOpacity style={styles.itemWrap} onPress={() => this.setSelectItem(item)}>
+            <Text style={styles.itemText}>
+              {item.name}
+            </Text>
+            <If condition={item.name === basic_category_name_path[tool.length(basic_category_name_path) - 1]}>
+              <AntDesign name={'check'} color={colors.main_color} size={16}/>
+            </If>
+          </TouchableOpacity>
+        </If>
+      </>
+    )
+  }
+  setSelectItem = (item) => {
+    const {isSelectCategory} = this.state
+    if (isSelectCategory)
+      this.setState({basic_category_obj: {...item}, sg_tag_id: item.id})
+    else {
+      if (undefined === item.children)
+        this.setState({store_categories: [item.id], store_categories_obj: {...item}})
+      else
+        this.setState({store_categories_obj: {...item}})
+    }
+  }
+  getItemLayout = (data, index) => ({
+    length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index
+  })
+  renderSelectTag = () => {
+    const {basic_categories, basic_category_obj, isSelectCategory, store_tags, store_categories_obj} = this.state
+
+    let arr = [], list
+    if (isSelectCategory) {
+      if (Object.keys(basic_category_obj).length) {
+        let {id_path} = basic_category_obj
+
+        arr = id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
+      }
+      list = this.treeMenuList(basic_categories, arr);
+    } else {
+      if (Object.keys(store_categories_obj).length) {
+        let {id_path} = store_categories_obj
+
+        arr = id_path && id_path.substr(0, tool.length(id_path) - 1).substr(1, tool.length(id_path) - 1).split(',');
+      }
+      list = this.treeMenuList(store_tags, arr);
+    }
+    return (
+      <FlatList style={styles.modalStyle}
+                data={list}
+                renderItem={this.renderItem}
+                initialNumToRender={10}
+                getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                keyExtractor={(item, index) => `${index}`}/>
     );
   }
 
   treeMenuList(children, ids) {
-    let id = ids.shift();
-    if (id != undefined) {
-      for (var item in children) {
-        if (children[item].id == id) {
-          if (ids.length >= 0) {
-            if (children[item].children != undefined) {
+
+    if (undefined === ids) {
+
+      return children
+
+    }
+    let id = ids && ids.shift();
+    if (id !== undefined) {
+      for (const item in children) {
+        if (children[item].id === id) {
+          if (tool.length(ids) >= 0) {
+            if (children[item].children !== undefined) {
               return this.treeMenuList(children[item].children, ids)
             } else {
               this.setState({buttonDisabled: false})
               return children;
             }
           } else {
-            if (children[item].children != undefined) {
+            if (children[item].children !== undefined) {
               this.setState({buttonDisabled: false})
               return children[item].children
             } else {
@@ -1301,10 +1704,9 @@ class GoodsEditScene extends PureComponent {
         <If condition={tool.length(list_img) > 0}>
           {
             tool.objectMap(list_img, (img_data, img_id) => {
-              let img_url = img_data["url"];
               return (
                 <View key={img_id} style={styles.hasImageList}>
-                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_data["url"])}}/>
                   <If condition={this.isProdEditable()}>
                     <TouchableOpacity style={styles.deleteUploadImageIcon}
                                       onPress={() => this.deleteUploadImage(img_id)}>
@@ -1334,28 +1736,17 @@ class GoodsEditScene extends PureComponent {
             </View>
           </If>
           <If condition={!cover_img}>
-            <View style={{
-              height: pxToDp(170),
-              width: pxToDp(170),
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center"
-            }}>
-              <FontAwesome5 name={'images'} size={32} color={colors.color666}/>
+            <View style={styles.imageIconWrap}>
+              <FontAwesome5 name={'images'} size={32} color={colors.colorCCC}/>
             </View>
           </If>
         </If>
         <If condition={this.isProdEditable()}>
-          <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+          <View style={styles.plusIconWrap}>
             <TouchableOpacity
               style={[styles.img_add, styles.img_add_box]}
               onPress={() => this.setState({showImgMenus: true})}>
-              <Text style={{
-                fontSize: pxToDp(36),
-                color: "#bfbfbf",
-                textAlignVertical: "center",
-                textAlign: "center"
-              }}>+ </Text>
+              <Text style={styles.plusIcon}>+ </Text>
             </TouchableOpacity>
           </View>
         </If>
@@ -1365,9 +1756,70 @@ class GoodsEditScene extends PureComponent {
 
 }
 
+const ITEM_HEIGHT = 48
 const styles = StyleSheet.create({
+  operationSpecsBtnWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    //justifyContent: 'space-around'
+  },
+  addSpecsWrap: {
+    flex: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  deleteSpecsWrap: {
+    flex: 1,
+    alignItems: 'flex-end',
+    paddingRight: 12,
+    paddingVertical: 13,
+  },
+  addSpecsText: {
+    paddingVertical: 13,
+    fontSize: 16,
+    color: colors.main_color,
+    lineHeight: 22
+  },
+  multiSpecsTip: {
+    marginLeft: 14,
+    marginTop: 4,
+    fontSize: 10,
+    color: colors.color333,
+    lineHeight: 14
+  },
+  imageIconWrap: {
+    height: pxToDp(170),
+    width: pxToDp(170),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  plusIconWrap: {
+    height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"
+  },
+  plusIcon: {
+    fontSize: pxToDp(36),
+    color: "#bfbfbf",
+    textAlignVertical: "center",
+    textAlign: "center"
+  },
+  itemWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 8,
+    height: ITEM_HEIGHT,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.colorEEE
+  },
+  itemText: {
+    fontSize: 16,
+    color: colors.color333
+  },
   weightUnitWrap: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 5, width: 40, justifyContent: 'flex-end'
+    flex: 1, flexDirection: 'row', alignItems: 'center', width: 40, justifyContent: 'center'
   },
   weightUnit: {
     fontSize: 12, fontWeight: '400', color: colors.color333, lineHeight: 17,
@@ -1415,7 +1867,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
   },
   selectedCateStyle: {
-    width: "100%", borderRadius: 0, position: "absolute", bottom: 0
+    width: "100%", borderRadius: 0, bottom: 0
   },
   baseRowWrap: {
     flexDirection: 'row',
@@ -1458,20 +1910,29 @@ const styles = StyleSheet.create({
 
   },
   saleStatusItemWrap: {
+    width: 80,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
   },
   saleStatusText: {
+    paddingLeft: 4,
     fontSize: 12,
     fontWeight: '400',
     color: colors.color333,
     lineHeight: 17
   },
+  rightSelect: {
+    width: 40,
+  },
   rightEmptyView: {
+    textAlign: 'center',
     width: 40,
   },
   modalStyle: {
-    height: '75%'
+    height: '75%',
+    paddingLeft: 8,
+    paddingRight: 8
   },
   modalWrap: {
     height: '75%', backgroundColor: colors.white, borderTopLeftRadius: 8, borderTopRightRadius: 8

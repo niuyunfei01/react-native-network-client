@@ -1,11 +1,14 @@
 // @flow
-import React, { Component } from "react";
-import { View, NativeModules, Platform, findNodeHandle } from "react-native";
-const { RNViewShot } = NativeModules;
-import type { ViewStyleProp } from "react-native/Libraries/StyleSheet/StyleSheet";
-import type { LayoutEvent } from "react-native/Libraries/Types/CoreEventTypes";
+import React, {Component} from "react";
+import {findNodeHandle, NativeModules, Platform, View} from "react-native";
+import type {ViewStyleProp} from "react-native/Libraries/StyleSheet/StyleSheet";
+import type {LayoutEvent} from "react-native/Libraries/Types/CoreEventTypes";
+import tool from "../../util/tool";
 
-const neverEndingPromise = new Promise(() => {});
+const {RNViewShot} = NativeModules;
+
+const neverEndingPromise = new Promise(() => {
+});
 
 type Options = {
   width?: number,
@@ -89,7 +92,7 @@ function validateOptions(
       acceptedResults.join(" | ")
     );
   }
-  return { options, errors };
+  return {options, errors};
 }
 
 export function ensureModuleIsLoaded() {
@@ -118,8 +121,8 @@ export function captureRef<T: React$ElementType>(view: number | ?View | React$Re
     }
     view = node;
   }
-  const { options, errors } = validateOptions(optionsObject);
-  if (__DEV__ && errors.length > 0) {
+  const {options, errors} = validateOptions(optionsObject);
+  if (__DEV__ && tool.length(errors) > 0) {
     console.warn(
       "react-native-view-shot: bad options:\n" +
       errors.map(e => `- ${e}`).join("\n")
@@ -140,8 +143,8 @@ export function releaseCapture(uri: string): void {
 
 export function captureScreen(optionsObject?: Options): Promise<string> {
   ensureModuleIsLoaded();
-  const { options, errors } = validateOptions(optionsObject);
-  if (__DEV__ && errors.length > 0) {
+  const {options, errors} = validateOptions(optionsObject);
+  if (__DEV__ && tool.length(errors) > 0) {
     console.warn(
       "react-native-view-shot: bad options:\n" +
       errors.map(e => `- ${e}`).join("\n")
@@ -197,7 +200,7 @@ export default class ViewShot extends Component<Props> {
   capture = (): Promise<string> =>
     this.firstLayoutPromise
       .then(() => {
-        const { root } = this;
+        const {root} = this;
         if (!root) return neverEndingPromise; // component is unmounted, you never want to hear back from the promise
         return captureRef(root, this.props.options);
       })
@@ -219,13 +222,13 @@ export default class ViewShot extends Component<Props> {
       setTimeout(releaseCapture, 500, this.lastCapturedURI);
     }
     this.lastCapturedURI = uri;
-    const { onCapture } = this.props;
+    const {onCapture} = this.props;
     if (onCapture) onCapture(uri);
   };
 
   onCaptureFailure = (e: Error) => {
     if (!this.root) return;
-    const { onCaptureFailure } = this.props;
+    const {onCaptureFailure} = this.props;
     if (onCaptureFailure) onCaptureFailure(e);
   };
 
@@ -248,7 +251,7 @@ export default class ViewShot extends Component<Props> {
   };
 
   onLayout = (e: LayoutEvent) => {
-    const { onLayout } = this.props;
+    const {onLayout} = this.props;
     this.resolveFirstLayout(e.nativeEvent.layout);
     if (onLayout) onLayout(e);
   };
@@ -278,7 +281,7 @@ export default class ViewShot extends Component<Props> {
   }
 
   render() {
-    const { children } = this.props;
+    const {children} = this.props;
     return (
       <View
         ref={this.onRef}

@@ -1,9 +1,10 @@
 package cn.cainiaoshicai.crm.ui.scanner;
 
+import android.view.MenuItem;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.MenuItem;
 
 import cn.cainiaoshicai.crm.R;
 

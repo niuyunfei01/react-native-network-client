@@ -4,6 +4,7 @@ import {Alert, Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
 
 import BleModule from '../../../pubilc/util/ble/BleModule';
 import ESC from "../../../pubilc/util/ble/Ecs";
+import tool from "../../../pubilc/util/tool";
 
 global.BluetoothManager = new BleModule();
 export default class BlueToothPrinterPage extends Component {
@@ -238,7 +239,7 @@ export default class BlueToothPrinterPage extends Component {
 
   /*write=(index)=>{
 
-  if(this.state.text.length == 0){
+  if(tool.length(this.state.text) == 0){
 
               this.alert('请输入消息');
 
@@ -415,7 +416,7 @@ export default class BlueToothPrinterPage extends Component {
 
   writeWithoutResponse = (index) => {
 
-    if (this.state.text.length == 0) {
+    if (tool.length(this.state.text) === 0) {
       this.alert('请输入消息');
       return;
     }
@@ -519,7 +520,7 @@ export default class BlueToothPrinterPage extends Component {
 
   renderReceiveView = (label, buttonText, characteristics, onPress, state) => {
 
-    if (characteristics.length == 0) {
+    if (tool.length(characteristics) === 0) {
       return;
     }
 
@@ -539,7 +540,7 @@ export default class BlueToothPrinterPage extends Component {
   }
 
   renderWriteView = (label, buttonText, characteristics, onPress, state) => {
-    if (characteristics.length == 0) {
+    if (tool.length(characteristics) === 0) {
       return;
     }
 

@@ -1,10 +1,11 @@
 import React, {PureComponent} from "react";
-import {Text, View, StyleSheet, ScrollView, TextInput, TouchableOpacity} from "react-native";
+import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {Styles} from "./GoodsIncrementServiceStyle";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   title: {
@@ -140,7 +141,7 @@ export default class TemplateSettingsScene extends PureComponent {
   saveSetting = () => {
     const {store} = this.props.route.params
     const {selectItem, tempValue} = this.state
-    if (selectItem === '2' && tempValue.customerTemp.length <= 0) {
+    if (selectItem === '2' && tool.length(tempValue.customerTemp) <= 0) {
       showError('请先输入自定义模板内容')
       return
     }
@@ -176,12 +177,11 @@ export default class TemplateSettingsScene extends PureComponent {
                 </TouchableOpacity>
                 <If condition={selectItem === item.id}>
                   <TextInput style={styles.textInput}
-                             allowFontScaling={false}
                              value={tempValue[item.name]}
                              editable={item.id !== '1'}
                              onChangeText={text => this.onChangeText(text, item.name)}
                              multiline={true}/>
-                  <TouchableOpacity style={tempValue[item.name].length > 0 ? styles.activeApplyBtn : styles.applyBtn}
+                  <TouchableOpacity style={tool.length(tempValue[item.name]) > 0 ? styles.activeApplyBtn : styles.applyBtn}
                                     onPress={this.saveSetting}>
                     <Text style={styles.applyText}>
                       应用模板

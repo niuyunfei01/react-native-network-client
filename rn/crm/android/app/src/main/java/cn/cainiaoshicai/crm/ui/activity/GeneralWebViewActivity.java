@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.webkit.WebResourceError;
@@ -13,6 +11,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainOrdersActivity;

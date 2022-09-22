@@ -220,7 +220,7 @@ class StoreInfo extends Component {
         name: city ? city : "点击选择城市"
       },
       qualification: {
-        name: files && files.length ? "资质已上传" : "点击上传资质",
+        name: files && tool.length(files) ? "资质已上传" : "点击上传资质",
         info: undefined
       }, //上传资质
       alias: alias, //别名
@@ -479,16 +479,23 @@ class StoreInfo extends Component {
   setAddress(res) {
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      selectCity: {
-        name: res.cityname,
-        cityId: res.citycode
-      },
-      district: res.adname,
-      dada_address: res.address,
+    let states = {
       location_long: Lng,
       location_lat: lat,
-    })
+    }
+    if (res.cityname && res.citycode) {
+      states.selectCity = {
+        name: res.cityname,
+        cityId: res.citycode
+      }
+    }
+    if (res.address) {
+      states.dada_address = res.address;
+    }
+    if (res.adname) {
+      states.district = res.adname
+    }
+    this.setState(states)
   }
 
   doUploadImg = qualification => {
@@ -670,19 +677,18 @@ class StoreInfo extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-              if (btn_type === "edit" && !resp.obj.can_edit) {
+              if (btn_type === "edit" && resp.obj.is_pop_sync_window) {
                 Alert.alert('提示', '您的门店信息发生改变，请同步配送平台信息。如果是自有账号，请联系对应配送方业务经理。', [{
-                  text: '确定',
+                  text: '去同步',
                   onPress: () => {
                     this.onPress(Config.ROUTE_DELIVERY_LIST);
                   },
                 }])
               }
-              const {goBack, state} = _this.props.navigation;
               if (this.props.route.params.actionBeforeBack) {
                 this.props.route.params.actionBeforeBack({shouldRefresh: true});
               }
-              goBack();
+              _this.props.navigation.goBack();
 
             }
           })
@@ -715,21 +721,21 @@ class StoreInfo extends Component {
     } = this.state;
     let error_msg = "";
 
-    if (name.length < 1 || name.length > 64) {
+    if (tool.length(name) < 1 || tool.length(name) > 64) {
       error_msg = "店名应在1-64个字符内";
     } else if (!sale_category) {
       error_msg = "请选择店铺类型";
-    } else if (tel.length < 8 || tel.length > 11) {
+    } else if (tool.length(tel) < 8 || tool.length(tel) > 11) {
       error_msg = "门店电话格式有误";
-    } else if (dada_address.length < 1) {
+    } else if (tool.length(dada_address) < 1) {
       error_msg = "请输入门店地址";
-    } else if (district.length < 1) {
+    } else if (tool.length(district) < 1) {
       error_msg = "请输入门店所在区域";
     } else if (location_long === "" || location_lat === "") {
       error_msg = "请选择门店定位信息";
     } else if (!this.state.selectCity.cityId) {
       error_msg = "请选择门店所在城市";
-    } else if (!owner_nation_id || (owner_nation_id.length !== 18 && owner_nation_id.length !== 11)) {
+    } else if (!owner_nation_id || (tool.length(owner_nation_id) !== 18 && tool.length(owner_nation_id) !== 11)) {
       // error_msg = "身份证格式有误";
     } else if (this.state.isBd && !this.state.templateInfo.key) {
       // error_msg = "请选择模板店";
@@ -737,7 +743,7 @@ class StoreInfo extends Component {
       // error_msg = "请选择bd";
     } else if (!(owner_id > 0)) {
       error_msg = "请选择门店店长";
-    } else if (mobile.length !== 11) {
+    } else if (tool.length(mobile) !== 11) {
       error_msg = "店长手机号格式有误";
     } else if (!owner_name) {
       error_msg = "请输入店长实名";
@@ -990,6 +996,50 @@ class StoreInfo extends Component {
             underlineColorAndroid="transparent"
           />
         </View>
+
+        <View style={{
+          borderBottomWidth: 1,
+          borderColor: colors.colorCCC,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 8,
+          height: pxToDp(90),
+        }}>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color333,
+          }}>定位地址 </Text>
+
+          <Text onPress={() => {
+            let center = "";
+            if (location_long && location_lat) {
+              center = `${location_long},${location_lat}`;
+            }
+            const params = {
+              center: center,
+              keywords: this.state.dada_address,
+              onBack: (res) => {
+                this.setAddress.bind(this)(res)
+              },
+            };
+            this.onPress(Config.ROUTE_SEARC_HSHOP, params);
+          }} style={{
+            fontSize: 14,
+            color: colors.color333,
+            flex: 1,
+            textAlign: "right",
+          }}>
+            {location_long !== "" && location_lat !== "" && location_lat !== undefined
+              ? `${location_long}、${location_lat}`
+              : "点击选择地址"}
+          </Text>
+
+          <Entypo name="location-pin" style={{
+            color: colors.main_color,
+            fontSize: 20,
+          }}/>
+
+        </View>
         <View style={{
           borderBottomWidth: 1,
           borderColor: colors.colorCCC,
@@ -1015,51 +1065,6 @@ class StoreInfo extends Component {
           />
         </View>
 
-        <View style={{
-          borderBottomWidth: 1,
-          borderColor: colors.colorCCC,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 8,
-          height: pxToDp(90),
-        }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>定位地址 </Text>
-
-          <Text onPress={() => {
-            let center = "";
-            if (location_long && location_lat) {
-              center = `${location_long},${location_lat}`;
-            }
-            const params = {
-              keywords: this.state.dada_address,
-              onBack: (res) => {
-                this.setAddress.bind(this)(res)
-              },
-              action: Config.LOC_PICKER,
-              center: center,
-              isType: 'fixed',
-            };
-            this.onPress(Config.ROUTE_SEARC_HSHOP, params);
-          }} style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}>
-            {location_long !== "" && location_lat !== "" && location_lat !== undefined
-              ? `${location_long}、${location_lat}`
-              : "点击选择地址"}
-          </Text>
-
-          <Entypo name="location-pin" style={{
-            color: colors.main_color,
-            fontSize: 20,
-          }}/>
-
-        </View>
 
         <View style={{
           borderBottomWidth: 1,

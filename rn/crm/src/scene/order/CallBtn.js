@@ -60,10 +60,7 @@ class CallBtn extends PureComponent {
           onPress={onPress ? onPress : this._doDial}>
           <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
 
-          <FontAwesome5 name={'check-circle'} size={25} style={{
-            width: pxToDp(20),
-            height: pxToDp(28),
-          }}/>
+          <FontAwesome5 name={'check-circle'} style={{fontSize: 14}}/>
         </TouchableOpacity>
       )
     }

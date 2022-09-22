@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {Button, DatePicker, List, Provider, WhiteSpace} from '@ant-design/react-native'
 import SearchPopup from "../../common/component/SearchPopup";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -51,7 +52,7 @@ class OrderPrint extends BaseComponent {
       start: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.start),
       end: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.end)
     }).then(orders => {
-      self.setState({orders, searched: orders.length > 0})
+      self.setState({orders, searched: tool.length(orders) > 0})
       if (!orders.length) {
         Alert.alert('提示', '无待打印订单')
       }

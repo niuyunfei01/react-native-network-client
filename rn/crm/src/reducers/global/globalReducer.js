@@ -12,12 +12,11 @@ const {
   SET_CURR_STORE,
   SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
-
   CHECK_VERSION_AT,
   BLE_STARTED,
-
   LOGOUT_SUCCESS,
   UPDATE_CFG,
+  UPDATE_CONFIG,
   HOST_UPDATED,
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
@@ -27,32 +26,42 @@ const {
   SET_SHOW_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
+  SET_NO_LOGIN_INFO
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
-  currentUser: null,
   currStoreId: 0,
-  simpleStore: {}, //使用前需校验是否与 currStoreId 对应, 没有则需要去服务器端获得; 默认随config等一起大批更新
-  accessToken: '',
-  refreshToken: '',
-  expireTs: 0,
-  config: {},
-  currentUserProfile: {},
-  canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
-  canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
-  remindTags: null,
-  host: '',
-  cfgOfKey: {},
-  last_get_cfg_ts: 0,
+  currentUser: null,
   currentNewProductStoreId: 0,
-  listeners: [],
-  printer_id: '',
-  mixpanel_id: '',
-  bleStarted: false,
+  expireTs: 0,
+  currentUserProfile: {},
+  host: '',
+  store_id: 0,
+  vendor_id: 0,
+  store_info: {
+    vip_info: {
+      show_vip: false,
+      expire_time: '未开通',
+      is_free: false,
+      exist_vip: false,
+      vip_invalid: false
+    }
+  },
+  vendor_info: {},
+  help_uid: [],
+  enabled_good_mgr: false,
+  show_goods_monitor: false,
+  show_sign_center: false,
+  float_kf_icon: false,
+  show_expense_center: false,
+  is_record_request_monitor: false,
+  customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {
     order_list_by: 'expectTime asc',
-  }
+  },
+  bleStarted: false,
+  printer_id: '0',
 };
 
 /**
@@ -63,6 +72,18 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_NO_LOGIN_INFO:
+      if (action.payload) {
+        return {
+          ...state,
+          currentUser: action.payload.currentUser,
+          accessToken: action.payload.accessToken,
+          currStoreId: action.payload.currStoreId,
+          host: action.payload.host,
+          printer_id: action.payload.printer_id
+        }
+      }
+      break
     case LOGIN_PROFILE_SUCCESS:
       if (action.payload && action.payload.id) {
         return {
@@ -73,21 +94,11 @@ export default function globalReducer(state = initialState, action) {
       } else return state;
 
     case SET_CURR_PROFILE:
-
       return {...state, currentUserProfile: action.profile};
 
     case SET_CURR_STORE:
       if (action.payload) {
-        if (typeof action.payload.store != 'undefined') {
-          return {...state, currStoreId: action.payload.id, simpleStore: action.payload.store}
-        } else {
-          return {...state, currStoreId: action.payload.id}
-        }
-      } else return state;
-
-    case SET_SIMPLE_STORE:
-      if (action.payload) {
-        return {...state, simpleStore: action.payload}
+        return {...state, currStoreId: action.payload.id}
       } else return state;
 
     case SESSION_TOKEN_SUCCESS:
@@ -118,27 +129,29 @@ export default function globalReducer(state = initialState, action) {
         currentUserProfile: {},
         accessToken: '',
         refreshToken: '',
-        canReadStores: {},
-        canReadVendors: {},
         currentNewProductStoreId: 0,
         bleStarted: false
       };
 
-    case UPDATE_CFG:
-      const newState = action.payload ? {
+
+    case UPDATE_CONFIG:
+      return action.payload ? {
         ...state,
-        canReadStores: action.payload.canReadStores || state.canReadStores,
-        canReadVendors: action.payload.canReadVendors || state.canReadVendors,
-        config: action.payload.config || state.config,
-        last_get_cfg_ts: action.last_get_cfg_ts || state.last_get_cfg_ts,
+        currStoreId: action.payload.store_id || state.currStoreId,
+        store_id: action.payload.store_id || state.store_id,
+        vendor_id: action.payload.vendor_id || state.vendor_id,
+        store_info: action.payload.store_info || state.store_info,
+        vendor_info: action.payload.vendor_info || state.vendor_info,
+        help_uid: action.payload.help_uid || state.help_uid,
+        enabled_good_mgr: action.payload && action.payload.enabled_good_mgr,
+        show_goods_monitor: action.payload.show_goods_monitor || state.show_goods_monitor,
+        show_sign_center: action.payload.show_sign_center || state.show_sign_center,
+        float_kf_icon: action.payload.float_kf_icon || state.float_kf_icon,
+        show_expense_center: action.payload.show_expense_center || state.show_expense_center,
+        is_record_request_monitor: action.payload.is_record_request_monitor || state.is_record_request_monitor,
+        customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
       } : state;
 
-      //有定义即可更新 simpleStore
-      if (typeof (action.payload.simpleStore) != 'undefined') {
-        state.simpleStore = action.payload.simpleStore
-      }
-
-      return newState;
     case HOST_UPDATED:
       const host = action.host;
       return host ? {...state, host} : state;

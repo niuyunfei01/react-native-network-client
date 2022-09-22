@@ -3,8 +3,6 @@ import {FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} f
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
-import tool from "../../../pubilc/util/tool"
-import {getSimpleStore} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http"
 import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
@@ -16,7 +14,7 @@ import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
-
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -29,17 +27,12 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-function FetchRender({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class StoreGoodsList extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -48,9 +41,9 @@ class StoreGoodsList extends Component {
       page: 1,
       statusList: [
         {label: '全部商品', value: 'all'},
-        {label: '售罄商品', value: 'out_of_stock'},
+        {label: '下架商品', value: 'out_of_stock'},
         {label: '最近上新', value: 'new_arrivals'},
-        {label: '在售商品', value: 'in_stock'},
+        {label: '上架商品', value: 'in_stock'},
       ],
       pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
       categories: [],
@@ -76,55 +69,59 @@ class StoreGoodsList extends Component {
       selectStatusItem: '',
       onStrict: false
     }
-
   }
 
   componentDidMount() {
-    const {global, dispatch} = this.props
-    const {currStoreId, accessToken} = global;
-    getSimpleStore(global, dispatch, currStoreId, (store) => {
-      this.setState({
-        fnPriceControlled: store['fn_price_controlled'],
-        fnProviding: Number(store['strict_providing']) > 0,
-        init: true
-      })
-      this.fetchUnreadPriceAdjustment(store.id, accessToken)
+    const {global, navigation} = this.props
+    const {accessToken, store_id, store_info} = global;
+    this.setState({
+      fnPriceControlled: store_info?.fn_price_controlled,
+      fnProviding: Number(store_info?.strict_providing) > 0,
+      init: true
     })
+    this.fetchUnreadPriceAdjustment(store_id, accessToken)
+    this.restart()
+    this.focus = navigation.addListener('focus', () => this.restart());
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   restart() {
     if (GlobalUtil.getGoodsFresh() === 2) {
       GlobalUtil.setGoodsFresh(1)
       this.onRefresh()
-      return null;
+      return;
     }
     this.fetchGoodsCount()
   }
 
   fetchGoodsCount() {
-    const {currStoreId, accessToken} = this.props.global;
+    const {currStoreId, accessToken, vendor_id} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
-      let newStatusList = []
+      let newStatusList
       if (res.strict_providing === '1') {
         newStatusList = [
           {label: '全部商品 - ' + res.all, value: 'all'},
           {label: '总部供货 - ' + res.common_provided, value: 'common_provided'},
           {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
-          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '售罄商品 - ' + (res.in_stock_but_nil ?? '0'), value: 'in_stock_but_nil'},
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
         ]
       } else {
         newStatusList = [
           {label: '全部商品 - ' + res.all, value: 'all'},
-          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
+          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'}
         ]
       }
+      if ((114 === vendor_id || 163 === vendor_id) && res.no_img)
+        newStatusList.push({label: '缺失图片 - ' + (res.no_img ?? '0'), value: 'no_img'})
       this.setState({
         statusList: [...newStatusList],
         selectedStatus: {...newStatusList[0]},
@@ -168,19 +165,28 @@ class StoreGoodsList extends Component {
   }
 
 
-  search(setList = 1) {
-    const {isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum} = this.state
+  search = (setList = 1, isRefreshItem = false) => {
+
+    const {
+      isLoading,
+      selectedStatus,
+      selectedChildTagId,
+      selectedTagId,
+      page,
+      pageNum,
+      selectedProduct,
+      goods
+    } = this.state
     if (isLoading) {
       return;
     }
-    const {accessToken, currStoreId} = this.props.global;
-    const {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken, currStoreId, vendor_id} = this.props.global;
     const {prod_status} = this.props.route.params || {};
     this.setState({
       isLoading: true,
     })
     const params = {
-      vendor_id: currVendorId,
+      vendor_id: vendor_id,
       status: selectedStatus.value,
       tagId: selectedChildTagId ? selectedChildTagId : selectedTagId,
       page: page,
@@ -191,17 +197,26 @@ class StoreGoodsList extends Component {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
+    if (isRefreshItem)
+      params.pid = selectedProduct.id
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      const goods = setList === 1 ? res.lists : this.state.goods.concat(res.lists)
-      this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+      if (isRefreshItem) {
+        const index = goods.findIndex(item => item.id === selectedProduct.id)
+        if (Array.isArray(res.lists) && res.lists.length > 0)
+          goods[index] = res.lists[0]
+        this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+        return
+      }
+      const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
+      this.setState({goods: goodList, isLastPage: res.isLastPage, isLoading: false})
     }, (res) => {
       ToastLong(res.reason)
       this.setState({isLoading: false})
     })
   }
 
-  doneProdUpdate(pid, prodFields, spFields) {
+  doneProdUpdate = (pid, prodFields, spFields) => {
     const {goods} = this.state
     const idx = goods.findIndex(g => `${g.id}` === `${pid}`);
     const item = goods[idx];
@@ -220,17 +235,17 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
-  onRefresh() {
+  onRefresh = () => {
     this.setState({page: 1}, () => {
       this.search()
     })
   }
 
-  onLoadMore() {
+  onLoadMore = () => {
     let {page, isLastPage} = this.state
     if (isLastPage) {
       ToastShort("暂无更多数据")
-      return null;
+      return;
     }
 
     this.setState({page: page + 1}, () => {
@@ -266,16 +281,16 @@ class StoreGoodsList extends Component {
   }
 
   changeRowExist(idx, supplyPrice) {
-    const products = this.state.goods
-    products[idx].is_exist = {supply_price: supplyPrice, status: 1}
-    this.setState({goods: products})
+    const {goods} = this.state
+    goods[idx].is_exist = {supply_price: supplyPrice, status: 1}
+    this.setState({goods: goods})
   }
 
   gotoGoodDetail = (pid) => {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
       storeId: this.props.global.currStoreId,
-      updatedCallback: this.doneProdUpdate.bind(this)
+      updatedCallback: this.doneProdUpdate
     })
   }
 
@@ -286,7 +301,7 @@ class StoreGoodsList extends Component {
       <For each="item" of={categories} index="i">
         <TouchableOpacity key={i} onPress={() => this.onSelectCategory(item)}>
           <View style={[selectedTagId === item.id ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={styles.n2grey6}>{item.name} </Text>
+            <Text style={selectedTagId === item.id ? styles.activeCategoriesText : styles.n2grey6}>{item.name} </Text>
           </View>
         </TouchableOpacity>
       </For>
@@ -334,25 +349,19 @@ class StoreGoodsList extends Component {
   }
 
   render() {
-    const p = this.state.selectedProduct;
-    const {sp} = this.state.selectedProduct;
-    const {accessToken, simpleStore} = this.props.global;
-    let {all_amount, all_count, inventorySummary, selectStatusItem} = this.state;
-    const {currVendorId} = tool.vendor(this.props.global);
-    return (
-      <View style={{flex: 1}}>
-        {this.renderHeader()}
-        <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
-        <View style={styles.container}>
 
-          <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
-            {this.showstatusSelect()}
-          </Dialog>
+    const {accessToken, store_info, currStoreId, vendor_id} = this.props.global;
+    let {all_amount, all_count, inventorySummary, selectStatusItem, selectedProduct, goods, isLoading} = this.state;
+    const {sp} = selectedProduct;
+    return (
+      <>
+        {this.renderHeader()}
+        <View style={styles.container}>
           <If condition={this.state.shouldShowNotificationBar}>
             <View style={styles.notificationBar}>
               <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
               <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
-                <Text style={{color: 'white'}}>查看 </Text>
+                <Text style={{color: 'white'}}>查看</Text>
               </TouchableOpacity>
             </View>
           </If>
@@ -368,17 +377,16 @@ class StoreGoodsList extends Component {
                 {this.renderChildrenCategories()}
               </View>
               <FlatList
-                style={{flex: 1}}
-                data={this.state.goods}
+                data={goods}
                 legacyImplementation={false}
                 directionalLockEnabled={true}
-                onEndReachedThreshold={0.3}
+                onEndReachedThreshold={0.5}
                 onEndReached={this.onEndReached}
                 onMomentumScrollBegin={this.onMomentumScrollBegin}
                 onTouchMove={(e) => this.onTouchMove(e)}
                 renderItem={this.renderItem}
-                onRefresh={this.onRefresh.bind(this)}
-                refreshing={this.state.isLoading}
+                onRefresh={this.onRefresh}
+                refreshing={isLoading}
                 keyExtractor={this._keyExtractor}
                 shouldItemUpdate={this._shouldItemUpdate}
                 getItemLayout={this._getItemLayout}
@@ -387,20 +395,23 @@ class StoreGoodsList extends Component {
             </View>
           </View>
           <If condition={sp}>
-            <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
-                                productName={p.name}
+            <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)}
+                                modalType={this.state.modalType}
+                                skuName={selectedProduct.sku_name}
+                                productName={selectedProduct.name}
                                 strictProviding={false} accessToken={accessToken}
-                                storeId={Number(this.props.global.currStoreId)}
+                                storeId={Number(currStoreId)}
                                 currStatus={Number(sp.status)}
-                                vendor_id={currVendorId}
-                                doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                onClose={() => this.setState({modalType: ''}, () => {
-                                  this.search()
-                                })}
+                                vendor_id={vendor_id}
+                                doneProdUpdate={this.doneProdUpdate}
+                                onClose={() => {
+                                  this.setState({modalType: ''})
+                                  this.search(1, true)
+                                }}
                                 spId={Number(sp.id)}
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                 navigation={this.props.navigation}
-                                storePro={p}
+                                storePro={selectedProduct}
                                 beforePrice={Number(sp.supply_price)}/>
           </If>
           <Modal
@@ -419,7 +430,7 @@ class StoreGoodsList extends Component {
                 alignItems: 'center'
               }}>
                 <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>
-                  {simpleStore.name}
+                  {store_info?.name}
                 </Text>
                 <View style={{
                   flexDirection: "column",
@@ -501,8 +512,10 @@ class StoreGoodsList extends Component {
           </Modal>
 
         </View>
-
-      </View>
+        <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
+          {this.showstatusSelect()}
+        </Dialog>
+      </>
     )
   }
 
@@ -522,12 +535,12 @@ class StoreGoodsList extends Component {
   }
 
   _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+    return {length: pxToDp(242), offset: pxToDp(242) * index, index}
   }
 
 
   renderHeader() {
-    let navigation = this.props.navigation;
+    let {navigation} = this.props;
     let {onStrict} = this.state
     return (
       <View style={{
@@ -568,7 +581,7 @@ class StoreGoodsList extends Component {
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
+            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate})
           }}>
           <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
         </TouchableOpacity>
@@ -638,7 +651,18 @@ class StoreGoodsList extends Component {
     }
   }
 
+
   opBar = (onSale, onStrict, item) => {
+    if ('' === item.coverimg) {
+      return (
+        <View style={[styles.row_center, styles.btnWrap]}>
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.gotoAddMissingPicture(item)}>
+            <Text style={styles.goodsOperationBtn}>编辑</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
     return (
       <View style={[styles.row_center, styles.btnWrap]}>
         <If condition={onSale}>
@@ -654,34 +678,54 @@ class StoreGoodsList extends Component {
           </TouchableOpacity>
         </If>
         <If condition={onStrict}>
-          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-            <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
-          </TouchableOpacity>
+          <If condition={item?.price_type === 1}>
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+              <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={item?.price_type === 0 || item?.price_type === undefined}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+              <Text style={styles.goodsOperationBtn}>报价/库存 </Text>
+            </TouchableOpacity>
+          </If>
         </If>
         <If condition={!onStrict}>
-          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                            onPress={() => this.onOpenModal('set_price', item)}>
-            <Text style={styles.goodsOperationBtn}>报价 </Text>
-          </TouchableOpacity>
+          <If condition={item?.price_type === 1}>
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+              <Text style={styles.goodsOperationBtn}>价格 </Text>
+            </TouchableOpacity>
+          </If>
+          <If condition={item?.price_type === 0}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('set_price', item)}>
+              <Text style={styles.goodsOperationBtn}>报价 </Text>
+            </TouchableOpacity>
+          </If>
         </If>
-        {/*{onOpen &&*/}
-        {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
-        {/*                      onPress={() => this.onOpenModal('set_price', item)}>*/}
-        {/*      <Text style={{color: colors.color333}}>报价 </Text>*/}
-        {/*    </TouchableOpacity>}*/}
-
       </View>
     )
   }
 
+  jumpToNewRetailPriceScene = (id) => {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {
+      productId: id
+    })
+  }
+
+  gotoAddMissingPicture = (item) => {
+    this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
+  }
   renderItem = (order) => {
-    let {item, index} = order;
+    let {item} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
-      <GoodListItem fnProviding={onStrict} product={item} key={index}
+      <GoodListItem fnProviding={onStrict} product={item} key={item.id}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
+                    price_type={item.price_type || 0}
                     opBar={this.opBar(onSale, onStrict, item)}
       />
     );
@@ -778,6 +822,12 @@ const styles = StyleSheet.create({
     colors.white,
     borderTopWidth: pxToDp(1),
     borderColor: colors.colorDDD
+  },
+  activeCategoriesText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.color333,
+    lineHeight: 20
   },
   n2grey6: {
     color: colors.color666,

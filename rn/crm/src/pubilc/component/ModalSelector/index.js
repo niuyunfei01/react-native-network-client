@@ -16,6 +16,7 @@ import {
 import BaseComponent from './BaseComponent';
 import Icon from "../../../weui/Icon/Icon";
 import pxToDp from "../../util/pxToDp";
+import tool from "../../util/tool";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
@@ -146,12 +147,7 @@ export default class ModalSelector extends BaseComponent {
     let checkMark = this.props.checkMark ? {flexDirection: 'row', justifyContent: 'center', paddingLeft: 20} : null;
 
     return (
-      <View key={key} style={[
-        bottom_line,
-        checkMark,
-        styles.defaultSelectStyle,
-        this.props.defaultSelectStyle,
-      ]}>
+      <View key={key} style={[bottom_line, checkMark, styles.defaultSelectStyle, this.props.defaultSelectStyle]}>
         <Text style={[styles.defaultTextStyle, this.props.defaultTextStyle]}>{default_section.label} </Text>
         {checkMark !== null && <Icon name="success_no_circle" style={{fontSize: 16, marginLeft: pxToDp(5)}}/>}
       </View>
@@ -169,7 +165,7 @@ export default class ModalSelector extends BaseComponent {
   }
 
   renderOptionList(styles) {
-    let last_item = this.props.data.length - 1;
+    let last_item = tool.length(this.props.data) - 1;
     let bottomLine = this.props.bottomLine;
     let options = this.props.data.map((item, key) => {
       let bottom_line = last_item !== key ? styles.bottom_line : (bottomLine ? styles.bottom_line : null);
@@ -185,9 +181,7 @@ export default class ModalSelector extends BaseComponent {
     const closeOverlay = this.props.backdropPressToClose;
 
     return (
-      <TouchableWithoutFeedback key={'modalSelector' + (componentIndex++)} onPress={() => {
-        closeOverlay && this.close()
-      }}>
+      <TouchableWithoutFeedback key={'modalSelector' + (componentIndex++)} onPress={() => closeOverlay && this.close()}>
         <View style={[styles.overlayStyle, this.props.overlayStyle]}>
           <View style={[styles.optionContainer, this.props.optionContainerStyle]}>
             <ScrollView keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}>

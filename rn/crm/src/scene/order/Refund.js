@@ -64,7 +64,7 @@ class Refund extends Component {
 
 
   fetchRefundGoodsList = () => {
-    if (this.state.spreadList.length > 0) {
+    if (tool.length(this.state.spreadList) > 0) {
       return null;
     }
     let {accessToken} = this.props.global
@@ -72,7 +72,7 @@ class Refund extends Component {
     let plat_order_id = this.state.orderDetail['platform_oid']
     let url = `/new_api/orders/get_unit_part_refund_foods/${es_id}/${plat_order_id}?access_token=${accessToken}`;
     HttpUtils.get(url).then(res => {
-      if (res && res.length > 0) {
+      if (res && tool.length(res) > 0) {
         let list = [];
         for (let value of res) {
           for (let val of this.state.goodsList) {
@@ -116,7 +116,7 @@ class Refund extends Component {
   };
 
   getSpreadPriceSum() {
-    if (this.state.spreadList.length <= 0) {
+    if (tool.length(this.state.spreadList) <= 0) {
       return 0;
     }
     let sum = 0;
@@ -129,7 +129,7 @@ class Refund extends Component {
   //退款
   refund = () => {
     if (
-      this.state.index === this.state.refundReason.length - 1 &&
+      this.state.index === tool.length(this.state.refundReason) - 1 &&
       !this.refundReason
     )
       return ToastLong("请输入退款原因！");
@@ -323,7 +323,7 @@ class Refund extends Component {
                   alignItems: "center",
                   marginTop: 15,
                   marginBottom:
-                    index === this.state.goodsList.length - 1 ? 15 : 0
+                    index === tool.length(this.state.goodsList) - 1 ? 15 : 0
                 }}
               >
                 <View

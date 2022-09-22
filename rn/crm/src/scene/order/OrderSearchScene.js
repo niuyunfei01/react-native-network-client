@@ -1,13 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  FlatList, InteractionManager,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {FlatList, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,8 +14,8 @@ import tool from "../../pubilc/util/tool";
 import {hideModal, showError, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, user, global, device} = state;
-  return {mine: mine, user: user, global: global, device: device}
+  const {global, device} = state;
+  return {global, device}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -51,7 +44,7 @@ class OrderSearchScene extends PureComponent {
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     const term = props.route.params?.term
     this.state = {
-      keyword: term && term.length > 12 && term.substring(9, 13) || '',
+      keyword: term && tool.length(term) > 12 && term.substring(9, 13) || '',
       isRefreshing: false,
       isSearching: false,
       prefix: [],
@@ -70,7 +63,7 @@ class OrderSearchScene extends PureComponent {
 
   componentDidMount() {
     const term = this.props.route.params?.term
-    if (term && term.length > 0) {
+    if (term && tool.length(term) > 0) {
       contentFromOrderList = true
       this.queryOrderInfo(true)
     }
@@ -86,12 +79,12 @@ class OrderSearchScene extends PureComponent {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -162,7 +155,7 @@ class OrderSearchScene extends PureComponent {
                      key={index}
                      onRefresh={() => this.onRefresh()}
                      navigation={navigation}
-                     vendorId={global.config.vendor.id}
+                     vendorId={global?.vendor_id}
                      setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}
@@ -207,7 +200,7 @@ class OrderSearchScene extends PureComponent {
     HttpUtils.get(url, params).then(res => {
       hideModal()
       const orderList = isChangeType ? res.orders : this.state.orderList.concat(res.orders)
-      const end = res.orders.length < query.limit
+      const end = tool.length(res.orders) < query.limit
       this.setState({orderList: orderList, end: end, isLoading: false})
     }, res => {
       hideModal()
@@ -233,7 +226,7 @@ class OrderSearchScene extends PureComponent {
                      placeholder={'流水号/订单号/手机尾号/商品名称/取货码'}
                      onChangeText={(keyword) => this.onSearch(keyword)}/>
         </View>
-        <If condition={keyword.length > 0}>
+        <If condition={tool.length(keyword) > 0}>
           <View style={styles.filterZoneWrap}>
             <Text style={styles.filterTipText}>
               点击标签筛选
@@ -255,16 +248,16 @@ class OrderSearchScene extends PureComponent {
             </View>
           </View>
         </If>
-        <If condition={orderList.length > 0}>
+        <If condition={tool.length(orderList) > 0}>
           <Text style={styles.filterBtnText}>
-            {contentFromOrderList && term && term.length > 0 ? '' : '近七日'}共计
+            {contentFromOrderList && term && tool.length(term) > 0 ? '' : '近七日'}共计
             <Text style={styles.orderListLength}>
-              {orderList.length}
+              {tool.length(orderList)}
             </Text>
             单
           </Text>
         </If>
-        <If condition={orderList.length === 0}>
+        <If condition={tool.length(orderList) === 0}>
           <Text style={styles.descriptionTipText}>
             支持搜索词说明
           </Text>

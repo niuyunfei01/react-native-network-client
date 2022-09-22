@@ -33,9 +33,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
@@ -55,6 +52,10 @@ import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -1104,13 +1105,10 @@ public class Utility {
     }
 
     public static void toast(final String msg, final Activity activity, final Runnable uiCallback, final int toastLength) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity, msg, toastLength).show();
-                if (uiCallback != null) {
-                    uiCallback.run();
-                }
+        activity.runOnUiThread(() -> {
+            Toast.makeText(activity, msg, toastLength).show();
+            if (uiCallback != null) {
+                uiCallback.run();
             }
         });
     }

@@ -10,7 +10,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import {get_help_types} from '../../../reducers/help/helpActions'
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import * as tool from "../../../pubilc/util/tool";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToEm from "../../../pubilc/util/pxToEm";
 import colors from "../../../pubilc/styles/colors";
@@ -18,8 +17,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -131,16 +130,13 @@ class HelpScene extends PureComponent {
       if (resp.ok) {
         let {questions, types} = resp.obj
         this.setState({questions, types})
-      } else {
-
       }
       hideModal()
-      // this.setState({query: false});
     }))
   }
 
   render() {
-    let server_info = tool.server_info(this.props);
+
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(140)}}>
@@ -206,11 +202,7 @@ class HelpScene extends PureComponent {
 
         </ScrollView>
         <View style={styles.call_btn_wrapper}>
-          <TouchableOpacity
-            onPress={() => {
-              native.dialNumber(server_info.mobilephone);
-            }}
-          >
+          <TouchableOpacity onPress={this.dialNumber}>
             <View style={styles.call_btn}>
               <FontAwesome5 name={'phone-square'}
                             style={{fontSize: pxToDp(36), color: colors.main_color, marginRight: pxToDp(24)}}/>
@@ -222,6 +214,15 @@ class HelpScene extends PureComponent {
 
       </View>
     )
+  }
+
+  dialNumber = async () => {
+    try {
+      let mobile = this.props.global?.vendor_info?.mobile;
+      await native.dialNumber(mobile)
+    } catch (e) {
+
+    }
   }
 
 }

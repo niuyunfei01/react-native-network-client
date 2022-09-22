@@ -7,22 +7,15 @@
  *
  */
 const {
-
   ORDER_PRINTED_CLOUD,
   GET_ORDER_SUCCESS,
   GET_ORDER_FAILURE,
-
-  ORDER_UPDATE_REQUEST,
   ORDER_UPDATE_SUCCESS,
   ORDER_UPDATE_FAILURE,
-
   ORDER_EDIT_ITEM,
   ORDER_INVALIDATED,
   ORDER_WAY_ROCED,
-
   LOGOUT_SUCCESS,
-
-  SET_STATE
 } = require('../../pubilc/common/constants').default
 
 /**
@@ -43,10 +36,8 @@ const initialState = {
  * @param {Object} action - type and payload
  */
 export default function orderReducer(state = initialState, action) {
-  let nextProfileState = null;
 
   switch (action.type) {
-
     case ORDER_PRINTED_CLOUD:
       if (action.payload.orderId === state.order.id) {
         state.order.print_times = action.payload.printTimes;

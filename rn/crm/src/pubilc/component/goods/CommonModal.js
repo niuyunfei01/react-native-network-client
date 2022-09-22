@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Modal, View, StyleSheet} from "react-native";
+import {Modal, StyleSheet, View} from "react-native";
 import PropTypes from 'prop-types'
 
 const styles = StyleSheet.create({
@@ -23,14 +23,15 @@ export default class CommonModal extends PureComponent {
   }
 
   render() {
-    const {visible, children, position, onClose} = this.props
+    const {visible, children, position, onRequestClose, onShow} = this.props
     const positionStyle = position && position === 'flex-end' ? styles.flexEnd : styles.center
     return (
       <Modal hardwareAccelerated={true}
              transparent={true}
              visible={visible}
              animationType={'slide'}
-             onRequestClose={onClose}>
+             onShow={onShow && onShow}
+             onRequestClose={onRequestClose}>
         <View style={[styles.page, positionStyle]}>
           {children}
         </View>

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 
-
 import java.util.Set;
 
 import cn.cainiaoshicai.crm.bt.BtUtil;

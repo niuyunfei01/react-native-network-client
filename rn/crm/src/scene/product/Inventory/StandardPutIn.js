@@ -328,7 +328,7 @@ class StandardPutIn extends BaseComponent {
           />}
         >盘点历史</JbbCellTitle>
         {
-          this.state.checkHistory.length ? (
+          tool.length(this.state.checkHistory) ? (
             <For of={this.state.checkHistory} each="item" index="idx">
               <View key={idx} style={styles.item}>
                 <View style={styles.itemRow}>

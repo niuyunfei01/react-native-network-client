@@ -1,5 +1,11 @@
 package cn.cainiaoshicai.crm.support.imageutility;
 
+import static android.media.ExifInterface.ORIENTATION_NORMAL;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
+import static android.media.ExifInterface.TAG_ORIENTATION;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,12 +27,6 @@ import cn.cainiaoshicai.crm.support.file.FileLocationMethod;
 import cn.cainiaoshicai.crm.support.file.FileManager;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-
-import static android.media.ExifInterface.ORIENTATION_NORMAL;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
-import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
-import static android.media.ExifInterface.TAG_ORIENTATION;
 
 /**
  * User: Jiang Qi

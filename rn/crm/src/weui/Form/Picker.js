@@ -11,6 +11,7 @@ import {
   View,
   ViewPropTypes
 } from 'react-native'
+import tool from "../../pubilc/util/tool";
 
 const {width, height} = Dimensions.get('window')
 
@@ -126,11 +127,11 @@ class Picker extends Component {
   _getCascadeData(pickerData, pickedValue) {
     const secondArr = pickerData.filter((item) =>
       item.value === pickedValue[0])
-    const secondWheelData = secondArr.length ? secondArr[0].children : pickerData[0].children
+    const secondWheelData = tool.length(secondArr) ? secondArr[0].children : pickerData[0].children
 
     const thirdArr = secondWheelData.filter((item) =>
       item.value === pickedValue[1])
-    const thirdWheelData = thirdArr.length ? thirdArr[0].children : secondWheelData[0].children
+    const thirdWheelData = tool.length(thirdArr) ? thirdArr[0].children : secondWheelData[0].children
 
     return {
       secondWheelData,
@@ -156,7 +157,7 @@ class Picker extends Component {
         pickerData = [pickerData]
       }
       this.pickedValue = JSON.parse(JSON.stringify(
-        selectedValue.length ? selectedValue :
+        tool.length(selectedValue) ? selectedValue :
           [pickerData[0][0]]
             .concat(pickerData[1] ? pickerData[1][0] : [])
             .concat(pickerData[2] ? pickerData[2][0] : [])
@@ -168,7 +169,7 @@ class Picker extends Component {
       // only support three stage
       cascadeData = this._getCascadeData(pickerData, selectedValue)
       this.pickedValue = JSON.parse(JSON.stringify(
-        selectedValue.length ? selectedValue :
+        tool.length(selectedValue) ? selectedValue :
           [
             pickerData[0].value,
             cascadeData.secondWheelData[0].value

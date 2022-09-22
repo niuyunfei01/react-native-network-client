@@ -5,7 +5,7 @@ import TabButton from "../../../pubilc/component/TabButton";
 import LoadMore from 'react-native-loadmore'
 import color from "../../../pubilc/styles/colors";
 import colors from "../../../pubilc/styles/colors";
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
@@ -184,10 +184,10 @@ class GoodsPriceIndex extends Component {
       <View style={styles.goodsRow} key={idx}>
         <View style={styles.goodsImageBox}>
           <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
-            <CachedImage
-              style={styles.goodsImage}
-              source={{uri: product.coverimg}}
-            />
+            <FastImage style={styles.goodsImage}
+                       source={{uri: product.coverimg}}
+                       resizeMode={FastImage.resizeMode.contain}/>
+
           </TouchableOpacity>
         </View>
         <View style={styles.goodsInfo}>

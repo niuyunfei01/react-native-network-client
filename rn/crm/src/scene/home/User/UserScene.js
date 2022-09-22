@@ -21,12 +21,12 @@ import {hideModal, showModal, showSuccess, ToastShort} from "../../../pubilc/uti
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
-import native from "../../../pubilc/util/native";
 import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
+import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -57,17 +57,17 @@ class UserScene extends PureComponent {
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
               onPress={() => {
-                  navigation.navigate(Config.ROUTE_USER_ADD, {
-                    type: 'edit',
-                    user_id: params.currentUser,
-                    user_name: params.user_name,
-                    mobile: params.mobile,
-                    user_status: params.user_status,
-                    store_id: params.store_id,
-                    worker_id: params.worker_id,
-                    worker_nav_key: params.navigation_key,
-                    user_info_key: key,
-                  });
+                navigation.navigate(Config.ROUTE_USER_ADD, {
+                  type: 'edit',
+                  user_id: params.currentUser,
+                  user_name: params.user_name,
+                  mobile: params.mobile,
+                  user_status: params.user_status,
+                  store_id: params.store_id,
+                  worker_id: params.worker_id,
+                  worker_nav_key: params.navigation_key,
+                  user_info_key: key,
+                });
               }}
             >
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -85,6 +85,7 @@ class UserScene extends PureComponent {
     const {mine} = this.props;
 
     this.state = {
+      cover_image: '',
       isRefreshing: false,
       onSubmitting: false,
       type: type,
@@ -96,14 +97,25 @@ class UserScene extends PureComponent {
       currentUser: currentUser,
       currVendorId: currVendorId,
     };
-    const {accessToken} = this.props.global;
+
+    this.mixpanel = MixpanelInstance;
+    this._onLogout = this._onLogout.bind(this)
+  }
+
+  componentDidMount() {
+    const {mine, route, global} = this.props;
+    const {
+      //个人页的当前用户ID必须是传入进来的
+      currentUser, currVendorId,
+    } = route.params || {};
+    const {accessToken} = global;
     const url = `/api/get_worker_info/${currVendorId}/${currentUser}.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       let {
         id, mobilephone, cover_image, //user 表数据
-        worker_id, user_id, status, name, mobile, //worker 表数据
+        status, name, //worker 表数据
       } = res;
-      cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+      cover_image = cover_image ? Config.staticUrl(cover_image) : "";
       this.setState({
         mobile: mobilephone,
         cover_image: cover_image,
@@ -111,21 +123,29 @@ class UserScene extends PureComponent {
         user_status: parseInt(status),
         worker_id: id,
       })
-    }, (res) => {
+    }, () => {
       ToastShort("获取员工信息失败")
     })
 
     if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
       this.onGetUserCount();
     }
-
-    this.mixpanel = MixpanelInstance;
-    this._onLogout = this._onLogout.bind(this)
   }
 
   _onLogout() {
-    const {dispatch, navigation} = this.props;
+    const {dispatch, navigation, global} = this.props;
     this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      currentUser: 0,
+      currStoreId: 0,
+      host: '',
+      co_type: '',
+      enabledGoodMgr: '',
+      currVendorId: '',
+      printer_id: global.printer_id || '0'
+    }
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
       navigation.navigate(Config.ROUTE_LOGIN, {});
@@ -175,7 +195,7 @@ class UserScene extends PureComponent {
   }
 
   render() {
-    let {type, user_status} = this.state;
+    let {type, user_status, cover_image} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -190,7 +210,7 @@ class UserScene extends PureComponent {
         <View style={styles.user_box}>
           <Image
             style={[styles.user_img]}
-            source={!!this.state.cover_image ? {uri: this.state.cover_image} :
+            source={cover_image ? {uri: cover_image} :
               require('../../../img/My/touxiang180x180_.png')}
           />
           <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
@@ -211,7 +231,8 @@ class UserScene extends PureComponent {
             <Text style={[styles.info_name]}>当月出勤天数 </Text>
           </View>
           <TouchableWithoutFeedback onPress={() => {
-            this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
+            ToastShort('正在开发中，尽请期待...')
+            // this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
           }}>
             <View style={[styles.info_item]}>
               <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
@@ -228,9 +249,10 @@ class UserScene extends PureComponent {
                       style={styles.btn_allow}>取消禁用</Button>
           )
         }
-        <Text onPress={() => {
-          this.cancel()
-        }} style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>账户注销 </Text>
+        <Text onPress={() => this.cancel()}
+              style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>
+          账户注销
+        </Text>
       </ScrollView>
     );
   }
@@ -329,18 +351,6 @@ class UserScene extends PureComponent {
           });
         }
       }));
-    });
-  }
-
-  onRouteJump(route, params = {}) {
-    let _this = this;
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments();
-      return;
-    }
-
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
     });
   }
 }

@@ -15,6 +15,7 @@ import {fetchSupplyBalancedOrder, loadAllStores, loadAllSuppliers} from "../../.
 import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
 import Entypo from "react-native-vector-icons/Entypo";
+import tool from "../../../pubilc/util/tool";
 
 
 function mapStateToProps(state) {
@@ -92,9 +93,9 @@ class InvoicingReceiptScene extends PureComponent {
         } else {
           isLastPage = true
         }
-        if (data_list.length > 0) {
+        if (tool.length(data_list) > 0) {
           data_list.forEach(item => {
-            if (item.data.length > 0) {
+            if (tool.length(item.data) > 0) {
               data = data.concat(item.data)
             }
           })
@@ -121,7 +122,7 @@ class InvoicingReceiptScene extends PureComponent {
         counter += 1;
       }
     })
-    return views.length > 0 ? views : <EmptyListView/>;
+    return tool.length(views) > 0 ? views : <EmptyListView/>;
   }
 
   chooseStore(option) {

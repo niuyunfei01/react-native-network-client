@@ -10,10 +10,11 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -74,6 +75,7 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   fetchExpenses() {
+    showModal("加载中...")
     const self = this;
     const {global} = self.props;
     const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
@@ -85,11 +87,17 @@ class SeparatedExpenseInfo extends PureComponent {
         platform_labels: res.platform_labels,
         show_pay_notice: res.show_pay_notice
       })
+    }).catch(() => {
+      ToastLong("请求失败，请稍后再试")
+      hideModal()
+      this.props.navigation.goBack()
     })
+
   }
 
   render() {
     const {records} = this.state;
+    if (records) hideModal()
     return (
       <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}

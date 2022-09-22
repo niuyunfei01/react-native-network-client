@@ -7,7 +7,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from "../../reducers/operateProfit/operateProfitActions";
-import {toFixed} from '../../pubilc/util/tool';
+import tool, {toFixed} from '../../pubilc/util/tool';
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
 import RenderEmpty from './RenderEmpty'
@@ -82,7 +82,7 @@ class OperateIncomeDetailScene extends PureComponent {
 
   renderContent() {
     let {tabNum, orders, other} = this.state;
-    if (tabNum == 1 && orders.length > 0) {
+    if (tabNum == 1 && tool.length(orders) > 0) {
       return (
         <View>
           <Header text={'今日订单总收入'} money={toFixed(this.state.order_money)}/>
@@ -113,7 +113,7 @@ class OperateIncomeDetailScene extends PureComponent {
           </Cells>
         </View>)
 
-    } else if (tabNum == 2 && other.length > 0) {
+    } else if (tabNum == 2 && tool.length(other) > 0) {
       return (
         <View>
           <Header text={'今日其他总收入'} money={toFixed(this.state.other_money)}/>

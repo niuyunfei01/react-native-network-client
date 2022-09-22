@@ -11,6 +11,9 @@
  * Configurable variables. You may need to tweak these to be compatible with
  * the server-side, but the defaults work in most cases.
  */
+import tool from './tool'
+import DeviceInfo from "react-native-device-info"
+
 var hexcase = 0;
 /* hex output format. 0 - lowercase; 1 - uppercase        */
 var b64pad = "";
@@ -22,22 +25,27 @@ var chrsz = 8;
  * These are the functions you'll usually want to call
  * They take string arguments and return either hex or base-64 encoded strings
  */
-module.exports.hex_md5 = function (s) {
-  return binl2hex(core_md5(str2binl(s), s.length * chrsz));
+export function hex_md5(s) {
+  return binl2hex(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.b64_md5 = function (s) {
-  return binl2b64(core_md5(str2binl(s), s.length * chrsz));
+
+export function b64_md5(s) {
+  return binl2b64(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.str_md5 = function (s) {
-  return binl2str(core_md5(str2binl(s), s.length * chrsz));
+
+export function str_md5(s) {
+  return binl2str(core_md5(str2binl(s), tool.length(s) * chrsz));
 }
-module.exports.hex_hmac_md5 = function (key, data) {
+
+export function hex_hmac_md5(key, data) {
   return binl2hex(core_hmac_md5(key, data));
 }
-module.exports.b64_hmac_md5 = function (key, data) {
+
+export function b64_hmac_md5(key, data) {
   return binl2b64(core_hmac_md5(key, data));
 }
-module.exports.str_hmac_md5 = function (key, data) {
+
+export function str_hmac_md5(key, data) {
   return binl2str(core_hmac_md5(key, data));
 }
 
@@ -45,7 +53,7 @@ module.exports.str_hmac_md5 = function (key, data) {
  * Perform a simple self-test to see if the VM is working
  */
 function md5_vm_test() {
-  return hex_md5("abc") == "900150983cd24fb0d6963f7d28e17f72";
+  return hex_md5("abc") === "900150983cd24fb0d6963f7d28e17f72";
 }
 
 /*
@@ -61,7 +69,7 @@ function core_md5(x, len) {
   var c = -1732584194;
   var d = 271733878;
 
-  for (var i = 0; i < x.length; i += 16) {
+  for (var i = 0; i < tool.length(x); i += 16) {
     var olda = a;
     var oldb = b;
     var oldc = c;
@@ -172,7 +180,7 @@ function md5_ii(a, b, c, d, x, s, t) {
  */
 function core_hmac_md5(key, data) {
   var bkey = str2binl(key);
-  if (bkey.length > 16) bkey = core_md5(bkey, key.length * chrsz);
+  if (tool.length(bkey) > 16) bkey = core_md5(bkey, tool.length(key) * chrsz);
 
   var ipad = Array(16), opad = Array(16);
   for (var i = 0; i < 16; i++) {
@@ -180,7 +188,7 @@ function core_hmac_md5(key, data) {
     opad[i] = bkey[i] ^ 0x5C5C5C5C;
   }
 
-  var hash = core_md5(ipad.concat(str2binl(data)), 512 + data.length * chrsz);
+  var hash = core_md5(ipad.concat(str2binl(data)), 512 + tool.length(data) * chrsz);
   return core_md5(opad.concat(hash), 512 + 128);
 }
 
@@ -208,7 +216,7 @@ function bit_rol(num, cnt) {
 function str2binl(str) {
   var bin = Array();
   var mask = (1 << chrsz) - 1;
-  for (var i = 0; i < str.length * chrsz; i += chrsz)
+  for (var i = 0; i < tool.length(str) * chrsz; i += chrsz)
     bin[i >> 5] |= (str.charCodeAt(i / chrsz) & mask) << (i % 32);
   return bin;
 }
@@ -219,7 +227,7 @@ function str2binl(str) {
 function binl2str(bin) {
   var str = "";
   var mask = (1 << chrsz) - 1;
-  for (var i = 0; i < bin.length * 32; i += chrsz)
+  for (var i = 0; i < tool.length(bin) * 32; i += chrsz)
     str += String.fromCharCode((bin[i >> 5] >>> (i % 32)) & mask);
   return str;
 }
@@ -230,7 +238,7 @@ function binl2str(bin) {
 function binl2hex(binarray) {
   var hex_tab = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
   var str = "";
-  for (var i = 0; i < binarray.length * 4; i++) {
+  for (var i = 0; i < tool.length(binarray) * 4; i++) {
     str += hex_tab.charAt((binarray[i >> 2] >> ((i % 4) * 8 + 4)) & 0xF) +
       hex_tab.charAt((binarray[i >> 2] >> ((i % 4) * 8)) & 0xF);
   }
@@ -243,14 +251,24 @@ function binl2hex(binarray) {
 function binl2b64(binarray) {
   var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   var str = "";
-  for (var i = 0; i < binarray.length * 4; i += 3) {
+  for (var i = 0; i < tool.length(binarray) * 4; i += 3) {
     var triplet = (((binarray[i >> 2] >> 8 * (i % 4)) & 0xFF) << 16)
       | (((binarray[i + 1 >> 2] >> 8 * ((i + 1) % 4)) & 0xFF) << 8)
       | ((binarray[i + 2 >> 2] >> 8 * ((i + 2) % 4)) & 0xFF);
     for (var j = 0; j < 4; j++) {
-      if (i * 8 + j * 6 > binarray.length * 32) str += b64pad;
+      if (i * 8 + j * 6 > tool.length(binarray) * 32) str += b64pad;
       else str += tab.charAt((triplet >> 6 * (3 - j)) & 0x3F);
     }
   }
   return str;
 }
+
+/**
+ * 图片上传key
+ */
+export function imageKey(imgName) {
+  let curTime = Date.now();
+  let UniqueId = DeviceInfo.getUniqueId();
+  return hex_md5(UniqueId + curTime + imgName)
+}
+

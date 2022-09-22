@@ -12,6 +12,7 @@ import CallBtn from "../../order/CallBtn";
 import Loadmore from 'react-native-loadmore'
 import FetchEx from "../../../pubilc/util/fetchEx";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -22,14 +23,12 @@ class WorkerScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {currentUser, currStoreId, canReadStores} = this.props.global;
+    const {currentUser, vendor_id, vendor_info} = this.props.global;
 
-    let currVendorId = canReadStores[currStoreId]['type'];
-    let currVendorName = canReadStores[currStoreId]['vendor'];
     this.state = {
       currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: currVendorName,
+      currVendorId: vendor_id,
+      currVendorName: vendor_info?.brand_name,
       lists: [],
       pageNum: 1,
       pageSize: 20,
@@ -58,7 +57,7 @@ class WorkerScene extends PureComponent {
         <CellHeader>
           <Image
             style={[styles.worker_img]}
-            source={user.image !== '' ? {uri: user.image} : require('../../../img/My/touxiang50x50_.png')}
+            source={user.image !== '' ? {uri: user.image.split("cai.cn")[1]} : require('../../../img/My/touxiang50x50_.png')}
           />
         </CellHeader>
         <CellBody>
@@ -118,7 +117,7 @@ class WorkerScene extends PureComponent {
       let {ok, reason, obj, error_code} = resp;
       if (ok) {
         let isLastPage = true
-        if (obj.lists.length && obj.page * obj.pageSize < obj.count) {
+        if (tool.length(obj.lists) && obj.page * obj.pageSize < obj.count) {
           isLastPage = false
         }
 
@@ -164,7 +163,7 @@ class WorkerScene extends PureComponent {
         </View>
 
         <View style={styles.searchBox}>
-          <FontAwesome5 name={'search'} style={{fontSize: 26}}/>
+          <FontAwesome5 name={'search'} style={{fontSize: 22, marginHorizontal: 15}}/>
           <TextInput
             underlineColorAndroid='transparent'
             placeholder='搜索员工'

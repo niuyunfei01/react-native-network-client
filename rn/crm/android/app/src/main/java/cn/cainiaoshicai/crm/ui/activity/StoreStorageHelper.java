@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,7 +11,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -33,8 +34,6 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 
 /**
  * Created by liuzhr on 10/31/16.

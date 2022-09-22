@@ -1,12 +1,13 @@
 import React, {PureComponent} from "react";
-import {View, Text, StyleSheet, Switch, TextInput, TouchableOpacity, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {Styles, LineView} from "./GoodsIncrementServiceStyle";
+import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   notificationWrap: {
@@ -182,13 +183,13 @@ class BadReviewReminderScene extends PureComponent {
           <Text style={styles.rowDescriptionText}>
             手机号码(+86)：
           </Text>
-          <TextInput allowFontScaling={false}
-                     style={[styles.rowDescriptionText, {flex: 1}]}
-                     placeholder={'请输入手机号'}
-                     placeholderTextColor={colors.colorEEE}
-                     keyboardType={'numeric'}
-                     onChangeText={text => this.onChangeText(text)}
-                     value={settings.mobile}/>
+          <TextInput
+            style={[styles.rowDescriptionText, {flex: 1}]}
+            placeholder={'请输入手机号'}
+            placeholderTextColor={colors.colorEEE}
+            keyboardType={'numeric'}
+            onChangeText={text => this.onChangeText(text)}
+            value={settings.mobile}/>
         </View>
       </View>
     )
@@ -221,11 +222,11 @@ class BadReviewReminderScene extends PureComponent {
   saveSetting = () => {
     const {settings} = this.state
 
-    if (settings.notify_start_at.length === 0 || settings.notify_end_at.length === 0) {
+    if (tool.length(settings.notify_start_at) === 0 || tool.length(settings.notify_end_at) === 0) {
       showError('请选择通知开始时间或者结束时间')
       return;
     }
-    if (settings.mobile.length <= 10) {
+    if (tool.length(settings.mobile) <= 10) {
       showError('请输入正确的手机号')
       return
     }
@@ -240,7 +241,7 @@ class BadReviewReminderScene extends PureComponent {
         showError('结束时间应大于开始时间，并且间隔不小于30分钟')
         return;
       }
-    }catch (e) {
+    } catch (e) {
 
     }
     const {accessToken, currStoreId} = this.props.global;

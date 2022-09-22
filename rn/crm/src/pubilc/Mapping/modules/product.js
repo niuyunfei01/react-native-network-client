@@ -2,11 +2,11 @@ export default {
   STORE_PRODUCT_STATUS: {
     ON_SALE: {
       value: '1',
-      label: '售卖中'
+      label: '上架'
     },
     SOLD_OUT: {
       value: '2',
-      label: '售罄'
+      label: '下架'
     },
     OFF_SALE: {
       value: '3',

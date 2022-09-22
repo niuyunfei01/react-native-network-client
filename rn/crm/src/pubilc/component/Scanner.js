@@ -66,8 +66,8 @@ class Scanner extends React.Component {
         if (error) {
           return;
         }
-        // loaded successfully
-        console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+        //  loaded successfully
+        // console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
 
         // Play the sound with an onEnd callback
         whoosh.play((success) => {
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   rectangle: {
     height: 200,
-    width: 200,
+    width: 300,
     borderWidth: 1,
     borderColor: '#00FF00',
     backgroundColor: 'transparent'
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   border: {
     flex: 0,
-    width: 200,
+    width: 300,
     height: 2,
     backgroundColor: '#00FF00',
   }

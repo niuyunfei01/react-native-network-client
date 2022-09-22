@@ -2,8 +2,9 @@ package cn.customer_serv.customer_servsdk.imageloader;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.annotation.DrawableRes;
 import android.widget.ImageView;
+
+import androidx.annotation.DrawableRes;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com

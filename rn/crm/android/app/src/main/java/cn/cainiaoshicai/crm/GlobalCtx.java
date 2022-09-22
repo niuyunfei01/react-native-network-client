@@ -5,6 +5,7 @@ import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -15,14 +16,12 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +30,7 @@ import androidx.multidex.MultiDex;
 
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -56,9 +56,11 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.reactnativerestart.RestartPackage;
@@ -78,6 +80,8 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
+import org.xutils.common.util.MD5;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,6 +98,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -118,7 +123,6 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
-import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -137,11 +141,11 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.jiguang.plugins.push.JPushModule;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import it.innove.BleManagerPackage;
+import qiuxiang.amap3d.AMap3DPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -174,7 +178,7 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     private DisplayMetrics displayMetrics = null;
 
-    private ImageLoader imageLoader;
+    //private ImageLoader imageLoader;
 
     //image memory cache
     private LruCache<String, Bitmap> appBitmapCache = null;
@@ -258,13 +262,13 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
-    public ImageLoader getImageLoader() {
-        return imageLoader;
-    }
+//    public ImageLoader getImageLoader() {
+//        return imageLoader;
+//    }
 
-    public void setImageLoader(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
-    }
+//    public void setImageLoader(ImageLoader imageLoader) {
+//        this.imageLoader = imageLoader;
+//    }
 
     private volatile boolean imageLoaderInited = false;
 
@@ -282,7 +286,8 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         public boolean getUseDeveloperSupport() {
             return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-       }
+        }
+
         //如果是debug模式，最优先加载getJSMainModuleName
         //如果是release模式，优先加载getJSBundleFile
         //如果getJSBundleFile为null，加载getBundleAssetName
@@ -290,7 +295,8 @@ public class GlobalCtx extends Application implements ReactApplication {
         @Override
         protected String getJSBundleFile() {
             String DocumentDir = GlobalCtx.this.getFilesDir().getAbsolutePath();
-            String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
+            String versionCode = Utility.getVersionCode(GlobalCtx.app());
+            String jsBundleFile = DocumentDir + "/last.android/" + versionCode + ".android.bundle";
             File file = new File(jsBundleFile);
             if (file.exists() && file.isFile()) {
                 return jsBundleFile;
@@ -329,12 +335,17 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new JPushPackage(),
                     new NewRelicPackage(),
                     new LinearGradientPackage(),
+                    new AMap3DPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage(),
                     new ClipboardPackage(),
                     new RNZipArchivePackage(),
                     new RestartPackage(),
-                    new RNViewShotPackage()
+                    new RNViewShotPackage(),
+                    new FastImageViewPackage(),
+                    new ReactSliderPackage(),
+                    new CameraRollPackage(),
+                    new RNCMaskedViewPackage()
             );
         }
     };
@@ -344,45 +355,68 @@ public class GlobalCtx extends Application implements ReactApplication {
         return mReactNativeHost;
     }
 
+    public static String getProcessName(Context ctx, int pid) {
+        //获取ActivityManager对象
+        ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        //在运行的进程的
+        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) {
+            return null;
+        }
+        for (ActivityManager.RunningAppProcessInfo procInfo : runningApps) {
+            if (procInfo.pid == pid) {
+                return procInfo.processName;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        startAppTime = System.currentTimeMillis();
-        MultiDex.install(this);
 
-        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
-        application = this;
+        String processName = getProcessName(this, android.os.Process.myPid());
+        if ("cn.cainiaoshicai.crm".equals(processName)) {
+            startAppTime = System.currentTimeMillis();
+            MultiDex.install(this);
 
-        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
-        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        updateAfterGap(24 * 60 * 60 * 1000);
+            Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
+            application = this;
 
-        try {
-            Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
-            field.setAccessible(true);
-            field.set(null, 100 * 1024 * 1024); //100MB
-        } catch (Exception e) {
-            if (BuildConfig.DEBUG) {
-                e.printStackTrace();
+            String myId = SettingUtility.getMyUUID();
+            if ("".equals(myId)) {
+                myId = MD5.md5(UUID.randomUUID().toString()).substring(0, 8);
+                SettingUtility.setMyUUID(myId);
             }
-        }
 
-        NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
+            @SuppressLint("HardwareIds") String android_id = myId;
+            agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
+            dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
+            updateAfterGap(24 * 60 * 60 * 1000);
+
+            try {
+                Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
+                field.setAccessible(true);
+                field.set(null, 100 * 1024 * 1024); //100MB
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
+                }
+            }
+
+            NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
 
 //        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
 //        AudioUtils.getInstance().init(getApplicationContext());
-        this.soundManager = new SoundManager();
-        this.soundManager.load(this);
+            this.soundManager = new SoundManager();
+            this.soundManager.load(this);
 
-        //初始化蓝牙管理
-        AppInfo.init(this);
-        startKeepAlive();
+            startKeepAlive();
 
-        SoLoader.init(this, /* native exopackage */ false);
-        JPushModule.registerActivityLifecycle(this);
+            SoLoader.init(this, /* native exopackage */ false);
 
+
+        }
     }
 
     public static long startAppTime = 0;
@@ -585,7 +619,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
         return accountBean;
     }
-
 
 
     public String getCurrentAccountId() {
@@ -1431,28 +1464,6 @@ public class GlobalCtx extends Application implements ReactApplication {
             }
 
             return false;
-        }
-
-        private boolean play_three_sound(final int storeSound, final int numberSound, final int suffixSound) {
-            if (check_disabled()) return false;
-            if (soundLoaded) {
-                new MyAsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(STORE_SOUND_LEN);
-                        soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(NUMBER_SOUND_LENGTH);
-                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(4000);
-                        return null;
-                    }
-                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
-                return true;
-            } else {
-                AppLogger.e("no sound");
-                return false;
-            }
         }
 
         private void pause(int time) {

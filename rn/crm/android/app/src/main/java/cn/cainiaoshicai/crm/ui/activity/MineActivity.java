@@ -7,13 +7,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,9 +132,7 @@ public class MineActivity extends AbstractActionBarActivity {
                     } else if (item.getType() == TYPE_ORDER_SEARCH) {
                         onSearchRequested();
                     } else if (item.getType() == TYPE_TOTAL_SCORE) {
-                        MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
                     } else if (item.getType() == TYPE_ORDER_DELAYED) {
-                        MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
                     } else if (item.getType() == TYPE_ORDER_LIST) {
                         Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
                         intent.putExtra("list_type", ListType.INVALID.getValue());

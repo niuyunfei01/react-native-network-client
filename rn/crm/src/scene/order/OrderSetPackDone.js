@@ -12,6 +12,7 @@ import CheckboxCells from "../../weui/Form/CheckboxCells";
 import Switch from "../../weui/Form/Switch";
 import CellFooter from "../../weui/Cell/CellFooter";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   return {
@@ -44,7 +45,7 @@ class OrderSetPackDone extends Component {
     if (order) {
       this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
       const packWorkers = store.packWorkers[order.store_id];
-      if (!packWorkers || packWorkers.length === 0) {
+      if (!packWorkers || tool.length(packWorkers) === 0) {
         showModal("加载中")
         this.setState({loadingPacker: true});
         dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
@@ -67,9 +68,9 @@ class OrderSetPackDone extends Component {
     const {order} = (route.params || {});
     if (order) {
       const workers = (store.packWorkers || {})[order.store_id];
-      if (workers && this.state.checked.length === 0) {
+      if (workers && tool.length(this.state.checked) === 0) {
         const currUid = '' + global.currentUser;
-        if (workers.filter(w => w.id === currUid).length > 0) {
+        if (tool.length(workers.filter(w => w.id === currUid)) > 0) {
           this.setState({checked: [currUid]})
         }
       }
@@ -82,7 +83,7 @@ class OrderSetPackDone extends Component {
   };
 
   _checkDisableSubmit = () => {
-    return !(this.state.checked && this.state.checked.length > 0 && this.state.notAutoConfirmed && this.state.storeRemarkConfirmed);
+    return !(this.state.checked && tool.length(this.state.checked) > 0 && this.state.notAutoConfirmed && this.state.storeRemarkConfirmed);
   };
 
   _doReply = () => {

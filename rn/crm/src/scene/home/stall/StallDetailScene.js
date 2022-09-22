@@ -1,12 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput, ScrollView
-} from "react-native";
+import {FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -16,6 +9,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {connect} from "react-redux";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   rowCenter: {flexDirection: 'row', alignItems: 'center', marginRight: 8},
@@ -129,7 +123,18 @@ const styles = StyleSheet.create({
     color: colors.color333,
     lineHeight: 20,
     width: '70%',
-    justifyContent:'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#979797',
+    borderStyle: 'solid',
+    paddingTop: 3,
+    paddingLeft: 7,
+    paddingBottom: 4
+  },
+  selectContent:{
+    width: '70%',
+    justifyContent: 'center',
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#979797',
@@ -293,6 +298,25 @@ const MODAL_DATA = [
 
 class StallDetailScene extends PureComponent {
 
+  state = {
+    selectType: 'income',
+    modalVisible: false,
+    modalContentObj: {
+      type: {
+        value: '',
+        label: ''
+      },
+      money: '',
+      remark: '',
+    },
+    stallInfo: {
+      income: [],
+      outcome: [],
+      other: []
+    },
+    selectItem: -1//展开某一项
+  }
+
   navigationOptions = () => {
     const {navigation} = this.props
     const option = {headerRight: () => this.headerRight()}
@@ -318,7 +342,7 @@ class StallDetailScene extends PureComponent {
   }
 
   submitSettlementInfo = (modalContentObj) => {
-    if (modalContentObj.type?.value?.length === 0 || modalContentObj.money.length === 0) {
+    if (tool.length(modalContentObj.type?.value) === 0 || tool.length(modalContentObj.money) === 0) {
       showError('请先选择类型和输入备注', 1);
       return
     }
@@ -357,6 +381,7 @@ class StallDetailScene extends PureComponent {
       },
     })
   }
+
   closeModal = () => {
     this.setState({
       modalVisible: false,
@@ -370,6 +395,7 @@ class StallDetailScene extends PureComponent {
       },
     })
   }
+
   onChangeText = (value, attr) => {
     const {modalContentObj} = this.state
     modalContentObj[attr] = value
@@ -403,7 +429,7 @@ class StallDetailScene extends PureComponent {
               门店
             </Text>
             <Text style={styles.modalContentRightText}>
-              {this.props.global.simpleStore.name}
+              {this.props.global?.store_info?.name}
             </Text>
           </View>
           <View style={styles.modalContentRowWrap}>
@@ -429,7 +455,7 @@ class StallDetailScene extends PureComponent {
             <ModalSelector onChange={value => this.onChangeText(value, 'type')}
                            data={MODAL_DATA}
                            skin="customer"
-                           style={styles.modalContentRightTextInput}
+                           style={styles.selectContent}
                            defaultKey={1}>
               <View style={styles.modalSelectWrap}>
                 <Text style={modalContentObj.type?.label ? styles.modalSelectText : styles.modalNotSelectText}>
@@ -445,7 +471,7 @@ class StallDetailScene extends PureComponent {
               金额
             </Text>
             <TextInput style={styles.modalContentRightTextInput}
-                       allowFontScaling={false}
+
                        value={modalContentObj.money}
                        placeholderTextColor={colors.colorDDD}
                        onChangeText={text => this.onChangeText(text, 'money')}
@@ -457,7 +483,7 @@ class StallDetailScene extends PureComponent {
               备注
             </Text>
             <TextInput style={styles.modalContentRightMultipleTextInput}
-                       allowFontScaling={false}
+
                        placeholderTextColor={colors.colorDDD}
                        multiline={true}
                        onChangeText={text => this.onChangeText(text, 'remark')}
@@ -484,7 +510,7 @@ class StallDetailScene extends PureComponent {
 
   renderOther = (list) => {
     return (
-      <If condition={list?.length > 0}>
+      <If condition={tool.length(list) > 0}>
         <For of={list} each="item" index="i">
           <View style={styles.modifySettlementWrap} key={i}>
             <View style={styles.modifySettlementTitleWrap}>
@@ -568,25 +594,6 @@ class StallDetailScene extends PureComponent {
     )
   }
 
-  state = {
-    selectType: 'income',
-    modalVisible: false,
-    modalContentObj: {
-      type: {
-        value: '',
-        label: ''
-      },
-      money: '',
-      remark: '',
-    },
-    stallInfo: {
-      income: [],
-      outcome: [],
-      other: []
-    },
-    selectItem: -1//展开某一项
-  }
-
   selectItem = (selectItem, index) => {
     this.setState({selectItem: selectItem !== index ? index : -1})
   }
@@ -602,19 +609,21 @@ class StallDetailScene extends PureComponent {
             完成时间：{order_time}
           </Text>
         </View>
-        <For of={items} each="item" index="i">
-          <View style={styles.extraContentWrap} key={i}>
-            <Text style={styles.extraContentText}>
-              {item.name}
-            </Text>
-            <Text style={styles.extraContentNumText}>
-              x{item.num}
-            </Text>
-            <Text style={styles.extraContentPriceText}>
-              ￥{item.price}
-            </Text>
-          </View>
-        </For>
+        <If condition={Array.isArray(items) && items.length > 0}>
+          <For of={items} each="item" index="i">
+            <View style={styles.extraContentWrap} key={i}>
+              <Text style={styles.extraContentText}>
+                {item.name}
+              </Text>
+              <Text style={styles.extraContentNumText}>
+                x{item.num}
+              </Text>
+              <Text style={styles.extraContentPriceText}>
+                ￥{item.price}
+              </Text>
+            </View>
+          </For>
+        </If>
       </View>
     )
   }

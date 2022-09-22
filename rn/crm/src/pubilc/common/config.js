@@ -3,30 +3,6 @@
 import GlobalUtil from "../util/GlobalUtil";
 import {Platform} from "react-native";
 
-const {HOST_UPDATED} = require("./constants").default;
-
-/**
- * if none in global, return the default host and try to update from settings into global
- * @param globalRed the reducer of global
- * @param dispatch
- * @param native
- * @returns {*}
- * @deprecated 直接使用 apiUrl
- */
-export function host(globalRed, dispatch, native) {
-  if (globalRed.host) {
-    return globalRed.host;
-  } else {
-    native.host(host => {
-      if (host) {
-        dispatch({type: HOST_UPDATED, host: host});
-      }
-    });
-
-    return C.defaultHost;
-  }
-}
-
 export function apiUrl(path) {
   const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
@@ -100,6 +76,7 @@ const C = {
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
+  ROUTE_NEW_REFUND_AUDIT: 'newAuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_ORDER_SETTING: 'SettingOrders',       // 新建订单
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
@@ -138,6 +115,8 @@ const C = {
   ROUTE_AUTOMATIC_PACKAGING: 'ROUTE_AUTOMATIC_PACKAGING',//自动打包
   ROUTE_TEMPLATE_SETTINGS: 'ROUTE_TEMPLATE_SETTINGS',//回评模板
   ROUTE_INCREMENT_SERVICE_DESCRIPTION: 'ROUTE_INCREMENT_SERVICE_DESCRIPTION',//详情介绍
+  ROUTE_OPEN_MEMBER: 'ROUTE_OPEN_MEMBER',//开通会员
+  ROUTE_Member_Agreement: 'ROUTE_Member_Agreement',//会员协议
 
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
@@ -149,12 +128,12 @@ const C = {
   ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
+  ROUTE_STORE_SELECT: 'StoreSelect',
   ROUTE_COMES_BACK: 'ComesBack',
   ROUTE_COMES_BACK_INFO: 'ComesBackInfo',
   ROUTE_STORE_CLOSE: 'StoreClose',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
-  ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
@@ -176,7 +155,6 @@ const C = {
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',
-  ROUTE_GOODS_APPLY_NEW_PRODUCT: 'GoodsApplyNewProduct',
   ROUTE_GOODS_WORK_NEW_PRODUCT: 'GoodsWorkNewProduct',
   ROUTE_OPERATE_PROFIT: 'OperateProfit',
   ROUTE_OPERATE_DETAIL: 'OperateDetail',
@@ -208,8 +186,9 @@ const C = {
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
-  ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',//设置配送方式
+  ROUTE_SEETING_DELIVERY_INFO: 'SettingDeliveryInfo',//设置配送方式
   ROUTE_AUTO_CALL_DELIVERY: 'AutoCallDelivery',
+  ROUTE_ORDER_RETAIL_PRICE_NEW: 'NewRetailPrice',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
   ROUTE_SEETING_PREFERENCE_DELIVERY: 'PreferenceBillingSetting',   //偏好发单设置
   ROUTE_SEETING_MININUM_DELIVERY: 'SeetingMiniNumDelivery',   //保底配送
@@ -233,8 +212,8 @@ const C = {
   ROUTE_STORE_GOODS_LIST: 'goods',
   ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
-  ROUTE_NEW_PRODUCT: 'NewProduct',
-  ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
+  ROUTE_ADD_MISSING_PICTURE: 'ROUTE_ADD_MISSING_PICTURE',//添加缺失图片
+
   ROUTE_INVOICING: 'Invoicing',
   ROUTE_INVOICING_GATHER_DETAIL: 'InvoicingGatherDetail',
   ROUTE_INVOICING_SHIPPING_DETAIL: 'InvoicingShippingDetail',
@@ -288,6 +267,9 @@ const C = {
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
   ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
 
+
+  RIDER_TRSJECTORY: 'RiderTrajectory',
+
   //wechat app_id
   APP_ID: "wx0ffb81c6dc194253",
   Program_id: "gh_ecf3cb98d5ef",
@@ -296,10 +278,6 @@ const C = {
   serverUrl,
   apiUrl,
   staticUrl,
-  /**
-   * @see host
-   */
-  host,
   hostPort
 };
 

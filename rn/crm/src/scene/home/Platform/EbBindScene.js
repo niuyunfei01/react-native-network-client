@@ -126,15 +126,15 @@ class EbBindScene extends PureComponent {
             <View style={styles.typeBox}>
               <Text style={[styles.labelLine, {marginBottom: pxToDp(10)}]}>应用类型：</Text>
               <ModalSelector
-                  onChange={option => {
-                    this.setState({
-                      applicationTypeLabel: option.label,
-                      applicationType: option.type
-                    })
-                  }}
-                  data={applicationTypes}
-                  skin="customer"
-                  defaultKey={-999}
+                onChange={option => {
+                  this.setState({
+                    applicationTypeLabel: option.label,
+                    applicationType: option.type
+                  })
+                }}
+                data={applicationTypes}
+                skin="customer"
+                defaultKey={-999}
               >
                 <View style={styles.body_text}>
                   <Text style={styles.selectLabelLine}>{this.state.applicationTypeLabel || '点击选择应用类型'}</Text>

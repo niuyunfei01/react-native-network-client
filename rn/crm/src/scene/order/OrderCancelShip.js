@@ -147,7 +147,7 @@ class OrderCancelShip extends Component {
                 onPress: async () => {
                   this.setState({showOtherDialog: false, upLoading: true});
                   showModal('提交中')
-                  this.upCancelShip()
+                  await this.upCancelShip()
                 }
               }]}>
         <TextInput
@@ -176,7 +176,7 @@ class OrderCancelShip extends Component {
                 onPress: async () => {
                   this.setState({showDialog: false, upLoading: true});
                   showModal('提交中')
-                  this.upCancelShip()
+                  await this.upCancelShip()
                 }
               }]}
       >

@@ -73,7 +73,7 @@ class UserTagPopup extends React.Component {
         if (resp.ok) {
           let tagList = resp.obj
           let list = []
-          if (tagList && tagList.length > 0) {
+          if (tagList && tool.length(tagList) > 0) {
             tagList.forEach(function (item) {
               list.push({name: item['name'], id: item['id']});
             });
@@ -89,7 +89,7 @@ class UserTagPopup extends React.Component {
     let selectTags = []
     let initTagIds = this.props.selectTagIds
     let tagList = this.state.originTagList
-    if (tagList && tagList.length > 0) {
+    if (tagList && tool.length(tagList) > 0) {
       tagList.forEach(function (item) {
         if (initTagIds.includes(item.id)) {
           selectTags.push({name: item.name, id: item.id})
@@ -208,7 +208,7 @@ class UserTagPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入名称" onChange={(value) => this.onSearch(value)}/>
-          {this.state.tagList.length > 0 ? <ScrollView>
+          {tool.length(this.state.tagList) > 0 ? <ScrollView>
               <List>
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>

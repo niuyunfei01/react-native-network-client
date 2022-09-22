@@ -1,4 +1,4 @@
-import { Mixpanel } from 'mixpanel-react-native';
+import {Mixpanel} from 'mixpanel-react-native';
 
 const token = "dec49f0bb85d25ec538dd9476575961d";
 const username = 'jbb.10cc05.mp-service-account';

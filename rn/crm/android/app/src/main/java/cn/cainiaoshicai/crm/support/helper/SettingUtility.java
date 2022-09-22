@@ -1,8 +1,9 @@
 package cn.cainiaoshicai.crm.support.helper;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -509,6 +510,14 @@ public class SettingUtility {
 
     public static void setDisableSoundNotify(boolean isChecked) {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
+    }
+
+    public static String getMyUUID() {
+        return SettingHelper.getSharedPreferences(getContext(), "wsb_my_uuid", "");
+    }
+
+    public static void setMyUUID(String isChecked) {
+        SettingHelper.setEditor(getContext(), "wsb_my_uuid", isChecked);
     }
 
     public static void setDisableNewOrderSoundNotify(boolean isChecked) {

@@ -60,7 +60,7 @@ class GoodItemEditBottom extends React.Component {
   }
 
   resetModal = () => {
-    this.setItem(-1)
+    //this.setItem(-1)
     const {onClose} = this.props
     onClose()
   }
@@ -116,7 +116,7 @@ class GoodItemEditBottom extends React.Component {
     this.setState({offOption: value})
   }
 
-  render(): React.ReactNode {
+  render() {
     const {
       productName,
       accessToken,

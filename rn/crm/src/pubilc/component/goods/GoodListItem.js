@@ -1,12 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {CachedImage} from "react-native-img-cache";
+import FastImage from 'react-native-fast-image'
 import Config from "../../common/config";
 import colors from "../../styles/colors";
 import Cts from "../../common/Cts";
 import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
+import tool from "../../util/tool";
+import {SvgXml} from "react-native-svg";
+import {noImage} from "../../../svg/svg";
 
 class GoodListItem extends React.PureComponent {
   static propTypes = {
@@ -41,17 +44,17 @@ class GoodListItem extends React.PureComponent {
     const {product, fnProviding} = this.props;
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-    let skus = product?.skus ? product.skus : []
+    let skus = product.skus || []
+    const {price_type} = this.props
     return (
       <ScrollView style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
         <View style={{flexDirection: "row"}}>
-          <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
-          </Text>
+          <Text style={[styles.n2grey6, offSaleTxtStyle]}>{product.price_type === 1 ? '零售价格' : '报价'}：</Text>
           <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-            {this.supplyPriceInYuan(product)}
+            ￥{product.price_type === 1 ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
           </Text>
           <If condition={product.sp && product.sp.is_fix_price === 1}>
             <View style={{
@@ -75,12 +78,8 @@ class GoodListItem extends React.PureComponent {
           <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>
         </If>
 
-        <If condition={skus?.length > 0}>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              showMore: !this.state.showMore
-            })
-          }}>
+        <If condition={tool.length(skus) > 0}>
+          <TouchableOpacity onPress={() => this.setState({showMore: !this.state.showMore})}>
             {
               this.state.showMore ?
                 <View style={{flexDirection: "row"}}>
@@ -95,16 +94,16 @@ class GoodListItem extends React.PureComponent {
           </TouchableOpacity>
         </If>
 
-        <If condition={skus?.length > 0 && this.state.showMore}>
+        <If condition={tool.length(skus) > 0 && this.state.showMore}>
           <For each="item" index="idx" of={skus}>
             <View style={{flexDirection: "column"}} key={idx}>
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
               <View style={{flexDirection: "row"}}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  报价：
+                  {price_type === 1 ? '零售价格' : '报价'}：
                 </Text>
                 <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  {parseFloat((item || {}).supply_price / 100).toFixed(2)}
+                  ￥{price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
                 </Text>
               </View>
 
@@ -115,7 +114,7 @@ class GoodListItem extends React.PureComponent {
               </If>
               <If condition={fnProviding}>
                 <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  库存：{item.left_since_last_stat ? item.left_since_last_stat : 0} 件
+                  库存：{item.left_since_last_stat || 0} 件
                 </Text>
               </If>
             </View>
@@ -135,7 +134,15 @@ class GoodListItem extends React.PureComponent {
                              onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <View>
-          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[styles.listImageSize, offSaleImg]}/>
+          <If condition={product.coverimg}>
+            <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                       style={[styles.listImageSize, offSaleImg]}
+                       resizeMode={FastImage.resizeMode.contain}/>
+          </If>
+          <If condition={!product.coverimg}>
+            <SvgXml xml={noImage()} style={[styles.listImageSize, offSaleImg]}/>
+          </If>
+
           <If condition={!onSale}>
             <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>
               <Text style={{color: colors.white}}>暂 停</Text>

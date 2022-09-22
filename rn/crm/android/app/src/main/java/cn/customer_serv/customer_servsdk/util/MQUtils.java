@@ -20,10 +20,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.StringRes;
-import androidx.core.graphics.drawable.DrawableCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -38,6 +34,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -49,9 +50,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.core.bean.MQAgent;
 import cn.customer_serv.core.bean.MQMessage;
-import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.model.Agent;
 import cn.customer_serv.customer_servsdk.model.BaseMessage;
 import cn.customer_serv.customer_servsdk.model.FileMessage;

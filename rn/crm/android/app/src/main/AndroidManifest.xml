@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="644"
-    android:versionName="3.18.1">
+    android:versionCode="650"
+    android:versionName="3.19.1">
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
@@ -82,9 +82,9 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="wx0ffb81c6dc194253"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="wx0ffb81c6dc194253" />
             </intent-filter>
         </activity>
 
@@ -92,32 +92,8 @@
             android:name=".MainOrdersActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Styled.NoActionBar"/>
+            android:theme="@style/Theme.Styled.NoActionBar" />
 
-        <activity
-            android:name=".wxapi.WXEntryActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="wx0ffb81c6dc194253"/>
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".wxapi.WXPayEntryActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="wx0ffb81c6dc194253"/>
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ui.activity.RemindersActivity"
             android:screenOrientation="portrait">
@@ -163,20 +139,7 @@
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity
-            android:name=".ui.activity.MonthPerfActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity
-            android:name=".ui.activity.InTimeStatsActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
+        <activity android:name=".ui.activity.LoginActivity" />
         <activity
             android:name=".ui.activity.UserCommentsActivity"
             android:screenOrientation="portrait">
@@ -194,12 +157,12 @@
         <activity
             android:name=".ui.activity.GeneralWebViewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Styled.NoActionBar"></activity>
+            android:theme="@style/Theme.Styled.NoActionBar"/>
         <activity
             android:name=".ui.activity.TowerActivity"
             android:parentActivityName=".ui.activity.MineActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Styled"></activity>
+            android:theme="@style/Theme.Styled"/>
         <activity
             android:name=".ui.activity.FeedBackEditActivity"
             android:parentActivityName=".ui.activity.FeedbackListsActivity"
@@ -231,9 +194,6 @@
             android:name=".ui.activity.StorageProvideActivity"
             android:parentActivityName=".ui.activity.StoreStorageActivity"
             android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".ui.activity.DataActivity"
-            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".ui.activity.CustomizedMQConversationActivity"
@@ -258,28 +218,6 @@
             android:name=".ui.activity.SearchBluetoothActivity"
             android:screenOrientation="portrait"></activity>
 
-        <!-- For test only 测试的主程序-->
-        <activity
-            android:name="com.example.jpushdemo.MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait" />
-        <!-- For test only 测试高级功能 -->
-        <activity
-            android:name="com.example.jpushdemo.PushSetActivity"
-            android:label="@string/app_name" />
-        <!-- For test only 测试设置 -->
-        <activity
-            android:name="com.example.jpushdemo.SettingActivity"
-            android:label="@string/app_name" />
-        <!-- For test only 测试状态通知栏，需要打开的Activity -->
-        <activity
-            android:name="com.example.jpushdemo.TestActivity"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="jpush.testAction" />
-                <category android:name="jpush.testCategory" />
-            </intent-filter>
-        </activity>
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
@@ -290,8 +228,8 @@
             android:name="cn.jpush.android.ui.PushActivity"
             android:configChanges="orientation|keyboardHidden"
             android:exported="false"
-            tools:replace="android:exported"
-            android:theme="@android:style/Theme.NoTitleBar">
+            android:theme="@android:style/Theme.NoTitleBar"
+            tools:replace="android:exported">
             <intent-filter>
                 <action android:name="cn.jpush.android.ui.PushActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -329,7 +267,7 @@
 
         <service android:name="cn.jpush.android.service.DownloadService" android:enabled="true" android:exported="false"/>
 
-        <service android:name=".notify.service.PushService" android:process=":pushcore" android:exported="true">
+        <service android:name=".notify.service.PushService" android:exported="true" android:process=":pushcore">
             <intent-filter>
                 <action android:name="cn.jiguang.user.service.action" />
             </intent-filter>
@@ -347,11 +285,12 @@
             </intent-filter>
         </service>
 
-        <activity android:name="cn.jpush.android.service.JNotifyActivity"
-                android:exported="true"
-                tools:replace="android:exported"
-                android:taskAffinity="jpush.custom"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        <activity
+            android:name="cn.jpush.android.service.JNotifyActivity"
+            android:exported="true"
+            android:taskAffinity="jpush.custom"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:replace="android:exported">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.JNotifyActivity" />
                 <category android:name="android.intent.category.DEFAULT" /><!--Required SDK核心功能 since 4.2.2-->
@@ -427,7 +366,10 @@
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".notify.service.PushMessageReceiver" android:enabled="true" android:exported="false" >
+        <receiver
+            android:name=".notify.service.PushMessageReceiver"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
                 <category android:name="${applicationId}" />
@@ -483,6 +425,8 @@
         <service
             android:name="com.fanjun.keeplive.service.RemoteService"
             android:process=":remote" />
+
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="1d669aafc6970cb991f9baf252bcdb66" />
 
     </application>
 

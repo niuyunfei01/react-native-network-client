@@ -10,6 +10,7 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchLocked, loadAllSuppliers, loadEnableSuppliers} from "../../../reducers/invoicing/invoicingActions";
 import Conf from '../../../pubilc/common/config';
 import EmptyListView from "./EmptyListView";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -123,7 +124,7 @@ class InvoicingShippingScene extends PureComponent {
             tintColor='gray'
           />
         }>
-          {reqList.length > 0 ? <Cells>{reqList}</Cells> : <EmptyListView/>}
+          {tool.length(reqList) > 0 ? <Cells>{reqList}</Cells> : <EmptyListView/>}
         </ScrollView>
       </View>
     )

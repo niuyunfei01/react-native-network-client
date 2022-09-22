@@ -23,6 +23,7 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {ActionSheet, Cells, CellsTitle} from "../../../weui";
 import tool from "../../../pubilc/util/tool";
+import {imageKey} from "../../../pubilc/util/md5";
 
 
 function mapStateToProps(state) {
@@ -84,7 +85,7 @@ class PrinterRemark extends PureComponent {
       onProgress: (data) => {
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
-      onComplete: (data) => {
+      onComplete: () => {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           showSuccess('上传成功')
           const {newImageKey} = this.state;
@@ -137,7 +138,7 @@ class PrinterRemark extends PureComponent {
         store_id: currStoreId,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
-      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+      HttpUtils.post.bind(this.props)(api, fromData).then(() => {
         ToastShort('操作成功')
         this.props.navigation.goBack();
       }, () => {
@@ -209,19 +210,13 @@ class PrinterRemark extends PureComponent {
   pickSingleImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(true))
         .then(image => {
 
 
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         })
     }, 1000)
@@ -231,16 +226,10 @@ class PrinterRemark extends PureComponent {
   pickCameraImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       })
     }, 1000)
@@ -248,7 +237,7 @@ class PrinterRemark extends PureComponent {
 
   startUploadImg(imgPath, imgName) {
     showModal("图片上传中...")
-    this.setState({newImageKey: tool.imageKey(imgName)})
+    this.setState({newImageKey: imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {
@@ -259,7 +248,7 @@ class PrinterRemark extends PureComponent {
       }
       QNEngine.setParams(params)
       QNEngine.startTask()
-    }).catch(error => {
+    }).catch(() => {
       Alert.alert('error', '图片上传失败！')
     })
   }
@@ -295,7 +284,7 @@ class PrinterRemark extends PureComponent {
                      // height: 118,
                    }}
                    placeholder="支持输入广告/联系方式" value={this.state.remark}
-                   onChangeText={(remark) => this.setState({remark})}></Input>
+                   onChangeText={(remark) => this.setState({remark})}/>
             {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
             {/*  {this.renderUploadImg()}*/}
             {/*</View>*/}

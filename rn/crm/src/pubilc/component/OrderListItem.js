@@ -22,6 +22,7 @@ import Clipboard from '@react-native-community/clipboard'
 import {
   addTipMoney,
   addTipMoneyNew,
+  addTipMoneys,
   cancelReasonsList,
   cancelShip,
   orderCallShip
@@ -67,8 +68,10 @@ class OrderListItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     index: PropTypes.number,
+    accessToken: PropTypes.string,
     showBtn: PropTypes.bool,
     onPress: PropTypes.func,
+    dispatch: PropTypes.func,
     onRefresh: PropTypes.func,
     fetchData: PropType.func,
     orderStatus: PropType.number,
@@ -80,6 +83,7 @@ class OrderListItem extends React.PureComponent {
   state = {
     modalTip: false,
     addTipModal: false,
+    addOrdersTip: false,
     addMoneyNum: '',
     veriFicationToShop: false,
     pickupCode: '',
@@ -136,31 +140,6 @@ class OrderListItem extends React.PureComponent {
     this.mixpanel.track("配送页")
   }
 
-  onCallSelf = () => {
-    Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
-      {
-        text: '确定',
-        onPress: () => {
-          this.onTransferSelf()
-        },
-      }, {
-        text: '取消'
-      }
-    ])
-  }
-
-  onTransferSelf = () => {
-    const api = `/api/order_transfer_self?access_token=${this.props.accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
-      orderId: this.props.item.id
-    }).then(res => {
-      ToastShort('操作成功');
-      this.props.fetchData();
-    }).catch(e => {
-      ToastLong('操作失败:' + e.desc);
-    })
-  }
-
   onChangeAccount = (text) => {
     this.setState({...this.state, addMoneyNum: text.toString()})
   }
@@ -183,22 +162,33 @@ class OrderListItem extends React.PureComponent {
     const api = `/api/stop_auto_ship?access_token=${this.props.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api, {
       orderId: this.props.item.id
-    }).then(res => {
+    }).then(() => {
       ToastShort('操作成功');
       this.setState({showDeliveryModal: false})
-    }).catch(e => {
+    }).catch(() => {
       ToastLong('操作失败')
     })
   }
 
   upAddTip = () => {
-    let {addMoneyNum, shipId} = this.state;
-    const {dispatch, accessToken} = this.props;
+    let {addMoneyNum, shipId, addOrdersTip} = this.state;
+    const {dispatch, accessToken, item} = this.props;
     if (addMoneyNum > 0) {
+      if (addOrdersTip) {
+        dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
+          this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
+          if (tool.length(resp?.obj?.error_msg) > 0) {
+            ToastShort(resp?.obj?.error_msg)
+          } else {
+            ToastShort('操作成功')
+          }
+        }));
+        return;
+      }
       dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
-          this.setState({addTipModal: false, respReason: '加小费成功'})
-          ToastShort(resp.reason)
+          this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
+          ToastShort('操作成功')
         } else {
           this.setState({respReason: resp.desc, ok: resp.ok})
         }
@@ -228,7 +218,7 @@ class OrderListItem extends React.PureComponent {
   cancelPlanDelivery = (order_id, planId) => {
     tool.debounces(() => {
       let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
-      HttpUtils.get(api).then(success => {
+      HttpUtils.get(api).then(() => {
         ToastShort(`取消预约成功`)
         this.fetchData()
       }).catch((reason) => {
@@ -261,17 +251,18 @@ class OrderListItem extends React.PureComponent {
   goVeriFicationToShop = (id) => {
     let {pickupCode} = this.state
     const api = `/v1/new_api/orders/order_checkout/${id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
-    HttpUtils.get(api).then(success => {
+    HttpUtils.get(api).then(() => {
       ToastShort(`核销成功，订单已完成`)
     }).catch((reason) => {
       ToastShort(`操作失败：${reason.reason}`)
     })
   }
 
-  onAinSend = (order_id, store_id) => {
+  onAinSend = (order_id, store_id, sync_order = 0) => {
     this.onPress(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
+      sync_order: sync_order,
       onBack: (res) => {
         if (res) {
           this.props.fetchData()
@@ -288,7 +279,7 @@ class OrderListItem extends React.PureComponent {
     Alert.alert('确认将订单已送达', '订单置为已送达后无法撤回，是否继续？', [{
       text: '确认', onPress: () => {
         const api = `/api/complete_order/${order_id}?access_token=${this.props.accessToken}`
-        HttpUtils.get(api).then(res => {
+        HttpUtils.get(api).then(() => {
           ToastLong('订单已送达')
           this.props.fetchData()
           GlobalUtil.setOrderFresh(1)
@@ -347,7 +338,8 @@ class OrderListItem extends React.PureComponent {
 
   closeAddTipModal = () => {
     this.setState({
-      addTipModal: false
+      addTipModal: false,
+      addOrdersTip: false
     })
   }
 
@@ -361,7 +353,7 @@ class OrderListItem extends React.PureComponent {
       {
         order: this.state.order,
         ship_id: val,
-        onCancelled: (ok, reason) => {
+        onCancelled: () => {
           this.fetchData()
         }
       });
@@ -384,17 +376,24 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
-    this.setState({showDeliveryModal: false})
-    const accessToken = this.props.accessToken
-    let path = '/rider_tracks.html?delivery_id=' + val + "&access_token=" + accessToken;
-    const uri = Config.serverUrl(path);
-    this.onPress(Config.ROUTE_WEB, {url: uri});
+    this.setState({showDeliveryModal: false}, () => {
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val})
+    })
     this.mixpanel.track('查看位置')
   }
 
-  goAddTip = (val) => {
+  addOrdersTip = () => {
     this.setState({
       addTipModal: true,
+      addOrdersTip: true,
+    })
+  }
+
+  goAddTip = (val) => {
+    this.mixpanel.track('配送调度页_加小费')
+    this.setState({
+      addTipModal: true,
+      addOrdersTip: false,
       modalTip: false,
       showDeliveryModal: false,
       shipId: val
@@ -424,9 +423,23 @@ class OrderListItem extends React.PureComponent {
     this.onCallThirdShips(order_id, store_id, 0)
   }
 
-  cancelDelivery = (val) => {
+  cancelDeliverys = () => {
+    let order = this.props.item
+    let token = this.props.accessToken
+    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
+      text: '确定', onPress: () => {
+        const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
+        HttpUtils.get.bind(this.props)(api, {}).then(res => {
+          ToastShort(res.desc);
+          this.props.fetchData();
+        })
+      }
+    }, {'text': '取消'}]);
+  }
+
+  cancelDelivery = (orderId) => {
     const token = this.props.accessToken
-    let orderId = val
+
     const api = `/api/pre_cancel_order?access_token=${token}`;
     let params = {
       order_id: orderId
@@ -440,7 +453,7 @@ class OrderListItem extends React.PureComponent {
               {
                 order: order,
                 ship_id: 0,
-                onCancelled: (ok, reason) => {
+                onCancelled: () => {
                   this.fetchData()
                 }
               });
@@ -451,7 +464,7 @@ class OrderListItem extends React.PureComponent {
           {
             order: order,
             ship_id: 0,
-            onCancelled: (ok, reason) => {
+            onCancelled: () => {
               this.fetchData()
             }
           });
@@ -465,7 +478,7 @@ class OrderListItem extends React.PureComponent {
                 {
                   order: order,
                   ship_id: 0,
-                  onCancelled: (ok, reason) => {
+                  onCancelled: () => {
                     this.fetchData()
                   }
                 });
@@ -648,49 +661,88 @@ class OrderListItem extends React.PureComponent {
     this.onAinSend(item.id, item.store_id)
     this.mixpanel.track('订单列表页_我自己送')
   }
+
   renderButton = () => {
     let {item} = this.props;
     return (
-      <View style={styles.btnContent}>
+      <View
+        style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
 
-        <If condition={item.btn_list && item.btn_list.btn_ignore_delivery}>
+        <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
                   onPress={() => this.loseDelivery(item.id)}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.colorCCC}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.colorCCC,
+                    width: width * 0.27
+                  }]}
                   titleStyle={{color: colors.colorCCC, fontSize: 16}}
           />
         </If>
-        <If condition={item.btn_list && item.btn_list.transfer_self}>
+
+        <If condition={item?.btn_list && item?.btn_list?.switch_batch_cancel_delivery_order}>
+          <Button title={'取消配送'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.cancelDeliverys(item.id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.color666,
+                    width: width * 0.27
+                  }]}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
+          />
+        </If>
+
+        <If condition={item?.btn_list && item?.btn_list?.transfer_self}>
           <Button title={'我自己送'}
                   onPress={() => this.myselfSend(item)}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
+                  }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
-        <If condition={item.btn_list && item.btn_list.btn_call_third_delivery}>
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
           <Button title={'呼叫配送'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('订单列表页_呼叫配送')
                   }}
-                  buttonStyle={styles.callDeliveryBtn}
+                  buttonStyle={[styles.callDeliveryBtn, {
+                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
+                  }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={item.btn_list && item.btn_list.btn_contact_rider}>
+        <If condition={item?.btn_list && item?.btn_list?.btn_contact_rider}>
           <Button title={'联系骑手'}
                   onPress={() => this.dialNumber(item.ship_worker_mobile)}
-                  buttonStyle={styles.callDeliveryBtn}
+                  buttonStyle={[styles.callDeliveryBtn, {
+                    width: width * 0.40
+                  }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={item.btn_list && item.btn_list.btn_cancel_delivery}>
+        <If condition={item?.btn_list && item?.btn_list?.btn_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
-                    this.cancelDelivery(item.id)
+
+                    Alert.alert('提示', `确定取消当前配送吗?`, [
+                      {text: '取消'},
+                      {
+                        text: '确定', onPress: () => {
+                          this.cancelDelivery(item.id)
+                        }
+                      }
+                    ])
                   }}
-                  buttonStyle={[styles.modalBtn, {borderColor: colors.main_color}]}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: width * 0.40
+                  }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
@@ -699,7 +751,7 @@ class OrderListItem extends React.PureComponent {
                   onPress={() => {
                     this.mixpanel.track('配送回传详情页_重新上传')
                     this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id)
+                    this.onAinSend(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     width: width * 0.86,
@@ -709,7 +761,7 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={item.btn_list && item.btn_list.btn_confirm_arrived == 1}>
+        <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived == 1}>
           <Button title={'确认送达'}
                   onPress={() => {
                     this.mixpanel.track('确认送达')
@@ -723,20 +775,35 @@ class OrderListItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+        <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
+          <Button title={'加小费'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.addOrdersTip()
+                    this.mixpanel.track('订单列表页_加小费')
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: width * 0.86,
+                    marginTop: 10
+                  }]}
+                  titleStyle={{color: colors.main_color, fontSize: 16}}
+          />
+        </If>
       </View>
     )
   }
 
   renderVerificationBtn = () => {
     return (
-        <View style={styles.btnContent}>
-          <View style={{flex: 1}}/>
-          <Button title={'到店核销'}
-                  onPress={() => this.openVeriFicationToShop()}
-                  buttonStyle={styles.veriFicationBtn}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </View>
+      <View style={styles.btnContent}>
+        <View style={{flex: 1}}/>
+        <Button title={'到店核销'}
+                onPress={() => this.openVeriFicationToShop()}
+                buttonStyle={styles.veriFicationBtn}
+                titleStyle={{color: colors.white, fontSize: 16}}
+        />
+      </View>
     )
   }
 
@@ -1041,7 +1108,7 @@ class OrderListItem extends React.PureComponent {
                 <If condition={i !== 0}>
                   <View style={[styles.deliveryStatusTitleBottom, {backgroundColor: log.status_color}]}/>
                 </If>
-                <If condition={i !== list.length - 1}>
+                <If condition={i !== tool.length(list) - 1}>
                   <View style={[styles.deliveryStatusTitleTop, {backgroundColor: log.status_color}]}/>
                 </If>
               </View>
@@ -1181,18 +1248,18 @@ const styles = StyleSheet.create({
   },
   modalBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.white,
     borderWidth: 1
   },
   callDeliveryBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.main_color,
   },
   veriFicationBtn: {
     borderRadius: 2,
-    paddingVertical: 7,
+    paddingVertical: 5,
     backgroundColor: colors.main_color,
     marginRight: 10
   },

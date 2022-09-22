@@ -8,7 +8,7 @@ import colors from "../../pubilc/styles/colors"
 import HttpUtils from "../util/http"
 import NoFoundDataView from "../../scene/common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
+import FastImage from 'react-native-fast-image'
 import BigImage from "../../scene/common/component/BigImage"
 import PropTypes from 'prop-types'
 import SearchInputNavigation from "../../scene/common/component/SearchInputNavigation";
@@ -143,10 +143,9 @@ class SearchProduct extends Component {
     return (
       <View style={styles.productRow} key={product.id}>
         <TouchableOpacity onPress={() => this.showBigImage(product)}>
-          <CachedImage
-            source={{uri: Config.staticUrl(product.coverimg)}}
-            style={{width: pxToDp(150), height: pxToDp(150)}}
-          />
+          <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+                     resizeMode={FastImage.resizeMode.contain}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.props.onSelect(product)}

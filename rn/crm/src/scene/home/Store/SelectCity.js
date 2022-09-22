@@ -7,6 +7,7 @@ import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import {getWithTpl} from "../../../pubilc/util/common";
 import colors from "../../../pubilc/styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -27,7 +28,7 @@ class SelectCity extends Component {
   goTo = index => {
     let start = 0;
     for (let i = 0; i < index; i++) {
-      start += this.state.cityList[i].cityList.length;
+      start += tool.length(this.state.cityList[i].cityList);
     }
     this.scrollView.scrollTo({y: 41 * start});
   };
@@ -135,7 +136,7 @@ class SelectCity extends Component {
               {this.state.cityList.map((item, index) => {
                 return (
                   <View>
-                    {item.cityList.length ? (
+                    {tool.length(item.cityList) ? (
                       <View
                         style={{
                           height: 20,
@@ -143,10 +144,7 @@ class SelectCity extends Component {
                           backgroundColor: colors.main_back
                         }}
                       >
-                        <Text
-                          style={[{paddingLeft: 18}, styles.n2grey6]}
-                          allowFontScaling={false}
-                        >
+                        <Text style={[{paddingLeft: 18}, styles.n2grey6]}>
                           {item.key}
                         </Text>
                       </View>
@@ -196,10 +194,7 @@ class SelectCity extends Component {
           {cityList.map((item, index) => {
             return (
               <TouchableOpacity onPress={() => this.goTo(index)}>
-                <Text
-                  style={{textAlign: "center", fontSize: 10, lineHeight: 21}}
-                  allowFontScaling={false}
-                >
+                <Text style={{textAlign: "center", fontSize: 10, lineHeight: 21}}>
                   {item.key}
                 </Text>
               </TouchableOpacity>

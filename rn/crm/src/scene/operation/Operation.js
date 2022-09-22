@@ -9,7 +9,6 @@ import colors from "../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import store from "../../reducers/store";
 import {setRecordFlag} from "../../reducers/store/storeActions";
-import GlobalUtil from "../../pubilc/util/GlobalUtil";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -102,9 +101,7 @@ class Operation extends BaseComponent {
   deleteRecordFlag() {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/delete_record_flag?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-
-    })
+    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then()
   }
 
   onRefresh() {
@@ -300,35 +297,35 @@ class Operation extends BaseComponent {
               <Text style={{fontSize: pxToDp(34)}}>市场调查</Text>
               <Entypo name="chevron-right" style={styles.right_icon}/>
             </TouchableOpacity>
-              <TouchableOpacity style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                borderRadius: pxToDp(15),
-                paddingHorizontal: pxToDp(10),
-                backgroundColor: colors.white,
-                alignItems: "center",
-                width: '98%',
-                marginLeft: '1%',
-                paddingVertical: '3%',
-                marginVertical: '2%'
-              }} onPress={() => {
-                let url = 'https://jinshuju.net/f/ObTCwq';
-                this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
-              }}>
-                <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
-                <View style={{flexDirection: "row"}}>
-                  <View style={{
-                    backgroundColor: 'red',
-                    borderRadius: 30,
-                    paddingHorizontal: 5,
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    <Text style={{color: colors.white, fontSize: pxToDp(22)}}>领1000元红包</Text>
-                  </View>
-                  <Entypo name="chevron-right" style={styles.right_icon}/>
+            <TouchableOpacity style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              borderRadius: pxToDp(15),
+              paddingHorizontal: pxToDp(10),
+              backgroundColor: colors.white,
+              alignItems: "center",
+              width: '98%',
+              marginLeft: '1%',
+              paddingVertical: '3%',
+              marginVertical: '2%'
+            }} onPress={() => {
+              let url = 'https://jinshuju.net/f/ObTCwq';
+              this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+            }}>
+              <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
+              <View style={{flexDirection: "row"}}>
+                <View style={{
+                  backgroundColor: 'red',
+                  borderRadius: 30,
+                  paddingHorizontal: 5,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <Text style={{color: colors.white, fontSize: pxToDp(22)}}>领1000元红包</Text>
                 </View>
-              </TouchableOpacity>
+                <Entypo name="chevron-right" style={styles.right_icon}/>
+              </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>

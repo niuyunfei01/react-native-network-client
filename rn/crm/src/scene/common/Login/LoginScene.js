@@ -13,7 +13,7 @@ import {
 
 import {
   check_is_bind_ext,
-  getCommonConfig,
+  getConfig,
   logout,
   requestSmsCode,
   setCurrentStore,
@@ -22,7 +22,6 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../../pubilc/util/ToastUtils";
-import HttpUtils from "../../../pubilc/util/http";
 import colors from '../../../pubilc/styles/colors'
 import pxToDp from '../../../pubilc/util/pxToDp'
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
@@ -30,11 +29,11 @@ import Config from '../../../pubilc/common/config'
 import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from '../../../pubilc/util/analytics';
-import dayjs from "dayjs";
 import {CheckBox} from "react-native-elements";
-import JPush from "jpush-react-native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import BottomModal from "../../../pubilc/component/BottomModal";
+import {setDeviceInfo} from "../../../reducers/device/deviceActions";
+import PropTypes from "prop-types";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 let {height, width} = Dimensions.get('window')
@@ -47,10 +46,22 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getCommonConfig, logout, signIn, requestSmsCode}, dispatch)}
+  return {
+    dispatch, ...bindActionCreators({
+      getConfig,
+      logout,
+      signIn,
+      setCurrentStore,
+      requestSmsCode
+    }, dispatch)
+  }
 }
 
 class LoginScene extends PureComponent {
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     this.timeouts = [];
@@ -74,18 +85,8 @@ class LoginScene extends PureComponent {
     this.mixpanel.track("openApp_page_view", {});
   }
 
-  clearTimeouts = () => {
-    this.timeouts.forEach(clearTimeout);
-  }
-
-  UNSAFE_componentWillMount = () => {
-
-    const {dispatch} = this.props;
-    dispatch(logout());
-
-    const params = (this.props.route.params || {});
-    this.next = params.next;
-    this.nextParams = params.nextParams;
+  componentDidMount() {
+    global.isLoginToOrderList = true
   }
 
   componentWillUnmount = () => {
@@ -96,23 +97,27 @@ class LoginScene extends PureComponent {
     return this.state.reRequestAfterSeconds;
   }
 
+  clearTimeouts = () => {
+    this.timeouts.forEach(clearTimeout);
+  }
+
   onRequestSmsCode = () => {
-
-    if (this.state.mobile && tool.length(this.state.mobile) > 10) {
-
+    let {mobile} = this.state
+    if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
-      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
+      dispatch(requestSmsCode(mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
         this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
           this.interval = setInterval(() => {
             this.setState({
               reRequestAfterSeconds: this.getCountdown() - 1
+            },()=>{
+              if (this.state.reRequestAfterSeconds <= 0) {
+                this.onCounterReReqEnd()
+                clearInterval(this.interval)
+              }
             })
-            if (this.state.reRequestAfterSeconds === 0) {
-              this.onCounterReReqEnd()
-              clearInterval(this.interval)
-            }
           }, 1000)
           this.setState({canAskReqSmsCode: true});
           showSuccess(msg)
@@ -130,13 +135,13 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    const loginType = this.state.loginType;
-    if (!this.state.authorization) {
+    let {loginType, authorization, mobile, verifyCode, password} = this.state;
+    if (!authorization) {
       return this.setState({
         show_auth_modal: true
       })
     }
-    if (!this.state.mobile) {
+    if (!mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastShort(msg)
       return false;
@@ -144,59 +149,74 @@ class LoginScene extends PureComponent {
     showModal('登录中');
     switch (loginType) {
       case BY_SMS:
-        if (!this.state.verifyCode) {
+        if (!verifyCode) {
           showError('请输入短信验证码')
           return false;
         }
-        this._signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
+        this._signIn(mobile, verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
-        if (!this.state.password) {
+        if (!password) {
           showError('请输入登录密码')
           return false;
         }
-        this._signIn(this.state.mobile, this.state.password, "帐号和密码");
+        this._signIn(mobile, password, "帐号和密码");
         break;
       default:
         showError('登录类型错误')
     }
   }
 
-  queryCommonConfig = (uid) => {
-    let flag = false;
-    showModal()
-    let {accessToken, currStoreId} = this.props.global;
+  _signIn = (mobile, password, name) => {
     const {dispatch} = this.props;
-    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(logout());
+    GlobalUtil.getDeviceInfo().then(deviceInfo => {
+      dispatch(setDeviceInfo(deviceInfo))
+    })
+    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
-        let only_store_id = currStoreId;
-        if (only_store_id > 0) {
-          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: only_store_id}, (binded) => {
-            this.doneSelectStore(only_store_id, !binded);
-          }));
-        } else {
-          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
-          this.doneSelectStore(store.id, flag);
+        this.queryConfig(uid)
+        if (uid) {
+          this.mixpanel.getDistinctId().then(res => {
+            if (res !== uid) {
+              mergeMixpanelId(res, uid);
+              this.mixpanel.identify(uid);
+            }
+          })
         }
       } else {
-        showError(err_msg);
+        if (msg.indexOf("注册") !== -1) {
+          this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
+        }
+        ToastShort(msg ? msg : "登录失败，请输入正确的" + name)
+      }
+    }));
+  }
+
+  queryConfig = (uid) => {
+    let {accessToken, currStoreId} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if (ok) {
+        let store_id = cfg?.store_id || currStoreId;
+        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
+          this.doneSelectStore(store_id, !binded);
+        }));
+      } else {
+        ToastShort(err_msg);
       }
     }));
   }
 
   doneSelectStore = (storeId, not_bind = false) => {
     const {dispatch, navigation} = this.props;
-    let {accessToken} = this.props.global;
-    dispatch(getCommonConfig(accessToken, storeId, () => {
-    }));
     const setCurrStoreIdCallback = (set_ok, msg) => {
       if (set_ok) {
-
         dispatch(setCurrentStore(storeId));
         if (not_bind) {
+          navigation.navigate(Config.ROUTE_STORE_STATUS)
           hideModal()
-          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
-          return true;
+          return;
         }
         navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
@@ -204,10 +224,8 @@ class LoginScene extends PureComponent {
           initialRouteName: Config.ROUTE_ALERT
         });
         hideModal()
-        return true;
       } else {
         showError(msg);
-        return false;
       }
     };
     if (Platform.OS === 'ios') {
@@ -217,48 +235,18 @@ class LoginScene extends PureComponent {
     }
   }
 
-  _signIn = (mobile, password, name) => {
-    const {dispatch} = this.props;
-    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
-      if (ok) {
-        this.doSaveUserInfo(token);
-        this.queryCommonConfig(uid)
-        if (uid) {
-
-          this.mixpanel.getDistinctId().then(res => {
-            if (res !== uid) {
-              mergeMixpanelId(res, uid);
-            }
-          })
-          this.mixpanel.identify(uid);
-
-          const alias = `uid_${uid}`;
-          JPush.setAlias({alias: alias, sequence: dayjs().unix()})
-          JPush.isPushStopped((isStopped) => {
-            if (isStopped) {
-              JPush.resumePush();
-            }
-          })
-        }
-        hideModal()
-        return true;
-      } else {
-        if (msg.indexOf("注册") != -1) {
-
-          this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
-        }
-        ToastShort(msg ? msg : "登录失败，请输入正确的" + name)
-        return false;
-      }
-    }));
+  closeModal = () => {
+    this.setState({
+      show_auth_modal: false
+    })
+    ToastShort("请手动勾选隐私政策")
   }
 
-
-  doSaveUserInfo = (token) => {
-    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
-      GlobalUtil.setUser(res)
-    })
-    return true;
+  onReadProtocol = () => {
+    this.closeModal()
+    this.mixpanel.track("openApp_privacy_click", {});
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 
   render() {
@@ -448,6 +436,13 @@ class LoginScene extends PureComponent {
               textDecorationLine: 'underline',
               marginLeft: pxToDp(10)
             }} onPress={() => {
+
+              if (!this.state.authorization) {
+                return this.setState({
+                  show_auth_modal: true
+                })
+              }
+
               this.mixpanel.track("info_customerservice_click", {});
               JumpMiniProgram("/pages/service/index", {place: 'login'});
               // native.dialNumber('18910275329');
@@ -462,7 +457,11 @@ class LoginScene extends PureComponent {
             <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
               style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
             <Text
-              style={{fontSize: 14, color: colors.color333, marginVertical: 6}}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
+              style={{
+                fontSize: 14,
+                color: colors.color333,
+                marginVertical: 6
+              }}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
             <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
           </View>
         </BottomModal>
@@ -470,18 +469,6 @@ class LoginScene extends PureComponent {
     )
   }
 
-  closeModal = () => {
-    this.setState({
-      show_auth_modal: false
-    })
-    ToastShort("请手动勾选隐私政策")
-  }
-  onReadProtocol = () => {
-    this.closeModal()
-    this.mixpanel.track("openApp_privacy_click", {});
-    const {navigation} = this.props;
-    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
-  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScene)

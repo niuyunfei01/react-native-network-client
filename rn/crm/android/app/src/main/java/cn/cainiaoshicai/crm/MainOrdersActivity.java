@@ -16,6 +16,8 @@
 
 package cn.cainiaoshicai.crm;
 
+import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -42,7 +44,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.common.collect.Maps;
-import com.newrelic.agent.android.NewRelic;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
@@ -83,8 +84,6 @@ import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
 
 public class MainOrdersActivity extends AbstractActionBarActivity {
 
@@ -772,9 +771,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
             case R.id.menu_store_operation:
                 GlobalCtx.app().toOperationActivity(this);
                 return true;
-//            case R.id.menu_operation:
-//                startActivity(new Intent(this, DataActivity.class));
-//                return true;
+
             default:
         }
 

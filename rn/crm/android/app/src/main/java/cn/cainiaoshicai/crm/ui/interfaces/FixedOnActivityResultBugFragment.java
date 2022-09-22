@@ -1,8 +1,9 @@
 package cn.cainiaoshicai.crm.ui.interfaces;
 
 import android.content.Intent;
-import androidx.fragment.app.Fragment;
 import android.util.SparseIntArray;
+
+import androidx.fragment.app.Fragment;
 
 import java.util.List;
 

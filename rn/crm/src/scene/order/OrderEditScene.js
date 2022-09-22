@@ -213,16 +213,10 @@ class OrderEditScene extends Component {
   }
 
   setAddress(res) {
-    // detailAddr  文字地址
-
-
     this.setState({
       loc_data: res.location,
       detailAddr: res.address,
-    }, () => {
-
     })
-
   }
 
   _toSetLocation() {
@@ -357,7 +351,7 @@ class OrderEditScene extends Component {
     const ts = this.editFields.filter(
       edit => this.state[edit.key] !== edit.val(order)
     );
-    return ts.length === 0;
+    return tool.length(ts) === 0;
   }
 
   showTagPopup(multi) {

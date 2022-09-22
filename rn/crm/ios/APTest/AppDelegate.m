@@ -3,6 +3,7 @@
 // 引入 JPush 功能所需头文件
 #import <RCTJPushModule.h>
 #import "IFlyMSC/IFlyMSC.h"
+#import <AMapFoundationKit/AMapFoundationKit.h>
 #import "Definition.h"
 #import "TTSConfig.h"
 
@@ -38,43 +39,44 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
+  
   //Set log level
   [IFlySetting setLogFile:LVL_ALL];
-
+  
   //Set whether to output log messages in Xcode console
   [IFlySetting showLogcat:YES];
-
+  
   //Set the local storage path of SDK
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
   NSString *cachePath = [paths objectAtIndex:0];
   [IFlySetting setLogFilePath:cachePath];
-
+  
   NSString *initString = [[NSString alloc] initWithFormat:@"appid=%@",APPID_VALUE];
   [IFlySpeechUtility createUtility:initString];
-
+  
   //TTS singleton
   if (self.iFlySpeechSynthesizer == nil) {
-      self.iFlySpeechSynthesizer = [IFlySpeechSynthesizer sharedInstance];
+    self.iFlySpeechSynthesizer = [IFlySpeechSynthesizer sharedInstance];
   }
-
+  
   self.iFlySpeechSynthesizer.delegate = self;
   [self.iFlySpeechSynthesizer setParameter:[IFlySpeechConstant TYPE_CLOUD]
-   forKey:[IFlySpeechConstant ENGINE_TYPE]];
-
+                                    forKey:[IFlySpeechConstant ENGINE_TYPE]];
+  
   [NewRelic startWithApplicationToken:@"AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA"];
+  [AMapServices sharedServices].apiKey = @"48148de470831f4155abda953888a487";
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
 #endif
-
+  
   [JPUSHService setupWithOption:launchOptions appKey:@"30073ab80a50534d39c84d3c"
                         channel:@"app_store"
                apsForProduction:YES
           advertisingIdentifier:nil];
   JPUSHRegisterEntity * entity = [[JPUSHRegisterEntity alloc] init];
-    if (@available(iOS 12.0, *)) {
-      entity.types = JPAuthorizationOptionAlert|JPAuthorizationOptionBadge|JPAuthorizationOptionSound|JPAuthorizationOptionProvidesAppNotificationSettings;
-    }
+  if (@available(iOS 12.0, *)) {
+    entity.types = JPAuthorizationOptionAlert|JPAuthorizationOptionBadge|JPAuthorizationOptionSound|JPAuthorizationOptionProvidesAppNotificationSettings;
+  }
   [JPUSHService registerForRemoteNotificationConfig:entity delegate:self];
   [launchOptions objectForKey: UIApplicationLaunchOptionsRemoteNotificationKey];
   
@@ -83,17 +85,17 @@ static void InitializeFlipper(UIApplication *application) {
   [defaultCenter addObserver:self selector:@selector(networkDidReceiveMessage:) name:kJPFNetworkDidReceiveMessageNotification object:nil];
   
   [JPUSHService registrationIDCompletionHandler:^(int resCode, NSString *registrationID) {
-      NSLog(@"resCode : %d,registrationID: %@",resCode,registrationID);
+    NSLog(@"resCode : %d,registrationID: %@",resCode,registrationID);
   }];
-
+  
   
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"crm"
                                             initialProperties:nil];
-
+  
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
-
+  
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];
   rootViewController.view = rootView;
@@ -105,12 +107,17 @@ static void InitializeFlipper(UIApplication *application) {
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
-
- return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 #else
+  
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
   NSString *docDir = [paths objectAtIndex:0];
-  NSString *bundlePath = [docDir stringByAppendingPathComponent:@"/last.ios/last.ios.bundle"];
+  NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];//获取app版本信息
+  NSString *app_build = [infoDictionary objectForKey:@"CFBundleVersion"];
+  NSLog(@"app版本%@",app_build);
+  NSString *pathString = [NSString stringWithFormat:@"/last.ios/%@.ios.bundle"app_build];
+  NSString *bundlePath = [docDir stringByAppendingPathComponent:pathString];
   NSFileManager *fileManager = [NSFileManager defaultManager];
   if([fileManager fileExistsAtPath:bundlePath])
   {
@@ -122,7 +129,7 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (void)application:(UIApplication *)application
 didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-
+  
   /// Required - 注册 DeviceToken
   [JPUSHService registerDeviceToken:deviceToken];
 }
@@ -142,24 +149,24 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
 //iOS 10 前台收到消息
 - (void)jpushNotificationCenter:(UNUserNotificationCenter *)center  willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(NSInteger))completionHandler {
-
+  
   NSDictionary * userInfo = notification.request.content.userInfo;
   UNNotificationRequest *request = notification.request; // 收到推送的请求
   UNNotificationContent *content = request.content; // 收到推送的消息内容
-
+  
   NSNumber *badge = content.badge;  // 推送消息的角标
   NSString *body = content.body;    // 推送消息体
   UNNotificationSound *sound = content.sound;  // 推送消息的声音
   NSString *subtitle = content.subtitle;  // 推送消息的副标题
   NSString *title = content.title;  // 推送消息的标题
-
+  
   NSString *speakWord = [userInfo objectForKey:@"speak_word"];
   if(speakWord != nil) {
     [self.iFlySpeechSynthesizer startSpeaking:speakWord];
   }
-
+  
   NSLog(@"iOS10 前台收到通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
-
+  
   if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
     // Apns
     NSLog(@"iOS 10 APNS 前台收到消息");
@@ -177,22 +184,22 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
 
 - (void)jpushNotificationAuthorization:(JPAuthorizationStatus)status withInfo:(NSDictionary *)info {
-    NSLog(@"jpushNotificationAuthorization");
+  NSLog(@"jpushNotificationAuthorization");
 }
 
 //iOS 10 消息事件回调
 - (void)jpushNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler: (void (^)(void))completionHandler {
   NSDictionary * userInfo = response.notification.request.content.userInfo;
-
+  
   UNNotificationRequest *request = response.notification.request; // 收到推送的请求
   UNNotificationContent *content = request.content; // 收到推送的消息内容
-
+  
   NSNumber *badge = content.badge;  // 推送消息的角标
   NSString *body = content.body;    // 推送消息体
   UNNotificationSound *sound = content.sound;  // 推送消息的声音
   NSString *subtitle = content.subtitle;  // 推送消息的副标题
   NSString *title = content.title;  // 推送消息的标题
-
+  
   if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
     // Apns
     NSLog(@"iOS 10 APNS 消息事件回调");
@@ -200,12 +207,12 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     // 保障应用被杀死状态下，用户点击推送消息，打开app后可以收到点击通知事件
     [[RCTJPushEventQueue sharedInstance]._notificationQueue insertObject:userInfo atIndex:0];
     [[NSNotificationCenter defaultCenter] postNotificationName:J_APNS_NOTIFICATION_OPENED_EVENT object:userInfo];
-
+    
     NSString *speakWord = [userInfo objectForKey:@"speak_word"];
     if(speakWord != nil) {
       [self.iFlySpeechSynthesizer startSpeaking:speakWord];
     }
-
+    
     // 判断为本地通知
     NSLog(@"iOS10 收到远程通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
   }
@@ -215,7 +222,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     // 保障应用被杀死状态下，用户点击推送消息，打开app后可以收到点击通知事件
     [[RCTJPushEventQueue sharedInstance]._localNotificationQueue insertObject:userInfo atIndex:0];
     [[NSNotificationCenter defaultCenter] postNotificationName:J_LOCAL_NOTIFICATION_OPENED_EVENT object:userInfo];
-
+    
     // 判断为本地通知
     NSLog(@"iOS10 收到本地通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
   }
@@ -230,16 +237,16 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    return  [WXApi handleOpenURL:url delegate:self];
+  return  [WXApi handleOpenURL:url delegate:self];
 }
 
 - (BOOL)application:(UIApplication *)application
-  continueUserActivity:(NSUserActivity *)userActivity
-  restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> * __nullable
-  restorableObjects))restorationHandler {
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> * __nullable
+                             restorableObjects))restorationHandler {
   // 触发回调方法
   [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
-
+  
   NSLog(@"userActivity: %@, application: %@, restoreHandler: %@", userActivity, application, restorationHandler);
   return [WXApi handleOpenUniversalLink:userActivity delegate:self];
 }
@@ -266,11 +273,11 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 /**
  callback of starting playing
  Notice：
-    Only apply to normal TTS
+ Only apply to normal TTS
  **/
 - (void)onSpeakBegin
 {
-    NSLog(@"Speak begin");
+  NSLog(@"Speak begin");
 }
 
 
@@ -278,11 +285,11 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 /**
  callback of buffer progress
  Notice：
-    Only apply to normal TTS
+ Only apply to normal TTS
  **/
 - (void)onBufferProgress:(int) progress message:(NSString *)msg
 {
-    NSLog(@"buffer progress %2d%%. msg: %@.", progress, msg);
+  NSLog(@"buffer progress %2d%%. msg: %@.", progress, msg);
 }
 
 
@@ -291,22 +298,22 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 /**
  callback of playback progress
  Notice：
-    Only apply to normal TTS
+ Only apply to normal TTS
  **/
 - (void) onSpeakProgress:(int) progress beginPos:(int)beginPos endPos:(int)endPos
 {
-    NSLog(@"speak progress %2d%%, beginPos=%d, endPos=%d", progress,beginPos,endPos);
+  NSLog(@"speak progress %2d%%, beginPos=%d, endPos=%d", progress,beginPos,endPos);
 }
 
 
 /**
  callback of pausing player
  Notice：
-    Only apply to normal TTS
+ Only apply to normal TTS
  **/
 - (void)onSpeakPaused
 {
-    NSLog(@"speak paused");
+  NSLog(@"speak paused");
 }
 
 
@@ -315,19 +322,19 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
  **/
 - (void)onCompleted:(IFlySpeechError *) error
 {
-    NSLog(@"%s,error=%d",__func__,error.errorCode);
-
-    if (error.errorCode ==10102) {
-        NSLog(@"%s,errorCode:%d",__func__,error.errorCode);
+  NSLog(@"%s,error=%d",__func__,error.errorCode);
+  
+  if (error.errorCode ==10102) {
+    NSLog(@"%s,errorCode:%d",__func__,error.errorCode);
+  }
+  if (error.errorCode != 0) {
+    //  [_popUpView showText:[NSString stringWithFormat:@"Error Code:%d",error.errorCode]];
+    if(error.errorCode==10102){
+      NSLog(@"%s,errorCode:%d",__func__,error.errorCode);
     }
-    if (error.errorCode != 0) {
-      //  [_popUpView showText:[NSString stringWithFormat:@"Error Code:%d",error.errorCode]];
-        if(error.errorCode==10102){
-            NSLog(@"%s,errorCode:%d",__func__,error.errorCode);
-        }
-        return;
-    }
-
+    return;
+  }
+  
   NSLog(@"onCompleted");
 }
 @end

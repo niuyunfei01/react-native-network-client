@@ -5,6 +5,7 @@ import {Icon} from '../Icon'
 import ImagePicker from 'react-native-image-picker'
 import $V from '../variable'
 import concat from 'lodash/concat'
+import tool from "../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   uploader: {},
@@ -176,15 +177,12 @@ class Uploader extends Component {
               </View>
             )
           })}
-          {files.length < maxCount ?
-            <TouchableOpacity
-              style={styles.uploaderAddButton}
-              onPress={this.showImagePicker}
-            >
+          <If condition={tool.length(files) < maxCount}>
+            <TouchableOpacity style={styles.uploaderAddButton} onPress={this.showImagePicker}>
               <View style={styles.uploaderAddButtonRec}/>
               <View style={[styles.uploaderAddButtonRec, {transform: [{rotate: '90deg'}]}]}/>
             </TouchableOpacity>
-            : null}
+          </If>
         </View>
       </View>
     )

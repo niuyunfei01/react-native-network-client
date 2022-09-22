@@ -1,8 +1,6 @@
 package cn.cainiaoshicai.crm.orders.view;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;

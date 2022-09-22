@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View} from "react-native";
+import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {ActionSheet} from "../../../weui";
@@ -10,11 +10,10 @@ import HttpUtils from "../../../pubilc/util/http";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
-import {MyText} from '../../../pubilc/component/MyText'
-import {MyTextInput} from "../../../pubilc/component/MyTextInput";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
+import {imageKey} from "../../../pubilc/util/md5";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
 
@@ -143,62 +142,62 @@ class RegisterShunfeng extends PureComponent {
     return (
       <View>
         <View style={styles.storeInfoTitleStyle}>
-          <MyText style={styles.titleStyle}>
+          <Text style={styles.titleStyle}>
             店铺信息
-          </MyText>
+          </Text>
         </View>
         <View style={{width: '100%', height: 1}}/>
         <View style={styles.storeInfoStyle}>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *店铺
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, storeName: text}})}
-                         value={store.storeName}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       onChangeText={text => this.setState({store: {...store, storeName: text}})}
+                       value={store.storeName}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *联系人
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, name: text}})}
-                         value={store.name}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       onChangeText={text => this.setState({store: {...store, name: text}})}
+                       value={store.name}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *联系人电话
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         keyboardType={'numeric'}
-                         onChangeText={text => this.setState({store: {...store, phone: text}})}
-                         value={store.phone}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       keyboardType={'numeric'}
+                       onChangeText={text => this.setState({store: {...store, phone: text}})}
+                       value={store.phone}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *店铺地址
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, address: text}})}
-                         value={store.address}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       onChangeText={text => this.setState({store: {...store, address: text}})}
+                       value={store.address}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *经纬度
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         onChangeText={text => this.setState({store: {...store, location: text}})}
-                         value={store.location}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       onChangeText={text => this.setState({store: {...store, location: text}})}
+                       value={store.location}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *经营品类
-            </MyText>
+            </Text>
             <ModalSelector
               onChange={value => this.onChange(value)}
               data={DATA}
@@ -233,16 +232,10 @@ class RegisterShunfeng extends PureComponent {
   pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(false)).then(image => {
         const image_path = image.path;
         const image_arr = image_path.split("/");
-        const image_name = image_arr[image_arr.length - 1];
+        const image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       })
     }, 1000)
@@ -250,7 +243,7 @@ class RegisterShunfeng extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    const newImageKey = tool.imageKey(imgName) + imgName
+    const newImageKey = imageKey(imgName) + imgName
     this.setState({newImageKey: newImageKey})
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {
@@ -270,17 +263,11 @@ class RegisterShunfeng extends PureComponent {
   pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(false))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         })
     }, 1000)
@@ -305,60 +292,60 @@ class RegisterShunfeng extends PureComponent {
     return (
       <>
         <View style={styles.storeInfoTitleStyle}>
-          <MyText style={styles.titleStyle}>
+          <Text style={styles.titleStyle}>
             店铺信息
-          </MyText>
+          </Text>
         </View>
         <View style={{width: '100%', height: 1}}/>
         <View style={styles.storeInfoStyle}>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *负责人电话
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         placeholder={this.subjectTextTip}
-                         placeholderTextColor={'gray'}
-                         onChangeText={text => this.setState({subject: {...subject, phone: text}})}
-                         value={subject.phone}
-                         keyboardType={'numeric'}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       placeholder={this.subjectTextTip}
+                       placeholderTextColor={'gray'}
+                       onChangeText={text => this.setState({subject: {...subject, phone: text}})}
+                       value={subject.phone}
+                       keyboardType={'numeric'}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.rowWrap}>
-            <MyText style={styles.textStyle}>
+            <Text style={styles.textStyle}>
               *负责人身份证号码
-            </MyText>
-            <MyTextInput style={styles.textInputStyle}
-                         keyboardType={'numeric'}
-                         placeholder={this.subjectTextTip}
-                         placeholderTextColor={'gray'}
-                         onChangeText={text => this.setState({subject: {...subject, personNum: text}})}
-                         value={subject.personNum}
-                         underlineColorAndroid={'transparent'}/>
+            </Text>
+            <TextInput style={styles.textInputStyle}
+                       keyboardType={'numeric'}
+                       placeholder={this.subjectTextTip}
+                       placeholderTextColor={'gray'}
+                       onChangeText={text => this.setState({subject: {...subject, personNum: text}})}
+                       value={subject.personNum}
+                       underlineColorAndroid={'transparent'}/>
           </View>
           <View style={styles.imageRowWrap}>
             {
-              imageUrl.length > 0 ?
+              tool.length(imageUrl) > 0 ?
                 <Image source={{uri: imageUrl}} style={styles.imageWrap}/> : (
                   <Pressable style={styles.imageWrap} onPress={this.uploadImageItem}>
                     <FontAwesome5 name={'plus'} size={24} color={'#666666'}/>
-                    <MyText style={styles.subjectText}>
+                    <Text style={styles.subjectText}>
                       上传营业执照
-                    </MyText>
+                    </Text>
                   </Pressable>
                 )
             }
             <View style={styles.imageWrap}>
               <ImageBackground style={styles.imageBackgroundWrap}
                                source={exampleImg}>
-                <MyText style={styles.subjectTipText}>
+                <Text style={styles.subjectTipText}>
                   示例
-                </MyText>
+                </Text>
               </ImageBackground>
             </View>
           </View>
-          <MyText style={styles.tip}>
+          <Text style={styles.tip}>
             请标准拍摄、禁止边框缺失、照片模糊、闪光强烈。
-          </MyText>
+          </Text>
           <ActionSheet visible={this.state.showImgMenus}
                        onRequestClose={this.onRequestClose}
                        menus={this.menus}
@@ -376,14 +363,14 @@ class RegisterShunfeng extends PureComponent {
           <View style={styles.iconWrap}>
             <FontAwesome5 name={'clock'} color={'#59B26A'} size={120}/>
           </View>
-          <MyText style={styles.successText}>
+          <Text style={styles.successText}>
             已提交注册申请
-          </MyText>
+          </Text>
         </View>
         <Pressable style={styles.contactTextWrap} onPress={this.find}>
-          <MyText style={styles.contactText}>
+          <Text style={styles.contactText}>
             联系客服
-          </MyText>
+          </Text>
         </Pressable>
       </>
     )
@@ -417,8 +404,8 @@ class RegisterShunfeng extends PureComponent {
 
   notSubmit = (store, subject) => {
 
-    this.enableSubmit = store.name.length > 0 && store.saleCategory.label.length > 0
-      && subject.personNum.length > 0 && subject.phone.length > 0 && this.state.imageUrl.length > 0;
+    this.enableSubmit = tool.length(store.name) > 0 && tool.length(store.saleCategory.label) > 0
+      && tool.length(subject.personNum) > 0 && tool.length(subject.phone) > 0 && tool.length(this.state.imageUrl) > 0;
     const style = this.enableSubmit ? styles.submitWrap : styles.cannotSubmitWrap
     return (
       <>
@@ -429,9 +416,9 @@ class RegisterShunfeng extends PureComponent {
           this.renderSubjectInfo(subject)
         }
         <Pressable style={style} onPress={this.submitInfo}>
-          <MyText style={styles.submitText}>
+          <Text style={styles.submitText}>
             提交
-          </MyText>
+          </Text>
         </Pressable>
       </>
     )

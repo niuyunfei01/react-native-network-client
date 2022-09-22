@@ -122,7 +122,7 @@ class SearchExtStore extends React.Component {
           renderRightButton={this.renderRightBtn.bind(this)}
           renderEmpty={this.renderEmpty.bind(this)}
           rowHeight={rowHeight}
-          hideSectionList={this.state.dataSource.length >= 200}
+          hideSectionList={tool.length(this.state.dataSource) >= 200}
           toolbarBackgroundColor={'#2196f3'}
           title='搜索外卖店铺'
           cancelTitle='取消'

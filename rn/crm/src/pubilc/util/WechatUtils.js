@@ -40,7 +40,6 @@ function wechatLogin() {
       return responseCode.code
     })
     .catch(err => {
-      console.log(err, 'err')
     })
 }
 

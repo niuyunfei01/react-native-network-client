@@ -151,10 +151,6 @@ export function orderSetReady(token, id, workerIdList, callback) {
   return getReqThenInvalidate(url, id, callback);
 }
 
-export function orderTransferSelf(token, orderId, callback) {
-  const url = `/api/order_transfer_self?access_token=${token}&orderId=${orderId}`;
-  return getReqThenInvalidate(url, orderId, callback);
-}
 
 /**
  *
@@ -379,6 +375,20 @@ export function addTipMoneyNew(shipId, addMoneyNum, accessToken, callback) {
   }
 }
 
+export function addTipMoneys(shipId, addMoneyNum, accessToken, callback) {
+  return dispatch => {
+    const url = `v1/new_api/delivery/batch_add_tips/${shipId}/${addMoneyNum}?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
 export function cancelReasonsList(ship_id, order_id, token, callback) {
   return dispatch => {
     const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}.json?access_token=${token}`;
@@ -403,8 +413,8 @@ export function deliveryFailedAudit(token, id, data, callback) {
   return jsonReqThenInvalidate(url, id, callback, data);
 }
 
-export function fetchPrintHexStr(wmId, callback) {
-  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${this.global.accessToken}`;
+export function fetchPrintHexStr(wmId, callback, accessToken) {
+  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${accessToken}`;
 
   if (typeof callback !== 'function') {
     callback = (ok, hex) => {

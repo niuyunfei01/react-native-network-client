@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {FlatList, Text, InteractionManager, View, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native'
+import {FlatList, InteractionManager, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -10,7 +10,7 @@ import colors from "../../pubilc/styles/colors";
 import tool from "../../pubilc/util/tool";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
-import {hideModal, showError, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import {SearchBar} from "../../weui";
@@ -18,10 +18,13 @@ import {calcMs} from '../../pubilc/util/AppMonitorInfo'
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import Config from "../../pubilc/common/config";
+import Scanner from "../../pubilc/component/Scanner";
+import {scan} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
-  const {remind, global, device} = state;
-  return {remind: remind, global: global, device: device}
+  const {global, device} = state;
+  return {global: global, device: device}
 }
 
 const timeObj = {
@@ -63,7 +66,22 @@ class OrderQueryResultScene extends PureComponent {
       title = '补送单'
       type = 'additional'
     }
-    navigation.setOptions({headerTitle: title})
+    navigation.setOptions({
+      headerTitle: title,
+      headerRight: (() => (
+          <TouchableOpacity
+            style={{paddingRight: 10}}
+            onPress={() => {
+              this.mixpanel.track('全部订单扫描')
+              this.setState({
+                scanBoolean: true,
+              })
+            }}>
+            <SvgXml xml={scan()}/>
+          </TouchableOpacity>
+        )
+      )
+    })
     this.state = {
       isLoading: false,
       query: {
@@ -77,6 +95,7 @@ class OrderQueryResultScene extends PureComponent {
       date: dayjs().format('YYYY-MM-DD'),
       showDatePicker: false,
       end: false,
+      scanBoolean: false,
       dateBtn: 1,
       platformBtn: 0,
       platform: Cts.PLAT_ARRAY,
@@ -117,75 +136,19 @@ class OrderQueryResultScene extends PureComponent {
     })
   }
 
-  renderItem = (order) => {
-    let {item, index} = order;
-    return (
-      <OrderListItem showBtn={false}
-                     fetchData={this.getOrderList}
-                     item={item} index={index}
-                     accessToken={this.props.global.accessToken}
-                     key={index}
-                     onRefresh={() => this.onRefresh()}
-                     navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
-                     setState={this.setState.bind(this)}
-                     allow_edit_ship_rule={false}
-                     onPress={this.onPress.bind(this)}
-      />
-    );
-  }
-
   onMomentumScrollBegin = () => {
     this.setState({
       isCanLoadMore: true
     })
   }
 
-  renderContent() {
-    const {orders, isCanLoadMore, isLoading} = this.state
-    return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
-        <FlatList
-          data={orders}
-          renderItem={this.renderItem}
-          onRefresh={() => this.onRefresh()}
-          onEndReachedThreshold={0.1}
-          onEndReached={() => {
-            if (isCanLoadMore) {
-              this.onEndReached();
-              this.setState({isCanLoadMore: false})
-            }
-          }}
-          onMomentumScrollBegin={this.onMomentumScrollBegin}
-          refreshing={isLoading}
-          keyExtractor={(item, index) => `${index}`}
-          //shouldItemUpdate={this._shouldItemUpdate}
-          // getItemLayout={(data, index) => this.getItemLayout(data, index)}
-          ListEmptyComponent={this.listEmptyComponent()}
-          initialNumToRender={5}
-        />
-      </SafeAreaView>
-    );
-  }
-
-  listEmptyComponent = () => {
-    return (
-      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
-        <If condition={!this.state.isLoading}>
-          <Text style={{fontSize: 18, color: colors.fontColor}}>
-            未搜索到订单
-          </Text>
-        </If>
-      </View>
-    )
-  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
 
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -217,7 +180,7 @@ class OrderQueryResultScene extends PureComponent {
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderQueryResultScene"
-    timeObj['is_record_request_monitor'] = config.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
   }
 
@@ -227,19 +190,6 @@ class OrderQueryResultScene extends PureComponent {
       return
     }
     this.onSearch(keywords, isSearch)
-  }
-
-  render() {
-    const {type} = this.state
-
-    return (
-      <View style={{flex: 1, backgroundColor: colors.back_color}}>
-        <If condition={type === 'done'}>
-          {this.renderHeader()}
-        </If>
-        {this.renderContent()}
-      </View>
-    );
   }
 
   fetchOrders = () => {
@@ -311,7 +261,7 @@ class OrderQueryResultScene extends PureComponent {
       page: query.page,
       limit: query.limit
     }
-    if (keywords.length > 0)
+    if (tool.length(keywords) > 0)
       params = {...params, keywords: keywords}
     const url = `/v1/new_api/orders/order_all_list`;
     HttpUtils.get.bind(this.props)(url, params, true).then(res => {
@@ -329,7 +279,7 @@ class OrderQueryResultScene extends PureComponent {
       this.setState({
         orders: isSearch ? obj : orders.concat(obj),
         isLoading: false,
-        end: obj.length < query.limit
+        end: tool.length(obj) < query.limit
       })
     }, (res) => {
       timeObj.method.push({
@@ -358,6 +308,42 @@ class OrderQueryResultScene extends PureComponent {
       this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH);
     });
 
+  }
+
+  onScanSuccess = (code) => {
+    if (code) {
+      ToastLong('加载中')
+      const {accessToken} = this.props.global;
+      const api = `/v1/new_api/orders/barcode_decode/${code}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then((res) => {
+        if (res.order_id && Number(res.order_id) > 0) {
+          this.onPress(Config.ROUTE_ORDER, {orderId: res.order_id})
+        }
+      })
+    }
+  }
+
+  onScanFail = () => {
+    ToastLong('编码不合法，请重新扫描')
+  }
+
+
+  render() {
+    const {type, scanBoolean} = this.state
+
+    return (
+      <View style={{flex: 1, backgroundColor: colors.back_color}}>
+        <If condition={type === 'done'}>
+          {this.renderHeader()}
+        </If>
+        {this.renderContent()}
+
+        <Scanner visible={scanBoolean} title="返回"
+                 onClose={() => this.setState({scanBoolean: false})}
+                 onScanSuccess={code => this.onScanSuccess(code)}
+                 onScanFail={code => this.onScanFail(code)}/>
+      </View>
+    );
   }
 
   renderHeader() {
@@ -486,6 +472,65 @@ class OrderQueryResultScene extends PureComponent {
         </View>
       </>
     )
+  }
+
+  renderContent() {
+    const {orders, isCanLoadMore, isLoading} = this.state
+    return (
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+        <FlatList
+          data={orders}
+          renderItem={this.renderItem}
+          onRefresh={() => this.onRefresh()}
+          onEndReachedThreshold={0.1}
+          onEndReached={() => {
+            if (isCanLoadMore) {
+              this.onEndReached();
+              this.setState({isCanLoadMore: false})
+            }
+          }}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          refreshing={isLoading}
+          keyExtractor={(item, index) => `${index}`}
+          //shouldItemUpdate={this._shouldItemUpdate}
+          // getItemLayout={(data, index) => this.getItemLayout(data, index)}
+          ListEmptyComponent={this.listEmptyComponent()}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  listEmptyComponent = () => {
+    return (
+      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
+        <If condition={!this.state.isLoading}>
+          <Text style={{fontSize: 18, color: colors.fontColor}}>
+            未搜索到订单
+          </Text>
+        </If>
+      </View>
+    )
+  }
+
+  renderItem = (order) => {
+    let {item, index} = order;
+    let {currVendorId} = tool.vendor(this.props.global);
+
+    return (
+      <OrderListItem showBtn={false}
+                     fetchData={this.getOrderList}
+                     item={item} index={index}
+                     accessToken={this.props.global.accessToken}
+                     key={index}
+                     onRefresh={() => this.onRefresh()}
+                     navigation={this.props.navigation}
+                     vendorId={currVendorId}
+                     setState={this.setState.bind(this)}
+                     allow_edit_ship_rule={false}
+                     onPress={this.onPress.bind(this)}
+      />
+    );
   }
 
 }

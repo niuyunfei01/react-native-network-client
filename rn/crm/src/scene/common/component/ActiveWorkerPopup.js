@@ -72,7 +72,7 @@ class ActiveWorkerPopup extends React.Component {
           let workerList = resp.obj;
           let list = [];
           list.push({name: '全部', id: '0'});
-          if (workerList && workerList.length > 0) {
+          if (workerList && tool.length(workerList) > 0) {
             workerList.forEach(function (item) {
               list.push({name: item['desc'], id: item['id']});
             });
@@ -202,7 +202,7 @@ class ActiveWorkerPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
-          {this.state.workerList.length > 0 ? <ScrollView>
+          {tool.length(this.state.workerList) > 0 ? <ScrollView>
               <List>
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>

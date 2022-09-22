@@ -7,65 +7,63 @@ import colors from "../../pubilc/styles/colors";
 import {Badge} from 'react-native-elements'
 import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
-import {setRecordFlag} from "../../reducers/store/storeActions";
 import tool from "../../pubilc/util/tool";
 
 import OrderListScene from '../order/OrderListScene'
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
-  const {global, remind} = state;
-  return {global: global, remind: remind};
+  const {global} = state;
+  return {global: global};
 }
 
 const Tab = createBottomTabNavigator();
 
 const tabBarOptions = {
   activeTintColor: colors.main_color,
-  inactiveTintColor: "#666",
-  style: {backgroundColor: "#ffffff"},
+  inactiveTintColor: colors.color666,
+  style: {backgroundColor: colors.white},
   animationEnabled: false,
   lazy: true,
   labelStyle: {fontSize: 15}
 }
 
 class TabHome extends React.Component {
+
+  static propTypes = {
+    route: PropTypes.object,
+    remind: PropTypes.object,
+  }
+
   constructor(props) {
     super(props)
-
     this.state = {
       showFlag: false
     }
   }
 
   componentDidMount() {
-    this.fetchShowRecordFlag()
-    store.subscribe(() => {
+    this.unSubscribe = store.subscribe(() => {
       this.setState({
         showFlag: store.getState().payload
       })
     })
   }
 
-  fetchShowRecordFlag() {
-    const {accessToken, currentUser} = this.props.global;
-    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      if (res.ok) {
-        store.dispatch(setRecordFlag(true))
-      } else {
-        store.dispatch(setRecordFlag(false))
-      }
-    })
+  componentWillUnmount() {
+    this.unSubscribe()
   }
+
 
   render() {
     let isBlx = false;
-    let {global, remind, route} = this.props
-    let {co_type} = tool.vendor(global);
-    let storeVendorId = Number(global.config.vendor.id)
-    let enabledGoodMgr = Number(global.config.enabled_good_mgr)
+    let remind = this.props.remind?.remindNum;
+    let {route} = this.props
+    let {co_type} = tool.vendor(this.props.global) !== undefined ? tool.vendor(this.props.global) : global.noLoginInfo.co_type;
+    let storeVendorId = Number(this.props?.global?.vendor_id !== undefined ? this.props?.global?.vendor_id : global.noLoginInfo.vendor_id || 0)
+
+    let enabledGoodMgr = Number(this.props.global?.enabled_good_mgr !== undefined ? this.props.global.enabled_good_mgr : global.noLoginInfo.enabledGoodMgr)
     if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
@@ -80,29 +78,23 @@ class TabHome extends React.Component {
         <If condition={co_type !== 'peisong'}>
           <Tab.Screen
             name="Home"
-            getComponent={() => require("../Remind/RemindScene").default}
+            getComponent={() => require("../notice/NoticeList").default}
             options={
               {
+                tabBarBadge:remind > 99 ? '99+' : remind,
                 tabBarLabel: "提醒",
                 tabBarIcon: ({focused}) => (
                   <View style={{position: "relative"}}>
                     <FontAwesome5 name={'bell'} size={22}
                                   color={focused ? colors.main_color : colors.colorCCC}
                     />
-                    <If condition={remind > 0}>
-                      <Badge
-                        value={remind > 99 ? '99+' : remind}
-                        status="error"
-                        containerStyle={{position: 'absolute', top: -5, right: -25}}
-                      />
-                    </If>
                   </View>
                 )
               }
             }
           />
         </If>
-        <If condition={global.simpleStore.fn_stall === '1'}>
+        <If condition={this.props.global?.store_info?.fn_stall === '1'}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
@@ -133,7 +125,6 @@ class TabHome extends React.Component {
         <Tab.Screen
           name="Orders"
           component={OrderListScene}
-          //getComponent={() => require('../order/OrderListScene').default}
           options={
             {
               tabBarLabel: "订单",

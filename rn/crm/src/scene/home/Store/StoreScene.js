@@ -15,6 +15,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import {Tabs} from '@ant-design/react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -36,12 +37,16 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class StoreScene extends PureComponent {
+
+  static propTypes = {
+    mine: PropTypes.object,
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-
-    const {vendor_stores, user_list} = this.props.mine;
-    let curr_user_list = tool.curr_vendor(user_list, currVendorId);
+    let curr_user_list = tool.curr_vendor(this.props.mine?.user_list, currVendorId);
 
     this.state = {
       isRefreshing: false,
@@ -68,11 +73,9 @@ class StoreScene extends PureComponent {
   }
 
   getVendorStore() {
-    const {accessToken} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken, vendor_id} = this.props.global;
     showModal('加载中')
-
-    const api = `api/get_vendor_store_list_by_city/${currVendorId}?access_token=${accessToken}`
+    const api = `api/get_vendor_store_list_by_city/${vendor_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(stores_by_city => {
       this.setState({
         cityList: Object.keys(stores_by_city),
@@ -90,12 +93,11 @@ class StoreScene extends PureComponent {
 
   onSearchWorkers() {
     const {dispatch} = this.props;
-    const {accessToken} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken, vendor_id} = this.props.global;
     let _this = this;
     showModal('加载中')
     dispatch(
-      fetchWorkers(currVendorId, accessToken, resp => {
+      fetchWorkers(vendor_id, accessToken, resp => {
         if (resp.ok) {
           let {user_list} = resp.obj;
           _this.setState({

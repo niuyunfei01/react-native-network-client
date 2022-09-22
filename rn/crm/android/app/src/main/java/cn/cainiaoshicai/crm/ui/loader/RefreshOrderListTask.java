@@ -1,9 +1,10 @@
 package cn.cainiaoshicai.crm.ui.loader;
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.react.bridge.UiThreadUtil;
 

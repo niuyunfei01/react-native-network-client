@@ -1,16 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import {
-  addTipMoney,
-  clearLocalOrder,
-  getOrder,
-  getRemindForOrderPage,
-  orderCancelZsDelivery,
-  orderWayRecord,
-  printInCloud,
-  saveOrderDelayShip,
-  saveOrderItems,
-} from '../../reducers/order/orderActions'
+import {saveOrderDelayShip,} from '../../reducers/order/orderActions'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Cts from '../../pubilc/common/Cts'
@@ -28,7 +18,6 @@ import native from '../../pubilc/util/native'
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
-import {markTaskDone} from '../../reducers/remind/remindActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
@@ -40,7 +29,6 @@ const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
 const MENU_SET_INVALID = 5; // 置为无效
 const MENU_ADD_TODO = 6;
-const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
@@ -57,15 +45,6 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       getContacts,
-      getOrder,
-      printInCloud,
-      getRemindForOrderPage,
-      saveOrderItems,
-      markTaskDone,
-      orderWayRecord,
-      clearLocalOrder,
-      orderCancelZsDelivery,
-      addTipMoney,
     }, dispatch)
   }
 }
@@ -73,10 +52,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
   return {
-    order: state.order,
     global: state.global,
-    store: state.store,
-
   }
 }
 
@@ -109,9 +85,8 @@ class OrderOperation extends Component {
   }
 
   order_reason() {
-    let {accessToken, config} = this.props.global
-    const {id} = config.vendor
-    HttpUtils.get(`/api/cancel_order_reason?access_token=${accessToken}&vendorId=${id}`).then(res => {
+    let {accessToken, vendor_id} = this.props.global
+    HttpUtils.get(`/api/cancel_order_reason?access_token=${accessToken}&vendorId=${vendor_id}`).then(res => {
       let arr = [];
       let obj
       res.map((v, i) => {
@@ -134,11 +109,10 @@ class OrderOperation extends Component {
   }
 
   toSetOrderComplete() {
-    let {accessToken, config} = this.props.global
-    const {id} = config.vendor
+    let {accessToken, vendor_id} = this.props.global
     Alert.alert('确认将订单置为完成', '订单置为完成后无法撤回，是否继续？', [{
       text: '确认', onPress: () => {
-        HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
+        HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${vendor_id}`).then(res => {
           ToastLong('订单已完成, 即将返回!')
           GlobalUtil.setOrderFresh(1)
           setTimeout(() => {
@@ -191,7 +165,7 @@ class OrderOperation extends Component {
   }
 
   _onToProvide() {
-    const {order, navigation} = this.props;
+    const {order, navigation} = this.state;
     if (order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
       return false;
@@ -201,18 +175,11 @@ class OrderOperation extends Component {
   }
 
   _onShowStoreCall() {
-    const {store, dispatch, global} = this.props;
+    const {dispatch, global} = this.props;
 
-    const store_id = this.state.order.store_id;
-    const contacts = (store.store_contacts || {}).store_id;
-    if (!contacts || contacts.length === 0) {
-      this.setState({showContactsLoading: true});
-      dispatch(getContacts(global.accessToken, store_id, (ok, msg, contacts) => {
-        this.setState({store_contacts: contacts, showContactsLoading: false, showCallStore: true})
-      }));
-    } else {
-      this.setState({showCallStore: true})
-    }
+    dispatch(getContacts(global.accessToken, this.state.order.store_id, (ok, msg, contacts) => {
+      this.setState({store_contacts: contacts, showCallStore: true})
+    }));
   }
 
   cancelOrder = () => {
@@ -310,10 +277,6 @@ class OrderOperation extends Component {
       case MENU_ADD_TODO:
         navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
         break
-      case MENU_OLD_VERSION:
-        GlobalUtil.setOrderFresh(1)
-        native.toNativeOrder(order.id).then();
-        break
       case MENU_PROVIDING:
         this._onToProvide();
         break
@@ -362,10 +325,9 @@ class OrderOperation extends Component {
   }
 
   openMiniprogarm = () => {
-    let {currStoreId, currentUser, currentUserProfile} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global)
+    let {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global;
     let data = {
-      v: currVendorId,
+      v: vendor_id,
       s: currStoreId,
       u: currentUser,
       m: currentUserProfile.mobilephone,
@@ -403,7 +365,7 @@ class OrderOperation extends Component {
               )
             })
           }
-          <View style={{width: '100%', height: pxToDp(200)}}></View>
+          <View style={{width: '100%', height: pxToDp(200)}}/>
         </ScrollView>
 
       </View>
