@@ -571,7 +571,7 @@ class SettingScene extends PureComponent {
             />
           </TouchableOpacity>
 
-          <If condition={is_alone_pay_vendor}>
+          <If condition={!is_alone_pay_vendor}>
             <TouchableOpacity onPress={() => {
               let val = !use_real_weight;
               this.save_use_real_weight(val)
