@@ -40,7 +40,6 @@ import Entypo from "react-native-vector-icons/Entypo"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import {Button, Image} from "react-native-elements";
 import BottomModal from "./BottomModal";
-import {Input} from "../../weui";
 import {MixpanelInstance} from "../util/analytics";
 
 let width = Dimensions.get("window").width;
@@ -53,16 +52,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const tipListTop = [
-  {label: '1元', value: 1},
-  {label: '2元', value: 2},
-  {label: '3元', value: 3}
-]
-const tipListBottom = [
-  {label: '4元', value: 4},
-  {label: '5元', value: 5},
-  {label: '10元', value: 10}
-]
 const tipList = [
   {label: '1元', value: 1},
   {label: '2元', value: 2},
