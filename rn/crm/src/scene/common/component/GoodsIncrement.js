@@ -168,7 +168,6 @@ class GoodsIncrement extends PureComponent {
 
 
   activate = (vip_info) => {
-    console.log('vip_info',vip_info)
     return (
       <LinearGradient style={styles.activateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
         <View style={styles.row}>
