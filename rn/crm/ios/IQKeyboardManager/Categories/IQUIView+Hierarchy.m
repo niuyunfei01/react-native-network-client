@@ -48,13 +48,13 @@ Class UIQueuingScrollViewClass;         //UIPageViewController
 
 Class UISearchBarTextFieldClass;        //UISearchBar
 
-+(void)initialize
++(void)load
 {
     [super initialize];
-    
+
     UIAlertSheetTextFieldClass          = NSClassFromString(@"UIAlertSheetTextField");
     UIAlertSheetTextFieldClass_iOS8     = NSClassFromString(@"_UIAlertControllerTextField");
-    
+
     UITableViewCellScrollViewClass      = NSClassFromString(@"UITableViewCellScrollView");
     UITableViewWrapperViewClass         = NSClassFromString(@"UITableViewWrapperView");
     UIQueuingScrollViewClass            = NSClassFromString(@"_UIQueuingScrollView");
@@ -76,7 +76,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 -(UIViewController*)viewController
 {
     UIResponder *nextResponder =  self;
-    
+
     do
     {
         nextResponder = [nextResponder nextResponder];
@@ -92,38 +92,38 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 -(UIViewController *)topMostController
 {
     NSMutableArray *controllersHierarchy = [[NSMutableArray alloc] init];
-    
+
     UIViewController *topController = self.window.rootViewController;
-    
+
     if (topController)
     {
         [controllersHierarchy addObject:topController];
     }
-    
+
     while ([topController presentedViewController]) {
-        
+
         topController = [topController presentedViewController];
         [controllersHierarchy addObject:topController];
     }
-    
+
     UIResponder *matchController = [self viewController];
-    
+
     while (matchController != nil && [controllersHierarchy containsObject:matchController] == NO)
     {
         do
         {
             matchController = [matchController nextResponder];
-            
+
         } while (matchController != nil && [matchController isKindOfClass:[UIViewController class]] == NO);
     }
-    
+
     return (UIViewController*)matchController;
 }
 
 -(UIView*)superviewOfClassType:(Class)classType
 {
     UIView *superview = self.superview;
-    
+
     while (superview)
     {
         if ([superview isKindOfClass:classType] &&
@@ -135,7 +135,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
         }
         else    superview = superview.superview;
     }
-    
+
     return nil;
 }
 
@@ -143,7 +143,7 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 {
     [self _setIsAskingCanBecomeFirstResponder:YES];
     BOOL _IQcanBecomeFirstResponder = ([self canBecomeFirstResponder] && [self isUserInteractionEnabled] && ![self isHidden] && [self alpha]!=0.0 && ![self isAlertViewTextField]  && ![self isSearchBarTextField]);
-    
+
     if (_IQcanBecomeFirstResponder == YES)
     {
         if ([self isKindOfClass:[UITextField class]])
@@ -155,9 +155,9 @@ Class UISearchBarTextFieldClass;        //UISearchBar
             _IQcanBecomeFirstResponder = [(UITextView*)self isEditable];
         }
     }
-    
+
     [self _setIsAskingCanBecomeFirstResponder:NO];
-    
+
     return _IQcanBecomeFirstResponder;
 }
 
@@ -165,21 +165,21 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 {
     //	Getting all siblings
     NSArray *siblings = self.superview.subviews;
-    
+
     //Array of (UITextField/UITextView's).
     NSMutableArray *tempTextFields = [[NSMutableArray alloc] init];
-    
+
     for (UITextField *textField in siblings)
         if ([textField _IQcanBecomeFirstResponder])
             [tempTextFields addObject:textField];
-    
+
     return tempTextFields;
 }
 
 - (NSArray*)deepResponderViews
 {
     NSMutableArray *textFields = [[NSMutableArray alloc] init];
-    
+
     //subviews are returning in opposite order. So I sorted it according the frames 'y'.
     NSArray *subViews = [self.subviews sortedArrayByPosition];
 
@@ -205,27 +205,27 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     {
         toView = self.window;
     }
-    
+
     CGAffineTransform myTransform = CGAffineTransformIdentity;
-    
+
     //My Transform
     {
         UIView *superView = [self superview];
-        
+
         if (superView)  myTransform = CGAffineTransformConcat(self.transform, [superView convertTransformToView:nil]);
         else            myTransform = self.transform;
     }
-    
+
     CGAffineTransform viewTransform = CGAffineTransformIdentity;
-    
+
     //view Transform
     {
         UIView *superView = [toView superview];
-        
+
         if (superView)  viewTransform = CGAffineTransformConcat(toView.transform, [superView convertTransformToView:nil]);
         else if (toView)  viewTransform = toView.transform;
     }
-    
+
     return CGAffineTransformConcat(myTransform, CGAffineTransformInvert(viewTransform));
 }
 
@@ -233,12 +233,12 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 - (NSInteger)depth
 {
     NSInteger depth = 0;
-    
+
     if ([self superview])
     {
         depth = [[self superview] depth] + 1;
     }
-    
+
     return depth;
 }
 
@@ -246,16 +246,16 @@ Class UISearchBarTextFieldClass;        //UISearchBar
 {
     NSMutableString *debugInfo = [[NSMutableString alloc] initWithString:@"\n"];
     NSInteger depth = [self depth];
-    
+
     for (int counter = 0; counter < depth; counter ++)  [debugInfo appendString:@"|  "];
-    
+
     [debugInfo appendString:[self debugHierarchy]];
-    
+
     for (UIView *subview in self.subviews)
     {
         [debugInfo appendString:[subview subHierarchy]];
     }
-    
+
     return debugInfo;
 }
 
@@ -271,15 +271,15 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     {
         [debugInfo appendString:@"\n"];
     }
-    
+
     NSInteger depth = [self depth];
-    
+
     for (int counter = 0; counter < depth; counter ++)  [debugInfo appendString:@"|  "];
-    
+
     [debugInfo appendString:[self debugHierarchy]];
 
     [debugInfo appendString:@"\n"];
-    
+
     return debugInfo;
 }
 
@@ -288,18 +288,18 @@ Class UISearchBarTextFieldClass;        //UISearchBar
     NSMutableString *debugInfo = [[NSMutableString alloc] init];
 
     [debugInfo appendFormat:@"%@: ( %.0f, %.0f, %.0f, %.0f )",NSStringFromClass([self class]), CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame)];
-    
+
     if ([self isKindOfClass:[UIScrollView class]])
     {
         UIScrollView *scrollView = (UIScrollView*)self;
         [debugInfo appendFormat:@"%@: ( %.0f, %.0f )",NSStringFromSelector(@selector(contentSize)),scrollView.contentSize.width,scrollView.contentSize.height];
     }
-    
+
     if (CGAffineTransformEqualToTransform(self.transform, CGAffineTransformIdentity) == false)
     {
         [debugInfo appendFormat:@"%@: %@",NSStringFromSelector(@selector(transform)),NSStringFromCGAffineTransform(self.transform)];
     }
-    
+
     return debugInfo;
 }
 
