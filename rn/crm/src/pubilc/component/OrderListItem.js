@@ -170,30 +170,28 @@ class OrderListItem extends React.PureComponent {
   upAddTip = () => {
     let {addMoneyNum, shipId, addOrdersTip} = this.state;
     const {dispatch, accessToken, item} = this.props;
-    if (addMoneyNum > 0) {
-      if (addOrdersTip) {
-        dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
-          this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
-          if (tool.length(resp?.obj?.error_msg) > 0) {
-            ToastShort(resp?.obj?.error_msg)
-          } else {
-            ToastShort('操作成功')
-          }
-        }));
-        return;
-      }
-      dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
-        if (resp.ok) {
-          this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
-          ToastShort('操作成功')
-        } else {
-          this.setState({respReason: resp.desc, ok: resp.ok})
-        }
-        await this.setState({addMoneyNum: ''});
-      }));
-    } else {
-      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
+    if (Number(addMoneyNum) < 1) {
+      return this.setState({addMoneyNum: 1, respReason: '加小费的金额必须大于1元', ok: false});
     }
+    if (addOrdersTip) {
+      return dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
+        this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
+        if (tool.length(resp?.obj?.error_msg) > 0) {
+          ToastShort(resp?.obj?.error_msg)
+        } else {
+          ToastShort('操作成功')
+        }
+      }));
+    }
+    dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
+      if (resp.ok) {
+        this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
+        ToastShort('操作成功')
+      } else {
+        this.setState({respReason: resp.desc, ok: resp.ok})
+      }
+      await this.setState({addMoneyNum: ''});
+    }));
   }
 
   onOverlookDelivery = (order_id) => {
@@ -665,7 +663,7 @@ class OrderListItem extends React.PureComponent {
     tool.objectMap(item?.btn_list, (item, idx) => {
       obj_num += item
     })
-    let btn_width = 0.85 / Number(obj_num)
+    let btn_width = 0.90 / Number(obj_num)
     return (
       <View
         style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
@@ -884,40 +882,41 @@ class OrderListItem extends React.PureComponent {
           actionText={'确定'}
           closeText={'取消'}
           onClose={() => this.closeAddTipModal()}>
-            <View style={[styles.container]}>
-              <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
-              <If condition={is_merchant_add_tip === 1}>
-                <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
-              </If>
-              <View style={[styles.container1]}>
-                <Text style={styles.f26}>金额</Text>
-                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", flexWrap: "wrap"}}>
-                  <For index='index' each='info' of={tipList}>
-                    <Text key={index} style={styles.amountBtn} onPress={() => {
-                      this.onChangeAccount(info.value)
-                    }}>{info.label}</Text>
-                  </For>
-                </View>
-                <View style={styles.addTipInputBox}>
-                  <TextInput placeholder={"请输入其他金额"}
-                             onChangeText={(value) => {
-                               this.onChangeAccount(value)
-                             }}
-                             value={`${this.state.addMoneyNum}`}
-                             placeholderTextColor={'#ccc'}
-                             style={styles.addTipTextInput}
-                             underlineColorAndroid="transparent"/>
-                  <Text style={{fontSize: pxToDp(26)}}>元</Text>
-                </View>
-                <If condition={!this.state.ok || this.state.addMoneyNum === 0}>
-                  <View style={styles.addTipIcon}>
-                    <Entypo name={"help-with-circle"}
-                            style={styles.addTipHelpIcon}/>
-                    <Text style={styles.addTipReason}>{this.state.respReason}</Text>
-                  </View>
-                </If>
+          <View style={[styles.container]}>
+            <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
+            <If condition={is_merchant_add_tip === 1}>
+              <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+            </If>
+            <View style={[styles.container1]}>
+              <Text style={styles.f26}>金额</Text>
+              <View
+                style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", flexWrap: "wrap"}}>
+                <For index='index' each='info' of={tipList}>
+                  <Text key={index} style={styles.amountBtn} onPress={() => {
+                    this.onChangeAccount(info.value)
+                  }}>{info.label}</Text>
+                </For>
               </View>
+              <View style={styles.addTipInputBox}>
+                <TextInput placeholder={"请输入其他金额"}
+                           onChangeText={(value) => {
+                             this.onChangeAccount(value)
+                           }}
+                           value={`${this.state.addMoneyNum}`}
+                           placeholderTextColor={'#ccc'}
+                           style={styles.addTipTextInput}
+                           underlineColorAndroid="transparent"/>
+                <Text style={{fontSize: pxToDp(26)}}>元</Text>
+              </View>
+              <If condition={!this.state.ok || this.state.addMoneyNum === 0}>
+                <View style={styles.addTipIcon}>
+                  <Entypo name={"help-with-circle"}
+                          style={styles.addTipHelpIcon}/>
+                  <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                </View>
+              </If>
             </View>
+          </View>
         </BottomModal>
       </View>
     )
