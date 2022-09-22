@@ -52,7 +52,7 @@ class HttpUtils {
     return options
   }
 
-  static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false) {
+  static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
     let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -84,23 +84,29 @@ class HttpUtils {
         .then((response) => {
           if (authUrl.includes(url)) {
             resolve(response)
-          } else {
-            if (response.ok) {
-              if (getNetworkDelay) {
-                const endTime = getTime();
-                resolve({obj: response.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
-              }
-              if (getMoreInfo)
-                resolve(response)
-              else resolve(response.obj)
-            } else {
-              this.error(response, props.navigation);
-              if (getNetworkDelay) {
-                const endTime = getTime();
-                reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
-              } else reject && reject(response)
-            }
+            return
           }
+          if (response.ok) {
+            if (getNetworkDelay) {
+              const endTime = getTime();
+              resolve({obj: response.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
+              return;
+            }
+            if (getMoreInfo) {
+              resolve(response)
+              return;
+            }
+            resolve(response.obj)
+            return;
+          }
+          if (showReason)
+            this.error(response, props.navigation);
+          if (getNetworkDelay) {
+            const endTime = getTime();
+            reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
+            return;
+          }
+          reject && reject(response)
         })
         .catch((error) => {
 
@@ -116,19 +122,22 @@ class HttpUtils {
   }
 
   static error(response, navigation) {
-    if (response.error_code === 10001) {
-      ToastShort('登录信息过期,请重新登录')
-      this.logout(navigation)
-    } else if (response.error_code === 21327) {
-      ToastShort('登录信息过期,请退出重新登录')
-      this.logout(navigation)
-    } else if (response.error_code === 30001) {
-      ToastShort('客户端版本过低')
-    } else {
-      let text = response.reason.toString()
-      // native.speakText(text)
+    switch (response.error_code) {
+      case 10001:
+        ToastShort('登录信息过期,请重新登录')
+        this.logout(navigation)
+        break
+      case 21327:
+        ToastShort('登录信息过期,请退出重新登录')
+        this.logout(navigation)
+        break
+      case 30001:
+        ToastShort('客户端版本过低')
+        break
+      default:
 
-      ToastLong(text)
+        ToastLong(response.reason.toString())
+        break
     }
   }
 
@@ -149,14 +158,14 @@ class HttpUtils {
     }
   }
 
-  static get(url, params, getNetworkDelay = false, getMoreInfo = false) {
+  static get(url, params, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
     const props = this
-    return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay, getMoreInfo)
+    return HttpUtils.apiBase('GET', url, params, props, getNetworkDelay, getMoreInfo, showReason)
   }
 
-  static post(url, params, getNetworkDelay = false, getMoreInfo = false) {
+  static post(url, params, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
     const props = this
-    return HttpUtils.apiBase('POST', url, params, props, getNetworkDelay, getMoreInfo)
+    return HttpUtils.apiBase('POST', url, params, props, getNetworkDelay, getMoreInfo, showReason)
   }
 
   static put(url, params) {
