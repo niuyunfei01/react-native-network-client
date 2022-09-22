@@ -181,7 +181,7 @@ class GoodsIncrement extends PureComponent {
         <If condition={vip_info.expire_date}>
           <TouchableOpacity style={[styles.row]} onPress={this.useIncrementService}>
             <Text style={styles.expireDate}>
-              {vip_info.exist_vip ? `${vip_info.expire_date}到期` : vip_info.vip_invalid ? '会员已到期' : '未开通'}
+              {!vip_info.vip_invalid ? `${vip_info.expire_date}到期` : vip_info.exist_vip ? '会员已到期' : '未开通'}
             </Text>
             <SvgXml xml={activateIcon()}/>
           </TouchableOpacity>
