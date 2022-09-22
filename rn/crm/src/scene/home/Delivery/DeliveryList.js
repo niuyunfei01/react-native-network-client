@@ -24,7 +24,7 @@ import config from "../../../pubilc/common/config";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import {Button} from "react-native-elements";
+import {Button, CheckBox} from 'react-native-elements'
 import {unDisable} from "../../../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
@@ -55,6 +55,7 @@ class DeliveryList extends PureComponent {
       show_type: 1,
       platform_delivery_bind_list: [],
       platform_delivery_unbind_list: [],
+      platform_delivery_forbidden_list: [],
       master_delivery_bind_list: [],
       master_delivery_unbind_list: [],
       uuVisible: false,
@@ -72,7 +73,9 @@ class DeliveryList extends PureComponent {
       unbind_url: null,
       show_modal: false,
       modal_msg: "",
-      delivery_way_state: ''
+      delivery_way_state: '',
+      multipleSelection: [],
+      wsbDeliveryList: []
     }
   }
 
@@ -87,6 +90,8 @@ class DeliveryList extends PureComponent {
             this.setState({
               show_disable_all: !show_disable_all,
               disable_id: 0
+            }, () => {
+              this.concatWsbDeliveryList()
             })
           } else {
             this.setState({
@@ -120,11 +125,14 @@ class DeliveryList extends PureComponent {
     const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
       this.setState({
-        platform_delivery_bind_list: res.wsb_deliveries.bind,
-        platform_delivery_unbind_list: res.wsb_deliveries.unbind,
         master_delivery_bind_list: res.store_deliveries.bind,
         master_delivery_unbind_list: res.store_deliveries.unbind,
         show_type: res.from_bd !== undefined && res.from_bd ? 2 : 1,
+        platform_delivery_forbidden_list: res?.wsb_deliveries?.forbidden,
+        platform_delivery_bind_list: res?.wsb_deliveries?.bind,
+        platform_delivery_unbind_list: res?.wsb_deliveries?.unbind
+      }, () => {
+        this.concatWsbDeliveryList()
       })
       hideModal()
     }).catch(() => {
@@ -429,13 +437,14 @@ class DeliveryList extends PureComponent {
     let {accessToken, currStoreId} = this.props.global
     let {currVendorId} = tool.vendor(this.props.global);
     let {dispatch} = this.props.route.params;
-    let {disable_id, delivery_way_state} = this.state
-    dispatch(unDisable(accessToken, currStoreId, disable_id, delivery_way_state, currVendorId, async (ok, desc) => {
+    let {delivery_way_state, multipleSelection} = this.state
+    dispatch(unDisable(accessToken, currStoreId, multipleSelection, delivery_way_state, currVendorId, async (ok, desc) => {
       if (ok) {
         this.setState({
           show_modal: true,
           modal_msg: desc,
-          show_disable_all: false
+          show_disable_all: false,
+          multipleSelection: []
         })
       } else {
         this.setState({
@@ -505,74 +514,75 @@ class DeliveryList extends PureComponent {
     }
   }
 
-  renderItem = (info) => {
-    let {show_unbind_all, unbind_id, show_disable_all, disable_id} = this.state
+  concatWsbDeliveryList = () => {
+    let {
+      show_disable_all,
+      platform_delivery_forbidden_list,
+      platform_delivery_bind_list,
+      platform_delivery_unbind_list
+    } = this.state
+    let list = []
+    if (!show_disable_all) {
+      list = list.concat(platform_delivery_unbind_list)
+      list = list.concat(platform_delivery_forbidden_list)
+      list = list.concat(platform_delivery_bind_list)
+    } else {
+      list = list.concat(platform_delivery_bind_list)
+      list = list.concat(platform_delivery_unbind_list)
+      list = list.concat(platform_delivery_forbidden_list)
+    }
+    this.setState({
+      wsbDeliveryList: list
+    })
+  }
+
+  renderItemUnbind = (info) => {
+    let {show_unbind_all, unbind_id} = this.state
     return (
       <View style={styles.listItem}>
         <If condition={show_unbind_all}>
           <View style={styles.ml6}>
-            <If condition={info.id === undefined}>
+            <If condition={info?.id === undefined}>
               <View style={styles.info_undefined}>
                 <FontAwesome5 name={'circle'} color={colors.fontColor} size={22}/>
               </View>
             </If>
 
-            <If condition={info.id !== undefined}>
-              {info.v2_type === unbind_id ?
+            <If condition={info?.id !== undefined}>
+              {info?.v2_type === unbind_id ?
                 <FontAwesome5 name={'check-circle'} color={colors.main_color} size={22}/> :
                 <FontAwesome5 name={'circle'} color={colors.color333} size={22}/>}
             </If>
           </View>
         </If>
-        <If condition={show_disable_all}>
-          <View style={styles.ml6}>
-            <If condition={info.id === undefined || info.is_forbidden === 1}>
-              <View style={styles.info_undefined}>
-                <FontAwesome5 name={'circle'} color={colors.fontColor} size={22}/>
-              </View>
-            </If>
 
-            <If condition={info.id !== undefined && info.is_forbidden === 0}>
-              {info.v2_type === disable_id ?
-                <FontAwesome5 name={'check-circle'} color={colors.main_color} size={22}/> :
-                <FontAwesome5 name={'circle'} color={colors.color333} size={22}/>}
-            </If>
-          </View>
-        </If>
-        <Image style={[styles.img]} source={{uri: info.img}}/>
+        <Image style={[styles.img]} source={{uri: info?.img}}/>
         <View style={styles.itemBox}>
           <View style={styles.itemBtn}>
-            <Text style={styles.itemText}>{info.name} </Text>
-            <If condition={info.id === undefined && show_unbind_all}>
+            <Text style={styles.itemText}>{info?.name} </Text>
+            <If condition={info?.id === undefined && show_unbind_all}>
               <Text style={styles.noBindText}>(未绑定)</Text>
-            </If>
-            <If condition={info.is_forbidden === 1}>
-              <Text style={styles.noBindText}>(已禁用)</Text>
             </If>
           </View>
           <View style={styles.mt10}>
-            {info.has_diff ? this.render_error_msg(info.diff_info) : this.render_msg([info.desc])}
+            {info?.has_diff ? this.render_error_msg(info?.diff_info) : this.render_msg([info?.desc])}
           </View>
         </View>
 
-        <If condition={info.is_forbidden === 1 && !show_disable_all}>
-          <Text style={[styles.status_err]}>恢复使用</Text>
-        </If>
-
-        <If condition={!tool.length(info.id) > 0 && !show_disable_all && !show_unbind_all}>
-          {info.bind_type === 'wsb' ? <Text style={[styles.status_err]}>申请开通</Text> :
+        <If condition={!tool.length(info?.id) > 0 && !show_unbind_all}>
+          {info?.bind_type === 'wsb' ? <Text style={[styles.status_err]}>申请开通</Text> :
             <Text style={[styles.status_err]}>去授权</Text>}
         </If>
 
-        <If condition={tool.length(info.id) > 0 && !show_disable_all && !show_unbind_all}>
-          {info.bind_type === 'wsb' && info.is_forbidden === 1 ? null :
+        <If condition={tool.length(info?.id) > 0 && !show_unbind_all}>
+          {info?.bind_type === 'wsb' && info?.is_forbidden === 1 ? null :
             <View style={styles.bindBox}>
               <Text style={styles.bindText}>已绑定</Text>
               <Icon name='chevron-thin-right' style={styles.bindIcon}/>
             </View>}
         </If>
 
-        <If condition={info.platform === '9' && !show_unbind_all && !show_unbind_all}>
+        <If condition={info?.platform === '9' && !show_unbind_all && !show_unbind_all}>
           <View style={styles.bind_block}>
             <Text style={styles.bind_block_text}>已停用</Text>
             <Icon name='chevron-thin-right' style={styles.bind_block_icon}/>
@@ -582,66 +592,169 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  renderList = (type = 1) => {
-    let {show_unbind_all, show_disable_all} = this.state
-    let list = [];
-    if (type === 1) {
-      list = list.concat(this.state.platform_delivery_unbind_list)
-      list = list.concat(this.state.platform_delivery_bind_list)
-    } else {
-      list = list.concat(this.state.master_delivery_unbind_list)
-      list = list.concat(this.state.master_delivery_bind_list)
-    }
-    let items = []
-    for (let i in list) {
-      const info = list[i]
-      items.push(
-        <TouchableOpacity
-          style={styles.listItemTouch}
-          onPress={() => {
-            if (show_unbind_all) {
-              if (info.id !== undefined) {
+  renderItemDisable = (info, idx) => {
+    let {show_disable_all, multipleSelection} = this.state
+    return (
+      <View style={styles.listItem}>
+        <If condition={show_disable_all}>
+          <If condition={info?.id !== undefined && info?.is_forbidden === 0}>
+            <CheckBox
+              checked={info?.checked}
+              checkedColor={colors.main_color}
+              color={colors.fontBlack}
+              onPress={() => {
+                let menu = [...this.state.wsbDeliveryList]
+                menu[idx].checked = !menu[idx].checked;
                 this.setState({
-                  unbind_id: info.v2_type,
-                  unbind_name: info.name,
+                  wsbDeliveryList: menu
                 })
-              }
-              return;
-            }
-            if (show_disable_all) {
-              if (info.id !== undefined && info.is_forbidden === 0) {
-                this.setState({
-                  disable_id: info.v2_type,
-                  delivery_way_state: info.is_forbidden
-                })
-              }
-              return;
-            }
-            if (tool.length(info.id) > 0) {
-              if (info.is_forbidden === 1) {
-                this.setState({
-                  disable_id: info.v2_type,
-                  delivery_way_state: info.is_forbidden
-                }, () => {
-                  this.unDisableBtn('启用')
-                })
-              } else {
-                this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
-              }
-            } else {
-              if (info.bind_type === 'wsb') {
-                this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.v2_type});
-              } else {
-                this.bind(info.type)
-              }
-            }
-          }}>
-          {this.renderItem(info)}
-        </TouchableOpacity>)
-    }
+                if (menu[idx].checked) {
+                  multipleSelection.push(info?.v2_type)
+                } else {
+                  multipleSelection.splice(multipleSelection.findIndex(index => Number(index) == info?.v2_type), 1)
+                }
+              }}
+            />
+          </If>
+        </If>
+        <Image style={[styles.img]} source={{uri: info?.img}}/>
+        <View style={styles.itemBox}>
+          <View style={styles.itemBtn}>
+            <Text style={styles.itemText}>{info?.name} </Text>
+            <If condition={info?.is_forbidden === 1}>
+              <Text style={styles.noBindText}>(已禁用)</Text>
+            </If>
+          </View>
+          <View style={styles.mt10}>
+            {info?.has_diff ? this.render_error_msg(info?.diff_info) : this.render_msg([info?.desc])}
+          </View>
+        </View>
+
+        <If condition={info?.is_forbidden === 1 && !show_disable_all}>
+          <Text style={[styles.status_err]}>恢复使用</Text>
+        </If>
+
+        <If condition={!tool.length(info?.id) > 0}>
+          {info?.bind_type === 'wsb' ? <Text style={[styles.status_err]}>申请开通</Text> :
+            <Text style={[styles.status_err]}>去授权</Text>}
+        </If>
+
+        <If condition={tool.length(info?.id) > 0}>
+          {info?.bind_type === 'wsb' && info?.is_forbidden === 1 ? null :
+            <View style={styles.bindBox}>
+              <Text style={styles.bindText}>已绑定</Text>
+              <Icon name='chevron-thin-right' style={styles.bindIcon}/>
+            </View>}
+        </If>
+
+        <If condition={info?.platform === '9'}>
+          <View style={styles.bind_block}>
+            <Text style={styles.bind_block_text}>已停用</Text>
+            <Icon name='chevron-thin-right' style={styles.bind_block_icon}/>
+          </View>
+        </If>
+      </View>
+    )
+  }
+
+  renderListDisable = () => {
+    let {show_disable_all, multipleSelection, wsbDeliveryList} = this.state
     return (
       <ScrollView style={styles.container}>
-        {items}
+        <For index="idx" each="info" of={wsbDeliveryList}>
+          <TouchableOpacity
+            key={idx}
+            style={styles.listItemTouch}
+            onPress={() => {
+              if (show_disable_all) {
+                if (info?.id !== undefined && info?.is_forbidden === 0) {
+                  this.setState({
+                    disable_id: info?.v2_type,
+                    delivery_way_state: info?.is_forbidden
+                  })
+                }
+                let menu = [...this.state.wsbDeliveryList]
+                menu[idx].checked = !menu[idx].checked;
+                this.setState({
+                  wsbDeliveryList: menu
+                })
+                if (menu[idx].checked) {
+                  multipleSelection.push(info?.v2_type)
+                } else {
+                  multipleSelection.splice(multipleSelection.findIndex(index => Number(index) == info?.v2_type), 1)
+                }
+                return;
+              }
+              if (tool.length(info?.id) > 0) {
+                if (info?.is_forbidden === 1) {
+                  this.setState({
+                    disable_id: info?.v2_type,
+                    delivery_way_state: info?.is_forbidden,
+                    multipleSelection: info?.v2_type
+                  }, () => {
+                    this.unDisableBtn('启用')
+                  })
+                } else {
+                  this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info?.id})
+                }
+              } else {
+                if (info?.bind_type === 'wsb') {
+                  this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info?.v2_type});
+                } else {
+                  this.bind(info?.type)
+                }
+              }
+            }}>
+            {this.renderItemDisable(info, idx)}
+          </TouchableOpacity>
+        </For>
+      </ScrollView>
+    )
+  }
+
+  renderListUnbind = () => {
+    let {show_unbind_all} = this.state
+    let list = [];
+    list = list.concat(this.state.master_delivery_unbind_list)
+    list = list.concat(this.state.master_delivery_bind_list)
+    return (
+      <ScrollView style={styles.container}>
+        <For index="idx" each="info" of={list}>
+          <TouchableOpacity
+            key={idx}
+            style={styles.listItemTouch}
+            onPress={() => {
+              if (show_unbind_all) {
+                if (info?.id !== undefined) {
+                  this.setState({
+                    unbind_id: info?.v2_type,
+                    unbind_name: info?.name,
+                  })
+                }
+                return;
+              }
+              if (tool.length(info?.id) > 0) {
+                if (info?.is_forbidden === 1) {
+                  this.setState({
+                    disable_id: info?.v2_type,
+                    delivery_way_state: info?.is_forbidden
+                  }, () => {
+                    this.unDisableBtn('启用')
+                  })
+                } else {
+                  this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info?.id})
+                }
+              } else {
+                if (info?.bind_type === 'wsb') {
+                  this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info?.v2_type});
+                } else {
+                  this.bind(info?.type)
+                }
+              }
+            }}>
+            {this.renderItemUnbind(info)}
+          </TouchableOpacity>
+        </For>
       </ScrollView>
     )
   }
@@ -653,7 +766,12 @@ class DeliveryList extends PureComponent {
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
           {this.renderHeader()}
-          {this.renderList(show_type)}
+          <If condition={show_type === 1}>
+            {this.renderListDisable()}
+          </If>
+          <If condition={show_type === 2}>
+            {this.renderListUnbind()}
+          </If>
           <If condition={show_unbind_all}>
             {this.renderBtn()}
           </If>
@@ -844,13 +962,14 @@ class DeliveryList extends PureComponent {
   }
 
   renderDisableBtn = () => {
+    const {multipleSelection} = this.state
     return (
       <View style={styles.bottomBtn}>
         <Button title={'确认'}
                 onPress={() => this.unDisableBtn('禁用')}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: this.state.disable_id !== 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: multipleSelection.length > 0 ? colors.main_color : colors.fontColor,
                 }}
                 titleStyle={styles.bottomBtnTitle}
         />

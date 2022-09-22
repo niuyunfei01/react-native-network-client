@@ -17,7 +17,6 @@ import {
   fetchStoreTurnover,
   fetchUserCount,
   fetchWorkers,
-  receiveIncrement,
   userCanChangeStore,
 } from "../../../reducers/mine/mineActions";
 import {connect} from "react-redux";
@@ -30,7 +29,6 @@ import {setRecordFlag} from "../../../reducers/store/storeActions"
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
-import JPush from "jpush-react-native";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import dayjs from "dayjs";
 
@@ -84,6 +82,7 @@ import {
   wallet
 } from "../../../svg/svg";
 import {LineView, Styles} from "../GoodsIncrementService/GoodsIncrementServiceStyle";
+import {doJPushSetAlias} from "../../../pubilc/component/jpushManage";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -221,8 +220,6 @@ class MineScene extends Component {
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
-
-    this.getServiceStatus(currStoreId, accessToken)
     this.getHuichuan(currStoreId, accessToken)
   }
 
@@ -454,21 +451,11 @@ class MineScene extends Component {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
     const {accessToken, currStoreId} = this.props.global;
-    this.getServiceStatus(currStoreId, accessToken)
   }
 
   registerJpush = () => {
     const {currentUser} = this.props.global
-    let date = Math.round(new Date() / 1000)
-    if (currentUser) {
-      const alias = `uid_${currentUser}`;
-      JPush.setAlias({alias: alias, sequence: date})
-      JPush.isPushStopped((isStopped) => {
-        if (isStopped) {
-          JPush.resumePush();
-        }
-      })
-    }
+    doJPushSetAlias(currentUser)
   }
 
   _doChangeStore = (store_id) => {
@@ -513,7 +500,7 @@ class MineScene extends Component {
     if (Platform.OS === 'ios') {
       callback(true, '');
     } else {
-      native.setCurrStoreId(store_id, callback);
+      native.setCurrStoreId(store_id, callback).then();
     }
   }
 
@@ -540,39 +527,6 @@ class MineScene extends Component {
     })
   }
 
-  getServiceStatus = (currStoreId, accessToken) => {
-    const api = `/v1/new_api/added/service_info/${currStoreId}?access_token=${accessToken}`
-    const {dispatch} = this.props
-    HttpUtils.get(api).then(res => {
-      const {is_new, expire_date} = res
-      const status = new Date(time) < new Date(expire_date)
-      dispatch(receiveIncrement({
-        ...res,
-        expire_date: is_new === 1 ? '未开通' : status ? expire_date : '已到期',
-        incrementStatus: status
-      }))
-    }).catch(error => {
-      dispatch(receiveIncrement({
-        auto_pack: {
-          expire_date: '',
-          status: 'off'
-        },
-        auto_reply: {
-          expire_date: '',
-          status: 'off'
-        },
-        bad_notify: {
-          expire_date: '',
-          status: 'off'
-        },
-        in_white_list: 0,
-        expire_date: '未开通',
-        incrementStatus: false
-      }))
-      showError(error.reason)
-    })
-  }
-
   onCanChangeStore = (store_id) => {
     const {dispatch, global} = this.props;
     const {accessToken} = global;
@@ -580,7 +534,6 @@ class MineScene extends Component {
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
           this._doChangeStore(store_id);
-          this.getServiceStatus(store_id, accessToken)
           this.getStoreDataOfMine(store_id)
           this.getStoreTurnover()
           this.getHuichuan(store_id, accessToken)
@@ -601,10 +554,6 @@ class MineScene extends Component {
   }
 
   onPress = (route, params = {}) => {
-    if (route === Config.ROUTE_GOODS_COMMENT) {
-      native.toUserComments().then();
-      return;
-    }
     this.props.navigation.navigate(route, params);
   }
 
@@ -758,7 +707,7 @@ class MineScene extends Component {
       <View style={[header_styles.main_box]}>
         <View style={header_styles.row}>
           <JbbText style={header_styles.shop_name}>
-            {(store_info?.name || '').length > 12 ? store_info?.name.substring(0, 13) + '...' : store_info?.name}
+            {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 11) + '...' : store_info?.name}
           </JbbText>
           <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
             <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
@@ -796,10 +745,10 @@ class MineScene extends Component {
   }
   renderStoreStatus = () => {
     let {storeStatus} = this.state
-    const statusColorStyle = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
-    const statusFlag = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? styles.closeFlag : styles.noExtStoreFlag) : styles.openStoreFlag;
-    const storeStatusWrap = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? header_styles.closeStoreStatusWrap : header_styles.noExtStoreStatusWrap) : header_styles.openStoreStatusWrap;
-    const rightStatus = storeStatus.all_close ? (storeStatus.business_status.length > 0 ? '#EE2626' : '#409EFF') : colors.main_color
+    const statusColorStyle = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
+    const statusFlag = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? styles.closeFlag : styles.noExtStoreFlag) : styles.openStoreFlag;
+    const storeStatusWrap = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? header_styles.closeStoreStatusWrap : header_styles.noExtStoreStatusWrap) : header_styles.openStoreStatusWrap;
+    const rightStatus = storeStatus.all_close ? (tool.length(storeStatus.business_status) > 0 ? '#EE2626' : '#409EFF') : colors.main_color
     return (
       <TouchableOpacity style={storeStatusWrap} onPress={this.jumpToStoreStatus}>
         <View style={header_styles.row}>
@@ -845,7 +794,7 @@ class MineScene extends Component {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
+            source={tool.length(cover_image) > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}
           />
 
           <View style={[worker_styles.sales_box]}>
@@ -891,7 +840,7 @@ class MineScene extends Component {
         <View style={worker_styles.container}>
           <Image
             style={[worker_styles.icon_head]}
-            source={cover_image.length > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
+            source={tool.length(cover_image) > 0 ? {uri: cover_image} : require("../../../img/My/touxiang180x180_.png")}/>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>
               {(currentUserProfile?.screen_name || "").substring(0, 4)}
@@ -1018,7 +967,7 @@ class MineScene extends Component {
     let {currVersion, is_mgr, is_helper} = this.state;
     const {navigation, global} = this.props
     const {currStoreId, accessToken, store_info} = global
-    const {added_service} = store_info;
+    const {vip_info = {}} = store_info;
     return (
       <>
         {this.renderHeader()}
@@ -1039,7 +988,7 @@ class MineScene extends Component {
           <If condition={currVersion === Cts.VERSION_DIRECT}>
             <NextSchedule/>
           </If>
-          <If condition={added_service === '1'}>
+          <If condition={vip_info.show_vip}>
             <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
           </If>
           {this.renderOftenUse()}
@@ -1320,7 +1269,7 @@ class MineScene extends Component {
             <Text style={[block_styles.block_name]}>摊位结算</Text>
           </TouchableOpacity>
         </If>
-        <If condition={wsb_store_account === 1 && activity_img.length > 0}>
+        <If condition={wsb_store_account === 1 && tool.length(activity_img) > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
@@ -1350,7 +1299,7 @@ class MineScene extends Component {
           <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
           <Text style={[block_styles.block_name]}>公告</Text>
         </TouchableOpacity>
-        <If condition={wsb_store_account !== 1 && activity_img.length > 0}>
+        <If condition={wsb_store_account !== 1 && tool.length(activity_img) > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}

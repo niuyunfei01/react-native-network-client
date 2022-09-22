@@ -73,7 +73,7 @@ class StallSettlementScene extends PureComponent {
   }
 
   renderItemRow = (headerLeftWrap, width50, price, orderTotal) => {
-    const priceStyle = `${parseInt(price)}`.length > 2 ? styles.headerPriceMore : styles.headerPrice
+    const priceStyle = tool.length(`${parseInt(price)}`) > 2 ? styles.headerPriceMore : styles.headerPrice
     return (
       <View style={styles.row}>
         <View style={headerLeftWrap}>

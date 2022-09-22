@@ -8,6 +8,7 @@ import Config from '../../../../pubilc/common/config'
 import Mapping from "../../../../pubilc/Mapping";
 import HttpUtils from "../../../../pubilc/util/http";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import tool from "../../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -67,7 +68,7 @@ class NextSchedule extends React.Component {
           </TouchableOpacity>
         </View>
         <View style={styles.scheduleContainer}>
-          {this.state.schedule.schedules.length ? (
+          {tool.length(this.state.schedule.schedules) ? (
 
             <For of={this.state.schedule.schedules} each='item' index='idx'>
               <Text key={idx}>{item} </Text>

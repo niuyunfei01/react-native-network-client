@@ -86,14 +86,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     };
   };
 
-  back(type) {
-    if (type == "add") {
-      native.gotoPage(type);
-    } else {
-      this.props.navigation.goBack();
-    }
-  }
-
   getVendorStore() {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -181,7 +173,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   dataValidate(formData) {
     let {goods_name, price_desc} = formData;
     let err_msg = "";
-    if (goods_name.length <= 0) {
+    if (tool.length(goods_name) <= 0) {
       err_msg = "请输入商品名";
     } else if (price_desc <= 0) {
       err_msg = "请输入正确的价格描述";
@@ -252,12 +244,14 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       compressImageMaxHeight: 480,
       compressImageQuality: 0.5,
       compressVideoPreset: "MediumQuality",
-      includeExif: true
+      includeExif: true,
+      cropperChooseText: '选择图片',
+      cropperCancelText: '取消'
     })
       .then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[tool.length(image_arr) - 1];
         let image_info = {
           uri: image_path,
           name: image_name

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {StyleSheet, View, ViewPropTypes} from 'react-native'
 import Grid from './Grid'
 import V from '../variable'
+import tool from "../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   grids: {
@@ -34,7 +35,7 @@ export default class Grids extends Component {
     const {children, data, style, ...others} = this.props
     return (
       <View style={[styles.grids, style]} {...others}>
-        {data.length > 0 ? this.renderData(data) : children}
+        {tool.length(data) > 0 ? this.renderData(data) : children}
       </View>
     )
   }

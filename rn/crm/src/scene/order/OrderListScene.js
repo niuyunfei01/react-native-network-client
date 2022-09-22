@@ -6,7 +6,6 @@ import {
   FlatList,
   InteractionManager,
   Platform,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -55,6 +54,7 @@ import DeviceInfo from "react-native-device-info";
 import {downloadApk} from "rn-app-upgrade";
 import {setRecordFlag} from "../../reducers/store/storeActions";
 import PropTypes from "prop-types";
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const {width} = Dimensions.get("window");
 
@@ -106,7 +106,6 @@ const initState = {
   show_button: false,
   is_service_mgr: false,
   allow_merchants_store_bind: true,
-  showBtn: false,
   img: '',
   showImgType: 1,
   show_img: true,
@@ -350,39 +349,42 @@ class OrderListScene extends Component {
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
-      const {co_type, currVendorId} = tool.vendor(store.getState().global)
-      if (co_type === undefined || currVendorId === '' || currVendorId === undefined || store.getState().global?.vendor_id === '' || store.getState().global?.vendor_id === '0') {
-        return;
-      }
-      if (store.getState().global.store_id === 0)
-        return;
-      if (store.getState().global.vendor_id === 0)
-        return;
-      const flag = store.getState().global.accessToken === global.noLoginInfo.accessToken &&
-        store.getState().global.currentUser === global.noLoginInfo.currentUser &&
-        store.getState().global.store_id === global.noLoginInfo.store_id &&
-        store.getState().global.host === global.noLoginInfo.host &&
-        co_type === global.noLoginInfo.co_type &&
-        currVendorId === global.noLoginInfo.currVendorId &&
-        store.getState().global?.vendor_id === global.noLoginInfo.storeVendorId &&
-        store.getState().global?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr
-
-      if (flag) {
-        return
-      }
-      const noLoginInfo = {
-        accessToken: store.getState().global.accessToken,
-        currentUser: store.getState().global.currentUser,
-        currStoreId: store.getState().global.store_id,
-        host: store.getState().global.host || Config.defaultHost,
-        co_type: co_type,
-        storeVendorId: store.getState().global.vendor_id,
-        enabledGoodMgr: store.getState().global.enabled_good_mgr,
-        currVendorId: currVendorId
-      }
-      global.noLoginInfo = noLoginInfo
-      setNoLoginInfo(JSON.stringify(noLoginInfo))
+      this.handleNoLoginInfo(store.getState().global)
     })
+  }
+  handleNoLoginInfo = (reduxGlobal) => {
+    const {co_type} = tool.vendor(reduxGlobal)
+    if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+      return;
+    }
+    if (reduxGlobal.store_id === 0)
+      return;
+    if (reduxGlobal.vendor_id === 0)
+      return;
+    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
+      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
+      reduxGlobal.store_id === global.noLoginInfo.store_id &&
+      reduxGlobal.host === global.noLoginInfo.host &&
+      co_type === global.noLoginInfo.co_type &&
+      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
+      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
+      reduxGlobal?.printer_id === global.noLoginInfo.printer_id
+
+    if (flag) {
+      return
+    }
+    const noLoginInfo = {
+      accessToken: reduxGlobal.accessToken,
+      currentUser: reduxGlobal.currentUser,
+      currStoreId: reduxGlobal.store_id,
+      host: reduxGlobal.host || Config.defaultHost,
+      co_type: co_type,
+      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
+      currVendorId: reduxGlobal.vendor_id,
+      printer_id: reduxGlobal.printer_id || '0'
+    }
+    global.noLoginInfo = noLoginInfo
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
   }
 
   checkVersion = () => {
@@ -391,7 +393,9 @@ class OrderListScene extends Component {
         Alert.alert('新版本提示', res.desc, [
           {text: '稍等再说', style: 'cancel'},
           {
-            text: '现在更新', onPress: () => {
+            text: '现在更新',
+            style: 'default',
+            onPress: () => {
               downloadApk({
                 interval: 250, // listen to upload progress event, emit every 666ms
                 apkUrl: res.download_url,
@@ -405,7 +409,7 @@ class OrderListScene extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -478,26 +482,23 @@ class OrderListScene extends Component {
   }
 
   getVendor = () => {
-    let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind === '1',
-      showBtn: wsb_store_account,
     })
     this.getstore()
     this.clearStoreCache()
   }
 
   getstore = () => {
-    this.setState({
-      show_button: false,
-    })
+
     const {dispatch} = this.props
     const {accessToken, currStoreId} = this.props.global;
     if (currStoreId > 0) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
-        if (res.business_status.length > 0) {
+        if (tool.length(res.business_status) > 0) {
           let all_store = {
             id: "0",
             name: "A所有外卖店铺",
@@ -506,6 +507,7 @@ class OrderListScene extends Component {
           res.business_status.push(all_store)
           dispatch(setExtStore(res.business_status));
           this.setState({
+            show_button: false,
             ext_store_list: res.business_status,
             allow_edit_ship_rule: res.allow_edit_ship_rule
           })
@@ -523,7 +525,7 @@ class OrderListScene extends Component {
   clearStoreCache = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
+    HttpUtils.get.bind(this.props)(api).then(res => {
       if (res.sum < 0) {
         Alert.alert('提醒', '余额不足请充值', [
           {
@@ -557,6 +559,7 @@ class OrderListScene extends Component {
         this.setState({isLoading: true})
       return;
     }
+    const {vendor_info} = this.props.global
     this.setState({
         query: {...query, page: 1, isAdd: true, offset: 0}
       },
@@ -575,7 +578,7 @@ class OrderListScene extends Component {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
-    HttpUtils.get(url, params, true).then(res => {
+    HttpUtils.get.bind(this.props)(url, params, true).then(res => {
       const {obj} = res
       timeObj.method.push({
         interfaceName: url,
@@ -648,9 +651,9 @@ class OrderListScene extends Component {
           this.onRefresh()
           return
         }
-        this.setState({
-          categoryLabels: res.tabs,
-        })
+        // this.setState({
+        //   categoryLabels: res.tabs,
+        // })
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -661,7 +664,8 @@ class OrderListScene extends Component {
         this.setState({
           ListData: setList === 1 ? res.orders : ListData.concat(res.orders),
           isLoading: false,
-          query
+          query: query,
+          categoryLabels: res.tabs,
         })
       }, (res) => {
         showError(res.reason);
@@ -814,10 +818,10 @@ class OrderListScene extends Component {
     } = this.state
 
     return (
-      <View style={styles.flex1}>
+      <SafeAreaView style={styles.flex1}>
         <FloatServiceIcon fromComponent={'订单列表'}/>
         {this.renderTabsHead()}
-        <If condition={ext_store_list.length > 0 && show_orderlist_ext_store}>
+        <If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>
           <View style={styles.extStore}>
             <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
               {ext_store_name}
@@ -848,7 +852,7 @@ class OrderListScene extends Component {
                  onClose={() => this.setState({scanBoolean: false})}
                  onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -884,7 +888,7 @@ class OrderListScene extends Component {
   }
 
   renderStatusTabs = () => {
-    const tab_width = 1 / this.state.categoryLabels.length;
+    const tab_width = 1 / tool.length(this.state.categoryLabels);
     if (!tool.length(this.state.categoryLabels) > 0) {
       return;
     }
@@ -939,7 +943,7 @@ class OrderListScene extends Component {
   }
   renderContent = (orders) => {
     return (
-      <SafeAreaView style={styles.orderListContent}>
+      <View style={styles.orderListContent}>
         <FlatList
           data={orders}
           legacyImplementation={false}
@@ -960,7 +964,7 @@ class OrderListScene extends Component {
           ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -995,6 +999,11 @@ class OrderListScene extends Component {
     })
   }
 
+  onChange = (event, sortItem) => {
+    if (event.target.checked) {
+      this.setOrderBy(sortItem.value)
+    }
+  }
   showSortSelect = () => {
     let {user_config} = this.props.global;
     let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
@@ -1003,11 +1012,7 @@ class OrderListScene extends Component {
         <For index="index" each="sortItem" of={this.state.sortData}>
           <RadioItem key={index} style={styles.sortSelect}
                      checked={sort === sortItem.value}
-                     onChange={event => {
-                       if (event.target.checked) {
-                         this.setOrderBy(sortItem.value)
-                       }
-                     }}>
+                     onChange={event => this.onChange(event, sortItem)}>
             <Text style={{color: colors.fontBlack}}>{sortItem.label} </Text>
           </RadioItem>
         </For>
@@ -1018,17 +1023,17 @@ class OrderListScene extends Component {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {showBtn, orderStatus, allow_edit_ship_rule} = this.state;
-    let {currVendorId} = tool.vendor(this.props.global);
+    let {orderStatus, allow_edit_ship_rule} = this.state;
+    let {vendor_id, vendor_info} = this.props.global
     return (
-      <OrderListItem showBtn={showBtn}
+      <OrderListItem showBtn={'1' === vendor_info.wsb_store_account}
                      key={index}
                      fetchData={() => this.onRefresh(orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}
                      onRefresh={this.onRefresh}
                      navigation={this.props.navigation}
-                     vendorId={currVendorId || '0'}
+                     vendorId={vendor_id || '0'}
                      allow_edit_ship_rule={allow_edit_ship_rule}
                      setState={this.setState.bind(this)}
                      orderStatus={orderStatus}

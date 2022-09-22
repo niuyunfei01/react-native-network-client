@@ -10,6 +10,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
+import tool from "../../../pubilc/util/tool";
 
 const mapStateToProps = state => {
   const {global} = state;
@@ -64,7 +65,7 @@ class PreferenceBillingSetting extends PureComponent {
   getDeliveryConf = () => {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let arr = [];
-      if (response !== undefined && response.menus.length > 0) {
+      if (response !== undefined && tool.length(response.menus) > 0) {
         for (let item of response.menus) {
           item.checked = false;
           if (this.state.selectArr.indexOf(item.id) > -1) {
@@ -87,7 +88,12 @@ class PreferenceBillingSetting extends PureComponent {
     let access_token = this.props.global.accessToken
     let {selectArr, checked_item, ext_store_id, deploy_time, auto_call} = this.state
 
-    if (deploy_time && deploy_time == 0) {
+    if (tool.length(selectArr) < 1) {
+      showError("至少选择一个配送方式");
+      this.setState({isRefreshing: false});
+      return;
+    }
+    if (deploy_time && Number(deploy_time) <= 0) {
       showError("请填写发单时间");
       this.setState({isRefreshing: false});
       return;

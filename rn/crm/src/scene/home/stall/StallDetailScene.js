@@ -9,6 +9,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {connect} from "react-redux";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   rowCenter: {flexDirection: 'row', alignItems: 'center', marginRight: 8},
@@ -121,6 +122,17 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: colors.color333,
     lineHeight: 20,
+    width: '70%',
+    justifyContent: 'center',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#979797',
+    borderStyle: 'solid',
+    paddingTop: 3,
+    paddingLeft: 7,
+    paddingBottom: 4
+  },
+  selectContent:{
     width: '70%',
     justifyContent: 'center',
     borderRadius: 4,
@@ -330,7 +342,7 @@ class StallDetailScene extends PureComponent {
   }
 
   submitSettlementInfo = (modalContentObj) => {
-    if (modalContentObj.type?.value?.length === 0 || modalContentObj.money.length === 0) {
+    if (tool.length(modalContentObj.type?.value) === 0 || tool.length(modalContentObj.money) === 0) {
       showError('请先选择类型和输入备注', 1);
       return
     }
@@ -443,7 +455,7 @@ class StallDetailScene extends PureComponent {
             <ModalSelector onChange={value => this.onChangeText(value, 'type')}
                            data={MODAL_DATA}
                            skin="customer"
-                           style={styles.modalContentRightTextInput}
+                           style={styles.selectContent}
                            defaultKey={1}>
               <View style={styles.modalSelectWrap}>
                 <Text style={modalContentObj.type?.label ? styles.modalSelectText : styles.modalNotSelectText}>
@@ -498,7 +510,7 @@ class StallDetailScene extends PureComponent {
 
   renderOther = (list) => {
     return (
-      <If condition={list?.length > 0}>
+      <If condition={tool.length(list) > 0}>
         <For of={list} each="item" index="i">
           <View style={styles.modifySettlementWrap} key={i}>
             <View style={styles.modifySettlementTitleWrap}>
@@ -597,19 +609,21 @@ class StallDetailScene extends PureComponent {
             完成时间：{order_time}
           </Text>
         </View>
-        <For of={items} each="item" index="i">
-          <View style={styles.extraContentWrap} key={i}>
-            <Text style={styles.extraContentText}>
-              {item.name}
-            </Text>
-            <Text style={styles.extraContentNumText}>
-              x{item.num}
-            </Text>
-            <Text style={styles.extraContentPriceText}>
-              ￥{item.price}
-            </Text>
-          </View>
-        </For>
+        <If condition={Array.isArray(items) && items.length > 0}>
+          <For of={items} each="item" index="i">
+            <View style={styles.extraContentWrap} key={i}>
+              <Text style={styles.extraContentText}>
+                {item.name}
+              </Text>
+              <Text style={styles.extraContentNumText}>
+                x{item.num}
+              </Text>
+              <Text style={styles.extraContentPriceText}>
+                ￥{item.price}
+              </Text>
+            </View>
+          </For>
+        </If>
       </View>
     )
   }

@@ -9,6 +9,7 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchUnlocked} from "../../../reducers/invoicing/invoicingActions";
 import EmptyListView from "./EmptyListView";
 import colors from "../../../pubilc/styles/colors";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -107,7 +108,7 @@ class InvoicingGatherScene extends PureComponent {
           />
         }>
           <Cells>
-            {reqList.length > 0 ? reqList : <EmptyListView/>}
+            {tool.length(reqList) > 0 ? reqList : <EmptyListView/>}
           </Cells>
         </ScrollView>
       </View>

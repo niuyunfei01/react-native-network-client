@@ -14,7 +14,6 @@ import tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
 import {Button, Input} from "react-native-elements";
-import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../../weui/variable";
@@ -23,6 +22,8 @@ import Config from '../../../pubilc/common/config'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+
+let {width} = Dimensions.get("window")
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -53,8 +54,6 @@ class StockCheck extends BaseComponent {
       loading: false,
       storeProd: this.props.route.params.storeProd.skus
     }
-
-    this.navigationOptions(this.props)
   }
 
   navigationOptions = ({navigation, global, route}) => {
@@ -74,20 +73,20 @@ class StockCheck extends BaseComponent {
   }
 
   componentDidMount() {
+    this.navigationOptions(this.props)
     this.fetchData()
     this.fetchStockCheckType()
   }
 
   fetchData() {
-    const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
-    self.setState({loading: true})
-    HttpUtils.get.bind(self.props)(api, {
+    this.setState({loading: true})
+    HttpUtils.get.bind(this.props)(api, {
       productId: this.props.route.params.productId,
-      storeId: self.state.storeId
+      storeId: this.state.storeId
     }).then(res => {
       const {product} = res
-      self.setState({
+      this.setState({
         productName: product.name,
         main_sku_name: product.sku_name,
         productInfo: res,
@@ -109,13 +108,9 @@ class StockCheck extends BaseComponent {
   }
 
   handleSubmit(pid, beforeStock, nowStock, remarkNew) {
-    const self = this
-    const {global, navigation} = self.props;
-    let productId = self.state.productId
-    let totalRemain = self.state.totalRemain
-    let actualNum = self.state.actualNum
-    let remainNum = self.state.remainNum
-    let remark = self.state.remark
+    const {global, navigation} = this.props;
+    let {productId, totalRemain, actualNum, remainNum, remark, storeId, orderUse, checkType} = this.state
+
     if (pid) {
       productId = pid
     }
@@ -130,34 +125,31 @@ class StockCheck extends BaseComponent {
       remark = remarkNew
     }
     const api = `api_products/inventory_check?access_token=${global.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      storeId: this.state.storeId,
+    HttpUtils.post.bind(this.props)(api, {
+      storeId: storeId,
       productId: productId,
       remainNum: remainNum,
-      orderUse: this.state.orderUse,
+      orderUse: orderUse,
       totalRemain: totalRemain,
       actualNum: actualNum,
-      differenceType: this.state.checkType.value,
+      differenceType: checkType.value,
       remark: remark
     }).then(res => {
-      ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualNum}`)
+      ToastShort(`#${productId} 实际库存 ${actualNum}`)
       navigation.goBack()
     }).catch(e => {
       if (e.obj == 'THEORY_NUM_CHANGED') {
-        self.fetchData()
+        this.fetchData()
       }
     })
   }
 
   toSearchUseOrders() {
-    const useOrderIds = this.state.productInfo.useOrderIds
+    const {useOrderIds} = this.state.productInfo
     if (!useOrderIds || !useOrderIds.length) {
       ToastShort('无占用订单')
-      return
     }
 
-    let searchStr = 'id:' + useOrderIds.join(',')
-    native.ordersSearch(searchStr)
   }
 
   renderInfoItem(label, value, extra = '') {
@@ -188,7 +180,9 @@ class StockCheck extends BaseComponent {
                 <Text style={styles.infoLabel}>商品ID(#{info.product_id}) </Text>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
                   <Text style={{color: colors.color333, width: '60%'}}>{productName}[{info.sku_name}] </Text>
-                  <Text style={{color: colors.color333, width: '30%'}}>货架号:{info.shelf_no ? info.shelf_no : '无'} </Text>
+                  <Text style={{color: colors.color333, width: '30%'}}>
+                    货架号:{info.shelf_no ? info.shelf_no : '无'}
+                  </Text>
                 </View>
               </View>
             </For>
@@ -209,7 +203,7 @@ class StockCheck extends BaseComponent {
       storeProd,
       main_sku_name
     } = this.state
-    let width = Dimensions.get("window").width
+
     return (
       <View style={{flex: 1}}>
         <ScrollView refreshControl={

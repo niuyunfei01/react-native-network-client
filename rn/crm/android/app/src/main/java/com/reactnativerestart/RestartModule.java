@@ -17,6 +17,8 @@ import org.devio.rn.splashscreen.SplashScreen;
 import java.io.File;
 import java.lang.reflect.Field;
 
+import cn.cainiaoshicai.crm.support.utils.Utility;
+
 public class RestartModule extends ReactContextBaseJavaModule {
 
     private LifecycleEventListener mLifecycleEventListener = null;
@@ -44,7 +46,8 @@ public class RestartModule extends ReactContextBaseJavaModule {
             new Handler(Looper.getMainLooper()).post(() -> {
                 try {
                     String DocumentDir = getReactApplicationContext().getFilesDir().getAbsolutePath();
-                    String jsBundleFile = DocumentDir + "/last.android/last.android.bundle";
+                    String versionCode = Utility.getVersionCode(getReactApplicationContext());
+                    String jsBundleFile = DocumentDir + "/last.android/" + versionCode + ".android.bundle";
                     File file = new File(jsBundleFile);
                     if (file.exists() && file.isFile()) {
                         SplashScreen.show(getCurrentActivity());

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const Util = require('./Util');
 var iconv = require('iconv-lite');
+const tool = require("../tool");
 const Common = {
   INIT: "1B 40",//初始化
   ALIGN_LEFT: "1B 61 00",//左对齐
@@ -35,7 +36,7 @@ function writeHexToDevice(hexString) {
 
   let str = hexString.toLowerCase().replace(" ", "");
   let pos = 0;
-  let len = str.length;
+  let len = tool.length(str);
   if (len % 2 !== 0) {
     return null;
   }
@@ -70,7 +71,7 @@ function keyValue(name, value, wordNumber = Config.wordNumber) {
     const diff = tvLen - (wordNumber - nameLen);
     if (diff <= 0) {
       temp += v;
-      if (i === value.length - 1) {
+      if (i === tool.length(value) - 1) {
         vArr.push(temp);
       }
     } else {
@@ -87,7 +88,7 @@ function keyValue(name, value, wordNumber = Config.wordNumber) {
     if (i === 0) {
       return name + v;
     } else {
-      return Util.getSpace(name.length) + v;
+      return Util.getSpace(tool.length(name)) + v;
     }
   }).join('');
 }

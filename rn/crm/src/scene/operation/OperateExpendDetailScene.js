@@ -62,7 +62,7 @@ class OperateExpendScene extends PureComponent {
 
   renderList() {
     let {items} = this.state;
-    if (items.length > 0) {
+    if (tool.length(items) > 0) {
       return items.map((item, index) => {
         let {day, money, label, order_label, order_id} = item;
         return (

@@ -21,11 +21,11 @@ import {
   updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import {Alert, Platform} from "react-native";
-import JPush from "jpush-react-native";
+import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import Cts from "../../pubilc/common/Cts";
-import dayjs from "dayjs";
+import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
+import tool from "../../pubilc/util/tool";
 
 /**
  * ## Imports
@@ -161,7 +161,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout().then();
-    JPush.deleteAlias({sequence: dayjs().unix()})
+    doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();
     }
@@ -186,7 +186,6 @@ export function getConfigItem(token, configKey, callback) {
       }
       callback(json.ok, json.reason, json.obj);
     }, (error) => {
-      console.log('获取服务器端配置错误：', error);
       callback(false)
     });
   }
@@ -196,7 +195,7 @@ export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
       .then(response => {
-        callback(true, response.length > 0)
+        callback(true, tool.length(response) > 0)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

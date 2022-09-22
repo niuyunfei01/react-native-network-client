@@ -18,6 +18,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
+import tool from "../../../pubilc/util/tool";
 
 const mapStateToProps = state => {
   const {global} = state;
@@ -98,7 +99,7 @@ class SeetingMiniNumDelivery extends PureComponent {
       if (this.state.wait_min <= 0) {
         return ToastShort("请选择保底配送触发时间");
       }
-      if (this.state.ship_ways.length <= 0) {
+      if (tool.length(this.state.ship_ways) <= 0) {
         return ToastShort("请选择保底配送平台");
       }
     }

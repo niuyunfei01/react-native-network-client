@@ -9,6 +9,7 @@ import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import ActionSheet from "../../../weui/ActionSheet/ActionSheet";
 import colors from "../../../pubilc/styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -36,7 +37,7 @@ class Qualification extends Component {
     let imageList = this.props.route.params.imageList != null ? this.props.route.params.imageList : [];
     this.state = {
       imageList:
-        imageList.length < 3
+        tool.length(imageList) < 3
           ? imageList.concat(data.slice(0, 3 - imageList.length))
           : imageList,
       storeImageUrl: this.props.route.params.storeImageUrl,
@@ -50,7 +51,9 @@ class Qualification extends Component {
     this.config = {
       cropping: false,
       includeExif: true,
-      includeBase64: true
+      includeBase64: true,
+      cropperChooseText: '选择图片',
+      cropperCancelText: '取消'
     };
 
   }
@@ -142,7 +145,7 @@ class Qualification extends Component {
     ImagePicker[this.state.camera](this.config).then(image => {
       let imagePath = image.path;
       let image_arr = imagePath.split("/");
-      let image_name = image_arr[image_arr.length - 1];
+      let image_name = image_arr[tool.length(image_arr) - 1];
       let image_info = {
         uri: imagePath,
         name: image_name

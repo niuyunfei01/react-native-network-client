@@ -90,7 +90,8 @@ class SettingScene extends PureComponent {
       funds_threshold: 0,
       funds_thresholds: 0,
       threshold_key: 0,
-      storeMgrMobile: ''
+      storeMgrMobile: '',
+      is_alone_pay_vendor: true,
     }
   }
 
@@ -157,6 +158,7 @@ class SettingScene extends PureComponent {
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
         show_good_remake: Boolean(store_info.show_remark_to_rider),
+        is_alone_pay_vendor: Boolean(store_info?.is_alone_pay_vendor),
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
@@ -550,7 +552,7 @@ class SettingScene extends PureComponent {
 
 
   renderGoods = () => {
-    let {hide_good_titles, use_real_weight} = this.state
+    let {hide_good_titles, use_real_weight, is_alone_pay_vendor} = this.state
     return (
       <View>
         <View style={styles.item_body}>
@@ -569,17 +571,19 @@ class SettingScene extends PureComponent {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            let val = !use_real_weight;
-            this.save_use_real_weight(val)
-          }}
-                            style={styles.item_row}>
-            <Text style={styles.row_label}>按照商品实际重量上传 </Text>
-            <Switch onValueChange={(val) => {
+          <If condition={is_alone_pay_vendor}>
+            <TouchableOpacity onPress={() => {
+              let val = !use_real_weight;
               this.save_use_real_weight(val)
-            }} color={colors.main_color} value={use_real_weight}
-            />
-          </TouchableOpacity>
+            }}
+                              style={styles.item_row}>
+              <Text style={styles.row_label}>按照商品实际重量上传 </Text>
+              <Switch onValueChange={(val) => {
+                this.save_use_real_weight(val)
+              }} color={colors.main_color} value={use_real_weight}
+              />
+            </TouchableOpacity>
+          </If>
         </View>
       </View>
     )
@@ -602,7 +606,7 @@ class SettingScene extends PureComponent {
                           style={styles.item_row}>
           <Text style={styles.row_label}>销售经理 </Text>
           <Text style={styles.row_footer}>
-            {bd_mobile.length > 0 ? bd_mobile : '去设置'}
+            {tool.length(bd_mobile) > 0 ? bd_mobile : '去设置'}
           </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
         </TouchableOpacity>

@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
+import {imageKey} from "../../../pubilc/util/md5";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
 
@@ -231,16 +232,10 @@ class RegisterShunfeng extends PureComponent {
   pickCameraImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(false)).then(image => {
         const image_path = image.path;
         const image_arr = image_path.split("/");
-        const image_name = image_arr[image_arr.length - 1];
+        const image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       })
     }, 1000)
@@ -248,7 +243,7 @@ class RegisterShunfeng extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    const newImageKey = tool.imageKey(imgName) + imgName
+    const newImageKey = imageKey(imgName) + imgName
     this.setState({newImageKey: newImageKey})
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {
@@ -268,17 +263,11 @@ class RegisterShunfeng extends PureComponent {
   pickSingleImg = () => {
     this.setState({showImgMenus: false})
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(false))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         })
     }, 1000)
@@ -335,7 +324,7 @@ class RegisterShunfeng extends PureComponent {
           </View>
           <View style={styles.imageRowWrap}>
             {
-              imageUrl.length > 0 ?
+              tool.length(imageUrl) > 0 ?
                 <Image source={{uri: imageUrl}} style={styles.imageWrap}/> : (
                   <Pressable style={styles.imageWrap} onPress={this.uploadImageItem}>
                     <FontAwesome5 name={'plus'} size={24} color={'#666666'}/>
@@ -415,8 +404,8 @@ class RegisterShunfeng extends PureComponent {
 
   notSubmit = (store, subject) => {
 
-    this.enableSubmit = store.name.length > 0 && store.saleCategory.label.length > 0
-      && subject.personNum.length > 0 && subject.phone.length > 0 && this.state.imageUrl.length > 0;
+    this.enableSubmit = tool.length(store.name) > 0 && tool.length(store.saleCategory.label) > 0
+      && tool.length(subject.personNum) > 0 && tool.length(subject.phone) > 0 && tool.length(this.state.imageUrl) > 0;
     const style = this.enableSubmit ? styles.submitWrap : styles.cannotSubmitWrap
     return (
       <>

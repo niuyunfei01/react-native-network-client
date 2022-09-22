@@ -140,7 +140,7 @@ class SendRedeemCoupon extends BaseComponent {
   }
 
   _on_press_mobile() {
-    if (this.state.mobiles.length > 1) {
+    if (tool.length(this.state.mobiles) > 1) {
       this.setState({show_mobiles: true});
     }
   }

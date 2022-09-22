@@ -3,6 +3,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import {TouchableOpacity, View} from "react-native";
 import color from '../../../pubilc/styles/colors'
 import dayjs from "dayjs";
+import tool from "../../../pubilc/util/tool";
 
 export default class JbbDateRangeDialog extends React.Component {
   constructor(props) {
@@ -87,14 +88,14 @@ export default class JbbDateRangeDialog extends React.Component {
   onDayPress(day) {
     let {start, markedDates} = this.state
 
-    if (markedDates && Object.keys(markedDates).length >= 2) {
+    if (markedDates && tool.length(Object.keys(markedDates)) >= 2) {
       markedDates = {}
     }
 
-    if (markedDates && Object.keys(markedDates).length === 0) {
+    if (markedDates && tool.length(Object.keys(markedDates)) === 0) {
       markedDates[day.dateString] = {startingDay: true, endingDay: true, selected: true, color: color.theme}
       this.setState({start: day.dateString, end: day.dateString, markedDates})
-    } else if (markedDates && Object.keys(markedDates).length === 1) {
+    } else if (markedDates && tool.length(Object.keys(markedDates)) === 1) {
       markedDates = this.getMarkedDates(start, day.dateString)
       this.setState({end: day.dateString, markedDates})
     }

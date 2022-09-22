@@ -1,23 +1,41 @@
 import React, {PureComponent} from "react";
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
 import {connect} from "react-redux";
-import {LineView} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
-import {autoPackage, autoReply, bell} from "../../../svg/svg";
+import {
+  activateIcon, activateMemberIcon,
+  activateNowIcon,
+  autoPackage,
+  autoReply,
+  bell,
+  notActivateMemberIcon
+} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import LinearGradient from 'react-native-linear-gradient'
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 const styles = StyleSheet.create({
   zoneWrap: {
-    backgroundColor: colors.white,
     marginTop: 10,
     marginLeft: 10,
     marginRight: 10,
-    borderRadius: 8
+    borderRadius: 8,
+    backgroundColor: colors.white
   },
-  header: {
+  notActivateHeader: {
+    borderRadius: 8,
+    paddingTop: 12,
+    paddingBottom: 10,
+    paddingRight: 21,
+    paddingLeft: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  activateHeader: {
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
     paddingTop: 12,
     paddingBottom: 10,
     paddingRight: 21,
@@ -26,35 +44,43 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   headerDescription: {
-    fontSize: 15,
+    marginLeft: 4,
+    fontSize: 14,
     fontWeight: 'bold',
-    color: colors.color333,
+    color: colors.white,
     lineHeight: 20
   },
   notServiceText: {
     fontSize: 12,
-    fontWeight: '400',
-    color: colors.colorCCC,
+    fontWeight: 'bold',
+    paddingRight: 16,
+    color: '#5C3813',
     lineHeight: 17,
     paddingLeft: 8
   },
   serviceText: {
     fontSize: 12,
-    fontWeight: '400',
     color: colors.main_color,
     lineHeight: 17,
     paddingLeft: 8
   },
-  row: {flexDirection: 'row'},
+  activateNow: {
+    backgroundColor: '#F2CA64',
+    borderRadius: 15,
+    width: 106,
+    height: 29,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  row: {flexDirection: 'row', alignItems: 'center',},
   contentWrap: {
-    paddingLeft: 12,
-    paddingTop: 17,
-    paddingBottom: 20,
-    flexDirection: 'row'
+    paddingTop: 4,
+    paddingBottom: 14,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
 
   iconZoneWrap: {
-
     marginRight: 6,
     justifyContent: 'center',
     alignItems: 'center',
@@ -63,21 +89,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  expireDate: {fontSize: 12, color: colors.color999, paddingTop: 4}
+  expireDate: {fontSize: 12, color: colors.white, marginRight: 9}
 })
 
+const iconColor = ['#064C50', '#35A54B']
+
+const member = [
+  {
+    id: 0,
+    icon: <SvgXml xml={bell()}/>,
+    routeName: Config.ROUTE_BAD_REVIEW_REMINDER
+  },
+  {
+    id: 1,
+    icon: <SvgXml xml={autoReply()}/>,
+    routeName: Config.ROUTE_AUTOMATIC_FEEDBACK
+  },
+  {
+    id: 2,
+    icon: <SvgXml xml={autoPackage()}/>,
+    routeName: Config.ROUTE_AUTOMATIC_PACKAGING
+  },
+]
 
 class GoodsIncrement extends PureComponent {
 
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
+
+  }
   componentDidMount() {
-    const {increment} = this.props.mine
-    if (increment.in_white_list === 1)
-      return
+    const {store_info} = this.props.global
+
     const currentDate = dayjs().format('YYYY-MM-DD')
-    const expire_date = dayjs(increment.expire_date).format('YYYY-MM-DD')
-    const calc = (new Date(expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
+    const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
     if (calc < 5 && calc >= 0)
-      Alert.alert('提醒', `服务将在${increment.expire_date}过期，是否续费？`, [
+      Alert.alert('提醒', `服务将在${store_info.vip_info.expire_date}过期，是否续费？`, [
         {
           text: '取消',
           style: 'cancel'
@@ -92,38 +140,73 @@ class GoodsIncrement extends PureComponent {
 
   useIncrementService = () => {
     const {navigation} = this.props
-    navigation.navigate(Config.ROUTE_INCREMENT_SERVICE_DESCRIPTION)
+    this.mixpanel.track('我的_立即开通')
+    navigation.navigate(Config.ROUTE_OPEN_MEMBER)
   }
 
-  renderHeader = () => {
-    const {increment} = this.props.mine
+  notActivate = (vip_info) => {
     return (
-      <View style={styles.header}>
-        <View>
+      <LinearGradient style={styles.notActivateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
+        <View style={styles.row}>
+          <SvgXml xml={notActivateMemberIcon()} style={{paddingTop: 8}}/>
           <Text style={styles.headerDescription}>
-            商品增值月费
+            限时抢购年费包立减优惠
           </Text>
-          <If condition={increment.in_white_list === 0}>
-            <Text style={styles.expireDate}>
-              服务到期时间：{increment.expire_date}
-            </Text>
-          </If>
         </View>
-        <If condition={increment.in_white_list === 0}>
-          <TouchableOpacity style={styles.row} onPress={this.useIncrementService}>
-            <Text style={increment.incrementStatus ? styles.serviceText : styles.notServiceText}>
-              {increment.incrementStatus ? '续费' : '未开通'}
+        <If condition={!vip_info.exist_vip}>
+          <TouchableOpacity style={[styles.activateNow, styles.row]} onPress={this.useIncrementService}>
+            <Text style={styles.notServiceText}>
+              {'立即开通'}
             </Text>
-            <AntDesign name={'right'} style={styles.notServiceText}/>
+            <SvgXml xml={activateNowIcon()}/>
           </TouchableOpacity>
         </If>
-      </View>
+      </LinearGradient>
     )
   }
 
+
+  activate = (vip_info) => {
+    return (
+      <LinearGradient style={styles.activateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
+        <View style={styles.row}>
+          <View>
+            <SvgXml xml={activateMemberIcon()}/>
+          </View>
+          <Text style={styles.headerDescription}>
+            会员版
+          </Text>
+        </View>
+        <If condition={vip_info.expire_date}>
+          <TouchableOpacity style={[styles.row]} onPress={this.useIncrementService}>
+            <Text style={styles.expireDate}>
+              {vip_info.expire_date}到期
+            </Text>
+            <SvgXml xml={activateIcon()}/>
+          </TouchableOpacity>
+        </If>
+        <If condition={!vip_info.expire_date}>
+          <View style={[styles.row]} onPress={this.useIncrementService}>
+            <Text style={styles.expireDate}>
+              免费使用
+            </Text>
+
+          </View>
+        </If>
+      </LinearGradient>
+    )
+  }
+
+  renderHeader = () => {
+    const {store_info} = this.props.global
+    if (store_info.vip_info.exist_vip)
+      return this.activate(store_info.vip_info)
+    return this.notActivate(store_info.vip_info)
+  }
+
   touchIcon = (routeName) => {
-    const {increment} = this.props.mine
-    if (increment.incrementStatus) {
+    const {store_info} = this.props.global
+    if (store_info.vip_info.exist_vip) {
       this.props.navigation.navigate(routeName)
       return
     }
@@ -133,48 +216,32 @@ class GoodsIncrement extends PureComponent {
   renderContent = () => {
     return (
       <View style={styles.contentWrap}>
-        <View style={styles.iconZoneWrap}>
-          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_BAD_REVIEW_REMINDER)}>
-            <SvgXml xml={bell()}/>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.iconZoneWrap}>
-          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_FEEDBACK)}>
-            <SvgXml xml={autoReply()}/>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.iconZoneWrap}>
-          <TouchableOpacity style={styles.iconWrap} onPress={() => this.touchIcon(Config.ROUTE_AUTOMATIC_PACKAGING)}>
-            <SvgXml xml={autoPackage()}/>
-          </TouchableOpacity>
-        </View>
+        {
+          member.map((item, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={() => this.touchIcon(item.routeName)}>
+                {item.icon}
+              </TouchableOpacity>
+            )
+          })}
       </View>
     )
   }
 
-  renderIcon = () => {
-    return (
-      <>
-        <LineView/>
-        {this.renderContent()}
-      </>
-    )
-  }
-
   render() {
-    const {increment} = this.props.mine
+    const {store_info} = this.props.global
     return (
       <View style={styles.zoneWrap}>
         {this.renderHeader()}
-        {increment.incrementStatus ? this.renderIcon() : null}
+        {store_info.vip_info.exist_vip ? this.renderContent() : null}
       </View>
     )
   }
 }
 
 function mapStateToProps(state) {
-  const {mine} = state;
-  return {mine: mine};
+  const {global} = state;
+  return {global: global};
 }
 
 export default connect(mapStateToProps)(GoodsIncrement)

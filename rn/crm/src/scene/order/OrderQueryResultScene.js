@@ -148,7 +148,7 @@ class OrderQueryResultScene extends PureComponent {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
 
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -261,7 +261,7 @@ class OrderQueryResultScene extends PureComponent {
       page: query.page,
       limit: query.limit
     }
-    if (keywords.length > 0)
+    if (tool.length(keywords) > 0)
       params = {...params, keywords: keywords}
     const url = `/v1/new_api/orders/order_all_list`;
     HttpUtils.get.bind(this.props)(url, params, true).then(res => {
@@ -279,7 +279,7 @@ class OrderQueryResultScene extends PureComponent {
       this.setState({
         orders: isSearch ? obj : orders.concat(obj),
         isLoading: false,
-        end: obj.length < query.limit
+        end: tool.length(obj) < query.limit
       })
     }, (res) => {
       timeObj.method.push({

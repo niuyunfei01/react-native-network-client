@@ -32,6 +32,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Alipay from '@uiw/react-native-alipay';
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import {Button} from "react-native-elements";
+import {imageKey} from "../../../pubilc/util/md5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -455,17 +456,11 @@ class SeparatedAccountFill extends PureComponent {
   pickSingleImg = () => {
     this.imgMenusFlag(false)
     setTimeout(() => {
-      ImagePicker.openPicker({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
+      ImagePicker.openPicker(tool.pickImageOptions(true))
         .then(image => {
           let image_path = image.path;
           let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
+          let image_name = image_arr[tool.length(image_arr) - 1];
           this.startUploadImg(image_path, image_name);
         })
     }, 1000)
@@ -475,16 +470,10 @@ class SeparatedAccountFill extends PureComponent {
   pickCameraImg = () => {
     this.imgMenusFlag(false)
     setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
+      ImagePicker.openCamera(tool.pickImageOptions(true)).then(image => {
         let image_path = image.path;
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[tool.length(image_arr) - 1];
         this.startUploadImg(image_path, image_name);
       })
     }, 1000)
@@ -493,7 +482,7 @@ class SeparatedAccountFill extends PureComponent {
 
   startUploadImg = (imgPath, imgName) => {
     showModal("图片上传中...")
-    this.setState({newImageKey: tool.imageKey(imgName)})
+    this.setState({newImageKey: imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       const params = {

@@ -178,32 +178,32 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   getproduct() {
-    //showModal('加载中')
     const {accessToken} = this.props.global;
     const {product_id, store_id, vendorId, allow_merchants_edit_prod} = this.state;
     if (allow_merchants_edit_prod) {
       const url = `/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(url).then(res => {
-        //hideModal()
         this.props.navigation.setOptions({
-          headerRight: () => (<View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                    type: 'edit',
-                    product_detail: res,
-                  });
-                });
-              }}>
-              <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-            </TouchableOpacity>
-          </View>),
+          headerRight: () => this.headerRight(res)
         })
-      }).catch(error => {
-        //hideModal()
       })
     }
+  }
+
+  headerRight = (res) => {
+    return (
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => InteractionManager.runAfterInteractions(() => {
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+              type: 'edit',
+              product_detail: res,
+            });
+          })}>
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   getStoreProdWithProd = () => {
@@ -229,7 +229,7 @@ class GoodStoreDetailScene extends PureComponent {
           goodsName: spec.name,
         })
       }
-      if (spec?.skus?.length > 0)
+      if (tool.length(spec?.skus) > 0)
         spec.skus.map(sku => {
           selectedSpecArray.push({
             value: sku.product_id,
@@ -294,9 +294,6 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   onDoneProdUpdate = (pid, prodFields, spFields) => {
-
-    // const {updatedCallback} = (this.props.route.params || {})
-    // updatedCallback && updatedCallback(pid, prodFields, spFields)
 
     const {product, store_prod} = this.state;
     const _p = {...product, ...prodFields}
@@ -428,7 +425,7 @@ class GoodStoreDetailScene extends PureComponent {
                 <Text style={styles.bottomText}>上架 </Text>
               </TouchableOpacity>
             </If>
-            <If condition={MORE_ITEM.length > 1}>
+            <If condition={tool.length(MORE_ITEM) > 1}>
               <ModalSelector style={[styles.toOnlineBtn]}
                              data={MORE_ITEM}
                              skin="customer"
@@ -439,7 +436,7 @@ class GoodStoreDetailScene extends PureComponent {
                 </Text>
               </ModalSelector>
             </If>
-            <If condition={MORE_ITEM.length === 1}>
+            <If condition={tool.length(MORE_ITEM) === 1}>
               <If condition={onStrict}>
                 <TouchableOpacity style={styles.toOnlineBtn}
                                   onPress={() => this.onOpenModal('set_price_add_inventory')}>
@@ -491,7 +488,7 @@ class GoodStoreDetailScene extends PureComponent {
   renderStall = () => {
     const {selectedSpecArray} = this.state
     return (
-      <If condition={selectedSpecArray.length > 0}>
+      <If condition={tool.length(selectedSpecArray) > 0}>
         <View style={styles.stallWrap}>
           <View style={styles.stallTopWrap}>
             <Text style={styles.stallTopText}>
@@ -500,7 +497,7 @@ class GoodStoreDetailScene extends PureComponent {
 
           </View>
           <For each="info" index="i" of={selectedSpecArray}>
-            <If condition={info?.stallName?.length > 0}>
+            <If condition={tool.length(info?.stallName) > 0}>
               <View style={styles.modalRowWrap} key={i}>
                 <Text style={styles.stallBottomText}>
                   {info.stallName}
@@ -557,7 +554,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
   renderModalStall = () => {
     const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
-    const flag = selectStall.value && (selectedSpecArray.length > 0 ? selectedSpec.value : selectedSpec.label)
+    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec.label
     return (
       <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
              onShow={this.onShowStall}>
@@ -585,7 +582,7 @@ class GoodStoreDetailScene extends PureComponent {
                 </ModalSelector>
               </View>
             </View>
-            <If condition={selectedSpecArray.length > 0}>
+            <If condition={tool.length(selectedSpecArray) > 0}>
               <View style={styles.modalRowWrap}>
                 <Text style={styles.modalRowText}>
                   规格

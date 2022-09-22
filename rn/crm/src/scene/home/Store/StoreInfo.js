@@ -220,7 +220,7 @@ class StoreInfo extends Component {
         name: city ? city : "点击选择城市"
       },
       qualification: {
-        name: files && files.length ? "资质已上传" : "点击上传资质",
+        name: files && tool.length(files) ? "资质已上传" : "点击上传资质",
         info: undefined
       }, //上传资质
       alias: alias, //别名
@@ -721,21 +721,21 @@ class StoreInfo extends Component {
     } = this.state;
     let error_msg = "";
 
-    if (name.length < 1 || name.length > 64) {
+    if (tool.length(name) < 1 || tool.length(name) > 64) {
       error_msg = "店名应在1-64个字符内";
     } else if (!sale_category) {
       error_msg = "请选择店铺类型";
-    } else if (tel.length < 8 || tel.length > 11) {
+    } else if (tool.length(tel) < 8 || tool.length(tel) > 11) {
       error_msg = "门店电话格式有误";
-    } else if (dada_address.length < 1) {
+    } else if (tool.length(dada_address) < 1) {
       error_msg = "请输入门店地址";
-    } else if (district.length < 1) {
+    } else if (tool.length(district) < 1) {
       error_msg = "请输入门店所在区域";
     } else if (location_long === "" || location_lat === "") {
       error_msg = "请选择门店定位信息";
     } else if (!this.state.selectCity.cityId) {
       error_msg = "请选择门店所在城市";
-    } else if (!owner_nation_id || (owner_nation_id.length !== 18 && owner_nation_id.length !== 11)) {
+    } else if (!owner_nation_id || (tool.length(owner_nation_id) !== 18 && tool.length(owner_nation_id) !== 11)) {
       // error_msg = "身份证格式有误";
     } else if (this.state.isBd && !this.state.templateInfo.key) {
       // error_msg = "请选择模板店";
@@ -743,7 +743,7 @@ class StoreInfo extends Component {
       // error_msg = "请选择bd";
     } else if (!(owner_id > 0)) {
       error_msg = "请选择门店店长";
-    } else if (mobile.length !== 11) {
+    } else if (tool.length(mobile) !== 11) {
       error_msg = "店长手机号格式有误";
     } else if (!owner_name) {
       error_msg = "请输入店长实名";

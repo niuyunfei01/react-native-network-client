@@ -140,19 +140,11 @@ class NoticeItem extends PureComponent {
           <View style={styles.ItemHeader}/>
           <Text style={styles.ItemHeaderTitle}>急 </Text>
         </If>
-        <View style={{
-          flex: 1,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <If condition={item.orderDate && item.dayId}>
-            <Text style={{
-              flex: 1,
-              fontSize: 16,
-              color: colors.color333,
-              marginLeft: item.quick > 0 ? 0 : 10
-            }}>{item.orderDate}#{item.dayId} </Text>
+            <Text style={{flex: 1, fontSize: 16, color: colors.color333, marginLeft: item.quick > 0 ? 0 : 10}}>
+              {item.orderDate}#{item.dayId}
+            </Text>
           </If>
 
           {/*<If condition={!(item.orderDate && item.dayId)}>*/}
@@ -198,11 +190,7 @@ class NoticeItem extends PureComponent {
       task_info = '申请上架: ' + item.remark + ';  价格: ' + new_goods_info.price_desc;
     }
     return (
-      <View style={{
-        paddingVertical: 10,
-        marginHorizontal: 12,
-        paddingHorizontal: 4,
-      }}>
+      <View style={{paddingVertical: 10, marginHorizontal: 12, paddingHorizontal: 4}}>
         <If condition={item.store_id}>
           <View style={styles.bodyItemRow}>
             <Text style={styles.itrmLabel}>店铺名称: </Text>
@@ -230,10 +218,8 @@ class NoticeItem extends PureComponent {
         <If condition={item.remark}>
           <View style={styles.bodyItemRow}>
             {/*<Text style={styles.itrmLabel}>店铺名称: </Text>*/}
-            <Text style={{
-              fontSize: 14, color: colors.color333, width: width * 0.85, fontWeight: "bold"
-            }}>{task_info}
-              {task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}</Text>
+            <Text style={{fontSize: 14, color: colors.color333, width: width * 0.85, fontWeight: "bold"}}>
+              {task_info}{task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}</Text>
           </View>
         </If>
       </View>

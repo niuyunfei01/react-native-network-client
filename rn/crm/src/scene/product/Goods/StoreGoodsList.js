@@ -98,7 +98,7 @@ class StoreGoodsList extends Component {
   }
 
   fetchGoodsCount() {
-    const {currStoreId, accessToken} = this.props.global;
+    const {currStoreId, accessToken, vendor_id} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
       let newStatusList
@@ -120,6 +120,8 @@ class StoreGoodsList extends Component {
           {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'}
         ]
       }
+      if ((114 === vendor_id || 163 === vendor_id) && res.no_img)
+        newStatusList.push({label: '缺失图片 - ' + (res.no_img ?? '0'), value: 'no_img'})
       this.setState({
         statusList: [...newStatusList],
         selectedStatus: {...newStatusList[0]},
@@ -163,9 +165,18 @@ class StoreGoodsList extends Component {
   }
 
 
-  search = (setList = 1) => {
+  search = (setList = 1, isRefreshItem = false) => {
 
-    const {isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum} = this.state
+    const {
+      isLoading,
+      selectedStatus,
+      selectedChildTagId,
+      selectedTagId,
+      page,
+      pageNum,
+      selectedProduct,
+      goods
+    } = this.state
     if (isLoading) {
       return;
     }
@@ -186,10 +197,19 @@ class StoreGoodsList extends Component {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
+    if (isRefreshItem)
+      params.pid = selectedProduct.id
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      const goods = setList === 1 ? res.lists : this.state.goods.concat(res.lists)
-      this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+      if (isRefreshItem) {
+        const index = goods.findIndex(item => item.id === selectedProduct.id)
+        if (Array.isArray(res.lists) && res.lists.length > 0)
+          goods[index] = res.lists[0]
+        this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+        return
+      }
+      const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
+      this.setState({goods: goodList, isLastPage: res.isLastPage, isLoading: false})
     }, (res) => {
       ToastLong(res.reason)
       this.setState({isLoading: false})
@@ -261,9 +281,9 @@ class StoreGoodsList extends Component {
   }
 
   changeRowExist(idx, supplyPrice) {
-    const products = this.state.goods
-    products[idx].is_exist = {supply_price: supplyPrice, status: 1}
-    this.setState({goods: products})
+    const {goods} = this.state
+    goods[idx].is_exist = {supply_price: supplyPrice, status: 1}
+    this.setState({goods: goods})
   }
 
   gotoGoodDetail = (pid) => {
@@ -281,7 +301,7 @@ class StoreGoodsList extends Component {
       <For each="item" of={categories} index="i">
         <TouchableOpacity key={i} onPress={() => this.onSelectCategory(item)}>
           <View style={[selectedTagId === item.id ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={styles.n2grey6}>{item.name} </Text>
+            <Text style={selectedTagId === item.id ? styles.activeCategoriesText : styles.n2grey6}>{item.name} </Text>
           </View>
         </TouchableOpacity>
       </For>
@@ -360,7 +380,7 @@ class StoreGoodsList extends Component {
                 data={goods}
                 legacyImplementation={false}
                 directionalLockEnabled={true}
-                onEndReachedThreshold={0.1}
+                onEndReachedThreshold={0.5}
                 onEndReached={this.onEndReached}
                 onMomentumScrollBegin={this.onMomentumScrollBegin}
                 onTouchMove={(e) => this.onTouchMove(e)}
@@ -384,7 +404,10 @@ class StoreGoodsList extends Component {
                                 currStatus={Number(sp.status)}
                                 vendor_id={vendor_id}
                                 doneProdUpdate={this.doneProdUpdate}
-                                onClose={() => this.setState({modalType: ''}, () => this.onRefresh())}
+                                onClose={() => {
+                                  this.setState({modalType: ''})
+                                  this.search(1, true)
+                                }}
                                 spId={Number(sp.id)}
                                 applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                 navigation={this.props.navigation}
@@ -512,7 +535,7 @@ class StoreGoodsList extends Component {
   }
 
   _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+    return {length: pxToDp(242), offset: pxToDp(242) * index, index}
   }
 
 
@@ -628,7 +651,18 @@ class StoreGoodsList extends Component {
     }
   }
 
+
   opBar = (onSale, onStrict, item) => {
+    if ('' === item.coverimg) {
+      return (
+        <View style={[styles.row_center, styles.btnWrap]}>
+          <TouchableOpacity style={[styles.toOnlineBtn]}
+                            onPress={() => this.gotoAddMissingPicture(item)}>
+            <Text style={styles.goodsOperationBtn}>编辑</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
     return (
       <View style={[styles.row_center, styles.btnWrap]}>
         <If condition={onSale}>
@@ -681,12 +715,15 @@ class StoreGoodsList extends Component {
     })
   }
 
+  gotoAddMissingPicture = (item) => {
+    this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
+  }
   renderItem = (order) => {
-    let {item, index} = order;
+    let {item} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
-      <GoodListItem fnProviding={onStrict} product={item} key={index}
+      <GoodListItem fnProviding={onStrict} product={item} key={item.id}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
                     price_type={item.price_type || 0}
                     opBar={this.opBar(onSale, onStrict, item)}
@@ -785,6 +822,12 @@ const styles = StyleSheet.create({
     colors.white,
     borderTopWidth: pxToDp(1),
     borderColor: colors.colorDDD
+  },
+  activeCategoriesText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.color333,
+    lineHeight: 20
   },
   n2grey6: {
     color: colors.color666,

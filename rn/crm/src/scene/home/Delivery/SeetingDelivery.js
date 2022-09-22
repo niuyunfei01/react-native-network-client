@@ -149,7 +149,7 @@ class SeetingDelivery extends PureComponent {
       suspend_confirm_order: !suspend_confirm_order
     })
 
-    if (auto_call && ship_ways.length === 0) {
+    if (auto_call && tool.length(ship_ways) === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
       return;
@@ -436,102 +436,101 @@ class SeetingDelivery extends PureComponent {
 
 }
 
-const
-  styles = StyleSheet.create({
-    container: {
-      marginBottom: pxToDp(22),
-      backgroundColor: colors.f7
-    },
-    btn_select: {
-      marginRight: pxToDp(20),
-      height: pxToDp(60),
-      width: pxToDp(60),
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      textAlign: "center",
-      textAlignVertical: "center"
-    },
-    cell_title: {
-      marginBottom: pxToDp(10),
-      fontSize: pxToDp(26),
-      color: colors.color999
-    },
-    cell_box: {
-      marginLeft: "2%",
-      marginRight: "2%",
-      marginTop: 3,
-      borderRadius: pxToDp(30),
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: pxToDp(22),
+    backgroundColor: colors.f7
+  },
+  btn_select: {
+    marginRight: pxToDp(20),
+    height: pxToDp(60),
+    width: pxToDp(60),
+    fontSize: pxToDp(40),
+    color: colors.color666,
+    textAlign: "center",
+    textAlignVertical: "center"
+  },
+  cell_title: {
+    marginBottom: pxToDp(10),
+    fontSize: pxToDp(26),
+    color: colors.color999
+  },
+  cell_box: {
+    marginLeft: "2%",
+    marginRight: "2%",
+    marginTop: 3,
+    borderRadius: pxToDp(30),
 
-      // borderTopWidth: pxToDp(1),
-      // borderBottomWidth: pxToDp(1),
-      // borderColor: colors.color999
-    },
-    cell_row: {
-      height: pxToDp(90),
-      justifyContent: "center"
-    },
-    cell_input: {
-      //需要覆盖完整这4个元素
-      fontSize: pxToDp(30),
-      height: pxToDp(70),
-      borderWidth: pxToDp(1),
-      width: pxToDp(100),
-      paddingTop: pxToDp(13),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
+    // borderTopWidth: pxToDp(1),
+    // borderBottomWidth: pxToDp(1),
+    // borderColor: colors.color999
+  },
+  cell_row: {
+    height: pxToDp(90),
+    justifyContent: "center"
+  },
+  cell_input: {
+    //需要覆盖完整这4个元素
+    fontSize: pxToDp(30),
+    height: pxToDp(70),
+    borderWidth: pxToDp(1),
+    width: pxToDp(100),
+    paddingTop: pxToDp(13),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
 
-    cell_inputs: {
-      //需要覆盖完整这4个元素
-      textAlign: 'center',
-      fontSize: pxToDp(30),
-      height: pxToDp(90),
-      borderWidth: pxToDp(1),
-      width: pxToDp(100),
-      marginLeft: pxToDp(10),
-      marginRight: pxToDp(10),
-    },
-    cell_label: {
-      width: pxToDp(234),
-      fontSize: pxToDp(30),
-      fontWeight: "bold",
-      color: colors.color333
-    },
-    btn_submit: {
-      backgroundColor: '#808080',
-      marginHorizontal: pxToDp(30),
-      borderRadius: pxToDp(20),
-      textAlign: 'center',
-      height: pxToDp(65),
-      marginBottom: pxToDp(70),
-    },
-    map_icon: {
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      height: pxToDp(60),
-      width: pxToDp(40),
-      textAlignVertical: "center"
-    },
-    body_text: {
-      paddingLeft: pxToDp(8),
-      fontSize: pxToDp(30),
-      color: colors.color333,
-      height: pxToDp(60),
-      textAlignVertical: "center"
-    },
-    right_btn: {
-      fontSize: pxToDp(26),
-      margin: pxToDp(10),
-      color: colors.color999,
-      paddingTop: pxToDp(3),
-      marginLeft: 0,
-    },
-    right_btns: {
-      fontSize: pxToDp(32),
-      color: colors.color999,
-      paddingTop: pxToDp(3),
-      marginRight: pxToDp(10),
-    },
-  });
+  cell_inputs: {
+    //需要覆盖完整这4个元素
+    textAlign: 'center',
+    fontSize: pxToDp(30),
+    height: pxToDp(90),
+    borderWidth: pxToDp(1),
+    width: pxToDp(100),
+    marginLeft: pxToDp(10),
+    marginRight: pxToDp(10),
+  },
+  cell_label: {
+    width: pxToDp(234),
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    color: colors.color333
+  },
+  btn_submit: {
+    backgroundColor: '#808080',
+    marginHorizontal: pxToDp(30),
+    borderRadius: pxToDp(20),
+    textAlign: 'center',
+    height: pxToDp(65),
+    marginBottom: pxToDp(70),
+  },
+  map_icon: {
+    fontSize: pxToDp(40),
+    color: colors.color666,
+    height: pxToDp(60),
+    width: pxToDp(40),
+    textAlignVertical: "center"
+  },
+  body_text: {
+    paddingLeft: pxToDp(8),
+    fontSize: pxToDp(30),
+    color: colors.color333,
+    height: pxToDp(60),
+    textAlignVertical: "center"
+  },
+  right_btn: {
+    fontSize: pxToDp(26),
+    margin: pxToDp(10),
+    color: colors.color999,
+    paddingTop: pxToDp(3),
+    marginLeft: 0,
+  },
+  right_btns: {
+    fontSize: pxToDp(32),
+    color: colors.color999,
+    paddingTop: pxToDp(3),
+    marginRight: pxToDp(10),
+  },
+});
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(SeetingDelivery);

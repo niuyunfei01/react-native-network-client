@@ -9,6 +9,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import SearchStoreItem from "../../../pubilc/component/SearchStoreItem";
 import Loadmore from 'react-native-loadmore'
 import tool from "../../../pubilc/util/tool";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const rowHeight = 40
 
@@ -85,6 +86,7 @@ class StoreSelect extends PureComponent {
   }
 
   fetchData = (options = {}) => {
+    ToastShort('加载中')
     const {page, page_size, access_token} = this.state
     const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
 
@@ -99,12 +101,10 @@ class StoreSelect extends PureComponent {
 
     HttpUtils.get(api, params).then(obj => {
       this.setState({isLoading: false});
-
       let isLastPage = true
       if (obj.lists && obj.page * obj.pageSize < obj.count) {
         isLastPage = false
       }
-
       let list = obj.lists
       let dataSource = []
       Object.keys(list).map((key) => {
@@ -113,9 +113,7 @@ class StoreSelect extends PureComponent {
         item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
         dataSource.push(item);
       })
-
       dataSource = obj.page !== 1 ? this.state.dataSource.concat(dataSource) : dataSource
-
       this.setState({
         dataSource: dataSource,
         page: obj.page + 1,

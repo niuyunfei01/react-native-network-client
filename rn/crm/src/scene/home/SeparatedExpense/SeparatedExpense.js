@@ -30,6 +30,7 @@ import {InputItem} from "@ant-design/react-native";
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import tool from "../../../pubilc/util/tool";
 
 const {StyleSheet} = ReactNative
 const {width} = Dimensions.get("window");
@@ -109,7 +110,7 @@ class SeparatedExpense extends PureComponent {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
 
-    if (timeObj.method.length > 0) {
+    if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
       timeObj.method.push({
@@ -774,7 +775,7 @@ class SeparatedExpense extends PureComponent {
     return (
       <View>
         {this.renderTHIRDHeader()}
-        {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
+        {tool.length(thirdAccountList) > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
       </View>
     )
   }

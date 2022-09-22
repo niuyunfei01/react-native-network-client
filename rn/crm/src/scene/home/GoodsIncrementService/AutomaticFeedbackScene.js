@@ -8,6 +8,7 @@ import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
   rowHeaderText: {
@@ -90,7 +91,7 @@ class AutomaticFeedbackScene extends PureComponent {
         item.value = item.id
         item.label = item.name
       })
-      let _selectStore = list.length > 0 ? list[0] : selectStore
+      let _selectStore = tool.length(list) > 0 ? list[0] : selectStore
       Object.keys(settings).map(key => {
         if (_selectStore.value === key)
           _selectStore = {..._selectStore, status: settings[key].status};

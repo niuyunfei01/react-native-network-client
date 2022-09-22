@@ -27,7 +27,7 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {center, cityName, keywords} = this.props.route.params;
+    const {center, cityName, keywords, placeholderText} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
@@ -56,6 +56,7 @@ class SearchShop extends Component {
       is_default: is_default,
       cityname: cityNames,
       shopmsg: map,
+      placeholderText: placeholderText !== undefined ? placeholderText : '请输入您的店铺地址'
     }
   }
 
@@ -303,7 +304,7 @@ class SearchShop extends Component {
           inputContainerStyle={styles.containerstyle}
           containerStyle={styles.searchbox}
           lightTheme={'false'}
-          placeholder="请输入您的店铺地址"
+          placeholder={this.state.placeholderText}
           onChangeText={(v) => this.onChange(v)}
           onCancel={this.onCancel}
           value={this.state.searchKeywords}

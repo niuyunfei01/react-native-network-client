@@ -1,12 +1,10 @@
 import Cts from "../common/Cts";
 import {CommonActions} from '@react-navigation/native';
-import DeviceInfo from "react-native-device-info";
-import md5 from "./md5";
 import dayjs from "dayjs";
 
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
-  if (typeof keys === "undefined" || keys.length === 0) {
+  if (typeof keys === "undefined" || length(keys) === 0) {
     return [];
   }
 
@@ -68,21 +66,19 @@ export function vendor(global) {
     vendor_id,
     help_uid,
   } = global;
-  let currVendorId = vendor_id;
   let currVendorName = vendor_info["brand_name"];
   let currStoreName = store_info["name"];
 
-  let currVendor = vendor_info;
-  let currVersion = currVendor["version"];
-  let fnProviding = currVendor["fnProviding"];
-  let fnProvidingOnway = currVendor["fnProvidingOnway"];
+  let currVersion = vendor_info["version"];
+  let fnProviding = vendor_info["fnProviding"];
+  let fnProvidingOnway = vendor_info["fnProvidingOnway"];
   let service_ids = [];
-  let service_uid = currVendor["service_uid"];
-  let service_mgr = currVendor["service_mgr"];
-  let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
-  let allow_merchants_edit_prod = currVendor["allow_merchants_edit_prod"];
-  let allow_store_mgr_call_ship = currVendor["allow_store_mgr_call_ship"];
-  let wsb_store_account = currVendor["wsb_store_account"] === '1';
+  let service_uid = vendor_info["service_uid"];
+  let service_mgr = vendor_info["service_mgr"];
+  let allow_merchants_store_bind = vendor_info["allow_merchants_store_bind"];
+  let allow_merchants_edit_prod = vendor_info["allow_merchants_edit_prod"];
+  let allow_store_mgr_call_ship = vendor_info["allow_store_mgr_call_ship"];
+  let wsb_store_account = vendor_info["wsb_store_account"] === '1';
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
     service_ids.push(service_uid);
   }
@@ -100,7 +96,7 @@ export function vendor(global) {
     is_helper = helper.indexOf("," + currentUser + ",") !== -1;
   }
   return {
-    currVendorId: currVendorId,
+    currVendorId: vendor_id,
     currVendorName: currVendorName,
     currVersion: currVersion,
     currStoreName: currStoreName,
@@ -114,26 +110,16 @@ export function vendor(global) {
     allow_store_mgr_call_ship: allow_store_mgr_call_ship,
     allow_merchants_edit_prod: allow_merchants_edit_prod,
     wsb_store_account,
-    co_type: currVendor.co_type,
+    co_type: vendor_info.co_type,
   };
-}
-
-export function server_info({global, user}) {
-  if (user === undefined) {
-    return {};
-  }
-  let {service_uid} = vendor(global);
-  let {user_info} = user;
-  return user_info[service_uid] ? user_info[service_uid] : {};
 }
 
 /**
  * 当前店铺信息
  * @param global
- * @param store_id
  * @returns {*}
  */
-export function store(global, store_id = null) {
+export function store(global) {
   const {store_info} = global;
   return store_info;
 }
@@ -141,14 +127,35 @@ export function store(global, store_id = null) {
 export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
-  } else {
-    if (typeof obj === "object" && obj.length === undefined) {
-      obj = Object.values(obj);
-    }
   }
-  return obj.length;
+  switch (typeof obj){
+    case "boolean":
+      return Number(obj)
+    case "number":
+      return obj
+    case "function":
+      return 0
+    case "string":
+      return obj.length
+    case "object":
+      return Object.values(obj).length;
+    default:
+      return 0
+  }
+
 }
 
+ const pickImageOptions = (cropping) => {
+  return {
+    width: 800,
+    height: 800,
+    cropping: cropping,
+    cropperCircleOverlay: false,
+    includeExif: true,
+    cropperChooseText: '选择图片',
+    cropperCancelText: '取消'
+  };
+}
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
@@ -164,11 +171,11 @@ export function curr_vendor(vendor_data, currVendorId) {
 export function user_info(mine, currVendorId, currentUser) {
   let user_info = {};
   if (
-    Object.keys(mine.user_list).length > 0 &&
+    length(Object.keys(mine.user_list)) > 0 &&
     mine.user_list[currVendorId] &&
-    Object.keys(mine.user_list[currVendorId]).length > 0 &&
+    length(Object.keys(mine.user_list[currVendorId])) > 0 &&
     mine.user_list[currVendorId][currentUser] &&
-    Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
+    length(Object.keys(mine.user_list[currVendorId][currentUser])) > 0
   ) {
     // let {
     //   id, nickname, nameRemark, mobilephone, image, //user 表数据
@@ -253,7 +260,6 @@ export function intOf(val) {
   if (typeof val === "string") {
     return parseInt(val);
   }
-
   return val;
 }
 
@@ -264,60 +270,6 @@ function parameterByName(name, url) {
   if (!results) return null;
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-
-/**
- * 数组按指定字段排序
- * @param itemlist
- * @param gby
- * @param keyName
- * @param valueName
- * @returns {Array}
- * @constructor
- */
-function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
-  var setGroupObj = function (noteObj, rule, gby, gIndex, maxIndex) {
-    var gname = rule[gby[gIndex]];
-    if (gIndex == maxIndex) {
-      if (noteObj[gname] == undefined)
-        noteObj[gname] = [];
-      if (noteObj[gname].indexOf(rule) < 0) {
-        noteObj[gname].push(rule);
-      }
-    } else {
-      if (noteObj[gname] == undefined) {
-        noteObj[gname] = {};
-      }
-      setGroupObj(noteObj[gname], rule, gby, gIndex + 1, maxIndex);
-    }
-  }
-
-  var noteObj = {};
-  for (var i = 0; i < itemlist.length; i++) {
-    setGroupObj(noteObj, itemlist[i], gby, 0, gby.length - 1);
-  }
-
-  var getSubInfo = function (note, p, gIndex, maxIndex) {
-    var newobj = {}
-    newobj[keyName] = p;
-    newobj[valueName] = [];
-    if (gIndex == maxIndex) {
-      for (var k in note[p]) {
-        newobj[valueName].push(note[p][k]);
-      }
-    } else {
-      for (var k in note[p]) {
-        newobj[valueName].push(getSubInfo(note[p][k], k, gIndex + 1, maxIndex));
-      }
-    }
-    return newobj;
-  }
-  var myobj = [];
-  for (var p in noteObj) {
-    myobj.push(getSubInfo(noteObj, p, 0, gby.length - 1));
-  }
-  return myobj;
 }
 
 
@@ -356,18 +308,6 @@ export function ship_name(type) {
   return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
-export function zs_status(status) {
-  let znMap = {};
-  znMap[Cts.ZS_STATUS_NEVER_START] = "待召唤";
-  znMap[Cts.ZS_STATUS_TO_ACCEPT] = "待接单";
-  znMap[Cts.ZS_STATUS_TO_FETCH] = "待取货";
-  znMap[Cts.ZS_STATUS_ON_WAY] = "已在途";
-  znMap[Cts.ZS_STATUS_ARRIVED] = "已送达";
-  znMap[Cts.ZS_STATUS_CANCEL] = "已取消";
-  znMap[Cts.ZS_STATUS_ABNORMAL] = "异常";
-
-  return znMap[status] === undefined ? "未知状态" : znMap[status];
-}
 
 export function sellingStatus(sell_status) {
   let map = {};
@@ -466,24 +406,6 @@ function deepClone(obj) {
   return result;
 }
 
-function getVendorName(vendorId) {
-  let map = {};
-  map[Cts.STORE_TYPE_SELF] = "菜鸟食材";
-  map[Cts.STORE_TYPE_AFFILIATE] = "菜鸟";
-  map[Cts.STORE_TYPE_GZW] = "鲜果集";
-  map[Cts.STORE_TYPE_BLX] = "比邻鲜";
-  map[Cts.STORE_TYPE_HLCS] = "华联超市";
-  map[0] = "全部";
-  return map[vendorId];
-}
-
-function getSortName(sortId) {
-  let map = {};
-  map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
-  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
-  return map[sortId];
-}
-
 /**
  * 价格尾数优化（需要和mobileweb项目 __priceWithExtra 方法保持一致）
  * @param $spPrice 分
@@ -541,15 +463,6 @@ function throttle(fn, wait) {
 }
 
 
-/**
- * 图片上传key
- */
-function imageKey(imgName) {
-  let curTime = Date.now();
-  let UniqueId = DeviceInfo.getUniqueId();
-  return md5.hex_md5(UniqueId + curTime + imgName)
-}
-
 export default {
   objectMap,
   shortTimeDesc,
@@ -572,16 +485,14 @@ export default {
   toFixed,
   billStatus,
   get_platform_name,
+  pickImageOptions,
   ship_name,
   sellingStatus,
   headerSupply,
   deepClone,
   getOperateDetailsType,
-  getVendorName,
-  getSortName,
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle,
-  imageKey
+  throttle
 };

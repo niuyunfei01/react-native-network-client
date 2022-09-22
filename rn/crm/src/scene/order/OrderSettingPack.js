@@ -17,7 +17,7 @@ import * as globalActions from "../../reducers/global/globalActions";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-
+import {SafeAreaView} from 'react-native-safe-area-context';
 function mapStateToProps(state) {
   return {
     global: state.global
@@ -95,6 +95,7 @@ class OrderSettingScene extends Component {
 
     const params = {
       center: center,
+      placeholderText: '请输入收件人地址',
       onBack: resp => {
         let {location} = resp;
         let locationAll = location.split(',')
@@ -343,7 +344,7 @@ class OrderSettingScene extends Component {
     let time = datePickerValue
     let str = dayjs(time).format('YYYY-MM-DD HH:mm')
     return (
-      <View style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.getCurrentStoreName.bind(this)}/>
         <ScrollView style={[styles.container]}>
           <View style={styles.containerTitle}>
@@ -608,7 +609,7 @@ class OrderSettingScene extends Component {
             </View>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }

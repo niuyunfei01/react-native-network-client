@@ -25,7 +25,6 @@ import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-// import colors from "../../../pubilc/styles/colors";
 // import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -140,7 +139,7 @@ class MaterialList extends React.Component {
     const api = `/api_products/inventory_entry_detail_v2/${item.id}?access_token=${accessToken}`
     this.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(api).then(res => {
-      if (res && Object.keys(res).length > 0) {
+      if (res && tool.length(Object.keys(res)) > 0) {
         this.setState({packDetailDialog: true, detailItems: res, selectedItem: item})
       } else {
         ToastShort('无打包任务详情')
@@ -426,7 +425,7 @@ class MaterialList extends React.Component {
             this.onRefresh();
             this.closeControlPanel()
           }}
-          backgroundColor={color.theme}
+          backgroundColor={colors.theme}
           fontColor={'#fff'}
           fontWeight={'bold'}
         />
@@ -449,13 +448,13 @@ class MaterialList extends React.Component {
             <View style={{flex: 1}}>
               <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name} </Text>
             </View>
-            {item.logs.length ? (
+            {tool.length(item.logs) ? (
               <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
                 <View>
                   <Text style={[styles.itemSupplier]}>修改记录 </Text>
                 </View>
               </TouchableOpacity>) : (
-              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>
+              <Text style={[styles.itemSupplier, {backgroundColor: colors.fontGray}]}>无修改</Text>
             )}
           </View>
           <If condition={item.bar_code}>

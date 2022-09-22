@@ -101,7 +101,7 @@ class SettingDeliveryInfo extends PureComponent {
 
   onBindDelivery = () => {
     const {auto_call, ship_ways, zs_way, max_call_time, deploy_time, order_require_minutes, default_str} = this.state
-    if (auto_call && ship_ways.length === 0) {
+    if (auto_call && tool.length(ship_ways) === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
       this.setState({isRefreshing: false});
       return;
@@ -113,6 +113,11 @@ class SettingDeliveryInfo extends PureComponent {
       return;
     }
 
+    if(Number(order_require_minutes) <= 0){
+      ToastLong("需要配置预订单自动呼叫骑手时间");
+      this.setState({isRefreshing: false});
+      return;
+    }
     let {accessToken} = this.props.global;
     tool.debounces(() => {
       this.props.actions.updateStoresAutoDelivery(
@@ -139,7 +144,7 @@ class SettingDeliveryInfo extends PureComponent {
 
   get_time_interval = () => {
     const {ship_ways, max_call_time} = this.state
-    if (ship_ways.length === 0 || max_call_time === 0) {
+    if (tool.length(ship_ways) === 0 || max_call_time === 0) {
       return max_call_time + "分"
     }
     let interval = max_call_time * 60 / ship_ways.length

@@ -236,7 +236,6 @@ public class LoginActivity extends AbstractActionBarActivity {
                 if (loginResult != null && loginResult.loginOk()) {
                     final String token = loginResult.getAccess_token();
                     final long expiresInSeconds = loginResult.getExpires_in();
-                    final GlobalCtx app = GlobalCtx.app();
                     DBResult dbResult = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
                     if (dbResult != null) return dbResult;
                 } else {

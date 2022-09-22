@@ -19,11 +19,14 @@ LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#40455A'
   },
   statusBar: {
     height: StatusBar.currentHeight,
-    backgroundColor: "rgba(0, 0, 0, 0.20)"
+    ...Platform.select({
+      android: {backgroundColor: '#40455A'}
+    })
   }
 });
 
@@ -39,16 +42,15 @@ class RootScene extends PureComponent {
 
   constructor() {
     super();
-    StatusBar.setBarStyle("light-content");
 
     this.state = {
       noLoginInfo: {
         accessToken: '',
         currentUser: '',
-        currStoreId: -1,
+        currStoreId: 0,
+        currVendorId: 0,
         host: Config.defaultHost,
         co_type: '',
-        storeVendorId: -1,
         enabledGoodMgr: 0
       },
       rehydrated: false,
@@ -63,7 +65,7 @@ class RootScene extends PureComponent {
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
-      if (noLoginInfo.accessToken) {
+      if (noLoginInfo.accessToken && noLoginInfo.currStoreId && noLoginInfo.currVendorId) {
         store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
         store.dispatch(setNoLoginInfo(noLoginInfo))
         HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {
@@ -131,28 +133,18 @@ class RootScene extends PureComponent {
       store_id: noLoginInfo.currStoreId ?? '未登录',
       login_user: noLoginInfo.currentUser ?? '未登录'
     })
-
-    let rootView = (
+    return (
       <Provider store={store}>
         <ErrorBoundary>
-          <View style={styles.container}>
+          <SafeAreaView style={styles.container}>
             <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent/>
+              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'light-content'}/>
             </View>
-            <AppNavigator initialRouteName={initialRouteName}
-                          initialRouteParams={initialRouteParams}/>
-          </View>
+            <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+          </SafeAreaView>
         </ErrorBoundary>
       </Provider>
     )
-    if (Platform.OS === 'ios') {
-      rootView = (
-        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
-          {rootView}
-        </SafeAreaView>
-      )
-    }
-    return rootView
   }
 }
 
