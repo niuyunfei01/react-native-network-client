@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
 import tool from "../../../pubilc/util/tool"
@@ -105,10 +105,12 @@ class StoreGoodsSearch extends Component {
 
   onLoadMore = () => {
     let {page, isLastPage, isLoading} = this.state
-    if (isLoading || isLastPage) {
+    if (isLastPage) {
       showError('没有更多商品')
       return
     }
+    if (isLoading)
+      return;
     this.setState({page: page + 1, isLoading: true}, () => this.search())
   }
 

@@ -181,11 +181,12 @@ class OrderSearchScene extends PureComponent {
 
   onEndReached = () => {
     const {query, end, isLoading} = this.state
-    if (end || isLoading) {
+    if (end) {
       showError('没有更多数据了')
       return
     }
-
+    if(isLoading)
+      return;
     query.page += 1
     this.setState({query: query, isLoading: true}, () => this.queryOrderInfo(false))
   }
