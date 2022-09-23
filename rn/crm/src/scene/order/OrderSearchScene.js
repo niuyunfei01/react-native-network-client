@@ -224,9 +224,9 @@ class OrderSearchScene extends PureComponent {
   }
 
   render() {
-    const {keyword, prefix, orderList, isLoading} = this.state
+    const {keyword, prefix, orderList} = this.state
     const {global, navigation, route} = this.props
-    const term = route.params?.term
+    const {term} = route.params
     return (
       <>
         <View style={styles.searchWarp}>
@@ -280,10 +280,11 @@ class OrderSearchScene extends PureComponent {
                   renderItem={(item) => this.renderItem(item, global, navigation)}
                   initialNumToRender={2}
                   onRefresh={this.onRefresh}
+                  refreshing={false}
                   onEndReachedThreshold={0.1}
                   onEndReached={this.onEndReached}
-                  refreshing={isLoading}
                   keyExtractor={(item, index) => `${index}`}
+
         />
       </>
     );
