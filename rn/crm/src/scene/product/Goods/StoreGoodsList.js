@@ -581,7 +581,7 @@ class StoreGoodsList extends Component {
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate})
+            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
           }}>
           <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
         </TouchableOpacity>
