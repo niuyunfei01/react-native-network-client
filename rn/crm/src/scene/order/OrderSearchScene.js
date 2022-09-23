@@ -51,7 +51,7 @@ class OrderSearchScene extends PureComponent {
     super(props);
 
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
-    const term = props.route.params?.term
+    const {term} = props.route.params || {}
     this.state = {
       keyword: term && tool.length(term) > 12 && term.substring(9, 13) || '',
       isRefreshing: false,
@@ -60,6 +60,7 @@ class OrderSearchScene extends PureComponent {
       orderList: [],
       end: false,
       isLoading: false,
+      isCanLoadMore: false,
       query: {
         page: 1,
         limit: 10,
@@ -71,7 +72,7 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentDidMount() {
-    const term = this.props.route.params?.term
+    const {term} = this.props.route.params || {}
     if (term && tool.length(term) > 0) {
       contentFromOrderList = true
       this.queryOrderInfo(true)
@@ -180,15 +181,18 @@ class OrderSearchScene extends PureComponent {
   }
 
   onEndReached = () => {
-    const {query, end, isLoading} = this.state
+    const {query, end, isLoading, isCanLoadMore} = this.state
+    if (!isCanLoadMore)
+      return;
     if (end) {
       showError('没有更多数据了')
+      this.setState({isCanLoadMore: false})
       return
     }
-    if(isLoading)
+    if (isLoading)
       return;
     query.page += 1
-    this.setState({query: query, isLoading: true}, () => this.queryOrderInfo(false))
+    this.setState({query: query, isLoading: true, isCanLoadMore: false}, () => this.queryOrderInfo(false))
   }
 
   queryOrderInfo = (isChangeType) => {
@@ -223,10 +227,14 @@ class OrderSearchScene extends PureComponent {
     })
   }
 
+  onScrollBeginDrag = () => {
+    this.setState({isCanLoadMore: true})
+  }
+
   render() {
     const {keyword, prefix, orderList} = this.state
     const {global, navigation, route} = this.props
-    const {term} = route.params
+    const {term} = route.params || {}
     return (
       <>
         <View style={styles.searchWarp}>
@@ -282,6 +290,7 @@ class OrderSearchScene extends PureComponent {
                   onRefresh={this.onRefresh}
                   refreshing={false}
                   onEndReachedThreshold={0.1}
+                  onScrollBeginDrag={this.onScrollBeginDrag}
                   onEndReached={this.onEndReached}
                   keyExtractor={(item, index) => `${index}`}
 

@@ -47,6 +47,7 @@ class StoreGoodsSearch extends Component {
       selectedProduct: {},
       modalType: '',
       showScan: false,
+      isCanLoadMore: false
     }
   }
 
@@ -77,6 +78,7 @@ class StoreGoodsSearch extends Component {
         }
 
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+
           hideModal()
           const totalPage = res.count / res.pageSize
           const isLastPage = res.page >= totalPage
@@ -104,14 +106,17 @@ class StoreGoodsSearch extends Component {
   }
 
   onLoadMore = () => {
-    let {page, isLastPage, isLoading} = this.state
+    let {page, isLastPage, isLoading, isCanLoadMore} = this.state
+    if (!isCanLoadMore)
+      return;
     if (isLastPage) {
       showError('没有更多商品')
+      this.setState({isCanLoadMore: false})
       return
     }
     if (isLoading)
       return;
-    this.setState({page: page + 1, isLoading: true}, () => this.search())
+    this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
   }
 
   onChange = (searchKeywords: any) => {
@@ -242,7 +247,7 @@ class StoreGoodsSearch extends Component {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
       storeId: this.state.storeId,
-      updatedCallback: this.doneProdUpdate
+      //updatedCallback: this.doneProdUpdate
     })
   }
 
@@ -285,12 +290,14 @@ class StoreGoodsSearch extends Component {
       </View>
     )
   }
+  onScrollBeginDrag = () => {
+    this.setState({isCanLoadMore: true})
+  }
 
   render() {
-    const p = this.state.selectedProduct;
-    const sp = this.state.selectedProduct.sp;
+    const {selectedProduct, showScan, goods, showNone, isLoading, modalType} = this.state;
+    const {sp} = selectedProduct;
     const {accessToken} = this.props.global;
-    const {showScan, goods, showNone, isLoading, modalType} = this.state
     const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <View style={styles.page}>
@@ -309,8 +316,9 @@ class StoreGoodsSearch extends Component {
                     refreshing={false}
                     keyExtractor={this._keyExtractor}
                     getItemLayout={this._getItemLayout}
+                    onScrollBeginDrag={this.onScrollBeginDrag}
                     ListEmptyComponent={this.renderNoProduct()}
-                    onEndReachedThreshold={0.1}
+                    onEndReachedThreshold={0.2}
                     onEndReached={this.onLoadMore}
           />
 
@@ -318,9 +326,9 @@ class StoreGoodsSearch extends Component {
             <NoFoundDataView/>
           </If>
 
-          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={modalType}
-                                     productName={p.name}
-                                     skuName={p.sku_name}
+          {sp && <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)} modalType={modalType}
+                                     productName={selectedProduct.name}
+                                     skuName={selectedProduct.sku_name}
                                      strictProviding={onStrict} accessToken={accessToken}
                                      storeId={Number(this.props.global.currStoreId)}
                                      currStatus={Number(sp.status)}
@@ -329,7 +337,7 @@ class StoreGoodsSearch extends Component {
                                      spId={Number(sp.id)}
                                      applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                      navigation={this.props.navigation}
-                                     storePro={p}
+                                     storePro={selectedProduct}
                                      beforePrice={Number(sp.supply_price)}/>}
 
         </View>
