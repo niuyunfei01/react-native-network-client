@@ -1,6 +1,15 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {FlatList, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  InteractionManager,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -167,26 +176,27 @@ class OrderSearchScene extends PureComponent {
     this.filterType = value
     contentFromOrderList = false
     this.queryOrderInfo(true)
+    Keyboard.dismiss()
   }
 
   onEndReached = () => {
-    const {query, end} = this.state
+    const {query, end, isLoading} = this.state
     if (end) {
       showError('没有更多数据了')
       return
     }
+    if(isLoading)
+      return;
     query.page += 1
-    this.setState({query: query}, () => this.queryOrderInfo(false))
+    this.setState({query: query, isLoading: true}, () => this.queryOrderInfo(false))
   }
 
   queryOrderInfo = (isChangeType) => {
     const {accessToken} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
-    const {query, keyword, isLoading} = this.state
-    const term = this.props.route.params?.term
-    if (isLoading)
-      return
-    this.setState({isLoading: true})
+    const {query, keyword} = this.state
+    const {term} = this.props.route.params
+
     showModal('加载中...')
     const params = {
       vendor_id: currVendorId,
@@ -273,7 +283,6 @@ class OrderSearchScene extends PureComponent {
                   onEndReachedThreshold={0.1}
                   onEndReached={this.onEndReached}
                   refreshing={isLoading}
-                  removeClippedSubviews={true}
                   keyExtractor={(item, index) => `${index}`}
         />
       </>

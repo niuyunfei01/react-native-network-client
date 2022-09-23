@@ -13,7 +13,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Scanner from "../../../pubilc/component/Scanner";
-import {showError} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -27,7 +27,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 let codeType = 'search'
-let isLoading = false
 
 class StoreGoodsSearch extends Component {
   constructor(props) {
@@ -60,7 +59,7 @@ class StoreGoodsSearch extends Component {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        //showModal('加载中')
+        showModal('加载中')
 
         params = {
           vendor_id: currVendorId,
@@ -78,7 +77,7 @@ class StoreGoodsSearch extends Component {
         }
 
         HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-
+          hideModal()
           const totalPage = res.count / res.pageSize
           const isLastPage = res.page >= totalPage
           const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
@@ -88,11 +87,10 @@ class StoreGoodsSearch extends Component {
             isLoading: false,
             showNone: !res.lists
           })
-          isLoading = false
         })
       } else {
-        isLoading = false
-        this.setState({goods: [], isLastPage: true})
+        hideModal()
+        this.setState({goods: [], isLoading: false, isLastPage: true})
         if (limit_store) {
           params['hideAreaHot'] = 1;
           params['limit_status'] = (prod_status || []).join(",");
@@ -106,13 +104,14 @@ class StoreGoodsSearch extends Component {
   }
 
   onLoadMore = () => {
-    let {page, isLastPage} = this.state
-    if (isLoading || isLastPage) {
+    let {page, isLastPage, isLoading} = this.state
+    if (isLastPage) {
       showError('没有更多商品')
       return
     }
-    isLoading = true
-    this.setState({page: page + 1}, () => this.search())
+    if (isLoading)
+      return;
+    this.setState({page: page + 1, isLoading: true}, () => this.search())
   }
 
   onChange = (searchKeywords: any) => {
@@ -311,7 +310,7 @@ class StoreGoodsSearch extends Component {
                     keyExtractor={this._keyExtractor}
                     getItemLayout={this._getItemLayout}
                     ListEmptyComponent={this.renderNoProduct()}
-                    onEndReachedThreshold={0.3}
+                    onEndReachedThreshold={0.1}
                     onEndReached={this.onLoadMore}
           />
 
