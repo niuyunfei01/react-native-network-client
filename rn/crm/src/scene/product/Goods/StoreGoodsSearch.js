@@ -306,7 +306,7 @@ class StoreGoodsSearch extends Component {
                     renderItem={this.renderRow}
                     initialNumToRender={5}
                     onRefresh={this.onRefresh}
-                    refreshing={isLoading}
+                    refreshing={false}
                     keyExtractor={this._keyExtractor}
                     getItemLayout={this._getItemLayout}
                     ListEmptyComponent={this.renderNoProduct()}
