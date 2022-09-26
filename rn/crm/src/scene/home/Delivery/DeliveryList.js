@@ -443,7 +443,6 @@ class DeliveryList extends PureComponent {
         this.setState({
           show_modal: true,
           modal_msg: desc,
-          show_disable_all: false,
           multipleSelection: []
         })
       } else {
@@ -606,7 +605,9 @@ class DeliveryList extends PureComponent {
                 let menu = [...this.state.wsbDeliveryList]
                 menu[idx].checked = !menu[idx].checked;
                 this.setState({
-                  wsbDeliveryList: menu
+                  wsbDeliveryList: menu,
+                  disable_id: info?.v2_type,
+                  delivery_way_state: info?.is_forbidden
                 })
                 if (menu[idx].checked) {
                   multipleSelection.push(info?.v2_type)

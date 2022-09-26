@@ -1177,6 +1177,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 650;
 				DEVELOPMENT_TEAM = YVB38MZTJM;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YVB38MZTJM;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1196,6 +1197,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
 				PROVISIONING_PROFILE_SPECIFIER = "wsb-app-appstore";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wsb-app-appstores";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
