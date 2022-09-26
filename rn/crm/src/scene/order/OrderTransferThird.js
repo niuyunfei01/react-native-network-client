@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {Alert, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -46,6 +46,7 @@ const timeObj = {
   componentName: '',
   method: []
 }//记录耗时的对象
+const json_str = '[{"logisticCode":0,"logisticName":"顺丰同城","logisticDesc":"4.56公里","tips":[],"est":{"name":"外送帮账号","delivery_fee":10.3,"distance":4558,"deliveryNo":"","do_uuid":"","coupons_amount":1.1,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":10.3},{"logisticCode":0,"logisticName":"裹小递","logisticDesc":"4.7公里","tips":[],"est":{"name":"外送帮账号","delivery_fee":10.4,"distance":4700,"deliveryNo":"XDcclexnf33h","do_uuid":"","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":10.4},{"logisticCode":0,"logisticName":"蜂鸟众包","logisticDesc":"4.58公里","tips":[],"est":{"name":"外送帮账号","delivery_fee":10.9,"distance":4576,"deliveryNo":"f567cc23-c3dc-434a-990f-c0ecf208b15d","do_uuid":"7c19b4ad0fbcb83","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":10.9},{"logisticCode":0,"logisticName":"美团快速达","logisticDesc":"4.87公里","tips":["不溢价","接单率93%"],"est":{"name":"外送帮账号","delivery_fee":11.9,"distance":4872,"deliveryNo":"","do_uuid":"6aff8524d27f5ff9b06d53d8828772e5","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":11.9},{"logisticCode":0,"logisticName":"达达配送","logisticDesc":"4.68公里","tips":[],"est":{"name":"外送帮账号","delivery_fee":12.37,"distance":4683,"deliveryNo":"Dada51975c219e5f48f89bb9a22f363be794","do_uuid":"0dddae71c8e44eb","coupons_amount":0.03,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":12.37},{"logisticCode":0,"logisticName":"UU跑腿","logisticDesc":"4.98公里","tips":[],"store_est":{"name":"自有账号","delivery_fee":15,"distance":4983,"deliveryNo":"db912b4bfa804cea9fa4b2455ce6b418","do_uuid":"2ab4d8aea8edc2b","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":-1,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false},"min_price":13.3,"est":{"name":"外送帮账号","delivery_fee":13.3,"distance":4983,"deliveryNo":"28a6289736f24cd8a413355c2e5a6719","do_uuid":"4316814bec719cf","coupons_amount":2.1,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"isChosed":false}}]';
 
 
 class OrderTransferThird extends Component {
@@ -61,7 +62,7 @@ class OrderTransferThird extends Component {
       storeId: this.props.route.params.storeId,
       addressId: this.props.route.params.addressId ? this.props.route.params.addressId : '',
       accessToken: this.props.global.accessToken,
-      logistics: [],
+      logistics: JSON.parse(json_str),
       logistics_error: [],
       not_exist: [],
       if_reship: if_reship,
@@ -86,7 +87,7 @@ class OrderTransferThird extends Component {
       logisticFeeMap: [],
       headerType: headerType,
       showDeliveryModal: false,
-      weight: 0,
+      weight: 1,
       weight_max: 0,
       weight_min: 0,
       weight_step: 0,
@@ -165,6 +166,7 @@ class OrderTransferThird extends Component {
         isLoading: false,
       })
 
+
       let params = {
         store_id: currStoreId,
         vendor_id: currVendorId,
@@ -196,7 +198,7 @@ class OrderTransferThird extends Component {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {currStoreId, currentUser, accessToken} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
@@ -273,7 +275,7 @@ class OrderTransferThird extends Component {
     this.mixpanel.track("deliverorder_click", {});
 
     const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
-    HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
+    HttpUtils.get.bind(self.props)(api).then(obj => {
       Alert.alert('提示', `${obj.content}`, [{
         text: `${obj.left_btn}`, onPress: () => {
           this.onCallThirdShip()
@@ -317,7 +319,7 @@ class OrderTransferThird extends Component {
         addressId,
         weight
       } = this.state;
-      HttpUtils.post.bind(self.props.navigation)(api, {
+      HttpUtils.post.bind(self.props)(api, {
         orderId: orderId,
         storeId: storeId,
         logisticCode: newSelected,
@@ -424,7 +426,7 @@ class OrderTransferThird extends Component {
         {
           text: '再次充值', onPress: () => {
             this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
-              onBack: (res) => {
+              onBack: () => {
                 this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
                   onBack: (res) => {
                     this.showAlert(res)
@@ -514,7 +516,13 @@ class OrderTransferThird extends Component {
       <View style={{flexGrow: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
 
-        <ScrollView style={{flex: 1}}>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isLoading}
+            onRefresh={() => this.fetchThirdWays()}
+            tintColor='gray'
+          />
+        } style={{flex: 1}}>
           {this.renderContent()}
           {!tool.length(this.state.logistics) > 0 && !this.state.isLoading ?
             <EmptyData containerStyle={{marginBottom: 40}} placeholder={'无可用配送方式'}/> : this.renderList()}
@@ -557,7 +565,7 @@ class OrderTransferThird extends Component {
   }
 
 
-  renderContent = (res) => {
+  renderContent = () => {
     let {if_reship, is_merchant_ship, merchant_reship_tip} = this.state
     return (
       <View style={styles.header}>
@@ -633,6 +641,9 @@ class OrderTransferThird extends Component {
 
   handle = (info, index) => {
     const {logistics} = this.state
+    if (logistics[index].logisticCode <= 0) {
+      return ToastLong("数据错误，请刷新当前页面")
+    }
     if (info.error_msg) {
       return false;
     }
@@ -665,7 +676,7 @@ class OrderTransferThird extends Component {
             {info.name}
           </Text>
 
-          <View style={{flex: 1}}></View>
+          <View style={{flex: 1}}/>
 
           <View style={{alignItems: 'center'}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
@@ -728,7 +739,7 @@ class OrderTransferThird extends Component {
         <View>
           {
             not_exist && not_exist.map((delivery, index) => {
-              return(
+              return (
                 <View style={{
                   flexDirection: "row",
                   marginHorizontal: 10,
@@ -909,7 +920,7 @@ class OrderTransferThird extends Component {
               </View>
             </If>
           </View>
-          <View style={{flex: 1}}></View>
+          <View style={{flex: 1}}/>
           <Button title={'呼叫配送'}
                   onPress={this.onCallThirdShipRule}
                   buttonStyle={{
