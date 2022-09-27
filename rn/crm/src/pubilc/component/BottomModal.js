@@ -86,7 +86,7 @@ class BottomModal extends React.Component {
       <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}>
         <TouchableOpacity style={styles.modalWrap} onPress={onClose}>
           <TouchableHighlight style={styles.contentWrap}>
-            <KeyboardAwareScrollView style={{paddingBottom: 3,}}>
+            <KeyboardAwareScrollView style={{paddingBottom: 3}} enableOnAndroid={false}>
               <View style={styles.keyboardWrap}>
                 <TouchableOpacity style={{width: '20%'}} onPress={this.props.onClose}>
                 </TouchableOpacity>

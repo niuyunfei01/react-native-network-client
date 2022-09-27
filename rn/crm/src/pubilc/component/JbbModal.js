@@ -50,7 +50,7 @@ class JbbModal extends PureComponent {
             padding: pxToDp(30),
             paddingBottom: pxToDp(50)
           }, this.props.HighlightStyle]}>
-            <KeyboardAwareScrollView style={[{padding: 10}, this.props.modalStyle]}>
+            <KeyboardAwareScrollView style={[{padding: 10}, this.props.modalStyle]} enableOnAndroid={false}>
               {this.props.children}
             </KeyboardAwareScrollView>
           </TouchableHighlight>

@@ -501,9 +501,10 @@ class SeparatedAccountFill extends PureComponent {
     if (this.state.headerType === 2) {
       return (
         <View style={{flex: 1}}>
-          <KeyboardAwareScrollView  automaticallyAdjustContentInsets={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
+          <KeyboardAwareScrollView enableOnAndroid={false}
+                                   automaticallyAdjustContentInsets={false}
+                                   showsHorizontalScrollIndicator={false}
+                                   showsVerticalScrollIndicator={false}>
             <View style={style.bankCard}>
               <View style={style.flexRow}>
                 <Text style={[style.center]}>开户名称: </Text>
