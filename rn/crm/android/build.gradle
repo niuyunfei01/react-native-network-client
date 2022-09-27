@@ -2,7 +2,7 @@
 
 buildscript {
     repositories {
-        maven {url 'https://developer.huawei.com/repo/'}
+        maven { url 'https://developer.huawei.com/repo/' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/public' }
         google()
@@ -29,15 +29,16 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {url 'https://developer.huawei.com/repo/'}
+        maven { url 'https://developer.huawei.com/repo/' }
 //        google()
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url "https://www.jitpack.io" }
         //All of React Native (JS, Android binaries) is installed from npm
-        maven {url "$rootDir/../node_modules/react-native/android" }
-        maven {url "$rootDir/../node_modules/jsc-android/dist" }
+        maven { url "$rootDir/../node_modules/react-native/android" }
+        maven { url "$rootDir/../node_modules/jsc-android/dist" }
         flatDir { dirs "$rootDir/../node_modules/@uiw/react-native-alipay/android/libs" }
+        flatDir { dirs 'libs' }
         google()
     }
 

@@ -54,13 +54,13 @@ dependencies {
     //implementation 'cn.jiguang.sdk.plugin:meizu:4.8.1'
 //厂商版本和 JPush SDK 版本保持一致
     implementation 'cn.jiguang.sdk.plugin:vivo:4.8.1'
-//    implementation 'cn.jiguang.sdk.plugin:oppo:4.8.1'
-//// JPush Android SDK v4.6.0 开始，需要单独引入 oppo 厂商 aar ，请下载官网 SDK 包并把 jpush-android-xxx-release/third-push/oppo/libs 下的 aar 文件单独拷贝一份到应用 module/libs 下//
-//    implementation(name: 'com.heytap.msp-push-3.1.0', ext: 'aar')
-//    //以下为 OPPO 3.1.0 aar需要依赖
-//
-//    implementation 'commons-codec:commons-codec:1.6'
-//    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'cn.jiguang.sdk.plugin:oppo:4.8.1'
+// JPush Android SDK v4.6.0 开始，需要单独引入 oppo 厂商 aar ，请下载官网 SDK 包并把 jpush-android-xxx-release/third-push/oppo/libs 下的 aar 文件单独拷贝一份到应用 module/libs 下//
+    implementation(name: 'com.heytap.msp-push-3.1.0', ext: 'aar')
+    //以下为 OPPO 3.1.0 aar需要依赖
+
+    implementation 'commons-codec:commons-codec:1.6'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
@@ -203,9 +203,9 @@ android {
                 VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
                 VIVO_APPID    : "100163985", // VIVO平台注册的appid
 
-                OPPO_APPKEY   : "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6", // OPPO平台注册的appkey
+                OPPO_APPKEY   : "OP-sM4zy3WQ1Es0cOwW8kcKcK0o", // OPPO平台注册的appkey
                 OPPO_APPID    : "OP-3609862", // OPPO平台注册的appid
-                OPPO_APPSECRET: "OP-sM4zy3WQ1Es0cOwW8kcKcK0o"//OPPO平台注册的appsecret
+                OPPO_APPSECRET: "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6"//OPPO平台注册的appsecret
         ]
 
         missingDimensionStrategy 'react-native-camera', 'general'
