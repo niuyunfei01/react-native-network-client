@@ -84,9 +84,8 @@ class OrderSendMoney extends PureComponent {
   }
 
   fetchQuerySurchargeLog() {
-    const self = this
-    const {global, route} = self.props;
-    const orderId = route.params.orderId;
+    const {global, route} = this.props;
+    const {orderId} = route.params;
     const api = `api/query_surcharge_log`;
     HttpUtils.get.bind(this.props)(api, {
       order_id: orderId,
@@ -131,8 +130,6 @@ class OrderSendMoney extends PureComponent {
                 type='number'
                 placeholder=" 请输入红包金额"
                 placeholderTextColor={'#ccc'}
-                ref={el => this.inputRef = el}
-                onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
                 clear
                 extra={'元'}
                 onChange={(amount) => this.setState({amount})}

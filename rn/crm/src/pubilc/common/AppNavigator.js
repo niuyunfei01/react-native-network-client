@@ -70,8 +70,6 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Home" getComponent={() => require("../../scene/notice/NoticeList").default}
-                      options={{headerShown: false}}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
         <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
@@ -474,8 +472,8 @@ export const AppNavigator = (props) => {
                       options={{headerTitle: '骑手轨迹'}}
                       getComponent={() => require('../../scene/order/RiderTrajectory').default}/>
         <Stack.Screen name={Config.ROUTE_ADD_MISSING_PICTURE}
-                      options={{headerTitle:'添加图片'}}
-                      getComponent={()=>require('../../scene/product/Goods/AddMissingPictureScene').default}/>
+                      options={{headerTitle: '添加图片'}}
+                      getComponent={() => require('../../scene/product/Goods/AddMissingPictureScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

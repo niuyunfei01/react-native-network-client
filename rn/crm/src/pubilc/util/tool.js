@@ -2,6 +2,39 @@ import Cts from "../common/Cts";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 
+export const SFCategory = [
+  {value: '1', label: '快餐'},
+  {value: '2', label: '送药'},
+  {value: '3', label: '百货'},
+  {value: '4', label: '脏衣服收'},
+  {value: '5', label: '干净衣服派'},
+  {value: '6', label: '生鲜'},
+  {value: '7', label: '保单'},
+  {value: '8', label: '高端饮品'},
+  {value: '9', label: '现场勘验'},
+  {value: '10', label: '快递'},
+  {value: '12', label: '文件'},
+  {value: '13', label: '蛋糕'},
+  {value: '14', label: '鲜花'},
+  {value: '15', label: '电子数码'},
+  {value: '16', label: '服装鞋帽'},
+  {value: '17', label: '汽车配件'},
+  {value: '18', label: '珠宝'},
+  {value: '20', label: '披萨'},
+  {value: '21', label: '中餐'},
+  {value: '22', label: '水产'},
+  {value: '27', label: '专人直送'},
+  {value: '32', label: '中端饮品'},
+  {value: '33', label: '便利店'},
+  {value: '34', label: '面包糕点'},
+  {value: '35', label: '火锅'},
+  {value: '36', label: '证照'},
+  {value: '40', label: '烧烤小龙虾'},
+  {value: '41', label: '外部落地配'},
+  {value: '47', label: '烟酒行'},
+  {value: '48', label: '成人用品'},
+  {value: '99', label: '其他'}];
+
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
   if (typeof keys === "undefined" || length(keys) === 0) {
@@ -128,7 +161,7 @@ export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
   }
-  switch (typeof obj){
+  switch (typeof obj) {
     case "boolean":
       return Number(obj)
     case "number":
@@ -145,7 +178,7 @@ export function length(obj) {
 
 }
 
- const pickImageOptions = (cropping) => {
+const pickImageOptions = (cropping) => {
   return {
     width: 800,
     height: 800,
@@ -156,6 +189,7 @@ export function length(obj) {
     cropperCancelText: '取消'
   };
 }
+
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (

@@ -81,7 +81,7 @@ class TabHome extends React.Component {
             getComponent={() => require("../notice/NoticeList").default}
             options={
               {
-                tabBarBadge:remind > 99 ? '99+' : remind,
+                tabBarBadge: remind > 99 ? '99+' : remind,
                 tabBarLabel: "提醒",
                 tabBarIcon: ({focused}) => (
                   <View style={{position: "relative"}}>

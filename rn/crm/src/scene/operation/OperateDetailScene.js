@@ -266,7 +266,6 @@ class OperateDetailScene extends PureComponent {
       total_balanced,
       balance_money
     } = this.state;
-    console.log('income', this.state.income)
     return (
       <View style={{flex: 1}}>
         <Header text={"今日运营收益"} money={toFixed(sum)}/>

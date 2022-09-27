@@ -199,7 +199,8 @@ class OrderSearchScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
     const {query, keyword} = this.state
-    const {term} = this.props.route.params
+
+    const {term = ''} = this.props.route.params || {}
 
     showModal('加载中...')
     const params = {

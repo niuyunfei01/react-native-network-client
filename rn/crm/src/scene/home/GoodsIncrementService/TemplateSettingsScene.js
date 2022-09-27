@@ -1,11 +1,12 @@
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {Styles} from "./GoodsIncrementServiceStyle";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
-import tool from "../../../pubilc/util/tool";
+import tool from "../../../pubilc/util/tool"
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const styles = StyleSheet.create({
   title: {
@@ -85,7 +86,7 @@ export default class TemplateSettingsScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    this.navigationOptions(props, props.route.params.store)
+
     this.state = {
       selectItem: '-1',
       tempValue: {
@@ -93,7 +94,12 @@ export default class TemplateSettingsScene extends PureComponent {
         customerTemp: props.route.params.store.tpl_content
       }
     }
-    this.getDefaultTempContent(props.route.params.store)
+
+  }
+
+  componentDidMount() {
+    this.navigationOptions(this.props, this.props.route.params.store)
+    this.getDefaultTempContent(this.props.route.params.store)
   }
 
   getDefaultTempContent = (store) => {
@@ -161,7 +167,7 @@ export default class TemplateSettingsScene extends PureComponent {
   render() {
     const {tempValue, selectItem} = this.state
     return (
-      <ScrollView>
+      <KeyboardAwareScrollView enableOnAndroid={false}>
         {
           TEMP_LIST.map((item, index) => {
             return (
@@ -192,7 +198,7 @@ export default class TemplateSettingsScene extends PureComponent {
             )
           })
         }
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
 }
