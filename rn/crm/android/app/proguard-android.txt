@@ -342,3 +342,7 @@
 
 -dontwarn com.xiaomi.push.**
 -keep class com.xiaomi.push.** { *; }
+
+-dontwarn com.vivo.push.**
+-keep class com.vivo.push.**{*; }
+-keep class com.vivo.vms.**{*; }

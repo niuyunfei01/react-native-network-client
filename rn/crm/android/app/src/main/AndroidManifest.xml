@@ -492,6 +492,30 @@
         <meta-data
                 android:name="XIAOMI_APPID"
                 android:value="MI-2882303761517675358"/>
+
+        <!--  vivo_push_config-->
+        <receiver android:name="cn.jpush.android.service.PluginVivoMessageReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <!-- 接收 push 消息 -->
+                <action android:name="com.vivo.pushclient.action.RECEIVE" />
+            </intent-filter>
+        </receiver>
+        <service
+                android:name="com.vivo.push.sdk.service.CommandClientService"
+                android:exported="true" />
+        <activity
+                android:name="com.vivo.push.sdk.LinkProxyClientActivity"
+                android:exported="false"
+                android:screenOrientation="portrait"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <meta-data
+                android:name="com.vivo.push.api_key"
+                android:value="fbd582b2fd5fc76ae1fe3d5d6fbea7c8" />
+        <meta-data
+                android:name="com.vivo.push.app_id"
+                android:value="100163985" />
+
     </application>
 
 </manifest>
