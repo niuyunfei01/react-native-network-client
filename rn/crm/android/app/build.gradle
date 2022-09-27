@@ -43,7 +43,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.google.android.material:material:1.0.0"
     implementation 'com.fanjun:keeplive:1.1.22'
-    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.8.1'
+    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.2.8'
+    implementation 'cn.jiguang.sdk.plugin:vivo:4.2.8'
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
@@ -177,6 +178,8 @@ android {
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
                 XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
                 XIAOMI_APPID : "MI-2882303761517675358", // 小米平台注册的appid
+                VIVO_APPKEY : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
+                VIVO_APPID : "100163985", // VIVO平台注册的appid
         ]
 
         missingDimensionStrategy 'react-native-camera', 'general'
