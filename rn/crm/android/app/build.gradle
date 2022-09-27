@@ -22,6 +22,7 @@ def enableSeparateBuildPerCPUArchitecture = true
 apply plugin: 'com.android.application'
 apply plugin: 'newrelic'
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+apply plugin: 'com.huawei.agconnect'
 subprojects {
     configurations.all {
         exclude group: 'com.facebook.fresco', module: 'imagepipeline-okhttp3'
@@ -43,8 +44,24 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.google.android.material:material:1.0.0"
     implementation 'com.fanjun:keeplive:1.1.22'
-    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.2.8'
-    implementation 'cn.jiguang.sdk.plugin:vivo:4.2.8'
+
+    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.8.1'
+//JPush Android SDK 4.6.0 以上版本更新华为 HMS SDK 版本为:6.3.0.304 及以上版本,接入要求：Android Studio 3.6.1 或更高版本、Android Gradle 插件 3.5.4 或更高版本。
+    implementation 'com.huawei.hms:push:6.5.0.300'
+    //厂商版本和 JPush SDK 版本保持一致
+    implementation 'cn.jiguang.sdk.plugin:huawei:4.8.1'
+//厂商版本和JPush SDK版本保持一致
+    //implementation 'cn.jiguang.sdk.plugin:meizu:4.8.1'
+//厂商版本和 JPush SDK 版本保持一致
+    implementation 'cn.jiguang.sdk.plugin:vivo:4.8.1'
+//    implementation 'cn.jiguang.sdk.plugin:oppo:4.8.1'
+//// JPush Android SDK v4.6.0 开始，需要单独引入 oppo 厂商 aar ，请下载官网 SDK 包并把 jpush-android-xxx-release/third-push/oppo/libs 下的 aar 文件单独拷贝一份到应用 module/libs 下//
+//    implementation(name: 'com.heytap.msp-push-3.1.0', ext: 'aar')
+//    //以下为 OPPO 3.1.0 aar需要依赖
+//
+//    implementation 'commons-codec:commons-codec:1.6'
+//    implementation 'androidx.annotation:annotation:1.1.0'
+
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
@@ -101,23 +118,23 @@ dependencies {
     implementation project(':@react-native-community_masked-view')
     implementation project(':react-native-linear-gradient')
     implementation project(':react-native-gesture-handler')
-    implementation (project(':@react-native-async-storage'))
-    implementation (project(':react-native-vector-icons'))
-    implementation (project(':react-native-splash-screen'))
-    implementation (project(':RCTWeChat'))
-    implementation (project(':react-native-webview'))
-    implementation (project(':react-native-pager-view'))
-    implementation (project(':react-native-screens'))
-    implementation (project(':react-native-reanimated'))
-    implementation (project(':react-native-safe-area-context'))
-    implementation (project(':react-native-camera'))
-    implementation (project(':react-native-sound'))
-    implementation (project(':react-native-alipay'))
-    implementation (project(path: ':rn-fetch-blob'))
-    implementation (project(path: ':rn-app-upgrade'))
-    implementation (project(":react-native-ble-manager"))
-    implementation (project(':react-native-svg'))
-    implementation (project(':mixpanel-react-native'))
+    implementation(project(':@react-native-async-storage'))
+    implementation(project(':react-native-vector-icons'))
+    implementation(project(':react-native-splash-screen'))
+    implementation(project(':RCTWeChat'))
+    implementation(project(':react-native-webview'))
+    implementation(project(':react-native-pager-view'))
+    implementation(project(':react-native-screens'))
+    implementation(project(':react-native-reanimated'))
+    implementation(project(':react-native-safe-area-context'))
+    implementation(project(':react-native-camera'))
+    implementation(project(':react-native-sound'))
+    implementation(project(':react-native-alipay'))
+    implementation(project(path: ':rn-fetch-blob'))
+    implementation(project(path: ':rn-app-upgrade'))
+    implementation(project(":react-native-ble-manager"))
+    implementation(project(':react-native-svg'))
+    implementation(project(':mixpanel-react-native'))
     implementation project(':react-native-fast-image')
     implementation project(':react-native-amap3d')
     implementation fileTree(dir: "../../node_modules/jpush-react-native/android/libs", include: ["*.jar"])
@@ -175,13 +192,19 @@ android {
         applicationId "cn.cainiaoshicai.crm"
 
         manifestPlaceholders = [
-                JPUSH_PKGNAME: applicationId,
-                JPUSH_APPKEY : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
+                JPUSH_PKGNAME : applicationId,
+                JPUSH_APPKEY  : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+
                 XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
-                XIAOMI_APPID : "MI-2882303761517675358", // 小米平台注册的appid
-                VIVO_APPKEY : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
-                VIVO_APPID : "100163985", // VIVO平台注册的appid
+                XIAOMI_APPID  : "MI-2882303761517675358", // 小米平台注册的appid
+
+                VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
+                VIVO_APPID    : "100163985", // VIVO平台注册的appid
+
+                OPPO_APPKEY   : "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6", // OPPO平台注册的appkey
+                OPPO_APPID    : "OP-3609862", // OPPO平台注册的appid
+                OPPO_APPSECRET: "OP-sM4zy3WQ1Es0cOwW8kcKcK0o"//OPPO平台注册的appsecret
         ]
 
         missingDimensionStrategy 'react-native-camera', 'general'
