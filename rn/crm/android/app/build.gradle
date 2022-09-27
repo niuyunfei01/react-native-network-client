@@ -114,6 +114,7 @@ dependencies {
     implementation project(':@react-native-community_geolocation')
     implementation project(':@react-native-community_clipboard')
     implementation project(':@react-native-community_slider')
+    implementation project(':@react-native-community_cameraroll')
     implementation project(':@react-native-community_datetimepicker')
     implementation project(':@react-native-community_masked-view')
     implementation project(':react-native-linear-gradient')

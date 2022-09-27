@@ -56,6 +56,7 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
@@ -341,6 +342,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNViewShotPackage(),
                     new FastImageViewPackage(),
                     new ReactSliderPackage(),
+                    new CameraRollPackage(),
                     new RNCMaskedViewPackage()
             );
         }
