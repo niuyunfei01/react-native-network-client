@@ -1,14 +1,16 @@
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import Config from "../../../pubilc/common/config";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import {SvgXml} from "react-native-svg";
+import {close} from "../../../svg/svg";
 
 const styles = StyleSheet.create({
   rowHeaderText: {
@@ -38,7 +40,36 @@ const styles = StyleSheet.create({
     paddingBottom: 13,
   },
   row: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  switchStyle: {marginRight: 14}
+  switchStyle: {marginRight: 14},
+  storeWrap: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    paddingHorizontal: 12,
+    maxHeight: '70%'
+  },
+  listItemText: {
+    fontSize: 16,
+    lineHeight: 22,
+    height: 44,
+    paddingVertical: 13,
+    textAlign: 'center'
+  },
+  selectedListItemText: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.main_color,
+    height: 44,
+    paddingVertical: 13,
+    textAlign: 'center'
+  },
+  headerWrap: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  }
 })
 const REPLAY_LIST = [
   {
@@ -76,7 +107,12 @@ class AutomaticFeedbackScene extends PureComponent {
         }
       },
       settings: {},
+      visible: false
     }
+
+  }
+
+  componentDidMount() {
     this.getSetting()
   }
 
@@ -127,30 +163,30 @@ class AutomaticFeedbackScene extends PureComponent {
             name: item.label,
             value: item.value,
             id: item.value,
-          }
+          },
+
         })
       }
     })
-
+    this.setState({visible: false})
   }
   renderHeader = () => {
-    const {storeList, selectStore} = this.state
+    const {selectStore} = this.state
     return (
       <View style={Styles.zoneWrap}>
         <Text style={styles.rowHeaderText}>
           外卖店
         </Text>
         <LineView/>
-        <ModalSelector skin="customer" data={storeList} onChange={item => this.onChange(item)}>
-          <View style={styles.row}>
-            <Text style={styles.rowContentText}>
-              {selectStore.label}
-            </Text>
-            <Text style={styles.rowContentRightText}>
-              {'切换门店 >'}
-            </Text>
-          </View>
-        </ModalSelector>
+        <TouchableOpacity style={styles.row} onPress={() => this.setState({visible: true})}>
+          <Text style={styles.rowContentText}>
+            {selectStore.label}
+          </Text>
+          <Text style={styles.rowContentRightText}>
+            {'切换门店 >'}
+          </Text>
+        </TouchableOpacity>
+
       </View>
     )
   }
@@ -281,7 +317,24 @@ class AutomaticFeedbackScene extends PureComponent {
     }).catch(error => showError('保存失败，原因：' + error.reason))
   }
 
+  renderItem = ({item}) => {
+    const {selectStore} = this.state
+    return (
+      <TouchableOpacity onPress={() => this.onChange(item)}>
+        <Text style={selectStore.id === item.id ? styles.selectedListItemText : styles.listItemText}>
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
+  getItemLayout = (data, index) => ({
+    length: 44.5, offset: 44.5 * index, index
+  })
+
   render() {
+    const {storeList, visible} = this.state
+
     return (
       <>
         <ScrollView>
@@ -295,6 +348,23 @@ class AutomaticFeedbackScene extends PureComponent {
             </Text>
           </TouchableOpacity>
         </View>
+        <CommonModal visible={visible} position={'flex-end'}>
+          <View style={styles.storeWrap}>
+            <View style={styles.headerWrap}>
+              <View/>
+              <Text style={styles.headerTitle}>
+                请选择外卖门店
+              </Text>
+              <SvgXml xml={close(18, 18)} onPress={() => this.setState({visible: false})}/>
+            </View>
+            <FlatList data={storeList}
+                      initialNumToRender={10}
+                      ItemSeparatorComponent={LineView}
+                      getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                      keyExtractor={item => item.id}
+                      renderItem={this.renderItem}/>
+          </View>
+        </CommonModal>
       </>
     )
   }

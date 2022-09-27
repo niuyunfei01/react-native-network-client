@@ -1,11 +1,10 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CommonStyle from "../../pubilc/util/CommonStyles";
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
-import {DatePickerView} from "@ant-design/react-native"
 import {Input, TextArea} from "../../weui/index";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
@@ -18,20 +17,12 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+
 function mapStateToProps(state) {
   return {
     global: state.global
   };
-}
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
 }
 
 const mapDispatchToProps = dispatch => {
@@ -75,7 +66,6 @@ class OrderSettingScene extends Component {
       addressId: '',
       isType: false
     };
-    this._toSetLocation = this._toSetLocation.bind(this);
   }
 
   getCurrentStoreName = () => {
@@ -134,27 +124,6 @@ class OrderSettingScene extends Component {
     setTimeout(() => {
       _this.props.navigation.goBack()
     }, time)
-  }
-
-  showDatePicker = () => {
-    let {datePickerValue} = this.state
-    return <View style={{marginTop: 12}}>
-      <View style={styles.modalCancel}>
-        <Text style={styles.modalCancelText}>期望送达时间</Text>
-      </View>
-      <DatePickerView value={datePickerValue} minDate={new Date()}
-                      minuteStep={10}
-                      mode='datetime'
-                      onChange={(value) => this.setState({datePickerValue: value})}>
-      </DatePickerView>
-      <TouchableOpacity onPress={() => {
-        this.onConfirm()
-      }} style={styles.modalCancel1}>
-        <View>
-          <Text style={styles.modalCancelText1}>确 认</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
   }
 
   onConfirm = () => {
@@ -223,7 +192,6 @@ class OrderSettingScene extends Component {
       mobile_suffix, weight, orderAmount, expect_time, store_id,
       is_right_once, loc_lng, loc_lat, location_long, location_lat, isSaveToBook, addressId, isType
     } = this.state
-    const self = this;
 
     if (!loc_lng && !loc_lng) {
       ToastShort('请先选择定位');
@@ -252,7 +220,7 @@ class OrderSettingScene extends Component {
       "address_id": addressId
     }
     showModal('正在保存订单，请稍等');
-    HttpUtils.post.bind(self.props)(api, params).then(res => {
+    HttpUtils.post.bind(this.props)(api, params).then(res => {
       hideModal()
       showSuccess("保存成功！")
       this.setState({
@@ -331,23 +299,27 @@ class OrderSettingScene extends Component {
     })
   }
 
+  componentDidMount() {
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getCurrentStoreName()
+    })
+  }
+
+  componentWillUnmount() {
+    this.focus()
+  }
+
   render() {
     const {
-      location_long,
-      location_lat,
-      datePickerValue,
-      is_right_once,
-      orderAmount,
-      inputShow,
-      isSaveToBook
+      location_long, location_lat, datePickerValue, is_right_once, orderAmount, inputShow, isSaveToBook
     } = this.state
-    let time = datePickerValue
-    let str = dayjs(time).format('YYYY-MM-DD HH:mm')
+    let str = dayjs(datePickerValue).format('YYYY-MM-DD HH:mm')
     return (
       <SafeAreaView style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.getCurrentStoreName.bind(this)}/>
-        <ScrollView style={[styles.container]}>
-          <View style={styles.containerTitle}>
+
+        <KeyboardAwareScrollView enableOnAndroid={false}>
+          <View style={styles.containerInfo}>
             <View style={styles.containerTitleSend}>
               <View style={styles.titleLabel}>
                 <Text style={styles.titleLabelText}>寄</Text>
@@ -357,7 +329,7 @@ class OrderSettingScene extends Component {
                 editable={false}
                 underlineColorAndroid={"transparent"}
                 style={CommonStyle.inputH35}
-                clearButtonMode={true}
+                clearButtonMode={'while-editing'}
               />
             </View>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onPress={this._toSetLocation}>
@@ -492,29 +464,7 @@ class OrderSettingScene extends Component {
                 </TouchableOpacity>}
             </View>
           </View>
-
-          <DateTimePicker
-            is24Hour={true}
-            cancelTextIOS={'取消'}
-            confirmTextIOS={'确定'}
-            customHeaderIOS={() => {
-              return (<View/>)
-            }}
-            minimumDate={new Date()}
-            date={datePickerValue}
-            mode='datetime'
-            isVisible={this.state.showDateModal}
-            onConfirm={(date) => {
-              this.setState({datePickerValue: date, showDateModal: false}, () => {
-                setTimeout(() => {
-                  this.onConfirm()
-                }, 1000)
-              })
-            }}
-            onCancel={() => this.onRequestClose()}
-          />
-
-          <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+          <View style={styles.containerInfo}>
             <View style={styles.containerSetWeight}>
               <Text style={{color: colors.color333}}> 重量：</Text>
               <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -535,15 +485,20 @@ class OrderSettingScene extends Component {
             </View>
             <View style={styles.containerSetAmount}>
               <Text style={{color: colors.color333}}> 订单金额：</Text>
-              {(orderAmount > 0) && <View style={styles.containerSetAmountNotice}><Text
-                style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
+              <If condition={orderAmount > 0}>
+                <View style={styles.containerSetAmountNotice}>
+                  <Text style={{fontSize: pxToDp(16), color: colors.white}}>
+                    保价时需填写
+                  </Text>
+                </View>
+              </If>
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <TextInput placeholder="0"
                            underlineColorAndroid="transparent"
                            style={styles.containerSetWeightInput}
                            placeholderTextColor={'#ddd'}
                            keyboardType={'numeric'}
-                           value={this.state.orderAmount}
+                           value={`${this.state.orderAmount}`}
                            onChangeText={value => {
                              const newText = value.replace(/[^\d]+/, '');
                              this.setState({orderAmount: newText});
@@ -554,14 +509,12 @@ class OrderSettingScene extends Component {
               </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.dateModal} onPress={() => {
-            this.setState({showDateModal: true})
-          }}>
+          <TouchableOpacity style={styles.dateModal} onPress={() => this.setState({showDateModal: true})}>
             <Text style={{color: colors.color333}}> 期望送达：</Text>
             <TextInput placeholder="默认立即送达"
                        underlineColorAndroid="transparent"
                        style={{height: 40}}
-                       placeholderTextColor={Math.round(time / 1000) > Math.round(new Date() / 1000) ? 'white' : '#bbb'}
+                       placeholderTextColor={Math.round(datePickerValue / 1000) > Math.round(new Date() / 1000) ? 'white' : '#bbb'}
                        textAlign='center'
                        editable={false}
             />
@@ -574,8 +527,7 @@ class OrderSettingScene extends Component {
                         style={styles.dateModalIcon}/> : null}
             </View>
           </TouchableOpacity>
-          <View
-            style={styles.setOrderRemark}>
+          <View style={styles.containerInfo}>
             <View style={styles.orderRemark}>
               <Text style={{color: colors.color333, height: 20, fontWeight: "bold"}}>订单备注</Text>
             </View>
@@ -591,7 +543,7 @@ class OrderSettingScene extends Component {
               underlineColorAndroid={"transparent"}
             />
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <View style={styles.saveBtn}>
           <TouchableOpacity onPress={() => {
             this.mixpanel.track('新建订单_保存')
@@ -609,14 +561,31 @@ class OrderSettingScene extends Component {
             </View>
           </TouchableOpacity>
         </View>
+        <DateTimePicker
+          is24Hour={true}
+          cancelTextIOS={'取消'}
+          confirmTextIOS={'确定'}
+          customHeaderIOS={() => <View/>}
+          minimumDate={new Date()}
+          date={datePickerValue}
+          mode='datetime'
+          isVisible={this.state.showDateModal}
+          onConfirm={(date) => {
+            this.setState({datePickerValue: date, showDateModal: false}, () => {
+              setTimeout(() => {
+                this.onConfirm()
+              }, 1000)
+            })
+          }}
+          onCancel={() => this.onRequestClose()}
+        />
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {backgroundColor: "#f2f2f2"},
-  containerTitle: {backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10},
+  container: {flex: 1},
   containerTitleSend: {
     flexDirection: "row",
     alignItems: "center",
@@ -739,7 +708,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10
   },
-  setOrderRemark: {backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, paddingBottom: 10},
   saveBtn: {
     flexDirection: "row",
     justifyContent: "space-around",

@@ -30,7 +30,7 @@ class GoodsAdjust extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.props.navigation.setParams({
       tab: 'remind',
       batch: 0,
@@ -48,9 +48,7 @@ class GoodsAdjust extends PureComponent {
       rightStyle.push(styles.tabActive)
     }
     return (
-      <View style={[styles.in_cell, {
-        backgroundColor: colors.white,
-      }]}>
+      <View style={[styles.in_cell, {backgroundColor: colors.white}]}>
         <View style={styles.tabs}>
           <Text style={leftStyle} onPress={() => this.changeTab('remind')}>运营提醒 </Text>
           <Text style={rightStyle} onPress={() => this.changeTab('quotation')}>商圈行情 </Text>
@@ -61,10 +59,10 @@ class GoodsAdjust extends PureComponent {
 
   render() {
     return (
-      <View>
+      <>
         {this.renderTab()}
         {this.state.tab === 'remind' ? <GoodsAdjustRemind/> : null}
-      </View>
+      </>
     )
   }
 

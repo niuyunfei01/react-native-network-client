@@ -279,15 +279,17 @@ class StoreGoodsSearch extends Component {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
   renderNoProduct = () => {
-    const {searchKeywords, goods} = this.state
+    const {searchKeywords, goods, isLoading} = this.state
     return (
-      <View style={styles.notGoodTip}>
-        {
-          tool.length(searchKeywords) > 0 && tool.length(goods) <= 0 ?
-            <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
-            <Text style={{color: colors.color333}}>暂时没有商品</Text>
-        }
-      </View>
+      <If condition={!isLoading}>
+        <View style={styles.notGoodTip}>
+          {
+            tool.length(searchKeywords) > 0 && tool.length(goods) <= 0 ?
+              <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
+              <Text style={{color: colors.color333}}>暂时没有商品</Text>
+          }
+        </View>
+      </If>
     )
   }
   onScrollBeginDrag = () => {

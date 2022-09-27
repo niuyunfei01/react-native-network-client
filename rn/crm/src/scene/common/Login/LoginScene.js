@@ -254,91 +254,83 @@ class LoginScene extends PureComponent {
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
         <ScrollView style={{zIndex: 999, flex: 1}}>
           <View style={{alignItems: "center"}}>
-            <Image
-              style={{
+            <Image style={{
                 height: pxToDp(134),
                 width: pxToDp(134),
                 borderRadius: pxToDp(20),
                 marginVertical: pxToDp(50),
                 marginHorizontal: 'auto'
               }}
-              source={require('../../../img/Login/ic_launcher.png')}/>
+                   source={require('../../../img/Login/ic_launcher.png')}/>
           </View>
-          <View>
+          <TextInput
+            underlineColorAndroid='transparent'
+            placeholder="请输入手机号"
+            onChangeText={(mobile) => {
+              this.setState({mobile})
+            }}
+            value={this.state.mobile}
+            placeholderTextColor={'#cad0d9'}
+            style={{
+              borderWidth: pxToDp(1),
+              borderColor: colors.main_color,
+              borderRadius: pxToDp(52),
+              marginHorizontal: pxToDp(50),
+              paddingLeft: pxToDp(45),
+              height: pxToDp(90)
+            }}
+          />
+          <View style={{flexDirection: 'row'}}>
             <TextInput
-              underlineColorAndroid='transparent'
-              placeholder="请输入手机号"
-              onChangeText={(mobile) => {
-                this.setState({mobile})
-              }}
-              value={this.state.mobile}
+              onChangeText={(verifyCode) => this.setState({verifyCode})}
+              value={this.state.verifyCode}
               placeholderTextColor={'#cad0d9'}
+              underlineColorAndroid='transparent'
+              placeholder="请输入验证码"
               style={{
                 borderWidth: pxToDp(1),
                 borderColor: colors.main_color,
                 borderRadius: pxToDp(52),
                 marginHorizontal: pxToDp(50),
-                paddingLeft: pxToDp(45),
-                height: pxToDp(90)
+                paddingLeft: pxToDp(40),
+                width: pxToDp(370),
+                marginTop: pxToDp(45),
+                height: pxToDp(90),
+                marginRight: pxToDp(20),
               }}
             />
-          </View>
-          <View style={{flex: 1}}>
-            <View style={{flexDirection: 'row'}}>
-              <TextInput
-                onChangeText={(verifyCode) => this.setState({verifyCode})}
-                value={this.state.verifyCode}
-                placeholderTextColor={'#cad0d9'}
-                underlineColorAndroid='transparent'
-                placeholder="请输入验证码"
-                style={{
-                  borderWidth: pxToDp(1),
-                  borderColor: colors.main_color,
-                  borderRadius: pxToDp(52),
-                  marginHorizontal: pxToDp(50),
-                  paddingLeft: pxToDp(40),
-                  width: pxToDp(370),
-                  marginTop: pxToDp(45),
-                  height: pxToDp(90),
-                  marginRight: pxToDp(20),
-                }}
-              />
-              {this.state.canAskReqSmsCode ?
-                <TouchableOpacity style={{
-                  alignSelf: 'center',
-                  height: pxToDp(90),
-                  width: pxToDp(230),
-                  borderWidth: pxToDp(1),
-                  borderRadius: pxToDp(45),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: pxToDp(40),
-                  borderColor: colors.fontBlack
-                }}>
-                  <Text style={{
-                    fontSize: pxToDp(colors.actionSecondSize),
-                    color: colors.fontBlack
-                  }}>{this.state.reRequestAfterSeconds}秒重新获取 </Text>
-                </TouchableOpacity>
-                : <TouchableOpacity style={{
-                  alignSelf: 'center',
-                  height: pxToDp(90),
-                  width: pxToDp(230),
-                  borderWidth: pxToDp(1),
-                  borderRadius: pxToDp(45),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: pxToDp(40),
-                  borderColor: colors.main_color
-                }} onPress={this.onRequestSmsCode}>
-                  <Text
-                    style={{
-                      fontSize: pxToDp(colors.actionSecondSize),
-                      color: colors.main_vice_color
-                    }}>获取验证码 </Text>
-                </TouchableOpacity>
-              }
-            </View>
+            {this.state.canAskReqSmsCode ?
+              <TouchableOpacity style={{
+                alignSelf: 'center',
+                height: pxToDp(90),
+                width: pxToDp(230),
+                borderWidth: pxToDp(1),
+                borderRadius: pxToDp(45),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: pxToDp(40),
+                borderColor: colors.fontBlack
+              }}>
+                <Text style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.fontBlack}}>
+                  {this.state.reRequestAfterSeconds}秒重新获取
+                </Text>
+              </TouchableOpacity>
+              : <TouchableOpacity style={{
+                alignSelf: 'center',
+                height: pxToDp(90),
+                width: pxToDp(230),
+                borderWidth: pxToDp(1),
+                borderRadius: pxToDp(45),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: pxToDp(40),
+                borderColor: colors.main_color
+              }} onPress={this.onRequestSmsCode}>
+                <Text style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.main_vice_color}}>
+                  获取验证码
+                </Text>
+              </TouchableOpacity>
+            }
           </View>
 
           <View style={{marginLeft: 15, marginRight: 15}}>
@@ -355,13 +347,9 @@ class LoginScene extends PureComponent {
             }}
                               activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
                               onPress={this.onLogin}>
-              <Text
-                style={{
-                  color: 'white',
-                  textAlign: 'center',
-                  lineHeight: pxToDp(96),
-                  fontSize: pxToDp(30)
-                }}>登录</Text>
+              <Text style={{color: 'white', textAlign: 'center', lineHeight: pxToDp(96), fontSize: pxToDp(30)}}>
+                登录
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={{
               height: pxToDp(90),
@@ -381,12 +369,9 @@ class LoginScene extends PureComponent {
                                 this.mixpanel.track("openApp_signupstore_click", {});
                                 this.props.navigation.navigate('Register')
                               }}>
-              <Text style={{
-                color: colors.main_color,
-                textAlign: 'center',
-                lineHeight: pxToDp(96),
-                fontSize: pxToDp(30)
-              }}>注册</Text>
+              <Text style={{color: colors.main_color, textAlign: 'center', lineHeight: pxToDp(96), fontSize: pxToDp(30)}}>
+                注册
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -454,15 +439,18 @@ class LoginScene extends PureComponent {
                      onClose={this.closeModal} btnStyle={{backgroundColor: colors.main_color}}>
 
           <View style={{marginVertical: 10, marginHorizontal: 6}}>
-            <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
-              style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: colors.color333,
-                marginVertical: 6
-              }}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
-            <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>
+              1.请先阅读并同意
+              <Text style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}>
+              隐私政策
+              </Text>
+            </Text>
+            <Text style={{fontSize: 14, color: colors.color333, marginVertical: 6}}>
+              2.授权app收集外送帮用户信息以提供发单及修改商品等服务
+            </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>
+              3.请手动勾选隐私协议
+            </Text>
           </View>
         </BottomModal>
       </View>

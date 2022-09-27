@@ -1,6 +1,7 @@
 import React, {PureComponent} from "react";
-import {Modal, StyleSheet, View} from "react-native";
+import {Modal, StyleSheet} from "react-native";
 import PropTypes from 'prop-types'
+import {SafeAreaView} from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
   page: {
@@ -32,9 +33,9 @@ export default class CommonModal extends PureComponent {
              animationType={'slide'}
              onShow={onShow && onShow}
              onRequestClose={onRequestClose}>
-        <View style={[styles.page, positionStyle]}>
+        <SafeAreaView style={[styles.page, positionStyle]}>
           {children}
-        </View>
+        </SafeAreaView>
       </Modal>
     )
   }

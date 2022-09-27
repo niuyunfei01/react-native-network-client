@@ -14,6 +14,7 @@ import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {imageKey} from "../../../pubilc/util/md5";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
 
@@ -445,11 +446,11 @@ class RegisterShunfeng extends PureComponent {
     const {store, subject, success} = this.state
     return (
       <SafeAreaView style={styles.content}>
-        <ScrollView>
+        <KeyboardAwareScrollView>
           {
             success ? this.renderSuccess() : this.notSubmit(store, subject)
           }
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     );
   }

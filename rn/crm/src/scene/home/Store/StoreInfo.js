@@ -22,6 +22,7 @@ import {TextArea} from "../../../weui";
 import WorkerPopup from "../../common/component/WorkerPopup";
 import Cts from "../../../pubilc/common/Cts";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -113,10 +114,11 @@ class StoreInfo extends Component {
       type: 0
     };
 
-    this.fetchcategories();
+
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
+    this.fetchcategories();
     let {editStoreId} = this.props.route.params;
     if (editStoreId) {
       this.fetchDeliveryErrorNum();
@@ -128,7 +130,6 @@ class StoreInfo extends Component {
       this.setStateByStoreInfo({}, this.state.currVendorId, this.props.global.accessToken)
     }
   }
-
 
   setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
     let {
@@ -407,7 +408,7 @@ class StoreInfo extends Component {
           let user_info = user_list[vice_mgr_id] || {};
           let mgr_name = user_info["name"] || user_info["nickname"] || vice_mgr_id;
           //let mgr_tel = user_info['mobilephone'];
-          if (!!mgr_name) {
+          if (mgr_name) {
             if (vice_mgr_name !== "") {
               vice_mgr_name += ",";
             }
@@ -416,8 +417,7 @@ class StoreInfo extends Component {
         }
       }
     }
-    let viceMgrNames = vice_mgr_name || "点击选择店助";
-    return viceMgrNames
+    return vice_mgr_name || "点击选择店助"
   }
 
   showWorkerPopup(is_vice) {
@@ -503,7 +503,6 @@ class StoreInfo extends Component {
       isUploadingImage: true
     });
     let barrier = simpleBarrier();
-    let self = this;
     this.upload(qualification.bossImageInfo, "StoreBoss", barrier);
     this.upload(qualification.storeImageInfo, "StoreImage", barrier);
     qualification.imageList.map(element => {
@@ -511,12 +510,12 @@ class StoreInfo extends Component {
     });
     let doneUpload = () => {
       let rmIds = qualification.rmIds;
-      let existImgIds = self.state.existImgIds;
+      let existImgIds = this.state.existImgIds;
       let ids = _.difference(existImgIds, rmIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
-      let fileIds = self.fileId;
+      let fileIds = this.fileId;
       fileIds = fileIds.concat(ids);
-      self.fileId = fileIds;
-      self.setState({
+      this.fileId = fileIds;
+      this.setState({
         isUploadingImage: false,
         fileId: fileIds,
         qualification: qualification,
@@ -796,14 +795,14 @@ class StoreInfo extends Component {
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
-        <ScrollView style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+        <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
           {this.renderErrmsg()}
           {this.renderStoreInfo()}
           {this.renderWorker()}
           {this.renderPayInfo()}
           {this.renderBack()}
           {this.renderOther()}
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <WorkerPopup
           multiple={this.state.workerPopupMulti}
           visible={this.state.workerPopupVisible}
@@ -849,19 +848,9 @@ class StoreInfo extends Component {
         borderBottomWidth: pxToDp(1)
       }}>
         <TouchableOpacity style={{width: 40}} onPress={() => this.props.navigation.goBack()}>
-          <Entypo name='chevron-thin-left' style={{
-            fontWeight: "bold",
-            fontSize: 20,
-            marginLeft: 5
-          }}/>
+          <Entypo name='chevron-thin-left' style={{fontWeight: "bold", fontSize: 20, marginLeft: 5}}/>
         </TouchableOpacity>
-        <Text style={{
-          flex: 1,
-          color: "#4a4a4a",
-          fontSize: 16,
-          fontWeight: "bold",
-          textAlign: "center"
-        }}>{title} </Text>
+        <Text style={{flex: 1, color: "#4a4a4a", fontSize: 16, fontWeight: "bold", textAlign: "center"}}>{title} </Text>
 
         <ModalSelector
           onChange={option => {
@@ -874,9 +863,7 @@ class StoreInfo extends Component {
           data={ActionSheet}
           skin="customer"
         >
-          <Entypo name="dots-three-horizontal" style={{
-            fontSize: 18, marginRight: 10
-          }}/>
+          <Entypo name="dots-three-horizontal" style={{fontSize: 18, marginRight: 10}}/>
         </ModalSelector>
       </View>
     )
@@ -885,63 +872,29 @@ class StoreInfo extends Component {
   renderErrmsg() {
     return (
       <If condition={this.state.err_num > 0}>
-        <View style={{
-          flexDirection: 'row',
-          marginTop: 5,
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <Text style={{
-            fontSize: pxToDp(25),
-            color: '#E88A8A',
-            textDecorationLine: 'underline',
-          }}>检测到{this.state.err_num}家配送平台所留信息不一致 </Text>
-          <Button onPress={() => {
-            this.onPress(Config.ROUTE_DELIVERY_LIST);
-          }}
+        <View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center', justifyContent: 'center'}}>
+          <Text style={{fontSize: pxToDp(25), color: '#E88A8A', textDecorationLine: 'underline'}}>
+            检测到{this.state.err_num}家配送平台所留信息不一致
+          </Text>
+          <Button onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
                   title={'去修改'}
-                  titleStyle={{
-                    fontSize: 12,
-                    color: colors.white
-                  }}
-                  buttonStyle={{
-                    height: 30,
-                    marginLeft: pxToDp(40),
-                    backgroundColor: "#EE2626",
-                  }}>去修改</Button>
+                  titleStyle={{fontSize: 12, color: colors.white}}
+                  buttonStyle={{height: 30, marginLeft: pxToDp(40), backgroundColor: "#EE2626"}}>
+            去修改
+          </Button>
         </View>
       </If>
     )
   }
 
   renderStoreInfo() {
-    let {
-      name,
-      location_long,
-      location_lat,
-      tel,
-      dada_address,
-      shelfNos,
-    } = this.state;
+    let {name, location_long, location_lat, tel, dada_address, shelfNos} = this.state;
     return (
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginVertical: 10,
-        padding: 10,
-      }}>
-        <View style={{
-          borderBottomWidth: 1,
-          paddingBottom: 2,
-          borderColor: colors.colorCCC
-        }}>
-          <Text style={{
-            color: colors.color333,
-            padding: 10,
-            paddingLeft: 8,
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>门店信息 </Text>
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginVertical: 10, padding: 10,}}>
+        <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
+          <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold'}}>
+            门店信息
+          </Text>
         </View>
 
         <View style={{
@@ -951,20 +904,12 @@ class StoreInfo extends Component {
           alignItems: 'center',
           paddingHorizontal: 8,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店铺名称</Text>
+          <Text style={{fontSize: 14}}>店铺名称</Text>
           <TextInput
             onChangeText={name => this.setState({name})}
             value={name}
             placeholder="64个字符以内"
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
           />
         </View>
@@ -977,22 +922,14 @@ class StoreInfo extends Component {
           alignItems: 'center',
           paddingHorizontal: 8,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>门店电话 </Text>
+          <Text style={{fontSize: 14}}>门店电话 </Text>
           <TextInput
             onChangeText={tel => this.setState({tel})}
             value={tel}
             placeholder="请输入店铺电话"
             maxLength={18} // 可输入的最大长度
             keyboardType="numeric" //默认弹出的键盘
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
           />
         </View>
@@ -1005,10 +942,7 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>定位地址 </Text>
+          <Text style={{fontSize: 14}}>定位地址 </Text>
 
           <Text onPress={() => {
             let center = "";
@@ -1023,21 +957,13 @@ class StoreInfo extends Component {
               },
             };
             this.onPress(Config.ROUTE_SEARC_HSHOP, params);
-          }} style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}>
+          }} style={{fontSize: 14, color: colors.color333, flex: 1, textAlign: "right"}}>
             {location_long !== "" && location_lat !== "" && location_lat !== undefined
               ? `${location_long}、${location_lat}`
               : "点击选择地址"}
           </Text>
 
-          <Entypo name="location-pin" style={{
-            color: colors.main_color,
-            fontSize: 20,
-          }}/>
+          <Entypo name="location-pin" style={{color: colors.main_color, fontSize: 20,}}/>
 
         </View>
         <View style={{
@@ -1047,20 +973,12 @@ class StoreInfo extends Component {
           alignItems: 'center',
           paddingHorizontal: 8,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>门店地址 </Text>
+          <Text style={{fontSize: 14,}}>门店地址 </Text>
           <TextInput
             onChangeText={dada_address => this.setState({dada_address})}
             value={dada_address}
             placeholder="请输入门店地址"
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
           />
         </View>
@@ -1074,10 +992,7 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店铺类型 </Text>
+          <Text style={{fontSize: 14}}>店铺类型 </Text>
 
           <ModalSelector
             style={{flex: 1}}
@@ -1098,16 +1013,11 @@ class StoreInfo extends Component {
             skin="customer"
             defaultKey={-999}
           >
-            <Text style={{
-              fontSize: 14,
-              color: colors.color333,
-              textAlign: 'right'
-            }}>{this.state.sale_category_name || '点击选择店铺类型'} </Text>
+            <Text style={{fontSize: 14, color: colors.color333, textAlign: 'right'}}>
+              {this.state.sale_category_name || '点击选择店铺类型'}
+            </Text>
           </ModalSelector>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18}}/>
         </View>
 
         <TouchableOpacity onPress={() => {
@@ -1123,69 +1033,35 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>营业时间 </Text>
-
-
+          <Text style={{fontSize: 14}}>营业时间 </Text>
           <View style={{flex: 1}}></View>
           <View>
             <If condition={this.state.open_time_conf}>
               <For of={this.state.open_time_conf} index="idx" each="item">
-                <Text style={{
-                  fontSize: 14,
-                  color: colors.color333,
-                }}>
-                  {item.start_time} —— {item.end_time}
-                </Text>
+                <Text style={{fontSize: 14}} key={idx}>{item.start_time} —— {item.end_time}</Text>
               </For>
             </If>
 
             <If condition={!this.state.open_time_conf}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-              }}>
-                设置营业时间
-              </Text>
+              <Text style={{fontSize: 14}}>设置营业时间</Text>
             </If>
           </View>
 
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18}}/>
         </TouchableOpacity>
       </View>
     )
   }
 
   renderWorker() {
-    let {
-      mobile,
-      owner_id,
-    } = this.state;
+    let {mobile, owner_id,} = this.state;
     return (
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginBottom: 10,
-        padding: 10,
-      }}>
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10,}}>
 
-        <View style={{
-          borderBottomWidth: 1,
-          paddingBottom: 2,
-          borderColor: colors.colorCCC
-        }}>
-          <Text style={{
-            color: colors.color333,
-            padding: 10,
-            paddingLeft: 8,
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>店长信息 </Text>
+        <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
+          <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold'}}>
+            店长信息
+          </Text>
         </View>
         <TouchableOpacity onPress={() => this.showWorkerPopup(false)}
                           style={{
@@ -1196,16 +1072,8 @@ class StoreInfo extends Component {
                             paddingHorizontal: 8,
                             height: pxToDp(90),
                           }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店长 </Text>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}>
+          <Text style={{fontSize: 14}}>店长 </Text>
+          <Text style={{fontSize: 14, flex: 1, textAlign: "right"}}>
             {owner_id > 0 ? this.getStoreMgrName() : "点击选择店长"}
           </Text>
         </TouchableOpacity>
@@ -1218,20 +1086,12 @@ class StoreInfo extends Component {
             paddingHorizontal: 8,
             height: pxToDp(90),
           }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店长手机号 </Text>
+          <Text style={{fontSize: 14}}>店长手机号 </Text>
           <TextInput
             onChangeText={mobile => this.setState({mobile})}
             value={mobile}
             maxLength={11} // 可输入的最大长度
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             placeholder="店长手机号"
             keyboardType="numeric" //默认弹出的键盘
             underlineColorAndroid="transparent" //取消安卓下划线
@@ -1247,22 +1107,11 @@ class StoreInfo extends Component {
                             paddingHorizontal: 8,
                             height: pxToDp(90),
                           }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店助 </Text>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}>
+          <Text style={{fontSize: 14}}>店助 </Text>
+          <Text style={{fontSize: 14, flex: 1, textAlign: "right"}}>
             {this.getViceMgrName()}
           </Text>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18,}}/>
         </TouchableOpacity>
       </View>
     )
@@ -1272,25 +1121,10 @@ class StoreInfo extends Component {
     let {receiveSecretKey} = this.state
     return (
 
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginBottom: 10,
-        padding: 10,
-      }}>
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10}}>
 
-        <View style={{
-          borderBottomWidth: 1,
-          paddingBottom: 2,
-          borderColor: colors.colorCCC
-        }}>
-          <Text style={{
-            color: colors.color333,
-            padding: 10,
-            paddingLeft: 8,
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>结算收款信息 </Text>
+        <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
+          <Text style={{padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold'}}>结算收款信息 </Text>
         </View>
         <View style={{
           borderBottomWidth: 1,
@@ -1299,10 +1133,7 @@ class StoreInfo extends Component {
           alignItems: 'center',
           paddingHorizontal: 8,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>店长实名 </Text>
+          <Text style={{fontSize: 14}}>店长实名 </Text>
           <TextInput
             onChangeText={owner_name => {
               if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
@@ -1313,27 +1144,12 @@ class StoreInfo extends Component {
 
             }}
             value={this.state.owner_name}
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
           />
         </View>
-        <View style={{
-          borderBottomWidth: 1,
-          borderColor: colors.colorCCC,
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 8,
-        }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            width: 80,
-          }}>收款密钥 </Text>
+        <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', alignItems: 'center', padding: 8}}>
+          <Text style={{fontSize: 14, width: 80}}>收款密钥 </Text>
           {receiveSecretKey ?
             <View style={{flexDirection: "row"}}>
               <Text style={{color: colors.color333, width: 140}}>{receiveSecretKey} </Text>
@@ -1381,17 +1197,11 @@ class StoreInfo extends Component {
           height: pxToDp(90),
           backgroundColor: colors.white,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>订单信息 </Text>
+          <Text style={{fontSize: 14}}>订单信息 </Text>
           <Text style={{fontSize: 14, color: colors.color999, flex: 1}}>
             （选填，可不填）
           </Text>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18}}/>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => {
@@ -1417,17 +1227,11 @@ class StoreInfo extends Component {
           height: pxToDp(90),
           backgroundColor: colors.white,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>银行卡信息 </Text>
+          <Text style={{fontSize: 14}}>银行卡信息 </Text>
           <Text style={{fontSize: 14, color: colors.color999, flex: 1}}>
             （选填，可不填）
           </Text>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18,}}/>
         </TouchableOpacity>
       </View>
     )
@@ -1435,44 +1239,21 @@ class StoreInfo extends Component {
 
   renderOther() {
 
-    let {
-      owner_nation_id,
-    } = this.state;
+    let {owner_nation_id,} = this.state;
 
     return (
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginBottom: 100,
-        padding: 10,
-      }}>
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 100, padding: 10}}>
 
-        <View style={{
-          borderBottomWidth: 1,
-          paddingBottom: 2,
-          borderColor: colors.colorCCC
-        }}>
-          <Text style={{
-            color: colors.color333,
-            padding: 10,
-            paddingLeft: 8,
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>其他信息 </Text>
+        <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
+          <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold'}}>
+            其他信息
+          </Text>
         </View>
 
-        <View style={{
-          borderBottomWidth: 1,
-          borderColor: colors.colorCCC,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 8,
-          height: pxToDp(90),
-        }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>门店类型 </Text>
+        <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: pxToDp(90),}}>
+          <Text style={{fontSize: 14}}>
+            门店类型
+          </Text>
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
@@ -1494,10 +1275,7 @@ class StoreInfo extends Component {
               {this.state.fn_price_controlledname || '点击选择门店类型'}
             </Text>
           </ModalSelector>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18}}/>
         </View>
         <TouchableOpacity onPress={() =>
           this.props.navigation.navigate(
@@ -1521,20 +1299,11 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>商家资质 </Text>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}> {this.state.qualification.name || '点击上传'} </Text>
-          <Entypo name="chevron-thin-right" style={{
-            color: colors.color666,
-            fontSize: 18,
-          }}/>
+          <Text style={{fontSize: 14}}>商家资质 </Text>
+          <Text style={{fontSize: 14, flex: 1, textAlign: "right"}}>
+            {this.state.qualification.name || '点击上传'}
+          </Text>
+          <Entypo name="chevron-thin-right" style={{color: colors.color666, fontSize: 18}}/>
         </TouchableOpacity>
         <View style={{
           borderBottomWidth: 1,
@@ -1543,24 +1312,14 @@ class StoreInfo extends Component {
           alignItems: 'center',
           paddingHorizontal: 8,
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>身份证号 </Text>
+          <Text style={{fontSize: 14}}>身份证号 </Text>
           <TextInput
-            onChangeText={owner_nation_id =>
-              this.setState({owner_nation_id})
-            }
+            onChangeText={owner_nation_id =>this.setState({owner_nation_id})}
             value={owner_nation_id}
             maxLength={18} // 可输入的最大长度
             placeholder="请输入本人身份证号"
             keyboardType="numeric" //默认弹出的键盘
-            style={{
-              textAlign: 'right',
-              fontSize: 14,
-              flex: 1,
-              height: pxToDp(90),
-            }}
+            style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
           />
         </View>
@@ -1574,10 +1333,7 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>选择模版店 </Text>
+          <Text style={{fontSize: 14}}>选择模版店 </Text>
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
@@ -1610,10 +1366,7 @@ class StoreInfo extends Component {
           paddingHorizontal: 8,
           height: pxToDp(90),
         }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-          }}>选择BD </Text>
+          <Text style={{fontSize: 14}}>选择BD </Text>
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
@@ -1637,17 +1390,8 @@ class StoreInfo extends Component {
             </Text>
           </ModalSelector>
         </View>
-        <View style={{
-          borderBottomWidth: 1,
-          borderColor: colors.colorCCC,
-          flexDirection: 'row',
-          padding: 8,
-        }}>
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            marginTop: 5
-          }}>备注: </Text>
+        <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', padding: 8}}>
+          <Text style={{fontSize: 14, marginTop: 5}}>备注: </Text>
           <TextArea
             value={this.state.remark}
             onChange={(remark) => {
@@ -1678,18 +1422,9 @@ class StoreInfo extends Component {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
-                onPress={() => {
-
-                  this.onStoreAdd();
-                }}
-                buttonStyle={{
-                  borderRadius: pxToDp(10),
-                  backgroundColor: colors.main_color,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
+                onPress={() => this.onStoreAdd()}
+                buttonStyle={{borderRadius: pxToDp(10), backgroundColor: colors.main_color}}
+                titleStyle={{color: colors.white, fontSize: 16}}
         />
       </View>
     )
@@ -1702,26 +1437,17 @@ class StoreInfo extends Component {
         cancelTextIOS={'取消'}
         confirmTextIOS={'确定'}
         customHeaderIOS={() => {
-          return (<View>
-            <Text style={{
-              fontSize: pxToDp(20),
-              textAlign: 'center',
-              lineHeight: pxToDp(40),
-              paddingTop: pxToDp(20)
-            }}>选择营业时间</Text>
-          </View>)
+          return (
+            <Text style={{fontSize: pxToDp(20), textAlign: 'center', lineHeight: pxToDp(40), paddingTop: pxToDp(20)}}>
+              选择营业时间
+            </Text>
+          )
         }}
         date={new Date()}
         mode='time'
         isVisible={this.state.isShowTimepicker}
-        onConfirm={(value) => {
-          this._handleDatePicked(value)
-        }}
-        onCancel={() => {
-          this.setState({
-            isShowTimepicker: false,
-          });
-        }}
+        onConfirm={(value) => this._handleDatePicked(value)}
+        onCancel={() => this.setState({isShowTimepicker: false})}
       />
     </View>
   }
@@ -1831,9 +1557,7 @@ class StoreInfo extends Component {
               })}
 
 
-              {this.state.isStartVisible && (
-                this.showDatePicker()
-              )}
+              {this.state.isStartVisible && this.showDatePicker()}
 
               {tool.length(this.state.open_time_conf) < 3 ?
                 <View style={{
@@ -1901,8 +1625,7 @@ class StoreInfo extends Component {
                     ToastLong('操作失败：' + e.desc)
                   })
                 }}
-              ><Text
-                style={{
+              ><Text style={{
                   height: 40,
                   backgroundColor: colors.main_color,
                   color: 'white',
