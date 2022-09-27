@@ -339,3 +339,6 @@
 -keep class com.amap.api.maps.*{*;}
 -keep class com.autonavi.*{*;}
 -keep class com.amap.api.trace.**{*;}
+
+-dontwarn com.xiaomi.push.**
+-keep class com.xiaomi.push.** { *; }

@@ -43,6 +43,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.google.android.material:material:1.0.0"
     implementation 'com.fanjun:keeplive:1.1.22'
+    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.8.1'
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
@@ -178,6 +179,8 @@ android {
                 JPUSH_PKGNAME: applicationId,
                 JPUSH_APPKEY : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
+                XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
+                XIAOMI_APPID : "MI-2882303761517675358", // 小米平台注册的appid
         ]
 
         missingDimensionStrategy 'react-native-camera', 'general'
