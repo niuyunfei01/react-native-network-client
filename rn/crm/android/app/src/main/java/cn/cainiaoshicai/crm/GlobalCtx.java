@@ -53,6 +53,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.newrelic.agent.android.NewRelic;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
@@ -78,6 +79,7 @@ import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
 import org.xutils.common.util.MD5;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import java.io.File;
 import java.io.IOException;
@@ -314,6 +316,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNCWebViewPackage(),
                     new PagerViewPackage(),
                     new RNScreensPackage(),
+                    new RNDateTimePickerPackage(),
                     new SafeAreaContextPackage(),
                     new ReanimatedPackage(),
                     new SvgPackage(),
@@ -337,7 +340,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RestartPackage(),
                     new RNViewShotPackage(),
                     new FastImageViewPackage(),
-                    new ReactSliderPackage()
+                    new ReactSliderPackage(),
+                    new RNCMaskedViewPackage()
             );
         }
     };
