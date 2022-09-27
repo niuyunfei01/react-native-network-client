@@ -53,13 +53,10 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.newrelic.agent.android.NewRelic;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
-import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
@@ -80,7 +77,6 @@ import com.zmxv.RNSound.RNSoundPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
-import org.reactnative.maskedview.RNCMaskedViewPackage;
 import org.xutils.common.util.MD5;
 
 import java.io.File;
@@ -315,14 +311,12 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new AsyncStoragePackage(),
                     new GeolocationPackage(),
                     new RNGestureHandlerPackage(),
-                    new RNDateTimePickerPackage(),
                     new RNCWebViewPackage(),
                     new PagerViewPackage(),
                     new RNScreensPackage(),
                     new SafeAreaContextPackage(),
                     new ReanimatedPackage(),
                     new SvgPackage(),
-                    new RNCPickerPackage(),
                     new RNDeviceInfo(),
                     new PickerPackage(),
                     new WeChatPackage(),
@@ -343,9 +337,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RestartPackage(),
                     new RNViewShotPackage(),
                     new FastImageViewPackage(),
-                    new ReactSliderPackage(),
-                    new CameraRollPackage(),
-                    new RNCMaskedViewPackage()
+                    new ReactSliderPackage()
             );
         }
     };
