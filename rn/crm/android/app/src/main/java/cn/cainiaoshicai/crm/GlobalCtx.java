@@ -59,6 +59,7 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
+import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
@@ -321,6 +322,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new SafeAreaContextPackage(),
                     new ReanimatedPackage(),
                     new SvgPackage(),
+                    new RNCPickerPackage(),
                     new RNDeviceInfo(),
                     new PickerPackage(),
                     new WeChatPackage(),

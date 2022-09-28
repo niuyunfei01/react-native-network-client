@@ -123,6 +123,7 @@ dependencies {
     implementation(project(':react-native-vector-icons'))
     implementation(project(':react-native-splash-screen'))
     implementation(project(':RCTWeChat'))
+    implementation (project(':@react-native-picker'))
     implementation(project(':react-native-webview'))
     implementation(project(':react-native-pager-view'))
     implementation(project(':react-native-screens'))
@@ -197,14 +198,14 @@ android {
                 JPUSH_APPKEY  : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
                 JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
 
-                XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
                 XIAOMI_APPID  : "MI-2882303761517675358", // 小米平台注册的appid
+                XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
 
-                VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
                 VIVO_APPID    : "100163985", // VIVO平台注册的appid
+                VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
 
-                OPPO_APPKEY   : "OP-sM4zy3WQ1Es0cOwW8kcKcK0o", // OPPO平台注册的appkey
                 OPPO_APPID    : "OP-3609862", // OPPO平台注册的appid
+                OPPO_APPKEY   : "OP-sM4zy3WQ1Es0cOwW8kcKcK0o", // OPPO平台注册的appkey
                 OPPO_APPSECRET: "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6"//OPPO平台注册的appsecret
         ]
 
