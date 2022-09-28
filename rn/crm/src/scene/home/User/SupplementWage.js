@@ -8,7 +8,6 @@ import AppConfig from "../../../pubilc/common/config";
 import FetchEx from "../../../pubilc/util/fetchEx";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
-import Accordion from '@ercpereda/react-native-accordion';
 import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
@@ -229,42 +228,7 @@ class SupplementWage extends PureComponent {
     const {expect_total_supplement} = self.state.supplementDetail
     return (
       <ScrollView>
-        <Accordion
-          header={this.renderOrderHeader}
-          content={this.renderOrderContent()}
-          activeOpacity={0}
-          easing="easeOutCubic"
-          underlayColor='#eee'
-          animationDuration={500}
-          style={{marginTop: pxToDp(20)}}
-        />
-        <Accordion
-          header={this.renderPunctualHeader}
-          content={this.renderPunctualContent()}
-          activeOpacity={0}
-          easing="easeOutCubic"
-          underlayColor='#eee'
-          animationDuration={500}
-          style={{marginTop: pxToDp(20)}}
-        />
-        <Accordion
-          header={this.renderScoreHeader}
-          content={this.renderScoreContent()}
-          activeOpacity={0}
-          easing="easeOutCubic"
-          underlayColor='#eee'
-          animationDuration={500}
-          style={{marginTop: pxToDp(20)}}
-        />
-
-        <View style={[styles.orderHeader, {marginTop: pxToDp(20)}]}>
-          <View>
-            <Text style={{color: colors.color333}}>合计 </Text>
-          </View>
-          <View style={styles.headerRight}>
-            <Text style={{color: colors.color333}}>{expect_total_supplement} </Text>
-          </View>
-        </View>
+        <Text>开发中....</Text>
       </ScrollView>
     )
   }
