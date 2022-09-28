@@ -158,20 +158,15 @@ class GoodsAdjustRemind extends PureComponent {
         buttons={[{
           label: '取消',
           type: 'default',
-          onPress: () => {
-            this.setState({modifyPriceModalVisible: false})
-          }
+          onPress: () => this.setState({modifyPriceModalVisible: false})
         }, {
           label: '保存',
           type: 'primary',
-          onPress: () => {
-            this.handleModify()
-          }
+          onPress: () => this.handleModify()
         }]}
         title={'修改价格'}
         titleStyle={{textAlign: 'center'}}
-        onRequestClose={() => {
-        }}
+        onRequestClose={() => {}}
       >
         <View>
           <Text style={styles.dialogTopText}>优势品不高于线下的价格的9折，采购他人的加价不超过10%</Text>
@@ -194,14 +189,10 @@ class GoodsAdjustRemind extends PureComponent {
         <LoadMore
           loadMoreType={'scroll'}
           renderList={this.renderItems()}
-          onLoadMore={() => {
-            this.fetchData()
-          }}
-          onRefresh={() => {
-            this.fetchData({pageNum: 1})
-          }}
+          onLoadMore={() => this.fetchData()}
+          onRefresh={() => this.fetchData({pageNum: 1})}
           isLastPage={false}
-        />
+          isLoading={false}/>
         {this.renderModifyPriceModal()}
       </View>
     )

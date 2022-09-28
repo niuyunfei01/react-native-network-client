@@ -31,6 +31,7 @@ import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import {SvgXml} from "react-native-svg";
 import {radioSelected, radioUnSelected} from "../../../svg/svg";
 import {imageKey} from "../../../pubilc/util/md5";
+import KeyboardAvoidingWrapView from "../../../pubilc/component/KeyboardAvoidingWrapView";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -1544,8 +1545,8 @@ class GoodsEditScene extends PureComponent {
   render() {
     const {spec_type, allow_multi_spec} = this.state
     return (
-      <>
-        <ScrollView>
+      <KeyboardAvoidingWrapView>
+        <ScrollView style={{flex: 1}}>
           {this.renderBaseInfo()}
           <If condition={spec_type === 'spec_multi' && allow_multi_spec === 1}>
             {this.renderMultiSpecs()}
@@ -1557,7 +1558,7 @@ class GoodsEditScene extends PureComponent {
         {this.renderSuccessInfo()}
         {this.renderActionSheet()}
         {this.renderModal()}
-      </>
+      </KeyboardAvoidingWrapView>
     )
   }
 

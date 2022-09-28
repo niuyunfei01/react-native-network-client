@@ -1,5 +1,16 @@
 import React, {PureComponent} from "react";
-import {Dimensions, FlatList, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {
+  Dimensions,
+  FlatList,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import Config from "../../common/config";
 import {showError, showModal, showSuccess} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
@@ -206,9 +217,7 @@ export default class MultiSpecsModal extends PureComponent {
     length: 120, offset: 120 * index, index
   })
   onShow = () => {
-    setTimeout(() => {
-      this.priceRef && this.priceRef.focus()
-    }, 80)
+    this.priceRef && this.priceRef.focus()
   }
 
   render() {
@@ -217,10 +226,10 @@ export default class MultiSpecsModal extends PureComponent {
     return (
       <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}
              onShow={this.onShow}>
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior={Platform.select({android: 'height', ios: 'padding'})}>
           <View style={styles.visibleArea}>
             <View style={styles.btn}>
-              <TouchableOpacity style={styles.btnWrap} tyle={{padding: 8, backgroundColor: 'red'}} onPress={onClose}>
+              <TouchableOpacity style={styles.btnWrap}  onPress={onClose}>
                 <Text style={styles.cancelBtn}>
                   取消
                 </Text>
@@ -238,7 +247,7 @@ export default class MultiSpecsModal extends PureComponent {
                       keyExtractor={(item, index) => `${index}`}
             />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
@@ -246,14 +255,14 @@ export default class MultiSpecsModal extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-end',
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.25)'
   },
   visibleArea: {
     backgroundColor: colors.white,
     padding: 10,
     width: '100%',
-    maxHeight: height * 0.7
+    maxHeight: height * 0.5
   },
   btn: {
     flexDirection: 'row',

@@ -5,7 +5,6 @@ import {
   Image,
   InteractionManager,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -33,6 +32,7 @@ import Alipay from '@uiw/react-native-alipay';
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import {Button} from "react-native-elements";
 import {imageKey} from "../../../pubilc/util/md5";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -260,7 +260,7 @@ class SeparatedAccountFill extends PureComponent {
     if (this.state.paid_done === PAID_WAIT && this.state.headerType === 1) {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false}
+          <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1}} automaticallyAdjustContentInsets={false}
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={false}>
             <View style={style.item_body}>
@@ -280,10 +280,8 @@ class SeparatedAccountFill extends PureComponent {
                 </View>
                 <View style={{flex: 1}}/>
                 {this.state.pay_by === PAY_ALI_APP ?
-                  <FontAwesome5 size={20} name={'check-circle'}
-                                style={style.circle}/>
-                  : <FontAwesome5 size={20} name={'circle'}
-                                  style={style.circle}/>
+                  <FontAwesome5 size={20} name={'check-circle'} style={style.circle}/> :
+                  <FontAwesome5 size={20} name={'circle'} style={style.circle}/>
                 }
               </TouchableOpacity>
               <TouchableOpacity onPress={() => this.selectWechat()} style={style.alipay}>
@@ -341,7 +339,7 @@ class SeparatedAccountFill extends PureComponent {
               </If>
             </View>
 
-          </ScrollView>
+          </KeyboardAwareScrollView>
           <View style={{marginBottom: pxToDp(100)}}>
             <Button onPress={() => this.onPay()}
                     disabled={!this.state.pay_by}
@@ -502,24 +500,21 @@ class SeparatedAccountFill extends PureComponent {
   renderBankCard = () => {
     if (this.state.headerType === 2) {
       return (
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
+        <View style={{flex: 1}}>
+          <KeyboardAwareScrollView enableOnAndroid={false}
+                                   automaticallyAdjustContentInsets={false}
+                                   showsHorizontalScrollIndicator={false}
+                                   showsVerticalScrollIndicator={false}>
             <View style={style.bankCard}>
               <View style={style.flexRow}>
                 <Text style={[style.center]}>开户名称: </Text>
                 <Text style={[style.center]}>北京家帮帮科技有限公司 </Text>
               </View>
-              <View style={{
-                flexDirection: 'row',
-              }}>
+              <View style={{flexDirection: 'row',}}>
                 <Text style={[style.center]}>开户银行: </Text>
                 <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行 </Text>
               </View>
-              <View style={{
-                flexDirection: 'row',
-              }}>
+              <View style={{flexDirection: 'row'}}>
                 <Text style={[style.center]}>开户账户: </Text>
                 <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101 </Text>
                 <Text onPress={() => {
@@ -575,7 +570,7 @@ class SeparatedAccountFill extends PureComponent {
                             onChange={(content) => this.setState({content})}
               />
             </View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
           <View style={{marginBottom: pxToDp(20)}}>
             <Button onPress={() => this.submit()}
                     disabled={!this.state.pay_by}
@@ -592,8 +587,6 @@ class SeparatedAccountFill extends PureComponent {
           />
         </View>
       )
-    } else {
-      return null
     }
   }
 

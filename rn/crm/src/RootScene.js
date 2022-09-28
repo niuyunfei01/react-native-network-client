@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
+import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
 import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
@@ -24,9 +24,6 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     height: StatusBar.currentHeight,
-    ...Platform.select({
-      android: {backgroundColor: '#40455A'}
-    })
   }
 });
 
