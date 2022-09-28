@@ -319,7 +319,7 @@
 <!--        <service android:name="cn.jpush.android.service.DownloadService" android:enabled="true"-->
 <!--                 android:exported="false"/>-->
 
-        <service android:name=".notify.service.PushService" android:exported="true">
+        <service android:name=".notify.service.PushService" android:exported="true"  android:process=":pushcore">
             <intent-filter>
                 <action android:name="cn.jiguang.user.service.action"/>
             </intent-filter>
@@ -328,7 +328,9 @@
         <service
                 android:name="cn.jpush.android.service.PushService"
                 android:enabled="true"
-                android:exported="false">
+                android:exported="false"
+                android:process=":pushcore"
+        >
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.REGISTER"/>
                 <action android:name="cn.jpush.android.intent.REPORT"/>
@@ -380,7 +382,8 @@
         <provider
                 android:name="cn.jpush.android.service.DataProvider"
                 android:authorities="cn.cainiaoshicai.crm.DataProvider"
-                android:exported="true"
+                android:exported="false"
+                android:process=":pushcore"
                 tools:replace="android:exported"/>
 
         <!-- since 1.8.0 option 可选项。用于同一设备中不同应用的 JPush 服务相互拉起的功能。 -->
@@ -595,8 +598,8 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <meta-data android:name="com.vivo.push.api_key" android:value="${VIVO_APPKEY}" />
-        <meta-data android:name="com.vivo.push.app_id" android:value="${VIVO_APPID}" />
+        <meta-data android:name="com.vivo.push.api_key" android:value="fbd582b2fd5fc76ae1fe3d5d6fbea7c8" />
+        <meta-data android:name="com.vivo.push.app_id" android:value="100163985" />
         <!--vivo_config_end-->
         <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100148685"/>
         <meta-data android:name="com.huawei.hms.client.cpid" android:value="cpid=890086000102039619"/>
