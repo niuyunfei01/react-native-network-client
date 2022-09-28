@@ -8,9 +8,6 @@
             android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
             android:protectionLevel="signature"/>
 
-    <permission
-            android:name="cn.cainiaoshicai.crm.permission.MIPUSH_RECEIVE"
-            android:protectionLevel="signature"/>
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
@@ -19,7 +16,7 @@
     <!-- Required  一些系统要求的权限，如访问网络等-->
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"/>
-    <uses-permission android:name="cn.cainiaoshicai.crm.permission.MIPUSH_RECEIVE"/>
+    <uses-permission android:name="cn.cainiaoshicai.crm.permission.JOPERATE_MESSAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -322,7 +319,7 @@
 <!--        <service android:name="cn.jpush.android.service.DownloadService" android:enabled="true"-->
 <!--                 android:exported="false"/>-->
 
-        <service android:name=".notify.service.PushService" android:exported="true" android:process=":pushcore">
+        <service android:name=".notify.service.PushService" android:exported="true">
             <intent-filter>
                 <action android:name="cn.jiguang.user.service.action"/>
             </intent-filter>
@@ -601,6 +598,8 @@
         <meta-data android:name="com.vivo.push.api_key" android:value="${VIVO_APPKEY}" />
         <meta-data android:name="com.vivo.push.app_id" android:value="${VIVO_APPID}" />
         <!--vivo_config_end-->
+        <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100148685"/>
+        <meta-data android:name="com.huawei.hms.client.cpid" android:value="cpid=890086000102039619"/>
 
     </application>
 
