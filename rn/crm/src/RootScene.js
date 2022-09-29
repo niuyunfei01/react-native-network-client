@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     height: StatusBar.currentHeight,
+    backgroundColor: '#40455A'
   }
 });
 
