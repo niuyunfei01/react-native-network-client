@@ -277,13 +277,13 @@ android {
 //            minifyEnabled true
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
 
-//            applicationIdSuffix ""
-//            versionNameSuffix "-debug"
+            applicationIdSuffix ""
+            versionNameSuffix "-debug"
             resValue "string", "applicationId", "cn.cainiaoshicai.crm" + getApplicationIdSuffix()
             resValue "string", "cainiaoshicai_com",
                     "cn.cainiaoshicai.crm" + getApplicationIdSuffix() + ".mention://@Cainiao-CRM"
             debuggable true
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled enableProguardInReleaseBuilds
