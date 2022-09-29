@@ -62,6 +62,10 @@ dependencies {
     implementation 'commons-codec:commons-codec:1.6'
     implementation 'androidx.annotation:annotation:1.1.0'
 
+    //荣耀极光
+    implementation 'cn.jiguang.sdk.plugin:honor:4.8.1' //4.8.1 极光对应插件的版本号
+    implementation(name: 'HiPushSdk-6.0.4.200', ext: 'aar')
+    implementation(name: 'HiPushSdkCommon-6.0.4.200', ext: 'aar')
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
@@ -123,7 +127,7 @@ dependencies {
     implementation(project(':react-native-vector-icons'))
     implementation(project(':react-native-splash-screen'))
     implementation(project(':RCTWeChat'))
-    implementation (project(':@react-native-picker'))
+    implementation(project(':@react-native-picker'))
     implementation(project(':react-native-webview'))
     implementation(project(':react-native-pager-view'))
     implementation(project(':react-native-screens'))
@@ -195,18 +199,20 @@ android {
 
         manifestPlaceholders = [
                 JPUSH_PKGNAME : applicationId,
-                JPUSH_APPKEY  : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+                JPUSH_APPKEY  : "30073ab80a50534d39c84d3c",           //JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL : "developer-default",                  //暂时填写默认值即可.
 
-                XIAOMI_APPID  : "MI-2882303761517675358", // 小米平台注册的appid
-                XIAOMI_APPKEY : "MI-5561767559358",// 小米平台注册的appkey
+                XIAOMI_APPID  : "MI-2882303761517675358",             // 小米平台注册的appid
+                XIAOMI_APPKEY : "MI-5561767559358",                   // 小米平台注册的appkey
 
-                VIVO_APPID    : "100163985", // VIVO平台注册的appid
-                VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8", // VIVO平台注册的appkey
+                VIVO_APPID    : "100163985",                          // VIVO平台注册的appid
+                VIVO_APPKEY   : "fbd582b2fd5fc76ae1fe3d5d6fbea7c8",   // VIVO平台注册的appkey
 
-                OPPO_APPID    : "OP-3609862", // OPPO平台注册的appid
-                OPPO_APPKEY   : "OP-sM4zy3WQ1Es0cOwW8kcKcK0o", // OPPO平台注册的appkey
-                OPPO_APPSECRET: "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6"//OPPO平台注册的appsecret
+                OPPO_APPID    : "OP-3609862",                         // OPPO平台注册的appid
+                OPPO_APPKEY   : "OP-sM4zy3WQ1Es0cOwW8kcKcK0o",        // OPPO平台注册的appkey
+                OPPO_APPSECRET: "OP-ABE43Cbf25Bdfc754cF9b1d1d20BB2b6",//OPPO平台注册的appsecret
+
+                HONOR_APPID   : "100100204"                           // Honor平台注册的APP ID
         ]
 
         missingDimensionStrategy 'react-native-camera', 'general'
@@ -271,13 +277,13 @@ android {
 //            minifyEnabled true
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
 
-            applicationIdSuffix ""
-            versionNameSuffix "-debug"
+//            applicationIdSuffix ""
+//            versionNameSuffix "-debug"
             resValue "string", "applicationId", "cn.cainiaoshicai.crm" + getApplicationIdSuffix()
             resValue "string", "cainiaoshicai_com",
                     "cn.cainiaoshicai.crm" + getApplicationIdSuffix() + ".mention://@Cainiao-CRM"
             debuggable true
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
         release {
             minifyEnabled enableProguardInReleaseBuilds
