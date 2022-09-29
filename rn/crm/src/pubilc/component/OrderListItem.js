@@ -75,7 +75,7 @@ class OrderListItem extends React.PureComponent {
     order: PropType.object,
     onItemClick: PropTypes.func,
     setState: PropType.func,
-    comesBackBtn: PropType.number,
+    comesBackBtn: PropType.bool,
   };
   state = {
     modalTip: false,
@@ -660,9 +660,13 @@ class OrderListItem extends React.PureComponent {
   renderButton = () => {
     let {item} = this.props;
     let obj_num = 0
-    tool.objectMap(item?.btn_list, (item, idx) => {
-      obj_num += item
-    })
+    if (this.props.comesBackBtn) {
+      obj_num = 1
+    } else {
+      tool.objectMap(item?.btn_list, (item, idx) => {
+        obj_num += item
+      })
+    }
     let btn_width = 0.90 / Number(obj_num)
     return (
       <View
