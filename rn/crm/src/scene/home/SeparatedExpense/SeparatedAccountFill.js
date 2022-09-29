@@ -151,10 +151,9 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   aliPay = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken, currStoreId, vendor_id} = this.props.global;
     showModal("支付跳转中...")
-    const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id={${currVendorId}}&store_id=${currStoreId}`;
+    const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
       hideModal();
       const resule = await Alipay.alipay(res.result);
@@ -261,8 +260,8 @@ class SeparatedAccountFill extends PureComponent {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1}} automaticallyAdjustContentInsets={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
+                                   showsHorizontalScrollIndicator={false}
+                                   showsVerticalScrollIndicator={false}>
             <View style={style.item_body}>
               <View style={style.item_head}>
                 <Text style={style.item_title}> 支付方式 </Text>
