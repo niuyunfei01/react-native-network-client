@@ -753,7 +753,7 @@ class SettingScene extends PureComponent {
                       buttonStyle={{
                         width: width * 0.3,
                         borderRadius: pxToDp(10),
-                        backgroundColor: colors.gray,
+                        backgroundColor: colors.colorCCC,
                       }}
                       titleStyle={{
                         color: colors.white,
@@ -787,7 +787,7 @@ class SettingScene extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  Content: {backgroundColor: colors.main_back, paddingVertical: 12, paddingHorizontal: 10,},
+  Content: {backgroundColor: colors.f2, paddingVertical: 12, paddingHorizontal: 10,},
   item_body: {
     backgroundColor: colors.white,
     borderRadius: 8,

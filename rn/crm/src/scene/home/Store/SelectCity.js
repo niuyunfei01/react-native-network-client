@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: colors.white
   },
   cityKeyText: {
-    paddingLeft: 18, paddingVertical: 5, backgroundColor: colors.main_back
+    paddingLeft: 18, paddingVertical: 5, backgroundColor: colors.f2
   },
   quicklyPositionText: {
     textAlign: "center", fontSize: 10, lineHeight: 21

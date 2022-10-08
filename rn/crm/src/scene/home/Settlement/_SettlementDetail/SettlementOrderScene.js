@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     height: pxToDp(1),
-    backgroundColor: colors.main_back
+    backgroundColor: colors.f2
   },
   dropdownRow: {
     paddingVertical: pxToDp(20),

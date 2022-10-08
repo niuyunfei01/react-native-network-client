@@ -61,7 +61,7 @@ class MeituanPaotui extends PureComponent {
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{flex: 1, backgroundColor: colors.main_back, padding: 14,}}>
+          } style={{flex: 1, backgroundColor: colors.f2, padding: 14,}}>
           <View style={{
             backgroundColor: colors.white,
             height: 134,

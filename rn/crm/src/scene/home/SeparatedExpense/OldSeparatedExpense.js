@@ -148,7 +148,7 @@ class SeparatedExpense extends PureComponent {
               zIndex: 999,
             }}>
               <Text style={{
-                color: colors.title_color,
+                color: colors.color111,
                 flex: 1,
                 fontSize: 16,
                 fontWeight: "bold",
@@ -166,7 +166,7 @@ class SeparatedExpense extends PureComponent {
                 onChange={this.onChange}
               >
                 <Text style={{
-                  color: colors.title_color,
+                  color: colors.color111,
                   fontSize: 16,
                   fontWeight: 'bold',
                   padding: 5,

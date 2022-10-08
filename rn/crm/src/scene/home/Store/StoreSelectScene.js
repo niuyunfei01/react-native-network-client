@@ -141,7 +141,7 @@ class StoreSelect extends PureComponent {
   listEmptyComponent = () => {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
-        <Text style={{fontSize: 18, color: colors.fontColor}}>
+        <Text style={{fontSize: 18, color: colors.b2}}>
           未搜索到门店
         </Text>
       </View>
@@ -196,7 +196,7 @@ class StoreSelect extends PureComponent {
 
   renderContent = () => {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <Loadmore
           keyboardShouldPersistTaps="never"
           renderList={this.renderList()}

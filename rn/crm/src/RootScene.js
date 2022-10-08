@@ -20,7 +20,7 @@ global.currentRouteName = ''
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#40455A'
+    // backgroundColor: '#40455A'
   },
   statusBar: {
     height: StatusBar.currentHeight,
@@ -136,7 +136,7 @@ class RootScene extends PureComponent {
         <ErrorBoundary>
           <SafeAreaView style={styles.container}>
             <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'light-content'}/>
+              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
             </View>
             <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
           </SafeAreaView>

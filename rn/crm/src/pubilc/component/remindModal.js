@@ -105,7 +105,7 @@ class RemindModal extends React.Component {
             <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
             <Text style={styles.modalContentTitleText}>{this.state.advicesInfoArray.title} </Text>
             <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
-              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
+              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.b2}}/>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
@@ -198,14 +198,14 @@ const styles = StyleSheet.create({
   modalContentIcon: {flexDirection: "row", justifyContent: "flex-end", width: '10%'},
   modalContentTitleText: {
     textAlign: 'center',
-    color: colors.title_color,
+    color: colors.color111,
     fontWeight: "bold",
     flex: 1,
     fontSize: pxToDp(28)
   },
   closeIcon: {
     fontSize: 35,
-    color: colors.fontColor
+    color: colors.b2
   },
   modalBtnWrap: {
     backgroundColor: colors.main_color,

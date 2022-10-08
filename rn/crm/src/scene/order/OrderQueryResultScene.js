@@ -477,7 +477,7 @@ class OrderQueryResultScene extends PureComponent {
   renderContent() {
     const {orders, isCanLoadMore, isLoading} = this.state
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <FlatList
           data={orders}
           renderItem={this.renderItem}
@@ -505,7 +505,7 @@ class OrderQueryResultScene extends PureComponent {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
         <If condition={!this.state.isLoading}>
-          <Text style={{fontSize: 18, color: colors.fontColor}}>
+          <Text style={{fontSize: 18, color: colors.b2}}>
             未搜索到订单
           </Text>
         </If>

@@ -795,7 +795,7 @@ class StoreInfo extends Component {
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
-        <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+        <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
           {this.renderErrmsg()}
           {this.renderStoreInfo()}
           {this.renderWorker()}
@@ -1154,12 +1154,12 @@ class StoreInfo extends Component {
             <View style={{flexDirection: "row"}}>
               <Text style={{color: colors.color333, width: 140}}>{receiveSecretKey} </Text>
               <Button titleStyle={{color: colors.color333, fontSize: 14}}
-                      buttonStyle={{width: 60, marginLeft: 10, backgroundColor: colors.main_back}} title={'复制'}
+                      buttonStyle={{width: 60, marginLeft: 10, backgroundColor: colors.f2}} title={'复制'}
                       onPress={() => this.copyReceiveSecretKey(receiveSecretKey)}/>
             </View> :
             <View style={{flex: 1}}>
               <Button title={'获取收款密钥'} titleStyle={{color: colors.color333, fontSize: 14}}
-                      buttonStyle={{width: 260, backgroundColor: colors.main_back}}
+                      buttonStyle={{width: 260, backgroundColor: colors.f2}}
                       onPress={() => {
                         if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                           this.getReceiveSecretKey()
@@ -1409,7 +1409,7 @@ class StoreInfo extends Component {
               height: 100,
               width: 260,
               marginLeft: 15,
-              backgroundColor: colors.main_back
+              backgroundColor: colors.f2
             }}
           >
           </TextArea>
@@ -1463,13 +1463,13 @@ class StoreInfo extends Component {
           onPress={() => this.setState({timemodalType: false})}>
         </TouchableOpacity>
 
-        <ScrollView style={{backgroundColor: colors.default_container_bg}}
+        <ScrollView style={{backgroundColor: colors.fa}}
                     overScrollMode="always"
                     automaticallyAdjustContentInsets={false}
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}>
 
-          <View style={{backgroundColor: colors.default_container_bg}}>
+          <View style={{backgroundColor: colors.fa}}>
             <View style={{
               marginHorizontal: 10,
               borderBottomLeftRadius: pxToDp(20),

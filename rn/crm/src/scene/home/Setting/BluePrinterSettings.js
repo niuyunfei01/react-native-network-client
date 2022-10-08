@@ -337,7 +337,7 @@ class BluePrinterSettings extends PureComponent {
             </Text>
           </View>}
 
-        <View style={{backgroundColor: colors.main_back}}>
+        <View style={{backgroundColor: colors.f2}}>
           <If condition={this.state.askEnableBle}>
             <View style={{margin: 10}}>
               <Button>开启蓝牙打印</Button>

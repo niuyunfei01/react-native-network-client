@@ -1990,7 +1990,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: colors.main_back,
+    borderColor: colors.f2,
   },
   my_cells: {
     marginTop: 0,

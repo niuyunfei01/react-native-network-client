@@ -980,7 +980,7 @@ class MineScene extends Component {
               tintColor="gray"
             />
           }
-          style={{backgroundColor: colors.main_back, marginTop: 4}}
+          style={{backgroundColor: colors.f2, marginTop: 4}}
         >
 
           {this.renderStoreStatus()}
@@ -1536,7 +1536,7 @@ class MineScene extends Component {
           btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
           closeText={'下班再看'}
           closeBtnStyle={{
-            borderColor: colors.fontColor,
+            borderColor: colors.b2,
             borderRightWidth: pxToDp(1),
             borderLeftWidth: 0,
             borderTopWidth: 0,
@@ -1544,7 +1544,7 @@ class MineScene extends Component {
           }}
           btnBottomStyle={{
             borderTopWidth: pxToDp(1),
-            borderColor: colors.fontColor,
+            borderColor: colors.b2,
             paddingBottom: 0,
           }}
           onPressClose={() => {
@@ -1707,7 +1707,7 @@ const header_styles = StyleSheet.create({
 
   },
   shop_name: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: 18,
     fontWeight: "bold",
     lineHeight: 25
@@ -1774,7 +1774,7 @@ const worker_styles = StyleSheet.create({
     justifyContent: "center"
   },
   worker_name: {
-    color: colors.title_color,
+    color: colors.color111,
     lineHeight: 17,
     fontSize: 12,
     fontWeight: "bold"
@@ -1788,7 +1788,7 @@ const worker_styles = StyleSheet.create({
     justifyContent: "center"
   },
   order_num: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: pxToEm(40),
     lineHeight: pxToDp(40),
     fontWeight: "bold",
@@ -1879,7 +1879,7 @@ const block_styles = StyleSheet.create({
     height: pxToDp(188),
     backgroundColor: colors.white,
 
-    borderColor: colors.main_back,
+    borderColor: colors.f2,
     borderWidth: pxToDp(1),
     alignItems: "center"
   },

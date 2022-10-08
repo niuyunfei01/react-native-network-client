@@ -21,7 +21,7 @@ export default {
     color: colors.fontGray,
   },
   fontRed: {
-    color: colors.editStatusAdd
+    color: colors.warn_color
   },
   fontBlue: {
     color: colors.fontBlue

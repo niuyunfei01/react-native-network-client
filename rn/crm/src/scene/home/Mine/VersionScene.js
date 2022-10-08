@@ -99,7 +99,7 @@ class VersionScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}>
+        style={{backgroundColor: colors.f2}}>
         {is_newest_version ? (
           <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
             <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version})    </Text>

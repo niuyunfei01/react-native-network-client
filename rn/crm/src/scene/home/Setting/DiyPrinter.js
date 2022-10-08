@@ -135,7 +135,7 @@ class DiyPrinter extends PureComponent {
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+          } style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
 
           <View style={{
             backgroundColor: colors.white,

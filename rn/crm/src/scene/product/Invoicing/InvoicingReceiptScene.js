@@ -211,7 +211,7 @@ const styles = {
 
   },
   select_item: {
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
     width: pxToDp(300),
     height: pxToDp(70),
     borderRadius: pxToDp(6),

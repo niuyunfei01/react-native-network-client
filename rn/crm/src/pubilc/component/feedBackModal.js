@@ -88,7 +88,7 @@ class FeedBackModal extends React.Component {
             <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
             <Text style={styles.modalContentTitleText}>反馈信息 </Text>
             <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
-              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
+              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.b2}}/>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     fontSize: 35,
-    color: colors.fontColor
+    color: colors.b2
   },
   modalBtnWrap: {
     backgroundColor: colors.main_color,

@@ -431,7 +431,7 @@ const
     left: {
       fontSize: pxToDp(30),
       fontWeight: "900",
-      color: colors.title_color
+      color: colors.color111
     },
     right: {
       fontSize: pxToDp(30),
@@ -440,11 +440,11 @@ const
     },
     text: {
       fontSize: pxToDp(30),
-      color: colors.title_color
+      color: colors.color111
     },
     money: {
       fontSize: pxToDp(36),
-      color: colors.title_color
+      color: colors.color111
     },
     cancel_item: {
       position: "relative"

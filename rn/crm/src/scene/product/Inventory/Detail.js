@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10
   },
-  tabText: {color: colors.title_color},
+  tabText: {color: colors.color111},
   tabTextActivity: {color: colors.main_color},
   navigationBtn: {
     flexDirection: "row",

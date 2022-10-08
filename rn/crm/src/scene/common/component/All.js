@@ -70,7 +70,7 @@ class Left extends PureComponent {
           }, !showTextInput && pdv]}
         >
           <Text style={{fontSize: 16, color: "#333", flex: 1}}>
-            {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
+            {title}{required && <Text style={{fontSize: 16, color: colors.warn_color}}>*</Text>}
           </Text>
           {info ? (
             <Text numberOfLines={1} style={{fontSize: 14, color: "#7A7A7A", flex: 1}}>
@@ -273,7 +273,7 @@ class Button extends Component {
 class Line extends Component {
   static defaultProps = {
     h: 1 / PixelRatio.get() * 2,
-    c: colors.main_back
+    c: colors.f2
   };
 
   render() {

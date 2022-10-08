@@ -138,7 +138,7 @@ class SearchShop extends Component {
       zIndex: 999,
       width: "100%",
       padding: 10,
-      backgroundColor: colors.background
+      backgroundColor: colors.f3
     }}>
       <View style={{flexDirection: "row", justifyContent: 'center', paddingBottom: 8}}>
         <Text
@@ -163,7 +163,7 @@ class SearchShop extends Component {
                 }}
                 buttonStyle={{
                   borderRadius: 5,
-                  backgroundColor: colors.fontColor,
+                  backgroundColor: colors.b2,
                   width: 125,
                   marginLeft: 15,
                 }}

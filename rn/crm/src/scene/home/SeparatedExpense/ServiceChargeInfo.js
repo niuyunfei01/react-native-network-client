@@ -67,7 +67,7 @@ class ServiceChargeInfo extends PureComponent {
   render() {
     const {records} = this.state;
     return (
-      <ScrollView style={{flex: 1, backgroundColor: colors.background}}>
+      <ScrollView style={{flex: 1, backgroundColor: colors.f3}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
                 return (
@@ -92,7 +92,7 @@ class ServiceChargeInfo extends PureComponent {
                   </TouchableOpacity>)
               }}
         >
-          <View style={{paddingVertical: 12, paddingHorizontal: 10, backgroundColor: colors.background}}>
+          <View style={{paddingVertical: 12, paddingHorizontal: 10, backgroundColor: colors.f3}}>
             {records.map((item, idx) => {
               return <List.Item arrow="horizontal"
                                 key={idx}

@@ -157,7 +157,7 @@ class PrinterRemark extends PureComponent {
         paddingHorizontal: pxToDp(20),
         paddingTop: pxToDp(10),
         borderBottomWidth: 1,
-        borderColor: colors.main_back
+        borderColor: colors.f2
       }
     ]}>
       <View style={{
@@ -263,7 +263,7 @@ class PrinterRemark extends PureComponent {
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{backgroundColor: colors.main_back}}>
+          } style={{backgroundColor: colors.f2}}>
 
           <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
           <Cells style={[styles.cell_box]}>

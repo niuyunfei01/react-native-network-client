@@ -91,7 +91,7 @@ class BindDelivery extends PureComponent {
         <View style={{
           padding: 10,
           flexDirection: "row",
-          borderColor: colors.fontColor,
+          borderColor: colors.b2,
           borderWidth: pxToDp(1),
           // justifyContent: 'center',
           alignItems: 'center',
@@ -114,7 +114,7 @@ class BindDelivery extends PureComponent {
         <View style={{
           flexDirection: "row",
           padding: 10,
-          borderColor: colors.fontColor,
+          borderColor: colors.b2,
           borderWidth: pxToDp(1),
           alignItems: 'center',
         }}>

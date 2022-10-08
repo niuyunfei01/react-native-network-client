@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    color: colors.title_color,
+    color: colors.color111,
     fontWeight: "bold",
     flex: 1,
     fontSize: pxToDp(34)

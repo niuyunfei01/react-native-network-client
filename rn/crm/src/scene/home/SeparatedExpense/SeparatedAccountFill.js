@@ -520,7 +520,7 @@ class SeparatedAccountFill extends PureComponent {
                   this.copyReceiveSecretKey();
                 }} style={[style.center, {color: colors.main_color}]}>一键复制 </Text>
               </View>
-              <Text style={[style.center, {color: colors.title_color, fontSize: pxToDp(35)}]}>温馨提示: </Text>
+              <Text style={[style.center, {color: colors.color111, fontSize: pxToDp(35)}]}>温馨提示: </Text>
               <Text style={{flexDirection: 'row', marginBottom: pxToDp(30)}}>
                 <Text style={[style.text]}>转账前请仔细检查 </Text>
                 <Text style={[style.text, {color: colors.warn_red}]}>银行信息 </Text>
@@ -669,7 +669,7 @@ const style = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color,
+    color: colors.color111,
     // borderBottomWidth: pxToDp(6),
     // borderBottomColor: colors.main_color
   },
@@ -741,7 +741,7 @@ const style = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: "center",
   },
-  recommendDesc: {color: colors.fontColor, marginTop: pxToDp(5)},
+  recommendDesc: {color: colors.b2, marginTop: pxToDp(5)},
   circle: {
     color: colors.main_color,
     marginVertical: pxToDp(25),
@@ -772,7 +772,7 @@ const style = StyleSheet.create({
   headerContent: {
     width: '100%',
     flexDirection: 'row',
-    backgroundColor: colors.fontColor,
+    backgroundColor: colors.b2,
   },
   uploadImg: {
     minHeight: pxToDp(215),
@@ -781,7 +781,7 @@ const style = StyleSheet.create({
     paddingHorizontal: pxToDp(20),
     paddingTop: pxToDp(10),
     borderBottomWidth: 1,
-    borderColor: colors.main_back
+    borderColor: colors.f2
   },
   uploadInfo: {
     height: pxToDp(170),

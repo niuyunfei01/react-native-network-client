@@ -864,7 +864,7 @@ const Styles = StyleSheet.create({
   },
   selectMonthLabel: {flex: 1, color: colors.color333, fontSize: 15, fontWeight: "bold"},
   selectMonthText: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: 16,
     fontWeight: 'bold',
     padding: 5,

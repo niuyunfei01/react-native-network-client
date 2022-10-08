@@ -949,7 +949,7 @@ class OrderListItem extends React.PureComponent {
                 }} style={styles.deliveryModalTitle}>呼叫配送规则</Text>
                 <View style={{flex: 1}}/>
                 <TouchableOpacity onPress={() => this.closeDeliveryModal()}>
-                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>
+                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.b2}}/>
                 </TouchableOpacity>
               </View>
 
@@ -1517,7 +1517,7 @@ const styles = StyleSheet.create({
   },
   amountBtn: {
     borderWidth: 1,
-    borderColor: colors.title_color,
+    borderColor: colors.color111,
     width: width * 0.2, textAlign: 'center',
     paddingVertical: pxToDp(10),
     marginVertical: pxToDp(5)

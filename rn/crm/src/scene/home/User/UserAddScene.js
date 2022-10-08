@@ -214,7 +214,7 @@ class UserAddScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
+        style={{backgroundColor: colors.f2}}
       >
         <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
         <Cells style={[styles.cell_box]}>

@@ -1285,7 +1285,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginLeft: pxToDp(10),
-    color: colors.title_color,
+    color: colors.color111,
   },
   tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
   modalDropDown: {
@@ -1322,7 +1322,7 @@ const styles = StyleSheet.create({
   },
   statusTabBadge: {position: 'absolute', top: 1, right: -15},
   statusTabRight: {height: 2, width: 24, backgroundColor: colors.main_color},
-  orderListContent: {flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)},
+  orderListContent: {flex: 1, backgroundColor: colors.f7, color: colors.b2, marginTop: pxToDp(10)},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   sortModal: {
     width: 0,
@@ -1361,7 +1361,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 210
   },
-  noOrderDesc: {fontSize: 18, color: colors.fontColor},
+  noOrderDesc: {fontSize: 18, color: colors.b2},
   noOrderBtn: {
     width: width - 20,
     borderRadius: pxToDp(10),

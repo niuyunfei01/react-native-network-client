@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   selectMonthText: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: 16,
     fontWeight: 'bold',
     padding: 5,

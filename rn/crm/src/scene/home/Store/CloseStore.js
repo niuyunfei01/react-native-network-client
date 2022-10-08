@@ -610,7 +610,7 @@ class StoreClose extends PureComponent {
                       selectTextOnFocus={true}
                       autoCapitalize="none"
                       underlineColorAndroid="transparent"
-                      placeholderTextColor={colors.gray}
+                      placeholderTextColor={colors.colorCCC}
                       multiline={true}
                       onChangeText={text => {
                         this.setState({

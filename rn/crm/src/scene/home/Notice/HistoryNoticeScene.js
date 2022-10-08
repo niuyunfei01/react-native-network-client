@@ -174,7 +174,7 @@ const Styles = StyleSheet.create({
   scrollStyle: {
     flex: 1,
     padding: 10,
-    backgroundColor: colors.background
+    backgroundColor: colors.f3
   },
   advicesListContainer: {
     backgroundColor: colors.white,

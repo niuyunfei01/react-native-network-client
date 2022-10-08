@@ -150,7 +150,7 @@ class InfromSetting extends PureComponent {
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back}}>
+        } style={{backgroundColor: colors.f2}}>
 
         <FetchInform navigation={this.props.navigation} onRefresh={this.geterror.bind(this)}/>
         <CellsTitle style={styles.cell_title}>消息设置</CellsTitle>
