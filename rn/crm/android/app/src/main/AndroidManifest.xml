@@ -53,6 +53,13 @@
         android:protectionLevel="signature" />
     <uses-permission android:name="cn.cainiaoshicai.crm.permission.MIPUSH_RECEIVE" />
     <!--xiaomi_permission_end-->
+    <!--honor_permission_start-->
+    <queries>
+        <intent>
+            <action android:name="com.hihonor.push.action.BIND_PUSH_SERVICE" />
+        </intent>
+    </queries>
+    <!--honor_permission_end-->
     <!--oppo_permission_start-->
     <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
     <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE" />
@@ -604,6 +611,19 @@
         <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100148685"/>
         <meta-data android:name="com.huawei.hms.client.cpid" android:value="cpid=890086000102039619"/>
 
+        <!--honor_config_start-->
+        <service
+            android:name="cn.jpush.android.service.JHonorService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.hihonor.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="${HONOR_APPID}" />
+        <!--honor_config_end-->
     </application>
 
 </manifest>

@@ -260,8 +260,8 @@ class SeparatedAccountFill extends PureComponent {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1}} automaticallyAdjustContentInsets={false}
-                                   showsHorizontalScrollIndicator={false}
-                                   showsVerticalScrollIndicator={false}>
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}>
             <View style={style.item_body}>
               <View style={style.item_head}>
                 <Text style={style.item_title}> 支付方式 </Text>
