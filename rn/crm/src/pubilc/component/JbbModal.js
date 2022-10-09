@@ -4,7 +4,6 @@ import {Modal, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const height = Dimensions.get("window").height;
 
@@ -35,9 +34,8 @@ class JbbModal extends PureComponent {
           flexGrow: 1
         } : {flex: 1}]}>
           <If condition={this.props.modal_type !== 'center'}>
-            <View style={{flexGrow: 1}}></View>
+            <View style={{flexGrow: 1}}/>
           </If>
-
           <TouchableHighlight style={[{
             backgroundColor: colors.white,
             borderRadius: pxToDp(30),
@@ -50,11 +48,10 @@ class JbbModal extends PureComponent {
             padding: pxToDp(30),
             paddingBottom: pxToDp(50)
           }, this.props.HighlightStyle]}>
-            <KeyboardAwareScrollView style={[{padding: 10}, this.props.modalStyle]} enableOnAndroid={false}>
+            <View style={[{padding: 10}, this.props.modalStyle]}>
               {this.props.children}
-            </KeyboardAwareScrollView>
+            </View>
           </TouchableHighlight>
-
         </TouchableOpacity>
       </Modal>
     )

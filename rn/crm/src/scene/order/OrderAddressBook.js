@@ -5,13 +5,11 @@ import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, Toucha
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {Button, SearchBar} from 'react-native-elements';
-import pxToDp from "../../pubilc/util/pxToDp";
-import Config from "../../pubilc/common/config";
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
+import Config from "../../pubilc/common/config";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   return {
@@ -40,6 +38,11 @@ function FetchView({navigation, onRefresh}) {
 }
 
 class OrderAddressBook extends Component {
+
+  static propTypes = {
+    route: PropTypes.object,
+  };
+
   constructor(props: Object) {
     super(props);
     let {accessToken} = this.props.global
@@ -47,16 +50,30 @@ class OrderAddressBook extends Component {
       accessToken: accessToken,
       addressBook: [],
       searchKeywords: '',
-      isRefreshing: true
+      isRefreshing: true,
+      headerShown: true,
     };
+  }
 
+  setHeader = (show = false) => {
+    const {navigation} = this.props
+    this.setState({
+      headerShown: show,
+    })
+    navigation.setOptions({
+      headerShown: show,
+    })
   }
 
   componentDidMount() {
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.fetchAddressBook()
+    })
   }
 
-  UNSAFE_componentWillMount() {
-    this.fetchAddressBook()
+  componentWillUnmount() {
+    this.focus()
   }
 
   onPress(route, params = {}) {
@@ -64,17 +81,6 @@ class OrderAddressBook extends Component {
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
-  }
-
-  timeOutBack(time) {
-    let _this = this;
-    setTimeout(() => {
-      _this.props.navigation.goBack()
-    }, time)
-  }
-
-  onCancel() {
-    this.setState({searchKeywords: ''});
   }
 
   fetchAddressBook() {
@@ -92,149 +98,151 @@ class OrderAddressBook extends Component {
     })
   }
 
-  deleteAddressItemBook(id) {
-    showModal('正在删除请稍后...')
-    const api = `/v1/new_api/address/deleteAddress?access_token=${this.state.accessToken}`;
-    HttpUtils.get.bind(this.props)(api, {id: id}).then(res => {
-      hideModal()
-      showSuccess('删除成功')
-      this.onHeaderRefresh()
-    })
-  }
 
   onHeaderRefresh() {
     this.fetchAddressBook();
   }
 
+  onCancel() {
+    this.setHeader(true);
+    this.setState({searchKeywords: ''});
+  }
+
+  onCheck = (info) => {
+    tool.debounces(() => {
+      this.props.route.params.onBack(info)
+      this.props.navigation.goBack()
+    }, 1000)
+  }
+
   render() {
+    let {headerShown, isRefreshing} = this.state
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView style={[styles.container, {flex: 1}]} refreshControl={
           <RefreshControl
-            refreshing={this.state.isRefreshing}
+            refreshing={isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
         }>
-          <View style={{backgroundColor: colors.white}}>
-            <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
-              <SearchBar
-                inputStyle={{fontSize: 12}}
-                inputContainerStyle={{backgroundColor: colors.white, height: 35}}
-                containerStyle={{
-                  width: '70%',
-                  padding: 0,
-                  margin: 0,
-                  backgroundColor: colors.white,
-                  borderWidth: 1,
-                  borderColor: '#eee',
-                  borderRadius: 6
-                }}
-                lightTheme={'true'}
-                placeholder="姓名 手机号 地址"
-                onChangeText={(v) => {
-                  this.setState({
-                    searchKeywords: v
-                  })
-                }}
-                onCancel={this.onCancel}
-                value={this.state.searchKeywords}
-              />
-              <Button title={'搜索'}
-                      onPress={() => {
-                        this.fetchAddressBook()
-                      }}
-                      buttonStyle={{
-                        borderRadius: pxToDp(10),
-                        borderWidth: 1,
-                        borderColor: colors.color333,
-                        backgroundColor: colors.white,
-                        marginLeft: 10,
-                        padding: 5
-                      }}
-                      titleStyle={{
-                        color: colors.color333,
-                        fontSize: 16
-                      }}
-              />
-              <Button title={'重置'}
-                      onPress={() => {
-                        this.fetchAddressBook()
-                      }}
-                      buttonStyle={{
-                        borderRadius: pxToDp(10),
-                        borderWidth: 1,
-                        borderColor: colors.color333,
-                        backgroundColor: colors.white,
-                        marginLeft: 10,
-                        padding: 5
-                      }}
-                      titleStyle={{
-                        color: colors.color333,
-                        fontSize: 16
-                      }}
-              />
-            </View>
-          </View>
-          <For index="index" each="info" of={this.state.addressBook}>
-            <TouchableOpacity style={{
-              flexDirection: "column",
-              width: '96%',
-              marginTop: '2%',
-              marginHorizontal: '2%',
-              borderRadius: 10,
-              backgroundColor: colors.white
-            }} onPress={() => {
-              ToastShort('载入中')
-              tool.debounces(() => {
-                this.props.route.params.onBack(info)
-                this.props.navigation.goBack()
-              }, 1000)
-            }}>
-              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin: 15}}>
-                <View style={{flexDirection: "row"}}>
-                  <Text style={{color: colors.color333, marginRight: 10}}>{info.name}</Text>
-                  <Text style={{color: colors.color333}}>{info.phone}</Text>
+          {this.renderHeader()}
+          {this.renderList()}
+        </ScrollView>
+
+        <If condition={headerShown}>
+          {this.renderBtn()}
+        </If>
+      </View>
+    );
+  }
+
+  renderHeader = () => {
+    let {headerShown, searchKeywords} = this.state
+    return (
+      <View style={{backgroundColor: colors.white}}>
+        <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
+          <SearchBar
+            inputStyle={{fontSize: 14, color: colors.color333}}
+            leftIconContainerStyle={{
+              width: 20,
+              height: 20
+            }}
+            cancelIcon={true}
+            clearIcon={true}
+            inputContainerStyle={{
+              backgroundColor: colors.f5,
+              height: 32,
+              borderRadius: 16,
+              borderWidth: 0
+            }}
+            containerStyle={{
+              flex: 1,
+              padding: 0,
+              margin: 0,
+              height: 31,
+              borderRadius: 16
+            }}
+            onFocus={() => {
+              this.setHeader(false);
+            }}
+            onBlur={() => {
+              this.setHeader(true);
+            }}
+            lightTheme={'true'}
+            placeholder="请输入地址，姓名，手机号搜索"
+            onChangeText={(searchKeywords) => {
+              this.setState({
+                searchKeywords
+              })
+            }}
+            onCancel={this.onCancel}
+            value={searchKeywords}
+          />
+          <If condition={!headerShown}>
+            <Text onPress={() => this.onCancel()}
+                  style={{textAlign: 'center', width: 56, fontSize: 14, color: colors.color333}}>取消</Text>
+          </If>
+        </View>
+      </View>
+    )
+  }
+
+  renderList = () => {
+    let {addressBook} = this.state
+    return (
+      <View style={{paddingHorizontal: 12, paddingVertical: 10}}>
+        <View style={{borderRadius: 8, flex: 1, paddingHorizontal: 12, backgroundColor: colors.white}}>
+          <For index="index" each="info" of={addressBook}>
+            <TouchableOpacity onPress={() => {
+              this.onCheck(info)
+            }} style={{paddingVertical: 20, borderColor: colors.e5, borderBottomWidth: 0.5}}>
+              <View style={{flexDirection: 'row', alignContent: 'center'}}>
+                <View
+                  style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>
+                  <Text style={{color: colors.white, fontSize: 12}}>常用</Text>
                 </View>
-                <View style={{flexDirection: "row"}}>
-                  <TouchableOpacity style={{flexDirection: "row", marginRight: 10}} onPress={() => {
-                    this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {addItem: info, type: 'edit'})
-                  }}>
-                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text
-                    style={{color: colors.color333, fontSize: 12}}> 编辑 </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={{flexDirection: "row"}} onPress={() => {
-                    this.deleteAddressItemBook(info.id)
-                  }}>
-                    <FontAwesome name='pencil-square-o' style={{fontSize: 16}}/><Text
-                    style={{color: colors.color333, fontSize: 12}}> 删除 </Text>
-                  </TouchableOpacity>
-                </View>
+                <Text style={{
+                  color: colors.color333,
+                  fontSize: 16,
+                  marginLeft: 4,
+                  fontWeight: '500'
+                  // eslint-disable-next-line no-undef
+                }}>{tool.length((info.address + info.street_block || '')) > 18 ? (info.address + info.street_block).substring(0, 17) + '...' : (info.address + info.street_block)} </Text>
               </View>
-              <View style={{flexDirection: "row", alignItems: "center", marginHorizontal: 15, marginBottom: 10}}>
-                <Text style={{color: colors.color999}}>{info.address}{info.street_block}</Text>
+              <View style={{flexDirection: 'row', marginTop: 10}}>
+                {/* eslint-disable-next-line no-undef */}
+                <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name}</Text>
+                {/* eslint-disable-next-line no-undef */}
+                <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone}</Text>
+                <Text style={{fontSize: 14, color: colors.main_color, width: 56}}>收藏</Text>
+                <Text onPress={() => {
+                  // eslint-disable-next-line no-undef
+                  this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {info, type: 'edit'})
+                }} style={{fontSize: 14, color: colors.main_color}}>编辑</Text>
               </View>
             </TouchableOpacity>
           </For>
-        </ScrollView>
-        <View style={{backgroundColor: colors.white, padding: pxToDp(30)}}>
-          <Button title={'新增收货地址'}
-                  onPress={() => {
-                    this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {type: 'add'})
-                  }}
-                  buttonStyle={{
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          />
         </View>
       </View>
-    );
+    )
+  }
+
+  renderBtn = () => {
+    return (
+      <View style={{backgroundColor: colors.white, padding: 15}}>
+        <Button title={'添加常用收件人'}
+                onPress={() => this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {type: 'add'})}
+                buttonStyle={[{
+                  backgroundColor: colors.main_color,
+                  borderRadius: 24,
+                  length: 48,
+                }]}
+                titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
+        />
+      </View>
+    )
   }
 }
 

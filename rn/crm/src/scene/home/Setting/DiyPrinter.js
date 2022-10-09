@@ -397,7 +397,7 @@ class DiyPrinter extends PureComponent {
                 <Text style={{
                   fontSize: 10,
                   color: colors.color999,
-                }}>开启后显示外送帮货架码，关闭后显示美团货架码</Text>
+                }}>开启后显示外送帮货架码</Text>
               </View>
               <Switch color={colors.main_color} style={{
                 fontSize: 16,

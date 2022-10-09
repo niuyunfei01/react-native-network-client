@@ -1174,7 +1174,7 @@ class OrderTransferThird extends Component {
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
                 商品重量
               </Text>
-              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="circle-with-cross"
+              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

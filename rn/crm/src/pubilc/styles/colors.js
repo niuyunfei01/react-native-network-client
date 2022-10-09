@@ -1,5 +1,5 @@
 const colors = {
-  main_color: '#59B26A',
+  main_color: '#26B942',
   color000: '#000000',
   color111: '#111111',
   color333: '#333',
@@ -18,6 +18,7 @@ const colors = {
   f5: '#F5F5F5',
   f7: '#f7f7f7',
   fa: '#FAFAFA',
+  e5: '#E5E5E5',
   default_theme: '#33A3F4',
   main_vice_color: '#006837',
   actionSecondSize: 28,
