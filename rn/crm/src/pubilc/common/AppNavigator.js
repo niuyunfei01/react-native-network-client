@@ -402,7 +402,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       getComponent={() => require('../../scene/product/Inventory/Detail').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
+        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerShown: false}}
                       getComponent={() => require('../component/SearchShop').default}
         />
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}

@@ -52,6 +52,7 @@ class OrderSettingScene extends Component {
     this.state = {
       accessToken: accessToken,
       store_id: currStoreId,
+      city: store_info?.city,
       store_name: store_info?.name,
       store_address: store_info?.dada_address,
       name: '',
@@ -101,13 +102,15 @@ class OrderSettingScene extends Component {
 
 
   goSelectAddress = () => {
-    let {address, loc_lng, loc_lat} = this.state;
+    let {address, loc_lng, loc_lat, city} = this.state;
     let center = ""
     if (loc_lng && loc_lat) {
       center = loc_lng + ',' + loc_lat
     }
     const params = {
       center: center,
+      cityName: city,
+      show_select_city: false,
       keywords: address,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
@@ -136,6 +139,7 @@ class OrderSettingScene extends Component {
     this.setState({
       store_id: store_info?.id,
       store_name: store_info?.name,
+      city: store_info?.city,
       store_address: store_info?.dada_address,
     })
   }

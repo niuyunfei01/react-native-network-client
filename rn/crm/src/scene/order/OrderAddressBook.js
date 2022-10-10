@@ -216,7 +216,7 @@ class OrderAddressBook extends Component {
                 <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name}</Text>
                 {/* eslint-disable-next-line no-undef */}
                 <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone}</Text>
-                <Text style={{fontSize: 14, color: colors.main_color, width: 56}}>收藏</Text>
+                {/*<Text style={{fontSize: 14, color: colors.main_color, width: 56}}>收藏</Text>*/}
                 <Text onPress={() => {
                   // eslint-disable-next-line no-undef
                   this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {info, type: 'edit'})
