@@ -927,7 +927,7 @@ class StoreInfo extends Component {
             onChangeText={tel => this.setState({tel})}
             value={tel}
             placeholder="请输入店铺电话"
-            maxLength={18} // 可输入的最大长度
+            maxLength={12} // 可输入的最大长度
             keyboardType="numeric" //默认弹出的键盘
             style={{textAlign: 'right', fontSize: 14, flex: 1, height: pxToDp(90)}}
             underlineColorAndroid="transparent"
