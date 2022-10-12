@@ -474,6 +474,15 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ADD_MISSING_PICTURE}
                       options={{headerTitle: '添加图片'}}
                       getComponent={() => require('../../scene/product/Goods/AddMissingPictureScene').default}/>
+        <Stack.Screen name={Config.ROUTE_PER_IDENTIFY}
+                      options={{headerTitle: '账号管理'}}
+                      getComponent={() => require('../../scene/home/Setting/AccountManagement').default}/>
+        <Stack.Screen name={Config.ROUTE_ADD_ACCOUNT}
+                      options={{headerTitle: '添加员工'}}
+                      getComponent={() => require('../../scene/home/Setting/AddAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_EDIT_ACCOUNT}
+                      options={{headerTitle: '编辑账号'}}
+                      getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

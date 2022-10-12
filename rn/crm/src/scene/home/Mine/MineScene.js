@@ -895,6 +895,12 @@ class MineScene extends Component {
         </Text>
         <LineView/>
         <View style={header_styles.row}>
+          <TouchableOpacity style={[block_styles.block_box]}
+                            onPress={() => this.onPress(Config.ROUTE_PER_IDENTIFY)}
+                            activeOpacity={customerOpacity}>
+            <SvgXml xml={dataAnalysis()} width={28} height={28} style={[block_styles.block_img]}/>
+            <Text style={[block_styles.block_name]}>权限标识</Text>
+          </TouchableOpacity>
           <If condition={wsb_store_account === 1}>
             <TouchableOpacity style={[block_styles.block_box]}
                               onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}

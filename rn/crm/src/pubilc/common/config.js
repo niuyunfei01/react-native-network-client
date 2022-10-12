@@ -162,6 +162,9 @@ const C = {
   ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
+  ROUTE_PER_IDENTIFY: 'PermissionToIdentify',        //权限标识
+  ROUTE_ADD_ACCOUNT: 'AddAccount',        //添加员工
+  ROUTE_EDIT_ACCOUNT: 'EditAccount',        //编辑员工
   ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
   ROUTE_SERVICE_CHARGE_INFO: 'ServiceChargeInfo',        //服务费详细
