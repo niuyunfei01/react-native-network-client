@@ -30,6 +30,8 @@ const screenOptions = ({
 })
 
 export const AppNavigator = (props) => {
+
+
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
@@ -66,6 +68,14 @@ export const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderListScene").default}
+                      initialParams={initialRouteParams}/>
+
+        <Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Mine/MineScene").default}
+                      initialParams={initialRouteParams}/>
+
         <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>

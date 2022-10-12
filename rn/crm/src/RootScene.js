@@ -121,7 +121,7 @@ class RootScene extends PureComponent {
           initialRouteName = Config.ROUTE_ORDER;
           initialRouteParams = {orderId};
         } else {
-          initialRouteName = "Tab";
+          initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
         }
       }
     }

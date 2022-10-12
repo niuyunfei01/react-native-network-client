@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {
-  DeviceEventEmitter,
   Dimensions,
   Image,
   InteractionManager,
@@ -30,9 +29,7 @@ import {setRecordFlag} from "../../../reducers/store/storeActions"
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
-import dayjs from "dayjs";
 
-import JbbText from "../../common/component/JbbText";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
 import BottomModal from "../../../pubilc/component/BottomModal";
 
@@ -44,8 +41,8 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import pxToEm from "../../../pubilc/util/pxToEm";
 import native from "../../../pubilc/util/native";
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import * as tool from "../../../pubilc/util/tool";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 import {Dialog} from "../../../weui";
 import NextSchedule from "./_Mine/NextSchedule";
 import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
@@ -120,9 +117,8 @@ function FetchView({navigation, onRefresh}) {
 
 
 const customerOpacity = 0.6;
-const time = dayjs().format('YYYY-MM-DD')
-let hasPriceControl = false
-let hasAllowAnalys = true
+let hasPriceControl = false;
+let hasAllowAnalys = false;
 
 class MineScene extends Component {
   constructor(props) {
@@ -206,17 +202,6 @@ class MineScene extends Component {
       showComesback: false,
     };
 
-    this._doChangeStore = this._doChangeStore.bind(this);
-    this.onCanChangeStore = this.onCanChangeStore.bind(this);
-    this.onPress = this.onPress.bind(this);
-    this.onGetUserCount = this.onGetUserCount.bind(this);
-    this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
-    this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
-    this.onGetUserInfo = this.onGetUserInfo.bind(this);
-    this.getCommonConfig = this.getCommonConfig.bind(this);
-    this.getNotifyCenter = this.getNotifyCenter.bind(this);
-    this.onRefresh = this.onRefresh.bind(this)
-
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
@@ -234,22 +219,7 @@ class MineScene extends Component {
   componentDidMount = () => {
     this.getActivity();
     this.registerJpush();
-    this.subscription = DeviceEventEmitter.addListener("EventChangeStore", (params) => {
-      this.onCanChangeStore(params['id']);
-    })
   }
-
-  // getStoreList = () => {
-  //   const {accessToken, currStoreId} = this.props.global;
-  //   let {md5_read_stores} = this.props.global?.config;
-  //   const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
-  //   HttpUtils.get.bind(this.props)(api).then((res) => {
-  //     if (!res) {
-  //       this.getTimeoutCommonConfig(currStoreId, () => {
-  //       })
-  //     }
-  //   })
-  // }
 
   getStoreTurnover = () => {
     const {accessToken, currStoreId} = this.props.global;
@@ -450,68 +420,12 @@ class MineScene extends Component {
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
-    const {accessToken, currStoreId} = this.props.global;
   }
 
   registerJpush = () => {
     const {currentUser} = this.props.global
     doJPushSetAlias(currentUser)
   }
-
-  _doChangeStore = (store_id) => {
-    if (this.state.onStoreChanging) {
-      return false;
-    }
-    this.setState({onStoreChanging: true});
-    showModal('加载中...')
-    const {global} = this.props;
-    const callback = (ok, msg) => {
-      if (ok) {
-        this.getCommonConfig(store_id, (ok, msg, obj) => {
-          if (ok) {
-            let {
-              is_mgr,
-              is_service_mgr,
-              is_helper
-            } = tool.vendor(this.props.global);
-            let {vendor_info, vendor_id} = global;
-            this.setState({
-              currStoreId: store_id,
-              currVendorId: vendor_id,
-              currVersion: vendor_info?.currVersion,
-              is_mgr: is_mgr,
-              is_service_mgr: is_service_mgr,
-              is_helper: is_helper,
-              onStoreChanging: false
-            });
-            this.setState({onStoreChanging: false});
-          } else {
-            ToastLong(msg);
-            hideModal()
-            this.setState({onStoreChanging: false});
-          }
-        });
-      } else {
-        ToastLong(msg);
-        hideModal()
-        this.setState({onStoreChanging: false});
-      }
-    };
-    if (Platform.OS === 'ios') {
-      callback(true, '');
-    } else {
-      native.setCurrStoreId(store_id, callback).then();
-    }
-  }
-
-  getCommonConfig = (store_id, callback = () => {
-  }) => {
-    const {accessToken} = this.props.global;
-    this.props.dispatch(getConfig(accessToken, store_id, (ok, msg, obj) => {
-      callback(ok, msg, obj);
-    }));
-  }
-
 
   getHuichuan = (currStoreId, accessToken) => {
     const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
@@ -528,20 +442,22 @@ class MineScene extends Component {
   }
 
   onCanChangeStore = (store_id) => {
-    const {dispatch, global} = this.props;
+    const {dispatch, global, navigation} = this.props;
     const {accessToken} = global;
-    dispatch(
-      userCanChangeStore(store_id, accessToken, resp => {
-        if (resp.obj.auth_store_change) {
-          this._doChangeStore(store_id);
-          this.getStoreDataOfMine(store_id)
-          this.getStoreTurnover()
-          this.getHuichuan(store_id, accessToken)
-        } else {
-          ToastLong("您没有该店访问权限, 如需访问请向上级申请");
-        }
-      })
-    );
+    dispatch(getConfig(accessToken, store_id, (ok, msg, obj) => {
+      if (ok) {
+        tool.debounces(() => {
+          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+            initTab: Config.ROUTE_ORDERS,
+            initialRouteName: Config.ROUTE_ALERT
+          });
+          hideModal()
+        }, 800)
+      } else {
+        ToastLong(msg);
+        hideModal()
+      }
+    }));
   }
 
   recordQuestionFirstShow(flag) {
@@ -706,9 +622,9 @@ class MineScene extends Component {
     return (
       <View style={[header_styles.main_box]}>
         <View style={header_styles.row}>
-          <JbbText style={header_styles.shop_name}>
+          <Text style={header_styles.shop_name}>
             {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 11) + '...' : store_info?.name}
-          </JbbText>
+          </Text>
           <TouchableOpacity style={styles.modifyStore} onPress={this.jumpToAddStore}>
             <SvgXml xml={pencilIcon(colors.color333, 18, 18)}/>
           </TouchableOpacity>
@@ -731,8 +647,9 @@ class MineScene extends Component {
   }
 
   selectStore = (item) => {
-    DeviceEventEmitter.emit("EventChangeStore", {
-      id: item['id']
+    showModal("切换店铺中...")
+    tool.debounces(() => {
+      this.onCanChangeStore(item['id']);
     })
   }
 
@@ -960,7 +877,6 @@ class MineScene extends Component {
             <SvgXml xml={contactCustomerService()} width={28} height={28} style={[block_styles.block_img]}/>
             <Text style={[block_styles.block_name]}>联系客服</Text>
           </TouchableOpacity>
-
         </View>
       </View>
     )
@@ -1310,7 +1226,7 @@ class MineScene extends Component {
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
             activeOpacity={customerOpacity}>
-            <SvgXml xml={shareActivity()} width={28} height={28} style={[block_styles.block_img]}/>
+            <SvgXml xml={shareActivity()} width={28} height={28}/>
             <Text style={[block_styles.block_name]}>老带新活动</Text>
           </TouchableOpacity>
         </If>

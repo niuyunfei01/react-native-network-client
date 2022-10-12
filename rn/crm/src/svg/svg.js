@@ -1186,3 +1186,103 @@ export const close = (width = 14, height = 14) => {
     `
   )
 }
+
+
+export const menu_left = (width = 24, height = 24) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+    <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作台-导航" transform="translate(-12.000000, -51.000000)">
+            <rect fill="#F5F5F5" x="0" y="0" width="375" height="918"></rect>
+            <g id="编组-10" transform="translate(0.000000, 44.000000)">
+                <g id="导航" fill="#FFFFFF">
+                    <rect id="矩形" x="0" y="0" width="375" height="44"></rect>
+                </g>
+                <g id="更多我的" transform="translate(12.000000, 7.000000)">
+                    <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+                    <g id="更多" transform="translate(3.000000, 5.000000)" fill="#333333">
+                        <rect id="矩形" x="0" y="0" width="18" height="2" rx="1"></rect>
+                        <rect id="矩形备份-2" x="0" y="6" width="14" height="2" rx="1"></rect>
+                        <rect id="矩形备份-3" x="0" y="13" width="15" height="2" rx="1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+
+export const this_down = (width = 16, height = 16) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+    <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作台-导航" transform="translate(-180.000000, -56.000000)" fill="#999999" fill-rule="nonzero" stroke="#999999" stroke-width="0.5">
+            <g id="编组-10" transform="translate(0.000000, 44.000000)">
+                <g id="编组-4" transform="translate(52.000000, 10.000000)">
+                    <g id="副导航图标/箭头-未选中" transform="translate(128.000000, 2.000000)">
+                        <path d="M9.94511909,3.74332344 L10.0282056,3.79880389 C10.1579141,3.90169169 10.1950804,4.07800987 10.1274611,4.22158281 L10.0723657,4.30503458 L6.77687317,8.01532897 L10.0490584,11.6993711 C10.1589677,11.8231354 10.1650398,12.0032203 10.0735827,12.1329148 L10.0124,12.1994206 L10.0048704,12.2055656 C9.81789682,12.3538774 9.54763165,12.3303012 9.3891622,12.1518554 L5.91986308,8.24522129 C5.79815735,8.10817351 5.80321326,7.90038807 5.92976358,7.77001717 L9.42262293,3.84110722 C9.55636848,3.69050198 9.7724803,3.65428257 9.94511909,3.74332344 Z" id="icon" transform="translate(7.996122, 7.999154) rotate(-90.000000) translate(-7.996122, -7.999154) "></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+
+export const seach_icon = (width = 24, height = 24) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+   <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作台-导航" transform="translate(-299.000000, -51.000000)">
+            <g id="编组-10" transform="translate(0.000000, 44.000000)">
+                <g id="图标/搜索栏/搜索" transform="translate(299.000000, 7.000000)">
+                    <rect id="Rectangle-3" x="0" y="0" width="24" height="24"></rect>
+                    <g id="icon" transform="translate(3.600000, 3.600000)" stroke="#333333" stroke-width="1.71428571">
+                        <line x1="13.8" y1="13.8" x2="16.6732308" y2="16.6755638" id="路径-2" stroke-linecap="round" stroke-linejoin="round"></line>
+                        <circle id="Oval-2" cx="8.4" cy="8.4" r="7.54285714"></circle>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+
+export const menu = (width = 24, height = 24) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
+     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作台-导航" transform="translate(-339.000000, -51.000000)">
+            <rect fill="#F5F5F5" x="0" y="0" width="375" height="918"></rect>
+            <g id="编组-10" transform="translate(0.000000, 44.000000)">
+                <g id="导航" fill="#FFFFFF">
+                    <rect id="矩形" x="0" y="0" width="375" height="44"></rect>
+                </g>
+                <g id="编组-5" transform="translate(339.000000, 7.000000)">
+                    <rect id="BG" fill="#FFFFFF" opacity="0" x="0" y="0" width="24" height="24"></rect>
+                    <g id="更多轮廓" transform="translate(4.285732, 10.285714)" fill="#333333">
+                        <path d="M15.4286357,1.71405194 C15.4286357,0.767723208 14.737361,0 13.8857721,0 C13.0341833,0 12.3429086,0.767723208 12.3429086,1.71405194 C12.3429086,2.66038067 13.0341833,3.42857143 13.8857721,3.42857143 C14.737361,3.42857143 15.4286357,2.66038067 15.4286357,1.71405194" id="Fill-1"></path>
+                        <path d="M9.25718143,1.71405194 C9.25718143,0.767723208 8.56590673,0 7.71431786,0 C6.86272899,0 6.17145429,0.767723208 6.17145429,1.71405194 C6.17145429,2.66038067 6.86272899,3.42857143 7.71431786,3.42857143 C8.56590673,3.42857143 9.25718143,2.66038067 9.25718143,1.71405194" id="Fill-4"></path>
+                        <path d="M3.08572714,1.71405194 C3.08572714,0.767723208 2.39487995,0 1.54286357,0 C0.691274701,0 0,0.767723208 0,1.71405194 C0,2.66038067 0.691274701,3.42857143 1.54286357,3.42857143 C2.39487995,3.42857143 3.08572714,2.66038067 3.08572714,1.71405194" id="Fill-7"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}

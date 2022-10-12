@@ -152,8 +152,9 @@ class SeparatedAccountFill extends PureComponent {
 
   aliPay = () => {
     const {accessToken, currStoreId, vendor_id} = this.props.global;
+    let {to_fill_yuan} = this.state;
     showModal("支付跳转中...")
-    const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
+    const url = `/api/gen_pay_app_order/${to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
       hideModal();
       const resule = await Alipay.alipay(res.result);

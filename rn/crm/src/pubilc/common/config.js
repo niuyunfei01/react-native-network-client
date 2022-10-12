@@ -70,7 +70,7 @@ const C = {
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
-  ROUTE_Mine: 'Mine',
+  ROUTE_MINE: 'Mine',
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',

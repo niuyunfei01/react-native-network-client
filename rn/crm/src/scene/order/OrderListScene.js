@@ -6,7 +6,6 @@ import {
   FlatList,
   InteractionManager,
   Platform,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,25 +24,20 @@ import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import tool from "../../pubilc/util/tool";
 import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
-import Dialog from "../common/component/Dialog";
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
-import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
 import {showError, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {Badge, Button} from "react-native-elements";
+import {Button} from "react-native-elements";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
-import RemindModal from "../../pubilc/component/remindModal";
-import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import Swiper from 'react-native-swiper'
 import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 import {AMapSdk} from "react-native-amap3d";
 import FastImage from "react-native-fast-image";
-import Scanner from "../../pubilc/component/Scanner";
 import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
 import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
 import BleManager from "react-native-ble-manager";
@@ -52,9 +46,9 @@ import store from "../../pubilc/util/configureStore";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import DeviceInfo from "react-native-device-info";
 import {downloadApk} from "rn-app-upgrade";
-import {setRecordFlag} from "../../reducers/store/storeActions";
 import PropTypes from "prop-types";
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SvgXml} from "react-native-svg";
+import {menu_left, seach_icon, this_down} from "../../svg/svg";
 
 const {width} = Dimensions.get("window");
 
@@ -74,8 +68,9 @@ function mapDispatchToProps(dispatch) {
 const initState = {
   isLoading: false,
   categoryLabels: [
-    {tabname: '待打包', num: 0, status: 1},
-    {tabname: '待配送', num: 0, status: 2},
+    {tabname: '新订单', num: 0, status: 9},
+    {tabname: '待接单', num: 0, status: 10},
+    {tabname: '待取货', num: 0, status: 2},
     {tabname: '配送中', num: 0, status: 3},
     {tabname: '异常', num: 0, status: 8},
   ],
@@ -324,7 +319,6 @@ class OrderListScene extends Component {
     calcMs(timeObj, accessToken)
 
     this.openAndroidNotification();
-    this.fetchShowRecordFlag();
     this.focus = navigation.addListener('focus', () => {
       this.getVendor()
       this.onRefresh()
@@ -337,21 +331,12 @@ class OrderListScene extends Component {
     );
   }
 
-
-  fetchShowRecordFlag() {
-    const {accessToken, currentUser} = this.props.global;
-    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      this.props.dispatch(setRecordFlag(res.ok))
-    })
-  }
-
-
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
       this.handleNoLoginInfo(store.getState().global)
     })
   }
+
   handleNoLoginInfo = (reduxGlobal) => {
     const {co_type} = tool.vendor(reduxGlobal)
     if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
@@ -381,7 +366,8 @@ class OrderListScene extends Component {
       co_type: co_type,
       enabledGoodMgr: reduxGlobal.enabled_good_mgr,
       currVendorId: reduxGlobal.vendor_id,
-      printer_id: reduxGlobal.printer_id || '0'
+      printer_id: reduxGlobal.printer_id || '0',
+      show_bottom_tab: reduxGlobal.show_bottom_tab || true,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
@@ -638,22 +624,19 @@ class OrderListScene extends Component {
     if (vendor_id && accessToken) {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-          for (let i in res.tabs) {
-            res.tabs[i].num = 0;
-          }
-          this.setState({
-            orderStatus: parseInt(res.tabs[0].status),
-            categoryLabels: res.tabs,
-            showTabs: true,
-            isLoading: false,
-          })
-          this.onRefresh()
-          return
-        }
-        // this.setState({
-        //   categoryLabels: res.tabs,
-        // })
+        // if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+        //   for (let i in res.tabs) {
+        //     res.tabs[i].num = 0;
+        //   }
+        //   this.setState({
+        //     orderStatus: parseInt(res.tabs[0].status),
+        //     // categoryLabels: res.tabs,
+        //     showTabs: true,
+        //     isLoading: false,
+        //   })
+        //   this.onRefresh()
+        //   return
+        // }
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -665,7 +648,6 @@ class OrderListScene extends Component {
           ListData: setList === 1 ? res.orders : ListData.concat(res.orders),
           isLoading: false,
           query: query,
-          categoryLabels: res.tabs,
         })
       }, (res) => {
         showError(res.reason);
@@ -753,10 +735,10 @@ class OrderListScene extends Component {
 
 
   onSelect = (e) => {
-    if (e === 0) {
+    if (e === 1) {
       this.mixpanel.track('新建订单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
-    } else if (e === 1) {
+    } else if (e === 0) {
       this.setState({showSortModal: !this.state.showSortModal})
     } else {
 
@@ -818,42 +800,109 @@ class OrderListScene extends Component {
     } = this.state
 
     return (
-      <SafeAreaView style={styles.flex1}>
-        <FloatServiceIcon fromComponent={'订单列表'}/>
-        {this.renderTabsHead()}
-        <If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>
-          <View style={styles.extStore}>
-            <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
-              {ext_store_name}
-            </Text>
-            <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-          </View>
-        </If>
-        <SearchExtStore visible={searchStoreVisible}
-                        data={ext_store_list}
-                        onClose={() => this.searchExtStoreOnClose()}
-                        onSelect={item => this.searchExtStoreOnSelect(item)}/>
-        {showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}
-        <If condition={show_hint}>
-          <TouchableOpacity style={styles.cell_row}>
-            <Text style={styles.cell_body_text}>
-              {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}
-            </Text>
-            <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
-          </TouchableOpacity>
-        </If>
-        <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
-        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {this.showSortSelect()}
-        </Dialog>
+      <View style={styles.flex1}>
+        {this.renderHead()}
+        {this.renderStatusTabs()}
+        {this.renderContent(ListData)}
+        {/*{this.renderTabsHead()}*/}
+        {/*<If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>*/}
+        {/*  <View style={styles.extStore}>*/}
+        {/*    <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>*/}
+        {/*      {ext_store_name}*/}
+        {/*    </Text>*/}
+        {/*    <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>*/}
+        {/*  </View>*/}
+        {/*</If>*/}
 
-        <Scanner visible={scanBoolean} title="返回"
-                 onClose={() => this.setState({scanBoolean: false})}
-                 onScanSuccess={code => this.onScanSuccess(code)}
-                 onScanFail={code => this.onScanFail(code)}/>
-      </SafeAreaView>
+        {/*{showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}*/}
+        {/*<If condition={show_hint}>*/}
+        {/*  <TouchableOpacity style={styles.cell_row}>*/}
+        {/*    <Text style={styles.cell_body_text}>*/}
+        {/*      {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}*/}
+        {/*    </Text>*/}
+        {/*    <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>*/}
+        {/*  </TouchableOpacity>*/}
+        {/*</If>*/}
+        {/*<HotUpdateComponent/>*/}
+        {/*<RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>*/}
+        {/*<Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>*/}
+        {/*  {this.showSortSelect()}*/}
+        {/*</Dialog>*/}
+
+        {/*<Scanner visible={scanBoolean} title="返回"*/}
+        {/*         onClose={() => this.setState({scanBoolean: false})}*/}
+        {/*         onScanSuccess={code => this.onScanSuccess(code)}*/}
+        {/*         onScanFail={code => this.onScanFail(code)}/>*/}
+        <FloatServiceIcon fromComponent={'订单列表'}/>
+      </View>
     );
+  }
+
+  renderHead = () => {
+    let {store_info} = this.props.global;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignContent: 'center',
+        height: 44,
+        width: width,
+        backgroundColor: colors.white,
+        paddingHorizontal: 12
+      }}>
+        <View>
+
+          <TouchableOpacity
+            onPress={() => this.onPress(Config.ROUTE_MINE)}
+            style={{height: 44, flexDirection: 'row', alignItems: 'center', paddingRight: 16}}>
+            <SvgXml xml={menu_left()}/>
+          </TouchableOpacity>
+
+        </View>
+        <TouchableOpacity onPress={() => {
+          console.log('121')
+        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center',}}>
+          <Text style={{
+            fontSize: 15,
+            color: colors.color333
+          }}>{tool.length((store_info?.name || '')) > 8 ? store_info?.name.substring(0, 7) + '...' : (store_info?.name || '')} </Text>
+          <SvgXml xml={this_down()}/>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+          style={{
+            height: 44,
+            width: 40,
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
+          <SvgXml xml={seach_icon()}/>
+        </TouchableOpacity>
+
+        <ModalDropdown
+          dropdownStyle={styles.modalDropDown}
+          dropdownTextStyle={styles.modalDropDownText}
+          dropdownTextHighlightStyle={{color: '#fff'}}
+          options={['订单排序', '手动下单']}
+          defaultValue={''}
+          onSelect={(e) => this.onSelect(e)}
+        >
+          <View style={{
+            height: 44,
+            width: 40,
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
+            <Entypo name={"dots-three-horizontal"} style={{
+              fontSize: 20, color: colors.color666
+            }}/>
+          </View>
+
+        </ModalDropdown>
+
+      </View>
+    )
   }
 
   renderTabsHead = () => {
@@ -875,7 +924,7 @@ class OrderListScene extends Component {
           dropdownStyle={styles.modalDropDown}
           dropdownTextStyle={styles.modalDropDownText}
           dropdownTextHighlightStyle={{color: '#fff'}}
-          options={['新 建', '排 序', '扫 描']}
+          options={['订单排序', '手动下单']}
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
         >
@@ -888,36 +937,47 @@ class OrderListScene extends Component {
   }
 
   renderStatusTabs = () => {
-    const tab_width = 1 / tool.length(this.state.categoryLabels);
-    if (!tool.length(this.state.categoryLabels) > 0) {
+    let {orderStatus, orderNum, categoryLabels} = this.state;
+    const tab_width = 1 / tool.length(categoryLabels);
+    if (!tool.length(categoryLabels) > 0) {
       return;
     }
     return (
-      <View style={styles.flex1}>
-        <View style={styles.statusTab}>
-          <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity
-              key={i}
-              style={{width: tab_width * width, alignItems: "center"}}
-              onPress={() => this.onRefresh(tab.status)}>
-              <View style={styles.statusTabItem}>
-                <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>
-                  {tab.tabname}
-                </Text>
-                <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
-                  <Badge
-                    status="error"
-                    value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                    containerStyle={styles.statusTabBadge}/>
-                </If>
-              </View>
-              <If condition={this.state.orderStatus === tab.status}>
-                <View style={styles.statusTabRight}/>
-              </If>
-            </TouchableOpacity>
-          </For>
-        </View>
-        {this.renderContent(this.state.ListData)}
+      <View style={styles.statusTab}>
+        <For index="i" each='tab' of={categoryLabels}>
+          <TouchableOpacity
+            key={i}
+            style={{width: tab_width * width, alignItems: "center"}}
+            onPress={() => this.onRefresh(tab.status)}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              paddingTop: 10,
+            }}>
+              <Text style={[styles.f14c33, {
+                fontWeight: orderStatus === tab.status ? "bold" : "normal",
+                color: orderStatus === tab.status ? colors.main_color : colors.color333
+              }]}>
+                {orderNum[tab.status] > 0 ? orderNum[tab.status] > 999 ? '999+' : orderNum[tab.status] : '-'}
+              </Text>
+            </View>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              paddingBottom: 10,
+            }}>
+              <Text style={[styles.f14c33, {
+                fontWeight: orderStatus === tab.status ? "bold" : "normal",
+                color: orderStatus === tab.status ? colors.main_color : colors.color333
+              }]}>
+                {tab.tabname}
+              </Text>
+            </View>
+            <If condition={orderStatus === tab.status}>
+              <View style={styles.statusTabRight}/>
+            </If>
+          </TouchableOpacity>
+        </For>
       </View>
     )
   }
@@ -1289,31 +1349,34 @@ const styles = StyleSheet.create({
   },
   tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
   modalDropDown: {
-    marginRight: 10,
-    width: 70,
-    height: 120,
-    backgroundColor: '#5f6660',
-    marginTop: -StatusBar.currentHeight,
+    width: 128,
+    height: 100,
+    backgroundColor: colors.white,
+    borderColor: colors.colorDDD,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
   },
   modalDropDownText: {
     textAlignVertical: 'center',
     textAlign: 'center',
+    paddingVertical: 14,
+    borderRadius: 10,
+    margin: 3,
+    height: 43,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#fff',
-    height: 40,
-    backgroundColor: '#5f6660',
-    borderRadius: 2,
-    borderColor: '#5f6660',
-    borderWidth: 1,
+    color: colors.color333,
   },
   modalDropDownIcon: {marginRight: 16, marginLeft: 18},
   modalDropDownIconMenu: {fontSize: 24, color: colors.color666},
-  statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 40},
+  statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 56},
   statusTabItem: {
     borderColor: colors.main_color,
-    // borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
-    height: 38,
+    flexDirection: 'row',
     justifyContent: 'center',
   },
   f14c33: {
@@ -1321,7 +1384,7 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   statusTabBadge: {position: 'absolute', top: 1, right: -15},
-  statusTabRight: {height: 2, width: 24, backgroundColor: colors.main_color},
+  statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
   orderListContent: {flex: 1, backgroundColor: colors.f7, color: colors.b2, marginTop: pxToDp(10)},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   sortModal: {

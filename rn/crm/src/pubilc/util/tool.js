@@ -298,7 +298,7 @@ export function intOf(val) {
 }
 
 function parameterByName(name, url) {
-  name = name.replace(/[\[\]]/g, "\\$&");
+  name = name.replace(/[[\]]/g, "\\$&");
   let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
     results = regex.exec(url);
   if (!results) return null;
@@ -430,8 +430,10 @@ function deepClone(obj) {
   for (let key in obj) {
     let copy = obj[key];
     if (isClass(copy) === "Object") {
+      // noinspection JSAnnotator
       result[key] = arguments.callee(copy); //递归调用
     } else if (isClass(copy) === "Array") {
+      // noinspection JSAnnotator
       result[key] = arguments.callee(copy);
     } else {
       result[key] = obj[key];

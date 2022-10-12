@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 
 import {
   check_is_bind_ext,
@@ -11,11 +11,10 @@ import {
 } from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from '../../../pubilc/styles/colors'
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from '../../../pubilc/common/config'
-import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from '../../../pubilc/util/analytics';
 import {Button, CheckBox} from "react-native-elements";
@@ -175,29 +174,25 @@ class LoginScene extends PureComponent {
 
   doneSelectStore = (storeId, not_bind = false) => {
     const {dispatch, navigation} = this.props;
-    const setCurrStoreIdCallback = (set_ok, msg) => {
-      if (set_ok) {
-        dispatch(setCurrentStore(storeId));
-        if (not_bind) {
-          navigation.navigate(Config.ROUTE_STORE_STATUS)
-          hideModal()
-          return;
-        }
-        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
-      } else {
-        showError(msg);
-      }
-    };
-    if (Platform.OS === 'ios') {
-      setCurrStoreIdCallback(true, '');
-    } else {
-      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    dispatch(setCurrentStore(storeId));
+
+    if (not_bind) {
+      navigation.navigate(Config.ROUTE_STORE_STATUS)
+      hideModal()
+      return;
     }
+
+    if (this.props.global.show_bottom_tab ) {
+      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
+    }
+
+    navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
+    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+      initTab: Config.ROUTE_ORDERS,
+      initialRouteName: Config.ROUTE_ALERT
+    });
+
+    hideModal()
   }
 
   closeModal = () => {
