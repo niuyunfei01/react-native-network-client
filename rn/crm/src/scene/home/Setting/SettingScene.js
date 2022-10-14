@@ -244,7 +244,7 @@ class SettingScene extends PureComponent {
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
-      navigation.navigate(Config.ROUTE_LOGIN, {});
+      tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
     }));
   }
 

@@ -27,6 +27,8 @@ import HttpUtils from "../../../pubilc/util/http";
 
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
+import tool from "../../../pubilc/util/tool";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -46,6 +48,13 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class UserScene extends PureComponent {
+
+  static propTypes = {
+    route: PropTypes.object,
+    remind: PropTypes.object,
+    mine: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
     const {navigation} = props;
@@ -148,7 +157,7 @@ class UserScene extends PureComponent {
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
-      navigation.navigate(Config.ROUTE_LOGIN, {});
+      tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
     }));
   }
 

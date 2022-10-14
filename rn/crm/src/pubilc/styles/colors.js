@@ -17,6 +17,7 @@ const colors = {
   f3: '#f3f3f3',
   f5: '#F5F5F5',
   f7: '#f7f7f7',
+  f9: '#f9f9f9',
   fa: '#FAFAFA',
   e5: '#E5E5E5',
   default_theme: '#33A3F4',

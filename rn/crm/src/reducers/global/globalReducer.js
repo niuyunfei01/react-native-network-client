@@ -58,7 +58,7 @@ const initialState = {
   customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {
-    order_list_by: 'expectTime asc',
+    order_list_by: 'orderTime asc',
   },
   bleStarted: false,
   printer_id: '0',
