@@ -557,6 +557,7 @@ class OrderListScene extends Component {
 
     return (
       <View style={styles.flex1}>
+
         <FloatServiceIcon fromComponent={'订单列表'}/>
         {this.renderHead()}
         {this.renderStatusTabs()}
@@ -564,7 +565,6 @@ class OrderListScene extends Component {
         {this.renderSortModal()}
         <HotUpdateComponent/>
         <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
-
         {/*<Scanner visible={scanBoolean} title="返回"*/}
         {/*         onClose={() => this.setState({scanBoolean: false})}*/}
         {/*         onScanSuccess={code => this.onScanSuccess(code)}*/}
@@ -873,161 +873,6 @@ class OrderListScene extends Component {
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
-  extStore: {
-    flexDirection: 'row',
-    lineHeight: 30,
-    paddingLeft: '2%',
-    paddingTop: 10,
-    paddingBottom: 6,
-    backgroundColor: colors.white
-  },
-  extStoreLabel: {fontSize: pxToDp(30), marginTop: pxToDp(3)},
-  glassIcon: {fontSize: 24, color: colors.color666},
-  center: {alignItems: 'center', justifyContent: 'center'},
-  modalWrap: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.25)'
-  },
-  modalContentWrap: {
-    width: '80%',
-    backgroundColor: colors.colorEEE,
-    borderRadius: 8,
-  },
-  modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
-  modalImgStyle: {width: 51.2, height: 51.2, marginTop: 12, borderRadius: 8},
-  modalContentText: {paddingTop: 12, paddingBottom: 16, marginLeft: 20, marginRight: 20, lineHeight: 25},
-  modalBtnWrap: {
-    backgroundColor: colors.main_color,
-    marginLeft: 20,
-    marginRight: 20,
-    borderRadius: 8
-  },
-  closeNewVersionModal: {fontSize: 20, textAlign: 'right'},
-  modalBtnText: {color: colors.white, fontSize: 20, padding: 12, textAlign: 'center'},
-  cell_row: {
-    marginLeft: 0,
-    paddingLeft: pxToDp(20),
-    backgroundColor: "#F2DDE0",
-    height: pxToDp(70),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  cell_body_text: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color333,
-  },
-  button_status: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    padding: pxToDp(7),
-    backgroundColor: colors.warn_color,
-    borderRadius: pxToDp(3),
-    color: colors.white,
-    marginRight: 10
-  },
-  printer_status_ok: {
-    color: colors.main_color,
-  },
-  printer_status_error: {
-    color: '#f44040',
-  },
-  searchBarPrefix: {
-    flexDirection: 'row',
-    width: pxToDp(140),
-    flex: 1,
-    position: 'relative',
-    alignItems: 'center'
-  },
-  label_box: {
-    backgroundColor: colors.white,
-    paddingHorizontal: pxToDp(20),
-    paddingVertical: pxToDp(10),
-  },
-  alert_msg: {
-    paddingHorizontal: pxToDp(5),
-    paddingVertical: pxToDp(10),
-    fontSize: pxToDp(28),
-    color: colors.color999,
-  },
-  label_view: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  label_style: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    borderWidth: pxToDp(1),
-    borderColor: colors.color999,
-    margin: pxToDp(10),
-    borderRadius: 13,
-    paddingVertical: pxToDp(8),
-    paddingHorizontal: pxToDp(20),
-  },
-  container: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.fontGray,
-  },
-  goToNew: {
-    margin: pxToDp(10),
-    marginLeft: pxToDp(30),
-    marginRight: pxToDp(30),
-    fontSize: pxToDp(32),
-    color: colors.white
-  },
-  tabsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    flexWrap: "nowrap",
-    backgroundColor: colors.white,
-    paddingVertical: 8,
-    width: width
-  },
-  tabsHeader1: {
-    backgroundColor: colors.f7,
-    width: 0.75 * width,
-    padding: pxToDp(8),
-    paddingLeft: pxToDp(0),
-    borderRadius: pxToDp(15),
-    flexDirection: 'row',
-    marginLeft: 10,
-  },
-  tabsHeader2: {
-    width: 0.24 * width,
-
-    paddingVertical: pxToDp(10),
-
-    borderRadius: pxToDp(18),
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: "center",
-    marginLeft: pxToDp(10),
-    color: colors.main_color,
-    backgroundColor: colors.white
-  },
-  tabsHeader3: {
-    width: 0.24 * width,
-
-    fontWeight: 'bold',
-    paddingVertical: pxToDp(10),
-
-    borderRadius: pxToDp(18),
-    fontSize: 16,
-    textAlign: "center",
-    marginLeft: pxToDp(10),
-    color: colors.color111,
-  },
-  tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
   modalDropDown: {
     width: 128,
     height: 100,
@@ -1051,53 +896,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.color333,
   },
-  modalDropDownIcon: {marginRight: 16, marginLeft: 18},
-  modalDropDownIconMenu: {fontSize: 24, color: colors.color666},
   statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 56},
-  statusTabItem: {
-    borderColor: colors.main_color,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
   f14c33: {
     color: colors.color333,
     fontSize: 14
   },
-  statusTabBadge: {position: 'absolute', top: 1, right: -15},
   statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
   orderListContent: {flex: 1, backgroundColor: colors.f5,},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
-  sortModal: {
-    width: 0,
-    height: 0,
-    borderRightWidth: 10,
-    borderRightColor: 'transparent',
-    borderLeftWidth: 10,
-    borderLeftColor: 'transparent',
-    borderBottomWidth: 10,
-    borderBottomColor: 'rgba(0,0,0,0.75)',
-    position: "absolute",
-    top: 37,
-    left: 350,
-  },
-  sortModalSelect: {
-    width: '30%',
-    position: 'absolute',
-    right: '3%',
-    top: '6%',
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    borderRadius: pxToDp(10)
-  },
-  image: {
-    width: width,
-    height: 70,
-    borderRadius: 10
-  },
-  right_btn: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(8),
-    marginLeft: pxToDp(10),
-  },
   noOrderContent: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -1121,44 +927,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16
   },
-  topImg: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    backgroundColor: '#EEDEE0',
-    height: 40
-  },
-  topImgDesc: {color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1},
-  topImgBtn: {
-    backgroundColor: colors.red,
-    borderRadius: 6,
-    marginRight: 13,
-    paddingVertical: 3,
-    paddingHorizontal: 4,
-  },
-  topImgTitle: {
-    fontSize: 12,
-    color: colors.white,
-  },
-  topImgBottom: {paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'},
-  topImgIcon: {
-    position: 'absolute',
-    color: colors.white,
-    right: 12,
-    top: -1,
-  },
-  bottomImg: {
-    paddingLeft: '3%', paddingRight: '3%', paddingBottom: pxToDp(20)
-  },
-  wrapper: {
-    marginVertical: 10
-  },
-  slide1: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)
