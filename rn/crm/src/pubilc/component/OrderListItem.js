@@ -627,7 +627,7 @@ class OrderListItem extends React.PureComponent {
 
   touchOrderInfoDetail = (item) => {
     this.mixpanel.track('点击详情')
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
   }
 
   touchShipDetail = (item) => {
@@ -810,7 +810,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   routeOrder = (item) => {
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
     this.mixpanel.track('订单详情页')
   }
 

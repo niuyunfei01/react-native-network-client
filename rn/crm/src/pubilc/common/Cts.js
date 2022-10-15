@@ -184,5 +184,17 @@ export default {
     {label: '饿了么', id: 4},
     {label: '京东', id: 6},
     {label: '其它', id: -1},
-  ]
+  ],
+
+  task_type: {
+    0: {'sort': 99, 'name': '其他'},
+    3: {'sort': 1, 'name': '其他重要'},
+    2: {'sort': 2, 'name': '门店退款'},
+    1: {'sort': 3, 'name': '疑似差评'},
+    4: {'sort': 4, 'name': '催单'},
+    5: {'sort': 5, 'name': '客户退款'},
+    6: {'sort': 6, 'name': '取消配送'},
+    7: {'sort': 7, 'name': '订单修改'},
+    12: {'sort': 12, 'name': '客户退款'},
+  }
 }

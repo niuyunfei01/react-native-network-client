@@ -68,6 +68,12 @@ export const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情新'}}
+                      getComponent={() => require("../../scene/order/OrderInfoNew").default}
+                      initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_OPERATION_LOG} options={{headerTitle: '操作日志'}}
+                      getComponent={() => require("../../scene/order/OrderOperationLog").default}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderListScene").default}
                       initialParams={initialRouteParams}/>

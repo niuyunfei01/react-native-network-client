@@ -65,6 +65,8 @@ const C = {
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
+  ROUTE_ORDER_NEW: 'OrderNew',
+  ROUTE_OPERATION_LOG: 'OrderOperationLog',
   ROUTE_ALERT: 'Tab', //home for reminds
   ROUTE_ORDERS: 'Orders',
   ROUTE_USER: 'User',
