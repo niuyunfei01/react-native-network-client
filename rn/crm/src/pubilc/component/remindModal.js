@@ -21,6 +21,7 @@ const initState = {
 class RemindModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
+    currStoreId: PropTypes.string,
     onPress: PropTypes.func
   }
   state = initState
@@ -61,8 +62,7 @@ class RemindModal extends React.Component {
     const api = `/v1/new_api/advice/recordAdvice/${id}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken
-    }).then((res) => {
-    })
+    }).then()
   }
 
   toAdvicesDetail = (val) => {

@@ -37,7 +37,6 @@ import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {showError, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {empty_data, menu_left, seach_icon, this_down} from "../../svg/svg";
-import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import store from "../../pubilc/util/configureStore";
@@ -49,6 +48,7 @@ import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/compone
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
+import GoodsListModal from "../../pubilc/component/GoodsListModal";
 
 const {width} = Dimensions.get("window");
 
@@ -99,6 +99,8 @@ const initState = {
   orderNum: {},
   isCanLoadMore: false,
   scanBoolean: false,
+  order_id: 0,
+  show_goods_list: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -362,7 +364,7 @@ class OrderListScene extends Component {
       let api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         this.setState({
-          show_bind_button: tool.length(res.business_status) > 0,
+          show_bind_button: tool.length(res.business_status) <= 0,
         })
       })
       api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
@@ -551,20 +553,32 @@ class OrderListScene extends Component {
 
   render() {
     const {currStoreId, accessToken} = this.props.global;
+    const {is_service_mgr = false} = tool.vendor(this.props.global);
+
     const {
       ListData,
+      order_id,
+      show_goods_list,
     } = this.state
 
     return (
       <View style={styles.flex1}>
 
-        <FloatServiceIcon fromComponent={'订单列表'}/>
+        {/*<FloatServiceIcon fromComponent={'订单列表'}/>*/}
         {this.renderHead()}
         {this.renderStatusTabs()}
         {this.renderContent(ListData)}
         {this.renderSortModal()}
         <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
+        <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
+        <GoodsListModal
+          setState={this.setState.bind(this)}
+          onPress={this.onPress.bind(this)}
+          is_service_mgr={is_service_mgr}
+          accessToken={accessToken}
+          order_id={order_id}
+          currStoreId={currStoreId}
+          show_goods_list={show_goods_list}/>
         {/*<Scanner visible={scanBoolean} title="返回"*/}
         {/*         onClose={() => this.setState({scanBoolean: false})}*/}
         {/*         onScanSuccess={code => this.onScanSuccess(code)}*/}
@@ -645,7 +659,7 @@ class OrderListScene extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      height: 48,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -658,24 +672,20 @@ class OrderListScene extends Component {
     return (
       <View style={{
         flexDirection: 'row',
-        alignContent: 'center',
+        alignItems: 'center',
         height: 44,
         width: width,
         backgroundColor: colors.white,
         paddingHorizontal: 12
       }}>
-        <View>
+        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE)}
+                xml={menu_left()}/>
 
-          <TouchableOpacity
-            onPress={() => this.onPress(Config.ROUTE_MINE)}
-            style={{height: 44, flexDirection: 'row', alignItems: 'center', paddingRight: 16}}>
-            <SvgXml xml={menu_left()}/>
-          </TouchableOpacity>
-
-        </View>
         <TouchableOpacity onPress={() => {
           console.log('121')
-        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center',}}>
+        }} style={{
+          height: 44, flex: 1, flexDirection: 'row', alignItems: 'center',
+        }}>
           <Text style={{
             fontSize: 15,
             color: colors.color333
@@ -831,7 +841,7 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {orderStatus} = this.state;
-    let {vendor_id, vendor_info, accessToken} = this.props.global
+    let {vendor_info, accessToken} = this.props.global
     return (
       <OrderItem showBtn={'1' === vendor_info.wsb_store_account}
                  key={index}
@@ -839,10 +849,9 @@ class OrderListScene extends Component {
                  item={item}
                  accessToken={accessToken}
                  navigation={this.props.navigation}
-                 vendorId={vendor_id || '0'}
                  setState={this.setState.bind(this)}
                  orderStatus={orderStatus}
-                 onPress={this.onPress}/>
+      />
     );
   }
 

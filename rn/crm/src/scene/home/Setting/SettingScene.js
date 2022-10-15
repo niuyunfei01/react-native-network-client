@@ -14,7 +14,7 @@ import {
   View
 } from 'react-native';
 import * as globalActions from '../../../reducers/global/globalActions';
-import {logout, setOrderListExtStore} from '../../../reducers/global/globalActions';
+import {logout} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
 import JPush from "jpush-react-native";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -75,15 +75,7 @@ class SettingScene extends PureComponent {
       showAlertModal: false,
       showDeleteModal: false,
       shouldShowModal: false,
-      servers: [
-        {name: '正式版1', host: "www.cainiaoshicai.cn"},
-        {name: '正式版2', host: "api.waisongbang.com"},
-        {name: '预览版', host: "rc.waisongbang.com"},
-        {name: 'beta版', host: "beta7.waisongbang.com"},
-        {name: '测试版2', host: "fire2.waisongbang.com"},
-        {name: '测试版7', host: "fire7.waisongbang.com"},
-      ],
-      show_orderlist_goods: false,
+      order_list_show_product: false,
       is_alone_pay_vendor: true,
       is_owner: false,
       bd_mobile: '',
@@ -98,9 +90,6 @@ class SettingScene extends PureComponent {
   }
 
   onHeaderRefresh = () => {
-    let {show_orderlist_goods} = this.props.global;
-
-    this.setState({show_orderlist_goods})
     this.setState({isRefreshing: true});
     if (Platform.OS !== 'ios') {
       native.getDisableSoundNotify((disabled,) => {
@@ -148,6 +137,7 @@ class SettingScene extends PureComponent {
         invoice_serial_font: res?.invoice_serial_font,
         hide_good_titles_to_shipper: Boolean(res.hide_good_titles_to_shipper),
         use_real_weight: Number(res?.use_real_weight) === 1,
+        order_list_show_product: Number(res?.order_list_show_product) === 1,
         is_alone_pay_vendor: Boolean(res?.is_alone_pay_vendor),
         is_owner: Boolean(res?.is_owner),
         bd_mobile: tool.length(res?.delivery_bd_info) > 0 ? res.delivery_bd_info.mobile : '',
@@ -244,7 +234,7 @@ class SettingScene extends PureComponent {
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
-      tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
+      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
     }));
   }
 
@@ -482,7 +472,7 @@ class SettingScene extends PureComponent {
 
   renderGoods = () => {
     let {dispatch} = this.props;
-    let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, show_orderlist_goods} = this.state
+    let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, order_list_show_product} = this.state
     return (
       <View>
         <View style={styles.item_body}>
@@ -521,12 +511,8 @@ class SettingScene extends PureComponent {
 
 
             <TouchableOpacity onPress={() => {
-              let val = !show_orderlist_goods;
-              this.setState({
-                show_orderlist_goods: val,
-              }, () => {
-                dispatch(setOrderListExtStore(val));
-              })
+              let val = !order_list_show_product;
+              this.setConfig('order_list_show_product', val)
             }}
                               style={styles.item_row}>
               <View style={{flex: 1}}>
@@ -534,13 +520,9 @@ class SettingScene extends PureComponent {
                 <Text style={styles.row_label_desc}>开启后，订单列表页可见商品信息 </Text>
               </View>
               <Switch onValueChange={(val) => {
-                this.setState({
-                  show_orderlist_goods: val,
-                }, () => {
-                  dispatch(setOrderListExtStore(val));
-                })
+                this.setConfig('order_list_show_product', val)
               }} color={colors.main_color}
-                      value={show_orderlist_goods}
+                      value={order_list_show_product}
               />
             </TouchableOpacity>
 

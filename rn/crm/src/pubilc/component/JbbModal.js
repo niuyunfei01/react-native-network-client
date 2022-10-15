@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
-import {Modal, TouchableHighlight, TouchableOpacity, View} from 'react-native'
+import {Modal, ScrollView, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -13,6 +13,7 @@ class JbbModal extends PureComponent {
     visible: PropTypes.bool,
     modal_type: PropTypes.string,
     modalStyle: PropTypes.object,
+    children: PropTypes.object,
     HighlightStyle: PropTypes.object,
   }
   static defaultProps = {
@@ -48,9 +49,11 @@ class JbbModal extends PureComponent {
             padding: pxToDp(30),
             paddingBottom: pxToDp(50)
           }, this.props.HighlightStyle]}>
-            <View style={[{padding: 10}, this.props.modalStyle]}>
+            <ScrollView style={[{
+              padding: 10,
+            }, this.props.modalStyle]}>
               {this.props.children}
-            </View>
+            </ScrollView>
           </TouchableHighlight>
         </TouchableOpacity>
       </Modal>

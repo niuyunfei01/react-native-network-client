@@ -34,8 +34,8 @@ import Entypo from "react-native-vector-icons/Entypo"
 import {Button, Image} from "react-native-elements";
 import BottomModal from "./BottomModal";
 import {MixpanelInstance} from "../util/analytics";
-import {call, locationIcon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import {call, locationIcon} from "../../svg/svg";
 
 let width = Dimensions.get("window").width;
 
@@ -53,6 +53,7 @@ class OrderItem extends React.PureComponent {
     accessToken: PropTypes.string,
     showBtn: PropTypes.bool,
     fetchData: PropType.func,
+    setState: PropType.func,
     comesBackBtn: PropType.bool,
   };
   state = {
@@ -120,6 +121,21 @@ class OrderItem extends React.PureComponent {
     });
   }
 
+
+  cancelDeliverys = () => {
+    let order = this.props.item
+    let token = this.props.accessToken
+    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
+      text: '确定', onPress: () => {
+        const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
+        HttpUtils.get.bind(this.props)(api, {}).then(res => {
+          ToastShort(res.desc);
+          this.props.fetchData();
+        })
+      }
+    }, {'text': '取消'}]);
+  }
+
   toSetOrderComplete = (order_id) => {
     Alert.alert('确认将订单已送达', '订单置为已送达后无法撤回，是否继续？', [{
       text: '确认', onPress: () => {
@@ -144,7 +160,7 @@ class OrderItem extends React.PureComponent {
     ToastLong('已复制到剪切板')
   }
 
-  loseDelivery = (val) => {
+  closeDelivery = (val) => {
     this.mixpanel.track('订单列表页_忽略配送')
     Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
       text: '继续忽略配送',
@@ -154,7 +170,7 @@ class OrderItem extends React.PureComponent {
     }])
   }
 
-  closePickModal = () => {
+  closeModal = () => {
     this.setState({
       verification_modal: false,
     })
@@ -191,40 +207,25 @@ class OrderItem extends React.PureComponent {
     this.mixpanel.track('订单详情页')
   }
 
-  renderContent = () => {
-    return (
-      <View>
-        <View style={{backgroundColor: 'red', height: 20}}>
-          <Text>232342</Text>
-        </View>
-      </View>
-    )
-  }
-
-
   render() {
     let {item, showBtn} = this.props;
     return (
       <TouchableWithoutFeedback onPress={() => this.routeOrder()}>
         <View style={styles.ItemContent}>
-
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
             {this.renderUser()}
             {this.renderGoods()}
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
+            <If condition={item?.btn_list && item?.btn_list?.write_off}>
+              {this.renderVerificationBtn()}
+            </If>
+            <If condition={Number(item.pickType) !== 1 && showBtn}>
+              {this.renderButton()}
+            </If>
           </View>
-          <If condition={(Number(item.pickType) === 1 && item.orderStatus < 4)}>
-            {this.renderVerificationBtn()}
-          </If>
-
-          <If condition={Number(item.pickType) !== 1 && showBtn}>
-            {this.renderButton()}
-          </If>
-
           {this.renderPickModal()}
-
         </View>
 
       </TouchableWithoutFeedback>
@@ -247,7 +248,7 @@ class OrderItem extends React.PureComponent {
           length: 48,
         }}
         btnTitleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
-        onPressClose={() => this.closePickModal()}>
+        onPressClose={() => this.closeModal()}>
         <TextInput placeholder={"请输入核销码"}
                    onChangeText={(pickupCode) => {
                      this.setState({pickupCode})
@@ -272,7 +273,7 @@ class OrderItem extends React.PureComponent {
         backgroundColor: colors.f9
       }}>
 
-        <If condition={!item.is_right_once}>
+        <If condition={item.is_right_once}>
           <View style={{
             position: 'absolute',
             left: 0,
@@ -285,8 +286,6 @@ class OrderItem extends React.PureComponent {
 
         <Image source={{uri: item.platformIcon}}
                style={styles.platformIcon}/>
-
-
         <View style={{flex: 1, marginLeft: 10}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{
@@ -295,14 +294,26 @@ class OrderItem extends React.PureComponent {
               color: colors.color333,
               marginRight: 10
             }}>#{item.platform_dayId} </Text>
+            <If condition={Number(item?.pickType) === 1}>
+              <Text style={{
+                borderWidth: 0.5,
+                borderColor: colors.main_color,
+                borderRadius: 2,
+                color: colors.main_color,
+                marginRight: 10,
+                height: 16,
+                lineHeight: 16,
+                width: 48,
+                fontSize: 10,
+                textAlign: 'center'
+              }}>
+                到店自提
+              </Text>
+            </If>
             <Text style={{
               fontSize: 12,
               color: '#FF8309'
-            }}>{item.friendly_order_time} </Text>
-            <Text style={{
-              fontSize: 12,
-              color: colors.color666,
-            }}>下单 </Text>
+            }}>{item.friendly_time_info} </Text>
           </View>
           <Text style={{
             color: colors.color666,
@@ -333,7 +344,11 @@ class OrderItem extends React.PureComponent {
   renderUser = () => {
     let {item} = this.props;
     return (
-      <View style={styles.contentHeader}>
+      <View style={{
+        paddingBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}>
         <View style={{flex: 1}}>
           <Text style={styles.userNameText}> {item.userName} &nbsp;&nbsp;{item.mobile_readable} </Text>
           <Text style={{
@@ -343,12 +358,13 @@ class OrderItem extends React.PureComponent {
           }}> {tool.length((item.address || '')) > 16 ? item.address.substring(0, 15) + '...' : item.address} </Text>
         </View>
 
-        <TouchableOpacity style={{paddingHorizontal: 10,}} onPress={() => this.touchLocation()}>
+        <TouchableOpacity style={{paddingHorizontal: 10}}
+                          onPress={() => this.touchLocation()}>
           <SvgXml xml={locationIcon()}/>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{paddingHorizontal: 10,}} onPress={() => {
-          // this.touchMobile()
+        <TouchableOpacity style={{paddingHorizontal: 10}} onPress={() => {
+          this.touchMobile()
         }}>
           <SvgXml xml={call()}/>
         </TouchableOpacity>
@@ -358,11 +374,15 @@ class OrderItem extends React.PureComponent {
 
   renderGoods = () => {
     let {item} = this.props;
-    if (item?.goods_info?.count <= 0) {
+    if (tool.length(item?.goods_info) <= 0 || item?.goods_info?.count <= 0) {
       return null;
     }
     return (
       <TouchableOpacity onPress={() => {
+        this.props.setState({
+          order_id: item?.id,
+          show_goods_list: true
+        })
       }} style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>商品 {item?.goods_info?.count} 件 </Text>
@@ -379,9 +399,12 @@ class OrderItem extends React.PureComponent {
 
   renderDeliveryDesc = () => {
     let {item} = this.props;
+    if (!item?.is_show_ship_status_desc) {
+      return null;
+    }
     return (
       <TouchableOpacity style={[styles.contentHeader, {paddingTop: 12}]}>
-        <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>[ 美团/顺丰/…4个配送 ] 下单成功 </Text>
+        <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>{item?.ship_status_desc} </Text>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
       </TouchableOpacity>
     )
@@ -390,13 +413,19 @@ class OrderItem extends React.PureComponent {
 
   renderDelivery = () => {
     let {item} = this.props;
+    if (!item?.is_show_ship_worker) {
+      return null
+    }
     return (
       <TouchableOpacity style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>配送中 </Text>
+          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-            <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>美团跑腿 </Text>
-            <Text style={{fontSize: 14, color: colors.color666}}>任志峰 &nbsp; 15011309110_400 </Text>
+            <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>{item?.ship_platform_name} </Text>
+            <Text style={{
+              fontSize: 14,
+              color: colors.color666
+            }}>{item?.ship_worker_name} &nbsp; {item?.ship_worker_mobile} </Text>
           </View>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
@@ -405,134 +434,129 @@ class OrderItem extends React.PureComponent {
   }
 
   renderButton = () => {
-    let {item} = this.props;
+    let {item, comesBackBtn} = this.props;
     let obj_num = 0
-    if (this.props.comesBackBtn) {
+    if (comesBackBtn) {
       obj_num = 1
     } else {
       tool.objectMap(item?.btn_list, (item, idx) => {
         obj_num += item
       })
     }
-    let btn_width = 0.90 / Number(obj_num)
+    let btn_width = 0.82 / Number(obj_num)
     return (
       <View
-        style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
+        style={{
+          paddingTop: 12,
+          borderTopWidth: 0.5,
+          borderColor: colors.e5,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
 
-        <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
+        <If condition={item?.btn_list && !item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
-                  onPress={() => this.loseDelivery(item.id)}
+                  onPress={() => this.closeDelivery(item.id)}
                   buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    width: width * btn_width
+                    borderWidth: 0.5,
+                    width: width * btn_width,
                   }]}
-                  titleStyle={{color: colors.colorCCC, fontSize: 16}}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
           />
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.switch_batch_cancel_delivery_order}>
           <Button title={'取消配送'}
                   onPress={() => {
-                    this.setState({showDeliveryModal: false})
                     this.cancelDeliverys(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
-                    borderColor: colors.color666,
-                    width: width * btn_width
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 0.5,
+                    width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
           />
         </If>
 
-        <If condition={item?.btn_list && item?.btn_list?.transfer_self}>
-          <Button title={'我自己送'}
-                  onPress={() => this.myselfSend(item)}
-                  buttonStyle={[styles.modalBtn, {
-                    borderColor: colors.main_color,
-                    width: width * btn_width
-                  }]}
-                  titleStyle={{color: colors.main_color, fontSize: 16}}
-          />
-        </If>
         <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
           <Button title={'加小费'}
                   onPress={() => {
-                    this.setState({showDeliveryModal: false})
                     this.mixpanel.track('订单列表页_加小费')
                   }}
                   buttonStyle={[styles.modalBtn, {
-                    borderColor: colors.main_color,
-                    width: width * btn_width
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 0.5,
+                    width: width * btn_width,
                   }]}
-                  titleStyle={{color: colors.main_color, fontSize: 16}}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
           />
         </If>
+
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
-          <Button title={'呼叫配送'}
+          <Button title={'下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('订单列表页_呼叫配送')
                   }}
-                  buttonStyle={[styles.callDeliveryBtn, {
-                    width: width * btn_width
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery_again}>
+          <Button title={'追加配送'}
+                  onPress={() => {
+                    this.onCallThirdShips(item.id, item.store_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
         <If condition={item?.btn_list && item?.btn_list?.btn_contact_rider}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(item.ship_worker_mobile)}
-                  buttonStyle={[styles.callDeliveryBtn, {
-                    width: width * btn_width
-                  }]}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </If>
-        <If condition={item?.btn_list && item?.btn_list?.btn_cancel_delivery}>
-          <Button title={'取消配送'}
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-
-                    Alert.alert('提示', `确定取消当前配送吗?`, [
-                      {text: '取消'},
-                      {
-                        text: '确定', onPress: () => {
-                          this.cancelDelivery(item.id)
-                        }
-                      }
-                    ])
-                  }}
+                  onPress={() => this.dialNumber(item?.ship_worker_mobile)}
                   buttonStyle={[styles.modalBtn, {
-                    borderColor: colors.main_color,
-                    width: width * btn_width
-                  }]}
-                  titleStyle={{color: colors.main_color, fontSize: 16}}
-          />
-        </If>
-        <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
-          <Button title={'重新上传配送信息'}
-                  onPress={() => {
-                    this.mixpanel.track('配送回传详情页_重新上传')
-                    this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id, 1)
-                  }}
-                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
                     width: width * btn_width,
-                    borderColor: colors.main_color,
-                    backgroundColor: colors.main_color
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
-        <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived === 1}>
-          <Button title={'确认送达'}
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived}>
+          <Button title={'配送完成'}
                   onPress={() => {
                     this.mixpanel.track('确认送达')
                     this.toSetOrderComplete(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
                     width: width * btn_width,
-                    borderColor: colors.main_color,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
+        <If condition={this.props.comesBackBtn !== undefined && this.props.comesBackBtn}>
+          <Button title={'重新上传配送信息'}
+                  onPress={() => {
+                    this.mixpanel.track('配送回传详情页_重新上传')
+                    this.onAinSend(item.id, item.store_id, 1)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    width: width * btn_width,
                     backgroundColor: colors.main_color
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
@@ -567,7 +591,7 @@ const styles = StyleSheet.create({
   humanExpectTime: {fontWeight: "bold", fontSize: 14, color: "#FF8854"},
   contentHeader: {
     paddingBottom: 12,
-    borderBottomWidth: 0.5,
+    borderTopWidth: 0.5,
     borderColor: colors.e5,
     flexDirection: 'row',
     alignItems: 'center',
@@ -584,6 +608,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     borderRadius: 6,
   },
+  modalBtn: {
+    flex: 1,
+    borderRadius: 20,
+    height: 36,
+    marginHorizontal: 6,
+  }
 });
 
 
