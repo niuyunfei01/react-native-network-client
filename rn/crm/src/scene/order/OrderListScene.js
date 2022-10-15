@@ -49,6 +49,7 @@ import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
+import AddTipModal from "../../pubilc/component/AddTipModal";
 
 const {width} = Dimensions.get("window");
 
@@ -90,17 +91,14 @@ const initState = {
   ListData: [],
   orderStatus: 9,
   showSortModal: false,
-  show_voice_pop: false,
-  show_inform_pop: false,
-  show_hint: false,
-  hint_msg: 1,
   show_bind_button: false,
-  ext_store_id: 0,
   orderNum: {},
   isCanLoadMore: false,
   scanBoolean: false,
   order_id: 0,
   show_goods_list: false,
+  add_tip_id: 0,
+  show_add_tip_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -554,11 +552,13 @@ class OrderListScene extends Component {
   render() {
     const {currStoreId, accessToken} = this.props.global;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-
+    let {dispatch} = this.props;
     const {
       ListData,
       order_id,
       show_goods_list,
+      show_add_tip_modal,
+      add_tip_id,
     } = this.state
 
     return (
@@ -579,6 +579,15 @@ class OrderListScene extends Component {
           order_id={order_id}
           currStoreId={currStoreId}
           show_goods_list={show_goods_list}/>
+
+        <AddTipModal
+          setState={this.setState.bind(this)}
+          accessToken={accessToken}
+          id={add_tip_id}
+          orders_add_tip={true}
+          dispatch={dispatch}
+          show_add_tip_modal={show_add_tip_modal}/>
+
         {/*<Scanner visible={scanBoolean} title="返回"*/}
         {/*         onClose={() => this.setState({scanBoolean: false})}*/}
         {/*         onScanSuccess={code => this.onScanSuccess(code)}*/}

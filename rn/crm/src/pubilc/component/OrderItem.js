@@ -443,8 +443,7 @@ class OrderItem extends React.PureComponent {
         obj_num += item
       })
     }
-    console.log(obj_num, item?.btn_list, 'bog1')
-    let btn_width = (obj_num === 2 ? 0.84 : 0.83) / Number(obj_num)
+    let btn_width = 0.83 / Number(obj_num)
     return (
       <View
         style={{
@@ -453,6 +452,7 @@ class OrderItem extends React.PureComponent {
           borderColor: colors.e5,
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'center',
         }}>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
@@ -468,7 +468,7 @@ class OrderItem extends React.PureComponent {
           />
         </If>
 
-        <If condition={item?.btn_list && item?.btn_list?.switch_batch_cancel_delivery}>
+        <If condition={item?.btn_list && item?.btn_list?.batch_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
                     this.cancelDeliverys(item.id)
@@ -483,9 +483,13 @@ class OrderItem extends React.PureComponent {
           />
         </If>
 
-        <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
+        <If condition={item?.btn_list && item?.btn_list?.batch_add_delivery_tips}>
           <Button title={'加小费'}
                   onPress={() => {
+                    this.props.setState && this.props.setState({
+                      add_tip_id: item?.id,
+                      show_add_tip_modal: true
+                    })
                     this.mixpanel.track('订单列表页_加小费')
                   }}
                   buttonStyle={[styles.modalBtn, {
