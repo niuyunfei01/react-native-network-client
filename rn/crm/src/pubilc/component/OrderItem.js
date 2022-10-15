@@ -443,7 +443,8 @@ class OrderItem extends React.PureComponent {
         obj_num += item
       })
     }
-    let btn_width = 0.82 / Number(obj_num)
+    console.log(obj_num, item?.btn_list, 'bog1')
+    let btn_width = (obj_num === 2 ? 0.84 : 0.83) / Number(obj_num)
     return (
       <View
         style={{
@@ -454,7 +455,7 @@ class OrderItem extends React.PureComponent {
           alignItems: 'center',
         }}>
 
-        <If condition={item?.btn_list && !item?.btn_list?.btn_ignore_delivery}>
+        <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
                   onPress={() => this.closeDelivery(item.id)}
                   buttonStyle={[styles.modalBtn, {
@@ -467,7 +468,7 @@ class OrderItem extends React.PureComponent {
           />
         </If>
 
-        <If condition={item?.btn_list && item?.btn_list?.switch_batch_cancel_delivery_order}>
+        <If condition={item?.btn_list && item?.btn_list?.switch_batch_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
                     this.cancelDeliverys(item.id)
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20,
     height: 36,
-    marginHorizontal: 6,
+    marginHorizontal: 3,
   }
 });
 
