@@ -2,11 +2,18 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
-  Dimensions, Image,
-  InteractionManager, PermissionsAndroid, Platform,
+  Animated,
+  Dimensions,
+  Image,
+  InteractionManager,
+  PanResponder,
+  PermissionsAndroid,
+  Platform,
   RefreshControl,
   ScrollView,
-  StyleSheet, Text, TouchableOpacity,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 import HttpUtils from "../../pubilc/util/http";
@@ -71,9 +78,7 @@ const MENU_CALL_STAFF = 17; // 联系员工
 
 function mapStateToProps(state) {
   return {
-    order: state.order,
     global: state.global,
-    store: state.store,
     device: state.device
   }
 }
@@ -132,8 +137,10 @@ class OrderInfoNew extends PureComponent {
       showPrinterChooser: false,
       modalTip: false,
       showQrcode: false,
-      showDeliveryModal: false
+      showDeliveryModal: false,
+      map_height: new Animated.Value(290),
     }
+
   }
 
   componentDidMount = () => {
@@ -155,6 +162,49 @@ class OrderInfoNew extends PureComponent {
     calcMs(timeObj, accessToken)
     this.enableBluetooth()
   }
+  setMapHeight = (map_height) => {
+    Animated.timing(                       // 随时间变化而执行动画
+      this.state.map_height,            // 动画中的变量值
+      {
+        toValue: map_height,                        // 透明度最终变为1，即完全不透明
+        duration: 400,                   // 让动画持续一段时间
+      }
+    ).start();
+  }
+
+  UNSAFE_componentWillMount() {
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        return true;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderGrant: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        if (-5 < gestureState.dy && gestureState.dy < 5) {
+          return;
+        }
+        this.setMapHeight((gestureState.dy > 10 ? 0.68 : 0.35) * height)
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        return true;
+
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        return true;
+        // Another component has become the responder, so this gesture
+        // should be cancelled
+      }
+    });
+
+  }
+
 
   componentDidUpdate = () => {
     if (tool.length(timeObj.method) > 0) {
@@ -287,7 +337,7 @@ class OrderInfoNew extends PureComponent {
         qrcode: tool.length(obj.pickup_code) > 0 ? obj.pickup_code : ''
       }, () => {
 
-        if (res?.loc_lat !=='' && res?.loc_lng !== '') {
+        if (res?.loc_lat !== '' && res?.loc_lng !== '') {
           this.setState({
             isShowMap: true
           })
@@ -563,17 +613,14 @@ class OrderInfoNew extends PureComponent {
     this.setState({showDeliveryModal: false})
   }
 
-  downDeliveryInfo = (i) => {
-    let delivery_list = [...this.state.delivery_list]
-    delivery_list[i].default_show = !delivery_list[i].default_show
-    this.setState({delivery_list: delivery_list})
-  }
-
   renderMap = () => {
     let {loc_lat, loc_lng, store_name} = this.state.order;
+    let {map_height} = this.state;
     return (
-      <View style={{height: 300}}>
+      <Animated.View style={{height: map_height}}>
         <MapView
+          scrollGesturesEnabled={false}
+          rotateGesturesEnabled={false}
           mapType={MapType.Navi}
           initialCameraPosition={{
             target: {latitude: Number(loc_lat), longitude: Number(loc_lng)},
@@ -596,13 +643,13 @@ class OrderInfoNew extends PureComponent {
             </View>
           </Marker>
         </MapView>
-      </View>
+      </Animated.View>
     )
   }
 
   renderOrderInfo = () => {
     return (
-      <View style={{zIndex: 999, marginTop: 20}}>
+      <View style={{zIndex: 999, marginTop: -20}}>
         {this.renderOrderInfoHeader()}
         {this.renderOrderInfoCard()}
       </View>
@@ -612,12 +659,13 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap} onPress={() => this.deliveryModalFlag()}>
+      <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                        onPress={() => this.deliveryModalFlag()}>
         <If condition={isShowMap}>
-          <View style={styles.orderInfoHeaderFlag} />
+          <View style={styles.orderInfoHeaderFlag}/>
         </If>
         <View style={styles.orderInfoHeaderStatus}>
-          <Text style={styles.orderStatusDesc}>{delivery_status }</Text>
+          <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
           <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
         </View>
         <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
@@ -637,7 +685,8 @@ class OrderInfoNew extends PureComponent {
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
           <Button title={'下配送单'}
-                  onPress={() => {}}
+                  onPress={() => {
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -652,14 +701,16 @@ class OrderInfoNew extends PureComponent {
         </If>
         <If condition={order.orderStatus === '2' || order.orderStatus === '4' || order.orderStatus === '5'}>
           <Button title={'再次配送'}
-                  onPress={() => {}}
+                  onPress={() => {
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={order.orderStatus === '3'}>
           <Button title={'完成配送'}
-                  onPress={() => {}}
+                  onPress={() => {
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -681,7 +732,9 @@ class OrderInfoNew extends PureComponent {
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
-            <Image source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}} style={styles.orderCardIcon}/>
+            <Image
+              source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
+              style={styles.orderCardIcon}/>
             <View style={styles.orderCardInfo}>
               <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
               <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
@@ -702,15 +755,16 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile}</Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
-            <FontAwesome5 solid={false} onPress={() => this.dialNumber(order?.mobile)} name={'phone'} style={styles.cardTitlePhone}/>
+            <FontAwesome5 solid={false} onPress={() => this.dialNumber(order?.mobile)} name={'phone'}
+                          style={styles.cardTitlePhone}/>
           </View>
         </View>
-        <View style={styles.cuttingLine} />
+        <View style={styles.cuttingLine}/>
         <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
           <Text style={styles.remarkLabel}>备注 </Text>
           <Text style={styles.remarkValue}>{order?.remark} </Text>
         </View>
-        <View style={styles.cuttingLine} />
+        <View style={styles.cuttingLine}/>
         <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
           <Text style={styles.cardTitle}>商品{order?.items?.length}件 </Text>
           <If condition={order?.items?.length >= 1}>
@@ -733,12 +787,14 @@ class OrderInfoNew extends PureComponent {
                       </If>
                       <If condition={!is_service_mgr && !order?.is_fn_show_wm_price}>
                         <If condition={order?.is_fn_price_controlled}>
-                          <Text style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text
+                            style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceBao}>保</Text>
                           <Text style={styles.price}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                         </If>
                         <If condition={!order?.is_fn_price_controlled}>
-                          <Text style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text
+                            style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                         </If>
@@ -751,8 +807,12 @@ class OrderInfoNew extends PureComponent {
             </For>
           </If>
         </View>
-        <View style={styles.cuttingLine} />
-        <View style={[styles.orderCardContainer, {flexDirection: "column", borderBottomLeftRadius: 6, borderBottomRightRadius: 6}]}>
+        <View style={styles.cuttingLine}/>
+        <View style={[styles.orderCardContainer, {
+          flexDirection: "column",
+          borderBottomLeftRadius: 6,
+          borderBottomRightRadius: 6
+        }]}>
           <If condition={order?.is_fn_price_controlled}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>供货价小计 </Text>
@@ -787,7 +847,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderDeliveryInfo = () => {
-    let {order, is_service_mgr} = this.state;
+    let {order} = this.state;
     return (
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
@@ -823,7 +883,7 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用 </Text>
             <Text style={styles.remarkValue}>{numeral(order?.deliver_fee / 100).format('0.00')}元 </Text>
           </View>
-          <View style={styles.cuttingLine1} />
+          <View style={styles.cuttingLine1}/>
           <If condition={tool.length(order.greeting) > 0}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语 </Text>
@@ -877,7 +937,12 @@ class OrderInfoNew extends PureComponent {
       <TouchableOpacity style={styles.orderInfoCard} onPress={() => {
         this.onPress(Config.ROUTE_OPERATION_LOG, {id: order?.id})
       }}>
-        <View style={[styles.orderCardContainer, {flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderRadius: 6}]}>
+        <View style={[styles.orderCardContainer, {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderRadius: 6
+        }]}>
           <Text style={styles.logLabel}>操作日志 </Text>
           <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
         </View>
@@ -911,7 +976,7 @@ class OrderInfoNew extends PureComponent {
         <Tips navigation={this.props.navigation} orderId={order.id}
               storeId={order.store_id} key={order.id} modalTip={modalTip}
               onItemClick={() => this.closeModal()}/>
-        <OrderReminds task_types={Cts.task_types} reminds={reminds} remindNicks={remindNicks}
+        <OrderReminds task_types={Cts.task_type} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
         <ActionSheet
           visible={true}
@@ -973,10 +1038,14 @@ class OrderInfoNew extends PureComponent {
               tintColor='gray'
             />}
           style={styles.Content}>
-          <If condition={isShowMap}>
-            {this.renderMap()}
-          </If>
-          {this.renderOrderInfo()}
+
+          {this.renderPrinter()}
+          <View  {...this._panResponder.panHandlers}>
+            <If condition={isShowMap}>
+              {this.renderMap()}
+            </If>
+            {this.renderOrderInfo()}
+          </View>
           {this.renderDeliveryInfo()}
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}
@@ -1170,7 +1239,13 @@ const styles = StyleSheet.create({
   },
   productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
   productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
-  productItemPrice: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10, width: width * 0.7},
+  productItemPrice: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    width: width * 0.7
+  },
   priceBao: {
     width: 15,
     height: 15,

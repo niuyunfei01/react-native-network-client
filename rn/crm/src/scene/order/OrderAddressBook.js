@@ -199,10 +199,10 @@ class OrderAddressBook extends Component {
               this.onCheck(info)
             }} style={{paddingVertical: 20, borderColor: colors.e5, borderBottomWidth: 0.5}}>
               <View style={{flexDirection: 'row', alignContent: 'center'}}>
-                <View
-                  style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>
-                  <Text style={{color: colors.white, fontSize: 12}}>常用</Text>
-                </View>
+                {/*<View*/}
+                {/*  style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>*/}
+                {/*  <Text style={{color: colors.white, fontSize: 12}}>常用</Text>*/}
+                {/*</View>*/}
                 <Text style={{
                   color: colors.color333,
                   fontSize: 16,
