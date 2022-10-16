@@ -184,7 +184,7 @@ class OrderInfoNew extends PureComponent {
         return true;
       },
       onPanResponderMove: (evt, gestureState) => {
-        if (-5 < gestureState.dy && gestureState.dy < 5) {
+        if (-3 < gestureState.dy && gestureState.dy < 2) {
           return;
         }
         this.setMapHeight((gestureState.dy > 10 ? 0.68 : 0.35) * height)
@@ -619,27 +619,57 @@ class OrderInfoNew extends PureComponent {
     return (
       <Animated.View style={{height: map_height}}>
         <MapView
-          scrollGesturesEnabled={false}
-          rotateGesturesEnabled={false}
-          mapType={MapType.Navi}
+          mapType={MapType.Standard}
           initialCameraPosition={{
             target: {latitude: Number(loc_lat), longitude: Number(loc_lng)},
-            zoom: 16
+            zoom: 15
           }}>
+          {/*门店定位*/}
           <Marker
             draggable={false}
             position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
             onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}} style={{
+                width: 30,
+                height: 34,
+              }}/>
+            </View>
+
+          </Marker>
+          {/*骑手位置*/}
+          <Marker
+            draggable={false}
+            position={{latitude: Number('28.162531'), longitude: Number('112.992999')}}
+            onPress={() => alert("onPress")}
+          >
+            <View style={{alignItems: 'center'}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
+                width: 30,
+                height: 34,
+              }}/>
+            </View>
+          </Marker>
+          {/*用户定位*/}
+          <Marker
+            draggable={false}
+            position={{latitude: Number('28.161108'), longitude: Number('112.981638')}}
+            onPress={() => alert("onPress")}
+          >
+            <View style={{alignItems: 'center'}}>
               <View style={styles.mapBox}>
                 <Text style={{
-                  color: colors.white,
-                  fontSize: 18,
-                }}>{store_name} </Text>
+                  color: colors.color333,
+                  fontSize: 12,
+                }}>距门店6.5公里 </Text>
               </View>
               <Entypo name={'triangle-down'}
-                      style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
+                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}} style={{
+                width: 23,
+                height: 48,
+              }}/>
             </View>
           </Marker>
         </MapView>
@@ -1040,10 +1070,10 @@ class OrderInfoNew extends PureComponent {
           style={styles.Content}>
 
           {this.renderPrinter()}
+          <If condition={isShowMap}>
+            {this.renderMap()}
+          </If>
           <View  {...this._panResponder.panHandlers}>
-            <If condition={isShowMap}>
-              {this.renderMap()}
-            </If>
             {this.renderOrderInfo()}
           </View>
           {this.renderDeliveryInfo()}
@@ -1061,7 +1091,7 @@ const styles = StyleSheet.create({
   Content: {backgroundColor: '#F5F5F5'},
   mapBox: {
     zIndex: 999,
-    backgroundColor: colors.main_color,
+    backgroundColor: colors.white,
     marginBottom: 15,
     padding: 8,
     borderRadius: 6,

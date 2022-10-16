@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
@@ -190,26 +190,6 @@ class SearchShop extends Component {
       }
     )
   }
-
-  getCenterLonLat = (oneLon, oneLat, twoLon, twoLat) => {
-    //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
-    let aLon = 0, aLat = 0;
-    let bLon = Number(oneLon) - Number(twoLon);
-    let bLat = Number(oneLat) - Number(twoLat);
-    //Math.abs()绝对值
-    if (bLon > 0) {
-      aLon = Number(oneLon) - Math.abs(bLon) / 2;
-    } else {
-      aLon = Number(twoLon) - Math.abs(bLon) / 2;
-    }
-    if (bLat > 0) {
-      aLat = Number(oneLat) - Math.abs(bLat) / 2;
-    } else {
-      aLat = Number(twoLat) - Math.abs(bLat) / 2;
-    }
-    return {aLon, aLat};
-  }
-
 
   render() {
     let {shops, ret_list, isMap} = this.state;
@@ -401,7 +381,7 @@ class SearchShop extends Component {
     return (
       <View style={{height: 300}}>
         <MapView
-          mapType={MapType.Navi}
+          mapType={MapType.Standard}
           style={StyleSheet.absoluteFill}
           minZoom={12}
           maxZoom={20}
@@ -414,7 +394,7 @@ class SearchShop extends Component {
             let {
               aLon,
               aLat
-            } = this.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
+            } = tool.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
             if (aLon, aLat) {
               this.setLatLng(aLat, aLon)
             }
@@ -433,18 +413,22 @@ class SearchShop extends Component {
             <View style={{alignItems: 'center'}}>
               <View style={{
                 zIndex: 999,
-                backgroundColor: colors.main_color,
+                backgroundColor: colors.white,
                 marginBottom: 15,
                 padding: 8,
                 borderRadius: 6,
               }}>
                 <Text style={{
-                  color: colors.white,
-                  fontSize: 18,
+                  color: colors.color333,
+                  fontSize: 12,
                 }}>{tool.length((shopmsg?.address || '标注点')) > 5 ? shopmsg?.address.substring(0, 5) + '...' : (shopmsg?.address || '标注点')}  </Text>
               </View>
               <Entypo name={'triangle-down'}
-                      style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
+                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}} style={{
+                width: 23,
+                height: 48,
+              }}/>
             </View>
           </Marker>
         </MapView>
