@@ -20,11 +20,9 @@ global.currentRouteName = ''
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#40455A'
   },
   statusBar: {
     height: StatusBar.currentHeight,
-    backgroundColor: '#40455A'
   }
 });
 
