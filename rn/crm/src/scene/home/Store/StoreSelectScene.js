@@ -11,7 +11,6 @@ import Loadmore from 'react-native-loadmore'
 import tool from "../../../pubilc/util/tool";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
-const rowHeight = 40
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -45,9 +44,7 @@ class StoreSelect extends PureComponent {
       access_token: global?.accessToken
     };
     this.clearHandle = this.clearHandle.bind(this)
-    this.handleFocus = this.handleFocus.bind(this)
     this.onCancel = this.onCancel.bind(this)
-    this.focus = this.focus.bind(this)
   }
 
   UNSAFE_componentWillMount() {
@@ -77,13 +74,6 @@ class StoreSelect extends PureComponent {
     this.setState({focus: true})
   }
 
-  focus() {
-    this.refs.searchInput.focus()
-  }
-
-  blur() {
-    this.refs.searchInput.blur()
-  }
 
   fetchData = (options = {}) => {
     ToastShort('加载中')
@@ -132,7 +122,7 @@ class StoreSelect extends PureComponent {
           <SearchStoreItem key={index} onPress={() => {
             this.props.navigation.goBack()
             this.props.route.params.onBack(item)
-          }} item={item} rowHeight={rowHeight}/>
+          }} item={item} rowHeight={50}/>
         )
       }
     })
@@ -156,6 +146,7 @@ class StoreSelect extends PureComponent {
           <View style={styles.searchInner}>
             <Entypo name="magnifying-glass" size={12} style={{color: colors.color999, marginRight: 10}}/>
             <TextInput
+              autoFocus={true}
               returnKeyType="search"
               eturnKeyLabel="搜索"
               value={searchKeywords}
@@ -196,7 +187,7 @@ class StoreSelect extends PureComponent {
 
   renderContent = () => {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, paddingTop: 10}}>
         <Loadmore
           keyboardShouldPersistTaps="never"
           renderList={this.renderList()}
