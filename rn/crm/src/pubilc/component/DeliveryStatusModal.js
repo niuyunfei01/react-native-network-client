@@ -70,7 +70,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 12
+    padding: 12,
+    marginVertical: 10
   },
   orderNum: {
     fontSize: 14,

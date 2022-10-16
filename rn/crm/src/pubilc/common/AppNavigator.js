@@ -82,6 +82,10 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Mine/MineScene").default}
                       initialParams={initialRouteParams}/>
 
+        <Stack.Screen name={Config.ROUTE_MINE_NEW} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Mine/Mine").default}
+                      initialParams={initialRouteParams}/>
+
         <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>

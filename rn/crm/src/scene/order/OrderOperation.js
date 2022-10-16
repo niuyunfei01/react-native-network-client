@@ -1,5 +1,15 @@
 import React, {Component} from 'react';
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {
+  Alert,
+  Dimensions,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import {saveOrderDelayShip,} from '../../reducers/order/orderActions'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
@@ -7,7 +17,6 @@ import Cts from '../../pubilc/common/Cts'
 import {ActionSheet} from "../../weui";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
-import {CheckBox} from 'react-native-elements'
 import {showError, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -22,6 +31,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
+const width = Dimensions.get("window").width;
 
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
@@ -348,24 +358,15 @@ class OrderOperation extends Component {
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}>
-          {
-            actionSheet && actionSheet.map((item, idx) => {
-              item.checked = false
-              return (
-                <CheckBox
-                  key={idx}
-                  left
-                  title={item.label}
-                  checkedIcon='dot-circle-o'
-                  uncheckedIcon='circle-o'
-                  checked={item.checked || false}
-                  checkedColor={colors.main_color}
-                  onPress={() => this.touchItem(actionSheet, idx)}
-                />
-              )
-            })
-          }
-          <View style={{width: '100%', height: pxToDp(200)}}/>
+          <View style={styles.Content}>
+            <For index='index' of={actionSheet} each='info'>
+              <TouchableOpacity key={index} style={[styles.checkItem, {borderTopWidth: index === 0 ? 0 : 0.5, borderTopColor: colors.e5}]} onPress={() => this.touchItem(actionSheet, index)}>
+                <Text style={styles.checkItemLabel}>
+                  {info?.label}
+                </Text>
+              </TouchableOpacity>
+            </For>
+          </View>
         </ScrollView>
 
       </View>
@@ -534,6 +535,21 @@ const styles = StyleSheet.create({
     width: '90%',
     left: '5%',
     height: pxToDp(100),
+  },
+  Content: {
+    width: width * 0.92,
+    marginLeft: width * 0.04,
+    backgroundColor: colors.white,
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 6
+  },
+  checkItem: {
+    flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 13
+  },
+  checkItemLabel: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333
   }
-
 });
