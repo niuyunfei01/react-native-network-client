@@ -373,8 +373,10 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
         />
 
-        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
+        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '我的钱包'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedAccountFill').default}/>
+        <Stack.Screen name={Config.ROUTE_TRIPARTITE_RECHARGE} options={{headerTitle: '三方充值'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/TripartiteRecharge').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}}
                       getComponent={() => require('../../scene/home/Store/SelectCity').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_QUALIFICATION} options={{headerTitle: '提交资质'}}

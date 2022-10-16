@@ -174,6 +174,7 @@ const C = {
   ROUTE_FREEZE_LIST: 'FREEZE_LIST',        //冻结列表
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
+  ROUTE_TRIPARTITE_RECHARGE: 'TripartiteRecharge',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
   ROUTE_BIND_SHUNFENG: 'BindShunfeng',

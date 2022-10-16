@@ -1,14 +1,5 @@
 import React, {PureComponent} from 'react'
-import ReactNative, {
-  Dimensions,
-  ImageBackground,
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import ReactNative, {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,20 +11,14 @@ import Config from "../../../pubilc/common/config";
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
-import {Button, Image} from "react-native-elements";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import LinearGradient from "react-native-linear-gradient";
-import JbbModal from "../../../pubilc/component/JbbModal";
-import {InputItem} from "@ant-design/react-native";
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import tool from "../../../pubilc/util/tool";
 
 const {StyleSheet} = ReactNative
-const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {global, device} = state;
@@ -48,8 +33,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const WSB_ACCOUNT = 0;
-const THIRD_PARTY_ACCOUNT = 1;
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -79,7 +62,6 @@ class SeparatedExpense extends PureComponent {
     let date = new Date();
     this.state = {
       isRefreshing: false,
-      switchType: WSB_ACCOUNT,
       balanceNum: 0,
       records: [],
       records2: [],
@@ -89,13 +71,6 @@ class SeparatedExpense extends PureComponent {
       date: date,
       choseTab: 1,
       start_day: this.format(date),
-      freeze_show: false,
-      freeze_msg: "",
-      prompt_msg: '外送帮仅支持充值，如需查看充值记录和账单明细，请登录配送商家版查看',
-      thirdAccountList: [],
-      pay_url: '',
-      dadaAccountModal: false,
-      dadaAccountNum: 0,
       service_msg: "",
       show_service_msg: false
     }
@@ -103,13 +78,10 @@ class SeparatedExpense extends PureComponent {
 
   UNSAFE_componentWillMount() {
     this.fetchExpenses()
-    this.fetchBalance()
     this.fetchServiceCharge()
-    this.fetchFreeze()
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-
     if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
       const startTime = timeObj.method[0].startTime
@@ -151,7 +123,8 @@ class SeparatedExpense extends PureComponent {
   }
 
   onRefresh = () => {
-    this.fetchThirdDeliveryList()
+    this.fetchExpenses()
+    this.fetchServiceCharge()
   }
 
   fetchExpenses() {
@@ -189,35 +162,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   //获取余额
-  fetchBalance() {
-    const {global} = this.props;
-    const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchBalance',
-        executeTime: res.endTime - res.startTime
-      })
-      this.setState({
-        balanceNum: res.obj
-      })
-    }).catch((res) => {
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchBalance',
-        executeTime: res.endTime - res.startTime
-      })
-    })
-  }
-
-
-  //获取余额
   fetchServiceCharge() {
     const {global} = this.props;
     const url = `/v1/new_api/delivery/service_fee?access_token=${global.accessToken}`;
@@ -246,36 +190,6 @@ class SeparatedExpense extends PureComponent {
     })
   }
 
-  //获取冻结
-  fetchFreeze() {
-    const {global} = this.props;
-    const url = `/v1/new_api/bill/freeze_info/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
-      const {obj} = res
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchFreeze',
-        executeTime: res.endTime - res.startTime
-      })
-      this.setState({
-        freeze_show: obj.show !== undefined && obj.show === 1,
-        freeze_msg: obj.notice !== undefined ? obj.notice : ""
-      })
-    }).catch(error => {
-      timeObj.method.push({
-        interfaceName: url,
-        executeStatus: error.executeStatus,
-        startTime: error.startTime,
-        endTime: error.endTime,
-        methodName: 'fetchFreeze',
-        executeTime: error.endTime - error.startTime
-      })
-    })
-  }
-
   // 获取充值记录
   fetchRechargeRecord = () => {
     const {global} = this.props;
@@ -297,35 +211,6 @@ class SeparatedExpense extends PureComponent {
         this.setState({records3: res.records})
       }
     })
-  }
-
-  // 获取三方配送充值列表
-  fetchThirdDeliveryList = () => {
-    showModal('加载中')
-    const {global} = this.props;
-    const url = `/v1/new_api/delivery/delivery_account_balance/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      hideModal()
-      this.setState({
-        thirdAccountList: res
-      })
-    })
-  }
-
-  // 切换外送帮钱包 三方配送充值tab
-  onChangeSwitchType = (val) => {
-    if (val === WSB_ACCOUNT) {
-      this.fetchExpenses()
-      this.fetchBalance()
-      this.fetchServiceCharge()
-      this.fetchFreeze()
-    } else if (val === THIRD_PARTY_ACCOUNT) {
-      this.fetchThirdDeliveryList()
-    }
-    this.setState({
-      switchType: val
-    })
-    this.mixpanel.track(val === 0 ? '钱包页' : '三方充值页')
   }
 
   // 切换费用账单 充值记录tab
@@ -370,82 +255,7 @@ class SeparatedExpense extends PureComponent {
     });
   }
 
-  // 顺丰去充值
-  toPay = (row) => {
-    if (row.type == 2) {
-      this.setState({
-        dadaAccountModal: true,
-        type_dada: row.type
-      })
-    } else {
-      showModal('请求中')
-      const {global} = this.props;
-      const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
-      HttpUtils.post.bind(this.props)(url, {
-        store_id: global.currStoreId,
-        delivery_type_v1: row.type,
-        amount: 0
-      }).then(res => {
-        hideModal()
-        if (res.msg && res.msg !== '') {
-          showError(`${res.msg}`)
-        } else {
-          this.setState({
-            pay_url: res.pay_url,
-            switch_type: THIRD_PARTY_ACCOUNT
-          }, () => {
-            ToastLong('即将前往充值...')
-            setTimeout(() => {
-              this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
-            }, 100)
-          })
-        }
-      })
-    }
-  }
-
-  // 达达去充值
-  fetchDeliveryPayUrl = () => {
-    showModal('请求中')
-    let {type_dada, dadaAccountNum} = this.state
-    const {global} = this.props;
-    const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
-    HttpUtils.post.bind(this.props)(url, {
-      store_id: global.currStoreId,
-      delivery_type_v1: type_dada,
-      amount: dadaAccountNum
-    }).then(res => {
-      hideModal()
-      if (res.msg && res.msg !== '') {
-        showError(`${res.msg}`)
-      } else {
-        this.setState({
-          pay_url: res.pay_url,
-          switch_type: THIRD_PARTY_ACCOUNT
-        }, () => {
-          ToastLong('即将前往充值...')
-          setTimeout(() => {
-            this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
-          }, 100)
-        })
-      }
-    })
-  }
-
-  // 去授权
-  toAuthorization = () => {
-    this.onPress(Config.ROUTE_DELIVERY_LIST, {tab: 2})
-  }
-
-  closeAccountModal = () => {
-    this.setState({
-      dadaAccountModal: false,
-      dadaAccountNum: 0
-    })
-  }
-
   render() {
-    const {switchType} = this.state;
     return (
       <View style={Styles.containerContent}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
@@ -453,123 +263,11 @@ class SeparatedExpense extends PureComponent {
           <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
                           tintColor='gray'/>
         }>
-          {this.renderHeaderType()}
-
-          <If condition={switchType === WSB_ACCOUNT}>
-            <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
-            {this.renderWSBHeader()}
-            {this.renderWSBType()}
-            {this.renderWSBContent()}
-          </If>
-
-          <If condition={switchType === THIRD_PARTY_ACCOUNT}>
-            {this.renderTHIRDContainer()}
-          </If>
-
-          {this.renderAccountModal()}
-
+          {this.renderWSBType()}
+          {this.renderWSBContent()}
         </ScrollView>
       </View>
     )
-  }
-
-  renderFreezeMsg = () => {
-    const {freeze_msg} = this.state
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
-        }}
-        style={Styles.containerHeader}>
-        <Text style={Styles.containerHeaderText}>{freeze_msg} </Text>
-        <Button onPress={() => {
-          this.onPress(Config.ROUTE_FREEZE_LIST)
-        }}
-                title={'查看'}
-                buttonStyle={Styles.containerHeaderBtn}
-                titleStyle={Styles.containerHeaderBtnText}>
-        </Button>
-      </TouchableOpacity>
-    )
-  }
-
-  renderHeaderType = () => {
-    let {switchType} = this.state
-    return (
-      <View style={Styles.headerType}>
-        <TouchableOpacity style={Styles.WSBHeaderBtn} onPress={() => this.onChangeSwitchType(0)}>
-          <View style={[switchType === WSB_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}> 外送帮钱包 </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={Styles.WSBHeaderBtn} onPress={() => this.onChangeSwitchType(1)}>
-          <View style={[switchType === THIRD_PARTY_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}> 三方配送充值 </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  renderWSBHeader = () => {
-    return (
-      <View style={Styles.WSBHeader}>
-
-        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_SETTING)} style={{
-          width: "100%",
-          flexDirection: "row",
-          justifyContent: "flex-end",
-          marginTop: 4,
-        }}>
-          <FontAwesome5 name={'cog'} size={16} color={colors.main_color}/>
-          <Text style={Styles.WSBHeaderTitle}> 电话通知 </Text>
-        </TouchableOpacity>
-        <View style={{
-          marginHorizontal: 16,
-          marginVertical: 24,
-          flexDirection: 'row',
-          justifyContent: "center",
-          alignItems: 'center'
-        }}>
-          <View style={{
-            justifyContent: "center",
-            alignItems: 'center'
-          }}>
-            <Text style={{fontSize: 16, color: colors.color333}}> 当前余额(元) </Text>
-            <Text style={Styles.WSBHeaderBalanceNum}> {this.state.balanceNum} </Text>
-          </View>
-
-          <If condition={this.state.show_service_msg}>
-            <View style={{
-              justifyContent: "center",
-              alignItems: 'center',
-              marginLeft: "24%",
-            }}>
-              <Text style={{fontSize: 16, color: colors.color333}}> 发单服务费(元) </Text>
-              <Text style={Styles.WSBHeaderBalanceNum}> {this.state.service_msg} </Text>
-            </View>
-          </If>
-        </View>
-        <Button title={'充值'}
-                onPress={this.accountFill}
-                buttonStyle={{
-                  width: width * 0.9,
-                  borderRadius: 4,
-                  backgroundColor: colors.main_color,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-      </View>
-    )
-  }
-
-  accountFill = () => {
-    this.mixpanel.track('钱包_充值')
-    this.onPress(Config.ROUTE_ACCOUNT_FILL)
   }
 
   renderWSBType = () => {
@@ -629,6 +327,7 @@ class SeparatedExpense extends PureComponent {
     this.mixpanel.track('清单详情页')
     this.onItemClicked(item)
   }
+
   renderWSBContent = () => {
     const {date, records, records3, records2, choseTab} = this.state;
     const datePicker = (
@@ -708,110 +407,6 @@ class SeparatedExpense extends PureComponent {
         </If>
 
       </View>
-    )
-  }
-
-  renderTHIRDHeader = () => {
-    const {prompt_msg} = this.state
-    return (
-      <View style={Styles.THIRDHeader}>
-        <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
-        <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
-      </View>
-    )
-  }
-
-  renderTHIRDContentItem = () => {
-    const {thirdAccountList} = this.state
-    return (
-      <View style={Styles.THIRDContainerList}>
-        <For index='i' each='info' of={thirdAccountList}>
-          <LinearGradient style={Styles.THIRDContainerItemLinear}
-                          key={i}
-                          start={{x: 0, y: 0}}
-                          end={{x: 1, y: 1}}
-                          colors={info.background_color}>
-            <View style={Styles.THIRDContainerItemBody}>
-              <View style={Styles.THIRDContainerItemBody}>
-                <Image source={{uri: info.img}}
-                       style={Styles.THIRDContainerItemIcon}/>
-                <Text style={Styles.THIRDContainerItemName}>{info.name}</Text>
-              </View>
-              <Button buttonStyle={Styles.THIRDContainerBtn}
-                      titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
-                      title={'立即充值'}
-                      onPress={() => {
-                        this.toPay(info)
-                      }}/>
-            </View>
-            <View style={Styles.THIRDContainerItemBody}>
-              <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
-              <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
-            </View>
-          </LinearGradient>
-        </For>
-      </View>
-    )
-  }
-
-  renderNOTHIRDList = () => {
-    return (
-      <View style={Styles.THIRDContainerNOList}>
-        <Text style={Styles.NoTHIRDListText}>
-          未授权商家自有账号
-        </Text>
-        <Button buttonStyle={Styles.NoTHIRDListBtn}
-                titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
-                title={'去授权'}
-                onPress={() => {
-                  this.toAuthorization()
-                }}/>
-      </View>
-    )
-  }
-
-  renderTHIRDContainer = () => {
-    const {thirdAccountList} = this.state
-    return (
-      <View>
-        {this.renderTHIRDHeader()}
-        {tool.length(thirdAccountList) > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
-      </View>
-    )
-  }
-
-  renderAccountModal = () => {
-    return (
-      <JbbModal visible={this.state.dadaAccountModal} onClose={() => this.closeAccountModal()} modal_type={'center'}>
-        <View style={{padding: pxToDp(20)}}>
-          <TouchableOpacity onPress={() => this.closeAccountModal()} style={Styles.flexRowStyle}>
-            <Text style={Styles.modalTitle}>充值金额</Text>
-            <Entypo name="circle-with-cross" style={Styles.closeIcon}/>
-          </TouchableOpacity>
-          <InputItem clear error={this.state.dadaAccountNum <= 0} type="number" value={this.state.dadaAccountNum}
-                     onChange={dadaAccountNum => {
-                       this.setState({dadaAccountNum});
-                     }}
-                     extra="元"
-                     placeholder="帐户充值金额">
-          </InputItem>
-          <View style={Styles.modalBtnStyle}>
-            <Button buttonStyle={Styles.modalBtnText}
-                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
-                    title={'取消'}
-                    onPress={() => {
-                      this.closeAccountModal()
-                    }}/>
-            <Button buttonStyle={Styles.modalBtnText1}
-                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
-                    title={'确定'}
-                    onPress={() => {
-                      this.closeAccountModal()
-                      this.fetchDeliveryPayUrl()
-                    }}/>
-          </View>
-        </View>
-      </JbbModal>
     )
   }
 
@@ -957,7 +552,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: colors.white,
     height: 40,
-    marginHorizontal: 10,
+    // marginHorizontal: 10,
     marginBottom: 5,
     borderRadius: 4,
   },
@@ -995,105 +590,6 @@ const Styles = StyleSheet.create({
     padding: pxToDp(10),
     flexGrow: 1
   },
-  THORDHeaderIcon: {
-    color: '#F12626',
-    marginLeft: pxToDp(5)
-  },
-  THIRDHeaderText: {
-    color: colors.color333,
-    fontSize: pxToDp(18)
-  },
-  THIRDContainerList: {
-    display: "flex",
-    flexDirection: "column"
-  },
-  THIRDContainerNOList: {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1
-  },
-  THIRDContainerItemBody: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingLeft: '1%',
-    paddingRight: '5%'
-  },
-  THIRDContainerItemLinear: {
-    width: "96%",
-    height: 142,
-    marginLeft: '2%',
-    borderRadius: pxToDp(10),
-    marginTop: pxToDp(10),
-    padding: pxToDp(40)
-  },
-  THIRDContainerItemName: {
-    fontSize: pxToDp(40),
-    fontWeight: "bold",
-    color: '#ffffff'
-  },
-  THIRDContainerItemIcon: {width: 53, height: 53, borderRadius: 26, marginRight: pxToDp(20)},
-  THIRDContainerItemIconBg: {width: 97, height: 59},
-  THIRDContainerBtn: {
-    backgroundColor: '#ffffff',
-    width: 88,
-    height: 38,
-    borderRadius: pxToDp(10),
-    padding: pxToDp(10)
-  },
-  currentBanlance: {
-    fontSize: pxToDp(30),
-    color: '#ffffff',
-    marginTop: pxToDp(30),
-    marginLeft: pxToDp(10)
-  },
-  NoTHIRDListText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: '#999999',
-    marginTop: '30%',
-    marginLeft: '20%'
-  },
-  NoTHIRDListBtn: {
-    width: "96%",
-    height: pxToDp(70),
-    marginTop: '20%',
-    marginLeft: '2%',
-    backgroundColor: '#59B26A',
-    borderRadius: pxToDp(10)
-  },
-  closeIcon: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
-  modalBtnStyle: {
-    flexDirection: 'row',
-    marginTop: 30,
-  },
-  modalBtnText: {
-    height: 40,
-    width: "50%",
-    marginHorizontal: '10%',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: 'gray',
-    lineHeight: 40,
-    borderRadius: pxToDp(10)
-  },
-  modalBtnText1: {
-    height: 40,
-    width: "50%",
-    marginHorizontal: '10%',
-    fontSize: pxToDp(30),
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: colors.main_color,
-    color: 'white',
-    lineHeight: 40,
-    borderRadius: pxToDp(10)
-  }
 });
 
 
