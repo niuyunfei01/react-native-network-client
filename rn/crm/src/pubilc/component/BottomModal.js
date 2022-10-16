@@ -60,6 +60,7 @@ class BottomModal extends React.Component {
     closeText: PropTypes.string,
     visible: PropTypes.bool,
     btnStyle: PropTypes.object,
+    children: PropTypes.object,
     btnTitleStyle: PropTypes.object,
     closeBtnStyle: PropTypes.object,
     closeBtnTitleStyle: PropTypes.object,
@@ -83,7 +84,7 @@ class BottomModal extends React.Component {
                 <Text style={styles.title}>
                   {this.props.title}
                 </Text>
-                <TouchableOpacity style={styles.closeWrap} onPress={this.props.onClose}>
+                <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
                   <Entypo name="cross" color={colors.fontGray} size={22}/>
                 </TouchableOpacity>
               </View>
@@ -97,7 +98,13 @@ class BottomModal extends React.Component {
                   <Button buttonStyle={[styles.closeBtn, closeBtnStyle]}
                           titleStyle={[{color: colors.color666}, closeBtnTitleStyle]}
                           title={closeText}
-                          onPress={onPressClose}/>
+                          onPress={()=>{
+                            if(onPressClose){
+                              onPressClose()
+                            }else {
+                              onClose()
+                            }
+                          }}/>
                 </If>
 
                 <Button buttonStyle={[{

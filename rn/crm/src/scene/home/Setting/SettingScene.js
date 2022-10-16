@@ -663,7 +663,7 @@ class SettingScene extends PureComponent {
           actionText={'绑定'}
           onPress={() => this.band_bd()}
           visible={shouldShowModal}
-          onClose={() => this.closeModal}
+          onClose={this.closeModal}
         >
           <View style={{
             flexDirection: 'row',

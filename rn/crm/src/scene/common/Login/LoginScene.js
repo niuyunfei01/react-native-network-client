@@ -236,6 +236,7 @@ class LoginScene extends PureComponent {
               onChangeText={(mobile) => {
                 this.setState({mobile})
               }}
+              maxLength={11}
               value={mobile}
               placeholderTextColor={colors.color999}
               style={{

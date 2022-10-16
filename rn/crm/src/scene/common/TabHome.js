@@ -43,7 +43,7 @@ class TabHome extends React.Component {
           style: {backgroundColor: colors.white, height: show_bottom_tab ? 49 : 0},
           animationEnabled: false,
           lazy: true,
-          labelStyle: {fontSize: 15}
+          labelStyle: {fontSize: 15, opacity: show_bottom_tab ? 1 : 0}
         }}>
         <If condition={Number(work) === 1}>
           <Tab.Screen name={'Console'}
@@ -54,7 +54,6 @@ class TabHome extends React.Component {
                           <Icon name={'grid'} size={26} color={focused ? colors.main_color : colors.colorCCC}/>)
                       }}/>
         </If>
-
         <Tab.Screen
           name="Orders"
           component={OrderListScene}
@@ -62,13 +61,14 @@ class TabHome extends React.Component {
             {
               tabBarLabel: "工作台",
               tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'file-alt'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>
+                <FontAwesome5 name={'file-alt'} size={22}
+                              style={{opacity: show_bottom_tab ? 1 : 0}}
+                              color={focused ? colors.main_color : colors.colorCCC}/>
               ),
 
             }
           }
         />
-
         <If condition={Number(product) === 1}>
           <Tab.Screen
             name="Goods"
