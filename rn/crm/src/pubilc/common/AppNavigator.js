@@ -180,6 +180,11 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/order/OrderTransferThird").default}
         />
 
+        <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderCallDelivery").default}
+        />
+
+
         <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
                       getComponent={() => require("../../scene/order/OrderAinSend").default}
         />
