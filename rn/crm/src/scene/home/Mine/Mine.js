@@ -1,8 +1,9 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
+  Alert,
   Dimensions, Image, ImageBackground,
-  InteractionManager, Platform,
+  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -42,9 +43,7 @@ import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import Cts from "../../../pubilc/common/Cts";
-import FetchEx from "../../../pubilc/util/fetchEx";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
@@ -63,8 +62,6 @@ const timeObj = {
 }
 
 const customerOpacity = 0.6;
-let hasPriceControl = false;
-let hasAllowAnalys = false;
 
 function mapStateToProps(state) {
   return {
@@ -98,8 +95,6 @@ class Mine extends PureComponent {
     let {
       currVendorId,
       currVersion,
-      is_helper,
-      is_service_mgr,
       co_type
     } = tool.vendor(this.props.global);
     this.state = {
@@ -108,56 +103,30 @@ class Mine extends PureComponent {
       currVendorId: currVendorId,
       currVersion: currVersion,
       access_token: accessToken,
-      is_service_mgr: is_service_mgr,
+      wsb_store_account: 0,
       co_type: co_type,
       storeStatus: {},
-      fnSeparatedExpense: false,
-      fnPriceControlled: false,
-      fnProfitControlled: false,
-      wsb_store_account: 0,
-      showRecord: false,
-      is_self_yy: false,
-      contacts: '',
-      allow_merchants_store_bind: false,
-      allow_analys: false,
-      is_helper: is_helper,
-      show_call_service_modal: false,
-
       is_mgr: false,
-
       storeInfo: {
         store_name: '',
-        role_desc: '',
-        balance: 0
+        role_desc: ''
       },
-      menu_list: {},
-      title: "今日美团外卖自配送回传率",
-      label: '实时回传：',
-      content: "全部已达标",
-      color: "green",
-      footer: '自然日有效配送信息上传率需>=90%',
-      showComeBack: false,
-      show_activity: false,
-      activity_img: '',
-      activity_url: '',
-      adjust_cnt: 0,
-      have_not_read_advice: 0,
+      balanceInfo: {
+        balance: 0.00,
+        disabled_recharge: false,
+        disabled_view_bill: false
+      },
+      menu_list: [],
       activity: [],
       img: ''
     }
-    this.getHuichuan(currStoreId, accessToken)
   }
 
   componentDidMount = () => {
-    const {currStoreId, accessToken} = this.props.global;
     this.fetchMineData()
-    this.getActivity(currStoreId, accessToken)
-    this.getNotifyCenter(currStoreId, accessToken)
+    this.fetchWsbWallet()
     this.getActivitySwiper()
-  }
-
-  componentDidUpdate = () => {
-
+    this.getStoreDataOfMine()
   }
 
   handleTimeObj = (api = '', executeStatus = 'success', startTime, endTime, methodName = '', executeTime) => {
@@ -178,9 +147,8 @@ class Mine extends PureComponent {
   }
 
   onRefresh = () => {
-  }
-
-  onHeaderRefresh() {
+    this.fetchMineData()
+    this.fetchWsbWallet()
   }
 
   navigateToBack = () => {
@@ -196,88 +164,10 @@ class Mine extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         storeStatus: res.store_status,
-        fnSeparatedExpense: res.fnSeparatedExpense,
         is_mgr: res.is_store_mgr,
-        fnPriceControlled: res.fnPriceControlled,
-        fnProfitControlled: res.fnProfitControlled,
-        wsb_store_account: res.wsb_store_account,
-        showRecord: res.show_questionnaire && res.show_questionnaire,
-        is_self_yy: res.customer_service_auth !== undefined ? res.customer_service_auth?.is_self_yy : false,
-        contacts: res.customer_service_auth !== undefined ? res.customer_service_auth?.contacts : "",
-      })
-      if (tool.length(res.allow_merchants_store_bind) > 0) {
-        this.setState({
-          allow_merchants_store_bind: res.allow_merchants_store_bind
-        })
-      }
-      if (tool.length(res.allow_analys) > 0) {
-        this.setState({
-          allow_analys: res.allow_analys === '1'
-        })
-      }
-      // let {is_helper} = this.state;
-      // if (res.is_store_mgr || is_helper) {
-      //   this.onGetStoreTurnover(store_id, res.fnPriceControlled);
-      // } else {
-      //   this.onGetUserCount();
-      // }
-    })
-  }
-
-  getHuichuan = (currStoreId, accessToken) => {
-    const api = `/v1/new_api/delivery_sync_log/summary?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then(res => {
-      this.setState({
-        title: res.title,
-        label: res.sync_info.label,
-        content: res.sync_info.content,
-        color: res.sync_info.color,
-        footer: res.footer,
-        showComeBack: res.show,
+        wsb_store_account: res.wsb_store_account
       })
     })
-  }
-
-  getActivity = (currStoreId, access_token) => {
-    const api = `api/get_activity_info?access_token=${access_token}`
-    let data = {
-      "storeId": currStoreId,
-      "pos": 1,
-      "auto_hide": 0,
-    }
-    HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (Array.isArray(res.list) && tool.length(res.list) > 0) {
-        res.list.map(item => {
-          if (item.id === '3') {
-            this.setState({
-              show_activity: true,
-              activity_img: item.icon,
-              activity_url: item.url + '?access_token=' + access_token,
-            })
-          }
-        })
-        return
-      }
-      this.setState({
-        show_activity: true,
-        activity_img: res.icon,
-        activity_url: res.url + '?access_token=' + access_token,
-      })
-    }).catch(() => {
-    })
-  }
-
-  getNotifyCenter = (currStoreId, access_token) => {
-    let _this = this;
-    const url = `api/notify_center/${currStoreId}.json?access_token=${access_token}`;
-    FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.ok) {
-          let {adjust_cnt} = resp.obj;
-          _this.setState({adjust_cnt: adjust_cnt});
-        }
-      })
   }
 
   fetchMineData = () => {
@@ -294,7 +184,23 @@ class Mine extends PureComponent {
           role_desc: res.role_desc,
           balance: res.balance
         },
-        menu_list: res.menu_list
+        menu_list: this.formatArr(res.menu_list)
+      })
+    })
+  }
+
+  fetchWsbWallet = () => {
+    const {accessToken} = this.props.global
+    const api = `/v4/wsbWallet/balance`;
+    HttpUtils.get.bind(this.props)(api, {
+      access_token: accessToken
+    }).then(res => {
+      this.setState({
+        balanceInfo: {
+          balance: res.balance,
+          disable_recharge: res.disabled_recharge === 1,
+          disable_view_bill: res.disable_view_bill === 1
+        }
       })
     })
   }
@@ -344,10 +250,14 @@ class Mine extends PureComponent {
     JumpMiniProgram("/pages/service/index", data);
   }
 
-  jumpToAccountFill = () => {
-    const {navigation} = this.props;
-    this.mixpanel.track('我的_充值')
-    navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+  jumpToAccountFill = (flag) => {
+    if (flag) {
+      const {navigation} = this.props;
+      this.mixpanel.track('我的_充值')
+      navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+    } else {
+      return showError('暂无权限')
+    }
   }
 
   navigateToDistributionAnalysis = () => {
@@ -366,7 +276,6 @@ class Mine extends PureComponent {
   }
 
   navigateToPlatformSetting = () => {
-    this.mixpanel.track('平台页')
     this.onPress(Config.ROUTE_STORE_STATUS, {
       updateStoreStatusCb: (storeStatus) => {
         this.setState({storeStatus: storeStatus})
@@ -375,8 +284,11 @@ class Mine extends PureComponent {
   }
 
   navigateToDeliverySetting = () => {
-    this.mixpanel.track('配送管理')
     this.onPress(Config.ROUTE_DELIVERY_LIST, {dispatch: this.props.dispatch})
+  }
+
+  navigateToExpense = () => {
+    this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})
   }
 
   navigateToPrinterSetting = () => {
@@ -400,7 +312,6 @@ class Mine extends PureComponent {
   }
 
   navigateToStoreManager = () => {
-    this.mixpanel.track('店铺页')
     const {currentUser, vendor_info} = this.props.global;
     const {is_mgr, currVendorId} = this.state
     this.onPress(Config.ROUTE_STORE, {
@@ -408,6 +319,16 @@ class Mine extends PureComponent {
       currVendorId: currVendorId,
       currVendorName: vendor_info?.brand_name,
       is_mgr: is_mgr
+    });
+  }
+
+  navigateToWorker = () => {
+    const {currentUser, vendor_info, vendor_id} = this.props.global;
+    this.onPress(Config.ROUTE_WORKER, {
+      type: "worker",
+      currentUser: currentUser,
+      currVendorId: vendor_id,
+      currVendorName: vendor_info?.brand_name
     });
   }
 
@@ -427,22 +348,73 @@ class Mine extends PureComponent {
   }
 
   logOutAccount = () => {
-    const {dispatch, navigation, global} = this.props;
-    this.mixpanel.reset();
-    const noLoginInfo = {
-      accessToken: '',
-      currentUser: 0,
-      currStoreId: 0,
-      host: '',
-      co_type: '',
-      enabledGoodMgr: '',
-      currVendorId: '',
-      printer_id: global.printer_id || '0'
+    Alert.alert('提醒', `确定要退出吗？`, [
+      {
+        text: '取消',
+        style: 'cancel'
+      },
+      {
+        text: '确定',
+        style: 'default',
+        onPress: () => {
+          const {dispatch, navigation, global} = this.props;
+          this.mixpanel.reset();
+          const noLoginInfo = {
+            accessToken: '',
+            currentUser: 0,
+            currStoreId: 0,
+            host: '',
+            co_type: '',
+            enabledGoodMgr: '',
+            currVendorId: '',
+            printer_id: global.printer_id || '0'
+          }
+          setNoLoginInfo(JSON.stringify(noLoginInfo))
+          dispatch(logout(() => {
+            tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
+          }));
+        }
+      }
+    ]);
+  }
+
+  formatArr (arr) {
+    let map = new Map()
+    for (let item in arr) {
+      if (!map.has(item)) {
+        map.set(arr[item], arr[item])
+      }
     }
-    setNoLoginInfo(JSON.stringify(noLoginInfo))
-    dispatch(logout(() => {
-      tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
-    }));
+    return [...map.values()]
+  }
+
+  touchBlockNavigate = (info) => {
+    this.mixpanel.track(`${info?.name}`)
+    if (info?.type === 'Router') {
+      switch (info?.path) {
+        case 'Store':
+          this.navigateToStoreManager()
+          break
+        case 'Worker':
+          this.navigateToWorker()
+          break
+        case 'StoreStatus':
+          this.navigateToPlatformSetting()
+          break
+        case 'DeliveryList':
+          this.navigateToDeliverySetting()
+          break
+        case 'OldSeparatedExpense':
+          this.navigateToExpense()
+          break
+        default:
+          this.onPress(info?.path)
+      }
+    } else {
+      let path = info?.path;
+      let url = Config.serverUrl(path, Config.https);
+      this.onPress(Config.ROUTE_WEB, {url: url});
+    }
   }
 
   renderHeader = () => {
@@ -461,7 +433,7 @@ class Mine extends PureComponent {
   }
 
   renderStoreInfo = () => {
-    let {store_info} = this.props.global;
+    let {storeInfo} = this.state;
     return (
       <View style={styles.storeInfoBox}>
         <Image source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
@@ -469,14 +441,14 @@ class Mine extends PureComponent {
         <View style={{flexDirection: "column", marginLeft: 10}}>
           <View style={styles.storeContent}>
             <Text style={styles.storeName}>
-              {tool.length((store_info?.name || '')) > 12 ? store_info?.name.substring(0, 11) + '...' : store_info?.name}
+              {tool.length((storeInfo?.store_name || '')) > 12 ? storeInfo?.store_name.substring(0, 11) + '...' : storeInfo?.store_name}
             </Text>
             <View style={styles.storeType}>
               <Text style={styles.storeTypeText}>连锁版 </Text>
             </View>
           </View>
           <TouchableOpacity style={styles.roleBox} onPress={() => this.onPress(Config.ROUTE_PER_IDENTIFY)}>
-            <Text style={styles.roleText}>店长 </Text>
+            <Text style={styles.roleText}>{storeInfo?.role_desc} </Text>
             <Entypo name="chevron-thin-right" style={styles.roleIcon}/>
           </TouchableOpacity>
         </View>
@@ -485,7 +457,6 @@ class Mine extends PureComponent {
   }
 
   renderStore = () => {
-    let {storeInfo} = this.state;
     return (
       <ImageBackground
         style={{width: width, height:222}}
@@ -498,6 +469,7 @@ class Mine extends PureComponent {
   }
 
   renderWallet = () => {
+    let {balanceInfo} = this.state;
     return (
       <LinearGradient style={styles.walletBox}
                       start={{x: 0, y: 0}}
@@ -508,11 +480,11 @@ class Mine extends PureComponent {
             外送帮账户余额 (元)
           </Text>
           <Text style={styles.walletValue}>
-            1987.09
+            {balanceInfo?.disabled_view_bill ? balanceInfo?.balance : `*****`}
           </Text>
         </View>
         <Button title={'立即充值'}
-                onPress={() => this.jumpToAccountFill()}
+                onPress={() => this.jumpToAccountFill(balanceInfo?.disable_recharge)}
                 buttonStyle={styles.walletBtn}
                 titleStyle={styles.walletBtnTitle}
         />
@@ -531,379 +503,34 @@ class Mine extends PureComponent {
     )
   }
 
-  renderCommonFunction = () => {
-    let {is_service_mgr, fnPriceControlled, allow_analys, wsb_store_account, color, content, showComeBack, co_type} = this.state
-
-    if (!allow_analys && is_service_mgr && fnPriceControlled > 0)
-      hasPriceControl = true
-    if (fnPriceControlled > 0)
-      hasAllowAnalys = false
+  renderBlock = () => {
+    let {menu_list} = this.state;
     return (
-      <View style={[styles.zoneWrap]}>
-        <Text style={styles.zoneWrapTitle}>
-          常用
-        </Text>
-        <View style={styles.flexRowWrap}>
-          <If condition={wsb_store_account === 1}>
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>钱包</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={wsb_store_account !== 1 && fnPriceControlled > 0}>
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={settlementRecord()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>结算记录</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={allow_analys || is_service_mgr}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={this.navigateToDistributionAnalysis}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={dataAnalysis()} width={28} height={28} style={[block_styles.block_img]}/>
-
-              <Text style={[block_styles.block_name]}>数据分析 </Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={!hasAllowAnalys}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>调价记录</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={co_type === 'peisong' && showComeBack}>
-            <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToSelfDelivery}
-                              activeOpacity={customerOpacity}>
-              <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
-                <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
-                  {content}
-                </Text>
-              </View>
-              <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>配送回传</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={co_type !== 'peisong'}>
-            <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToSettingPage}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>设置</Text>
-            </TouchableOpacity>
-          </If>
-          <TouchableOpacity style={[block_styles.block_box]} onPress={this.JumpToServices}
-                            activeOpacity={customerOpacity}>
-            <SvgXml xml={contactCustomerService()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>联系客服</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
-  }
-
-  renderStoreBlock = () => {
-    const {
-      currentUser,
-      accessToken,
-      vendor_id,
-      vendor_info,
-      store_info,
-      show_goods_monitor = false,
-      enabled_good_mgr = false
-    } = this.props.global;
-    let token = `?access_token=${accessToken}`;
-    let {
-      currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled, activity_url,
-      activity_img, wsb_store_account, color, content, showComesback, co_type
-    } = this.state
-    const fn_stall = store_info?.fn_stall
-    return (
-      <View style={styles.zoneWrap}>
-        <Text style={styles.zoneWrapTitle}>
-          配送设置
-        </Text>
-        <View style={styles.flexRowWrap}>
-          <If condition={co_type !== 'peisong' && showComesback}>
-            <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToSelfDelivery}
-                              activeOpacity={customerOpacity}>
-              <View style={[block_styles.deliveryTip, {backgroundColor: color}]}>
-                <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
-                  {content}
-                </Text>
-              </View>
-              <SvgXml xml={delivery()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>配送回传</Text>
-            </TouchableOpacity>
-          </If>
-          <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToOrderSearch} activeOpacity={customerOpacity}>
-            <SvgXml xml={orderSearch()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>订单搜索</Text>
-          </TouchableOpacity>
-          <If condition={fnPriceControlled > 0}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={settlementRecord()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>结算记录</Text>
-            </TouchableOpacity>
-            <If condition={!hasPriceControl && hasAllowAnalys}>
-              <TouchableOpacity
-                style={[block_styles.block_box]}
-                onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
-                activeOpacity={customerOpacity}>
-                <SvgXml xml={priceAdjustmentRecord()} width={28} height={28} style={[block_styles.block_img]}/>
-                <Text style={[block_styles.block_name]}>调价记录</Text>
+      <For of={menu_list} each='item' index='index'>
+        <View style={[styles.zoneWrap]} key={index}>
+          <Text style={styles.zoneWrapTitle}>
+            {item?.title}
+          </Text>
+          <View style={styles.flexRowWrap}>
+            <For of={item?.items} each='info' index='index'>
+              <TouchableOpacity style={[block_styles.block_box]} key={index}
+                                onPress={() => this.touchBlockNavigate(info)}
+                                activeOpacity={customerOpacity}>
+                <If condition={tool.length(info?.badge) > 0}>
+                  <View style={[block_styles.deliveryTip, {backgroundColor: info?.badge?.bg_color}]}>
+                    <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
+                      {info?.badge?.label}
+                    </Text>
+                  </View>
+                </If>
+                <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
+                <Text style={[block_styles.block_name]}>{info?.name} </Text>
               </TouchableOpacity>
-            </If>
-          </If>
-          <If condition={fnPriceControlled <= 0}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                if (is_mgr || is_helper) {
-                  let path = `/stores/worker_stats.html${token}&&_v_id=${vendor_id}`;
-                  let url = Config.serverUrl(path, Config.https);
-                  this.onPress(Config.ROUTE_WEB, {url: url});
-                  this.mixpanel.track('业绩页')
-                } else {
-                  ToastLong("您没有查看业绩的权限");
-                }
-              }}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={achievement()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>业绩</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={enabled_good_mgr}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={orderCompensation()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>订单补偿</Text>
-            </TouchableOpacity>
-          </If>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={this.navigateToStoreManager}
-            activeOpacity={customerOpacity}>
-            <SvgXml xml={shopManagement()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>店铺管理</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-            this.mixpanel.track('员工页')
-            this.onPress(Config.ROUTE_WORKER, {
-              type: "worker",
-              currentUser: currentUser,
-              currVendorId: vendor_id,
-              currVendorName: vendor_info?.brand_name
-            });
-          }} activeOpacity={customerOpacity}>
-            <SvgXml xml={employeeManagement()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>员工管理</Text>
-          </TouchableOpacity>
-          <If condition={currVersion === Cts.VERSION_DIRECT}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/working_status.html${token}&&_v_id=${vendor_id}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }} activeOpacity={customerOpacity}>
-              <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/kaoqin_.png")}/>
-              <Text style={[block_styles.block_name]}>考勤记录</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={fnPriceControlled > 0 && is_service_mgr}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                if (is_service_mgr) {
-                  let path = `/stores/worker_stats.html${token}&&_v_id=${vendor_id}`;
-                  let url = Config.serverUrl(path, Config.https);
-                  this.onPress(Config.ROUTE_WEB, {url: url});
-                  this.mixpanel.track('业绩页')
-                } else {
-                  ToastLong("您没有查看托管店业绩的权限");
-                }
-              }} activeOpacity={customerOpacity}
-            >
-              <SvgXml xml={achievement()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>业绩</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr)}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
-              activeOpacity={customerOpacity}
-            >
-              <SvgXml xml={operatingIncome()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>运营收益</Text>
-            </TouchableOpacity>
-          </If>
-
-          <If condition={wsb_store_account !== 1}>
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: wsb_store_account})}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={expenseBill()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>费用账单</Text>
-            </TouchableOpacity>
-          </If>
-
-          <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={this.navigateToPlatformSetting}
-                            activeOpacity={customerOpacity}>
-            <SvgXml xml={platformSettings()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>平台设置</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToDeliverySetting}
-                            activeOpacity={customerOpacity}>
-            <SvgXml xml={deliveryManagement()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>配送管理</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToPrinterSetting}
-                            activeOpacity={customerOpacity}>
-            <SvgXml xml={printSettings()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>打印设置</Text>
-          </TouchableOpacity>
-          <If condition={Platform.OS !== 'ios'}>
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_INFORM)}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={messageRingtone()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>消息与铃声</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={currVersion === Cts.VERSION_DIRECT}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${vendor_id}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-            >
-              <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/pingjia_.png")}
-              />
-              <Text style={[block_styles.block_name]}>评价</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={show_goods_monitor}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
-              activeOpacity={customerOpacity}>
-              {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-              <SvgXml xml={commodityAdjustment()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>商品调整</Text>
-            </TouchableOpacity>
-          </If>
-
-          <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToPushSetting} activeOpacity={customerOpacity}>
-            <SvgXml xml={pushSettings()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>推送设置</Text>
-          </TouchableOpacity>
-
-          <If condition={fn_stall === '1'}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_HOME_SETTLEMENT_STALL_SETTLEMENT)}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={stallIcon()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>摊位结算</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={wsb_store_account === 1 && tool.length(activity_img) > 0}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={shareActivity()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>老带新活动</Text>
-            </TouchableOpacity>
-          </If>
+            </For>
+          </View>
         </View>
-      </View>
-    );
-  }
-
-  renderVersionBlock = () => {
-    const {have_not_read_advice, activity_url, activity_img, wsb_store_account, co_type} = this.state
-    const {show_expense_center} = this.props.global;
-    return (
-      <View style={styles.zoneWrap}>
-        <Text style={styles.zoneWrapTitle}>
-          其他
-        </Text>
-        <View style={styles.flexRowWrap}>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_HISTORY_NOTICE)}
-            activeOpacity={customerOpacity}>
-            <If condition={have_not_read_advice > 0}>
-              <View style={[block_styles.notice_point]}/>
-            </If>
-            <SvgXml xml={notice()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>公告</Text>
-          </TouchableOpacity>
-          <If condition={wsb_store_account !== 1 && tool.length(activity_img) > 0}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_WEB, {url: activity_url, title: '老带新活动'})}
-              activeOpacity={customerOpacity}>
-              <SvgXml xml={shareActivity()} width={28} height={28}/>
-              <Text style={[block_styles.block_name]}>老带新活动</Text>
-            </TouchableOpacity>
-          </If>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            activeOpacity={customerOpacity}
-            onPress={this.navigateToVersionInfo}
-          >
-            <SvgXml xml={versionInformation()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>版本信息</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[block_styles.block_box]} activeOpacity={customerOpacity} onPress={this.navigateToHelpPage}>
-            <SvgXml xml={help()} width={28} height={28} style={[block_styles.block_img]}/>
-            <Text style={[block_styles.block_name]}>帮助</Text>
-          </TouchableOpacity>
-
-          <If condition={co_type === 'peisong'}>
-            <TouchableOpacity style={[block_styles.block_box]} onPress={this.navigateToSettingPage}
-                              activeOpacity={customerOpacity}>
-              <SvgXml xml={settings()} width={28} height={28} style={[block_styles.block_img]}/>
-              <Text style={[block_styles.block_name]}>设置</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={show_expense_center}>
-            <TouchableOpacity
-              style={[block_styles.block_box]}
-              activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../img/My/huiyuan_.png")}/>
-              <Text style={[block_styles.block_name]}>我的钱包</Text>
-            </TouchableOpacity>
-          </If>
-        </View>
-      </View>
-    );
+      </For>
+    )
   }
 
   renderSwiper = () => {
@@ -975,7 +602,7 @@ class Mine extends PureComponent {
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
+              onRefresh={() => this.onRefresh()}
               tintColor='gray'
             />}
           style={styles.Content}>
@@ -994,9 +621,7 @@ class Mine extends PureComponent {
           <View style={{position: "relative", top: -53}}>
             {this.renderWallet()}
             {this.renderValueAdded()}
-            {this.renderCommonFunction()}
-            {this.renderStoreBlock()}
-            {this.renderVersionBlock()}
+            {this.renderBlock()}
             {this.renderSwiper()}
             {this.renderLoginOut()}
             {this.renderCopyRight()}
@@ -1213,13 +838,13 @@ const block_styles = StyleSheet.create({
     width: 41,
     height: 11,
     borderRadius: 7,
-    right: 12,
+    right: 0,
     top: pxToDp(20),
     position: 'absolute',
     zIndex: 99,
   },
   deliveryTipText: {
-    fontSize: 7, fontWeight: '400', color: colors.white, lineHeight: 9, textAlign: 'center'
+    fontSize: 7, fontWeight: '400', color: colors.white, lineHeight: 11, textAlign: 'center'
   }
 });
 
