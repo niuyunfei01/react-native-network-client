@@ -716,7 +716,7 @@ class OrderListScene extends Component {
         backgroundColor: colors.white,
         paddingHorizontal: 12
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE)}
+        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE_NEW)}
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {

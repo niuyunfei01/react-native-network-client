@@ -33,7 +33,7 @@ import {
   Service,
   settings,
   settlementRecord, shareActivity,
-  shopManagement, stallIcon, versionInformation,
+  shopManagement, stallIcon, switchStore, versionInformation,
   wallet
 } from "../../../svg/svg";
 import pxToDp from "../../../pubilc/util/pxToDp";
@@ -42,13 +42,13 @@ import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Cts from "../../../pubilc/common/Cts";
 import FetchEx from "../../../pubilc/util/fetchEx";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout} from "../../../reducers/global/globalActions";
+import {getConfig, logout} from "../../../reducers/global/globalActions";
 
 const width = Dimensions.get("window").width;
 
@@ -946,6 +946,26 @@ class Mine extends PureComponent {
     );
   }
 
+  onCanChangeStore = (item) => {
+    showModal("切换店铺中...")
+    tool.debounces(() => {
+      const {dispatch, global, navigation} = this.props;
+      const {accessToken} = global;
+      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
+        if (ok) {
+          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+            initTab: Config.ROUTE_ORDERS,
+            initialRouteName: Config.ROUTE_ALERT
+          });
+          hideModal()
+        } else {
+          ToastLong(msg);
+          hideModal()
+        }
+      }));
+    })
+  }
+
   render() {
     let {isRefreshing} = this.state;
     return (
@@ -959,6 +979,17 @@ class Mine extends PureComponent {
               tintColor='gray'
             />}
           style={styles.Content}>
+
+          {/*<TouchableOpacity onPress={() => {*/}
+          {/*  this.onPress(Config.ROUTE_STORE_SELECT, {*/}
+          {/*    onBack: (item) => {*/}
+          {/*      this.onCanChangeStore(item)*/}
+          {/*    }*/}
+          {/*  })*/}
+          {/*}}>*/}
+          {/*    <Text style={{fontSize:20,margin:20}}>切换门店 </Text>*/}
+          {/*</TouchableOpacity>*/}
+
           {this.renderStore()}
           <View style={{position: "relative", top: -53}}>
             {this.renderWallet()}
