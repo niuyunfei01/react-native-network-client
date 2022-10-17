@@ -94,7 +94,7 @@ class Mine extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    const {currStoreId, access_token} = this.props.global;
+    const {currStoreId, accessToken} = this.props.global;
     let {
       currVendorId,
       currVersion,
@@ -107,7 +107,7 @@ class Mine extends PureComponent {
       currStoreId: currStoreId,
       currVendorId: currVendorId,
       currVersion: currVersion,
-      access_token: access_token,
+      access_token: accessToken,
       is_service_mgr: is_service_mgr,
       co_type: co_type,
       storeStatus: {},
@@ -145,14 +145,14 @@ class Mine extends PureComponent {
       activity: [],
       img: ''
     }
-    this.getHuichuan(currStoreId, access_token)
+    this.getHuichuan(currStoreId, accessToken)
   }
 
   componentDidMount = () => {
-    const {currStoreId, access_token} = this.props.global;
+    const {currStoreId, accessToken} = this.props.global;
     this.fetchMineData()
-    this.getActivity(currStoreId, access_token)
-    this.getNotifyCenter(currStoreId, access_token)
+    this.getActivity(currStoreId, accessToken)
+    this.getNotifyCenter(currStoreId, accessToken)
     this.getActivitySwiper()
   }
 

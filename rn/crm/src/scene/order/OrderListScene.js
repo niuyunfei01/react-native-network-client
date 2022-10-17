@@ -163,6 +163,7 @@ class OrderListScene extends Component {
   componentDidMount() {
     initJPush()
     this.whiteNoLoginInfo()
+    this.getVendor()
     const {global, navigation, device} = this.props
     if (Platform.OS === 'android') {
       native.xunfeiIdentily().then()
@@ -262,7 +263,6 @@ class OrderListScene extends Component {
     calcMs(timeObj, accessToken)
 
     this.focus = navigation.addListener('focus', () => {
-      this.getVendor()
       this.onRefresh()
     })
 
