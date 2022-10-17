@@ -397,19 +397,25 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  setDeliveryModal = () => {
+    let {item, setState} = this.props;
+    setState({
+      show_delivery_modal: true,
+      order_id: item?.id
+    })
+  }
   renderDeliveryDesc = () => {
     let {item} = this.props;
     if (!item?.is_show_ship_status_desc) {
       return null;
     }
     return (
-      <TouchableOpacity style={[styles.contentHeader, {paddingTop: 12}]}>
+      <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
         <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>{item?.ship_status_desc} </Text>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
       </TouchableOpacity>
     )
   }
-
 
   renderDelivery = () => {
     let {item} = this.props;
@@ -417,7 +423,7 @@ class OrderItem extends React.PureComponent {
       return null
     }
     return (
-      <TouchableOpacity style={[styles.contentHeader, {paddingTop: 12}]}>
+      <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>

@@ -50,6 +50,7 @@ import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
+import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 
 const {width} = Dimensions.get("window");
 
@@ -99,6 +100,7 @@ const initState = {
   show_goods_list: false,
   add_tip_id: 0,
   show_add_tip_modal: false,
+  show_delivery_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -549,6 +551,20 @@ class OrderListScene extends Component {
     ToastLong('编码不合法，请重新扫描')
   }
 
+  closeDeliveryModal = () => {
+    this.setState({
+      order_id: 0,
+      show_delivery_modal: false
+    })
+  }
+  openAddTipModal = (order_id) => {
+    this.setState({
+      add_tip_id: order_id,
+      show_add_tip_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   render() {
     const {currStoreId, accessToken} = this.props.global;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
@@ -557,6 +573,7 @@ class OrderListScene extends Component {
       ListData,
       order_id,
       show_goods_list,
+      show_delivery_modal,
       show_add_tip_modal,
       add_tip_id,
     } = this.state
@@ -570,7 +587,8 @@ class OrderListScene extends Component {
         {this.renderContent(ListData)}
         {this.renderSortModal()}
         <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress.bind(this)} accessToken={accessToken} currStoreId={currStoreId}/>
+        <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
+                     currStoreId={currStoreId}/>
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
@@ -579,6 +597,17 @@ class OrderListScene extends Component {
           order_id={order_id}
           currStoreId={currStoreId}
           show_goods_list={show_goods_list}/>
+
+        <DeliveryStatusModal
+          order_id={order_id}
+          store_id={currStoreId}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          openAddTipModal={this.openAddTipModal.bind(this)}
+          accessToken={accessToken}
+          show_modal={show_delivery_modal}
+          onClose={this.closeDeliveryModal}
+        />
 
         <AddTipModal
           setState={this.setState.bind(this)}
@@ -639,7 +668,7 @@ class OrderListScene extends Component {
                 flexWrap: "wrap"
               }}>
               <For index='index' each='info' of={sort_list}>
-                <TouchableOpacity style={{
+                <TouchableOpacity key={index} style={{
                   borderWidth: 0.5,
                   borderColor: info.value === sort ? colors.main_color : colors.colorDDD,
                   backgroundColor: info.value === sort ? '#DFFAE2' : colors.white,
@@ -687,7 +716,7 @@ class OrderListScene extends Component {
         backgroundColor: colors.white,
         paddingHorizontal: 12
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE_NEW)}
+        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE)}
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {

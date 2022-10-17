@@ -22,7 +22,10 @@ const tip_list = [
 class AddTipModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
-    id: PropTypes.string,
+    id: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     show_add_tip_modal: PropTypes.bool,
     add_money: PropTypes.number,
     orders_add_tip: PropTypes.bool,
@@ -33,8 +36,8 @@ class AddTipModal extends React.Component {
 
   state = {
     show_modal: false,
-    add_money: this.props.add_money || 0,
-    input_add_money: 0,
+    add_money: this.props.add_money || '',
+    input_add_money: '',
     respReason: '',
   }
 
@@ -148,8 +151,8 @@ class AddTipModal extends React.Component {
                 onChangeText={(input_add_money) => {
                   this.setState({input_add_money: Number(input_add_money), add_money: Number(input_add_money)})
                 }}
-                defaultValue={input_add_money}
-                value={input_add_money}
+                defaultValue={`${input_add_money}`}
+                value={`${input_add_money}`}
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"

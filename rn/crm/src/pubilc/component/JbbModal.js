@@ -11,13 +11,15 @@ class JbbModal extends PureComponent {
   static propTypes = {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
+    is_slide: PropTypes.bool,
     modal_type: PropTypes.string,
     modalStyle: PropTypes.object,
     children: PropTypes.object,
     HighlightStyle: PropTypes.object,
   }
   static defaultProps = {
-    visible: true
+    visible: true,
+    is_slide: true,
   }
 
   render() {
@@ -49,11 +51,17 @@ class JbbModal extends PureComponent {
             padding: pxToDp(30),
             paddingBottom: pxToDp(50)
           }, this.props.HighlightStyle]}>
-            <ScrollView style={[{
-              padding: 10,
-            }, this.props.modalStyle]}>
-              {this.props.children}
-            </ScrollView>
+            {this.props.is_slide !== undefined && !this.props.is_slide ?
+              <View style={[{
+                padding: 10,
+              }, this.props.modalStyle]}>
+                {this.props.children}
+              </View>
+              : <ScrollView style={[{
+                padding: 10,
+              }, this.props.modalStyle]}>
+                {this.props.children}
+              </ScrollView>}
           </TouchableHighlight>
         </TouchableOpacity>
       </Modal>

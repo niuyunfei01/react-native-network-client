@@ -8,8 +8,11 @@ import HttpUtils from "../util/http";
 import Config from "../common/config";
 import pxToDp from "../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import GlobalUtil from "../util/GlobalUtil";
 
 const width = Dimensions.get("window").width;
+
+const {HOST_UPDATED} = require("../../pubilc/common/constants").default;
 
 const initState = {
   scrollViewIsBottom: false,
@@ -22,7 +25,8 @@ class RemindModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
     currStoreId: PropTypes.string,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
+    dispatch: PropTypes.func,
   }
   state = initState
 
@@ -39,7 +43,18 @@ class RemindModal extends React.Component {
         advicesInfoArray: res,
         showAdvicesVisible: true
       })
-    }, () => {
+    })
+
+    let api = 'v4/wsbServerConfig/getServer?accessToken='+accessToken
+    let data = {
+      store_id:currStoreId,
+    }
+    HttpUtils.post.bind(this.props)(api, data).then(res => {
+      if(res?.host && res?.host !== GlobalUtil.getHostPort()){
+        const {dispatch} = this.props;
+        dispatch({type: HOST_UPDATED, host: res?.host});
+        GlobalUtil.setHostPort(res?.host)
+      }
     })
   }
 

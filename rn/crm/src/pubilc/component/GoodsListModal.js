@@ -14,7 +14,10 @@ import Config from "../common/config";
 class GoodsListModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
-    order_id: PropTypes.string,
+    order_id: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     currStoreId: PropTypes.string,
     setState: PropTypes.func,
     onPress: PropTypes.func,
@@ -32,7 +35,6 @@ class GoodsListModal extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {accessToken, order_id, show_goods_list} = nextProps;
-
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_goods_list) {
       return null;
     }
