@@ -17,7 +17,7 @@ import {
   View
 } from 'react-native';
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker} from "react-native-amap3d/lib/src/index";
@@ -45,6 +45,7 @@ import {markTaskDone} from "../../reducers/remind/remindActions";
 import JbbModal from "../../pubilc/component/JbbModal";
 import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
+import AddTipModal from "../../pubilc/component/AddTipModal";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -59,22 +60,18 @@ const timeObj = {
   method: []
 }
 // 订单操作常量
-const MENU_EDIT_BASIC = 1;
-const MENU_EDIT_EXPECT_TIME = 2;
-const MENU_EDIT_STORE = 3;
-const MENU_FEEDBACK = 4;
-const MENU_SET_INVALID = 5; // 置为无效
-const MENU_ADD_TODO = 6;
-const MENU_PROVIDING = 8;
-const MENU_SEND_MONEY = 9;
-const MENU_RECEIVE_QR = 10;
-const MENU_ORDER_SCAN = 11;
-const MENU_ORDER_SCAN_READY = 12;
-const MENU_ORDER_CANCEL_TO_ENTRY = 13;
-const MENU_REDEEM_GOOD_COUPON = 14;
-const MENU_CANCEL_ORDER = 15; // 取消订单
-const MENU_SET_COMPLETE = 16; // 置为完成
-const MENU_CALL_STAFF = 17; // 联系员工
+const MENU_PRINT_AGAIN = 1;               // 再次打印
+const MENU_COMPLAINT_RIDER = 2;           // 投诉骑手
+const MENU_CANCEL_ORDER = 3;              // 取消订单
+const MENU_EDIT_BASIC = 4;                // 修改订单
+const MENU_EDIT_STORE = 5;                // 修改门店
+const MENU_SEND_MONEY = 6;                // 发红包
+const MENU_CALL_STAFF = 7;               // 联系门店
+const MENU_SET_INVALID = 8;               // 置为无效
+const MENU_SET_COMPLETE = 9;             // 置为完成
+const MENU_ORDER_SCAN = 10;               // 订单过机
+const MENU_ORDER_SCAN_READY = 11;         // 扫码出库
+const MENU_ORDER_CANCEL_TO_ENTRY = 12;    // 退单入库
 
 function mapStateToProps(state) {
   return {
@@ -123,8 +120,6 @@ class OrderInfoNew extends PureComponent {
       },
       actionSheet: [],
       isShowMap: false,
-      delivery_list: [],
-      is_merchant_add_tip: false,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,
@@ -137,13 +132,18 @@ class OrderInfoNew extends PureComponent {
       showPrinterChooser: false,
       modalTip: false,
       showQrcode: false,
-      showDeliveryModal: false,
+      show_delivery_modal: false,
       map_height: new Animated.Value(290),
+      toastContext: '',
+      add_tip_id: 0,
+      show_add_tip_modal: false
     }
 
   }
 
   componentDidMount = () => {
+    const {deviceInfo} = this.props?.device
+    const {currStoreId, currentUser, accessToken} = this.props.global;
     this.fetchOrder()
     this.navigationOptions()
     timeObj.method[0].endTime = getTime()
@@ -151,8 +151,6 @@ class OrderInfoNew extends PureComponent {
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ''
     timeObj.method[0].methodName = 'componentDidUpdate'
-    const {deviceInfo} = this.props?.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = currStoreId
     timeObj.currentUserId = currentUser
@@ -162,6 +160,7 @@ class OrderInfoNew extends PureComponent {
     calcMs(timeObj, accessToken)
     this.enableBluetooth()
   }
+
   setMapHeight = (map_height) => {
     Animated.timing(                       // 随时间变化而执行动画
       this.state.map_height,            // 动画中的变量值
@@ -204,7 +203,6 @@ class OrderInfoNew extends PureComponent {
     });
 
   }
-
 
   componentDidUpdate = () => {
     if (tool.length(timeObj.method) > 0) {
@@ -253,14 +251,15 @@ class OrderInfoNew extends PureComponent {
 
   handleActionSheet = (order, allow_merchants_cancel_order) => {
     const as = [
-      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
-      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+      {key: MENU_PRINT_AGAIN, label: '再次打印'},
+      {key: MENU_EDIT_BASIC, label: '修改订单'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_RECEIVE_QR, label: '收款码'},
       {key: MENU_CALL_STAFF, label: '联系门店'},
     ];
     const {is_service_mgr} = this.state
+    if (order && order?.ship_id > 0) {
+      as.push({key: MENU_COMPLAINT_RIDER, label: '投诉骑手'});
+    }
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
@@ -271,10 +270,6 @@ class OrderInfoNew extends PureComponent {
     if (is_service_mgr || this.props.global?.vendor_info?.wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
-    if (this._fnProvidingOnway()) {
-      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
-      as.push({key: MENU_PROVIDING, label: '门店备货'});
-    }
     if (order && order?.fn_scan_items) {
       as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
     }
@@ -284,17 +279,20 @@ class OrderInfoNew extends PureComponent {
     if (order && order?.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
     }
-    if (order && order?.fn_coupon_redeem_good) {
-      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
-    }
+    // if (order && order?.fn_coupon_redeem_good) {
+    //   as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
+    // }
+    // if (this._fnProvidingOnway()) {
+    //   as.push({key: MENU_PROVIDING, label: '门店备货'});
+    // }
     this.setState({actionSheet: as})
   }
 
-  _fnProvidingOnway = () => {
-    const {global} = this.props;
-    const storeId = this.state.order?.store_id;
-    return storeId && storeId > 0 && global?.vendor_info?.fnProvidingOnway;
-  }
+  // _fnProvidingOnway = () => {
+  //   const {global} = this.props;
+  //   const storeId = this.state.order?.store_id;
+  //   return storeId && storeId > 0 && global?.vendor_info?.fnProvidingOnway;
+  // }
 
   navigationOptions = () => {
     const {navigation} = this.props
@@ -323,7 +321,7 @@ class OrderInfoNew extends PureComponent {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    const api = `/v1/new_api/orders/order_by_id/${orderId}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
+    const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
@@ -352,7 +350,6 @@ class OrderInfoNew extends PureComponent {
       }));
       this.fetchShipData()
       this.logOrderViewed();
-      this.fetchDeliveryList()
       this.fetchThirdWays()
 
     }, ((res) => {
@@ -417,19 +414,6 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
-  fetchDeliveryList = () => {
-    const api = `/v1/new_api/orders/third_deliverie_record/${this.state.orderId}?access_token=${this.props.global.accessToken}`;
-    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
-      const {obj} = res
-      this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchDeliveryList', res.endTime - res.startTime)
-      this.setState({
-        delivery_list: undefined !== obj?.delivery_lists && Array.isArray(obj.delivery_lists) ? obj.delivery_lists : [],
-        is_merchant_add_tip: undefined !== obj?.is_merchant_add_tip ? Boolean(obj.is_merchant_add_tip) : false
-      })
-
-    })
-  }
-
   fetchThirdWays = () => {
     let {orderId, order} = this.state;
     if (order?.orderStatus === Cts.ORDER_STATUS_TO_READY || order?.orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
@@ -453,7 +437,7 @@ class OrderInfoNew extends PureComponent {
 
   onPrint = () => {
     const {order} = this.state
-    if (order.printer_sn) {
+    if (order?.printer_sn) {
       this.setState({showPrinterChooser: true})
     } else {
       this._doBluetoothPrint()
@@ -605,29 +589,130 @@ class OrderInfoNew extends PureComponent {
   deliveryModalFlag = () => {
     if (this.state.delivery_status !== '待呼叫配送') {
       this.mixpanel.track('订单详情页_>')
-      this.setState({showDeliveryModal: true})
+      this.setState({show_delivery_modal: true})
     }
   }
 
   closeDeliveryModal = () => {
-    this.setState({showDeliveryModal: false})
+    this.setState({show_delivery_modal: false})
+  }
+
+  onCallThirdShips = (order_id, store_id, if_reship) => {
+    this.onPress(Config.ROUTE_ORDER_TRANSFER_THIRD, {
+      orderId: order_id,
+      storeId: store_id,
+      selectedWay: [],
+      if_reship: if_reship,
+      onBack: (res) => {
+        if (res && res.count >= 0) {
+          ToastShort('发配送成功')
+        } else {
+          ToastShort('发配送失败，请联系运营人员')
+        }
+      }
+    });
+  }
+
+  callSelfAgain = () => {
+    let {order} = this.state
+    this.setState({show_delivery_modal: false})
+    this.onCallThirdShips(order?.id, order?.store_id, 0)
+  }
+
+  cancelDelivery = (orderId) => {
+    const {global} = this.props;
+    const {accessToken} = global;
+    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
+    let params = {
+      order_id: orderId
+    }
+    let {order, toastContext} = this.state;
+
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      if (res?.deduct_fee < 0) {
+        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
+          text: '确定', onPress: () => {
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+              {
+                order: order,
+                ship_id: 0,
+                onCancelled: () => {
+                  this.fetchOrder()
+                }
+              });
+          }
+        }, {'text': '取消'}]);
+      } else if (res?.deduct_fee == 0) {
+        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+          {
+            order: order,
+            ship_id: 0,
+            onCancelled: () => {
+              this.fetchOrder()
+            }
+          });
+      } else {
+        this.setState({
+          toastContext: res.deduct_fee
+        }, () => {
+          Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${toastContext}元`, [{
+            text: '确定', onPress: () => {
+              this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+                {
+                  order: order,
+                  ship_id: 0,
+                  onCancelled: () => {
+                    this.fetchOrder()
+                  }
+                });
+            }
+          }, {'text': '取消'}]);
+        })
+      }
+    }).catch(e => {
+      showError(`${e.reason}`)
+    })
+  }
+
+  toSetOrderComplete = (order_id) => {
+    const {global} = this.props;
+    const {accessToken} = global;
+    Alert.alert('当前配送确认完成吗？', '订单送达后无法撤回，请确认顾客已收到货物？', [{
+      text: '确认', onPress: () => {
+        const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
+        HttpUtils.get(api).then(() => {
+          ToastLong('配送已完成')
+          this.fetchOrder()
+        }).catch(() => {
+          showError('配送完成失败，请稍后重试')
+        })
+      }
+    }, {text: '再想想'}])
+  }
+
+  openAddTipModal = (order_id) => {
+    this.setState({
+      add_tip_id: order_id,
+      show_add_tip_modal: true,
+      show_delivery_modal: false
+    })
   }
 
   renderMap = () => {
-    let {loc_lat, loc_lng, store_name} = this.state.order;
+    let {loc_lat, loc_lng, store_loc_lat, store_loc_lng, ship_worker_lat, ship_worker_lng, dada_distance} = this.state.order;
     let {map_height} = this.state;
     return (
       <Animated.View style={{height: map_height}}>
         <MapView
           mapType={MapType.Standard}
           initialCameraPosition={{
-            target: {latitude: Number(loc_lat), longitude: Number(loc_lng)},
+            target: {latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)},
             zoom: 15
           }}>
           {/*门店定位*/}
           <Marker
             draggable={false}
-            position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+            position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
             onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
@@ -639,22 +724,24 @@ class OrderInfoNew extends PureComponent {
 
           </Marker>
           {/*骑手位置*/}
-          <Marker
-            draggable={false}
-            position={{latitude: Number('28.162531'), longitude: Number('112.992999')}}
-            onPress={() => alert("onPress")}
-          >
-            <View style={{alignItems: 'center'}}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
-                width: 30,
-                height: 34,
-              }}/>
-            </View>
-          </Marker>
+          <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
+            <Marker
+              draggable={false}
+              position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
+              onPress={() => alert("onPress")}
+            >
+              <View style={{alignItems: 'center'}}>
+                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
+                  width: 30,
+                  height: 34,
+                }}/>
+              </View>
+            </Marker>
+          </If>
           {/*用户定位*/}
           <Marker
             draggable={false}
-            position={{latitude: Number('28.161108'), longitude: Number('112.981638')}}
+            position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
             onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
@@ -662,7 +749,7 @@ class OrderInfoNew extends PureComponent {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 12,
-                }}>距门店6.5公里 </Text>
+                }}>距门店{numeral(dada_distance / 100).format('0.00')}公里 </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
@@ -706,50 +793,80 @@ class OrderInfoNew extends PureComponent {
 
   renderOrderInfoHeaderButton = () => {
     let {order} = this.state;
+    let {btn_list} = order;
     return (
       <View style={styles.orderInfoHeaderButton}>
-        <If condition={order.orderStatus === '1'}>
+        <If condition={btn_list && btn_list?.btn_print === 1}>
           <Button title={'打印订单'}
                   onPress={() => this.onPrint()}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
+        </If>
+        <If condition={btn_list && btn_list?.btn_print_again === 1}>
+          <Button title={'再次打印'}
+                  onPress={() => this.onPrint()}
+                  buttonStyle={styles.orderInfoHeaderButtonLeft}
+                  titleStyle={styles.orderInfoHeaderButtonTitleLeft}
+          />
+        </If>
+        <If condition={btn_list && btn_list?.btn_call_third_delivery === 1}>
           <Button title={'下配送单'}
-                  onPress={() => {
-                  }}
+                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id)}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
-        <If condition={order.orderStatus === '2' || order.orderStatus === '3'}>
+        <If condition={btn_list && btn_list?.batch_cancel_delivery === 1}>
           <Button title={'取消配送'}
-                  onPress={() => this.onPrint()}
+                  onPress={() => {
+                    Alert.alert('提示', `确定取消当前配送吗?`, [
+                      {text: '取消'},
+                      {
+                        text: '确定', onPress: () => {
+                          this.cancelDelivery(order?.id)
+                        }
+                      }
+                    ])
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
 
         </If>
-        <If condition={order.orderStatus === '2' || order.orderStatus === '4' || order.orderStatus === '5'}>
+        <If condition={btn_list && btn_list?.btn_resend === 1}>
           <Button title={'再次配送'}
-                  onPress={() => {
-                  }}
+                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id, 1)}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
-        <If condition={order.orderStatus === '3'}>
+        <If condition={btn_list && btn_list?.btn_call_third_delivery_again}>
+          <Button title={'追加配送'}
+                  onPress={() => this.callSelfAgain()}
+                  buttonStyle={styles.orderInfoHeaderButtonRight}
+                  titleStyle={styles.orderInfoHeaderButtonTitleRight}
+          />
+        </If>
+        <If condition={btn_list && btn_list?.btn_confirm_arrived === 1}>
           <Button title={'完成配送'}
-                  onPress={() => {
-                  }}
+                  onPress={() => this.toSetOrderComplete(order?.id)}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
-        <If condition={order.orderStatus === '5'}>
-          <Button title={'联系达达'}
-                  onPress={() => this.onPrint()}
+        <If condition={btn_list && btn_list?.btn_contact_rider === 1}>
+          <Button title={'联系骑手'}
+                  onPress={() => this.dialNumber(order?.ship_worker_mobile)}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
+          />
+        </If>
+        <If condition={btn_list && btn_list?.batch_add_delivery_tips === 1}>
+          <Button title={'加小费'}
+                  onPress={() => this.openAddTipModal(order?.id)}
+                  buttonStyle={styles.orderInfoHeaderButtonRight}
+                  titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
       </View>
@@ -758,6 +875,7 @@ class OrderInfoNew extends PureComponent {
 
   renderOrderInfoCard = () => {
     let {order, is_service_mgr} = this.state;
+    const {currStoreId} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
@@ -796,10 +914,12 @@ class OrderInfoNew extends PureComponent {
         </View>
         <View style={styles.cuttingLine}/>
         <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-          <Text style={styles.cardTitle}>商品{order?.items?.length}件 </Text>
+          <Text style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
           <If condition={order?.items?.length >= 1}>
             <For index='index' each='info' of={order?.items}>
-              <View style={styles.productInfo} key={index}>
+              <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
+                this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
+              }}>
                 <Image
                   source={{url: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                   style={styles.productImage}
@@ -833,7 +953,7 @@ class OrderInfoNew extends PureComponent {
                     <Text style={styles.productNum}> x {info?.num} </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </For>
           </If>
         </View>
@@ -884,7 +1004,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>配送信息 </Text>
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>配送门店 </Text>
-            <Text style={styles.remarkValue}>{order?.store_name} </Text>
+            <Text style={styles.remarkValue}>{order?.show_store_name} </Text>
           </View>
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>下单时间 </Text>
@@ -898,17 +1018,21 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送方式 </Text>
             <Text style={styles.remarkValue}>自配送/美团跑腿 </Text>
           </View>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>骑手信息 </Text>
-            <Text style={styles.remarkValue}>叶佳华 </Text>
-          </View>
-          <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(17678024864)}>
-            <Text style={styles.remarkLabel}>骑手电话 </Text>
-            <View style={{flexDirection: "row"}}>
-              <Text style={styles.remarkValue}>17678024864 </Text>
-              <Text style={styles.copyText}>拨打 </Text>
+          <If condition={order?.ship_worker_name !== ''}>
+            <View style={styles.productItemRow}>
+              <Text style={styles.remarkLabel}>骑手姓名 </Text>
+              <Text style={styles.remarkValue}>{order?.ship_worker_name} </Text>
             </View>
-          </TouchableOpacity>
+          </If>
+          <If condition={order?.ship_worker_mobile !== ''}>
+            <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(order?.ship_worker_mobile)}>
+              <Text style={styles.remarkLabel}>骑手电话 </Text>
+              <View style={{flexDirection: "row"}}>
+                <Text style={styles.remarkValue}>{order?.ship_worker_mobile} </Text>
+                <Text style={styles.copyText}>拨打 </Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>配送费用 </Text>
             <Text style={styles.remarkValue}>{numeral(order?.deliver_fee / 100).format('0.00')}元 </Text>
@@ -1009,7 +1133,7 @@ class OrderInfoNew extends PureComponent {
         <OrderReminds task_types={Cts.task_type} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
         <ActionSheet
-          visible={true}
+          visible={showPrinterChooser}
           onRequestClose={this._hidePrinterChooser}
           menus={menus}
           actions={this.printAction}
@@ -1036,23 +1160,40 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderDeliveryModal = () => {
-    let {delivery_list, order, showDeliveryModal, orderId} = this.state;
+    let {show_delivery_modal, orderId, currStoreId} = this.state;
+    const {global} = this.props;
+    const {accessToken} = global;
     return (
       <DeliveryStatusModal
-        id={orderId}
-        pl_name={order?.pl_name}
-        platform_dayId={order?.platform_dayId}
-        expectTimeStr={order?.expectTimeStr}
-        visible={showDeliveryModal}
-        delivery_list={delivery_list}
+        order_id={orderId}
+        store_id={currStoreId}
+        onPress={this.onPress.bind(this)}
+        openAddTipModal={this.openAddTipModal.bind(this)}
+        accessToken={accessToken}
+        show_modal={show_delivery_modal}
         onClose={this.closeDeliveryModal}
       />
     )
   }
 
+  renderAddTipModal = () => {
+    let {show_add_tip_modal, add_tip_id} = this.state;
+    const {global, dispatch} = this.props;
+    const {accessToken} = global;
+    return (
+      <AddTipModal
+        setState={this.setState.bind(this)}
+        accessToken={accessToken}
+        id={add_tip_id}
+        orders_add_tip={true}
+        dispatch={dispatch}
+        show_add_tip_modal={show_add_tip_modal}/>
+    )
+  }
+
   render() {
     const {isRefreshing, isShowMap, order} = this.state
-    if (order?.orderStatus === '4') {
+    if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
       })
@@ -1081,6 +1222,7 @@ class OrderInfoNew extends PureComponent {
           {this.renderOperationLog()}
           {this.renderQrCode()}
           {this.renderDeliveryModal()}
+          {this.renderAddTipModal()}
         </ScrollView>
       </View>
     );
@@ -1117,7 +1259,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     width: width * 0.94,
     marginLeft: width * 0.03,
-    borderRadius: 6
+    borderRadius: 6,
+    marginTop: 30
   },
   orderInfoHeaderFlag: {
     width: 32,
@@ -1160,7 +1303,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.main_color,
-    marginRight: 10
+    marginHorizontal: 10
   },
   orderInfoHeaderButtonTitleLeft: {
     fontWeight: '500',
@@ -1171,7 +1314,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 35,
     borderRadius: 21,
-    backgroundColor: colors.main_color
+    backgroundColor: colors.main_color,
+    marginHorizontal: 10
   },
   orderInfoHeaderButtonTitleRight: {
     fontWeight: '500',
