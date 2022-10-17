@@ -793,7 +793,7 @@ class SettingScene extends PureComponent {
               }}>注销账号会清空所有信息和数据，请确认是否要注销？ </Text>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Button title={'暂  不'}
+              <Button title={'取消'}
                       onPress={this.closeModal}
                       containerStyle={{
                         flex: 1,
@@ -806,7 +806,7 @@ class SettingScene extends PureComponent {
                       }}
                       titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
 
-              <Button title={'删 除'}
+              <Button title={'确定'}
                       onPress={this.cancel}
                       containerStyle={{
                         flex: 1,

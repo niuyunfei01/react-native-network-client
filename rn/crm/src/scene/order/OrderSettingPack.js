@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Alert, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -17,6 +17,7 @@ import {MixpanelInstance} from "../../pubilc/util/analytics";
 import * as tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
+import Clipboard from '@react-native-community/clipboard'
 
 let width = Dimensions.get("window").width;
 
@@ -72,6 +73,7 @@ class OrderSettingScene extends Component {
       showWeightModal: false,
       showGoodsPriceModal: false,
       showContentModal: false,
+      show_smart_modal: false,
       mealTime: '',
       datePickerType: 'today',
       datePickerList: [],
@@ -82,9 +84,11 @@ class OrderSettingScene extends Component {
       is_right_once: 1,
       id: '',
       smartText: '',
+      show_smart_input: false,
       isSaveToBook: false,
       address_id: '',
     };
+
   }
 
   setAddressInfo = (info) => {
@@ -145,35 +149,31 @@ class OrderSettingScene extends Component {
   }
 
   componentDidMount() {
-    const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-
-    })
+    this.getClipboardText()
   }
 
-  componentWillUnmount() {
-    this.focus()
-  }
+  getClipboardText = () => {
+    Clipboard.getString().then(res => {
+      if (tool.length(res) > 0) {
+        Alert.alert('"外送帮"想从粘贴板粘贴', '你允许这样做吗？', [{
+          text: '允许', onPress: () => {
+            this.setState({
+              smartText: res,
+            }, () => {
+              this.intelligentIdentification()
+            })
+          }
+        }, {'text': '不允许'}]);
+      }
+    });
 
+  }
   onPress = (route, params = {}) => {
     this.props.navigation.navigate(route, params);
   }
 
   timeOutBack = (time) => {
-    this.setState({
-      expect_time: Math.round(new Date() / 1000),
-      is_right_once: 1,
-      name: '',
-      mobile: '',
-      mobile_suffix: '',
-      address: '',
-      street_block: '',
-      loc_lng: '',
-      loc_lat: '',
-      weight: 0,
-      goods_price: 0,
-      remark: '',
-    })
+    this.cancelData()
     let _this = this;
     setTimeout(() => {
       _this.props.navigation.goBack()
@@ -196,7 +196,10 @@ class OrderSettingScene extends Component {
   }
 
   intelligentIdentification = () => {
-    const {smartText, accessToken} = this.state
+    const {smartText, accessToken, city} = this.state
+    if (tool.length(smartText) <= 0) {
+      return ToastShort("请粘贴地址", 0)
+    }
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -208,14 +211,27 @@ class OrderSettingScene extends Component {
       } else if (res.address === '') {
         ToastShort('地址识别失败！')
       }
+
       this.setState({
         name: res.name,
         address: res.address,
         mobile: res.phone,
         smartText: ''
       })
+
+      const params = {
+        cityName: city,
+        show_select_city: false,
+        keywords: res.address,
+        onBack: (res) => {
+          this.setAddress.bind(this)(res)
+          this.setState({show_smart_modal: true,})
+        },
+      };
+      this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
     })
   }
+
 
   orderToSave = (status) => {
     let {
@@ -280,6 +296,23 @@ class OrderSettingScene extends Component {
       }
     }).catch(() => {
       hideModal()
+    })
+  }
+
+  cancelData = () => {
+    this.setState({
+      expect_time: Math.round(new Date() / 1000),
+      is_right_once: 1,
+      name: '',
+      mobile: '',
+      mobile_suffix: '',
+      address: '',
+      street_block: '',
+      loc_lng: '',
+      loc_lat: '',
+      weight: 0,
+      goods_price: 0,
+      smartText: '',
     })
   }
 
@@ -348,6 +381,7 @@ class OrderSettingScene extends Component {
             {this.renderContent()}
             {this.renderWeightModal()}
             {this.renderGoodsPriceModal()}
+            {this.renderSmartModal()}
             {this.renderContentModal()}
             {this.renderDatePicker()}
           </View>
@@ -358,7 +392,7 @@ class OrderSettingScene extends Component {
   }
 
   renderUserFrom = () => {
-    let {mobile, address, smartText, name, mobile_suffix, street_block} = this.state;
+    let {mobile, address, smartText, name, mobile_suffix, street_block, show_smart_input} = this.state;
     return (
       <View
         style={{
@@ -366,7 +400,7 @@ class OrderSettingScene extends Component {
           backgroundColor: colors.white,
           padding: 12,
           marginTop: 10,
-          height: 292,
+          // height: 292,
         }}>
         <View style={{
           flexDirection: 'row',
@@ -485,25 +519,49 @@ class OrderSettingScene extends Component {
           />
         </View>
         <View style={{
-          backgroundColor: colors.f5,
           borderRadius: 4,
-          height: 44,
           marginTop: 11
         }}>
-          <TextInput
-            underlineColorAndroid='transparent'
-            placeholder="智能地址识别"
+          <TextArea
+            showCounter={false}
+            style={{
+              height: show_smart_input ? 110 : 44,
+              fontSize: 12,
+              paddingLeft: 10,
+              borderRadius: 5,
+              backgroundColor: colors.f5,
+            }}
+            onBlur={() => {
+              this.setState({
+                show_smart_input: true
+              })
+            }}
+            placeholder={show_smart_input ? "复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
+              : "智能地址识别"}
+            placeholderTextColor={colors.color999}
             onChange={value => {
               this.setState({smartText: value});
             }}
             value={smartText}
-            placeholderTextColor={colors.color999}
-            style={{
-              fontSize: 14,
-              flex: 1,
-              padding: 12,
-            }}
+            underlineColorAndroid={"transparent"}
           />
+
+          <If condition={show_smart_input}>
+            <Button title={'识别'}
+                    onPress={this.intelligentIdentification}
+                    containerStyle={{
+                      borderRadius: 5,
+                      width: 70,
+                      position: 'absolute',
+                      top: 70, right: 5,
+                    }}
+                    buttonStyle={{
+                      backgroundColor: colors.main_color,
+                    }}
+                    titleStyle={{color: colors.white, fontSize: 12, lineHeight: 20}}/>
+
+          </If>
+
         </View>
 
       </View>
@@ -640,6 +698,7 @@ class OrderSettingScene extends Component {
       showGoodsPriceModal: false,
       showContentModal: false,
       showDateModal: false,
+      show_smart_modal: false,
     })
   }
 
@@ -810,6 +869,79 @@ class OrderSettingScene extends Component {
                       length: 48,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+          </View>
+        </View>
+      </JbbModal>
+    )
+  }
+
+  renderSmartModal = () => {
+    let {show_smart_modal, address, name, street_block, mobile} = this.state;
+    return (
+      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'center'}>
+        <View style={{marginBottom: 20}}>
+          <View style={{
+            flexDirection: 'row',
+            padding: 12,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              使用复制的收件信息？
+            </Text>
+            <Entypo onPress={this.closeModal} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
+
+          <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
+            <View style={{paddingHorizontal: 20, paddingBottom: 20}}>
+              <View style={{flexDirection: "row", alignItems: 'center'}}>
+                <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>地址： </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{address} </Text>
+              </View>
+              <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
+                <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{street_block} </Text>
+              </View>
+              <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
+                <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>联系人： </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{name} </Text>
+              </View>
+              <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
+                <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>联系电话： </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{mobile} </Text>
+              </View>
+            </View>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+              <Button title={'取消'}
+                      onPress={() => {
+                        this.cancelData()
+                        this.closeModal()
+                      }}
+                      containerStyle={{
+                        flex: 1,
+                        borderRadius: 20,
+                        length: 40,
+                        marginRight: 10
+                      }}
+                      buttonStyle={{
+                        backgroundColor: colors.f5,
+                      }}
+                      titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+
+              <Button title={'确定'}
+                      onPress={this.closeModal}
+                      containerStyle={{
+                        flex: 1,
+                        borderRadius: 20,
+                        length: 40,
+                      }}
+                      buttonStyle={{
+                        backgroundColor: colors.main_color,
+                      }}
+                      titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+            </View>
           </View>
         </View>
       </JbbModal>

@@ -45,10 +45,8 @@ class SearchShop extends Component {
       cityNames = citymsg.city
       map.location = citymsg.loc_lng + "," + citymsg.loc_lat;
     }
-
     if (cityName !== undefined && tool.length(cityName) > 0)
       cityNames = cityName;
-
 
     if (keywords) {
       map.address = keywords
@@ -58,12 +56,7 @@ class SearchShop extends Component {
     if (tool.length(center) > 0) {
       map.location = center
       isMap = is_default = true;
-    } else {
-      if (keywords) {
-        this.search()
-      }
     }
-
 
     this.state = {
       loading: false,
@@ -77,6 +70,10 @@ class SearchShop extends Component {
       cityname: cityNames,
       shopmsg: map,
       placeholderText: placeholderText !== undefined ? placeholderText : '请在此输入地址'
+    }
+
+    if (tool.length(center) <= 0 && keywords) {
+      this.search()
     }
   }
 
