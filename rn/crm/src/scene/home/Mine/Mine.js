@@ -2,12 +2,15 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
-  Dimensions, Image, ImageBackground,
+  Dimensions,
+  Image,
+  ImageBackground,
   InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text, TouchableOpacity,
+  Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 import HttpUtils from "../../../pubilc/util/http";
@@ -18,24 +21,23 @@ import LinearGradient from "react-native-linear-gradient";
 import {rgbaColor} from "react-native-reanimated/src/reanimated2/Colors";
 import {SvgXml} from "react-native-svg";
 import {
-  achievement, commodityAdjustment,
-  contactCustomerService,
-  dataAnalysis,
-  delivery,
-  deliveryManagement,
-  employeeManagement,
-  expenseBill, help,
-  messageRingtone, notice,
-  operatingIncome,
-  orderCompensation, orderSearch,
-  platformSettings,
-  priceAdjustmentRecord,
-  printSettings, pushSettings,
+  adjust,
+  deliveries,
+  delivery_sync,
+  ext_store,
+  fee_bills,
+  help,
+  history_notice,
+  operator_data,
+  order_compensate,
+  order_search,
+  performance,
+  printer,
+  product,
+  push,
   Service,
-  settings,
-  settlementRecord, shareActivity,
-  shopManagement, stallIcon, switchStore, versionInformation,
-  wallet
+  setting,
+  stores,
 } from "../../../svg/svg";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
@@ -84,9 +86,7 @@ function FetchView({navigation, onRefresh}) {
 
 class Mine extends PureComponent {
 
-  static propTypes = {
-
-  }
+  static propTypes = {}
 
   constructor(props) {
     super(props);
@@ -97,6 +97,7 @@ class Mine extends PureComponent {
       currVersion,
       co_type
     } = tool.vendor(this.props.global);
+    let json_str = '[{"title":"常用","items":[{"name":"订单查询","type":"Router","path":"OrderSearch","icon":"order_search","badge":{}},{"name":"运营数据","type":"Router","path":"DistributionAnalysis","icon":"operator_data","badge":{}},{"name":"配送回传","type":"Router","path":"ComesBack","icon":"delivery_sync","badge":{"label":"达标","color":"white","bg_color":"#26B942"}},{"name":"调价","type":"Router","path":"GoodsApplyRecord","icon":"adjust","badge":{}},{"name":"订单补偿","type":"Router","path":"OrderSurcharge","icon":"order_compensate","badge":{}},{"name":"费用账单","type":"Router","path":"OldSeparatedExpense","icon":"fee_bills","badge":{}}]},{"title":"配送设置","items":[{"name":"外卖门店","type":"Router","path":"StoreStatus","icon":"ext_store","badge":{}},{"name":"配送管理","type":"Router","path":"DeliveryList","icon":"deliveries","badge":{}},{"name":"门店管理","type":"Router","path":"Store","icon":"stores","badge":{}},{"name":"打印设置","type":"Router","path":"PrinterSetting","icon":"printer","badge":{}}]},{"title":"其他","items":[{"name":"通知设置","type":"Router","path":"PushSetting","icon":"push","badge":{}},{"name":"系统设置","type":"Router","path":"Setting","icon":"setting","badge":{}},{"name":"帮助","type":"Router","path":"Help","icon":"help","badge":{}},{"name":"公告","type":"Router","path":"HistoryNoticeScene","icon":"history_notice","badge":{}}]}]'
     this.state = {
       isRefreshing: false,
       currStoreId: currStoreId,
@@ -116,7 +117,7 @@ class Mine extends PureComponent {
         disabled_recharge: false,
         disabled_view_bill: false
       },
-      menu_list: [],
+      menu_list: JSON.parse(json_str),
       activity: [],
       img: ''
     }
@@ -371,14 +372,14 @@ class Mine extends PureComponent {
           }
           setNoLoginInfo(JSON.stringify(noLoginInfo))
           dispatch(logout(() => {
-            tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
+            tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
           }));
         }
       }
     ]);
   }
 
-  formatArr (arr) {
+  formatArr(arr) {
     let map = new Map()
     for (let item in arr) {
       if (!map.has(item)) {
@@ -436,8 +437,9 @@ class Mine extends PureComponent {
     let {storeInfo} = this.state;
     return (
       <View style={styles.storeInfoBox}>
-        <Image source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
-               style={{width: 48, height: 48}}/>
+        <Image
+          source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
+          style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
           <View style={styles.storeContent}>
             <Text style={styles.storeName}>
@@ -459,9 +461,9 @@ class Mine extends PureComponent {
   renderStore = () => {
     return (
       <ImageBackground
-        style={{width: width, height:222}}
-        source={{uri:'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%88%91%E7%9A%84-%E8%83%8C%E6%99%AF%403x.png'}}
-        imageStyle={{width: width, height:222}}>
+        style={{width: width, height: 222}}
+        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%88%91%E7%9A%84-%E8%83%8C%E6%99%AF%403x.png'}}
+        imageStyle={{width: width, height: 222}}>
         {this.renderHeader()}
         {this.renderStoreInfo()}
       </ImageBackground>
@@ -503,6 +505,62 @@ class Mine extends PureComponent {
     )
   }
 
+  getIcon = (icon) => {
+    switch (icon) {
+      case 'order_search':
+        return order_search();
+        break;
+      case 'operator_data':
+        return operator_data()
+        break;
+      case 'delivery_sync':
+        return delivery_sync()
+        break;
+      case 'adjust':
+        return adjust()
+        break;
+      case 'order_compensate':
+        return order_compensate()
+        break;
+      case 'product':
+        return product()
+        break;
+      case 'performance':
+        return performance()
+        break;
+      case 'fee_bills':
+        return fee_bills()
+        break;
+      case 'ext_store':
+        return ext_store()
+        break;
+      case 'deliveries':
+        return deliveries()
+        break;
+      case 'stores':
+        return stores()
+        break;
+      case 'printer':
+        return printer()
+        break;
+      case 'push':
+        return push()
+        break;
+      case 'setting':
+        return setting()
+        break;
+      case 'help':
+        return help()
+        break;
+      case 'history_notice':
+        return history_notice()
+        break;
+      default:
+        return order_search()
+        break;
+    }
+  }
+
   renderBlock = () => {
     let {menu_list} = this.state;
     return (
@@ -516,6 +574,7 @@ class Mine extends PureComponent {
               <TouchableOpacity style={[block_styles.block_box]} key={index}
                                 onPress={() => this.touchBlockNavigate(info)}
                                 activeOpacity={customerOpacity}>
+
                 <If condition={tool.length(info?.badge) > 0}>
                   <View style={[block_styles.deliveryTip, {backgroundColor: info?.badge?.bg_color}]}>
                     <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
@@ -523,7 +582,8 @@ class Mine extends PureComponent {
                     </Text>
                   </View>
                 </If>
-                <SvgXml xml={wallet()} width={28} height={28} style={[block_styles.block_img]}/>
+
+                <SvgXml xml={this.getIcon(info?.icon)} width={28} height={28} style={[block_styles.block_img]}/>
                 <Text style={[block_styles.block_name]}>{info?.name} </Text>
               </TouchableOpacity>
             </For>
@@ -537,13 +597,13 @@ class Mine extends PureComponent {
     let {activity} = this.state
     return (
       <Swiper
-              showsButtons={false}
-              height={100}
-              horizontal={true}
-              paginationStyle={{bottom: 10}}
-              autoplay={true}
-              autoplayTimeout={4}
-              loop={true}
+        showsButtons={false}
+        height={100}
+        horizontal={true}
+        paginationStyle={{bottom: 10}}
+        autoplay={true}
+        autoplayTimeout={4}
+        loop={true}
       >
         <For index='i' each='info' of={activity}>
           <TouchableOpacity onPress={() => this.onPressActivity(info)} key={i}>
@@ -607,15 +667,15 @@ class Mine extends PureComponent {
             />}
           style={styles.Content}>
 
-          {/*<TouchableOpacity onPress={() => {*/}
-          {/*  this.onPress(Config.ROUTE_STORE_SELECT, {*/}
-          {/*    onBack: (item) => {*/}
-          {/*      this.onCanChangeStore(item)*/}
-          {/*    }*/}
-          {/*  })*/}
-          {/*}}>*/}
-          {/*    <Text style={{fontSize:20,margin:20}}>切换门店 </Text>*/}
-          {/*</TouchableOpacity>*/}
+          <TouchableOpacity onPress={() => {
+            this.onPress(Config.ROUTE_STORE_SELECT, {
+              onBack: (item) => {
+                this.onCanChangeStore(item)
+              }
+            })
+          }}>
+            <Text style={{fontSize: 20, margin: 20}}>切换门店 </Text>
+          </TouchableOpacity>
 
           {this.renderStore()}
           <View style={{position: "relative", top: -53}}>
@@ -651,7 +711,7 @@ const styles = StyleSheet.create({
   storeType: {
     width: 44,
     height: 18,
-    backgroundColor: rgbaColor(255,255,255,0.9),
+    backgroundColor: rgbaColor(255, 255, 255, 0.9),
     borderRadius: 2,
     alignItems: "center",
     marginLeft: pxToDp(10)
@@ -666,7 +726,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 20,
     borderRadius: 10,
-    backgroundColor: rgbaColor(255,255,255,0.2),
+    backgroundColor: rgbaColor(255, 255, 255, 0.2),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -791,7 +851,7 @@ const headerRightStyles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 10,
     paddingVertical: 10,
-    backgroundColor: rgbaColor(255,255,255,0)
+    backgroundColor: rgbaColor(255, 255, 255, 0)
   },
   text: {
     fontSize: 20,
@@ -800,7 +860,7 @@ const headerRightStyles = StyleSheet.create({
   rightBtn: {
     width: 90,
     height: 32,
-    backgroundColor: rgbaColor(255,255,255,0.2),
+    backgroundColor: rgbaColor(255, 255, 255, 0.2),
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     flexDirection: "row",
