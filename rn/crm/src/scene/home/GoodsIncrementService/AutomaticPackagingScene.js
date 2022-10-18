@@ -51,7 +51,18 @@ class AutomaticPackagingScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    this.getSetting(props.global)
+
+  }
+
+  componentDidMount() {
+    const {navigation, global} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getSetting(global)
+    })
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   getSetting = (global) => {

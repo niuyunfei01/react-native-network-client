@@ -10,12 +10,10 @@ const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
   SET_CURR_STORE,
-  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
   CHECK_VERSION_AT,
   BLE_STARTED,
   LOGOUT_SUCCESS,
-  UPDATE_CFG,
   UPDATE_CONFIG,
   HOST_UPDATED,
   UPDATE_CFG_ITEM,
@@ -26,7 +24,9 @@ const {
   SET_SHOW_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
-  SET_NO_LOGIN_INFO
+  SET_NO_LOGIN_INFO,
+  SET_GOODS_SG_CATEGORY,
+  SET_BLUETOOTH_DEVICE_LIST
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -70,7 +70,9 @@ const initialState = {
     product: 0,
     switch_store: 1,
     work: 0
-  }
+  },
+  basic_categories: [],
+  bluetoothDeviceList: []
 };
 
 /**
@@ -81,6 +83,22 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_BLUETOOTH_DEVICE_LIST:
+      if (action.payload) {
+        return {
+          ...state,
+          bluetoothDeviceList: action.payload
+        }
+      }
+      break
+    case SET_GOODS_SG_CATEGORY:
+      if (action.payload) {
+        return {
+          ...state,
+          basic_categories: action.payload
+        }
+      }
+      break
     case SET_NO_LOGIN_INFO:
       if (action.payload) {
         return {

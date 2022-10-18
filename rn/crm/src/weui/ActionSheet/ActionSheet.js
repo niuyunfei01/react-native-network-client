@@ -108,13 +108,7 @@ class ActionSheet extends Component {
 
   _renderMenuItems() {
     return this.props.menus.map((menu, idx) => {
-      const {
-        type,
-        label,
-        style,
-        textStyle,
-        ...others
-      } = menu
+      const {type, label, style, textStyle, ...others} = menu
       return (
         <TouchableHighlight
           key={idx}
@@ -122,9 +116,9 @@ class ActionSheet extends Component {
           style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
           {...others}
         >
-          <Text
-            style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-          >{label} </Text>
+          <Text style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}>
+            {label}
+          </Text>
         </TouchableHighlight>
       )
     })
@@ -132,53 +126,29 @@ class ActionSheet extends Component {
 
   _renderActions() {
     return this.props.actions.map((action, idx) => {
-      const {
-        type,
-        label,
-        style,
-        textStyle,
-        ...others
-      } = action
+      const {type, label, style, textStyle, ...others} = action
       return (
-        <TouchableHighlight
-          key={idx}
-          underlayColor={underlayColor}
-          style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
-          {...others}
-        >
-          <Text
-            style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-          >{label} </Text>
+        <TouchableHighlight key={idx}
+                            underlayColor={underlayColor}
+                            style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
+                            {...others}>
+          <Text style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}>
+            {label}
+          </Text>
         </TouchableHighlight>
       )
     })
   }
 
   render() {
-    const {
-      style,
-      wrapperStyle,
-      onShow,
-      onRequestClose,
-    } = this.props
+    const {style, wrapperStyle, onShow, onRequestClose,} = this.props
 
     return (
-      <Modal
-        visible={this.state.visible}
-        transparent={!false}
-        onShow={onShow}
-        onRequestClose={onRequestClose}
-      >
+      <Modal visible={this.state.visible} transparent={true} onShow={onShow} onRequestClose={onRequestClose}>
         <View style={{width, height}}>
           <Animated.View
-            style={[{width, height, backgroundColor: 'rgba(0,0,0,.6)'}, wrapperStyle, {
-              opacity: this.state.fadeAnim
-            }]}
-          >
-            <Text
-              style={{width, height}}
-              onPress={onRequestClose}
-            />
+            style={[{width, height, backgroundColor: 'rgba(0,0,0,.6)'}, wrapperStyle, {opacity: this.state.fadeAnim}]}>
+            <Text style={{width, height}} onPress={onRequestClose}/>
           </Animated.View>
           <Animated.View
             style={[styles.actionsheet, style, {
@@ -190,10 +160,7 @@ class ActionSheet extends Component {
             }]}
           >
             <ScrollView>
-              <View
-                ref="actionsheet"
-                onLayout={this.handleLayout}
-              >
+              <View ref="actionsheet" onLayout={this.handleLayout}>
                 <View style={[styles.actionsheetMenu]}>
                   {this._renderMenuItems()}
                 </View>

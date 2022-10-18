@@ -1,0 +1,218 @@
+import React from "react";
+import {TextInput, Text, View, StyleSheet, Dimensions, FlatList, TouchableOpacity, Keyboard} from 'react-native'
+import {connect} from "react-redux";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import colors from "../../../pubilc/styles/colors";
+import FastImage from "react-native-fast-image";
+import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
+import Config from "../../../pubilc/common/config";
+import HttpUtils from "../../../pubilc/util/http";
+
+const {width} = Dimensions.get('window')
+const styles = StyleSheet.create({
+  page: {flex: 1},
+  HeaderWrap: {
+    flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, marginTop: 10
+  },
+  HeaderInputWrap: {
+    flex: 9, flexDirection: 'row', alignItems: 'center', borderRadius: 17, backgroundColor: '#f7f7f7'
+  },
+  searchTextInput: {flex: 1, padding: 4, marginLeft: 13},
+  itemWrap: {
+    height: 100,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    marginHorizontal: 10,
+    backgroundColor: colors.white
+  },
+  storeHasItemWrap: {
+    height: 100,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    marginHorizontal: 10,
+    backgroundColor: colors.colorCCC
+  },
+  itemGoodsExitsWrap: {height: 100, borderRadius: 4, flexDirection: 'row', alignItems: 'center'},
+  itemImage: {width: 80, height: 80, margin: 10},
+  itemTitle: {fontSize: 14, fontWeight: 'bold', color: colors.color333, width: width - 120, paddingTop: 10},
+  itemCategoryName: {fontSize: 12, color: colors.color666},
+  itemGoodsExistFlagWrap: {backgroundColor: '#FFB454', borderRadius: 2, position: 'absolute', top: 4, right: 6},
+  itemGoodsExistFlagText: {fontSize: 10, color: colors.white, paddingVertical: 1, paddingHorizontal: 4},
+  bottomWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.colorEEE
+  },
+  bottomTextNormal: {fontSize: 14, color: colors.color666},
+  bottomTextBtn: {fontSize: 14, color: colors.main_color, marginLeft: 12}
+})
+
+class SearchAndCreateGoodsScene extends React.PureComponent {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchKeywords: '',
+      goodsList: [],
+      page: 1,
+      pageSize: 10,
+      isLastPage: false,
+      isLoading: false,
+      isCanLoadMore: false
+    }
+  }
+
+  onChangeText = (value) => {
+    this.setState({searchKeywords: value}, () => setTimeout(() => this.search(), 500))
+  }
+
+  getHeader() {
+    let {searchKeywords} = this.state
+    return (
+      <View style={styles.HeaderWrap}>
+        <View style={styles.HeaderInputWrap}>
+          <AntDesign name={'search1'} size={18} style={{marginLeft: 10}}/>
+          <TextInput value={searchKeywords} onChangeText={text => this.onChangeText(text)}
+                     style={styles.searchTextInput}
+                     underlineColorAndroid={'transparent'}
+                     placeholderTextColor={colors.color999}
+                     placeholder={'请输入商品名称'}/>
+        </View>
+      </View>
+    )
+  }
+
+
+  renderItem = ({item}) => {
+    const {store_had, name, sg_tag_name_list, sg_tag_id, pic} = item
+    return (
+      <TouchableOpacity style={store_had ? styles.storeHasItemWrap : styles.itemWrap}
+                        onPress={() => this.jumpToGoodsEdit(item)}
+                        disabled={store_had}>
+        <FastImage style={styles.itemImage} source={{uri: pic}} resizeMode={FastImage.resizeMode.contain}/>
+        <View>
+          <Text style={styles.itemTitle} numberOfLines={2}>
+            {name}
+          </Text>
+
+          <Text style={styles.itemCategoryName}>
+            类目：{sg_tag_name_list}
+          </Text>
+          <Text style={styles.itemCategoryName}>
+            UPC：{sg_tag_id}
+          </Text>
+        </View>
+        <If condition={store_had}>
+          <View style={styles.itemGoodsExistFlagWrap}>
+            <Text style={styles.itemGoodsExistFlagText}>
+              商品已存在
+            </Text>
+          </View>
+        </If>
+      </TouchableOpacity>
+    )
+  }
+
+  getItemLayout = (data, index) => ({
+    length: 100, offset: 100 * index, index
+  })
+  onScrollBeginDrag = () => {
+    this.setState({isCanLoadMore: true})
+  }
+  search = () => {
+    const {searchKeywords, goodsList, page, pageSize} = this.state
+    const {accessToken, currStoreId, vendor_id} = this.props.global
+    if (!searchKeywords)
+      return
+    const url = `/api/get_product_by_name`
+    const params = {
+      access_token: accessToken,
+      store_id: currStoreId,
+      vendor_id: vendor_id,
+      name: searchKeywords,
+      page: page,
+      pageSize: pageSize
+    };
+    showModal('加载中')
+    HttpUtils.get(url, params).then(res => {
+      hideModal()
+      if (Array.isArray(res.lists))
+        this.setState({
+          goodsList: Number(res.page) === 1 ? res.lists : goodsList.concat(res.lists),
+          page: res.page,
+          isLastPage: res.isLastPage
+        })
+    }, () => hideModal())
+      .catch(() => hideModal())
+    Keyboard.dismiss()
+  }
+  onLoadMore = () => {
+    let {page, isLastPage, isLoading, isCanLoadMore} = this.state
+    if (!isCanLoadMore)
+      return;
+    if (isLastPage) {
+      showError('没有更多商品')
+      this.setState({isCanLoadMore: false})
+      return
+    }
+    if (isLoading)
+      return;
+    this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
+  }
+  getGoodsList = () => {
+    const {goodsList} = this.state
+    return (
+      <FlatList data={goodsList}
+                renderItem={this.renderItem}
+                getItemLayout={this.getItemLayout}
+                initialNumToRender={10}
+                onScrollBeginDrag={this.onScrollBeginDrag}
+                onEndReachedThreshold={0.2}
+                onEndReached={this.onLoadMore}
+                keyExtractor={(item, index) => `${index}`}
+      />
+    )
+  }
+
+  jumpToGoodsEdit = (goodsInfo = {}) => {
+    let {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_GOODS_EDIT, {goodsInfo: goodsInfo, type: 'add'})
+  }
+  getBottomView = () => {
+    const {searchKeywords} = this.state
+    if (searchKeywords)
+      return (
+        <View style={styles.bottomWrap}>
+          <Text style={styles.bottomTextNormal}>
+            未找到合适的商品可
+          </Text>
+          <Text style={styles.bottomTextBtn} onPress={this.jumpToGoodsEdit}>
+            手动创建
+          </Text>
+        </View>
+      )
+  }
+
+  render() {
+    return (
+      <>
+        {this.getHeader()}
+        {this.getGoodsList()}
+        {this.getBottomView()}
+      </>
+    )
+  }
+}
+
+const mapStateToProps = (state) => {
+  const {global} = state
+  return {global: global}
+}
+export default connect(mapStateToProps)(SearchAndCreateGoodsScene)

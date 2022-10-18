@@ -48,11 +48,27 @@ const {
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
-  SET_NO_LOGIN_INFO
+  SET_NO_LOGIN_INFO,
+  SET_GOODS_SG_CATEGORY,
+  SET_BLUETOOTH_DEVICE_LIST
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
+}
+
+export const setBlueToothDeviceList = (list) => {
+  return {
+    type: SET_BLUETOOTH_DEVICE_LIST,
+    payload: list
+  }
+}
+
+export const setSGCategory = (basic_categories) => {
+  return {
+    type: SET_GOODS_SG_CATEGORY,
+    payload: basic_categories
+  }
 }
 
 export function setAccessToken(oauthToken) {
@@ -241,7 +257,6 @@ export function upCurrentProfile(token, storeId, callback) {
     )
   }
 }
-
 
 export function sendDverifyCode(mobile, type, is_agree, callback) {
   return dispatch => {
