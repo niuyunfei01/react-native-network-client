@@ -27,10 +27,14 @@ class AddTipModal extends React.Component {
       PropTypes.string
     ]),
     show_add_tip_modal: PropTypes.bool,
-    add_money: PropTypes.number,
+    add_money: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     orders_add_tip: PropTypes.bool,
     set_add_tip_money: PropTypes.bool,
     setState: PropTypes.func,
+    fetchData: PropTypes.func,
     dispatch: PropTypes.func,
   }
 
@@ -86,8 +90,8 @@ class AddTipModal extends React.Component {
   }
 
 
-  closeModal = (add_money) => {
-    let {set_add_tip_money, setState} = this.props
+  closeModal = (add_money = 0) => {
+    let {set_add_tip_money, setState, fetchData} = this.props
     this.setState({
       add_money: 0,
       respReason: '',
@@ -97,8 +101,16 @@ class AddTipModal extends React.Component {
         show_add_tip_modal: false,
         add_tip_id: 0,
       }
-      if (set_add_tip_money) params.add_tip_money = add_money;
-      setState && setState(params)
+      if (set_add_tip_money) {
+        params.add_tips = add_money;
+        setState && setState(params, () => {
+          if (add_money > 0) {
+            fetchData && fetchData()
+          }
+        })
+      } else {
+        setState && setState(params)
+      }
     })
   }
 
@@ -162,7 +174,7 @@ class AddTipModal extends React.Component {
                   width: width * 0.25,
                   borderWidth: 0.5,
                   color: colors.color333,
-                  borderColor: colors.colorDDD,
+                  borderColor: input_add_money === add_money ? colors.main_color : colors.colorDDD,
                   textAlign: 'center',
                   paddingVertical: 8,
                   marginVertical: 5,

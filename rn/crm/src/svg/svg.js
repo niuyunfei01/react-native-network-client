@@ -1391,7 +1391,7 @@ export const locationIcon = (width = 24, height = 24) => {
 }
 
 
-export const weight = () => {
+export const weighticon = () => {
   return (
     `
     <svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -1502,7 +1502,7 @@ export const add_tip = () => {
   )
 }
 
-export const remark = () => {
+export const remarkIcon = () => {
   return (
     `
    <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

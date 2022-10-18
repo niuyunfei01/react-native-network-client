@@ -1,31 +1,37 @@
 import React, {Component} from 'react'
 import {
   Alert,
+  Dimensions,
   Image,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
 import {connect} from "react-redux";
 import dayjs from "dayjs";
-import {MixpanelInstance} from '../../pubilc/util/analytics';
-import {Button, CheckBox} from "react-native-elements";
+import {Button, CheckBox, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 
-import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
-import Config from "../../pubilc/common/config";
-import tool from "../../pubilc/util/tool";
-import {calcMs} from "../../pubilc/util/AppMonitorInfo";
-import {getTime} from "../../pubilc/util/TimeUtil";
 import {SvgXml} from "react-native-svg";
-import {add_tip, cost, remark, time, weight} from "../../svg/svg";
+import {add_tip, cost, remarkIcon, time, weighticon} from "../../svg/svg";
+import PropTypes from "prop-types";
+import tool from "../../pubilc/util/tool";
+import JbbModal from "../../pubilc/component/JbbModal";
+import {TextArea} from "../../weui";
+import AddTipModal from "../../pubilc/component/AddTipModal";
+import {getContacts} from "../../reducers/store/storeActions";
+import Config from "../../pubilc/common/config";
+import native from "../../pubilc/util/native";
+
+let width = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
   return {
@@ -34,160 +40,148 @@ function mapStateToProps(state) {
   }
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
+const goods_price_list = [
+  {label: '20元', value: 20},
+  {label: '30元', value: 30},
+  {label: '50元', value: 50},
+  {label: '100元', value: 100},
+  {label: '150元', value: 150},
+  {label: '200元', value: 200},
+  {label: '300元', value: 300}
+]
 
-const timeObj = {
-  deviceInfo: {},
-  currentStoreId: '',
-  currentUserId: '',
-  moduleName: '',
-  componentName: '',
-  method: []
-}//记录耗时的对象
 
 class OrderCallDelivery extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props: Object) {
     super(props);
-    timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
-    const if_reship = this.props.route.params.if_reship || 0;
-    const headerType = this.props.route.params.headerType || 1;
+    let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
     this.state = {
-      selected: this.props.route.params.selectedWay,
-      newSelected: [],
-      orderId: this.props.route.params.orderId,
-      storeId: this.props.route.params.storeId,
-      addressId: this.props.route.params.addressId ? this.props.route.params.addressId : '',
-      accessToken: this.props.global.accessToken,
-      logistics: [],
-      logistics_error: [],
-      not_exist: [],
-      if_reship: if_reship,
       isLoading: true,
-      showDateModal: false,
-      dateValue: new Date(),
-      mealTime: '',
-      expectTime: this.props.route.params.expectTime,
-      store_id: 0,
-      vendor_id: 0,
-      total_selected_ship: 0,
-      is_mobile_visiable: false,
-      reason: '',
-      mobile: '',
-      btn_visiable: false,
+      order_id: order_id,
+      store_id: store_id,
+      if_reship: if_reship,
+      address_id: address_id,
+      store_est: [],
+      est: [],
+      exist_waiting_delivery: [],
       maxPrice: 0,
-      minPrice: 10001,
+      minPrice: 0,
       wayNums: 0,
-      testnum: {
-        data: 1,
-      },
-      logisticFeeMap: [],
-      headerType: headerType,
-      showDeliveryModal: false,
       weight: 1,
-      weight_max: 0,
-      weight_min: 0,
-      weight_step: 0,
-      showErr: false,
-      is_merchant_ship: 0,
-      merchant_reship_tip: '',
-      showContentModal: false,
+      weight_input_value: 1,
+      weight_max: 20,
+      weight_min: 1,
+      weight_step: 1,
+      logisticFeeMap: [],
+      dateArray: [],
+      wm_platform: '',
+      wm_platform_day_id: '',
+      order_expect_time: '',
+      wm_address: '',
+      wm_user_name: '',
+      wm_mobile: '',
+      expect_time: expect_time ? expect_time : dayjs(new Date()).format('YYYY-MM-DD HH:ii:ss'),
+      order_money: 20,
+      order_money_input_value: 20,
+      order_money_value: '',
+      add_tips: '',
+      add_tips_input_value: '',
       remark: '',
+      remark_input_value: '',
+      is_alone_pay_vendor: true,
+      show_weight_modal: false,
+      show_goods_price_modal: false,
+      show_date_modal: false,
+      show_add_tip_modal: false,
+      show_remark_modal: false,
+      show_worker_delivey_modal: false,
       datePickerType: 'today',
       datePickerList: [],
       datePickerOther: [],
       callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD'),
-      callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`,
-      dateArray: [],
-      set_default_product_weight: false,
-      is_alone_pay_vendor: true,
+      callDelivery_Time: dayjs(new Date()).format('HH:ii'),
+      is_right_once: 1,
+      mealTime: '',
+      worker_list: [],
+      worker_delivery_id: 0,
+      worker_name: '',
+      worker_mobile: '',
+      is_mobile_visiable: false,
+      btn_visiable: false,
+      reason: '',
+      mobile: '',
+      est_all_check: false,
+      store_est_all_check: false,
+      logistic_fee_map: []
     };
-    this.mixpanel = MixpanelInstance;
-    this.mixpanel.track("deliverorder_page_view", {});
+    this.fetchData();
+  }
+
+  componentWillUnmount() {
+    this.focus()
+  }
+
+  componentDidMount() {
+    this.fetchWorker();
+    this.focus = this.props.navigation.addListener('focus', () => {
+      this.fetchData()
+    })
+  }
+
+  fetchWorker() {
+    const {dispatch, global} = this.props;
+    dispatch(getContacts(global.accessToken, global.store_id, (ok, msg, contacts) => {
+      this.setState({worker_list: contacts || []})
+    }));
   }
 
   fetchData = () => {
-    return null;
     this.setState({
       isLoading: true
     })
     showModal('加载中')
-    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&weight=${this.state.weight}`;
-    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
-      let deliverys = []
-      const {obj} = res
-      timeObj.method.push({
-        interfaceName: api,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchThirdWays',
-        executeTime: res.endTime - res.startTime
-      })
-      hideModal();
-      if (tool.length(obj.exist) > 0) {
-        for (let i in obj.exist) {
-          let is_push = false
-          if (obj.exist[i].est && !obj.exist[i].est.error_msg) {
-            obj.exist[i].est.isChosed = false;
-            is_push = true
-          } else {
-            delete obj.exist[i].est;
-          }
-          if (obj.exist[i].store_est && !obj.exist[i].store_est.error_msg) {
-            obj.exist[i].store_est.isChosed = false;
-            is_push = true
-          } else {
-            delete obj.exist[i].store_est;
-          }
+    let {order_id, weight, expect_time, remark, add_tips, order_money} = this.state;
+    let {accessToken, vendor_id, store_id} = this.props.global;
+    let params = {
+      weight,
+      remark,
+      add_tips,
+      expect_time,
+      order_money,
+      vendor_id,
+      store_id,
+    }
 
-          if (is_push) deliverys.push(obj.exist[i])
-        }
-      }
-      const {currStoreId} = this.props.global;
-      let {currVendorId} = tool.vendor(this.props.global);
+    const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
+    HttpUtils.post.bind(this.props)(api, params).then(obj => {
+      hideModal();
       this.setState({
-        logistics: deliverys,
-        not_exist: obj.not_exist,
-        allow_edit_ship_rule: obj.allow_edit_ship_rule,
-        store_id: currStoreId,
-        vendor_id: currVendorId,
-        weight: obj.weight,
-        weight_max: obj.weight_max,
-        weight_min: obj.weight_min,
-        weight_step: obj.weight_step,
-        logistics_error: obj.error_ways,
-        is_merchant_ship: obj.is_merchant_ship,
-        merchant_reship_tip: obj.merchant_reship_tip,
+        store_est: obj?.store_est,
+        est: obj?.est,
+        exist_waiting_delivery: obj?.exist_waiting_delivery,
+        wm_platform: obj?.wm_platform,
+        wm_platform_day_id: obj?.wm_platform_day_id,
+        wm_address: obj?.wm_address,
+        wm_user_name: obj?.wm_user_name,
+        wm_mobile: obj?.wm_mobile,
+        order_expect_time: obj?.expect_time,
+        order_money: obj?.wm_order_money,
+        order_money_input_value: obj?.wm_order_money,
+        weight: obj?.weight,
+        weight_input_value: obj?.weight,
+        weight_max: obj?.weight_max,
+        weight_min: obj?.weight_min,
+        weight_step: obj?.weight_step,
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         isLoading: false,
       })
-
-
-      let params = {
-        store_id: currStoreId,
-        vendor_id: currVendorId,
-        total_available_ship: tool.length(obj),
-
-      }
       this.priceFn();
-      this.mixpanel.track("ship.list_to_call", params);
-    }).catch((res) => {
-      timeObj.method.push({
-        interfaceName: api,
-        executeStatus: res.executeStatus,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        methodName: 'fetchThirdWays',
-        executeTime: res.endTime - res.startTime
-      })
+    }).catch(() => {
       hideModal();
       this.setState({
         isLoading: false,
@@ -195,154 +189,163 @@ class OrderCallDelivery extends Component {
     })
   }
 
-  componentDidMount() {
-    timeObj.method[0].endTime = getTime()
-    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
-    timeObj.method[0].executeStatus = 'success'
-    timeObj.method[0].interfaceName = ""
-    timeObj.method[0].methodName = "componentDidMount"
-    const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
-    timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
-    timeObj.currentUserId = currentUser
-    timeObj['moduleName'] = "订单"
-    timeObj['componentName'] = "OrderCallDelivery"
-    timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
-    calcMs(timeObj, accessToken)
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (tool.length(timeObj.method) > 0) {
-      const endTime = getTime()
-      const startTime = timeObj.method[0].startTime
-      timeObj.method.push({
-        interfaceName: '',
-        executeStatus: 'success',
-        startTime: startTime,
-        endTime: endTime,
-        methodName: 'componentDidUpdate',
-        executeTime: endTime - startTime
-      })
-      const duplicateObj = {...timeObj}
-      timeObj.method = []
-      calcMs(duplicateObj, this.props.global.accessToken)
-    }
-  }
 
   priceFn = () => {// 取最大价格和最小价格
-    let {logistics, logisticFeeMap, maxPrice, minPrice, wayNums} = this.state;
-    logisticFeeMap = [];
-    maxPrice = 0;
-    minPrice = 10001;
-    // logisticFeeMap: [{logisticCode: '',paidPartnerId: ''},{logisticCode: '',paidPartnerId: ''}]
-    wayNums = 0;
-    for (let i in logistics) {
-      let obiItem = {};
-      if (logistics[i]?.est && logistics[i].est?.isChosed) {
-        obiItem.logisticCode = logistics[i].logisticCode;
-        obiItem.paidPartnerId = 0;
-        wayNums += 1;
-        maxPrice = logistics[i].est.delivery_fee > maxPrice ? logistics[i].est.delivery_fee : maxPrice
-        minPrice = logistics[i].est.delivery_fee < minPrice ? logistics[i].est.delivery_fee : minPrice
-      }
-      if (logistics[i]?.store_est && logistics[i].store_est?.isChosed) {
-        obiItem.logisticCode = logistics[i].logisticCode;
-        obiItem.paidPartnerId = -1;
-        wayNums += 1
-        maxPrice = logistics[i].store_est.delivery_fee > maxPrice ? logistics[i].store_est.delivery_fee : maxPrice
-        minPrice = logistics[i].store_est.delivery_fee < minPrice ? logistics[i].store_est.delivery_fee : minPrice
-      }
-      if (obiItem.logisticCode) {
-        logisticFeeMap.push(obiItem)
-      }
+    let {est, store_est} = this.state;
+    let maxPrice = 0;
+    let minPrice = 0;
+    let wayNums = 0;
+    let est_all_check = true;
+    let store_est_all_check = true;
 
+    for (let info of est) {
+      if (info?.ischeck) {
+        wayNums += 1;
+        if (wayNums === 1) {
+          minPrice = maxPrice = info?.delivery_fee
+        } else {
+          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
+          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+        }
+      } else {
+        est_all_check = false
+      }
+    }
+
+    for (let info of store_est) {
+      if (info?.ischeck) {
+        wayNums += 1;
+        if (wayNums === 1) {
+          minPrice = maxPrice = info?.delivery_fee
+        } else {
+          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
+          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+        }
+      } else {
+        store_est_all_check = false;
+      }
     }
 
     this.setState({
       maxPrice: maxPrice,
       minPrice: minPrice,
       wayNums: wayNums,
-      logisticFeeMap: logisticFeeMap
+      est_all_check: est_all_check,
+      store_est_all_check: store_est_all_check,
     })
-
   }
 
-  onCallThirdShipRule = () => {
-    let total_selected_ship = tool.length(this.state.newSelected);
-    let store_id = this.props.global.currStoreId;
-    let {currVendorId} = tool.vendor(this.props.global);
+  onPress = (route, params = {}) => {
+    this.props.navigation.navigate(route, params);
+  }
 
-    let total_ok_ship = this.state.total_ok_ship;
-    const self = this;
-    const {orderId} = this.state;
-    this.mixpanel.track("deliverorder_click", {});
-
-    const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
-    HttpUtils.get.bind(self.props)(api).then(obj => {
-      Alert.alert('提示', `${obj.content}`, [{
-        text: `${obj.left_btn}`, onPress: () => {
-          this.onCallThirdShip()
-          this.mixpanel.track("ship.list_to_call.call", {
-            store_id,
-            vendor_id: currVendorId,
-            total_selected_ship,
-            total_ok_ship
+  cancelDelivery = (ship_id) => {
+    let {accessToken, order_id} = this.props.global
+    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
+    let params = {
+      order_id: order_id
+    }
+    let order = {
+      id: order_id
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      if (res?.deduct_fee < 0) {
+        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
+          text: '确定', onPress: () => {
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+              {
+                order: order,
+                ship_id: ship_id,
+                onCancelled: () => {
+                  this.fetchData()
+                }
+              });
+          }
+        }, {'text': '取消'}]);
+      } else if (Number(res?.deduct_fee) === 0) {
+        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+          {
+            order: order,
+            ship_id: ship_id,
+            onCancelled: () => {
+              this.fetchData()
+            }
           });
-        }
-      }, {text: `${obj.right_btn}`}])
-    }).catch(reason => {
-      if (reason.ok === false) {
-        this.onCallThirdShip()
-        this.mixpanel.track("ship.list_to_call.call", {
-          store_id,
-          vendor_id: currVendorId,
-          total_selected_ship,
-          total_ok_ship
-        });
+      } else {
+        Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${res?.deduct_fee}元`, [{
+          text: '确定', onPress: () => {
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+              {
+                order: order,
+                ship_id: ship_id,
+                onCancelled: () => {
+                  this.fetchData()
+                }
+              });
+          }
+        }, {'text': '取消'}]);
       }
+    }).catch(e => {
+      showError(`${e.reason}`)
     })
   }
 
-  onCallThirdShip = () => {
-    tool.debounces(() => {
-      const self = this;
-      const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
 
-      showModal('正在呼叫第三方配送，请稍等')
-      const {
-        orderId,
-        storeId,
-        newSelected,
-        if_reship,
-        mealTime,
-        store_id,
+  onWorkerDelivery() {
+    let {worker_delivery_id, order_id} = this.state;
+    if (!this.state.worker > 0) {
+      ToastLong('请选择员工');
+      return;
+    }
+    const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
+    HttpUtils.get.bind(this.props)(api, {
+      orderId: order_id,
+      userId: worker_delivery_id,
+      sync_order: 0
+    }).then(() => {
+      hideModal();
+      this.props.route.params.onBack && this.props.route.params.onBack({count: 1});
+      this.props.navigation.goBack()
+    }).catch(() => hideModal())
+  }
+
+  onCallDelivery = () => {
+    showModal('正在呼叫配送，请稍等')
+    let {vendor_id, store_id,} = this.props.global;
+    let {
+      order_id,
+      logistic_fee_map,
+      if_reship,
+      address_id,
+      weight,
+      expect_time,
+      order_money,
+      add_tips,
+      remark,
+      worker_delivery_id
+    } = this.state;
+    if (worker_delivery_id > 0) {
+      return this.onWorkerDelivery();
+    }
+    tool.debounces(() => {
+      let params = {
         vendor_id,
-        total_selected_ship,
-        logisticFeeMap,
-        addressId,
-        weight
-      } = this.state;
-      HttpUtils.post.bind(self.props)(api, {
-        orderId: orderId,
-        storeId: storeId,
-        logisticCode: newSelected,
-        if_reship: if_reship,
-        mealTime: mealTime,
-        logisticFeeMap,
-        address_id: addressId,
-        remark: this.state.remark,
-        weight: weight
-      }).then(res => {
+        store_id,
+        order_id,
+        logistic_fee_map,
+        if_reship,
+        address_id,
+        weight,
+        expect_time,
+        order_money,
+        order_tips: add_tips,
+        remark
+      }
+      const api = `/v4/wsb_delivery/call_delivery?access_token=${this.state.accessToken}`;
+      HttpUtils.post.bind(this.props)(api, params).then(res => {
         hideModal();
-        this.mixpanel.track("ship.list_to_call.call", {
-          store_id,
-          vendor_id,
-          total_selected_ship,
-          total_ok_ship: res.count
-        });
-        self.props.route.params.onBack && self.props.route.params.onBack(res);
-        self.props.navigation.goBack()
+        this.props.route.params.onBack && this.props.route.params.onBack(res);
+        this.props.navigation.goBack()
       }).catch((res) => {
         hideModal();
         if (res.obj.mobile && res.obj.mobile !== '') {
@@ -359,17 +362,11 @@ class OrderCallDelivery extends Component {
             is_mobile_visiable: true
           })
         }
-        this.mixpanel.track("ship.list_to_call.call", {
-          store_id,
-          vendor_id,
-          total_selected_ship,
-          total_ok_ship: 0
-        });
-        if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
+        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
             {
               text: '去充值', onPress: () => {
-                this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
                   onBack: (res) => {
                     this.showAlert(res)
                   }
@@ -382,42 +379,16 @@ class OrderCallDelivery extends Component {
     }, 1000)
   }
 
-  onSelectLogistic(code, event) {
-    let selected = this.state.newSelected;
-    let index = selected.indexOf(code);
-    if (code === 10) {
-      let diff_time = (new Date(this.state.expectTime)).getTime() - (new Date()).getTime();
-      diff_time = Math.floor(diff_time / 1000 / 60);
-      if (diff_time >= 60 && event.target.checked) {
-        this.setState({
-          showDateModal: true
-        })
-      } else {
-        this.setState({
-          mealTime: '',
-          showDateModal: false
-        })
-      }
-    }
-    if (index >= 0) {
-      selected.splice(index, 1)
-    } else {
-      selected.push(code)
-    }
-    this.setState({newSelected: selected, total_selected_ship: selected.length})
-  }
-
-
   showAlert = (res) => {
     if (res) {
       Alert.alert('充值成功，是否立即发配送', ``, [
         {text: '取消发单'},
         {
           text: '立即发单', onPress: () => {
-            this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+            this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: (res) => {
                 if (res) {
-                  this.onCallThirdShipRule();
+                  this.onCallDelivery();
                 }
               }
             });
@@ -429,23 +400,948 @@ class OrderCallDelivery extends Component {
         {text: '取消'},
         {
           text: '再次充值', onPress: () => {
-            this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+            this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: () => {
-                this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
                   onBack: (res) => {
                     this.showAlert(res)
                   }
                 });
               }
-            });
+            })
           }
         }
       ])
     }
   }
 
-  onPress = (route, params = {}) => {
-    this.props.navigation.navigate(route, params);
+  closeModal = () => {
+    this.setState({
+      show_weight_modal: false,
+      show_worker_delivey_modal: false,
+      show_goods_price_modal: false,
+      show_date_modal: false,
+      show_add_tip_modal: false,
+      show_remark_modal: false,
+    })
+  }
+
+  onSelectDeliveyAll = (type, cancel = 0) => {
+    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map} = this.state;
+    let list = type === 1 ? est : store_est;
+    let lists = type === 1 ? store_est : est;
+    let bool = type === 1 ? !est_all_check : !store_est_all_check;
+    if (cancel === 1) bool = false;
+    for (let i in list) {
+      list[i].ischeck = bool;
+    }
+
+    let check = false
+    let check_logistic = {}
+    for (let idx in list) {
+      for (let i in lists) {
+        if (lists[i]?.logisticCode === list[idx]?.logisticCode) {
+          lists[i].ischeck = false;
+        }
+      }
+      check = false
+      for (let i in logistic_fee_map) {
+        if (logistic_fee_map[i]?.logistic_code === list[idx]?.logisticCode) {
+          check = true
+          if (bool) {
+            logistic_fee_map[i].logistic_code = list[idx]?.logisticCode
+            logistic_fee_map[i].paid_partner_id = list[idx]?.fee_by
+          } else {
+            logistic_fee_map.splice(i, 1)
+          }
+        }
+      }
+      if (!check && cancel === 0) {
+        check_logistic = {
+          logistic_code: list[idx]?.logisticCode,
+          paid_partner_id: list[idx]?.fee_by
+        }
+        logistic_fee_map.push(check_logistic)
+      }
+    }
+
+    let params = type === 1 ?
+      {logistic_fee_map, est: [...list], store_est: [...lists], est_all_check: bool} :
+      {logistic_fee_map, store_est: [...list], est: [...lists], store_est_all_check: bool};
+    if (cancel === 0) {
+      params.worker_delivery_id = 0;
+    }
+    this.setState(
+      params
+      , () => {
+        this.priceFn()
+      })
+  }
+  onSelectDelivey = (item, key, type) => {
+    let {est, store_est, logistic_fee_map} = this.state;
+    let list = type === 0 ? est : store_est;
+    let lists = type === 0 ? store_est : est
+    item.ischeck = item?.ischeck !== undefined ? !item?.ischeck : true;
+    list[key] = item;
+    let check = false
+    for (let idx in logistic_fee_map) {
+      if (logistic_fee_map[idx]?.logistic_code === item?.logisticCode) {
+        check = true;
+        if (item.ischeck) {
+
+          for (let i in lists) {
+            if (lists[i]?.logisticCode === item?.logisticCode) {
+              lists[i].ischeck = false;
+            }
+          }
+          logistic_fee_map[idx].paid_partner_id = item?.fee_by
+        } else {
+          if (logistic_fee_map[idx].paid_partner_id === item?.fee_by) {
+            logistic_fee_map.splice(idx, 1)
+          }
+        }
+
+
+      }
+    }
+    if (!check) {
+      let check_logistic = {
+        logistic_code: item?.logisticCode,
+        paid_partner_id: item?.fee_by
+      }
+      logistic_fee_map.push(check_logistic)
+    }
+    let params = type === 0 ?
+      {worker_delivery_id: 0, logistic_fee_map, est: [...list], store_est: [...lists]} :
+      {worker_delivery_id: 0, logistic_fee_map, store_est: [...list], est: [...lists]};
+    this.setState(
+      params
+      , () => {
+        this.priceFn()
+      })
+  }
+
+  render() {
+    let {isLoading, order_id, add_tips, show_add_tip_modal} = this.state
+    return (
+      <View style={{flexGrow: 1}}>
+        {this.renderHead()}
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => this.fetchData()}
+            tintColor='gray'
+          />
+        } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
+          {this.renderCollect()}
+          {this.renderCancelDelivery()}
+          {this.renderWsbDelivery()}
+          {this.renderStoreDelivery()}
+          {this.renderOwnDelivery()}
+        </ScrollView>
+        {this.renderBtn()}
+        {this.renderWorkerDeliveryModal()}
+        {this.renderWeightModal()}
+        {this.renderGoodsPriceModal()}
+        {this.renderRemarkModal()}
+        {this.renderDatePicker()}
+        {this.renderReasonModal()}
+
+        <AddTipModal
+          setState={this.setState.bind(this)}
+          fetchData={this.fetchData.bind(this)}
+          id={order_id}
+          add_money={add_tips}
+          set_add_tip_money={true}
+          show_add_tip_modal={show_add_tip_modal}/>
+
+      </View>
+    )
+  }
+
+  renderCancelDelivery = () => {
+    let {exist_waiting_delivery} = this.state
+    if (tool.length(exist_waiting_delivery) <= 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+
+        <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{
+            borderBottomWidth: 4,
+            borderColor: 'rgba(38,185,66,0.2)'
+          }}>
+            <Text style={{
+              fontWeight: '500',
+              fontSize: 17,
+              color: colors.color333,
+            }}>呼叫中</Text>
+          </View>
+        </View>
+        {this.renderCancalDeliveryItem(exist_waiting_delivery)}
+      </View>
+    )
+  }
+
+  renderOwnDelivery = () => {
+    let {worker_delivery_id, worker_name, worker_mobile} = this.state;
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4, marginBottom: 100}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{
+            borderBottomWidth: 4,
+            borderColor: 'rgba(38,185,66,0.2)'
+          }}>
+            <Text style={{
+              fontWeight: '500',
+              fontSize: 17,
+              color: colors.color333,
+            }}>其他配送</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity onPress={() => {
+          this.setState({
+            show_worker_delivey_modal: true
+          })
+        }} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
+          <Image
+            source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
+            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>自配送 </Text>
+            </View>
+            <Text style={{fontSize: 12, color: colors.color666}}>
+              {worker_delivery_id > 0 ? worker_name + '' + worker_mobile : '骑手信息'}
+            </Text>
+          </View>
+
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{fontSize: 14, color: colors.color666}}>自行配送</Text>
+            <Entypo name='chevron-thin-right' style={{fontSize: 18, color: colors.color999}}/>
+          </View>
+
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  renderCancalDeliveryItem = (exist_waiting_delivery) => {
+    return (
+      <For index='key' each='item' of={exist_waiting_delivery}>
+        <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
+          <Image
+            source={{url: item?.icon}}
+            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.platform_name} </Text>
+            </View>
+            <Text style={{fontSize: 12, color: colors.color666}}>
+              已等待 <Text style={{fontSize: 12, color: "#FF8309"}}>{item?.waiting_time} </Text>分钟
+            </Text>
+          </View>
+          <Button title={'取消'}
+                  onPress={() => {
+                    this.cancelDelivery(item.id)
+                  }}
+                  buttonStyle={{
+                    width: 67,
+                    borderRadius: 20,
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorDDD,
+                    borderWidth: 0.5
+                  }}
+                  titleStyle={{color: colors.color666, fontSize: 14, lineHeight: 20}}
+          />
+        </View>
+      </For>
+    )
+  }
+
+  renderWsbDelivery = () => {
+    let {est_all_check, est} = this.state
+    if (tool.length(est) <= 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+
+        <TouchableOpacity
+          onPress={() => this.onSelectDeliveyAll(1)}
+          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{
+            borderBottomWidth: 4,
+            borderColor: 'rgba(38,185,66,0.2)'
+          }}>
+            <Text style={{
+              fontWeight: '500',
+              fontSize: 17,
+              color: colors.color333,
+            }}>省钱配送</Text>
+          </View>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text>全选</Text>
+            <CheckBox
+              size={20}
+              checkedColor={colors.main_color}
+              uncheckedColor={'#DDDDDD'}
+              containerStyle={{margin: 0, padding: 0}}
+              checked={est_all_check}
+              onPress={() => this.onSelectDeliveyAll(1)}
+            />
+          </View>
+        </TouchableOpacity>
+        {this.renderDeliveryItem(est, 0)}
+      </View>
+    )
+  }
+
+  renderStoreDelivery = () => {
+    let {store_est_all_check, store_est} = this.state
+    if (tool.length(store_est) <= 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+        <TouchableOpacity
+          onPress={() => this.onSelectDeliveyAll(2)}
+          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{
+            borderBottomWidth: 4,
+            borderColor: 'rgba(38,185,66,0.2)'
+          }}>
+            <Text style={{
+              fontWeight: '500',
+              fontSize: 17,
+              color: colors.color333,
+            }}>自有账号</Text>
+          </View>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text>全选</Text>
+            <CheckBox
+              size={20}
+              checkedColor={colors.main_color}
+              uncheckedColor={'#DDDDDD'}
+              containerStyle={{margin: 0, padding: 0}}
+              checked={store_est_all_check}
+              onPress={() => this.onSelectDeliveyAll(2)}
+            />
+          </View>
+        </TouchableOpacity>
+        {this.renderDeliveryItem(store_est, 1)}
+      </View>
+    )
+  }
+
+
+  renderDeliveryItem = (list = [], type = 0) => {
+    if (tool.length(list) <= 0) {
+      return null
+    }
+    return (
+      <For index='key' each='item' of={list}>
+        <TouchableOpacity onPress={() => {
+          this.onSelectDelivey(item, key, type)
+        }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
+          <Image
+            source={{url: item?.icon}}
+            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
+              <If condition={tool.length(item?.marking[0]) > 0}>
+                <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
+                  <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>常用</Text>
+                </View>
+              </If>
+              <If condition={tool.length(item?.marking[0]) > 0}>
+                <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
+                  <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>最便宜</Text>
+                </View>
+              </If>
+            </View>
+            <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
+          </View>
+
+          <View style={{marginRight: 1}}>
+            <Text style={{fontSize: 12, color: colors.color333}}>
+              <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
+            </Text>
+            <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
+              <Text style={{fontSize: 12, color: '#FF8309'}}>优惠{item?.coupons_amount}元</Text>
+            </If>
+          </View>
+          <CheckBox
+            size={20}
+            checkedColor={colors.main_color}
+            uncheckedColor={'#DDDDDD'}
+            containerStyle={{margin: 0, padding: 0}}
+            checked={item?.ischeck}
+            onPress={() => {
+              this.onSelectDelivey(item, key, type)
+            }}
+          />
+        </TouchableOpacity>
+      </For>
+    )
+  }
+
+  renderCollect = () => {
+    let {wm_address, wm_user_name, wm_mobile, exist_waiting_delivery} = this.state;
+    if (tool.length(exist_waiting_delivery) > 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{
+            backgroundColor: '#FF8309',
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <Text style={{fontSize: 15, color: colors.white, fontWeight: '500'}}>收</Text>
+          </View>
+          <View style={{marginLeft: 9}}>
+            <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
+              {tool.length((wm_address)) > 18 ? wm_address.substring(0, 17) + '...' : wm_address}
+            </Text>
+            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>{wm_user_name}&nbsp;{wm_mobile} </Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  renderHead = () => {
+    let {order_expect_time, wm_platform_day_id, wm_platform} = this.state;
+    return (
+      <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.goBack()}
+          style={{
+            paddingLeft: 12,
+            width: 36
+          }}>
+          <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
+        </TouchableOpacity>
+        <View style={{flex: 1,}}>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{fontWeight: '500', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
+            <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
+          </View>
+          <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
+            <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间{order_expect_time} </Text>
+          </View>
+        </View>
+        <View style={{width: 36}}/>
+      </View>
+    )
+  }
+
+
+  renderBtn = () => {
+    let {
+      is_alone_pay_vendor,
+      weight,
+      order_money,
+      remark,
+      add_tips,
+      is_right_once,
+      mealTime,
+      worker_delivery_id,
+      maxPrice,
+      minPrice,
+      wayNums
+    } = this.state;
+    return (
+      <View style={{paddingHorizontal: 10, paddingBottom: 10, backgroundColor: colors.white}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 12}}>
+          <TouchableOpacity onPress={() => {
+            if (is_alone_pay_vendor) {
+              return ToastLong('不支持修改商品重量');
+            }
+            this.setState({
+              show_weight_modal: true
+            })
+          }} style={{
+            height: 56,
+            width: 56,
+            borderRadius: 4,
+            borderColor: colors.e5,
+            borderWidth: 0.5,
+            marginHorizontal: 8,
+            alignItems: 'center'
+          }}>
+            <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{weight}KG</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              show_date_modal: true,
+              datePickerList: this.timeSlot(10, true)
+            })
+          }} style={{
+            height: 56,
+            width: 56,
+            borderRadius: 4,
+            borderColor: colors.e5,
+            borderWidth: 0.5,
+            marginHorizontal: 8,
+            alignItems: 'center'
+          }}>
+            <SvgXml style={{marginTop: 5}} xml={time()}/>
+            <Text style={{
+              fontSize: 11,
+              color: colors.color333,
+              marginTop: 5
+            }}>{is_right_once === 0 ? mealTime : '立即送达'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              show_goods_price_modal: true
+            })
+          }} style={{
+            height: 56,
+            width: 56,
+            borderRadius: 4,
+            borderColor: colors.e5,
+            borderWidth: 0.5,
+            marginHorizontal: 8,
+            alignItems: 'center'
+          }}>
+            <SvgXml style={{marginTop: 5}} xml={cost()}/>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{order_money}元</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              show_add_tip_modal: true
+            })
+          }} style={{
+            height: 56,
+            width: 56,
+            borderRadius: 4,
+            borderColor: colors.e5,
+            borderWidth: 0.5,
+            marginHorizontal: 8,
+            alignItems: 'center'
+          }}>
+            <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
+            <Text style={{
+              fontSize: 11,
+              color: colors.color333,
+              marginTop: 5
+            }}>{add_tips > 0 ? '加' + add_tips + '元' : '加小费'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              show_remark_modal: true
+            })
+          }} style={{
+            height: 56,
+            width: 56,
+            borderRadius: 4,
+            borderColor: colors.e5,
+            borderWidth: 0.5,
+            marginHorizontal: 8,
+            alignItems: 'center'
+          }}>
+            <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+              {tool.length(remark) > 0 ? '已' : ''}备注
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{flexDirection: 'row',}}>
+          <View style={{
+            borderTopLeftRadius: 24,
+            borderBottomLeftRadius: 24,
+            flex: 1,
+            backgroundColor: colors.color444,
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: 48,
+          }}>
+            <If condition={worker_delivery_id > 0}>
+              <View style={{marginLeft: 30}}>
+                <Text style={{color: colors.white, fontWeight: '500', fontSize: 13}}>0元 </Text>
+                <Text style={{color: colors.colorCCC, fontSize: 11}}>已选择自配送 </Text>
+              </View>
+            </If>
+            <If condition={worker_delivery_id <= 0 && wayNums <= 0}>
+              <View style={{marginLeft: 30}}>
+                <Text style={{color: colors.white, fontWeight: '500', fontSize: 13}}>暂无费用 </Text>
+                <Text style={{color: colors.colorCCC, fontSize: 11}}>至少选择1个运力 </Text>
+              </View>
+            </If>
+
+            <If condition={worker_delivery_id <= 0 && wayNums > 0}>
+              <View style={{marginLeft: 30}}>
+                <Text style={{color: colors.white, fontSize: 11}}>
+                  预计<Text style={{
+                  fontWeight: '500',
+                  color: colors.white,
+                  fontSize: 16
+                }}> {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice} </Text>元
+                </Text>
+                <Text style={{color: colors.colorCCC, fontSize: 11}}>已选择{wayNums}个运力 </Text>
+              </View>
+            </If>
+          </View>
+          <View style={{
+            position: 'absolute',
+            top: 0,
+            right: 116,
+            height: 48,
+            zIndex: 1,
+            borderLeftWidth: 20,
+            borderLeftColor: colors.color444,
+            borderBottomWidth: 48,
+            borderBottomColor: colors.main_color,
+          }}/>
+          <TouchableOpacity onPress={this.onCallDelivery} style={{
+            width: 136,
+            height: 48,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.main_color,
+            borderTopRightRadius: 24,
+            borderBottomRightRadius: 24,
+          }}>
+            <Text style={{color: colors.white, fontWeight: '500', fontSize: 16}}>配送下单 </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+
+  renderWorkerDeliveryModal = () => {
+    let {show_worker_delivey_modal, worker_list, worker_delivery_id} = this.state;
+    return (
+      <JbbModal
+        visible={show_worker_delivey_modal}
+        HighlightStyle={{padding: 0}}
+        modalStyle={{padding: 20}}
+        onClose={() => {
+          this.setState({
+            worker_delivery_id: 0
+          })
+          this.closeModal()
+        }}
+        modal_type={'bottom'}>
+        <View style={{marginBottom: 30,}}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              自配信息
+            </Text>
+            <Entypo onPress={() => {
+              this.setState({
+                worker_delivery_id: 0
+              })
+              this.closeModal()
+            }} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
+          <If condition={tool.length(worker_list) > 0}>
+            <For each='worker' index='idx' of={worker_list}>
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  worker_delivery_id: worker?.id,
+                  worker_name: worker?.label,
+                  worker_mobile: worker?.mobile,
+                })
+              }} key={idx} style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 14,
+                borderColor: colors.colorDDD,
+                borderBottomWidth: 0.5
+              }}>
+                <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                  <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.label} </Text>
+                  <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
+                </View>
+                <If condition={worker_delivery_id === worker?.id}>
+                  <Entypo name={'check'} style={{
+                    fontSize: 22,
+                    color: colors.main_color,
+                  }}/>
+                </If>
+              </TouchableOpacity>
+            </For>
+          </If>
+
+          <Button title={'确 定'}
+                  onPress={() => {
+                    this.onSelectDeliveyAll(1, 1)
+                    this.onSelectDeliveyAll(2, 1)
+                    this.closeModal()
+                  }}
+                  buttonStyle={[{
+                    marginTop: 20,
+                    backgroundColor: colors.main_color,
+                    borderRadius: 24,
+                    length: 48,
+                  }]}
+                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+        </View>
+      </JbbModal>
+    )
+  }
+
+
+  renderWeightModal = () => {
+    let {show_weight_modal, weight_min, weight_max, weight_input_value, weight_step} = this.state;
+    return (
+      <JbbModal visible={show_weight_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'bottom'}>
+        <View>
+          <View style={{
+            flexDirection: 'row',
+            padding: 12,
+            justifyContent: 'space-between',
+            borderBottomWidth: 0.5,
+            borderColor: '#EEEEEE'
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              物品重量
+            </Text>
+            <Entypo onPress={this.closeModal} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
+          <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
+            <View
+              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'space-between'}}>
+              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
+              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
+                <Text style={{color: '#E32321', fontSize: 20}}>
+                  {weight_input_value}
+                </Text>
+                千克 </Text>
+            </View>
+            <View style={{
+              flexDirection: 'row',
+              marginVertical: 20,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{color: colors.color333, fontSize: 12, marginRight: 10}}>
+                {weight_min}千克
+              </Text>
+              <View style={{flex: 1}}>
+                <Slider
+                  thumbTintColor={'red'}
+                  minimumTrackTintColor={colors.main_color}
+                  maximumTrackTintColor={colors.f5}
+                  value={weight_input_value}
+                  maximumValue={weight_max}
+                  minimumValue={weight_min}
+                  step={weight_step}
+                  trackStyle={{height: 6, borderRadius: 7}}
+                  thumbStyle={{
+                    height: 26,
+                    width: 26,
+                    borderRadius: 13,
+                    backgroundColor: colors.colorEEE
+                  }}
+                  onValueChange={(value) => {
+                    this.setState({weight_input_value: value})
+                  }}
+                />
+              </View>
+              <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>
+                {weight_max}千克
+              </Text>
+            </View>
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignContent: 'center',
+              marginBottom: 10,
+            }}>
+              <Text style={{fontSize: 14, color: colors.color999}}>请合理填写物品的实际重量</Text>
+            </View>
+            <Button title={'确 定'}
+                    onPress={() => {
+                      this.setState({
+                        weight: weight_input_value
+                      }, () => {
+                        this.fetchData()
+                        this.closeModal()
+                      })
+                    }}
+                    buttonStyle={[{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 24,
+                      length: 48,
+                    }]}
+                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+          </View>
+        </View>
+      </JbbModal>
+    )
+  }
+
+  setOrderMoney = (price) => {
+    this.setState({
+      order_money_input_value: price
+    })
+  }
+
+  renderGoodsPriceModal = () => {
+    let {show_goods_price_modal, order_money_value, order_money, order_money_input_value} = this.state;
+    return (
+      <JbbModal visible={show_goods_price_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'center'}>
+        <View style={{marginBottom: 20}}>
+          <View style={{
+            flexDirection: 'row',
+            padding: 12,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              物品价值
+            </Text>
+            <Entypo onPress={this.closeModal} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
+          <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+                justifyContent: "space-around",
+                flexWrap: "wrap"
+              }}>
+              <For index='index' each='info' of={goods_price_list}>
+                <Text key={index} style={{
+                  borderWidth: 0.5,
+                  borderColor: Number(info.value) === order_money_input_value ? colors.main_color : colors.colorDDD,
+                  fontSize: 14,
+                  color: Number(info.value) === order_money_input_value ? colors.main_color : colors.color333,
+                  backgroundColor: Number(info.value) === order_money_input_value ? '#DFFAE2' : colors.white,
+                  width: width * 0.25,
+                  textAlign: 'center',
+                  paddingVertical: 8,
+                  marginVertical: 5
+                }} onPress={() => {
+                  this.setOrderMoney(Number(info.value))
+                }}>{info.label} </Text>
+              </For>
+              <TextInput
+                onChangeText={(order_money_value) => {
+                  this.setState({order_money_value: Number(order_money_value), order_money: 0})
+                }}
+                defaultValue={order_money_value}
+                value={order_money_value}
+                placeholderTextColor={colors.color999}
+                underlineColorAndroid='transparent'
+                placeholder="自定义"
+                keyboardType={'numeric'}
+                style={{
+                  fontSize: 14,
+                  width: width * 0.53,
+                  borderWidth: 0.5,
+                  color: colors.color333,
+                  borderColor: colors.colorDDD,
+                  textAlign: 'center',
+                  paddingVertical: 8,
+                  marginVertical: 5,
+                }}
+              />
+            </View>
+            <Button title={'确 定'}
+                    onPress={() => {
+                      let order_money = order_money_input_value === 0 ? order_money_value : order_money_input_value;
+                      this.setState({
+                        order_money
+                      }, () => {
+                        this.fetchData()
+                        this.closeModal()
+                      })
+                    }}
+                    buttonStyle={[{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 24,
+                      length: 48,
+                    }]}
+                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+          </View>
+        </View>
+      </JbbModal>
+    )
+  }
+
+  renderRemarkModal = () => {
+    let {show_remark_modal, remark_input_value} = this.state;
+    return (
+      <JbbModal visible={show_remark_modal} onClose={this.closeModal} modal_type={'center'}>
+        <View style={{marginBottom: 20}}>
+          <View style={{
+            flexDirection: 'row',
+            padding: 12,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              备注
+            </Text>
+            <Entypo onPress={this.closeModal} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
+          <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
+            <TextArea
+              value={remark_input_value}
+              onChange={(remark_input_value) => this.setState({remark_input_value})}
+              showCounter={false}
+              placeholder={'请在此填写备注信息，最多不超过30个字符'}
+              placeholderTextColor={colors.color999}
+              underlineColorAndroid="transparent" //取消安卓下划线
+              style={{
+                marginBottom: 12,
+                height: 100,
+                fontSize: 14,
+                color: colors.color333,
+                backgroundColor: colors.f5,
+                borderRadius: 4
+              }}
+            >
+            </TextArea>
+            <Button title={'确 定'}
+                    onPress={() => {
+                      this.setState({
+                        remark: remark_input_value
+                      }, () => {
+                        this.fetchData()
+                        this.closeModal()
+                      })
+                    }}
+                    buttonStyle={[{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 24,
+                      length: 48,
+                    }]}
+                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+          </View>
+        </View>
+      </JbbModal>
+    )
   }
 
 
@@ -465,8 +1361,8 @@ class OrderCallDelivery extends Component {
       time.getHours() < 10 ? hour = '0' + time.getHours() : hour = time.getHours()
       time.getMinutes() < 10 ? sec = '0' + time.getMinutes() : sec = time.getMinutes()
       timeArr.push({label: hour + ':' + sec})
-      if (isNow && timeArr.findIndex((item) => item.label === '立即发单')) {
-        timeArr.unshift({label: '立即发单'})
+      if (isNow && timeArr.findIndex((item) => item.label === '立即送达')) {
+        timeArr.unshift({label: '立即送达'})
       }
     }
     return timeArr
@@ -491,591 +1387,216 @@ class OrderCallDelivery extends Component {
 
     return getDates(new Date(), (new Date()).addDays(2))
   }
-  setCheckd = () => {
 
-  }
-
-  render() {
-    let {isLoading} = this.state
-    return (
-      <View style={{flexGrow: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        {this.renderHead()}
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={() => this.fetchData()}
-            tintColor='gray'
-          />
-        } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
-          {this.renderCollect()}
-          {this.renderCancelDelivery()}
-          {this.renderWsbDelivery()}
-          {this.renderStoreDelivery()}
-          {this.renderOwnDelivery()}
-        </ScrollView>
-        {this.renderBtn()}
-      </View>
-    )
-  }
-
-  renderCancelDelivery = () => {
-    return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
-
-        <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>呼叫中</Text>
-          </View>
-
-        </View>
-        {this.renderCancalDeliveryItem()}
-      </View>
-    )
-  }
-
-  renderOwnDelivery = () => {
-    return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4, marginBottom: 100}}>
-        <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>其他配送</Text>
-          </View>
-        </View>
-
-        <View style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
-            source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
-          <View style={{flex: 1}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>自配送 </Text>
-            </View>
-            <Text style={{fontSize: 12, color: colors.color666}}>骑手信息 </Text>
-          </View>
-
-          <View style={{flexDirection: 'row'}}>
-            <Text>自行配送</Text>
-            <Entypo name='chevron-thin-right' style={{fontSize: 18, color: colors.color999}}/>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  renderCancalDeliveryItem = () => {
-    return (
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-        <Image
-          source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
-          style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
-        <View style={{flex: 1}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>闪送 </Text>
-          </View>
-          <Text style={{fontSize: 12, color: colors.color666}}>12.2公里 </Text>
-        </View>
-
-        <Button title={'取消'}
-                onPress={console.log(121)}
-                buttonStyle={{
-                  width: 67,
-                  borderRadius: 20,
-                  backgroundColor: colors.white,
-                  borderColor: colors.colorDDD,
-                  borderWidth: 0.5
-                }}
-                titleStyle={{color: colors.color666, fontSize: 14, lineHeight: 20}}
-        />
-      </View>
-    )
-  }
-
-  renderWsbDelivery = () => {
-    let {wsb_delivery_all} = this.state
-    return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
-
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>省钱配送</Text>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text>全选</Text>
-            <CheckBox
-              size={20}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={wsb_delivery_all}
-              onPress={this.setCheckd}
-            />
-          </View>
-        </View>
-        {this.renderDeliveryItem()}
-        {this.renderDeliveryItem()}
-        {this.renderDeliveryItem()}
-      </View>
-    )
-  }
-
-
-  renderStoreDelivery = () => {
-    let {wsb_delivery_all} = this.state
-    return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
-
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>自有账号</Text>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text>全选</Text>
-            <CheckBox
-              size={20}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={wsb_delivery_all}
-              onPress={this.setCheckd}
-            />
-          </View>
-        </View>
-        {this.renderDeliveryItem()}
-        {this.renderDeliveryItem()}
-        {this.renderDeliveryItem()}
-      </View>
-    )
-  }
-
-  renderDeliveryItem = () => {
-    return (
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-        <Image
-          source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
-          style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
-        <View style={{flex: 1}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>闪送 </Text>
-            <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
-              <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>常用</Text>
-            </View>
-            <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
-              <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>最便宜</Text>
-            </View>
-          </View>
-          <Text style={{fontSize: 12, color: colors.color666}}>12.2公里 </Text>
-        </View>
-
-        <View style={{marginRight: 1}}>
-          <Text style={{fontSize: 12, color: colors.color333}}>
-            <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>19.2</Text>元
-          </Text>
-          <Text style={{fontSize: 12, color: '#FF8309'}}>优惠2元</Text>
-        </View>
-        <CheckBox
-          size={20}
-          checkedColor={colors.main_color}
-          uncheckedColor={'#DDDDDD'}
-          containerStyle={{margin: 0, padding: 0}}
-          checked={false}
-          onPress={this.setCheckd}
-        />
-      </View>
-    )
-  }
-
-  renderCollect = () => {
-    return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View style={{
-            backgroundColor: '#FF8309',
-            width: 28,
-            height: 28,
-            borderRadius: 14,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Text style={{fontSize: 15, color: colors.white, fontWeight: '500'}}>收</Text>
-          </View>
-          <View style={{marginLeft: 9}}>
-            <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>味多美（立水桥店） </Text>
-            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>博彦科技大厦B座四层2912室 </Text>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  renderHead = () => {
-    return (
-      <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.goBack()}
-          style={{
-            paddingLeft: 12,
-            width: 36
-          }}>
-          <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
-        </TouchableOpacity>
-        <View style={{flex: 1,}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{fontWeight: '500', fontSize: 16, color: colors.color333}}>美团 </Text>
-            <Text style={{color: colors.color666, fontSize: 14}}>#{"121"} </Text>
-          </View>
-          <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-            <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间 19：21 </Text>
-          </View>
-        </View>
-        <View style={{width: 36}}/>
-      </View>
-    )
-  }
-
-  handle = (info, index) => {
-    const {logistics} = this.state
-    if (logistics[index].logisticCode <= 0) {
-      return ToastLong("数据错误，请刷新当前页面")
-    }
-    if (info.error_msg) {
-      return false;
-    }
-    if (info.name === '外送帮账号') {
-      let isChosed = logistics[index]?.est?.isChosed ? logistics[index]?.est?.isChosed : false;
-      logistics[index].est.isChosed = !isChosed;
-      if (logistics[index].store_est) {
-        logistics[index].store_est.isChosed = false;
-      }
-    } else {
-      let isChosed = logistics[index].store_est.isChosed ? logistics[index].store_est.isChosed : false;
-      logistics[index].store_est.isChosed = !isChosed;
-      if (logistics[index].est) {
-        logistics[index].est.isChosed = false;
-      }
-    }
-    this.setState({
-      logistics: logistics
+  checkDateItem = (idx, item) => {
+    let {
+      datePickerType,
+      datePickerList,
+      datePickerOther,
+    } = this.state
+    let datePickerListCopy = datePickerType === 'today' ? datePickerList : datePickerOther
+    datePickerListCopy.forEach(checkedItem => {
+      checkedItem.isChosed = false
     })
-    this.priceFn();
+    datePickerListCopy[idx].isChosed = true
+    let params = {};
+    if (datePickerType === 'today') {
+      params.datePickerList = datePickerListCopy;
+    } else {
+      params.datePickerOther = datePickerListCopy;
+    }
+
+    if (item?.label !== '立即送达') {
+      params.callDelivery_Time = item?.label;
+    }
+    this.setState(params)
   }
 
-  renderItem = (info, index) => {
+  renderDatePicker = () => {
+    let {
+      show_date_modal,
+      datePickerType,
+      datePickerList,
+      datePickerOther,
+      callDelivery_Day,
+      callDelivery_Time
+    } = this.state
+    let date = datePickerType === 'today' ? '今天' : datePickerType === 'tomorrow' ? '明天' : '后天';
+    let mealtime = date + ' ' + callDelivery_Time
+    let expect_time = callDelivery_Day + ' ' + callDelivery_Time
     return (
-      <TouchableOpacity
-        style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}}
-        onPress={() => this.handle(info, index)}>
-        <View style={styles.check}>
-          <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold', lineHeight: 56}}>
-            {info.name}
-          </Text>
+      <JbbModal onClose={this.closeModal} visible={show_date_modal} HighlightStyle={{padding: 0}}
+                modalStyle={{padding: 0}}
+                modal_type={'bottom'}>
+        <View>
+          <View style={{
+            flexDirection: 'row',
+            padding: 12,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              期望送达时间
+            </Text>
+            <Entypo onPress={this.closeModal} name="cross"
+                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+          </View>
 
-          <View style={{flex: 1}}/>
-
-          <View style={{alignItems: 'center'}}>
-            <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <Text style={{fontSize: 12, fontWeight: 'bold', lineHeight: pxToDp(42)}}>
-                预估
-              </Text>
-              <Text style={{fontWeight: 'bold', fontSize: 20, color: colors.color333}}>
-                {info.delivery_fee}
-              </Text>
-            </View>
-
-            {info && info.coupons_amount > 0 ?
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontSize: 10, fontWeight: 'bold', lineHeight: pxToDp(42), color: colors.color999}}>
-                  已优惠
+          <View
+            style={{flexDirection: "row", justifyContent: "space-evenly", paddingHorizontal: 12, paddingVertical: 5}}>
+            <View style={{flexDirection: "column", justifyContent: "space-around", flex: 1}}>
+              <TouchableOpacity style={datePickerType === 'today' ? styles.datePickerActive : styles.datePicker}
+                                onPress={() => {
+                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                                  this.setState({
+                                    datePickerType: 'today',
+                                    callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD')
+                                  })
+                                }}>
+                <Text style={datePickerType === 'today' ? styles.dateTextActive : styles.dateText}>
+                  今天
                 </Text>
-                <Text style={{
-                  fontWeight: 'bold',
-                  fontSize: 12,
-                  color: colors.warn_red
-                }}> {info.coupons_amount} </Text>
-              </View>
-              : null}
-          </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={datePickerType === 'tomorrow' ? styles.datePickerActive : styles.datePicker}
+                                onPress={() => {
+                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                                  this.setState({
+                                    datePickerType: 'tomorrow',
+                                    callDelivery_Day: this.createDatePickerArray()[1],
+                                    datePickerOther: this.timeSlot(10, false)
+                                  })
+                                }}>
+                <Text style={datePickerType === 'tomorrow' ? styles.dateTextActive : styles.dateText}>
+                  明天
+                </Text>
+              </TouchableOpacity>
 
-          <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
-            {info?.isChosed ?
-              <View style={{
-                borderRadius: 10,
-                width: 20,
-                height: 20,
-                backgroundColor: colors.main_color,
-                justifyContent: "center",
-                alignItems: 'center',
-              }}>
-                <Entypo name='check' style={{fontSize: pxToDp(25), color: colors.white}}/>
-              </View> :
-              <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
-          </View>
+              <TouchableOpacity
+                style={datePickerType === 'after-tomorrow' ? styles.datePickerActive : styles.datePicker}
+                onPress={() => {
+                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                  this.setState({
+                    datePickerType: 'after-tomorrow',
+                    callDelivery_Day: this.createDatePickerArray()[2],
+                    datePickerOther: this.timeSlot(10, false)
+                  })
+                }}>
+                <Text style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>
+                  后天
+                </Text>
+              </TouchableOpacity>
 
-        </View>
-      </TouchableOpacity>
-    )
-  }
+            </View>
 
-
-  renderBtn = () => {
-    let {is_alone_pay_vendor} = this.state;
-    return (
-      <View style={{paddingHorizontal: 10, paddingBottom: 10, backgroundColor: colors.white}}>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 12}}>
-          <View style={{
-            height: 56,
-            width: 56,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            marginHorizontal: 8,
-            alignItems: 'center'
-          }}>
-            <SvgXml style={{marginTop: 5}} xml={weight()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>3KG</Text>
-          </View>
-          <View style={{
-            height: 56,
-            width: 56,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            marginHorizontal: 8,
-            alignItems: 'center'
-          }}>
-            <SvgXml style={{marginTop: 5}} xml={time()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>明天12:00</Text>
-          </View>
-          <View style={{
-            height: 56,
-            width: 56,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            marginHorizontal: 8,
-            alignItems: 'center'
-          }}>
-            <SvgXml style={{marginTop: 5}} xml={cost()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>50元</Text>
-          </View>
-          <View style={{
-            height: 56,
-            width: 56,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            marginHorizontal: 8,
-            alignItems: 'center'
-          }}>
-            <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>加5元</Text>
-          </View>
-          <View style={{
-            height: 56,
-            width: 56,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            marginHorizontal: 8,
-            alignItems: 'center'
-          }}>
-            <SvgXml style={{marginTop: 5}} xml={remark()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>备注</Text>
-          </View>
-        </View>
-        <View style={{flexDirection: 'row',}}>
-          <View style={{
-            borderTopLeftRadius: 24,
-            borderBottomLeftRadius: 24,
-            flex: 1,
-            backgroundColor: colors.color444,
-            flexDirection: 'row',
-            alignItems: 'center',
-            height: 48,
-          }}>
-            <View style={{marginLeft: 30}}>
-              <Text style={{color: colors.white, fontWeight: '500', fontSize: 13}}>暂无费用</Text>
-              <Text style={{color: colors.colorCCC, fontSize: 11}}>至少选择1个运力</Text>
+            <View style={{flex: 3, height: 250}}>
+              <ScrollView
+                style={{flex: 1}}
+                ref={(scrollView) => {
+                  this._scrollView = scrollView
+                }}
+                showsVerticalScrollIndicator={false}
+                directionalLockEnabled={true}
+                scrollEventThrottle={16}
+                bounces={false}
+                onMomentumScrollEnd={(e) => {
+                  let offsetY = e.nativeEvent.contentOffset.y;
+                  let contentSizeHeight = e.nativeEvent.contentSize.height;
+                  let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
+                  if (offsetY + oriageScrollHeight >= contentSizeHeight) {
+                    if (datePickerType === 'today') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.setState({
+                        datePickerType: 'tomorrow',
+                        callDelivery_Day: this.createDatePickerArray()[1],
+                        datePickerOther: this.timeSlot(10, false)
+                      })
+                    } else if (datePickerType === 'tomorrow') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.setState({
+                        datePickerType: 'after-tomorrow',
+                        callDelivery_Day: this.createDatePickerArray()[2],
+                        datePickerOther: this.timeSlot(10, false)
+                      })
+                    }
+                  }
+                }}
+              >
+                <For of={datePickerType === 'today' ? datePickerList : datePickerOther} index="idx" each='item'>
+                  <TouchableOpacity
+                    key={idx}
+                    style={item?.isChosed ? styles.datePickerItemActive : styles.datePickerItem}
+                    onPress={() => this.checkDateItem(idx, item)}>
+                    <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label} </Text>
+                    <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
+                      {item?.isChosed ?
+                        <View style={styles.datePickerIcon}>
+                          <Entypo name='check' style={{fontSize: 13, color: colors.white,}}/>
+                        </View> :
+                        <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
+                    </View>
+                  </TouchableOpacity>
+                </For>
+              </ScrollView>
             </View>
           </View>
-          <View style={{
-            position: 'absolute',
-            top: 0,
-            right: 116,
-            height: 48,
-            zIndex: 1,
-            borderLeftWidth: 20,
-            borderLeftColor: colors.color444,
-            borderBottomWidth: 48,
-            borderBottomColor: colors.main_color,
-          }}/>
-          <View style={{
-            width: 136,
-            height: 48,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: colors.main_color,
-            borderTopRightRadius: 24,
-            borderBottomRightRadius: 24,
-          }}>
-            <Text style={{color: colors.white, fontWeight: '500', fontSize: 16}}>配送下单 </Text>
-          </View>
+          <Button title={'确 定'}
+                  onPress={() => {
+
+                    this.setState(
+                      {
+                        is_right_once: 0,
+                        expect_time: expect_time,
+                        mealTime: mealtime,
+                        show_date_modal: false
+                      },
+                      () => {
+                        this.fetchData()
+                      })
+                  }}
+                  buttonStyle={[{
+                    backgroundColor: colors.main_color,
+                    borderRadius: 24,
+                    marginHorizontal: 10,
+                    length: 48,
+                  }]}
+                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>
-      </View>
+      </JbbModal>
     )
   }
 
+  renderReasonModal = () => {
+    let {is_mobile_visiable, reason, mobile, btn_visiable} = this.state;
+    return (
+      <JbbModal onClose={() => this.closeDialog()} visible={is_mobile_visiable} modal_type={'center'}>
+        <View>
+          <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
+          <View style={[styles.container1]}>
+            <Text style={{fontSize: pxToDp(26)}}>{reason}
+              <TouchableOpacity onPress={() => native.dialNumber(mobile)}>
+                <Text style={{color: colors.main_color}}>
+                  {mobile}
+                </Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
+          <If condition={btn_visiable}>
+            <View style={styles.btn1}>
+              <View style={{flex: 1}}>
+                <TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                  onPress={() => this.setState({is_mobile_visiable: false})}>
+                  <Text style={styles.btnText}>知道了</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </If>
+
+        </View>
+      </JbbModal>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
-  header: {
-    height: pxToDp(40),
-    marginTop: pxToDp(30),
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  header_text: {
-    height: 40,
-    width: "50%",
-    fontSize: pxToDp(30),
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: colors.main_color,
-    color: colors.white,
-    ...Platform.select({
-      ios: {
-        lineHeight: 40,
-      },
-      android: {}
-    }),
-  },
-  footbtn: {
-    height: 40,
-    width: "30%",
-    margin: '10%',
-    fontSize: pxToDp(30),
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: colors.main_color,
-    color: 'white',
-    lineHeight: 40,
-  },
-  footbtn2: {
-    height: 40,
-    width: "30%",
-    margin: '10%',
-    fontSize: pxToDp(30),
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: 'gray',
-    color: 'white',
-    lineHeight: 40,
-  },
-  check_staus: {
-    backgroundColor: colors.white,
-    color: colors.color111,
-  },
-  modalCancel: {
-    width: '100%',
-    height: pxToDp(80),
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: pxToDp(10),
-    marginTop: pxToDp(20)
-  },
-  modalCancel1: {
-    width: '100%',
-    height: pxToDp(80),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: pxToDp(10),
-    marginTop: pxToDp(20)
-  },
-  modalCancelText: {
-    color: 'black',
-    fontSize: pxToDp(40)
-  },
-  status_err: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    padding: pxToDp(10),
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    // padding: pxToDp(3),
-    color: colors.f7,
-    marginRight: pxToDp(30),
-  },
-
-  status_err1: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    padding: pxToDp(10),
-    backgroundColor: colors.color666,
-    borderRadius: pxToDp(5),
-    // padding: pxToDp(3),
-    color: colors.f7,
-    marginRight: pxToDp(30),
-  },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  container: {
-    width: '90%',
-    maxHeight: '70%',
-    backgroundColor: '#fff',
-    borderRadius: pxToDp(10),
-    padding: pxToDp(20),
-    alignItems: 'center'
-  },
-  container1: {
-    width: '95%',
-    maxHeight: '70%',
-    backgroundColor: '#fff',
-    padding: pxToDp(20),
-    justifyContent: "flex-start",
-    borderTopWidth: pxToDp(1),
-    borderTopColor: "#CCCCCC"
-  },
   btnText: {
     height: 40,
     backgroundColor: colors.main_color,
@@ -1087,18 +1608,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     borderRadius: pxToDp(10)
   },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
   btn1: {
     flexDirection: "row",
     justifyContent: "space-evenly",
     marginVertical: pxToDp(15),
     marginBottom: pxToDp(10)
   },
-  check: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    // paddingHorizontal: pxToDp(20),
-    margin: pxToDp(10),
-  },
+  container: {flex: 1},
+  locationIcon: {fontSize: 16, fontWeight: "bold", color: colors.color666},
   datePicker: {
     backgroundColor: colors.colorEEE,
     flex: 1,
@@ -1123,9 +1649,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.colorEEE,
     paddingBottom: 15
   },
-  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.color111},
-  sureBtn: {fontSize: pxToDp(32), color: colors.main_color},
-  dateMsg: {fontWeight: "bold", fontSize: pxToDp(22), color: '#DA0000', marginVertical: 10},
+  callTime: {fontWeight: "bold", fontSize: 16, color: colors.color111},
+  sureBtn: {fontSize: 16, color: colors.main_color},
+  dateMsg: {fontWeight: "bold", fontSize: 11, color: '#DA0000', marginVertical: 10},
   datePickerItem: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 5},
   datePickerItemActive: {
     flexDirection: "row",
