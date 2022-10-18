@@ -55,13 +55,12 @@ class OrderBottom extends PureComponent {
   }
 
   onCallThirdShips(order_id, store_id, if_reship) {
-    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: order_id,
-      storeId: store_id,
-      selectedWay: [],
+    this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           this.props.fetchData()
 
           GlobalUtil.setOrderFresh(1)

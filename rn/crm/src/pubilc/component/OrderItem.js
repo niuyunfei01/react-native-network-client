@@ -88,13 +88,13 @@ class OrderItem extends React.PureComponent {
     }, 600)
   }
 
-  onCallThirdShips = (order_id, store_id) => {
-    this.onPress(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: order_id,
-      storeId: store_id,
-      selectedWay: [],
+  onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
+      if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -102,7 +102,6 @@ class OrderItem extends React.PureComponent {
       }
     });
   }
-
 
   onAinSend = (order_id, store_id, sync_order = 0) => {
     this.onPress(Config.ROUTE_ORDER_AIN_SEND, {
@@ -525,7 +524,7 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery_again}>
           <Button title={'追加配送'}
                   onPress={() => {
-                    this.onCallThirdShips(item.id, item.store_id)
+                    this.onCallThirdShips(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
