@@ -1,5 +1,6 @@
 #import <NewRelic/NewRelic.h>
 #import "AppDelegate.h"
+#import "RNSplashScreen.h"  // 添加这一句
 // 引入 JPush 功能所需头文件
 #import <RCTJPushModule.h>
 #import "IFlyMSC/IFlyMSC.h"
@@ -101,6 +102,7 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  [RNSplashScreen show];  // 添加这一句，这一句一定要在最后
   return YES;
 }
 

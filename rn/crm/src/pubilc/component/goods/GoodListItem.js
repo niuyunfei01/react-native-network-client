@@ -41,33 +41,16 @@ class GoodListItem extends React.PureComponent {
   }
 
   right = () => {
-    const {product, fnProviding} = this.props;
+    const {product, fnProviding, price_type} = this.props;
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
     let skus = product.skus || []
-    const {price_type} = this.props
+    const {showMore} = this.state
     return (
       <ScrollView style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
-        <View style={{flexDirection: "row"}}>
-          <Text style={[styles.n2grey6, offSaleTxtStyle]}>{product.price_type === 1 ? '零售价格' : '报价'}：</Text>
-          <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-            ￥{product.price_type === 1 ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
-          </Text>
-          <If condition={product.sp && product.sp.is_fix_price === 1}>
-            <View style={{
-              backgroundColor: colors.main_color,
-              padding: pxToDp(3),
-              borderRadius: 1,
-              justifyContent: "center",
-              marginLeft: pxToDp(10)
-            }}>
-              <Text style={{fontSize: 12, color: colors.white}}>固</Text>
-            </View>
-          </If>
-        </View>
 
         <If condition={typeof product.sp.applying_price !== "undefined"}>
           <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
@@ -77,11 +60,18 @@ class GoodListItem extends React.PureComponent {
         <If condition={fnProviding}>
           <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>
         </If>
-
+        <View style={{flexDirection: "row", alignItems: 'center'}}>
+          <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
+            {product.price_type === 1 ? '零售价格' : '报价'}：
+          </Text>
+          <Text style={[styles.priceText, offSaleTxtStyle]}>
+            ￥{product.price_type === 1 ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
+          </Text>
+        </View>
         <If condition={tool.length(skus) > 0}>
-          <TouchableOpacity onPress={() => this.setState({showMore: !this.state.showMore})}>
+          <TouchableOpacity onPress={() => this.setState({showMore: !showMore})}>
             {
-              this.state.showMore ?
+              showMore ?
                 <View style={{flexDirection: "row"}}>
                   <Text style={{color: colors.main_color, fontSize: 12, fontWeight: "bold"}}>点击收起多规格信息 </Text>
                   <Entypo name='chevron-thin-up' style={{fontSize: 14, marginLeft: 5, color: colors.main_color}}/>
@@ -94,19 +84,10 @@ class GoodListItem extends React.PureComponent {
           </TouchableOpacity>
         </If>
 
-        <If condition={tool.length(skus) > 0 && this.state.showMore}>
+        <If condition={tool.length(skus) > 0 && showMore}>
           <For each="item" index="idx" of={skus}>
             <View style={{flexDirection: "column"}} key={idx}>
               <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
-              <View style={{flexDirection: "row"}}>
-                <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  {price_type === 1 ? '零售价格' : '报价'}：
-                </Text>
-                <Text style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  ￥{price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
-                </Text>
-              </View>
-
               <If condition={typeof item.applying_price !== "undefined"}>
                 <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
                   审核中：{parseFloat(item.applying_price / 100).toFixed(2)}
@@ -117,6 +98,14 @@ class GoodListItem extends React.PureComponent {
                   库存：{item.left_since_last_stat || 0} 件
                 </Text>
               </If>
+              <View style={{flexDirection: "row", alignItems: 'center'}}>
+                <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
+                  {price_type === 1 ? '零售价格' : '报价'}：
+                </Text>
+                <Text style={[styles.priceText, offSaleTxtStyle, {color: colors.warn_red}]}>
+                  ￥{price_type === 1 ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
+                </Text>
+              </View>
             </View>
           </For>
         </If>
@@ -125,7 +114,7 @@ class GoodListItem extends React.PureComponent {
   }
 
   render() {
-    const {product, onPressImg, onPressRight} = this.props;
+    const {product, onPressImg, onPressRight, opBar} = this.props;
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const bg = onSale ? colors.white : colors.colorDDD;
     const offSaleImg = onSale ? {} : {opacity: 0.3}
@@ -159,7 +148,7 @@ class GoodListItem extends React.PureComponent {
           {this.right()}
         </If>
       </View>
-      {this.props.opBar}
+      {opBar}
     </TouchableOpacity>
   }
 }
@@ -167,12 +156,20 @@ class GoodListItem extends React.PureComponent {
 export default GoodListItem
 
 const styles = StyleSheet.create({
+  priceTextFlag: {fontSize: 16, color: colors.color333},
+  priceText: {
+    fontSize: 16,
+    color: '#EE2626',
+    lineHeight: 22
+  },
   productRow: {
+    borderTopWidth: 1,
+    borderTopColor: colors.colorCCC,
     padding: 5,
     paddingLeft: 0,
     marginLeft: 2,
     marginBottom: 3,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   listImageSize: {
     width: pxToDp(150),
@@ -188,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   n2grey6: {
-    color: colors.color666,
+    color: colors.color333,
     fontSize: 12
   },
   n2b: {

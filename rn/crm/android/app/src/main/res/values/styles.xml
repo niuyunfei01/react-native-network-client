@@ -5,6 +5,7 @@
         <!--设置状态栏透明开始-->
         <item name="android:windowTranslucentStatus">true</item>
         <!--设置状态栏透明结束-->
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="Theme.Styled" parent="@style/Theme.AppCompat.Light">
@@ -25,7 +26,6 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@drawable/launcher_</item>
     </style>
 
     <!-- Base application theme. -->

@@ -31,6 +31,12 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		844E6F50A356E3818A9D8833 /* libPods-APTest-APTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24E94354652B2C96F193DBD3 /* libPods-APTest-APTestTests.a */; };
 		8452B372286C6561003F2D3D /* Restart.m in Sources */ = {isa = PBXBuildFile; fileRef = 8452B371286C6561003F2D3D /* Restart.m */; };
+		8469C97228FD6A9400D27732 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C96C28FD6A8F00D27732 /* logo@2x.png */; };
+		8469C97328FD6A9400D27732 /* slogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C96D28FD6A9000D27732 /* slogo@2x.png */; };
+		8469C97428FD6A9400D27732 /* slogo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C96E28FD6A9100D27732 /* slogo@3x.png */; };
+		8469C97528FD6A9400D27732 /* logo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C96F28FD6A9200D27732 /* logo@3x.png */; };
+		8469C97628FD6A9400D27732 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C97028FD6A9300D27732 /* logo.png */; };
+		8469C97728FD6A9400D27732 /* slogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8469C97128FD6A9400D27732 /* slogo.png */; };
 		84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B93872286C231A00333FE1 /* RNZipArchive.m */; };
 		A302566523DFA21579892063 /* libPods-APTest-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D03D365927993BD7965CD2 /* libPods-APTest-tvOSTests.a */; };
 		AB8074FF287C1896004356ED /* RNViewShot.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8074FE287C1896004356ED /* RNViewShot.m */; };
@@ -105,6 +111,12 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = APTest/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8452B370286C6530003F2D3D /* Restart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Restart.h; sourceTree = "<group>"; };
 		8452B371286C6561003F2D3D /* Restart.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Restart.m; sourceTree = "<group>"; };
+		8469C96C28FD6A8F00D27732 /* logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo@2x.png"; sourceTree = "<group>"; };
+		8469C96D28FD6A9000D27732 /* slogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "slogo@2x.png"; sourceTree = "<group>"; };
+		8469C96E28FD6A9100D27732 /* slogo@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "slogo@3x.png"; sourceTree = "<group>"; };
+		8469C96F28FD6A9200D27732 /* logo@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo@3x.png"; sourceTree = "<group>"; };
+		8469C97028FD6A9300D27732 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		8469C97128FD6A9400D27732 /* slogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = slogo.png; sourceTree = "<group>"; };
 		84B93871286C22D700333FE1 /* RNZipArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZipArchive.h; sourceTree = "<group>"; };
 		84B93872286C231A00333FE1 /* RNZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZipArchive.m; sourceTree = "<group>"; };
 		8E8C3829062660F7F4F89072 /* Pods-APTest-APTestTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-APTestTests.debug.xcconfig"; path = "Target Support Files/Pods-APTest-APTestTests/Pods-APTest-APTestTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -269,6 +281,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				8469C96B28FD6A7A00D27732 /* logo */,
 				13B07FAE1A68108700A75B9A /* APTest */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* APTestTests */,
@@ -291,6 +304,19 @@
 				2D02E4901E0B4A5D006451C7 /* APTest-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8469C96B28FD6A7A00D27732 /* logo */ = {
+			isa = PBXGroup;
+			children = (
+				8469C97028FD6A9300D27732 /* logo.png */,
+				8469C96C28FD6A8F00D27732 /* logo@2x.png */,
+				8469C96F28FD6A9200D27732 /* logo@3x.png */,
+				8469C97128FD6A9400D27732 /* slogo.png */,
+				8469C96D28FD6A9000D27732 /* slogo@2x.png */,
+				8469C96E28FD6A9100D27732 /* slogo@3x.png */,
+			);
+			path = logo;
 			sourceTree = "<group>";
 		};
 		A27F04B233224ADB9ED7430B /* Resources */ = {
@@ -483,7 +509,13 @@
 				FE6BDDB5273BE90100EDD177 /* QBImagePicker.strings in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				08C13FC426FC3DB60031A0BC /* main.jsbundle in Resources */,
+				8469C97628FD6A9400D27732 /* logo.png in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				8469C97228FD6A9400D27732 /* logo@2x.png in Resources */,
+				8469C97728FD6A9400D27732 /* slogo.png in Resources */,
+				8469C97428FD6A9400D27732 /* slogo@3x.png in Resources */,
+				8469C97528FD6A9400D27732 /* logo@3x.png in Resources */,
+				8469C97328FD6A9400D27732 /* slogo@2x.png in Resources */,
 				FE382F61272AC03D00631292 /* scanner.mp3 in Resources */,
 				FE2239F927479E9F00838E6E /* Weui.ttf in Resources */,
 				F9AA123CF5BD4CCF97E44815 /* antfill.ttf in Resources */,
@@ -1030,11 +1062,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-1";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = APTest/APTest.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 650;
-				DEVELOPMENT_TEAM = YVB38MZTJM;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YVB38MZTJM;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1054,8 +1086,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
-				PROVISIONING_PROFILE_SPECIFIER = "wsb-app-appstore";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wsb-app-appstores";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

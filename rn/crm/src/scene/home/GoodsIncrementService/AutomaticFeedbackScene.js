@@ -97,8 +97,8 @@ class AutomaticFeedbackScene extends PureComponent {
     this.state = {
       storeList: [],
       selectStore: {
-        label: '',
-        value: '',
+        name: '',
+        id: '',
         status: {
           score_1: 'off',
           score_3: 'off',
@@ -113,7 +113,14 @@ class AutomaticFeedbackScene extends PureComponent {
   }
 
   componentDidMount() {
-    this.getSetting()
+    this.focus = this.props.navigation.addListener('focus', () => {
+      this.getSetting()
+    })
+
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   getStoreList = () => {
@@ -123,17 +130,18 @@ class AutomaticFeedbackScene extends PureComponent {
 
     const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
-      list.map(item => {
-        item.value = item.id
-        item.label = item.name
-      })
-      let _selectStore = tool.length(list) > 0 ? list[0] : selectStore
+      // list.map(item => {
+      //   item.value = item.id
+      //   item.label = item.name
+      // })
+      const lists = [{id: '0', name: '全部', platform: '0', store: currStoreId}].concat(list)
+      let _selectStore = tool.length(lists) > 0 ? lists[0] : selectStore
       Object.keys(settings).map(key => {
-        if (_selectStore.value === key)
+        if (_selectStore.id === key)
           _selectStore = {..._selectStore, status: settings[key].status};
       })
       this.setState({
-        storeList: list,
+        storeList: lists,
         selectStore: _selectStore
       })
     }).catch(error => showError(error.reason))
@@ -154,15 +162,13 @@ class AutomaticFeedbackScene extends PureComponent {
   onChange = (item) => {
     let {selectStore, settings} = this.state
     Object.keys(settings).map(key => {
-      if (item.value === key) {
+      if (item.id === key) {
         this.setState({
           selectStore: {
             ...selectStore,
             status: settings[key].status,
-            label: item.label,
-            name: item.label,
-            value: item.value,
-            id: item.value,
+            name: item.name,
+            id: item.id,
           },
 
         })
@@ -180,7 +186,7 @@ class AutomaticFeedbackScene extends PureComponent {
         <LineView/>
         <TouchableOpacity style={styles.row} onPress={() => this.setState({visible: true})}>
           <Text style={styles.rowContentText}>
-            {selectStore.label}
+            {selectStore.name}
           </Text>
           <Text style={styles.rowContentRightText}>
             {'切换门店 >'}
@@ -195,13 +201,14 @@ class AutomaticFeedbackScene extends PureComponent {
     const {global} = this.props
     const {currStoreId, accessToken} = global
     const {selectStore, settings} = this.state
-    let tpl_content = ''
+    let tpl_content = '', tpl_type = 0
     Object.keys(settings).map(key => {
       if (key === selectStore.id) {
         const storeInfo = settings[key]
         Object.keys(storeInfo?.tpl).map(tplKey => {
           if (tplKey === `${item.id}`) {
             tpl_content = storeInfo.tpl[tplKey].tpl_content
+            tpl_type = storeInfo.tpl[tplKey].tpl_type
           }
         })
       }
@@ -209,9 +216,10 @@ class AutomaticFeedbackScene extends PureComponent {
     this.props.navigation.navigate(Config.ROUTE_TEMPLATE_SETTINGS, {
       store: {
         store_id: currStoreId,
-        ext_store_id: selectStore.value,
+        ext_store_id: selectStore.id,
         tpl_level: `${item.id}`,
         tpl_content: tpl_content,
+        tpl_type: Number(tpl_type),
         title: item.title,
         accessToken: accessToken
       }
@@ -306,7 +314,7 @@ class AutomaticFeedbackScene extends PureComponent {
     const api = `/v1/new_api/added/auto_reply?access_token=${accessToken}`
     const params = {
       store_id: currStoreId,
-      ext_store_id: selectStore.value,
+      ext_store_id: selectStore.id,
       score_5: selectStore.status.score_5,
       score_4: selectStore.status.score_4,
       score_3: selectStore.status.score_3,
@@ -322,7 +330,7 @@ class AutomaticFeedbackScene extends PureComponent {
     return (
       <TouchableOpacity onPress={() => this.onChange(item)}>
         <Text style={selectStore.id === item.id ? styles.selectedListItemText : styles.listItemText}>
-          {item.label}
+          {item.name}
         </Text>
       </TouchableOpacity>
     )

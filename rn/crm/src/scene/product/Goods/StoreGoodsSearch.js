@@ -11,9 +11,10 @@ import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import Scanner from "../../../pubilc/component/Scanner";
 import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
+import {SvgXml} from "react-native-svg";
+import {scan} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -31,7 +32,7 @@ let codeType = 'search'
 class StoreGoodsSearch extends Component {
   constructor(props) {
     super(props);
-    const {limit_store} = this.props.route.params;
+    const {limit_store, searchKeywords = ''} = this.props.route.params;
 
     this.state = {
       storeId: limit_store ? limit_store : this.props.global.currStoreId,
@@ -42,13 +43,20 @@ class StoreGoodsSearch extends Component {
       isLoading: false,
       isLastPage: false,
       selectTagId: 0,
-      searchKeywords: '',
+      searchKeywords: searchKeywords,
       showNone: false,
       selectedProduct: {},
       modalType: '',
       showScan: false,
       isCanLoadMore: false
     }
+  }
+
+  componentDidMount() {
+    const {searchKeywords} = this.state
+
+    if (searchKeywords)
+      this.search()
   }
 
   search = () => {
@@ -126,7 +134,7 @@ class StoreGoodsSearch extends Component {
       toUpdate.page = 1
     }
     this.setState(toUpdate, () => {
-      this.search(true)
+      this.search()
     });
   }
 
@@ -166,12 +174,16 @@ class StoreGoodsSearch extends Component {
 
   renderSearchBar = () => {
     return (
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 9}}>
-          <SearchBar placeholder="请输入商品名称、SKU或UPC" value={this.state.searchKeywords} onChange={this.onChange}
-                     onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+          <SearchBar placeholder={'请输入商品名称、SKU或UPC'}
+                     value={this.state.searchKeywords}
+                     onChange={this.onChange}
+                     onCancel={this.onCancel}
+                     onSubmit={() => this.search()}
+                     returnKeyType={'search'}/>
         </View>
-        <Ionicons name={'scan-circle'} onPress={this.scanGoodId} style={{padding: 4}} size={36}/>
+        <SvgXml xml={scan()} onPress={this.scanGoodId} style={{padding: 4}}/>
       </View>
     )
   }

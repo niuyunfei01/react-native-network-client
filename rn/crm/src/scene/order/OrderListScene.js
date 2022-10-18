@@ -36,7 +36,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {empty_data, menu_left, seach_icon, this_down} from "../../svg/svg";
+import {empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import store from "../../pubilc/util/configureStore";
@@ -647,11 +647,7 @@ class OrderListScene extends Component {
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
-          <View style={{
-            flexDirection: 'row',
-            padding: 12,
-            justifyContent: 'space-between',
-          }}>
+          <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
@@ -659,14 +655,13 @@ class OrderListScene extends Component {
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 10,
-                justifyContent: "space-around",
-                flexWrap: "wrap"
-              }}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              justifyContent: "space-around",
+              flexWrap: "wrap"
+            }}>
               <For index='index' each='info' of={sort_list}>
                 <TouchableOpacity key={index} style={{
                   borderWidth: 0.5,
@@ -679,13 +674,15 @@ class OrderListScene extends Component {
                   paddingVertical: 14,
                   marginVertical: 5
                 }} onPress={() => this.setOrderBy(info.value)}>
-                  <Text key={index} style={{
-                    fontSize: 14,
-                    color: info.value === sort ? colors.main_color : colors.color333,
-                    fontWeight: info.value === sort ? '500' : '400'
-                  }} onPress={() => {
-                    this.setOrderBy(info.value)
-                  }}>{info.label} </Text>
+                  <Text key={index}
+                        style={{
+                          fontSize: 14,
+                          color: info.value === sort ? colors.main_color : colors.color333,
+                          fontWeight: info.value === sort ? '500' : '400'
+                        }}
+                        onPress={() => this.setOrderBy(info.value)}>
+                    {info.label}
+                  </Text>
                 </TouchableOpacity>
               </For>
             </View>
@@ -694,11 +691,7 @@ class OrderListScene extends Component {
                       this.onRefresh()
                       this.closeModal()
                     }}
-                    buttonStyle={[{
-                      backgroundColor: colors.main_color,
-                      borderRadius: 24,
-                      height: 48,
-                    }]}
+                    buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, height: 48}]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
@@ -741,30 +734,18 @@ class OrderListScene extends Component {
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_STORE_SELECT, {
-            onBack: (item) => {
-              this.onCanChangeStore(item)
-            }
-          })
-        }} style={{
-          height: 44, flex: 1, flexDirection: 'row', alignItems: 'center',
-        }}>
-          <Text style={{
-            fontSize: 15,
-            color: colors.color333
-          }}>{tool.length((store_info?.name || '')) > 8 ? store_info?.name.substring(0, 7) + '...' : (store_info?.name || '')} </Text>
+          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
+        }}
+                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={{fontSize: 15, color: colors.color333}}>
+            {tool.length((store_info?.name || '')) > 8 ? store_info?.name.substring(0, 7) + '...' : (store_info?.name || '')}
+          </Text>
           <SvgXml xml={this_down()}/>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
-          style={{
-            height: 44,
-            width: 40,
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-          }}>
-          <SvgXml xml={seach_icon()}/>
+          style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+          <SvgXml xml={search_icon()}/>
         </TouchableOpacity>
 
         <ModalDropdown
@@ -775,16 +756,8 @@ class OrderListScene extends Component {
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
         >
-          <View style={{
-            height: 44,
-            width: 40,
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-          }}>
-            <Entypo name={"dots-three-horizontal"} style={{
-              fontSize: 20, color: colors.color666
-            }}/>
+          <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color666}}/>
           </View>
         </ModalDropdown>
 

@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: colors.colorEEE,
     borderWidth: 1,
-    width: 94,
+    width: 98,
     height: 129,
     marginLeft: 12
   },
@@ -89,31 +89,36 @@ const styles = StyleSheet.create({
     borderColor: '#f64e30',
     backgroundColor: '#FFF6F0',
     borderWidth: 1,
-    width: 94,
+    width: 98,
     height: 129,
     marginLeft: 12
   },
-  memberMonthText: {fontSize: 14, color: '#5C3814', lineHeight: 20},
+  memberMonthText: {fontSize: 14, color: '#5C3813', lineHeight: 20},
   memberMonthPresentPrice: {fontSize: 14, color: '#f64e30', fontWeight: 'bold'},
-  memberMonthPresentPriceLarge: {fontSize: 25, lineHeight: 24},
-  memberMonthOriginalPrice: {fontSize: 12, color: colors.colorCCC, lineHeight: 17, textDecorationLine: 'line-through'},
+  memberMonthPresentPriceLarge: {fontSize: 25},
+  memberMonthOriginalPrice: {fontSize: 12, color: colors.color999, lineHeight: 17, textDecorationLine: 'line-through'},
   memberMonthRecommendWrap: {
     backgroundColor: '#F64E30',
     borderRadius: 10,
-    width: 74,
-    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10
   },
-  memberMonthRecommendText: {fontSize: 12, color: colors.white, lineHeight: 17},
+  memberMonthRecommendText: {
+    fontSize: 11,
+    color: colors.white,
+    fontWeight: '500',
+    paddingVertical: 2,
+    paddingHorizontal: 8
+  },
   memberExclusiveWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
   viewDetailText: {fontSize: 14, color: colors.colorCCC, lineHeight: 20, marginRight: 4},
   memberExclusiveItem: {marginTop: 19, marginLeft: 17, marginBottom: 38, flexDirection: 'row', alignItems: 'center'},
   memberExclusiveItemText: {fontSize: 12, color: '#5c3813', lineHeight: 17, marginTop: 8},
   agreeMemberWrap: {marginTop: 13, marginLeft: 17, flexDirection: 'row', alignItems: 'center'},
   agreeMemberText: {fontSize: 10, color: colors.color333, lineHeight: 14, marginLeft: 4},
-  agreeMemberGreenText: {color: colors.main_color, textDecorationLine: 'underline'}
+  agreeMemberGreenText: {color: colors.main_color, textDecorationLine: 'underline'},
+
 })
 
 
@@ -317,7 +322,7 @@ class OpenMemberScene extends PureComponent {
                   <If condition={12 === item.months}>
                     <View style={styles.memberMonthRecommendWrap}>
                       <Text style={styles.memberMonthRecommendText}>
-                        立省{parseFloat(item.pay_money - item.pay_money_actual).toFixed(1)}元
+                        立省{parseInt(item.pay_money - item.pay_money_actual)}元
                       </Text>
                     </View>
                   </If>

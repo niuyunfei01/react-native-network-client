@@ -13,11 +13,12 @@ export function staticUrl(path) {
     let isFullUrl = path.indexOf("http");
     if (isFullUrl === -1) {
       return serverUrl(path, true);
-    } else if (path) {
-      return path.replace("http://", "https://");
-    } else {
-      return path;
     }
+    if (path) {
+      return path.replace("http://", "https://");
+    }
+    return path;
+
   }
 }
 
@@ -45,7 +46,7 @@ export function hostPort() {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: "preview.waisongbang.com/",
+  defaultHost: "www.cainiaoshicai.cn",
   AppName: "Crm",
 
   DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
@@ -219,6 +220,7 @@ const C = {
   ROUTE_SEARCH_GOODS: 'SearchGoods',
   ROUTE_STORE_GOODS_LIST: 'goods',
   ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
+  ROUTE_SEARCH_AND_CREATE_GOODS: 'SearchAndCreateGoodsScene',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_ADD_MISSING_PICTURE: 'ROUTE_ADD_MISSING_PICTURE',//添加缺失图片
 

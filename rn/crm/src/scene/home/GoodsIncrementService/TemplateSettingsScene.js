@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   rowDescription: {
     padding: 12,
     fontSize: 17,
+    width: 116,
     fontWeight: '400',
     color: colors.color333,
     lineHeight: 24
@@ -66,6 +67,10 @@ const styles = StyleSheet.create({
     paddingTop: 7,
     paddingBottom: 7,
     textAlign: 'center'
+  },
+  currentApplyWrap: {backgroundColor: '#FF8309', borderRadius: 4},
+  currentApplyText: {
+    color: colors.white, padding: 4, fontSize: 10
   }
 })
 
@@ -91,10 +96,10 @@ export default class TemplateSettingsScene extends PureComponent {
       selectItem: '-1',
       tempValue: {
         defaultTemp: '',
-        customerTemp: props.route.params.store.tpl_content
+        customerTemp: props.route.params.store.tpl_content,
+        tpl_type: props.route.params.store.tpl_type
       }
     }
-
   }
 
   componentDidMount() {
@@ -161,6 +166,7 @@ export default class TemplateSettingsScene extends PureComponent {
     }
     HttpUtils.post(api, params).then(() => {
       showSuccess('保存成功')
+      this.setState({tempValue: {...tempValue, tpl_type: Number(selectItem)}})
     }).catch(error => showError('保存出错，原因：' + error.reason))
   }
 
@@ -173,9 +179,18 @@ export default class TemplateSettingsScene extends PureComponent {
             return (
               <View style={Styles.zoneWrap} key={index}>
                 <TouchableOpacity style={styles.row} onPress={() => this.selectTempInput(item.id)}>
-                  <Text style={styles.rowDescription}>
-                    {item.text}
-                  </Text>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={styles.rowDescription}>
+                      {item.text}
+                    </Text>
+                    <If condition={tempValue.tpl_type === index + 1}>
+                      <View style={styles.currentApplyWrap}>
+                        <Text style={styles.currentApplyText}>
+                          当前应用
+                        </Text>
+                      </View>
+                    </If>
+                  </View>
                   <Text style={styles.rowRightText}>
                     回评模板
                     <AntDesign name={selectItem === item.id ? 'down' : 'right'} color={colors.colorCCC}/>
@@ -187,8 +202,9 @@ export default class TemplateSettingsScene extends PureComponent {
                              editable={item.id !== '1'}
                              onChangeText={text => this.onChangeText(text, item.name)}
                              multiline={true}/>
-                  <TouchableOpacity style={tool.length(tempValue[item.name]) > 0 ? styles.activeApplyBtn : styles.applyBtn}
-                                    onPress={this.saveSetting}>
+                  <TouchableOpacity
+                    style={tool.length(tempValue[item.name]) > 0 ? styles.activeApplyBtn : styles.applyBtn}
+                    onPress={this.saveSetting}>
                     <Text style={styles.applyText}>
                       应用模板
                     </Text>

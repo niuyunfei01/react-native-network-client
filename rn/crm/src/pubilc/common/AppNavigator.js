@@ -68,7 +68,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情新'}}
+        <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_OPERATION_LOG} options={{headerTitle: '操作日志'}}
@@ -359,6 +359,8 @@ export const AppNavigator = (props) => {
                       initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} options={{headerTitle: '商品搜索'}}
                       getComponent={() => require('../../scene/product/Goods/StoreGoodsSearch').default}/>
+        <Stack.Screen name={Config.ROUTE_SEARCH_AND_CREATE_GOODS} options={{headerTitle: '搜索新建商品'}}
+                      getComponent={() => require('../../scene/product/Goods/SearchAndCreateGoodsScene').default}/>
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpense').default}
         />

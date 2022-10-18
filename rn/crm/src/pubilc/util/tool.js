@@ -41,7 +41,7 @@ export function objectMap(obj, fn) {
     return [];
   }
 
-  return keys.map(key => fn(obj[key], key));
+  return keys.map((key, index) => fn(obj[key], key, index));
 }
 
 /**
@@ -430,10 +430,8 @@ function deepClone(obj) {
   for (let key in obj) {
     let copy = obj[key];
     if (isClass(copy) === "Object") {
-      // noinspection JSAnnotator
       result[key] = arguments.callee(copy); //递归调用
     } else if (isClass(copy) === "Array") {
-      // noinspection JSAnnotator
       result[key] = arguments.callee(copy);
     } else {
       result[key] = obj[key];

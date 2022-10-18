@@ -29,6 +29,10 @@ export default keyMirror({
   SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
 
+  SET_GOODS_SG_CATEGORY: null,
+
+  SET_BLUETOOTH_DEVICE_LIST: null,
+
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
 

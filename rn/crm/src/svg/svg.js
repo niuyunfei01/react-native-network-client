@@ -1234,11 +1234,10 @@ export const this_down = (width = 16, height = 16) => {
 }
 
 
-export const seach_icon = (width = 24, height = 24) => {
+export const search_icon = (width = 24, height = 24) => {
   return (
     `
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>图标/搜索栏/搜索备份</title>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <g id="手动发单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="图标/搜索栏/搜索备份">
             <rect id="Rectangle-3" x="0" y="0" width="20" height="20"></rect>
