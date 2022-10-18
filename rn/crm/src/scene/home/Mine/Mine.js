@@ -632,25 +632,6 @@ class Mine extends PureComponent {
     );
   }
 
-  onCanChangeStore = (item) => {
-    showModal("切换店铺中...")
-    tool.debounces(() => {
-      const {dispatch, global, navigation} = this.props;
-      const {accessToken} = global;
-      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
-        if (ok) {
-          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-            initTab: Config.ROUTE_ORDERS,
-            initialRouteName: Config.ROUTE_ALERT
-          });
-          hideModal()
-        } else {
-          ToastLong(msg);
-          hideModal()
-        }
-      }));
-    })
-  }
 
   render() {
     let {isRefreshing} = this.state;
@@ -665,17 +646,6 @@ class Mine extends PureComponent {
               tintColor='gray'
             />}
           style={styles.Content}>
-
-          <TouchableOpacity onPress={() => {
-            this.onPress(Config.ROUTE_STORE_SELECT, {
-              onBack: (item) => {
-                this.onCanChangeStore(item)
-              }
-            })
-          }}>
-            <Text style={{fontSize: 20, margin: 20}}>切换门店 </Text>
-          </TouchableOpacity>
-
           {this.renderStore()}
           <View style={{position: "relative", top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}

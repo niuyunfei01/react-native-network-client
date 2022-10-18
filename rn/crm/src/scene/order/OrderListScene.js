@@ -24,7 +24,7 @@ import {AMapSdk} from "react-native-amap3d";
 import ModalDropdown from "react-native-modal-dropdown";
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {setBleStarted, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
+import {getConfig, setBleStarted, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 
 import colors from "../../pubilc/styles/colors";
@@ -34,7 +34,7 @@ import tool from "../../pubilc/util/tool";
 import native from "../../pubilc/util/native";
 import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
-import {showError, ToastLong} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {empty_data, menu_left, seach_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
@@ -705,6 +705,27 @@ class OrderListScene extends Component {
       </JbbModal>
     )
   }
+
+  onCanChangeStore = (item) => {
+    showModal("切换店铺中...")
+    tool.debounces(() => {
+      const {dispatch, global, navigation} = this.props;
+      const {accessToken} = global;
+      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
+        if (ok) {
+          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+            initTab: Config.ROUTE_ORDERS,
+            initialRouteName: Config.ROUTE_ALERT
+          });
+          hideModal()
+        } else {
+          ToastLong(msg);
+          hideModal()
+        }
+      }));
+    })
+  }
+
   renderHead = () => {
     let {store_info} = this.props.global;
     return (
@@ -720,7 +741,11 @@ class OrderListScene extends Component {
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {
-          console.log('121')
+          this.onPress(Config.ROUTE_STORE_SELECT, {
+            onBack: (item) => {
+              this.onCanChangeStore(item)
+            }
+          })
         }} style={{
           height: 44, flex: 1, flexDirection: 'row', alignItems: 'center',
         }}>
