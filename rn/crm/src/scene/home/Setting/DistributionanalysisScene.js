@@ -6,13 +6,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Appearance
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showError, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Dialog from "../../common/component/Dialog";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Cts from "../../../pubilc/common/Cts";
@@ -30,6 +31,7 @@ const timeOptions = [
   {label: '本月', value: 2},
   {label: '自定义', value: 3},
 ]
+const tableTitle = ['配送方式', '配送费', '总发单量', '平均成本', '平均距离']
 const styleLine = {
   borderTopColor: colors.colorDDD,
   borderTopWidth: 1 / PixelRatio.get() * 2,
@@ -49,7 +51,6 @@ class DistributionAnalysisScene extends PureComponent {
       currStoreId: currStoreId,
       accessToken: accessToken,
       DistributionAnalysisData: [],
-      tableTitle: ['配送方式', '配送费', '总发单量', '平均成本', '平均距离'],
       total_delivery: '',
       total_fee: '',
       dateStatus: 0,
@@ -73,7 +74,7 @@ class DistributionAnalysisScene extends PureComponent {
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.initializeTime()
   }
 
@@ -100,7 +101,7 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  getProfitAndLossAnalysisData(startTime, endTime) {
+  getProfitAndLossAnalysisData = (startTime, endTime) => {
     const {currStoreId, accessToken} = this.state;
     ToastShort("查询中");
     const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
@@ -112,6 +113,9 @@ class DistributionAnalysisScene extends PureComponent {
       })
     }).catch((reason => {
       showError(reason?.desc)
+      this.setState({
+        headerType: 1
+      })
     }))
   }
 
@@ -138,7 +142,7 @@ class DistributionAnalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 2) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 7) * 86400000).setHours(0, 0, 0, 0) / 1000)
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -149,11 +153,11 @@ class DistributionAnalysisScene extends PureComponent {
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
-      dateStatus: type,
+      dateStatus: type
     })
   }
 
-  p(s) {
+  p = (s) => {
     return s < 10 ? '0' + s : s
   }
 
@@ -171,7 +175,7 @@ class DistributionAnalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 2) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 7) * 86400000).setHours(0, 0, 0, 0) / 1000)
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -186,15 +190,46 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  onRequestClose() {
+  onRequestClose = () => {
     this.setState({
       showLeftDateModal: false,
       showRightDateModal: false,
     })
   }
 
-  renderDistributionAnalysis() {
-    const {DistributionAnalysisData, tableTitle, total_delivery, total_fee, filterPlatform, dateStatus} = this.state
+  renderHeaderTab = () => {
+    let {showHeader} = this.state
+    if (showHeader) {
+      return (
+        <View style={styles.headerTab}>
+          <Text onPress={() => {
+            this.setState({
+              headerType: 1,
+              dateStatus: 0
+            }, () => {
+              this.setLeftDateStatus(0)
+            })
+          }}
+                style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
+          <Text
+            onPress={() => {
+              this.setState({
+                headerType: 2,
+                dateStatus: 0
+              }, () => {
+                this.setRightDateStatus(0)
+              })
+            }}
+            style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>
+        </View>
+      )
+    } else {
+      return null
+    }
+  }
+
+  renderDistributionAnalysis = () => {
+    const {DistributionAnalysisData, total_delivery, total_fee, filterPlatform, dateStatus} = this.state
     let Array = []
     for (let i in DistributionAnalysisData) {
       Array.push(DistributionAnalysisData[i])
@@ -270,7 +305,7 @@ class DistributionAnalysisScene extends PureComponent {
       )
   }
 
-  renderProfitAndLossAnalysis() {
+  renderProfitAndLossAnalysis = () => {
     const {cardStatus, profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
     if (headerType !== 1) {
       return (
@@ -344,38 +379,8 @@ class DistributionAnalysisScene extends PureComponent {
     }
   }
 
-  renderHeaderTab() {
-    let {showHeader} = this.state
-    if (showHeader) {
-      return (
-        <View style={styles.headerTab}>
-          <Text onPress={() => {
-              this.setState({
-                headerType: 1,
-                dateStatus: 0
-              }, () => {
-                this.setLeftDateStatus(0)
-              })
-            }}
-            style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 2,
-                dateStatus: 0
-              }, () => {
-                this.setRightDateStatus(0)
-              })
-            }}
-            style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>
-        </View>
-      )
-    } else {
-      return null
-    }
-  }
-
-  showDatePicker() {
+  showDatePicker = () => {
+    const colorScheme = Appearance.getColorScheme();
     return <View>
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
         let self = this
@@ -401,6 +406,9 @@ class DistributionAnalysisScene extends PureComponent {
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'
+        backdropStyleIOS={
+          {backdrop: colorScheme === 'dark' ? colors.back_color : colors.white}
+        }
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
           let d = new Date(value)
@@ -431,7 +439,7 @@ class DistributionAnalysisScene extends PureComponent {
     </View>
   }
 
-  onConfirm() {
+  onConfirm = () => {
     this.setState({
       showLeftDateModal: false,
       showRightDateModal: false
@@ -444,7 +452,7 @@ class DistributionAnalysisScene extends PureComponent {
     }
   }
 
-  render() {
+  render = () => {
     return (
       <View style={{flex: 1}}>
         {this.renderHeaderTab()}
