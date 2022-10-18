@@ -39,7 +39,6 @@ import {
   setting,
   stores,
 } from "../../../svg/svg";
-import pxToDp from "../../../pubilc/util/pxToDp";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
@@ -678,7 +677,7 @@ class Mine extends PureComponent {
           </TouchableOpacity>
 
           {this.renderStore()}
-          <View style={{position: "relative", top: -53}}>
+          <View style={{position: "relative", top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
             {this.renderValueAdded()}
             {this.renderBlock()}
@@ -714,7 +713,7 @@ const styles = StyleSheet.create({
     backgroundColor: rgbaColor(255, 255, 255, 0.9),
     borderRadius: 2,
     alignItems: "center",
-    marginLeft: pxToDp(10)
+    marginLeft: 5
   },
   storeTypeText: {
     fontWeight: '400',
@@ -730,7 +729,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: pxToDp(10)
+    marginTop: 5
   },
   roleText: {
     fontSize: 12,
@@ -742,10 +741,8 @@ const styles = StyleSheet.create({
     color: colors.white
   },
   walletBox: {
-    width: width * 0.92,
     height: 86,
     borderRadius: 6,
-    marginLeft: width * 0.04,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -810,8 +807,6 @@ const styles = StyleSheet.create({
     color: '#C5852C'
   },
   zoneWrap: {
-    width: width * 0.92,
-    marginLeft: width * 0.04,
     backgroundColor: colors.white,
     borderRadius: 6,
     padding: 12,
@@ -820,21 +815,17 @@ const styles = StyleSheet.create({
   zoneWrapTitle: {fontSize: 16, fontWeight: '500', color: colors.color333},
   flexRowWrap: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
   companyInfoWrap: {
-    justifyContent: 'center', alignItems: 'center', height: pxToDp(100), marginTop: 50
+    justifyContent: 'center', alignItems: 'center', height: 50, marginTop: 50
   },
   swiper: {
-    width: width * 0.92,
     height: 80,
     borderRadius: 10,
-    marginLeft: width * 0.04,
     marginTop: 10
   },
   logOut: {
-    width: width * 0.92,
     height: 42,
     borderRadius: 21,
     backgroundColor: colors.white,
-    marginLeft: width * 0.04,
     marginTop: 10
   },
   logOutTitle: {
@@ -871,21 +862,22 @@ const headerRightStyles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: colors.white,
-    marginLeft: pxToDp(5)
+    marginLeft: 3
   }
 })
 
 const block_styles = StyleSheet.create({
   block_box: {
-    width: width / 5,
-    height: width / 5,
+    width: (width * 0.95) / 5,
+    height: (width * 0.95) / 5,
+    marginHorizontal: 5,
     alignItems: "center"
   },
   block_img: {
-    marginTop: pxToDp(30),
-    marginBottom: pxToDp(16),
-    width: pxToDp(60),
-    height: pxToDp(60)
+    marginTop: 15,
+    marginBottom: 8,
+    width: 30,
+    height: 30
   },
   block_name: {
     color: colors.color333,
@@ -899,7 +891,7 @@ const block_styles = StyleSheet.create({
     height: 11,
     borderRadius: 7,
     right: 0,
-    top: pxToDp(20),
+    top: 10,
     position: 'absolute',
     zIndex: 99,
   },

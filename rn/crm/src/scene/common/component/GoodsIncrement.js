@@ -1,26 +1,20 @@
 import React, {PureComponent} from "react";
-import {Alert, Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
 import {connect} from "react-redux";
-import {
-  autoPackage,
-  autoReply,
-  bell
-} from "../../../svg/svg";
+import {autoPackage, autoReply, bell} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import Entypo from "react-native-vector-icons/Entypo";
-const width = Dimensions.get("window").width;
+
 
 const styles = StyleSheet.create({
   zoneWrap: {
     marginTop: 10,
     borderRadius: 8,
     backgroundColor: colors.white,
-    width: width * 0.92,
-    marginLeft: width * 0.04,
   },
   notActivateHeader: {
     borderRadius: 6,
@@ -120,9 +114,9 @@ class GoodsIncrement extends PureComponent {
   notActivate = (vip_info) => {
     return (
       <ImageBackground
-        style={[{width: width * 0.92, height:50}, styles.notActivateHeader]}
-        source={{uri:'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
-        imageStyle={{width: width * 0.92, height:53}}>
+        style={[{flex: 1, height: 50}, styles.notActivateHeader]}
+        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
+        imageStyle={{flex: 1, height: 53}}>
         <View style={styles.ValueAddBoxLeft}>
           <Text style={styles.ValueAddLabel}>增值服务 </Text>
           <Text style={styles.ValueAddDesc}>开通年包立省999元 发单更便宜 </Text>
@@ -141,9 +135,9 @@ class GoodsIncrement extends PureComponent {
   activate = (vip_info) => {
     return (
       <ImageBackground
-        style={[{width: width * 0.92, height:50}, styles.activateHeader]}
-        source={{uri:'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
-        imageStyle={{width: width * 0.92, height:53}}>
+        style={[{flex: 1, height: 50}, styles.activateHeader]}
+        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
+        imageStyle={{flex: 1, height: 53}}>
         <View style={styles.ValueAddBoxLeft}>
           <Text style={styles.ValueAddLabel}>增值服务 </Text>
           <If condition={vip_info.expire_date}>
