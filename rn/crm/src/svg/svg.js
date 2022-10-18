@@ -1845,3 +1845,50 @@ export const product = () => {
   )
 }
 
+export const search = (width = 18, height = 18) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    
+    <g id="商品" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linejoin="round">
+        <g  transform="translate(-41.000000, -737.000000)" stroke="#333333">
+            <g id="编组-8" transform="translate(0.000000, 730.000000)">
+                <g id="编组-5" transform="translate(30.000000, 8.000000)">
+                    <g id="搜索_search-tab" transform="translate(12.000000, 0.000000)">
+                        <path d="M7.21353386,14.4270677 C11.1974413,14.4270677 14.4270677,11.1974413 14.4270677,7.21353386 C14.4270677,3.22962641 11.1974413,0 7.21353386,0 C3.22962641,0 0,3.22962641 0,7.21353386 C0,11.1974413 3.22962641,14.4270677 7.21353386,14.4270677 Z" id="路径"></path>
+                        <line x1="12.3994707" y1="12.3995131" x2="16" y2="16.0000424" id="路径" stroke-linecap="round"></line>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
+
+export const addGoods = (width = 18, height = 18) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 17 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
+   
+    <g id="商品" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g  transform="translate(-179.000000, -738.000000)">
+            <g id="编组-8" transform="translate(0.000000, 730.000000)">
+                <g id="编组-6" transform="translate(167.500000, 8.000000)">
+                    <g id="添加_add" transform="translate(12.000000, 0.000000)">
+                        <path d="M1,7 L0,7 L0,2 C0,0.343145751 0.343145751,0 2,0 L7,0 L7,1 L2,1 C1.44771525,1 1,1.44771525 1,2 L1,7 Z" id="路径" fill="#333333" fill-rule="nonzero"></path>
+                        <path d="M1,16 L0,16 L0,11 C0,9.34314575 0.343145751,9 2,9 L7,9 L7,10 L2,10 C1.44771525,10 1,10.4477153 1,11 L1,16 Z" id="路径备份-3" fill="#333333" fill-rule="nonzero" transform="translate(3.500000, 12.500000) scale(1, -1) translate(-3.500000, -12.500000) "></path>
+                        <path d="M10,7 L9,7 L9,2 C9,0.343145751 9.34314575,0 11,0 L16,0 L16,1 L11,1 C10.4477153,1 10,1.44771525 10,2 L10,7 Z" id="路径备份-2" fill="#333333" fill-rule="nonzero" transform="translate(12.500000, 3.500000) scale(-1, 1) translate(-12.500000, -3.500000) "></path>
+                        <path d="M10,16 L9,16 L9,11 C9,9.34314575 9.34314575,9 11,9 L16,9 L16,10 L11,10 C10.4477153,10 10,10.4477153 10,11 L10,16 Z" id="路径备份-4" fill="#333333" fill-rule="nonzero" transform="translate(12.500000, 12.500000) scale(-1, -1) translate(-12.500000, -12.500000) "></path>
+                        <line x1="8" y1="4.44444444" x2="8" y2="12.4444444" id="路径" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"></line>
+                        <line x1="4" y1="8.22222222" x2="12" y2="8.22222222" id="路径" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"></line>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  `)
+}
+
