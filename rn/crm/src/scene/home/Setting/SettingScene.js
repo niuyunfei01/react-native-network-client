@@ -4,7 +4,6 @@ import {bindActionCreators} from "redux";
 import {
   Alert,
   Dimensions,
-  InteractionManager,
   Platform,
   RefreshControl,
   ScrollView,
@@ -15,11 +14,11 @@ import {
   View
 } from 'react-native';
 import * as globalActions from '../../../reducers/global/globalActions';
-import {setFloatSerciceIcon, setOrderListExtStore} from '../../../reducers/global/globalActions';
+import {logout} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
 import JPush from "jpush-react-native";
 import Entypo from "react-native-vector-icons/Entypo";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 
 
@@ -34,6 +33,8 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 
 import BottomModal from "../../../pubilc/component/BottomModal";
 import JbbModal from "../../../pubilc/component/JbbModal";
+import PropTypes from "prop-types";
+import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const width = Dimensions.get("window").width;
@@ -52,37 +53,31 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SettingScene extends PureComponent {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('设置页')
     this.state = {
       isRefreshing: false,
-      switch_val: false,
-      enable_notify: true,
-      hide_good_titles: false,
-      show_good_remake: true,
-      invoice_serial_set: '',
-      ship_order_list_set: '',
+      hide_good_titles_to_shipper: false,
+      show_remark_to_rider: true,
+      invoice_serial_font: '',
       use_real_weight: false,
+      enable_notify: true,
       enable_new_order_notify: true,
       notificationEnabled: 1,
-      showDeliveryModal: false,
-      servers: [
-        {name: '正式版1', host: "www.cainiaoshicai.cn"},
-        {name: '正式版2', host: "api.waisongbang.com"},
-        {name: '预览版', host: "rc.waisongbang.com"},
-        {name: 'beta版', host: "beta7.waisongbang.com"},
-        {name: '测试版2', host: "fire2.waisongbang.com"},
-        {name: '测试版7', host: "fire7.waisongbang.com"},
-      ],
-      invoice_serial_setting_labels: {},
-      auto_pack_setting_labels: [],
-      auto_pack_done: 0,
       isRun: true,
-      show_orderlist_ext_store: false,
-      show_float_service_icon: false,
+      showAlertModal: false,
+      showDeleteModal: false,
       shouldShowModal: false,
+      order_list_show_product: false,
+      is_alone_pay_vendor: true,
+      is_owner: false,
       bd_mobile: '',
       bd_err: '',
       show_bd: '',
@@ -90,33 +85,18 @@ class SettingScene extends PureComponent {
       funds_threshold: 0,
       funds_thresholds: 0,
       threshold_key: 0,
-      storeMgrMobile: '',
-      is_alone_pay_vendor: true,
+      owner_mobile: '',
     }
-  }
-
-  get_msg() {
-    const {storeMgrMobile} = this.state
-    let msg = '设置后，将不会对您进行余额电话提醒';
-    if (this.state.funds_thresholds > 0) {
-      msg = `设置后，当余额≤0及≤该阈值时将免费对您的电话：${storeMgrMobile}进行提醒。`
-    } else if (this.state.funds_thresholds >= 0) {
-      msg = `设置后，当余额≤0时将免费对您进行电话：${storeMgrMobile}进行提醒`;
-    }
-    return msg
   }
 
   onHeaderRefresh = () => {
-    let {show_orderlist_ext_store, show_float_service_icon} = this.props.global;
-
-    this.setState({show_orderlist_ext_store, show_float_service_icon})
     this.setState({isRefreshing: true});
     if (Platform.OS !== 'ios') {
-      native.getDisableSoundNotify((disabled, msg) => {
+      native.getDisableSoundNotify((disabled,) => {
         this.setState({enable_notify: !disabled})
       })
 
-      native.getNewOrderNotifyDisabled((disabled, msg) => {
+      native.getNewOrderNotifyDisabled((disabled,) => {
         this.setState({enable_new_order_notify: !disabled})
       })
 
@@ -125,76 +105,68 @@ class SettingScene extends PureComponent {
         this.setState({isRun: isRun})
       })
     }
+
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
     })
-    this.get_store_settings();
+
+    // this.get_store_settings();
+    this.getConfig();
   }
 
   componentDidMount() {
     this.onHeaderRefresh();
   }
 
-  get_store_settings = () => {
+  getConfig = () => {
     const {currStoreId, accessToken} = this.props.global;
-    const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then(store_info => {
-      if (tool.length(store_info.servers) > 0) {
-        this.setState({
-          servers: store_info.servers,
-          storeMgrMobile: Number(store_info.mobile)
-        })
-      }
+    const api = `/v4/wsb_store/getStoreConfig?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId}).then(res => {
       let funds_threshold_mapping = [];
-      if (store_info.funds_threshold_mapping !== undefined) {
-        tool.objectMap(store_info.funds_threshold_mapping, (item, idx) => {
+      if (res?.funds_threshold_mapping) {
+        tool.objectMap(res.funds_threshold_mapping, (item,) => {
           funds_threshold_mapping.push(item);
         })
       }
       this.setState({
         isRefreshing: false,
-        ship_order_list_set: Number(store_info.ship_order_list_set) === 1,
-        use_real_weight: Number(store_info.use_real_weight) === 1,
-        invoice_serial_set: store_info.invoice_serial_set,
-        hide_good_titles: Boolean(store_info.hide_good_titles),
-        show_good_remake: Boolean(store_info.show_remark_to_rider),
-        is_alone_pay_vendor: Boolean(store_info?.is_alone_pay_vendor),
-        invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
-        auto_pack_setting_labels: store_info.auto_pack_setting_labels,
-        auto_pack_done: Number(store_info.auto_pack_done),
-        bd_mobile: tool.length(store_info.delivery_bd_info) > 0 ? store_info.delivery_bd_info.mobile : '',
-        show_bd: store_info.show_delivery_bd_set !== undefined && store_info.show_delivery_bd_set === 1,
-        funds_threshold: Number(store_info.funds_threshold),
+        funds_threshold: Number(res.funds_threshold),
         funds_threshold_mapping,
-        funds_thresholds: Number(store_info.funds_threshold),
+        show_remark_to_rider: Boolean(res.show_remark_to_rider),
+        owner_mobile: res?.owner_mobile,
+        invoice_serial_font: res?.invoice_serial_font,
+        hide_good_titles_to_shipper: Boolean(res.hide_good_titles_to_shipper),
+        use_real_weight: Number(res?.use_real_weight) === 1,
+        order_list_show_product: Number(res?.order_list_show_product) === 1,
+        is_alone_pay_vendor: Boolean(res?.is_alone_pay_vendor),
+        is_owner: Boolean(res?.is_owner),
+        bd_mobile: tool.length(res?.delivery_bd_info) > 0 ? res.delivery_bd_info.mobile : '',
+        show_bd: res?.show_delivery_bd_set !== undefined && res.show_delivery_bd_set === 1,
       })
     })
   }
 
-  set_funds_threshold = () => {
-    if (this.state.threshold_key > 0) {
-      const {currStoreId, accessToken} = this.props.global;
-      const api = `/v1/new_api/stores/set_funds_threshold/${currStoreId}/?access_token=${accessToken}`
-      let params = {
-        threshold_key: this.state.threshold_key
-      }
-      HttpUtils.post.bind(this.props)(api, params).done((res) => {
-        ToastShort(res.desc)
-      })
-    }
-  }
 
-  onPress(route, params = {}) {
-    InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.navigate(route, params);
-    });
+  setConfig = (field, value) => {
+    this.setState({
+      [field]: value
+    })
+    tool.debounces(() => {
+      const {currStoreId, accessToken} = this.props.global;
+      const api = `/v4/wsb_store/setStoreConfig?access_token=${accessToken}`
+      const params = {store_id: currStoreId, field, value}
+      HttpUtils.get.bind(this.props)(api, params).then(() => {
+        ToastShort("设置成功");
+      }).catch(e => ToastShort(e.reason))
+    })
   }
 
   band_bd = () => {
     const {currStoreId, accessToken} = this.props.global;
+    let {bd_mobile} = this.state;
     const api = `api/set_store_delivery_bd/${currStoreId}?access_token=${accessToken}`
     let data = {
-      mobile: this.state.bd_mobile
+      mobile: bd_mobile
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
       ToastShort("已保存");
@@ -210,78 +182,6 @@ class SettingScene extends PureComponent {
     })
   }
 
-  save_invoice_serial_set = (invoice_serial_set) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_invoice_serial_setting/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {invoice_serial_set}).then(() => {
-      this.setState({
-        invoice_serial_set
-      }, () => {
-        ToastShort("已保存");
-      });
-    })
-  }
-
-  save_auto_pack_done = (auto_pack_done) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_auto_pack_done/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {auto_pack_done}).then(() => {
-      this.setState({
-        auto_pack_done
-      }, () => {
-        ToastShort("已保存");
-      });
-    })
-  }
-
-  save_hide_good_titles = (hide_good_titles) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_hide_good_titles/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {hide_good_titles}).then(() => {
-      this.setState({
-        hide_good_titles
-      }, () => {
-        ToastShort("已保存");
-      });
-    })
-  }
-
-  save_show_good_remake = (show_good_remake) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/v1/new_api/stores/set_switch_remark_show_rider/${currStoreId}?access_token=${accessToken}`
-    const parameter = {show_remark_to_rider: show_good_remake ? 1 : 0}
-    HttpUtils.get.bind(this.props)(api, parameter).then(() => {
-      this.setState({
-        show_good_remake: show_good_remake
-      }, () => {
-        ToastShort("设置成功");
-      });
-    }).catch(e => ToastShort(e.reason))
-  }
-  save_ship_order_list_set = (ship_order_list_set) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_ship_order_list/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {ship_order_list_set}).then(() => {
-      this.setState({
-        ship_order_list_set
-      }, () => {
-        ToastShort("已保存");
-      });
-    })
-  }
-
-  save_use_real_weight = (use_real_weight) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_prod_real_weight/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {use_real_weight: use_real_weight ? 1 : 0}).then(() => {
-      this.setState({
-        use_real_weight
-      }, () => {
-        ToastShort("已保存");
-      });
-    })
-  }
-
   onReadProtocol = () => {
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
@@ -291,6 +191,51 @@ class SettingScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch({type: HOST_UPDATED, host: host});
     GlobalUtil.setHostPort(host)
+  }
+
+  get_msg() {
+    const {owner_mobile, funds_thresholds} = this.state
+    let msg = '设置后，将不会对您进行余额电话提醒';
+    if (funds_thresholds > 0) {
+      msg = `设置后，当余额≤0及≤该阈值时将免费对您的电话：${owner_mobile}进行提醒。`
+    } else if (this.state.funds_thresholds >= 0) {
+      msg = `设置后，当余额≤0时将免费对您进行电话：${owner_mobile}进行提醒`;
+    }
+    return msg
+  }
+
+  cancel = () => {
+    const {accessToken, vendor_id, currentUser} = this.props.global;
+    const url = `/v1/new_api/User/close_account/${vendor_id}/${currentUser}/0.json?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(() => {
+        ToastLong('注销成功', 0)
+        setTimeout(() => {
+          this._onLogout()
+        }, 2000)
+      }, (res) => {
+        ToastLong(res?.reason, 0)
+      }
+    );
+  }
+
+  _onLogout = () => {
+    const {dispatch, navigation, global} = this.props;
+    this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      currentUser: 0,
+      currStoreId: 0,
+      host: '',
+      co_type: '',
+      enabledGoodMgr: '',
+      currVendorId: '',
+      printer_id: global.printer_id || '0'
+    }
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
+
+    dispatch(logout(() => {
+      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
+    }));
   }
 
   render() {
@@ -306,245 +251,219 @@ class SettingScene extends PureComponent {
         style={styles.Content}>
         {this.renderRemind()}
         {this.renderOrderSetting()}
-        {this.renderAutomaticPackaging()}
+        {this.renderPrintSetting()}
         {this.renderGoods()}
         {this.renderMarket()}
-        {this.renderServer()}
         {this.renderPrivacyPolicy()}
+        {this.renderBtn()}
         {this.renderModal()}
       </ScrollView>
     );
   }
 
+
   renderRemind = () => {
     let {enable_new_order_notify, enable_notify, funds_threshold, notificationEnabled, isRun} = this.state
     return (
       <View style={styles.item_body}>
-        <View style={styles.item_head}>
-          <Text style={styles.item_title}>提醒 </Text>
-        </View>
+        <Text style={styles.item_title}>提醒 </Text>
 
-        <If condition={Platform.OS !== 'ios'}>
-          <TouchableOpacity onPress={() => {
-            let val = !enable_new_order_notify;
-            this.setState({enable_new_order_notify: val});
-            native.setDisabledNewOrderNotify(!val)
-          }}
-                            style={styles.item_row}>
-            <Text style={styles.row_label}>新订单通知 </Text>
-            <Switch onValueChange={(val) => {
+        <View style={{
+          backgroundColor: colors.white,
+          borderRadius: 8,
+          paddingHorizontal: 12,
+        }}>
+          <If condition={Platform.OS !== 'ios'}>
+            <TouchableOpacity onPress={() => {
+              let val = !enable_new_order_notify;
               this.setState({enable_new_order_notify: val});
               native.setDisabledNewOrderNotify(!val)
-            }} color={colors.main_color} value={enable_new_order_notify}
-            />
-          </TouchableOpacity>
+            }}
+                              style={styles.item_row}>
+              <Text style={styles.row_label}>新订单通知 </Text>
+              <Switch onValueChange={(val) => {
+                this.setState({enable_new_order_notify: val});
+                native.setDisabledNewOrderNotify(!val)
+              }} color={colors.main_color} value={enable_new_order_notify}
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            let val = !enable_notify;
-            native.setDisableSoundNotify(!val)
-            this.setState({enable_notify: val});
-          }}
-                            style={styles.item_row}>
-            <Text style={styles.row_label}>语音通知 </Text>
-            <Switch onValueChange={(val) => {
+            <TouchableOpacity onPress={() => {
+              let val = !enable_notify;
               native.setDisableSoundNotify(!val)
               this.setState({enable_notify: val});
-            }} color={colors.main_color} value={enable_notify}
-            />
-          </TouchableOpacity>
-        </If>
-        <TouchableOpacity onPress={() => {
-          this.setState({showDeliveryModal: true})
-        }}
-                          style={styles.item_row}>
-          <Text style={styles.row_label}>余额不足通知 </Text>
-          <Text style={styles.row_footer}>
-            {funds_threshold > 0 ? funds_threshold + '元' : "设置通知"}
-          </Text>
-          <Entypo name="chevron-thin-right" style={styles.row_right}/>
-        </TouchableOpacity>
-
-
-        <If condition={Platform.OS !== 'ios'}>
+            }}
+                              style={styles.item_row}>
+              <Text style={styles.row_label}>语音通知 </Text>
+              <Switch onValueChange={(val) => {
+                native.setDisableSoundNotify(!val)
+                this.setState({enable_notify: val});
+              }} color={colors.main_color} value={enable_notify}
+              />
+            </TouchableOpacity>
+          </If>
           <TouchableOpacity onPress={() => {
-            Alert.alert('确认是否已开启', '', [
-              {
-                text: '去开启', onPress: () => {
-                  native.toOpenNotifySettings((resp, msg) => {
-
-                  })
-                  this.onHeaderRefresh();
-                }
-              },
-              {
-                text: '确认',
-                onPress: () => {
-                  this.onHeaderRefresh();
-                }
-              }
-            ])
-            native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+            this.setState({showAlertModal: true})
           }}
                             style={styles.item_row}>
-            <Text style={styles.row_label}>系统通知 </Text>
+            <Text style={styles.row_label}>余额不足通知 </Text>
             <Text style={styles.row_footer}>
-              {notificationEnabled ? "已开启" : "去系统设置中开启"}
+              {funds_threshold > 0 ? funds_threshold + '元' : "设置通知"}
             </Text>
             <Entypo name="chevron-thin-right" style={styles.row_right}/>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            Alert.alert('确认是否已开启', '', [
-              {
-                text: '去开启', onPress: () => {
-                  native.toRunInBg((resp, msg) => {
+          <If condition={Platform.OS !== 'ios'}>
+            <TouchableOpacity onPress={() => {
+              Alert.alert('确认是否已开启', '', [
+                {
+                  text: '去开启', onPress: () => {
+                    native.toOpenNotifySettings(() => {
 
-                  })
-                  this.onHeaderRefresh();
+                    })
+                    this.onHeaderRefresh();
+                  }
+                },
+                {
+                  text: '确认',
+                  onPress: () => {
+                    this.onHeaderRefresh();
+                  }
                 }
-              },
-              {
-                text: '确认',
-                onPress: () => {
-                  this.onHeaderRefresh();
+              ])
+              native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+            }}
+                              style={styles.item_row}>
+              <Text style={styles.row_label}>系统通知 </Text>
+              <Text style={styles.row_footer}>
+                {notificationEnabled ? "已开启" : "去系统设置中开启"}
+              </Text>
+              <Entypo name="chevron-thin-right" style={styles.row_right}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              Alert.alert('确认是否已开启', '', [
+                {
+                  text: '去开启', onPress: () => {
+                    native.toRunInBg(() => {
+
+                    })
+                    this.onHeaderRefresh();
+                  }
+                },
+                {
+                  text: '确认',
+                  onPress: () => {
+                    this.onHeaderRefresh();
+                  }
                 }
-              }
-            ])
-            native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
-          }}
-                            style={styles.item_row}>
-            <Text style={styles.row_label}>后台运行 </Text>
-            <Text style={styles.row_footer}>
-              {isRun ? "已开启" : '未开启 - 去设置'}
-            </Text>
-            <Entypo name="chevron-thin-right" style={styles.row_right}/>
-          </TouchableOpacity>
-        </If>
+              ])
+              native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
+            }}
+                              style={styles.item_row}>
+              <Text style={styles.row_label}>后台运行 </Text>
+              <Text style={styles.row_footer}>
+                {isRun ? "已开启" : '未开启 - 去设置'}
+              </Text>
+              <Entypo name="chevron-thin-right" style={styles.row_right}/>
+            </TouchableOpacity>
+          </If>
+        </View>
       </View>
     )
   }
 
 
   renderOrderSetting = () => {
-    let {dispatch} = this.props
-    let {ship_order_list_set, show_orderlist_ext_store, show_float_service_icon, show_good_remake} = this.state
+    let {show_remark_to_rider} = this.state
     return (
       <View>
         <View style={styles.item_body}>
-          <View style={styles.item_head}>
-            <Text style={styles.item_title}>订单 </Text>
+          <Text style={styles.item_title}>备注 </Text>
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+          }}>
+
+            <TouchableOpacity onPress={() => {
+              let val = !show_remark_to_rider
+              this.setConfig('show_remark_to_rider', val)
+            }}
+                              style={styles.item_row}>
+              <View style={{flex: 1}}>
+                <Text style={styles.row_label}>展示订单备注 </Text>
+                <Text style={styles.row_label_desc}>开启后骑手端可见客户下单备注 </Text>
+              </View>
+              <Switch onValueChange={(val) => {
+                this.setConfig('show_remark_to_rider', val)
+              }} color={colors.main_color}
+                      value={show_remark_to_rider}
+              />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => {
-            let val = !ship_order_list_set
-            this.save_ship_order_list_set(val)
-          }}
-                            style={styles.item_row}>
-            <View style={{flex: 1}}>
-              <Text style={styles.row_label}>配送版订单列表 </Text>
-              <Text style={styles.row_label_desc}>开启后定位新订单,待接单,待取货,配送中,异常 </Text>
-            </View>
-            <Switch onValueChange={(val) => {
-              this.save_ship_order_list_set(val)
-            }} color={colors.main_color}
-                    value={ship_order_list_set}
-            />
-          </TouchableOpacity>
-
-
-          <TouchableOpacity onPress={() => {
-            let val = !show_orderlist_ext_store;
-            this.setState({
-              show_orderlist_ext_store: val,
-            }, () => {
-              dispatch(setOrderListExtStore(val));
-            })
-          }}
-                            style={styles.item_row}>
-            <View style={{flex: 1}}>
-              <Text style={styles.row_label}>是否展示外卖店铺筛选 </Text>
-              <Text style={styles.row_label_desc}>订单列表控制 </Text>
-            </View>
-            <Switch onValueChange={(val) => {
-              this.setState({
-                show_orderlist_ext_store: val,
-              }, () => {
-                dispatch(setOrderListExtStore(val));
-              })
-            }} color={colors.main_color}
-                    value={show_orderlist_ext_store}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => {
-            let val = !show_good_remake
-            this.save_show_good_remake(val)
-          }}
-                            style={styles.item_row}>
-            <View style={{flex: 1}}>
-              <Text style={styles.row_label}>对骑手展示订单备注 </Text>
-              <Text style={styles.row_label_desc}>开启后骑手可以看到顾客下单的备注 </Text>
-            </View>
-            <Switch onValueChange={(val) => {
-              this.save_show_good_remake(val)
-            }} color={colors.main_color}
-                    value={show_good_remake}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => {
-            let val = !show_float_service_icon;
-            this.setState({
-              show_float_service_icon: val,
-            }, () => {
-              dispatch(setFloatSerciceIcon(val));
-            })
-          }}
-                            style={styles.item_row}>
-            <View style={{flex: 1}}>
-              <Text style={styles.row_label}>是否展示联系客服 </Text>
-              <Text style={styles.row_label_desc}>开启后可在列表页直接联系客服 </Text>
-            </View>
-            <Switch onValueChange={(val) => {
-              this.setState({
-                show_float_service_icon: val,
-              }, () => {
-                dispatch(setFloatSerciceIcon(val));
-              })
-            }} color={colors.main_color}
-                    value={show_float_service_icon}
-            />
-          </TouchableOpacity>
         </View>
       </View>
     )
   }
 
-  renderAutomaticPackaging = () => {
-    let {auto_pack_setting_labels, auto_pack_done} = this.state
+  renderPrintSetting = () => {
+    let {invoice_serial_font} = this.state
     return (
       <View>
         <View style={styles.item_body}>
-          <View style={styles.item_head}>
-            <Text style={styles.item_title}>自动打包 </Text>
-          </View>
-          <For index='idx' each='item' of={auto_pack_setting_labels}>
-            <TouchableOpacity key={idx} onPress={() => {
-              if (auto_pack_done !== Number(idx)) {
-                this.save_auto_pack_done(Number(idx))
-              }
-
+          <Text style={styles.item_title}>小票设置 </Text>
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.setConfig('invoice_serial_font', 0)
             }}
-                              style={styles.item_row}>
-              <Text style={styles.row_label}>{item} </Text>
-              <If condition={auto_pack_done === Number(idx)}>
+                              style={{
+                                borderBottomWidth: 1,
+                                borderColor: colors.colorEEE,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>使用平台店名与平台单号 </Text>
+              <If condition={invoice_serial_font === 0}>
                 <Entypo name={'check'} style={{
                   fontSize: 22,
                   color: colors.main_color,
                 }}/>
               </If>
             </TouchableOpacity>
-          </For>
 
+            <TouchableOpacity onPress={() => {
+              this.setConfig('invoice_serial_font', 1)
+            }}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90),
+                              }}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+                flex: 1,
+              }}>使用商家名称与总单号 </Text>
+              <If condition={invoice_serial_font === 1}>
+                <Entypo name={'check'} style={{
+                  fontSize: 22,
+                  color: colors.main_color,
+                }}/>
+              </If>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
@@ -552,38 +471,62 @@ class SettingScene extends PureComponent {
 
 
   renderGoods = () => {
-    let {hide_good_titles, use_real_weight, is_alone_pay_vendor} = this.state
+    let {dispatch} = this.props;
+    let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, order_list_show_product} = this.state
     return (
       <View>
         <View style={styles.item_body}>
-          <View style={styles.item_head}>
-            <Text style={styles.item_title}>商品 </Text>
-          </View>
-          <TouchableOpacity onPress={() => {
-            let val = !hide_good_titles;
-            this.save_hide_good_titles(val)
-          }}
-                            style={styles.item_row}>
-            <Text style={styles.row_label}>对骑手隐藏商品敏感信息 </Text>
-            <Switch onValueChange={(val) => {
-              this.save_hide_good_titles(val)
-            }} color={colors.main_color} value={hide_good_titles}
-            />
-          </TouchableOpacity>
+          <Text style={styles.item_title}>商品 </Text>
 
-          <If condition={!is_alone_pay_vendor}>
+          <View style={{
+            backgroundColor: colors.white,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+          }}>
             <TouchableOpacity onPress={() => {
-              let val = !use_real_weight;
-              this.save_use_real_weight(val)
+              let val = !hide_good_titles_to_shipper;
+              this.setConfig('hide_good_titles_to_shipper', val)
             }}
                               style={styles.item_row}>
-              <Text style={styles.row_label}>按照商品实际重量上传 </Text>
+              <Text style={styles.row_label}>隐藏商品敏感信息 </Text>
               <Switch onValueChange={(val) => {
-                this.save_use_real_weight(val)
-              }} color={colors.main_color} value={use_real_weight}
+                this.setConfig('hide_good_titles_to_shipper', val)
+              }} color={colors.main_color} value={hide_good_titles_to_shipper}
               />
             </TouchableOpacity>
-          </If>
+
+            <If condition={!is_alone_pay_vendor}>
+              <TouchableOpacity onPress={() => {
+                let val = !use_real_weight;
+                this.setConfig('use_real_weight', val)
+              }}
+                                style={styles.item_row}>
+                <Text style={styles.row_label}>按照商品实际重量上传 </Text>
+                <Switch onValueChange={(val) => {
+                  this.setConfig('use_real_weight', val)
+                }} color={colors.main_color} value={use_real_weight}
+                />
+              </TouchableOpacity>
+            </If>
+
+
+            <TouchableOpacity onPress={() => {
+              let val = !order_list_show_product;
+              this.setConfig('order_list_show_product', val)
+            }}
+                              style={styles.item_row}>
+              <View style={{flex: 1}}>
+                <Text style={styles.row_label}>订单列表页展示商品 </Text>
+                <Text style={styles.row_label_desc}>开启后，订单列表页可见商品信息 </Text>
+              </View>
+              <Switch onValueChange={(val) => {
+                this.setConfig('order_list_show_product', val)
+              }} color={colors.main_color}
+                      value={order_list_show_product}
+              />
+            </TouchableOpacity>
+
+          </View>
         </View>
       </View>
     )
@@ -595,7 +538,12 @@ class SettingScene extends PureComponent {
       return null;
     }
     return (
-      <View style={styles.item_body}>
+      <View style={{
+        backgroundColor: colors.white,
+        borderRadius: 8,
+        marginBottom: 10,
+        paddingHorizontal: 12,
+      }}>
         <TouchableOpacity onPress={() => {
           if (!bd_mobile) {
             this.setState({
@@ -620,27 +568,36 @@ class SettingScene extends PureComponent {
     return (
 
       <View style={styles.item_body}>
-        <View style={styles.item_head}>
-          <Text style={styles.item_title}>选择服务器 </Text>
+        <Text style={styles.item_title}>选择服务器 </Text>
+        <View style={{
+          backgroundColor: colors.white,
+          borderRadius: 8,
+          paddingHorizontal: 12,
+        }}>
+          <For index='idx' each='item' of={servers}>
+            <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
+              <Text style={styles.row_label}>{item.name}resp, msg </Text>
+              <If condition={host === item.host}>
+                <Entypo name={'check'} style={{
+                  fontSize: 22,
+                  color: colors.main_color,
+                }}/>
+              </If>
+            </TouchableOpacity>
+          </For>
         </View>
-        <For index='idx' each='item' of={servers}>
-          <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
-            <Text style={styles.row_label}>{item.name} </Text>
-            <If condition={host === item.host}>
-              <Entypo name={'check'} style={{
-                fontSize: 22,
-                color: colors.main_color,
-              }}/>
-            </If>
-          </TouchableOpacity>
-        </For>
       </View>
     )
   }
 
   renderPrivacyPolicy = () => {
     return (
-      <View style={[styles.item_body, {marginBottom: 100}]}>
+      <View style={{
+        backgroundColor: colors.white,
+        borderRadius: 8,
+        marginBottom: 10,
+        paddingHorizontal: 12,
+      }}>
         <TouchableOpacity onPress={() => {
           this.onReadProtocol()
         }}
@@ -652,20 +609,61 @@ class SettingScene extends PureComponent {
     )
   }
 
+  renderBtn = () => {
+    if (!this.state.is_owner) {
+      return null;
+    }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', marginVertical: 20}}>
+        <Button title={'注销账号'}
+                onPress={() => {
+                  this.setState({
+                    showDeleteModal: true,
+                  })
+                }}
+                buttonStyle={{
+                  width: 132,
+                  borderRadius: 21,
+                  backgroundColor: colors.f2,
+                  borderColor: colors.colorDDD,
+                  borderWidth: 0.5
+                }}
+                titleStyle={{
+                  color: colors.color666,
+                  fontSize: 14
+                }}
+        />
+      </View>
+    )
+  }
+
+  closeModal = () => {
+    this.setState({
+      shouldShowModal: false,
+      showAlertModal: false,
+      showDeleteModal: false,
+      bd_err: '',
+    })
+  }
 
   renderModal() {
+    let {
+      showDeleteModal,
+      shouldShowModal,
+      bd_err,
+      showAlertModal,
+      shopId,
+      funds_thresholds,
+      funds_threshold_mapping
+    } = this.state;
     return (
       <View>
         <BottomModal
           title={'绑定销售经理'}
           actionText={'绑定'}
           onPress={() => this.band_bd()}
-          visible={this.state.shouldShowModal}
-          onClose={() => this.setState({
-            shouldShowModal: false,
-            bd_mobile: '',
-            bd_err: '',
-          })}
+          visible={shouldShowModal}
+          onClose={this.closeModal}
         >
           <View style={{
             flexDirection: 'row',
@@ -681,11 +679,11 @@ class SettingScene extends PureComponent {
               underlineColorAndroid="transparent"
               style={[{marginLeft: 10, height: 40, flex: 1}]}
               placeholderTextColor={"#7A7A7A"}
-              value={this.state.shopId}
+              value={shopId}
               onChangeText={text => this.setState({bd_mobile: text})}
             />
           </View>
-          <If condition={this.state.bd_err}>
+          <If condition={bd_err}>
             <View style={{
               marginVertical: pxToDp(15),
               paddingHorizontal: pxToDp(40),
@@ -694,27 +692,25 @@ class SettingScene extends PureComponent {
               flexDirection: 'row'
             }}>
               <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
-              <Text style={{color: colors.color333}}>{this.state.bd_err}   </Text>
+              <Text style={{color: colors.color333}}>{bd_err}   </Text>
             </View>
           </If>
         </BottomModal>
 
-        <JbbModal visible={this.state.showDeliveryModal} onClose={() =>
-          this.setState({showDeliveryModal: false})}>
+        <JbbModal visible={showAlertModal} onClose={this.closeModal}>
           <View>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>设置通知</Text>
-            <Text style={{color: 'red', lineHeight: pxToDp(40)}}>{this.get_msg()} </Text>
+            <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: pxToDp(60)}}>设置通知</Text>
+            <Text style={{color: 'red', lineHeight: 20}}>{this.get_msg()} </Text>
 
             <View style={{
               width: '100%',
               flexDirection: 'row',
               justifyContent: 'space-around',
               marginTop: 15,
-              flex: 1,
               alignItems: 'center',
               flexWrap: "wrap",
             }}>
-              <For each="item" index='idx' of={this.state.funds_threshold_mapping}>
+              <For each="item" index='idx' of={funds_threshold_mapping}>
                 <Button key={idx} title={item === -1 ? '不通知' : "≤" + item + '元'}
                         onPress={() => {
                           this.setState({
@@ -726,12 +722,12 @@ class SettingScene extends PureComponent {
                           width: width * 0.25,
                           marginTop: 8,
                           borderRadius: pxToDp(10),
-                          backgroundColor: this.state.funds_thresholds === item ? colors.main_color : colors.white,
-                          borderWidth: this.state.funds_thresholds === item ? 0 : pxToDp(1),
+                          backgroundColor: funds_thresholds === item ? colors.main_color : colors.white,
+                          borderWidth: funds_thresholds === item ? 0 : pxToDp(1),
                           borderColor: colors.color999,
                         }}
                         titleStyle={{
-                          color: this.state.funds_thresholds === item ? colors.white : colors.color333,
+                          color: funds_thresholds === item ? colors.white : colors.color333,
                           fontSize: 16
                         }}
                 />
@@ -744,16 +740,13 @@ class SettingScene extends PureComponent {
               justifyContent: 'center',
               alignItems: 'center',
               marginTop: 15,
-
             }}>
               <Button title={'取消'}
-                      onPress={() => {
-                        this.setState({showDeliveryModal: false})
-                      }}
+                      onPress={() => this.closeModal()}
                       buttonStyle={{
                         width: width * 0.3,
                         borderRadius: pxToDp(10),
-                        backgroundColor: colors.gray,
+                        backgroundColor: colors.colorCCC,
                       }}
                       titleStyle={{
                         color: colors.white,
@@ -762,8 +755,8 @@ class SettingScene extends PureComponent {
               />
               <Button title={'确定'}
                       onPress={() => {
-                        this.set_funds_threshold()
-                        this.setState({showDeliveryModal: false, funds_threshold: this.state.funds_thresholds})
+                        this.closeModal()
+                        this.setConfig('funds_threshold', funds_thresholds)
                       }}
                       buttonStyle={{
                         width: width * 0.3,
@@ -781,16 +774,60 @@ class SettingScene extends PureComponent {
           </View>
         </JbbModal>
 
+        <JbbModal visible={showDeleteModal} onClose={this.closeModal} modal_type={'center'}>
+          <View style={{margin: 20}}>
+            <Text
+              style={{
+                fontSize: 17,
+                color: colors.color333,
+                fontWeight: '500',
+                textAlign: 'center',
+              }}>确定要注销账号吗？ </Text>
+
+            <Text
+              style={{
+                fontSize: 16,
+                color: colors.color333,
+                marginVertical: 12,
+                lineHeight: 22,
+              }}>注销账号会清空所有信息和数据，请确认是否要注销？ </Text>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Button title={'取消'}
+                      onPress={this.closeModal}
+                      containerStyle={{
+                        flex: 1,
+                        borderRadius: 20,
+                        length: 40,
+                        marginRight: 10
+                      }}
+                      buttonStyle={{
+                        backgroundColor: colors.f5,
+                      }}
+                      titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+
+              <Button title={'确定'}
+                      onPress={this.cancel}
+                      containerStyle={{
+                        flex: 1,
+                        borderRadius: 20,
+                        length: 40,
+                      }}
+                      buttonStyle={{
+                        backgroundColor: colors.main_color,
+                      }}
+                      titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+            </View>
+          </View>
+        </JbbModal>
       </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  Content: {backgroundColor: colors.main_back, paddingVertical: 12, paddingHorizontal: 10,},
+  Content: {backgroundColor: colors.f2, paddingVertical: 12, paddingHorizontal: 10,},
   item_body: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
     marginBottom: 10,
   },
   item_head: {
@@ -800,15 +837,17 @@ const styles = StyleSheet.create({
   },
   item_title: {
     color: colors.color333,
-    padding: 12,
-    fontSize: 15,
+    fontSize: 14,
+    marginBottom: 8,
+    marginHorizontal: 4,
     fontWeight: 'bold',
   },
   item_row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 11,
+    paddingVertical: 14,
+    borderColor: colors.f5,
+    borderBottomWidth: 0.5,
   },
   row_label: {
     fontSize: 14,

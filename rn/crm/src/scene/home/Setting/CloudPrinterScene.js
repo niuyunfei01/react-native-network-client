@@ -242,7 +242,7 @@ class CloudPrinterScene extends PureComponent {
               tintColor='gray'
             />
           }
-          style={{backgroundColor: colors.main_back, flexGrow: 1}}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}
         >
           <View style={{marginTop: 4}}>
             <Cells style={[styles.cell_box]}>

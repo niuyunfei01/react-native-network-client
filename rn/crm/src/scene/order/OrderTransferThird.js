@@ -543,7 +543,7 @@ class OrderTransferThird extends Component {
                 this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
               }} style={{flexDirection: "row", alignItems: "center"}}>
                 <Entypo name='cog'
-                        style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
+                        style={{fontSize: 18, color: colors.b2, marginRight: 4}}/>
                 <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
@@ -1089,7 +1089,7 @@ class OrderTransferThird extends Component {
               showCounter={false}
               defaultValue={'请输入备注信息'}
               underlineColorAndroid="transparent" //取消安卓下划线
-              style={{borderWidth: 1, borderColor: colors.fontColor, marginTop: 12, height: 100}}
+              style={{borderWidth: 1, borderColor: colors.b2, marginTop: 12, height: 100}}
             >
             </TextArea>
 
@@ -1174,7 +1174,7 @@ class OrderTransferThird extends Component {
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
                 商品重量
               </Text>
-              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="circle-with-cross"
+              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -1327,7 +1327,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color,
+    color: colors.color111,
   },
   modalCancel: {
     width: '100%',
@@ -1432,7 +1432,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   dateTextActive: {color: colors.main_color, fontWeight: "bold"},
-  dateText: {color: colors.title_color, fontWeight: "bold"},
+  dateText: {color: colors.color111, fontWeight: "bold"},
   datePickerHead: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1441,7 +1441,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.colorEEE,
     paddingBottom: 15
   },
-  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.title_color},
+  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.color111},
   sureBtn: {fontSize: pxToDp(32), color: colors.main_color},
   dateMsg: {fontWeight: "bold", fontSize: pxToDp(22), color: '#DA0000', marginVertical: 10},
   datePickerItem: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 5},

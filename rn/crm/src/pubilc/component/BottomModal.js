@@ -1,13 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Modal,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from 'react-native'
+import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
 import pxToDp from "../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
@@ -34,11 +27,10 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    textAlign: 'center',
-    color: colors.title_color,
+    color: colors.color333,
     fontWeight: "bold",
     flex: 1,
-    fontSize: pxToDp(34)
+    fontSize: 16
   },
   closeWrap: {
     flexDirection: "row", justifyContent: "flex-end", width: '20%'
@@ -68,6 +60,7 @@ class BottomModal extends React.Component {
     closeText: PropTypes.string,
     visible: PropTypes.bool,
     btnStyle: PropTypes.object,
+    children: PropTypes.object,
     btnTitleStyle: PropTypes.object,
     closeBtnStyle: PropTypes.object,
     closeBtnTitleStyle: PropTypes.object,
@@ -88,14 +81,11 @@ class BottomModal extends React.Component {
           <TouchableHighlight style={styles.contentWrap}>
             <KeyboardAwareScrollView style={{paddingBottom: 3}} enableOnAndroid={false}>
               <View style={styles.keyboardWrap}>
-                <TouchableOpacity style={{width: '20%'}} onPress={this.props.onClose}>
-                </TouchableOpacity>
-
                 <Text style={styles.title}>
                   {this.props.title}
                 </Text>
-                <TouchableOpacity style={styles.closeWrap} onPress={this.props.onClose}>
-                  <Entypo name="circle-with-cross" color={colors.fontGray} size={pxToDp(45)}/>
+                <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
+                  <Entypo name="cross" color={colors.fontGray} size={22}/>
                 </TouchableOpacity>
               </View>
               <View style={{paddingHorizontal: 10}}>
@@ -108,7 +98,13 @@ class BottomModal extends React.Component {
                   <Button buttonStyle={[styles.closeBtn, closeBtnStyle]}
                           titleStyle={[{color: colors.color666}, closeBtnTitleStyle]}
                           title={closeText}
-                          onPress={onPressClose}/>
+                          onPress={()=>{
+                            if(onPressClose){
+                              onPressClose()
+                            }else {
+                              onClose()
+                            }
+                          }}/>
                 </If>
 
                 <Button buttonStyle={[{

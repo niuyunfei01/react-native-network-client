@@ -298,7 +298,7 @@ export function intOf(val) {
 }
 
 function parameterByName(name, url) {
-  name = name.replace(/[\[\]]/g, "\\$&");
+  name = name.replace(/[[\]]/g, "\\$&");
   let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
     results = regex.exec(url);
   if (!results) return null;
@@ -430,8 +430,10 @@ function deepClone(obj) {
   for (let key in obj) {
     let copy = obj[key];
     if (isClass(copy) === "Object") {
+      // noinspection JSAnnotator
       result[key] = arguments.callee(copy); //递归调用
     } else if (isClass(copy) === "Array") {
+      // noinspection JSAnnotator
       result[key] = arguments.callee(copy);
     } else {
       result[key] = obj[key];
@@ -496,6 +498,25 @@ function throttle(fn, wait) {
   }
 }
 
+function getCenterLonLat (oneLon, oneLat, twoLon, twoLat)  {
+  //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
+  let aLon = 0, aLat = 0;
+  let bLon = Number(oneLon) - Number(twoLon);
+  let bLat = Number(oneLat) - Number(twoLat);
+  //Math.abs()绝对值
+  if (bLon > 0) {
+    aLon = Number(oneLon) - Math.abs(bLon) / 2;
+  } else {
+    aLon = Number(twoLon) - Math.abs(bLon) / 2;
+  }
+  if (bLat > 0) {
+    aLat = Number(oneLat) - Math.abs(bLat) / 2;
+  } else {
+    aLat = Number(twoLat) - Math.abs(bLat) / 2;
+  }
+  return {aLon, aLat};
+}
+
 
 export default {
   objectMap,
@@ -528,5 +549,6 @@ export default {
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle
+  throttle,
+  getCenterLonLat,
 };

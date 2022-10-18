@@ -50,7 +50,7 @@ class ServiceChargeDesc extends PureComponent {
         paddingVertical: 12,
         paddingHorizontal: 10,
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.f3,
         borderRadius: 4
       }}>
         <View style={{

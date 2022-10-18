@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleText: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   cell_rowTitleTextR1: {
@@ -526,23 +526,23 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleTextR2: {
     fontSize: pxToDp(30),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10),
     fontWeight: "bold"
   },
   cell_rowTitleTextR3: {
     fontSize: pxToDp(30),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(20)
   },
   cell_rowTitleTextR4: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   cell_rowText: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   catInfo: {
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleText_today1: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     paddingVertical: pxToDp(25),
     paddingHorizontal: pxToDp(15)
   },
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color
+    color: colors.color111
   },
   profitBox: {
     marginVertical: 15,
@@ -669,7 +669,7 @@ const Styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: pxToDp(20)
   },
-  scrollContainer: {backgroundColor: colors.main_back}
+  scrollContainer: {backgroundColor: colors.f2}
 })
 
 export default connect(mapStateToProps)(DistributionAnalysisScene)

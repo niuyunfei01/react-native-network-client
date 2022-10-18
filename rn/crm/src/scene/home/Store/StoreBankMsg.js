@@ -131,7 +131,7 @@ const
     },
     cell_rowTitleText: {
       fontSize: pxToDp(30),
-      color: colors.title_color
+      color: colors.color111
     },
     cell_title: {
       marginBottom: pxToDp(10),

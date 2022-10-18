@@ -238,7 +238,7 @@ class WorkerScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
+        style={{backgroundColor: colors.f2}}
       >
         <View>
           <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>

@@ -45,7 +45,7 @@ export function hostPort() {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: "www.cainiaoshicai.cn",
+  defaultHost: "preview.waisongbang.com/",
   AppName: "Crm",
 
   DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
@@ -65,12 +65,15 @@ const C = {
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
+  ROUTE_ORDER_NEW: 'OrderNew',
+  ROUTE_OPERATION_LOG: 'OrderOperationLog',
   ROUTE_ALERT: 'Tab', //home for reminds
   ROUTE_ORDERS: 'Orders',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
-  ROUTE_Mine: 'Mine',
+  ROUTE_MINE: 'Mine',
+  ROUTE_MINE_NEW: 'MineNew',
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',
@@ -82,6 +85,7 @@ const C = {
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
+  ROUTE_ORDER_CALL_DELIVERY: 'OrderCallDelivery',
   ROUTE_ORDER_AIN_SEND: 'orderAinSend',
   ROUTE_ORDER_PACK: 'OrderSetPack',
   ROUTE_ORDER_START_SHIP: 'OrderStartShip',
@@ -162,6 +166,9 @@ const C = {
   ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
+  ROUTE_PER_IDENTIFY: 'PermissionToIdentify',        //权限标识
+  ROUTE_ADD_ACCOUNT: 'AddAccount',        //添加员工
+  ROUTE_EDIT_ACCOUNT: 'EditAccount',        //编辑员工
   ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
   ROUTE_SERVICE_CHARGE_INFO: 'ServiceChargeInfo',        //服务费详细
@@ -169,6 +176,7 @@ const C = {
   ROUTE_FREEZE_LIST: 'FREEZE_LIST',        //冻结列表
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
+  ROUTE_TRIPARTITE_RECHARGE: 'TripartiteRecharge',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
   ROUTE_BIND_SHUNFENG: 'BindShunfeng',

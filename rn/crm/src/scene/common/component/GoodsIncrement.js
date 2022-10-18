@@ -1,76 +1,35 @@
 import React, {PureComponent} from "react";
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
 import {connect} from "react-redux";
-import {
-  activateIcon, activateMemberIcon,
-  activateNowIcon,
-  autoPackage,
-  autoReply,
-  bell,
-  notActivateMemberIcon
-} from "../../../svg/svg";
+import {autoPackage, autoReply, bell} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
-import LinearGradient from 'react-native-linear-gradient'
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import Entypo from "react-native-vector-icons/Entypo";
+
 
 const styles = StyleSheet.create({
   zoneWrap: {
     marginTop: 10,
-    marginLeft: 10,
-    marginRight: 10,
     borderRadius: 8,
-    backgroundColor: colors.white
+    backgroundColor: colors.white,
   },
   notActivateHeader: {
-    borderRadius: 8,
-    paddingTop: 12,
-    paddingBottom: 10,
+    borderRadius: 6,
     paddingRight: 21,
     paddingLeft: 12,
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   activateHeader: {
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    paddingTop: 12,
-    paddingBottom: 10,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
     paddingRight: 21,
     paddingLeft: 12,
     flexDirection: 'row',
     justifyContent: 'space-between'
-  },
-  headerDescription: {
-    marginLeft: 4,
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: colors.white,
-    lineHeight: 20
-  },
-  notServiceText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingRight: 16,
-    color: '#5C3813',
-    lineHeight: 17,
-    paddingLeft: 8
-  },
-  serviceText: {
-    fontSize: 12,
-    color: colors.main_color,
-    lineHeight: 17,
-    paddingLeft: 8
-  },
-  activateNow: {
-    backgroundColor: '#F2CA64',
-    borderRadius: 15,
-    width: 106,
-    height: 29,
-    alignItems: 'center',
-    justifyContent: 'center'
   },
   row: {flexDirection: 'row', alignItems: 'center',},
   contentWrap: {
@@ -79,20 +38,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
-
-  iconZoneWrap: {
-    marginRight: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
+  ValueAddBoxLeft: {flexDirection: "row", alignItems: "center"},
+  ValueAddLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#985800',
+    marginRight: 5
   },
-  iconWrap: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  ValueAddDesc: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#C5852C'
   },
-  expireDate: {fontSize: 12, color: colors.white, marginRight: 9}
+  ValueAddBtn: {
+    fontWeight: '400',
+    fontSize: 12,
+    color: '#AD6500'
+  },
+  ValueAddIcon: {
+    fontSize: 12,
+    color: '#AD6500'
+  },
 })
-
-const iconColor = ['#064C50', '#35A54B']
 
 const member = [
   {
@@ -122,7 +89,6 @@ class GoodsIncrement extends PureComponent {
 
   componentDidMount() {
     const {store_info} = this.props.global
-
     const currentDate = dayjs().format('YYYY-MM-DD')
     const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
     if (calc < 5 && calc >= 0)
@@ -147,54 +113,55 @@ class GoodsIncrement extends PureComponent {
 
   notActivate = (vip_info) => {
     return (
-      <LinearGradient style={styles.notActivateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
-        <View style={styles.row}>
-          <SvgXml xml={notActivateMemberIcon()} style={{paddingTop: 8}}/>
-          <Text style={styles.headerDescription}>
-            限时抢购年费包立减优惠
-          </Text>
+      <ImageBackground
+        style={[{flex: 1, height: 50}, styles.notActivateHeader]}
+        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
+        imageStyle={{flex: 1, height: 53}}>
+        <View style={styles.ValueAddBoxLeft}>
+          <Text style={styles.ValueAddLabel}>增值服务 </Text>
+          <Text style={styles.ValueAddDesc}>开通年包立省999元 发单更便宜 </Text>
         </View>
         <If condition={!vip_info.exist_vip}>
-          <TouchableOpacity style={[styles.activateNow, styles.row]} onPress={this.useIncrementService}>
-            <Text style={styles.notServiceText}>
-              {'立即开通'}
-            </Text>
-            <SvgXml xml={activateNowIcon()}/>
+          <TouchableOpacity style={styles.ValueAddBoxLeft} onPress={() => this.useIncrementService}>
+            <Text style={styles.ValueAddBtn}>立即查看 </Text>
+            <Entypo name="chevron-thin-right" style={styles.ValueAddIcon}/>
           </TouchableOpacity>
         </If>
-      </LinearGradient>
+      </ImageBackground>
     )
   }
 
 
   activate = (vip_info) => {
     return (
-      <LinearGradient style={styles.activateHeader} start={{x: 0, y: 0}} end={{x: 1, y: 1}} colors={iconColor}>
-        <View style={styles.row}>
-          <View>
-            <SvgXml xml={activateMemberIcon()}/>
-          </View>
-          <Text style={styles.headerDescription}>
-            会员版
-          </Text>
+      <ImageBackground
+        style={[{flex: 1, height: 50}, styles.activateHeader]}
+        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
+        imageStyle={{flex: 1, height: 53}}>
+        <View style={styles.ValueAddBoxLeft}>
+          <Text style={styles.ValueAddLabel}>增值服务 </Text>
+          <If condition={vip_info.expire_date}>
+            <TouchableOpacity style={[styles.row]} onPress={this.useIncrementService}>
+              <Text style={styles.ValueAddDesc}>
+                {!vip_info.vip_invalid ? `${vip_info.expire_date}到期` : vip_info.exist_vip ? '会员已到期' : '未开通'}
+              </Text>
+            </TouchableOpacity>
+          </If>
         </View>
-        <If condition={vip_info.expire_date}>
-          <TouchableOpacity style={[styles.row]} onPress={this.useIncrementService}>
-            <Text style={styles.expireDate}>
-              {!vip_info.vip_invalid ? `${vip_info.expire_date}到期` : vip_info.exist_vip ? '会员已到期' : '未开通'}
-            </Text>
-            <SvgXml xml={activateIcon()}/>
-          </TouchableOpacity>
-        </If>
         <If condition={!vip_info.expire_date}>
-          <View style={[styles.row]} onPress={this.useIncrementService}>
-            <Text style={styles.expireDate}>
+          <View style={[styles.row]}>
+            <Text style={styles.ValueAddDesc}>
               免费使用
             </Text>
-
           </View>
         </If>
-      </LinearGradient>
+        <If condition={vip_info.expire_date}>
+          <TouchableOpacity style={styles.ValueAddBoxLeft} onPress={this.useIncrementService}>
+            <Text style={styles.ValueAddBtn}>去续费 </Text>
+            <Entypo name="chevron-thin-right" style={styles.ValueAddIcon}/>
+          </TouchableOpacity>
+        </If>
+      </ImageBackground>
     )
   }
 

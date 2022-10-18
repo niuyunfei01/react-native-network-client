@@ -20,11 +20,9 @@ global.currentRouteName = ''
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#40455A'
   },
   statusBar: {
     height: StatusBar.currentHeight,
-    backgroundColor: '#40455A'
   }
 });
 
@@ -121,7 +119,7 @@ class RootScene extends PureComponent {
           initialRouteName = Config.ROUTE_ORDER;
           initialRouteParams = {orderId};
         } else {
-          initialRouteName = "Tab";
+          initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
         }
       }
     }
@@ -136,7 +134,7 @@ class RootScene extends PureComponent {
         <ErrorBoundary>
           <SafeAreaView style={styles.container}>
             <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'light-content'}/>
+              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
             </View>
             <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
           </SafeAreaView>

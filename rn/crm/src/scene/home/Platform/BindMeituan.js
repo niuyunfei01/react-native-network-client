@@ -169,7 +169,7 @@ class BindMeituan extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+        <ScrollView style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <Text style={{
             marginLeft: 'auto',
             marginRight: 'auto',
@@ -207,13 +207,13 @@ class BindMeituan extends PureComponent {
             }}
             title={'联系客服'}
             titleStyle={{
-              color: colors.fontColor,
+              color: colors.b2,
             }}
             containerStyle={{width: '40%'}}
             buttonStyle={{
               backgroundColor: colors.white,
               borderRadius: pxToDp(20),
-              borderColor: colors.fontColor,
+              borderColor: colors.b2,
               borderWidth: pxToDp(2)
             }}/>
 

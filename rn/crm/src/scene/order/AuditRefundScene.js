@@ -81,7 +81,7 @@ class AuditRefundScene extends Component {
       return (
         <View style={styles.bottom_box}>
           <View style={{marginVertical: pxToDp(40)}}>
-            <Text style={[styles.bottom_box_text, {color: colors.editStatusAdd}]}>
+            <Text style={[styles.bottom_box_text, {color: colors.warn_color}]}>
               同意退款后,货款立即原路退回，无法追回</Text>
           </View>
           <TouchableOpacity style={styles.handleAgreeWrap} onPress={async () => {
@@ -221,7 +221,7 @@ class AuditRefundScene extends Component {
             this.state.chevron &&
             <Cell customStyle={[styles.my_cell]}>
               <CellHeader style={{marginVertical: pxToDp(15)}}>
-                <Text style={{color: colors.editStatusAdd}}>
+                <Text style={{color: colors.warn_color}}>
                   {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
                 </Text>
                 {remind_id.hasOwnProperty("total_refund_price") &&
@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
     marginBottom: pxToDp(10)
   },
   btn_red: {
-    color: colors.editStatusAdd,
-    borderColor: colors.editStatusAdd
+    color: colors.warn_color,
+    borderColor: colors.warn_color
   },
   agree: {
     marginTop: pxToDp(30),
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   handleRefuseWrap: {
     width: '100%',
-    backgroundColor: colors.editStatusAdd,
+    backgroundColor: colors.warn_color,
     justifyContent: 'center',
     alignItems: 'center',
     height: pxToDp(90),

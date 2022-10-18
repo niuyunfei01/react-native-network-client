@@ -90,7 +90,7 @@ class MsgVoiceScene extends PureComponent {
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back}}>
+        } style={{backgroundColor: colors.f2}}>
 
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>

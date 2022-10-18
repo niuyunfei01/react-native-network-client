@@ -87,7 +87,7 @@ class GoodsAdjustRemind extends PureComponent {
                                      style={{color: colors.main_color, fontSize: 26, marginRight: pxToDp(30)}}/>
                         :
                         <FontAwesome name={'check-circle'}
-                                     style={{color: colors.gray, fontSize: 26, marginRight: pxToDp(30)}}/>
+                                     style={{color: colors.colorCCC, fontSize: 26, marginRight: pxToDp(30)}}/>
                     }
                   </TouchableWithoutFeedback>
                   : null

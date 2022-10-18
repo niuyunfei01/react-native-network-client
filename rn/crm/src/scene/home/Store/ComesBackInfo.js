@@ -234,7 +234,7 @@ class OrderQueryResultScene extends PureComponent {
   renderContent = () => {
     const orders = this.state.orders || []
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <FlatList
           extraData={orders}
           data={orders}
@@ -266,7 +266,7 @@ class OrderQueryResultScene extends PureComponent {
               height: 210
             }}>
               <If condition={!this.state.isLoading}>
-                <Text style={{fontSize: 18, color: colors.fontColor}}>
+                <Text style={{fontSize: 18, color: colors.b2}}>
                   没有数据
                 </Text>
               </If>

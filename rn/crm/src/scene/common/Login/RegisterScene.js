@@ -126,7 +126,7 @@ class RegisterScene extends PureComponent {
       <ScrollView style={{
         flex: 1,
         padding: 12,
-        backgroundColor: colors.background,
+        backgroundColor: colors.f3,
       }}>
         <View style={{
           paddingTop: 30,
@@ -216,7 +216,7 @@ class RegisterScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
             </View>
             {this.state.canAskReqSmsCode ?
-              <Button buttonStyle={{backgroundColor: colors.fontColor, marginLeft: 6}}
+              <Button buttonStyle={{backgroundColor: colors.b2, marginLeft: 6}}
                       titleStyle={{fontSize: 14, color: colors.white}}
                       title={this.state.reRequestAfterSeconds + "秒重新获取"}/>
               : <Button buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}

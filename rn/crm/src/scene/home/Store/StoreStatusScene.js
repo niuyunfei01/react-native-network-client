@@ -442,7 +442,7 @@ class StoreStatusScene extends PureComponent {
     type: 'primary',
     label: '允许',
     sty: {
-      backgroundColor: colors.fontColor,
+      backgroundColor: colors.b2,
       borderColor: 'gray',
       borderWidth: pxToDp(1),
     },

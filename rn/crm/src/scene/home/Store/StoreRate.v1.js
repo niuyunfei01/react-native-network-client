@@ -94,7 +94,7 @@ export default class StoreRate extends React.Component {
         <TabButton
           data={this.state.tabData}
           onClick={(value) => this.onClickTab(value)}
-          disableBackgroundTint={colors.background}
+          disableBackgroundTint={colors.f3}
         />
 
         {this.renderStoreRate()}

@@ -175,7 +175,7 @@ const content = StyleSheet.create({
   },
   item_time: {
     fontSize: pxToDp(28),
-    color: colors.fontColor
+    color: colors.b2
   },
   cell: {
     height: pxToDp(125),

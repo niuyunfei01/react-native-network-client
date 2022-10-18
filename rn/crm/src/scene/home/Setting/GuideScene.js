@@ -121,7 +121,7 @@ class GuideScene extends PureComponent {
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
+        } style={{backgroundColor: colors.f2, margin: pxToDp(30)}}>
         <JbbText style={{
           fontSize: pxToDp(40),
           color: 'black',

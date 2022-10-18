@@ -66,7 +66,7 @@ class Tips extends Component {
 
             <Text style={[{
               textAlign: 'center',
-              color: colors.title_color,
+              color: colors.color111,
               fontWeight: "bold",
               flex: 1,
               fontSize: 14

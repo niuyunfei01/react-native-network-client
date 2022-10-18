@@ -277,7 +277,7 @@ class ApplyScene extends PureComponent {
       <ScrollView style={{
         flex: 1,
         padding: 12,
-        backgroundColor: colors.background,
+        backgroundColor: colors.f3,
       }}>
         <View style={{
           paddingTop: 30,
@@ -490,7 +490,7 @@ class ApplyScene extends PureComponent {
             </View>
             <View style={{
               width: "68%",
-              borderColor: colors.fontColor,
+              borderColor: colors.b2,
               borderBottomWidth: pxToDp(2),
               padding: 6,
             }}>

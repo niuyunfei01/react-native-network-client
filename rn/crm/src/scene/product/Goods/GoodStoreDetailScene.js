@@ -813,9 +813,9 @@ const full_styles = StyleSheet.create({
 const styles = StyleSheet.create({
   page: {flex: 1, flexDirection: "column"},
   normalText: {color: colors.color333, fontSize: 12},
-  iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
+  iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.colorCCC},
   iconSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
-  scrollViewWrap: {backgroundColor: colors.main_back, flexDirection: 'column'},
+  scrollViewWrap: {backgroundColor: colors.f2, flexDirection: 'column'},
   stallWrap: {margin: 10, backgroundColor: colors.white, borderRadius: 8},
   stallTopWrap: {borderBottomWidth: 1, borderBottomColor: colors.colorEEE, borderStyle: 'solid'},
   stallTopText: {
@@ -968,7 +968,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     height: pxToDp(70),
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
   },
   goods_desc: {
     fontSize: pxToDp(30),
@@ -1137,7 +1137,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10
   },
-  tabText: {color: colors.title_color, fontWeight: "bold"},
+  tabText: {color: colors.color111, fontWeight: "bold"},
   tabTextActivity: {color: colors.main_color, fontWeight: "bold"},
 });
 

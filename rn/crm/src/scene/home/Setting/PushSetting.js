@@ -114,7 +114,7 @@ class PushSetting extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
+        style={{backgroundColor: colors.f2}}
       >
         {
           groupedArr.map(item => {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleText: {
     fontSize: pxToDp(30),
-    color: colors.title_color
+    color: colors.color111
   },
   cell_body_text: {
     fontSize: pxToDp(26),

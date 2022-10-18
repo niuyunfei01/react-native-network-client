@@ -131,7 +131,7 @@ const list = {
     backgroundColor: colors.white,
   },
   item_header: {
-    borderColor: colors.main_back,
+    borderColor: colors.f2,
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     justifyContent: 'space-between',

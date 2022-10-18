@@ -120,7 +120,7 @@ class Complain extends React.Component {
               tintColor='gray'
             />
           }
-          style={{backgroundColor: colors.main_back, flexGrow: 1}}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}
         >
           <TouchableOpacity onPress={() => {
 

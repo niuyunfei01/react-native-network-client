@@ -254,7 +254,7 @@ class GoodsDetailScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
+        style={{backgroundColor: colors.f2}}
       >
         {this.renderImg(product_detail.mid_list_img, product_detail.coverimg)}
 
@@ -566,10 +566,10 @@ class GoodsDetailScene extends PureComponent {
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
       return <FontAwesome5 name={'cart-arrow-up'}
-                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
+                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.colorCCC}}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
       return <FontAwesome5 name={'cart-arrow-down'}
-                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
+                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.colorCCC}}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <View style={{
         width: pxToDp(28),
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     height: pxToDp(70),
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
   },
   goods_desc: {
     fontSize: pxToDp(30),

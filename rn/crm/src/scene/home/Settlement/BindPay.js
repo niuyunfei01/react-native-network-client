@@ -145,7 +145,7 @@ class BindPay extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.background}}>
+      <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.f3}}>
         {this.renderWechatInfo()}
         {this.renderAlipayInfo()}
       </ScrollView>

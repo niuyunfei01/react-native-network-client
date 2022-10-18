@@ -650,7 +650,7 @@ class newRefundScene extends Component {
 
 const styles = StyleSheet.create({
   Content: {
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
     paddingVertical: 12,
     paddingHorizontal: 10,
     flexGrow: 1,

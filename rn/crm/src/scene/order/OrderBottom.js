@@ -179,7 +179,7 @@ class OrderBottom extends PureComponent {
                   }}
                   buttonStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontColor,
+                    backgroundColor: colors.b2,
                   }}
 
                   titleStyle={{
@@ -195,7 +195,7 @@ class OrderBottom extends PureComponent {
                   }}
                   buttonStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontColor,
+                    backgroundColor: colors.b2,
                   }}
                   titleStyle={{
                     color: colors.white,

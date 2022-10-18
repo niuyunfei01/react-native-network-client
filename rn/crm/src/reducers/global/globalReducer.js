@@ -58,10 +58,19 @@ const initialState = {
   customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {
-    order_list_by: 'expectTime asc',
+    order_list_by: 'orderTime asc',
   },
   bleStarted: false,
   printer_id: '0',
+  show_bottom_tab: false,
+  menu_list: {
+    delivery: 1,
+    myself: 1,
+    news: 0,
+    product: 0,
+    switch_store: 1,
+    work: 0
+  }
 };
 
 /**
@@ -150,6 +159,8 @@ export default function globalReducer(state = initialState, action) {
         show_expense_center: action.payload.show_expense_center || state.show_expense_center,
         is_record_request_monitor: action.payload.is_record_request_monitor || state.is_record_request_monitor,
         customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
+        menu_list: action.payload.menu_list || state.menu_list,
+        show_bottom_tab: Boolean(action.payload.show_bottom_tab),
       } : state;
 
     case HOST_UPDATED:

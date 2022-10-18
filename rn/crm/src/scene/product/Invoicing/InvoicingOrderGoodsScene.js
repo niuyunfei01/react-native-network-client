@@ -1072,7 +1072,7 @@ const list = {
     backgroundColor: colors.white,
   },
   item_header: {
-    borderColor: colors.main_back,
+    borderColor: colors.f2,
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     justifyContent: 'space-between',
@@ -1141,9 +1141,9 @@ const list = {
     textAlign: 'center',
     textAlignVertical: 'center',
     borderRadius: pxToDp(5),
-    color: colors.editStatusAdd,
+    color: colors.warn_color,
     borderWidth: 0.5,
-    borderColor: colors.editStatusAdd,
+    borderColor: colors.warn_color,
     fontSize: 13,
   },
   good_item_field: {
