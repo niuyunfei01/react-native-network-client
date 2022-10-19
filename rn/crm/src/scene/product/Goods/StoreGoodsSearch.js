@@ -1,11 +1,9 @@
 import React, {Component} from "react"
-import {Alert, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Alert, FlatList, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
 import tool from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
-import NoFoundDataView from "../../common/component/NoFoundDataView"
-import {SearchBar} from "@ant-design/react-native"
 import Cts from "../../../pubilc/common/Cts";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import colors from "../../../pubilc/styles/colors";
@@ -53,6 +51,7 @@ class StoreGoodsSearch extends Component {
   }
 
   componentDidMount() {
+
     const {searchKeywords} = this.state
 
     if (searchKeywords)
@@ -60,6 +59,8 @@ class StoreGoodsSearch extends Component {
   }
 
   search = () => {
+    showModal('加载中')
+
     tool.debounces(() => {
       const {searchKeywords} = this.state
       const {type, limit_store, prod_status} = this.props.route.params;
@@ -68,8 +69,6 @@ class StoreGoodsSearch extends Component {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        showModal('加载中')
-
         params = {
           vendor_id: currVendorId,
           tagId: this.state.selectTagId,
@@ -99,6 +98,7 @@ class StoreGoodsSearch extends Component {
           })
         })
       } else {
+
         hideModal()
         this.setState({goods: [], isLoading: false, isLastPage: true})
         if (limit_store) {
@@ -106,6 +106,7 @@ class StoreGoodsSearch extends Component {
           params['limit_status'] = (prod_status || []).join(",");
         }
       }
+      Keyboard.dismiss()
     }, 1000)
   }
 
@@ -133,9 +134,7 @@ class StoreGoodsSearch extends Component {
     if (this.state.searchKeywords !== searchKeywords) {
       toUpdate.page = 1
     }
-    this.setState(toUpdate, () => {
-      this.search()
-    });
+    this.setState(toUpdate);
   }
 
   onCancel = () => {
@@ -174,23 +173,28 @@ class StoreGoodsSearch extends Component {
 
   renderSearchBar = () => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{flex: 9}}>
-          <SearchBar placeholder={'请输入商品名称、SKU或UPC'}
-                     value={this.state.searchKeywords}
-                     onChange={this.onChange}
-                     onCancel={this.onCancel}
-                     onSubmit={() => this.search()}
-                     returnKeyType={'search'}/>
-        </View>
-        <SvgXml xml={scan()} onPress={this.scanGoodId} style={{padding: 4}}/>
+      <View style={{flexDirection: 'row', alignItems: 'center', margin: 10, flex: 1}}>
+        <TextInput value={this.state.searchKeywords}
+                   style={{padding: 4, backgroundColor: colors.white, flex: 3}}
+                   onChangeText={this.onChange}
+                   placeholder={'请输入商品名称、SKU或UPC'}
+                   clearButtonMode={'while-editing'}
+                   placeholderTextColor={colors.color999}
+                   onSubmitEditing={this.search}
+                   returnKeyType={'search'}/>
+        <If condition={this.state.searchKeywords}>
+          <Text onPress={this.search} style={{padding: 4, color: colors.color333, fontSize: 14}}>
+            搜索
+          </Text>
+        </If>
+        <SvgXml xml={scan()} onPress={this.scanGoodId} style={{padding: 4, flex: 1}}/>
       </View>
     )
   }
   gotoAddMissingPicture = (item) => {
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
-  opBar = (onSale, onStrict, product) => {
+  opBar = (onSale, onStrict, product, price_type) => {
     if ('' === product.coverimg) {
       return (
         <View style={[styles.row_center, styles.btnWrap]}>
@@ -213,7 +217,7 @@ class StoreGoodsSearch extends Component {
                             onPress={() => this.onOpenModal('on_sale', product)}>
             <Text style={{color: colors.color333}}>上架 </Text>
           </TouchableOpacity>}
-        <If condition={product.price_type === 1}>
+        <If condition={price_type}>
           {onStrict ?
             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
@@ -225,7 +229,7 @@ class StoreGoodsSearch extends Component {
             </TouchableOpacity>
           }
         </If>
-        <If condition={product.price_type === 0}>
+        <If condition={!price_type}>
           {onStrict ?
             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                               onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
@@ -242,14 +246,15 @@ class StoreGoodsSearch extends Component {
     )
   }
   renderRow = ({item}) => {
+    const {price_type} = this.props.global.vendor_info
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return <GoodListItem onPressImg={() => this.gotoGoodDetail(item.id)} product={item}
                          modalType={this.state.modalType}
-                         price_type={item.price_type || 0}
+                         price_type={price_type || 0}
                          onPressRight={() => this.gotoGoodDetail(item.id)}
                          fnProviding={onStrict}
-                         opBar={this.opBar(onSale, onStrict, item)}/>
+                         opBar={this.opBar(onSale, onStrict, item, price_type)}/>
   }
 
   jumpToNewRetailPriceScene = (id) => {
@@ -321,7 +326,7 @@ class StoreGoodsSearch extends Component {
                  onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>
         {this.renderSearchBar()}
-        {/*<ScrollView>*/}
+
         <View style={styles.goodsWrap}>
           <FlatList data={goods}
                     renderItem={this.renderRow}
@@ -331,13 +336,12 @@ class StoreGoodsSearch extends Component {
                     keyExtractor={this._keyExtractor}
                     getItemLayout={this._getItemLayout}
                     onScrollBeginDrag={this.onScrollBeginDrag}
-                    ListEmptyComponent={this.renderNoProduct()}
                     onEndReachedThreshold={0.2}
                     onEndReached={this.onLoadMore}
           />
 
           <If condition={showNone && !isLoading}>
-            <NoFoundDataView/>
+            {this.renderNoProduct()}
           </If>
 
           {sp && <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)} modalType={modalType}
@@ -355,7 +359,6 @@ class StoreGoodsSearch extends Component {
                                      beforePrice={Number(sp.supply_price)}/>}
 
         </View>
-        {/*<ScrollView/>*/}
       </View>
     );
   }
@@ -365,9 +368,9 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     flex: 1,
-    maxHeight: 6000
   },
   goodsWrap: {
+    flex: 10,
     flexDirection: "column",
     paddingBottom: 80
   },

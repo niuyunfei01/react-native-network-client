@@ -300,9 +300,7 @@ export function signIn(mobile, password, props, callback) {
           //fixme: 需要给出明确提示
           callback(false, "登录失败，请检查验证码是否正确")
         }
-      }).catch(() => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
+      }).catch(() => callback(false, '网络错误，请检查您的网络连接'))
   }
 }
 

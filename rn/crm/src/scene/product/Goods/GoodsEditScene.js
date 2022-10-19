@@ -94,6 +94,7 @@ class GoodsEditScene extends PureComponent {
     const {currVendorId} = tool.vendor(props.global);
     const {scan, product_detail} = (props.route.params || {});
     const {currStoreId, store_info} = this.props.global;
+    this.isCanLoadMore = false
     this.state = {
       isSelectCategory: true,
       selectHeaderText: '闪购类目',
@@ -105,10 +106,9 @@ class GoodsEditScene extends PureComponent {
       picList: [],
       searchPicText: '',
       page: 1,
-      pageSize: 10,
+      pageSize: 12,
       isLastPage: false,
       isLoadingPic: false,
-      isCanLoadMore: false,
       weightList: [],//重量单位列表
       selectWeight: product_detail?.unit_info || {label: '克', value: 1},//选择重量单位
       provided: 1,
@@ -417,6 +417,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit: "个",
       weight: "",
       likeProds: [],
+      store_has: false,
       upc: '',
       sale_status: Cts.STORE_PROD_ON_SALE, //默认为售卖状态
       transCode: '', //条码
@@ -500,6 +501,11 @@ class GoodsEditScene extends PureComponent {
 
   onNameChanged = (name) => {
     // let {type} = this.props.route.params;
+    const {store_has} = this.state
+    if (store_has) {
+      showError('商品已存在，不可修改')
+      return
+    }
     this.setState({name: name})
     this.getProductByName(name)
   }
@@ -528,7 +534,8 @@ class GoodsEditScene extends PureComponent {
           this.setState({store_categories: [...store_categories]})
         }
       }, 100)
-    }).catch(error => console.log('error：', error))
+    }).catch(error => {
+    })
 
   }
 
@@ -638,7 +645,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   upLoad = async () => {
-    let {type, priceType} = this.props.route.params;
+    let {type} = this.props.route.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
@@ -647,7 +654,7 @@ class GoodsEditScene extends PureComponent {
       sale_status, provided, task_id, actualNum, selectWeight, upc, spec_type, multiSpecsList, store_price
     } = this.state;
 
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, currStoreId, vendor_info} = this.props.global;
 
     let formData = {
       id,
@@ -676,7 +683,7 @@ class GoodsEditScene extends PureComponent {
 
 
       if (spec_type === 'spec_single') {
-        if (priceType)
+        if (vendor_info.price_type)
           formData.store_goods_status.store_price = store_price
         formData.store_goods_status.price = price
         formData.inventory = {
@@ -724,7 +731,8 @@ class GoodsEditScene extends PureComponent {
   };
 
   dataValidate = (formData) => {
-    let {type = 'add', priceType} = this.props.route.params;
+    const {price_type} = this.props.global.vendor_info
+    let {type = 'add'} = this.props.route.params;
     const {
       id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type, inventory
     } = formData;
@@ -744,11 +752,11 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入报价')
           return false
         }
-        if (parseInt(store_price) < 0) {
+        if (price_type && parseInt(store_price) < 0) {
           ToastLong('请输入正确的零售价格')
           return false
         }
-        if (!store_price) {
+        if (price_type && !store_price) {
           ToastLong('请输入零售价格')
           return false
         }
@@ -788,7 +796,7 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入多规格价格')
           return false
         }
-        if (type === 'add' && priceType && !spec_list[i].store_price) {
+        if (type === 'add' && price_type && !spec_list[i].store_price) {
           ToastLong('请输入多规格零售价格')
           return false
         }
@@ -861,8 +869,8 @@ class GoodsEditScene extends PureComponent {
             this.getBasicCategory(p['upc_data']['sg_tag_id'])
             //this.SearchCommodityCategories(p['upc_data']['sg_tag_id'], 'id')
           }
-          if (p['upc_data']['grossweight'])
-            this.setState({weight: p.upc_data.grossweight})
+          if (p['upc_data']['weight'])
+            this.setState({weight: p.upc_data.weight})
         }
       } else {
         hideModal()
@@ -928,24 +936,11 @@ class GoodsEditScene extends PureComponent {
   }
   renderBaseInfo = () => {
     let {
-      basic_category_obj,
-      name,
-      upc,
-      weightList,
-      weight,
-      sale_status,
-      fnProviding,
-      store_price,
-      store_tags,
-      editable_upc,
-      price,
-      selectWeight,
-      actualNum,
-      store_categories,
-      spec_type,
-      allow_multi_spec
+      basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, store_price, store_tags,
+      editable_upc, price, selectWeight, actualNum, store_categories, spec_type, allow_multi_spec, store_has
     } = this.state
-    const {type, priceType} = this.props.route.params;
+    const {price_type} = this.props.global.vendor_info
+    const {type} = this.props.route.params;
     return (
       <View style={Styles.zoneWrap}>
         <Text style={Styles.headerTitleText}>
@@ -954,9 +949,10 @@ class GoodsEditScene extends PureComponent {
         <LineView/>
         <View style={styles.baseRowCenterWrap}>
           <Text style={styles.leftText}>
+            商品名称
             <Text style={styles.leftFlag}>
               *
-            </Text>商品名称
+            </Text>
           </Text>
           <TextInput
             value={name}
@@ -974,12 +970,18 @@ class GoodsEditScene extends PureComponent {
           </If>
 
         </View>
+        <If condition={store_has}>
+          <Text style={{padding: '3%', paddingLeft: '4%', backgroundColor: colors.white, color: colors.warn_color}}>
+            商品已存在
+          </Text>
+        </If>
         <LineView/>
         <View style={styles.baseRowWrap}>
           <Text style={styles.leftText}>
+            商品图片
             <Text style={styles.leftFlag}>
               *
-            </Text>商品图片
+            </Text>
           </Text>
           {
             this.renderUploadImg()
@@ -989,9 +991,10 @@ class GoodsEditScene extends PureComponent {
         <If condition={this.isStoreProdEditable() && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
+              报价
               <Text style={styles.leftFlag}>
                 *
-              </Text>报价
+              </Text>
             </Text>
             <TextInput
               style={styles.textInputStyle}
@@ -1005,12 +1008,13 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <If condition={!this.isAddProdToStore()}>
-          <If condition={priceType && spec_type === 'spec_single'}>
+          <If condition={price_type && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
+                零售价格
                 <Text style={styles.leftFlag}>
                   *
-                </Text>零售价格
+                </Text>
               </Text>
               <TextInput
                 value={store_price}
@@ -1027,9 +1031,10 @@ class GoodsEditScene extends PureComponent {
           <If condition={spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
+                重量
                 <Text style={styles.leftFlag}>
                   *
-                </Text>重量
+                </Text>
               </Text>
               <TextInput
                 style={styles.textInputStyle}
@@ -1072,9 +1077,10 @@ class GoodsEditScene extends PureComponent {
           <If condition={fnProviding && this.isStoreProdEditable() && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
+                库存
                 <Text style={styles.leftFlag}>
                   *
-                </Text>库存
+                </Text>
               </Text>
               <TextInput
                 value={actualNum}
@@ -1091,9 +1097,10 @@ class GoodsEditScene extends PureComponent {
             <TouchableOpacity style={styles.baseRowCenterWrap}
                               onPress={() => this.setSelectHeaderText('闪购类目', true)}>
               <Text style={styles.leftText}>
+                闪购类目
                 <Text style={styles.leftFlag}>
                   *
-                </Text>闪购类目
+                </Text>
               </Text>
               <View style={styles.textInputStyle}>
                 <Text style={styles.selectTipText}>
@@ -1107,9 +1114,10 @@ class GoodsEditScene extends PureComponent {
 
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
+              商品分类
               <Text style={styles.leftFlag}>
                 *
-              </Text>商品分类
+              </Text>
             </Text>
             {/*<TouchableOpacity style={styles.textInputStyle}*/}
             {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
@@ -1141,43 +1149,7 @@ class GoodsEditScene extends PureComponent {
             </View>
           </View>
           <LineView/>
-          <If condition={this.isStoreProdEditable()}>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>上架状态
-              </Text>
-              <View style={styles.saleStatusWrap}>
-                <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
-                  <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
-                    <SvgXml xml={radioSelected(18, 18)}/>
-                  </If>
-                  <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
-                    <SvgXml xml={radioUnSelected(18, 18)}/>
-                  </If>
-                  <Text style={styles.saleStatusText}>
-                    上架
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
-                  <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
-                    <SvgXml xml={radioSelected(18, 18)}/>
-                  </If>
-                  <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
-                    <SvgXml xml={radioUnSelected(18, 18)}/>
-                  </If>
-                  <Text style={styles.saleStatusText}>
-                    下架
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.rightEmptyView}/>
-            </View>
-            <LineView/>
-          </If>
+
           <If condition={allow_multi_spec === 1 && 'add' === type}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
@@ -1213,6 +1185,44 @@ class GoodsEditScene extends PureComponent {
             </View>
           </If>
         </If>
+        <If condition={store_has || this.isStoreProdEditable()}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              上架状态
+              <Text style={styles.leftFlag}>
+                *
+              </Text>
+            </Text>
+            <View style={styles.saleStatusWrap}>
+              <TouchableOpacity style={styles.saleStatusItemWrap}
+                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
+                <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
+                  <SvgXml xml={radioSelected(18, 18)}/>
+                </If>
+                <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
+                  <SvgXml xml={radioUnSelected(18, 18)}/>
+                </If>
+                <Text style={styles.saleStatusText}>
+                  上架
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saleStatusItemWrap}
+                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
+                <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
+                  <SvgXml xml={radioSelected(18, 18)}/>
+                </If>
+                <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
+                  <SvgXml xml={radioUnSelected(18, 18)}/>
+                </If>
+                <Text style={styles.saleStatusText}>
+                  下架
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
       </View>
     )
   }
@@ -1235,12 +1245,11 @@ class GoodsEditScene extends PureComponent {
   }
 
   setMultiSpecsInfo = (index, key, value) => {
-    const {currStoreId} = this.props.global;
+    const {currStoreId, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
-    const {priceType} = this.props.route.params;
 
     const multiSpecsInfo = multiSpecsList[index]
-    if ('store_price' !== key || priceType)
+    if ('store_price' !== key || vendor_info.price_type)
       multiSpecsInfo[key] = value
     if ('selectWeight' === key)
       multiSpecsInfo['sku_unit'] = multiSpecsInfo[key].label
@@ -1262,7 +1271,7 @@ class GoodsEditScene extends PureComponent {
   renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type) => {
     const {inventory = {}, upc, weight, price, store_price, sku_name} = multiSpecsList[index]
     const {actualNum = ''} = inventory
-    const {priceType} = this.props.route.params;
+    const {price_type} = this.props.global.vendor_info;
     return (
       <View style={Styles.zoneWrap} key={index}>
         <Text style={Styles.headerTitleText}>
@@ -1271,9 +1280,10 @@ class GoodsEditScene extends PureComponent {
         <LineView/>
         <View style={styles.baseRowCenterWrap}>
           <Text style={styles.leftText}>
+            规格名称
             <Text style={styles.leftFlag}>
               *
-            </Text>规格名称
+            </Text>
           </Text>
           <TextInput
             maxLength={40}
@@ -1289,9 +1299,10 @@ class GoodsEditScene extends PureComponent {
         <If condition={'add' === type}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
+              报价
               <Text style={styles.leftFlag}>
                 *
-              </Text>报价
+              </Text>
             </Text>
             <TextInput
               keyboardType={'numeric'}
@@ -1304,12 +1315,13 @@ class GoodsEditScene extends PureComponent {
             <View style={styles.rightEmptyView}/>
           </View>
           <LineView/>
-          <If condition={priceType}>
+          <If condition={price_type}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
+                零售价格
                 <Text style={styles.leftFlag}>
                   *
-                </Text>零售价格
+                </Text>
               </Text>
               <TextInput
                 keyboardType={'numeric'}
@@ -1326,9 +1338,10 @@ class GoodsEditScene extends PureComponent {
         </If>
         <View style={styles.baseRowCenterWrap}>
           <Text style={styles.leftText}>
+            重量
             <Text style={styles.leftFlag}>
               *
-            </Text>重量
+            </Text>
           </Text>
           <TextInput
             style={styles.textInputStyle}
@@ -1368,9 +1381,10 @@ class GoodsEditScene extends PureComponent {
         <If condition={fnProviding && 'add' === type}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
+              库存
               <Text style={styles.leftFlag}>
                 *
-              </Text>库存
+              </Text>
             </Text>
             <TextInput
               keyboardType={'numeric'}
@@ -1403,9 +1417,8 @@ class GoodsEditScene extends PureComponent {
     )
   }
   addSpecs = () => {
-    const {currStoreId} = this.props.global;
+    const {currStoreId, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
-    const {priceType} = this.props.route.params;
     const multiSpecsInfo = {
       sku_name: '',//规格
       price: '',//价格
@@ -1423,7 +1436,7 @@ class GoodsEditScene extends PureComponent {
 
       }
     }
-    if (priceType)
+    if (vendor_info.price_type)
       multiSpecsInfo.store_price = ''
     multiSpecsList.push(multiSpecsInfo)
     this.setState({
@@ -1592,6 +1605,10 @@ class GoodsEditScene extends PureComponent {
   ]
 
   getSearchCategoriesByName = (value) => {
+    if (!value) {
+      showError('搜索的类目不能为空', 1)
+      return
+    }
     const {accessToken} = this.props.global
     const url = `/api_products/search_sg_tag_by_name?access_token=${accessToken}`
     HttpUtils.get(url, {keyword: value}).then(res => {
@@ -1699,8 +1716,8 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderLockedItem(item, index) {
-    const {list_img} = this.state
-    if (tool.length(list_img) < 8)
+    const {list_img, store_has} = this.state
+    if (!store_has && tool.length(list_img) < 8)
       return (
         <View style={styles.plusIconWrap}>
           <TouchableOpacity style={[styles.img_add_box]}
@@ -1726,7 +1743,8 @@ class GoodsEditScene extends PureComponent {
     const {searchPicVisible, picList, searchPicText} = this.state
     if (searchPicVisible)
       return (
-        <CommonModal visible={searchPicVisible} position={'flex-end'}>
+        <CommonModal visible={searchPicVisible} position={'flex-end'}
+                     onRequestClose={() => this.setState({searchPicVisible: false, searchPicText: '', picList: []})}>
           <View style={styles.searchModalWrap}>
             <View style={styles.searchModalHeaderWrap}>
               <Text style={styles.searchModalHeaderText}>
@@ -1780,24 +1798,25 @@ class GoodsEditScene extends PureComponent {
   }
 
   onScrollBeginDrag = () => {
-    this.setState({isCanLoadMore: true})
+    this.isCanLoadMore = true
   }
   onRefresh = () => {
     this.setState({page: 1}, () => this.searchPicList(this.state.searchPicText))
   }
   onLoadMore = () => {
-    let {page, isLastPage, isLoadingPic, isCanLoadMore, searchPicText} = this.state
-    console.log('page',page)
-    if (!isCanLoadMore)
-      return;
+
+    let {page, isLastPage, isLoadingPic, searchPicText} = this.state
     if (isLastPage) {
       showError('没有更多图片', 1)
-      this.setState({isCanLoadMore: false})
+      this.isCanLoadMore = false
       return
     }
-    if (isLoadingPic)
+    if (!this.isCanLoadMore || isLoadingPic)
       return;
-    this.setState({page: page + 1, isLoadingPic: true, isCanLoadMore: false}, () => this.searchPicList(searchPicText))
+    this.setState({page: page + 1, isLoadingPic: true}, () => {
+      this.isCanLoadMore = false
+      this.searchPicList(searchPicText)
+    })
   }
 
   _getItemLayout = (data, index) => {
@@ -1809,11 +1828,11 @@ class GoodsEditScene extends PureComponent {
   }
 
   searchPicList = (searchPicText) => {
+    showModal('加载中', 'loading', 6000, 1)
     const {vendor_id, accessToken} = this.props.global
     const {page, pageSize, picList} = this.state
-
     if (!searchPicText) {
-      this.setState({picList: [], page: 1, isLastPage: false})
+      this.setState({picList: [], page: 1, isLastPage: false, isLoadingPic: false})
       return
     }
     const url = `/api_products/search_product_pic_by_name?access_token=${accessToken}`
@@ -1823,20 +1842,25 @@ class GoodsEditScene extends PureComponent {
       page: page,
       pageSize: pageSize
     }
-    console.log('params',params)
+
     HttpUtils.get(url, params).then(res => {
-      console.log('res',res)
+      hideModal()
       const {lists = [], isLastPage = false, page = 1} = res
       if (Array.isArray(lists))
         this.setState({
           picList: Number(page) === 1 ? lists : picList.concat(lists),
           isLastPage: isLastPage,
           page: page,
+          isLoadingPic: false
         })
-      else showError('返回的结果有问题', 1)
+      else {
+        showError('返回的结果有问题', 1)
+        this.setState({isLoadingPic: false})
+      }
       Keyboard.dismiss()
     }).catch(() => {
-
+      showError('返回的结果有问题', 1)
+      this.setState({isLoadingPic: false})
     })
   }
 
@@ -2070,7 +2094,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderUploadImg = () => {
-    let {list_img, selectPreviewPic} = this.state
+    let {list_img, selectPreviewPic, store_has} = this.state
     return (
       <View style={styles.area_cell}>
         <If condition={tool.length(list_img) > 0}>
@@ -2102,7 +2126,7 @@ class GoodsEditScene extends PureComponent {
             <FontAwesome5 name={'images'} size={32} color={colors.colorCCC}/>
           </View>
         </If>
-        <If condition={tool.length(list_img) < 8}>
+        <If condition={!store_has && tool.length(list_img) < 8}>
           <View style={styles.plusIconWrap}>
             <TouchableOpacity style={[styles.img_add_box]}
                               onPress={() => this.setState({showImgMenus: true, selectPicType: true})}>

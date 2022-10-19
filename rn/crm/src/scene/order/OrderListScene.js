@@ -132,9 +132,6 @@ class OrderListScene extends Component {
     GlobalUtil.setOrderFresh(1)
   }
 
-  openAndroidNotification = () => {
-  }
-
   calcAppStartTime = () => {
     native.getStartAppTime((flag, startAppTime) => {
       if (flag) {

@@ -221,64 +221,42 @@ class LoginScene extends PureComponent {
     let {mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization} = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
-        <Text style={{fontSize: 28, fontWeight: '500', color: colors.color333}}>登录外送帮 </Text>
-        <Text
-          style={{fontSize: 12, color: colors.color666, lineHeight: 17, marginVertical: 4}}>未注册手机号验证后自动创建外送帮账号 </Text>
+        <Text style={{fontSize: 28, fontWeight: '500', color: colors.color333}}>
+          登录外送帮
+        </Text>
+        <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17, marginVertical: 4}}>
+          未注册手机号验证后自动创建外送帮账号
+        </Text>
         <View style={{marginVertical: 16}}>
-          <View style={{
-            backgroundColor: colors.f5,
-            borderRadius: 4,
-            height: 48,
-          }}>
+          <View style={{backgroundColor: colors.f5, borderRadius: 4, height: 48}}>
             <TextInput
               underlineColorAndroid='transparent'
               placeholder="请输入手机号"
-              onChangeText={(mobile) => {
-                this.setState({mobile})
-              }}
+              onChangeText={(mobile) => this.setState({mobile})}
               maxLength={11}
               value={mobile}
               placeholderTextColor={colors.color999}
-              style={{
-                fontSize: 16,
-                flex: 1,
-                padding: 12,
-              }}
+              style={{fontSize: 16, flex: 1, padding: 12}}
             />
           </View>
-          <View style={{
-            backgroundColor: colors.f5,
-            borderRadius: 4,
-            height: 48,
-            marginTop: 16,
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}>
+          <View style={{backgroundColor: colors.f5, borderRadius: 4, height: 48, marginTop: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
             <TextInput
               onChangeText={(verifyCode) => this.setState({verifyCode})}
               value={verifyCode}
               placeholderTextColor={colors.color999}
               underlineColorAndroid='transparent'
               placeholder="请输入验证码"
-              style={{
-                fontSize: 16,
-                flex: 1,
-                padding: 12,
-              }}
+              style={{fontSize: 16, flex: 1, padding: 12}}
             />
-            <TouchableOpacity style={{
-              padding: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }} onPress={this.onRequestSmsCode}>
+            <TouchableOpacity style={{padding: 12, justifyContent: 'center', alignItems: 'center'}}
+                              onPress={this.onRequestSmsCode}>
               <Text style={{fontSize: 16, color: colors.main_color}}>
                 {canAskReqSmsCode ? reRequestAfterSeconds + '秒重新获取' : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity onPress={this.setCheckd}
-                          style={{flexDirection: 'row', alignItems: 'center',}}>
+        <TouchableOpacity onPress={this.setCheckd} style={{flexDirection: 'row', alignItems: 'center',}}>
           <CheckBox
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
@@ -292,8 +270,7 @@ class LoginScene extends PureComponent {
           <Text onPress={this.onReadProtocol} style={{color: colors.main_color, fontSize: 12}}>《外送帮隐私政策》 </Text>
           <If condition={!authorization}>
             <TouchableOpacity onPress={this.setCheckd} style={{position: 'absolute', top: 20, left: 0}}>
-              <Entypo name={'triangle-up'}
-                      style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
+              <Entypo name={'triangle-up'} style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
 
               <View style={{
                 backgroundColor: 'rgba(0,0,0,0.7)',
@@ -315,11 +292,7 @@ class LoginScene extends PureComponent {
         <View style={{marginTop: authorization ? 30 : 70}}>
           <Button title={'登 录'}
                   onPress={this.onLogin}
-                  buttonStyle={[{
-                    backgroundColor: colors.main_color,
-                    borderRadius: 24,
-                    length: 48,
-                  }]}
+                  buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, length: 48}]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
           />
         </View>
