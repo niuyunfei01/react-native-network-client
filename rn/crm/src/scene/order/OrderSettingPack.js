@@ -63,7 +63,7 @@ class OrderSettingScene extends Component {
       street_block: '',
       loc_lng: '',
       loc_lat: '',
-      weight: 0,
+      weight: 1,
       weight_min: 0,
       weight_max: 20,
       goods_price: 0,
@@ -257,6 +257,13 @@ class OrderSettingScene extends Component {
       ToastShort('请先选择定位', 0);
       return this.goSelectAddress()
     }
+    if(Number(goods_price) <= 0){
+      return  ToastShort('请选择物品价值');
+    }
+
+    if(Number(weight) <= 0){
+      return  ToastShort('请选择物品重量');
+    }
 
     if (isSaveToBook) {
       this.updateAddressBook()
@@ -431,7 +438,7 @@ class OrderSettingScene extends Component {
             fontSize: 14,
             color: colors.color666,
             textAlign: 'right'
-          }}>地址薄 </Text>
+          }}>地址簿 </Text>
         </View>
 
         <View style={{
@@ -503,7 +510,7 @@ class OrderSettingScene extends Component {
             />
           </View>
 
-          <TextInput placeholder="分机(选填)"
+          <TextInput placeholder="分机号(选填)"
                      maxLength={4}
                      underlineColorAndroid="transparent"
                      style={{width: 77, fontSize: 14, color: colors.color333}}
@@ -897,7 +904,7 @@ class OrderSettingScene extends Component {
             <View style={{paddingHorizontal: 20, paddingBottom: 20}}>
               <View style={{flexDirection: "row", alignItems: 'center'}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>地址： </Text>
-                <Text style={{color: colors.color333, fontSize: 14}}>{address} </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

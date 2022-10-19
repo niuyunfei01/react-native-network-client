@@ -182,7 +182,7 @@ class PermissionToIdentify extends PureComponent {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
         <If condition={!this.state.isLoading}>
-          <Image source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
+          <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
                  style={{width: 100, height: 100, marginBottom: 20}}/>
           <Text style={{fontSize: 18, color: colors.b2}}>
             暂未设置员工信息

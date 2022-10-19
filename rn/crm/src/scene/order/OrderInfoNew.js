@@ -880,7 +880,7 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <Image
-              source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
+              source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
               style={styles.orderCardIcon}/>
             <View style={styles.orderCardInfo}>
               <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
@@ -920,7 +920,7 @@ class OrderInfoNew extends PureComponent {
                 this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
               }}>
                 <Image
-                  source={{url: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
+                  source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                   style={styles.productImage}
                 />
                 <View style={styles.productItem}>

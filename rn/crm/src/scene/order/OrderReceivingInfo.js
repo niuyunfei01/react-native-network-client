@@ -349,7 +349,7 @@ class OrderReceivingInfo extends Component {
                        }}
             />
           </View>
-          <TextInput placeholder="分机(选填)"
+          <TextInput placeholder="分机号(选填)"
                      maxLength={4}
                      underlineColorAndroid="transparent"
                      style={{width: 77, fontSize: 14, color: colors.color333}}
@@ -395,7 +395,7 @@ class OrderReceivingInfo extends Component {
 
             <If condition={show_smart_input}>
               <Button title={'识别'}
-                      onPress={this.intelligentIdentification}
+                      onPress={()=>this.intelligentIdentification()}
                       containerStyle={{
                         borderRadius: 5,
                         width: 70,
@@ -439,7 +439,7 @@ class OrderReceivingInfo extends Component {
             <View style={{paddingHorizontal: 20, paddingBottom: 20}}>
               <View style={{flexDirection: "row", alignItems: 'center'}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>地址： </Text>
-                <Text style={{color: colors.color333, fontSize: 14}}>{address} </Text>
+                <Text style={{color: colors.color333, fontSize: 14}}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

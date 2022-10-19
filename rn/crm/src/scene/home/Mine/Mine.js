@@ -44,11 +44,11 @@ import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {showError} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {getConfig, logout} from "../../../reducers/global/globalActions";
+import {logout} from "../../../reducers/global/globalActions";
 
 const width = Dimensions.get("window").width;
 
@@ -437,7 +437,7 @@ class Mine extends PureComponent {
     return (
       <View style={styles.storeInfoBox}>
         <Image
-          source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
           <View style={styles.storeContent}>
@@ -568,24 +568,26 @@ class Mine extends PureComponent {
           <Text style={styles.zoneWrapTitle}>
             {item?.title}
           </Text>
-          <View style={styles.flexRowWrap}>
-            <For of={item?.items} each='info' index='index'>
-              <TouchableOpacity style={[block_styles.block_box]} key={index}
-                                onPress={() => this.touchBlockNavigate(info)}
-                                activeOpacity={customerOpacity}>
+          <View style={{flexDirection: 'row', justifyContent: 'center', flex: 1}}>
+            <View style={styles.flexRowWrap}>
+              <For of={item?.items} each='info' index='index'>
+                <TouchableOpacity style={[block_styles.block_box]} key={index}
+                                  onPress={() => this.touchBlockNavigate(info)}
+                                  activeOpacity={customerOpacity}>
 
-                <If condition={tool.length(info?.badge) > 0}>
-                  <View style={[block_styles.deliveryTip, {backgroundColor: info?.badge?.bg_color}]}>
-                    <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
-                      {info?.badge?.label}
-                    </Text>
-                  </View>
-                </If>
+                  <If condition={tool.length(info?.badge) > 0}>
+                    <View style={[block_styles.deliveryTip, {backgroundColor: info?.badge?.bg_color}]}>
+                      <Text allowFontScaling={false} style={block_styles.deliveryTipText}>
+                        {info?.badge?.label}
+                      </Text>
+                    </View>
+                  </If>
 
-                <SvgXml xml={this.getIcon(info?.icon)} width={28} height={28} style={[block_styles.block_img]}/>
-                <Text style={[block_styles.block_name]}>{info?.name} </Text>
-              </TouchableOpacity>
-            </For>
+                  <SvgXml xml={this.getIcon(info?.icon)} width={28} height={28} style={[block_styles.block_img]}/>
+                  <Text style={[block_styles.block_name]}>{info?.name} </Text>
+                </TouchableOpacity>
+              </For>
+            </View>
           </View>
         </View>
       </For>
@@ -838,8 +840,8 @@ const headerRightStyles = StyleSheet.create({
 
 const block_styles = StyleSheet.create({
   block_box: {
-    width: (width * 0.95) / 5,
-    height: (width * 0.95) / 5,
+    width: (width * 0.75) / 4,
+    height: (width * 0.75) / 4,
     marginHorizontal: 5,
     alignItems: "center"
   },

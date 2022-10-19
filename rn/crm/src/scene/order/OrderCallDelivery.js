@@ -607,7 +607,7 @@ class OrderCallDelivery extends Component {
           })
         }} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
+            source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -633,7 +633,7 @@ class OrderCallDelivery extends Component {
       <For index='key' each='item' of={exist_waiting_delivery}>
         <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: item?.icon}}
+            source={{uri: item?.icon}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -747,7 +747,7 @@ class OrderCallDelivery extends Component {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: item?.icon}}
+            source={{uri: item?.icon}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -860,9 +860,10 @@ class OrderCallDelivery extends Component {
       minPrice,
       wayNums
     } = this.state;
+    let iron_width =  width * 0.9 / 6;
     return (
       <View style={{paddingHorizontal: 10, paddingBottom: 10, backgroundColor: colors.white}}>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 12}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 12}}>
           <TouchableOpacity onPress={() => {
             if (is_alone_pay_vendor) {
               return ToastLong('不支持修改商品重量');
@@ -871,12 +872,11 @@ class OrderCallDelivery extends Component {
               show_weight_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
@@ -888,12 +888,11 @@ class OrderCallDelivery extends Component {
               datePickerList: this.timeSlot(10, true)
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={time()}/>
@@ -908,12 +907,11 @@ class OrderCallDelivery extends Component {
               show_goods_price_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
@@ -924,12 +922,11 @@ class OrderCallDelivery extends Component {
               show_add_tip_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
@@ -945,12 +942,11 @@ class OrderCallDelivery extends Component {
               show_remark_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
