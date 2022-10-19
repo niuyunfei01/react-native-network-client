@@ -87,7 +87,7 @@ const initState = {
   sort_list: [
     {"label": '最新来单', 'value': 'orderTime desc'},
     {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '预订单', 'value': 'expectTime desc'},
+    {"label": '尽快送达', 'value': 'expectTime desc'},
   ],
   ListData: [],
   orderStatus: 9,

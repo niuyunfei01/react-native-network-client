@@ -236,7 +236,11 @@ class DistributionAnalysisScene extends PureComponent {
     }
     if (this.state.analysis_by === Distribution_Analysis && this.state.headerType === 1)
       return (
-        <ScrollView style={Styles.scrollContainer}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={Styles.scrollContainer}>
           <View style={[styles.cell_box_header, {marginBottom: 10, paddingVertical: 10}]}>
             <For index='i' each='info' of={Cts.PLAT_ARRAY}>
               <TouchableOpacity
@@ -309,7 +313,11 @@ class DistributionAnalysisScene extends PureComponent {
     const {cardStatus, profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
     if (headerType !== 1) {
       return (
-        <ScrollView style={Styles.scrollContainer}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={Styles.scrollContainer}>
           <View style={[styles.cell_box_header]}>
             <For index='i' each='info' of={timeOptions}>
               <View key={i} style={styles.cell_box_info}>

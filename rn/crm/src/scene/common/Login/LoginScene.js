@@ -182,7 +182,8 @@ class LoginScene extends PureComponent {
       return;
     }
 
-    if (this.props.global.show_bottom_tab ) {
+    if (this.props.global.show_bottom_tab) {
+      hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
 
@@ -217,6 +218,12 @@ class LoginScene extends PureComponent {
     this.setState({authorization: !authorization})
   }
 
+  cancelValue = () => {
+    this.setState({
+      mobile: ''
+    })
+  }
+
   render() {
     let {mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization} = this.state;
     return (
@@ -236,8 +243,17 @@ class LoginScene extends PureComponent {
               maxLength={11}
               value={mobile}
               placeholderTextColor={colors.color999}
-              style={{fontSize: 16, flex: 1, padding: 12}}
+              keyboardType={'numeric'}
+              style={{
+                fontSize: 16,
+                flex: 1,
+                padding: 12,
+              }}
             />
+            <If condition={tool.length(mobile) > 0}>
+              <Entypo onPress={this.cancelValue} name="circle-with-cross"
+                      style={{position: 'absolute', top: 15, right: 10, fontSize: 18, color: colors.color999}}/>
+            </If>
           </View>
           <View style={{backgroundColor: colors.f5, borderRadius: 4, height: 48, marginTop: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
             <TextInput
@@ -248,10 +264,13 @@ class LoginScene extends PureComponent {
               placeholder="请输入验证码"
               style={{fontSize: 16, flex: 1, padding: 12}}
             />
-            <TouchableOpacity style={{padding: 12, justifyContent: 'center', alignItems: 'center'}}
-                              onPress={this.onRequestSmsCode}>
-              <Text style={{fontSize: 16, color: colors.main_color}}>
-                {canAskReqSmsCode ? reRequestAfterSeconds + '秒重新获取' : '获取验证码'}
+            <TouchableOpacity style={{
+              padding: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }} onPress={this.onRequestSmsCode}>
+              <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
+                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>

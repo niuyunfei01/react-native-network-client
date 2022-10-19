@@ -24,7 +24,10 @@ export default class IncrementServiceDescription extends PureComponent {
 
   render() {
     return (
-      <ScrollView>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
         {
           DESCRIPTION_LIST.map((item, index) => {
             return (

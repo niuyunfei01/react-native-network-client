@@ -95,7 +95,11 @@ class JdAuditDeliveryScene extends Component {
   render() {
     let {delivery_urge, reply_content, remind} = this.state;
 
-    return <ScrollView style={[styles.container, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, {flex: 1}]}>
       <Dialog
         onRequestClose={() => {
         }}

@@ -125,6 +125,9 @@ class DiyPrinter extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={this.state.isRefreshing}
@@ -327,11 +330,16 @@ class DiyPrinter extends PureComponent {
                                 paddingHorizontal: 8,
                                 height: pxToDp(90),
                               }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>显示货号（暂仅显示美团货号） </Text>
+              <View style={{flex: 1,}}>
+                <Text style={{
+                  fontSize: 14,
+                  color: colors.color333,
+                }}>显示货号 </Text>
+                <Text style={{
+                  fontSize: 10,
+                  color: colors.color999,
+                }}>暂仅显示美团货号</Text>
+              </View>
               <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
@@ -446,7 +454,6 @@ class DiyPrinter extends PureComponent {
               }}/>
             </TouchableOpacity>
           </View>
-
 
 
           <View style={{

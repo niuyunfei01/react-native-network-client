@@ -67,7 +67,11 @@ class ServiceChargeInfo extends PureComponent {
   render() {
     const {records} = this.state;
     return (
-      <ScrollView style={{flex: 1, backgroundColor: colors.f3}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, backgroundColor: colors.f3}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
                 return (

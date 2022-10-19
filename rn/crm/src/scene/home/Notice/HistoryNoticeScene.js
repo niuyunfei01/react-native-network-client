@@ -106,7 +106,10 @@ class HistoryNoticeScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={Styles.scrollStyle}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false} style={Styles.scrollStyle}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchHistoryAdvicesList.bind(this)}/>
         {this.renderHistoryAdvicesList()}
         <If condition={!this.state.isLastPage}>

@@ -1767,7 +1767,11 @@ class OrderInfo extends Component {
     const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
 
     return noOrder ?
-      <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
         <View>
           <FloatServiceIcon fromComponent={'订单详情'}/>
           <Text style={Styles.textAlignCenter}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>

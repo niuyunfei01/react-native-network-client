@@ -3,11 +3,19 @@ import {connect} from "react-redux";
 import {View} from "react-native";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import colors from "../../pubilc/styles/colors";
-import Icon from "react-native-vector-icons/Entypo";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-
 import OrderListScene from '../order/OrderListScene'
 import PropTypes from "prop-types";
+import {
+  bottom_tab_control,
+  bottom_tab_control_check,
+  bottom_tab_goods,
+  bottom_tab_goods_check,
+  bottom_tab_message,
+  bottom_tab_message_check,
+  bottom_tab_workbench,
+  bottom_tab_workbench_check
+} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -51,9 +59,12 @@ class TabHome extends React.Component {
                       options={{
                         tabBarLabel: '控制台',
                         tabBarIcon: ({focused}) => (
-                          <Icon name={'grid'} size={26} color={focused ? colors.main_color : colors.colorCCC}/>)
+                          focused ? <SvgXml xml={bottom_tab_control_check()} width={24} height={24}/> :
+                            <SvgXml xml={bottom_tab_control()} width={24} height={24}/>
+                        )
                       }}/>
         </If>
+
         <Tab.Screen
           name="Orders"
           component={OrderListScene}
@@ -61,14 +72,15 @@ class TabHome extends React.Component {
             {
               tabBarLabel: "工作台",
               tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'file-alt'} size={22}
-                              style={{opacity: show_bottom_tab ? 1 : 0}}
-                              color={focused ? colors.main_color : colors.colorCCC}/>
+                show_bottom_tab ?
+                  focused ? <SvgXml xml={bottom_tab_workbench_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_workbench()} width={24} height={24}/> : <View/>
               ),
 
             }
           }
         />
+
         <If condition={Number(product) === 1}>
           <Tab.Screen
             name="Goods"
@@ -77,14 +89,13 @@ class TabHome extends React.Component {
               {
                 tabBarLabel: "商品",
                 tabBarIcon: ({focused}) => (
-                  <Icon name={"shopping-bag"}
-                        style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
+                  focused ? <SvgXml xml={bottom_tab_goods_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_goods()} width={24} height={24}/>
                 ),
               }
             }
           />
         </If>
-
 
         <If condition={Number(news) === 1}>
           <Tab.Screen
@@ -95,32 +106,13 @@ class TabHome extends React.Component {
                 tabBarBadge: remind > 99 ? '99+' : remind,
                 tabBarLabel: "提醒",
                 tabBarIcon: ({focused}) => (
-                  <View style={{position: "relative"}}>
-                    <FontAwesome5 name={'bell'} size={22}
-                                  color={focused ? colors.main_color : colors.colorCCC}
-                    />
-                  </View>
+                  focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_message()} width={24} height={24}/>
                 )
               }
             }
           />
         </If>
-
-        {/*<Tab.Screen*/}
-        {/*  name="Mine"*/}
-        {/*  getComponent={() => require("../home/Mine/MineScene").default}*/}
-        {/*  options={*/}
-        {/*    {*/}
-        {/*      tabBarLabel: "我的",*/}
-        {/*      tabBarIcon: ({focused}) => (*/}
-        {/*        <FontAwesome5 name={'user-cog'} size={22}*/}
-        {/*                      color={focused ? colors.main_color : colors.colorCCC}*/}
-        {/*        />*/}
-        {/*      )*/}
-        {/*    }*/}
-        {/*  }*/}
-        {/*/>*/}
-
       </Tab.Navigator>
     )
   }

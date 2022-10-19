@@ -47,7 +47,11 @@ class GoodListItem extends React.PureComponent {
     let skus = product.skus || []
     const {showMore} = this.state
     return (
-      <ScrollView style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>

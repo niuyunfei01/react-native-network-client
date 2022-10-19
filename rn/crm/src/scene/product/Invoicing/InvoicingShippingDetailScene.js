@@ -264,10 +264,18 @@ class InvoicingShippingDetailScene extends Component {
           placeholder={'请输入对应供应商订货单备注'}
         />
         <View style={{flexDirection: 'row'}}>
-          <ScrollView style={styles.left_list}>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={styles.left_list}>
             {this.renderSuppliers()}
           </ScrollView>
-          <ScrollView style={styles.left_right}>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={styles.left_right}>
             <CheckboxCells
               options={checkItems}
               value={checkSupplierId}

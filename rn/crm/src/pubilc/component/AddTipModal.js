@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dimensions, Text, TextInput, View} from 'react-native'
+import {Dimensions, Platform, Text, TextInput, View} from 'react-native'
 import colors from "../styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../util/tool";
@@ -119,7 +119,7 @@ class AddTipModal extends React.Component {
     return (
       <JbbModal visible={show_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
-                modal_type={'center'}>
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
 
         <View style={{marginBottom: 20}}>
           <View style={{
@@ -149,6 +149,7 @@ class AddTipModal extends React.Component {
                   borderWidth: 0.5,
                   borderColor: Number(info.value) === add_money ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
+                  height:36,
                   color: Number(info.value) === add_money ? colors.main_color : colors.color333,
                   backgroundColor: Number(info.value) === add_money ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
@@ -173,6 +174,7 @@ class AddTipModal extends React.Component {
                   fontSize: 14,
                   width: width * 0.25,
                   borderWidth: 0.5,
+                  height:36,
                   color: colors.color333,
                   borderColor: input_add_money === add_money ? colors.main_color : colors.colorDDD,
                   textAlign: 'center',

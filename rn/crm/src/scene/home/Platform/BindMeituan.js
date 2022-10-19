@@ -169,7 +169,11 @@ class BindMeituan extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView style={{backgroundColor: colors.f2, flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <Text style={{
             marginLeft: 'auto',
             marginRight: 'auto',

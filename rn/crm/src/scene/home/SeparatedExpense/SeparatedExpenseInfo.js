@@ -99,7 +99,11 @@ class SeparatedExpenseInfo extends PureComponent {
     const {records} = this.state;
     if (records) hideModal()
     return (
-      <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
                 return <If condition={this.state.show_pay_notice}>

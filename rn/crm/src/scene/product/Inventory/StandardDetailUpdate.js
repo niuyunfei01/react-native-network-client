@@ -184,6 +184,9 @@ class StandardDetailUpdate extends BaseComponent {
   render() {
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}
         style={{flex: 1}}
       >

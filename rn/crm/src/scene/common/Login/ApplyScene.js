@@ -229,29 +229,22 @@ class ApplyScene extends PureComponent {
 
   doneSelectStore = (storeId, not_bind = false) => {
     const {dispatch, navigation} = this.props;
-    const setCurrStoreIdCallback = (set_ok, msg) => {
-      if (set_ok) {
-        dispatch(setCurrentStore(storeId));
-        if (not_bind) {
-          navigation.navigate(Config.ROUTE_STORE_STATUS)
-          hideModal()
-          return;
-        }
-        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
-      } else {
-        showError(msg);
-      }
-    };
-    if (Platform.OS === 'ios') {
-      setCurrStoreIdCallback(true, '');
-    } else {
-      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    dispatch(setCurrentStore(storeId));
+    if (not_bind) {
+      navigation.navigate(Config.ROUTE_STORE_STATUS)
+      hideModal()
+      return;
     }
+    if (this.props.global.show_bottom_tab) {
+      hideModal()
+      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
+    }
+    navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
+    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+      initTab: Config.ROUTE_ORDERS,
+      initialRouteName: Config.ROUTE_ALERT
+    });
+    hideModal()
   }
 
   setAddress(res) {
@@ -274,7 +267,10 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (
-      <ScrollView style={{
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false} style={{
         flex: 1,
         padding: 12,
         backgroundColor: colors.f3,

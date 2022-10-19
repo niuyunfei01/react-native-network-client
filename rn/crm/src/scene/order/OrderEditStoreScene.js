@@ -64,7 +64,11 @@ class OrderEditStoreScene extends Component {
 
   render() {
     let {store_name} = this.state;
-    return <ScrollView style={{flex: 1, backgroundColor: colors.f3, paddingHorizontal: 10}}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={{flex: 1, backgroundColor: colors.f3, paddingHorizontal: 10}}>
       <View style={{
         backgroundColor: colors.white,
         borderRadius: 8,

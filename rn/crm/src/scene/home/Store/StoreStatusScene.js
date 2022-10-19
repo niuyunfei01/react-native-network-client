@@ -190,7 +190,11 @@ class StoreStatusScene extends PureComponent {
     const {currStoreId, vendor_id} = this.props.global
 
     return (
-      <ScrollView style={styles.bodyContainer}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.bodyContainer}>
         {
           business_status && business_status.map((store, index) => {
             let suspend_confirm_order = store.suspend_confirm_order === '0'

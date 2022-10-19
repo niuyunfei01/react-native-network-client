@@ -248,7 +248,11 @@ class NoticeList extends React.PureComponent {
     }
     return (
       <View style={styles.typeTab}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          horizontal={true} showsHorizontalScrollIndicator={false}>
           <For index="i" each='tab' of={typeLabels}>
             <TouchableOpacity
               key={i}

@@ -103,7 +103,10 @@ class AutomaticPackagingScene extends PureComponent {
     const {packageStatus} = this.state
     return (
       <>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
           <View style={Styles.rowWrap}>
             <Text style={styles.description}>
               自动打包

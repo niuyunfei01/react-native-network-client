@@ -35,7 +35,11 @@ class BindSetMeituan extends PureComponent {
           urls={[{url: this.state.showImg}]}
           onClickModal={() => this.onToggleFullScreen()}
         />
-        <ScrollView style={{backgroundColor: colors.f2, flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <View style={{
             backgroundColor: colors.white,
             borderRadius: 8,

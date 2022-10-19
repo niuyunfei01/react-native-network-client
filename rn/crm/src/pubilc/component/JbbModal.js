@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ScrollView, TouchableHighlight, TouchableOpacity, View} from 'react-native'
-import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
@@ -11,7 +10,6 @@ class JbbModal extends PureComponent {
   static propTypes = {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
-    is_slide: PropTypes.bool,
     modal_type: PropTypes.string,
     modalStyle: PropTypes.object,
     children: PropTypes.object,
@@ -19,7 +17,6 @@ class JbbModal extends PureComponent {
   }
   static defaultProps = {
     visible: true,
-    is_slide: true,
   }
 
   render() {
@@ -41,27 +38,25 @@ class JbbModal extends PureComponent {
           </If>
           <TouchableHighlight style={[{
             backgroundColor: colors.white,
-            borderRadius: pxToDp(30),
             maxHeight: height * 0.8
           }, this.props.modal_type && this.props.modal_type === 'center' ? {
+            borderRadius: 15,
             width: '88%',
           } : {
-            borderTopLeftRadius: pxToDp(30),
-            borderTopRightRadius: pxToDp(30),
-            padding: pxToDp(30),
-            paddingBottom: pxToDp(50)
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            paddingBottom: 20,
           }, this.props.HighlightStyle]}>
-            {this.props.is_slide !== undefined && !this.props.is_slide ?
-              <View style={[{
-                padding: 10,
-              }, this.props.modalStyle]}>
-                {this.props.children}
-              </View>
-              : <ScrollView style={[{
-                padding: 10,
-              }, this.props.modalStyle]}>
-                {this.props.children}
-              </ScrollView>}
+
+            <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false} style={[{
+              padding: 10,
+            }, this.props.modalStyle]}>
+              {this.props.children}
+            </ScrollView>
+
           </TouchableHighlight>
         </TouchableOpacity>
       </Modal>

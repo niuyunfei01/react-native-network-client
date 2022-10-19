@@ -122,7 +122,11 @@ class OrderTodoScene extends Component {
       return {label: reason.label, value: idx}
     });
 
-    return <ScrollView style={[styles.container, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {
       }}

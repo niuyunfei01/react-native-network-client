@@ -120,7 +120,11 @@ class OrderAddressBook extends Component {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
-        <ScrollView style={[styles.container, {flex: 1}]} refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.container, {flex: 1}]} refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
@@ -175,6 +179,10 @@ class OrderAddressBook extends Component {
             onChangeText={(searchKeywords) => {
               this.setState({
                 searchKeywords
+              }, () => {
+                tool.debounces(() => {
+                  this.fetchAddressBook()
+                })
               })
             }}
             onCancel={this.onCancel}

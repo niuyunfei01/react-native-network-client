@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -526,7 +527,11 @@ class OrderCallDelivery extends Component {
     return (
       <View style={{flexGrow: 1}}>
         {this.renderHead()}
-        <ScrollView refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
           <RefreshControl
             refreshing={isLoading}
             onRefresh={() => this.fetchData()}
@@ -607,7 +612,7 @@ class OrderCallDelivery extends Component {
           })
         }} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
+            source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -633,7 +638,7 @@ class OrderCallDelivery extends Component {
       <For index='key' each='item' of={exist_waiting_delivery}>
         <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: item?.icon}}
+            source={{uri: item?.icon}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -747,7 +752,7 @@ class OrderCallDelivery extends Component {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <Image
-            source={{url: item?.icon}}
+            source={{uri: item?.icon}}
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -860,9 +865,10 @@ class OrderCallDelivery extends Component {
       minPrice,
       wayNums
     } = this.state;
+    let iron_width = width * 0.9 / 6;
     return (
       <View style={{paddingHorizontal: 10, paddingBottom: 10, backgroundColor: colors.white}}>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 12}}>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 12}}>
           <TouchableOpacity onPress={() => {
             if (is_alone_pay_vendor) {
               return ToastLong('不支持修改商品重量');
@@ -871,12 +877,11 @@ class OrderCallDelivery extends Component {
               show_weight_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
@@ -888,12 +893,11 @@ class OrderCallDelivery extends Component {
               datePickerList: this.timeSlot(10, true)
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={time()}/>
@@ -908,12 +912,11 @@ class OrderCallDelivery extends Component {
               show_goods_price_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
@@ -924,12 +927,11 @@ class OrderCallDelivery extends Component {
               show_add_tip_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
@@ -945,12 +947,11 @@ class OrderCallDelivery extends Component {
               show_remark_modal: true
             })
           }} style={{
-            height: 56,
-            width: 56,
+            height: iron_width,
+            width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
             borderWidth: 0.5,
-            marginHorizontal: 8,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
@@ -1094,7 +1095,8 @@ class OrderCallDelivery extends Component {
                     marginTop: 20,
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
-                    length: 48,
+                    marginHorizontal: 10,
+                    length: 42,
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>
@@ -1188,7 +1190,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1208,7 +1211,7 @@ class OrderCallDelivery extends Component {
     return (
       <JbbModal visible={show_goods_price_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
-                modal_type={'center'}>
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1233,6 +1236,7 @@ class OrderCallDelivery extends Component {
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
+                  height: 36,
                   borderColor: Number(info.value) === order_money_input_value ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
                   color: Number(info.value) === order_money_input_value ? colors.main_color : colors.color333,
@@ -1257,7 +1261,8 @@ class OrderCallDelivery extends Component {
                 keyboardType={'numeric'}
                 style={{
                   fontSize: 14,
-                  width: width * 0.53,
+                  height: 36,
+                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
                   borderWidth: 0.5,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
@@ -1280,7 +1285,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1292,7 +1298,8 @@ class OrderCallDelivery extends Component {
   renderRemarkModal = () => {
     let {show_remark_modal, remark_input_value} = this.state;
     return (
-      <JbbModal visible={show_remark_modal} onClose={this.closeModal} modal_type={'center'}>
+      <JbbModal visible={show_remark_modal} onClose={this.closeModal}
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1335,7 +1342,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1556,7 +1564,7 @@ class OrderCallDelivery extends Component {
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
                     marginHorizontal: 10,
-                    length: 48,
+                    length: 42,
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>

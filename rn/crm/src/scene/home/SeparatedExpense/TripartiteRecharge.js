@@ -162,7 +162,11 @@ class TripartiteRecharge extends PureComponent {
     return (
       <View style={Styles.containerContent}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-        <ScrollView style={Styles.containerContent} refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={Styles.containerContent} refreshControl={
           <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
                           tintColor='gray'/>
         }>

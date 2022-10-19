@@ -76,10 +76,8 @@ class StoreSelect extends PureComponent {
 
 
   fetchData = (options = {}) => {
-    ToastShort('加载中')
     const {page, page_size, access_token} = this.state
     const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
-
     let params = {
       keywords: this.state.searchKeywords,
       page: options.page ? options.page : page,
@@ -176,11 +174,11 @@ class StoreSelect extends PureComponent {
             </If>
           </View>
         </View>
-        <If condition={focus}>
-          <Text style={styles.searchCancel} onPress={this.onCancel}>
-            {lang.cancel}
-          </Text>
-        </If>
+        {/*<If condition={focus}>*/}
+        {/*  <Text style={styles.searchCancel} onPress={this.onCancel}>*/}
+        {/*    {lang.cancel}*/}
+        {/*  </Text>*/}
+        {/*</If>*/}
       </View>
     )
   }

@@ -143,7 +143,11 @@ class SeetingMiniNumDelivery extends PureComponent {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{
           marginBottom: pxToDp(22),
           backgroundColor: colors.f7
         }}

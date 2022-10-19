@@ -208,7 +208,10 @@ class GoodsAnalysis extends Component {
           visible={this.state.productListModal}
           onRequestClose={() => this.onProductListModalClose()}
         >
-          <ScrollView>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}>
             {this.renderProductList()}
           </ScrollView>
         </Dialog>

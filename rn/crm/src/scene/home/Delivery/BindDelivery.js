@@ -72,7 +72,11 @@ class BindDelivery extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
         marginBottom: pxToDp(22),
         backgroundColor: colors.white
       }}

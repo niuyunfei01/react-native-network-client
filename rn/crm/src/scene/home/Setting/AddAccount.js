@@ -117,6 +117,9 @@ class AddAccount extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           style={styles.Content}>
           {this.renderEditInfo()}
         </ScrollView>

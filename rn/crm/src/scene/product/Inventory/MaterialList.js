@@ -375,7 +375,11 @@ class MaterialList extends React.Component {
     const {filterStatus, filterSupplyPriceHigh} = this.state
     return (
       <View style={{flex: 1, backgroundColor: '#fff'}}>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.drawerItem}>
             <Text style={styles.drawerItemLabel}>状态 </Text>
             {this.renderStatusFilterBtn('全部', '', filterStatus === '')}

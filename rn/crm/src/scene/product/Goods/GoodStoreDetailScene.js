@@ -334,7 +334,11 @@ class GoodStoreDetailScene extends PureComponent {
 
     return (
       <View style={styles.page}>
-        <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
           {
             product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
           }

@@ -134,7 +134,11 @@ class ApplyDelivery extends PureComponent {
     } = this.state;
     return (
       <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
-        <ScrollView style={{flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flexGrow: 1}}>
           <Text style={{
             fontSize: pxToDp(35),
             color: colors.fontGray,

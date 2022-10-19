@@ -162,6 +162,10 @@ class OrderInfoNew extends PureComponent {
   }
 
   setMapHeight = (map_height) => {
+    let {isShowMap} = this.state;
+    if (!isShowMap) {
+      return null;
+    }
     Animated.timing(                       // 随时间变化而执行动画
       this.state.map_height,            // 动画中的变量值
       {
@@ -698,7 +702,15 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderMap = () => {
-    let {loc_lat, loc_lng, store_loc_lat, store_loc_lng, ship_worker_lat, ship_worker_lng, dada_distance} = this.state.order;
+    let {
+      loc_lat,
+      loc_lng,
+      store_loc_lat,
+      store_loc_lng,
+      ship_worker_lat,
+      ship_worker_lng,
+      dada_distance
+    } = this.state.order;
     let {map_height} = this.state;
     return (
       <Animated.View style={{height: map_height}}>
@@ -775,18 +787,20 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
-                        onPress={() => this.deliveryModalFlag()}>
-        <If condition={isShowMap}>
-          <View style={styles.orderInfoHeaderFlag}/>
-        </If>
-        <View style={styles.orderInfoHeaderStatus}>
-          <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-          <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
-        </View>
-        <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
-        {this.renderOrderInfoHeaderButton()}
-      </TouchableOpacity>
+      <View {...this._panResponder.panHandlers} >
+        <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                          onPress={() => this.deliveryModalFlag()}>
+          <If condition={isShowMap}>
+            <View style={styles.orderInfoHeaderFlag}/>
+          </If>
+          <View style={styles.orderInfoHeaderStatus}>
+            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+          </View>
+          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
+          {this.renderOrderInfoHeaderButton()}
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -880,7 +894,7 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <Image
-              source={{url: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
+              source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
               style={styles.orderCardIcon}/>
             <View style={styles.orderCardInfo}>
               <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
@@ -920,7 +934,7 @@ class OrderInfoNew extends PureComponent {
                 this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
               }}>
                 <Image
-                  source={{url: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
+                  source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                   style={styles.productImage}
                 />
                 <View style={styles.productItem}>
@@ -1201,6 +1215,9 @@ class OrderInfoNew extends PureComponent {
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
         <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -1213,9 +1230,7 @@ class OrderInfoNew extends PureComponent {
           <If condition={isShowMap}>
             {this.renderMap()}
           </If>
-          <View  {...this._panResponder.panHandlers}>
-            {this.renderOrderInfo()}
-          </View>
+          {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}

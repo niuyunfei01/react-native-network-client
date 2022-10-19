@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import JbbModal from "./JbbModal";
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
 import {hideModal, showModal, ToastLong, ToastShort} from "../util/ToastUtils";
@@ -13,7 +12,7 @@ import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
 import native from "../util/native";
 
-const {width} = Dimensions.get("window")
+const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
   copyText: {
     fontSize: 12,
@@ -274,51 +273,74 @@ class deliveryStatusModal extends React.Component {
   render = () => {
     let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc} = this.state;
     return (
-      <JbbModal is_slide={false} visible={show_modal} onClose={this.closeModal} HighlightStyle={{padding: 0}}
-                modalStyle={{padding: 20}}>
-        <View style={styles.flexC}>
-          <View style={styles.QrTitle}>
-            <View style={styles.flexC}>
-              <View style={styles.flexR}>
-                <Text style={styles.f16}>{order_platform_desc} </Text>
-                <Text style={styles.f14}>#{platform_dayId} </Text>
-              </View>
-              <View style={[styles.flexR, {marginTop: 5}]}>
-                {/*<Text style={styles.f12}>预计送达时间 </Text>*/}
-                <Text style={styles.expectTime}>{expect_time_desc} </Text>
-              </View>
-            </View>
-            <Entypo onPress={this.closeModal} name="cross" style={styles.QrClose}/>
-          </View>
 
-          <ScrollView style={{maxHeight: 350}}>
-            <For index='index' each='info' of={delivery_list}>
-              <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
+      <Modal hardwareAccelerated={true}
+             onRequestClose={this.closeModal}
+             maskClosable transparent={true}
+             animationType="fade"
+             visible={show_modal}>
+        <TouchableOpacity onPress={this.closeModal} style={[{
+          backgroundColor: 'rgba(0,0,0,0.25)',
+          flex: 1
+        }]}>
+          <View style={{flexGrow: 1}}/>
+          <TouchableHighlight style={[{
+            backgroundColor: colors.white,
+            maxHeight: height * 0.8,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            padding: 20,
+          }]}>
+            <View style={styles.flexC}>
+
+              <View style={styles.QrTitle}>
                 <View style={styles.flexC}>
                   <View style={styles.flexR}>
-                    <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
-                    <Text style={styles.f14}>第<Text style={styles.orderNum}>{info?.call_rank} </Text>次下单 </Text>
+                    <Text style={styles.f16}>{order_platform_desc} </Text>
+                    <Text style={styles.f14}>#{platform_dayId} </Text>
                   </View>
-                  <View style={[styles.flexR, {marginTop: 10}]}>
-                    <Text style={[styles.f12, {marginRight: 10}]}>状态： </Text>
-                    <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_status} </Text>
-                    <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_time} </Text>
-                    <Text style={styles.f12}>{info?.fee}元 </Text>
+                  <View style={[styles.flexR, {marginTop: 5}]}>
+                    {/*<Text style={styles.f12}>预计送达时间 </Text>*/}
+                    <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-                {info?.default_show ?
-                  <Entypo name='chevron-thin-up' style={styles.IconShow}/> :
-                  <Entypo name='chevron-thin-down' style={styles.IconShow}/>
-                }
-              </TouchableOpacity>
-              <If condition={info?.default_show}>
-                {this.renderDeliveryStatus(info)}
-              </If>
-            </For>
-          </ScrollView>
-          {this.renderButton()}
-        </View>
-      </JbbModal>
+                <Entypo onPress={this.closeModal} name="cross" style={styles.QrClose}/>
+              </View>
+
+              <ScrollView overScrollMode="always"
+                          automaticallyAdjustContentInsets={false}
+                          showsHorizontalScrollIndicator={false}
+                          showsVerticalScrollIndicator={false} style={{maxHeight: 350}}>
+                <For index='index' each='info' of={delivery_list}>
+                  <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
+                    <View style={styles.flexC}>
+                      <View style={styles.flexR}>
+                        <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
+                        <Text style={styles.f14}>第<Text style={styles.orderNum}>{info?.call_rank} </Text>次下单 </Text>
+                      </View>
+                      <View style={[styles.flexR, {marginTop: 10}]}>
+                        <Text style={[styles.f12, {marginRight: 10}]}>状态： </Text>
+                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_status} </Text>
+                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_time} </Text>
+                        <Text style={styles.f12}>{info?.fee}元 </Text>
+                      </View>
+                    </View>
+                    {info?.default_show ?
+                      <Entypo name='chevron-thin-up' style={styles.IconShow}/> :
+                      <Entypo name='chevron-thin-down' style={styles.IconShow}/>
+                    }
+                  </TouchableOpacity>
+                  <If condition={info?.default_show}>
+                    {this.renderDeliveryStatus(info)}
+                  </If>
+                </For>
+              </ScrollView>
+              {this.renderButton()}
+            </View>
+
+          </TouchableHighlight>
+        </TouchableOpacity>
+      </Modal>
     )
   }
 

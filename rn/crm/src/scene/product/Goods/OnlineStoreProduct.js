@@ -107,7 +107,11 @@ class OnlineStoreProduct extends Component {
             <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
           </View>
           <If condition={tool.length(this.state.trade_products) > 0}>
-            <ScrollView style={styles.scroll_view}>
+            <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              style={styles.scroll_view}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}

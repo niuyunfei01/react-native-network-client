@@ -597,7 +597,11 @@ class NewRetailPriceScene extends React.PureComponent {
   render() {
     return (
       <>
-        <ScrollView style={styles.pageWrap}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.pageWrap}>
           {this.getHeader()}
           {this.getPlatformPrice()}
           {this.getSinglePrice()}

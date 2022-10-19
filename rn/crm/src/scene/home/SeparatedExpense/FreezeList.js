@@ -56,7 +56,11 @@ class SeparatedExpenseInfo extends PureComponent {
   render() {
     const {list} = this.state;
     return (
-      <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
                 return (
