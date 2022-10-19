@@ -583,7 +583,7 @@ class OrderListScene extends Component {
         {this.renderStatusTabs()}
         {this.renderContent(ListData)}
         {this.renderSortModal()}
-        <HotUpdateComponent/>
+        <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
         <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
                      currStoreId={currStoreId}/>
         <GoodsListModal

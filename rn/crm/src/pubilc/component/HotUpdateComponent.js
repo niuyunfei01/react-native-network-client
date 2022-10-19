@@ -13,6 +13,7 @@ import {SvgXml} from "react-native-svg";
 import {hotUpdateHeader} from "../../svg/svg";
 import tool from "../util/tool";
 import DeviceInfo from "react-native-device-info";
+import PropTypes from "prop-types";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -154,6 +155,12 @@ export default class HotUpdateComponent extends PureComponent {
     errorMsg: ''
   }
 
+  static propTypes = {
+    currStoreId: PropTypes.string,
+    accessToken: PropTypes.string,
+  }
+
+
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
@@ -165,8 +172,16 @@ export default class HotUpdateComponent extends PureComponent {
 
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
-    const version = Cts.BUNDLE_VERSION;
-    const params = {platform: platform, version: version, version_code: DeviceInfo.getBuildNumber()}
+    let {accessToken, currStoreId} = this.props;
+    const version  = Cts.BUNDLE_VERSION;
+    const params = {
+      store_id: currStoreId,
+      accessToken: accessToken,
+      platform: platform,
+      version: version,
+      hot_update_num: version,
+      version_code: DeviceInfo.getBuildNumber()
+    }
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})
