@@ -171,6 +171,7 @@ class OrderInfoNew extends PureComponent {
       {
         toValue: map_height,                        // 透明度最终变为1，即完全不透明
         duration: 400,                   // 让动画持续一段时间
+        useNativeDriver: false
       }
     ).start();
   }
@@ -709,7 +710,9 @@ class OrderInfoNew extends PureComponent {
       store_loc_lng,
       ship_worker_lat,
       ship_worker_lng,
-      dada_distance
+      dada_distance,
+      ship_distance_destination,
+      ship_distance_store
     } = this.state.order;
     let {map_height} = this.state;
     return (
@@ -742,6 +745,22 @@ class OrderInfoNew extends PureComponent {
               onPress={() => alert("onPress")}
             >
               <View style={{alignItems: 'center'}}>
+                <View style={styles.mapBox}>
+                  <If condition={ship_distance_destination > 0}>
+                    <Text style={{
+                      color: colors.color333,
+                      fontSize: 12,
+                    }}>骑手距离顾客{numeral(ship_distance_destination / 1000).format('0.00')}公里 </Text>
+                  </If>
+                  <If condition={ship_distance_store > 0}>
+                    <Text style={{
+                      color: colors.color333,
+                      fontSize: 12,
+                    }}>骑手距离商家{numeral(ship_distance_store / 1000).format('0.00')}公里 </Text>
+                  </If>
+                </View>
+                <Entypo name={'triangle-down'}
+                        style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
                   width: 30,
                   height: 34,
@@ -760,7 +779,7 @@ class OrderInfoNew extends PureComponent {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 12,
-                }}>距门店{numeral(dada_distance / 100).format('0.00')}公里 </Text>
+                }}>距门店{numeral(dada_distance / 1000).format('0.00')}公里 </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
@@ -894,7 +913,7 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <Image
-              source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E7%BE%8E%E5%9B%A2%E5%A4%96%E5%8D%96%403x.png'}}
+              source={{uri: order?.platform_icon}}
               style={styles.orderCardIcon}/>
             <View style={styles.orderCardInfo}>
               <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
@@ -1019,17 +1038,21 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送门店 </Text>
             <Text style={styles.remarkValue}>{order?.show_store_name} </Text>
           </View>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>下单时间 </Text>
-            <Text style={styles.remarkValue}>{order?.orderTime} </Text>
-          </View>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>物品信息 </Text>
-            <Text style={styles.remarkValue}>蛋糕 /200元/3千克 </Text>
-          </View>
+          <If condition={order?.ship_create_time !== ''}>
+            <View style={styles.productItemRow}>
+              <Text style={styles.remarkLabel}>下单时间 </Text>
+              <Text style={styles.remarkValue}>{order?.ship_create_time} </Text>
+            </View>
+          </If>
+          <If condition={order?.ship_goods_info !== ''}>
+            <View style={styles.productItemRow}>
+              <Text style={styles.remarkLabel}>物品信息 </Text>
+              <Text style={styles.remarkValue}>{order?.ship_goods_info} </Text>
+            </View>
+          </If>
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>配送方式 </Text>
-            <Text style={styles.remarkValue}>自配送/美团跑腿 </Text>
+            <Text style={styles.remarkValue}>{order?.ship_type_desc} </Text>
           </View>
           <If condition={order?.ship_worker_name !== ''}>
             <View style={styles.productItemRow}>
@@ -1048,7 +1071,7 @@ class OrderInfoNew extends PureComponent {
           </If>
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>配送费用 </Text>
-            <Text style={styles.remarkValue}>{numeral(order?.deliver_fee / 100).format('0.00')}元 </Text>
+            <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元 </Text>
           </View>
           <View style={styles.cuttingLine1}/>
           <If condition={tool.length(order.greeting) > 0}>
@@ -1356,7 +1379,7 @@ const styles = StyleSheet.create({
   orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
-    width: width * 0.94,
+    width: width * 0.90,
     backgroundColor: colors.white,
     padding: 12
   },

@@ -481,7 +481,7 @@ class Mine extends PureComponent {
             外送帮账户余额 (元)
           </Text>
           <Text style={styles.walletValue}>
-            {balanceInfo?.disabled_view_bill ? balanceInfo?.balance : `*****`}
+            {balanceInfo?.disable_view_bill ? balanceInfo?.balance : `*****`}
           </Text>
         </View>
         <Button title={'立即充值'}
