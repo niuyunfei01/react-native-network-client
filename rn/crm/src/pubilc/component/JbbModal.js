@@ -41,15 +41,14 @@ class JbbModal extends PureComponent {
           </If>
           <TouchableHighlight style={[{
             backgroundColor: colors.white,
-            borderRadius: pxToDp(30),
             maxHeight: height * 0.8
           }, this.props.modal_type && this.props.modal_type === 'center' ? {
+            borderRadius: 15,
             width: '88%',
           } : {
-            borderTopLeftRadius: pxToDp(30),
-            borderTopRightRadius: pxToDp(30),
-            padding: pxToDp(30),
-            paddingBottom: pxToDp(50)
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            paddingBottom: 20,
           }, this.props.HighlightStyle]}>
             {this.props.is_slide !== undefined && !this.props.is_slide ?
               <View style={[{

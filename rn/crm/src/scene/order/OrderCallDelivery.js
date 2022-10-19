@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -860,7 +861,7 @@ class OrderCallDelivery extends Component {
       minPrice,
       wayNums
     } = this.state;
-    let iron_width =  width * 0.9 / 6;
+    let iron_width = width * 0.9 / 6;
     return (
       <View style={{paddingHorizontal: 10, paddingBottom: 10, backgroundColor: colors.white}}>
         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 12}}>
@@ -1090,7 +1091,8 @@ class OrderCallDelivery extends Component {
                     marginTop: 20,
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
-                    length: 48,
+                    marginHorizontal: 10,
+                    length: 42,
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>
@@ -1184,7 +1186,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1204,7 +1207,7 @@ class OrderCallDelivery extends Component {
     return (
       <JbbModal visible={show_goods_price_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
-                modal_type={'center'}>
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1229,6 +1232,7 @@ class OrderCallDelivery extends Component {
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
+                  height: 36,
                   borderColor: Number(info.value) === order_money_input_value ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
                   color: Number(info.value) === order_money_input_value ? colors.main_color : colors.color333,
@@ -1253,7 +1257,8 @@ class OrderCallDelivery extends Component {
                 keyboardType={'numeric'}
                 style={{
                   fontSize: 14,
-                  width: width * 0.53,
+                  height: 36,
+                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
                   borderWidth: 0.5,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
@@ -1276,7 +1281,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1288,7 +1294,8 @@ class OrderCallDelivery extends Component {
   renderRemarkModal = () => {
     let {show_remark_modal, remark_input_value} = this.state;
     return (
-      <JbbModal visible={show_remark_modal} onClose={this.closeModal} modal_type={'center'}>
+      <JbbModal visible={show_remark_modal} onClose={this.closeModal}
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1331,7 +1338,8 @@ class OrderCallDelivery extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -1552,7 +1560,7 @@ class OrderCallDelivery extends Component {
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
                     marginHorizontal: 10,
-                    length: 48,
+                    length: 42,
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>

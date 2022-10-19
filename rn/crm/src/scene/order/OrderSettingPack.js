@@ -1,6 +1,16 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {Alert, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Dimensions,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -796,7 +806,8 @@ class OrderSettingScene extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -815,7 +826,7 @@ class OrderSettingScene extends Component {
     return (
       <JbbModal visible={showGoodsPriceModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
-                modal_type={'center'}>
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -865,7 +876,7 @@ class OrderSettingScene extends Component {
                 keyboardType={'numeric'}
                 style={{
                   fontSize: 14,
-                  width: width * 0.52,
+                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
                   height: 36,
                   borderWidth: 0.5,
                   color: colors.color333,
@@ -884,7 +895,8 @@ class OrderSettingScene extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
@@ -898,7 +910,7 @@ class OrderSettingScene extends Component {
     return (
       <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
-                modal_type={'center'}>
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1175,7 +1187,7 @@ class OrderSettingScene extends Component {
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
                     marginHorizontal: 10,
-                    length: 48,
+                    length: 42,
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>
@@ -1186,7 +1198,8 @@ class OrderSettingScene extends Component {
   renderContentModal = () => {
     let {showContentModal, remark} = this.state;
     return (
-      <JbbModal visible={showContentModal} onClose={this.closeModal} modal_type={'center'}>
+      <JbbModal visible={showContentModal} onClose={this.closeModal}
+                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1224,7 +1237,8 @@ class OrderSettingScene extends Component {
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
-                      length: 48,
+                      marginHorizontal: 10,
+                      length: 42,
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
