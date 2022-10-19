@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   itemGoodsExitsWrap: {height: 100, borderRadius: 4, flexDirection: 'row', alignItems: 'center'},
   itemImage: {width: 80, height: 80, margin: 10},
   itemTitle: {fontSize: 14, fontWeight: 'bold', color: colors.color333, width: width - 120, paddingTop: 10},
-  itemCategoryName: {fontSize: 12, color: colors.color666},
+  itemCategoryName: {fontSize: 12, color: colors.color666, width: width - 120},
   itemGoodsExistFlagWrap: {backgroundColor: '#FFB454', borderRadius: 2, position: 'absolute', top: 4, right: 6},
   itemGoodsExistFlagText: {fontSize: 10, color: colors.white, paddingVertical: 1, paddingHorizontal: 4},
   bottomWrap: {
@@ -70,7 +70,10 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
   }
 
   onChangeText = (value) => {
-    this.setState({searchKeywords: value}, () => setTimeout(() => this.search(), 500))
+    this.setState({searchKeywords: value}, () => setTimeout(() => {
+      this.search()
+      Keyboard.dismiss()
+    }, 500))
   }
 
   getHeader() {
@@ -102,7 +105,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
             {name}
           </Text>
 
-          <Text style={styles.itemCategoryName}>
+          <Text style={styles.itemCategoryName} numberOfLines={2}>
             类目：{sg_tag_name_list}
           </Text>
           <Text style={styles.itemCategoryName}>
@@ -147,22 +150,32 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
         this.setState({
           goodsList: Number(res.page) === 1 ? res.lists : goodsList.concat(res.lists),
           page: res.page,
-          isLastPage: res.isLastPage
+          isLastPage: res.isLastPage,
+          isLoading: false
         })
-    }, () => hideModal())
-      .catch(() => hideModal())
-    Keyboard.dismiss()
+    }, () => {
+      this.setState({
+        isLoading: false
+      })
+      hideModal()
+    })
+      .catch(() => {
+        hideModal()
+        this.setState({
+          isLoading: false
+        })
+      })
+
   }
   onLoadMore = () => {
     let {page, isLastPage, isLoading, isCanLoadMore} = this.state
-    if (!isCanLoadMore)
-      return;
+
     if (isLastPage) {
       showError('没有更多商品')
       this.setState({isCanLoadMore: false})
       return
     }
-    if (isLoading)
+    if (!isCanLoadMore || isLoading)
       return;
     this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
   }

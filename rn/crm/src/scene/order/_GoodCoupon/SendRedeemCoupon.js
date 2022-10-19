@@ -1,6 +1,6 @@
 import BaseComponent from "../../common/BaseComponent";
 import React from "react";
-import {Dimensions, ScrollView, StyleSheet, Text, View} from "react-native";
+import {Alert, Dimensions, ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
@@ -11,7 +11,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
 import HttpUtils from "../../../pubilc/util/http";
-import {Button, DatePicker, InputItem, List, Modal, PickerView, Provider} from '@ant-design/react-native'
+import {Button, DatePicker, InputItem, List, PickerView, Provider} from '@ant-design/react-native'
 import dayjs from "dayjs";
 
 const Brief = List.Item.Brief;
@@ -96,18 +96,10 @@ class SendRedeemCoupon extends BaseComponent {
     if (preview.code) {
       HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_save?access_token=${accessToken}`, params).then(res => {
         self.setState({preview: res})
-        Modal.alert("成功提示", "发放优惠券成功", [{text: 'OK'}])
+        Alert.alert("成功提示", "发放优惠券成功", [{text: 'OK'}])
       }, resp => {
-        Modal.alert('错误提示', resp.reason, [
-          {
-            text: '取消',
-            onPress: () => console.log('cancel'),
-            style: 'cancel',
-          },
-          {text: 'OK', onPress: () => console.log('ok')},
-        ]);
+        Alert.alert('错误提示', resp.reason, [{text: '取消'}, {text: 'OK'}]);
       })
-    } else {
     }
   }
 
@@ -135,7 +127,6 @@ class SendRedeemCoupon extends BaseComponent {
         'type': 'select_for_store',
         'prod_status': [Cts.STORE_PROD_ON_SALE, Cts.STORE_PROD_SOLD_OUT],
       })
-    } else {
     }
   }
 
@@ -154,9 +145,12 @@ class SendRedeemCoupon extends BaseComponent {
             <List.Item
               arrow="horizontal"
               extra={self.state.selected_prod && (<View>
-                <Text style={{color: colors.color333}}>{self.state.selected_prod.name}  </Text>
-                <Brief
-                  style={{textAlign: 'right'}}>{(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
+                <Text style={{color: colors.color333}}>
+                  {self.state.selected_prod.name}
+                </Text>
+                <Brief style={{textAlign: 'right'}}>
+                  {(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}
+                </Brief>
               </View>)}
               onPress={() => this._on_prod_selection()}
               multipleLine
@@ -202,8 +196,7 @@ class SendRedeemCoupon extends BaseComponent {
 
           <If condition={this.state.preview.code}>
             <List renderHeader={() => '生成结果'}>
-              <List.Item disabled extra={this.state.preview.code} onPress={() => {
-              }}>
+              <List.Item disabled extra={this.state.preview.code}>
                 优惠码
               </List.Item>
               <List.Item>
@@ -214,14 +207,14 @@ class SendRedeemCoupon extends BaseComponent {
           </If>
 
           {!this.state.preview.sent_coupon_id &&
-          <View style={[styles.printBtnBox,]}>
-            <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
-                    disalbed={!this.state.preview.code}
-                    style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
-                    onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
-            <Button type={'ghost'} size="small" style={[styles.printBtn,]}
-                    onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
-          </View>
+            <View style={[styles.printBtnBox,]}>
+              <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
+                      disalbed={!this.state.preview.code}
+                      style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
+                      onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+              <Button type={'ghost'} size="small" style={[styles.printBtn,]}
+                      onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+            </View>
           }
         </ScrollView>
       </View>

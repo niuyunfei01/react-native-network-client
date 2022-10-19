@@ -43,11 +43,12 @@ class RemindModal extends React.Component {
         advicesInfoArray: res,
         showAdvicesVisible: true
       })
+    }, () => {
     })
 
-    let api = 'v4/wsbServerConfig/getServer?accessToken='+accessToken
+    let api = 'v4/wsbServerConfig/getServer?accessToken=' + accessToken
     let data = {
-      store_id:currStoreId,
+      store_id: currStoreId,
     }
     HttpUtils.post.bind(this.props)(api, data).then(res => {
       if(res?.host && res?.host !== GlobalUtil.getHostPort()){

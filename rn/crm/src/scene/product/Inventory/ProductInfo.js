@@ -22,7 +22,7 @@ import ModalSelector from "react-native-modal-selector";
 import SearchProduct from "../../../pubilc/component/SearchProduct";
 import JbbTimeRange from "../../common/component/JbbTimeRange";
 import _ from "lodash";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import JbbModal from "../../../pubilc/component/JbbModal";
@@ -293,7 +293,7 @@ class ProductInfo extends React.Component {
     this._baseRequest('/api_products/chg_sku_sale_days', {
       skuId: this.state.productInfo.sku.id,
       value
-    }, () => {this.setState({saleDayCyclePrompt: false})})
+    }, () => this.setState({saleDayCyclePrompt: false}))
   }
 
   onSaveProductSaleTime = (value) => {
@@ -410,28 +410,34 @@ class ProductInfo extends React.Component {
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.setState({stockCheckCyclePrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+          <TouchableOpacity onPress={() => this.setState({stockCheckCyclePrompt: true})}
+                            style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>盘点周期: </Text>
             <View style={styles.itemRow}>
-              <Text style={styles.row_right}>{productInfo?.sku?.stock_check_cycle > 0 ? `${productInfo?.sku?.stock_check_cycle}天` : '无'}</Text>
+              <Text
+                style={styles.row_right}>{productInfo?.sku?.stock_check_cycle > 0 ? `${productInfo?.sku?.stock_check_cycle}天` : '无'}</Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.setState({saleDayCyclePrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+          <TouchableOpacity onPress={() => this.setState({saleDayCyclePrompt: true})}
+                            style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>售卖天数: </Text>
             <View style={styles.itemRow}>
-              <Text style={styles.row_right}>{productInfo?.sku?.sale_days > 0 ? `${productInfo?.sku?.sale_days}天` : '不限'}</Text>
+              <Text
+                style={styles.row_right}>{productInfo?.sku?.sale_days > 0 ? `${productInfo?.sku?.sale_days}天` : '不限'}</Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.setState({riskMinStatVocPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+          <TouchableOpacity onPress={() => this.setState({riskMinStatVocPrompt: true})}
+                            style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>忙日最低库存: </Text>
             <View style={styles.itemRow}>
               <Text style={styles.row_right}>{productInfo?.risk_min_stat_voc}</Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.setState({riskMinStatPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+          <TouchableOpacity onPress={() => this.setState({riskMinStatPrompt: true})}
+                            style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>闲日最低库存: </Text>
             <View style={styles.itemRow}>
               <Text style={styles.row_right}>{productInfo?.risk_min_stat}</Text>
@@ -443,14 +449,16 @@ class ProductInfo extends React.Component {
               <Text style={styles.item_title}>品名(货号): </Text>
               <Text style={styles.row_right}>{productInfo?.sku.name}({this.state.productInfo?.sku?.id})</Text>
             </View>
-            <TouchableOpacity onPress={() => this.setState({tagCodePrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({tagCodePrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>秤签编号: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{productInfo?.sku?.material_code}</Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.setState({tagCodePrompt: true})} style={[styles.itemRow, {justifyContent: "space-between", paddingRight: 10}]}>
+            <TouchableOpacity onPress={() => this.setState({tagCodePrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between", paddingRight: 10}]}>
               <Text style={styles.item_title}>需要打包: </Text>
               <Switch onValueChange={(checked) => {
                 this.onChangeNeedPack(checked)
@@ -459,14 +467,16 @@ class ProductInfo extends React.Component {
             </TouchableOpacity>
           </If>
           <If condition={productInfo?.sku?.need_pack == 1}>
-            <TouchableOpacity onPress={() => this.setState({packScorePrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({packScorePrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>打包工分: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{productInfo?.product?.pre_pack_score}</Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.setState({packLossWarnPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({packLossWarnPrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>打包损耗预警: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{tool.toFixed(productInfo?.sku?.pack_loss_warn, 'percent')}</Text>
@@ -489,7 +499,8 @@ class ProductInfo extends React.Component {
             </ModalSelector>
           </If>
           <If condition={this.state.isStandard}>
-            <TouchableOpacity onPress={() => this.setState({upcPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({upcPrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>商品码: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{productInfo?.product.upc}</Text>
@@ -498,7 +509,8 @@ class ProductInfo extends React.Component {
             </TouchableOpacity>
           </If>
           <If condition={!_.isEmpty(this.state.referred_by)}>
-            <TouchableOpacity onPress={() => this.setState({referredPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({referredPrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>被关联商品数: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{Object.keys(this.state.referred_by).length}</Text>
@@ -511,7 +523,8 @@ class ProductInfo extends React.Component {
             cancelText={'取消'}
             data={this.state.skuFreshDegrees}
           >
-            <TouchableOpacity onPress={() => this.setState({refProdPrompt: true})} style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity onPress={() => this.setState({refProdPrompt: true})}
+                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>温区: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{productInfo?.sku?.fresh_degree_label}</Text>
@@ -574,11 +587,27 @@ class ProductInfo extends React.Component {
     )
   }
 
+  isValid(str) {
+    return '' === str || /[@|#|-|_|+|*]/.test(str) || /^[\w|\s]*$/.test(str);
+  }
+
+  filterShelfNo = (text) => {
+
+    if (this.isValid(text)) {
+      this.setState({shelf_no: text})
+      return
+    }
+    showError('输入有误，请重新输入', 1)
+  }
+
   renderModal = () => {
     return (
-      <JbbModal visible={this.state.showDeliveryModal} behavior={Platform.select({android: 'height', ios: 'padding'})} onClose={() => this.setState({showDeliveryModal: false})} modal_type={'center'}>
+      <JbbModal visible={this.state.showDeliveryModal}
+                onClose={() => this.setState({showDeliveryModal: false})} modal_type={'center'}>
         <KeyboardAwareScrollView enableAutomaticScroll={false}>
-          <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>请输入或扫描填入货架码</Text>
+          <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+            请输入或扫描填入货架码
+          </Text>
 
           <View style={styles.shlfOnModal}>
             <TextInput
@@ -586,8 +615,9 @@ class ProductInfo extends React.Component {
               style={[{marginLeft: 10, height: 40, flex: 1, borderWidth: 1, borderColor: colors.back_color}]}
               placeholderTextColor={"#7A7A7A"}
               value={this.state.shelf_no}
+              keyboardType={'email-address'}
               placeholder={'请扫描或输入货架码'}
-              onChangeText={text => this.setState({shelf_no: text})}
+              onChangeText={text => this.filterShelfNo(text)}
             />
             <Ionicons name={'scan-sharp'} style={styles.rightEmptyView} color={colors.color333} size={22}
                       onPress={() => this.startScan()}/>
