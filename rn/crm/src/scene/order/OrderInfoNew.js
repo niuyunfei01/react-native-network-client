@@ -162,6 +162,10 @@ class OrderInfoNew extends PureComponent {
   }
 
   setMapHeight = (map_height) => {
+    let {isShowMap} = this.state;
+    if (!isShowMap) {
+      return null;
+    }
     Animated.timing(                       // 随时间变化而执行动画
       this.state.map_height,            // 动画中的变量值
       {
@@ -698,7 +702,15 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderMap = () => {
-    let {loc_lat, loc_lng, store_loc_lat, store_loc_lng, ship_worker_lat, ship_worker_lng, dada_distance} = this.state.order;
+    let {
+      loc_lat,
+      loc_lng,
+      store_loc_lat,
+      store_loc_lng,
+      ship_worker_lat,
+      ship_worker_lng,
+      dada_distance
+    } = this.state.order;
     let {map_height} = this.state;
     return (
       <Animated.View style={{height: map_height}}>
@@ -775,18 +787,20 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
-                        onPress={() => this.deliveryModalFlag()}>
-        <If condition={isShowMap}>
-          <View style={styles.orderInfoHeaderFlag}/>
-        </If>
-        <View style={styles.orderInfoHeaderStatus}>
-          <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-          <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
-        </View>
-        <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
-        {this.renderOrderInfoHeaderButton()}
-      </TouchableOpacity>
+      <View {...this._panResponder.panHandlers} >
+        <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                          onPress={() => this.deliveryModalFlag()}>
+          <If condition={isShowMap}>
+            <View style={styles.orderInfoHeaderFlag}/>
+          </If>
+          <View style={styles.orderInfoHeaderStatus}>
+            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+          </View>
+          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
+          {this.renderOrderInfoHeaderButton()}
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -1216,9 +1230,7 @@ class OrderInfoNew extends PureComponent {
           <If condition={isShowMap}>
             {this.renderMap()}
           </If>
-          <View  {...this._panResponder.panHandlers}>
-            {this.renderOrderInfo()}
-          </View>
+          {this.renderOrderInfo()}
           {this.renderDeliveryInfo()}
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}
