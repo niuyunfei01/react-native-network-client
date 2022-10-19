@@ -76,6 +76,7 @@ import com.uiwjs.alipay.RNAlipayPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
+import com.henninghall.date_picker.DatePickerPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.linusu.RNGetRandomValuesPackage;
@@ -328,6 +329,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new WeChatPackage(),
                     new RNCameraPackage(),
                     new RNSoundPackage(),
+                    new DatePickerPackage(),
                     new QiniuPackage(),
                     new UpgradePackage(),
                     new RNGetRandomValuesPackage(),
