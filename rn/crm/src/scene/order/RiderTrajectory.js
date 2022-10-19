@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {StyleSheet, Text, View} from 'react-native'
+import {Image, StyleSheet, Text, View} from 'react-native'
 import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker, Polyline} from "react-native-amap3d";
 import HttpUtils from "../../pubilc/util/http";
@@ -55,7 +55,7 @@ class RiderTrajectory extends Component {
       if (res.distance_store > 0 || res.distance_destination > 0) {
         msg = res.distance_store > 0 ? "距离门店地址：" + res.distance_store + "米" : "距离收货地址：" + res.distance_destination + "米"
       }
-      let zoom = res.distance_order > 0 && res.distance_order > 3000 ? 13 : 14;
+      let zoom = res.distance_order > 0 && res.distance_order > 2000 ? 13 : 14;
       let list = [];
       let item = {};
       tool.objectMap(res.track_list, (itm, idx) => {
@@ -113,46 +113,44 @@ class RiderTrajectory extends Component {
 
         <If condition={track_horseman_lat && track_horseman_lng}>
           <Marker
-            zIndex={90}
+            zIndex={99}
             position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
-            icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/RiderTrajectory/peisong.png",
-              width: 50,
-              height: 30,
-            }}
-          />
-          <If condition={msg !== ''}>
-            <Marker
-              position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
-            >
-              <View style={{alignItems: 'center',}}>
-                <View style={{
-                  zIndex: 90,
-                  backgroundColor: colors.main_color,
-                  marginBottom: 50,
-                  padding: 8,
-                  borderRadius: 6,
-                }}>
-                  <Text style={{
-                    color: colors.white,
-                    fontSize: 18,
-                  }}>{msg} </Text>
-                </View>
-                <Entypo name={'triangle-down'}
-                        style={{color: colors.main_color, fontSize: 30, position: 'absolute', top: 24}}/>
-              </View>
-            </Marker>
-          </If>
+          >
+            <View style={{alignItems: 'center'}}>
 
+              <If condition={msg !== ''}>
+                <View style={{marginBottom: 30, alignItems: 'center'}}>
+                  <View style={{
+                    zIndex: 999,
+                    backgroundColor: colors.white,
+                    marginBottom: 15,
+                    padding: 8,
+                    borderRadius: 6,
+                  }}>
+                    <Text style={{
+                      color: colors.color333,
+                      fontSize: 12,
+                    }}>{msg} </Text>
+                  </View>
+                  <Entypo name={'triangle-down'}
+                          style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+                </View>
+              </If>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
+                width: 30,
+                height: 34,
+              }}/>
+            </View>
+          </Marker>
         </If>
         <If condition={track_store_lat && track_store_lng}>
           <Marker
             zIndex={91}
             position={{latitude: track_store_lat, longitude: track_store_lng}}
             icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/RiderTrajectory/store.png",
+              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png",
               width: 30,
-              height: 30,
+              height: 34,
             }}
           />
         </If>
@@ -162,9 +160,9 @@ class RiderTrajectory extends Component {
             // centerOffset={{x: 1, y: 1}}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
             icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/RiderTrajectory/local.png",
-              width: 30,
-              height: 30,
+              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
+              width: 22,
+              height: 42,
             }}
           />
         </If>
