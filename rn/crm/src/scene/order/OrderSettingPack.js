@@ -63,8 +63,9 @@ class OrderSettingScene extends Component {
       street_block: '',
       loc_lng: '',
       loc_lat: '',
-      weight: 1,
-      weight_min: 0,
+      weight: 0,
+      weight_input_value: 1,
+      weight_min: 1,
       weight_max: 20,
       goods_price: 0,
       goods_price_value: 0,
@@ -166,7 +167,6 @@ class OrderSettingScene extends Component {
         }, {'text': '不允许'}]);
       }
     });
-
   }
   onPress = (route, params = {}) => {
     this.props.navigation.navigate(route, params);
@@ -257,12 +257,12 @@ class OrderSettingScene extends Component {
       ToastShort('请先选择定位', 0);
       return this.goSelectAddress()
     }
-    if(Number(goods_price) <= 0){
-      return  ToastShort('请选择物品价值');
+    if (Number(goods_price) <= 0) {
+      return ToastShort('请选择物品价值');
     }
 
-    if(Number(weight) <= 0){
-      return  ToastShort('请选择物品重量');
+    if (Number(weight) <= 0) {
+      return ToastShort('请选择物品重量');
     }
 
     if (isSaveToBook) {
@@ -318,6 +318,7 @@ class OrderSettingScene extends Component {
       loc_lng: '',
       loc_lat: '',
       weight: 0,
+      weight_input_value: 1,
       goods_price: 0,
       smartText: '',
     })
@@ -513,7 +514,12 @@ class OrderSettingScene extends Component {
           <TextInput placeholder="分机号(选填)"
                      maxLength={4}
                      underlineColorAndroid="transparent"
-                     style={{width: 77, fontSize: 14, color: colors.color333}}
+                     style={{
+                       width: 90,
+                       fontSize: 14,
+                       color: colors.color333,
+                       textAlign: 'right',
+                     }}
                      placeholderTextColor={colors.color666}
                      keyboardType={'numeric'}
                      value={mobile_suffix}
@@ -546,7 +552,7 @@ class OrderSettingScene extends Component {
               : "智能地址识别"}
             placeholderTextColor={colors.color999}
             onChange={value => {
-              this.setState({smartText: value});
+              this.setState({smartText: value, show_smart_input: tool.length(value) > 0});
             }}
             value={smartText}
             underlineColorAndroid={"transparent"}
@@ -554,17 +560,20 @@ class OrderSettingScene extends Component {
 
           <If condition={show_smart_input}>
             <Button title={'识别'}
-                    onPress={this.intelligentIdentification}
+                    onPress={() => this.intelligentIdentification()}
                     containerStyle={{
                       borderRadius: 5,
-                      width: 70,
                       position: 'absolute',
-                      top: 70, right: 5,
+                      top: 78,
+                      right: 5,
                     }}
                     buttonStyle={{
+                      padding: 0,
+                      paddingVertical: 2,
+                      paddingHorizontal: 12,
                       backgroundColor: colors.main_color,
                     }}
-                    titleStyle={{color: colors.white, fontSize: 12, lineHeight: 20}}/>
+                    titleStyle={{color: colors.white, fontSize: 12}}/>
 
           </If>
 
@@ -709,7 +718,7 @@ class OrderSettingScene extends Component {
   }
 
   renderWeightModal = () => {
-    let {showWeightModal, weight_min, weight_max, weight,} = this.state;
+    let {showWeightModal, weight_min, weight_max, weight_input_value} = this.state;
     return (
       <JbbModal visible={showWeightModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -730,13 +739,10 @@ class OrderSettingScene extends Component {
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View
-              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'space-between'}}>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
-                <Text style={{color: '#E32321', fontSize: 20}}>
-                  {weight}
-                </Text>
-                千克 </Text>
+              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
+              <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
+                {weight_input_value}kg
+              </Text>
             </View>
             <View style={{
               flexDirection: 'row',
@@ -752,7 +758,7 @@ class OrderSettingScene extends Component {
                   thumbTintColor={'red'}
                   minimumTrackTintColor={colors.main_color}
                   maximumTrackTintColor={colors.f5}
-                  value={weight}
+                  value={weight_input_value}
                   maximumValue={weight_max}
                   minimumValue={weight_min}
                   step={1}
@@ -764,7 +770,7 @@ class OrderSettingScene extends Component {
                     backgroundColor: colors.colorEEE
                   }}
                   onValueChange={(value) => {
-                    this.setState({weight: value})
+                    this.setState({weight_input_value: value})
                   }}
                 />
               </View>
@@ -782,7 +788,11 @@ class OrderSettingScene extends Component {
               <Text style={{fontSize: 14, color: colors.color999}}>请合理填写物品的实际重量</Text>
             </View>
             <Button title={'确 定'}
-                    onPress={this.closeModal}
+                    onPress={() => {
+                      this.setState({weight: weight_input_value}, () => {
+                        this.closeModal()
+                      })
+                    }}
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
                       borderRadius: 24,
@@ -835,6 +845,7 @@ class OrderSettingScene extends Component {
                   color: Number(info.value) === goods_price ? colors.main_color : colors.color333,
                   backgroundColor: Number(info.value) === goods_price ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
+                  height: 36,
                   textAlign: 'center',
                   paddingVertical: 8,
                   marginVertical: 5
@@ -854,7 +865,8 @@ class OrderSettingScene extends Component {
                 keyboardType={'numeric'}
                 style={{
                   fontSize: 14,
-                  width: width * 0.53,
+                  width: width * 0.52,
+                  height: 36,
                   borderWidth: 0.5,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
@@ -904,7 +916,10 @@ class OrderSettingScene extends Component {
             <View style={{paddingHorizontal: 20, paddingBottom: 20}}>
               <View style={{flexDirection: "row", alignItems: 'center'}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>地址： </Text>
-                <Text style={{color: colors.color333, fontSize: 14}}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
+                <Text style={{
+                  color: colors.color333,
+                  fontSize: 14
+                }}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

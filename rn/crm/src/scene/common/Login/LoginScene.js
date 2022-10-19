@@ -246,6 +246,7 @@ class LoginScene extends PureComponent {
               maxLength={11}
               value={mobile}
               placeholderTextColor={colors.color999}
+              keyboardType={'numeric'}
               style={{
                 fontSize: 16,
                 flex: 1,

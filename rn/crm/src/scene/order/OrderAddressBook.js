@@ -175,6 +175,10 @@ class OrderAddressBook extends Component {
             onChangeText={(searchKeywords) => {
               this.setState({
                 searchKeywords
+              }, () => {
+                tool.debounces(() => {
+                  this.fetchAddressBook()
+                })
               })
             }}
             onCancel={this.onCancel}
