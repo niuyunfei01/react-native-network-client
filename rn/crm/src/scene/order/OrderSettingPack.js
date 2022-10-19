@@ -1081,50 +1081,6 @@ class OrderSettingScene extends Component {
 const styles = StyleSheet.create({
   container: {flex: 1},
   locationIcon: {fontSize: 16, fontWeight: "bold", color: colors.color666},
-  datePicker: {
-    backgroundColor: colors.colorEEE,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10
-  },
-  datePickerActive: {
-    backgroundColor: colors.white,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10
-  },
-  dateTextActive: {color: colors.main_color, fontWeight: "bold"},
-  dateText: {color: colors.color111, fontWeight: "bold"},
-  datePickerHead: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.colorEEE,
-    paddingBottom: 15
-  },
-  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.color111},
-  sureBtn: {fontSize: pxToDp(32), color: colors.main_color},
-  dateMsg: {fontWeight: "bold", fontSize: pxToDp(22), color: '#DA0000', marginVertical: 10},
-  datePickerItem: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 5},
-  datePickerItemActive: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 5,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 5
-  },
-  datePickerIcon: {
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    backgroundColor: colors.main_color,
-    justifyContent: "center",
-    alignItems: 'center',
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderSettingScene);
