@@ -59,7 +59,6 @@ class StoreGoodsList extends Component {
     this.state = {
       goods: [],
       page: 1,
-      priceType: 0,//0-报价模式，1-零售价模式
       statusList: [
         {label: '全部 0', value: 'all'},
         {label: '上架 0', value: 'in_stock'},
@@ -67,6 +66,7 @@ class StoreGoodsList extends Component {
         {label: '最近上新 0', value: 'new_arrivals'},
 
       ],
+      showStatusList: [],
       showMoreGoodsStatus: false,
       pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
       categories: [],
@@ -157,7 +157,8 @@ class StoreGoodsList extends Component {
           {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
         ]
       this.setState({
-        statusList: [...newStatusList],
+        statusList: newStatusList,
+        showStatusList: newStatusList.length > 4 ? newStatusList.slice(0, 4) : newStatusList,
         selectedStatus: newStatusList[0],
         all_amount: res.all_amount,
         all_count: res.all_count,
@@ -239,12 +240,11 @@ class StoreGoodsList extends Component {
         return
       }
       const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
-      const priceType = goodList[0] && goodList[0].price_type || 0
+
       this.setState({
         goods: goodList,
         isLastPage: res.isLastPage,
-        isLoading: false,
-        priceType: priceType
+        isLoading: false
       })
     }, (res) => {
       ToastLong(res.reason)
@@ -516,20 +516,30 @@ class StoreGoodsList extends Component {
     return {length: pxToDp(242), offset: pxToDp(242) * index, index}
   }
 
-  selectGoodsStatus = (item) => {
+  selectGoodsStatus = (item, index) => {
+    const {statusList} = this.state
+    if (index > 3) {
+
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(3)})
+      this.onSelectStatus()
+      return
+    }
+    if (index <= 3) {
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(0, 4)})
+      this.onSelectStatus()
+      return;
+    }
     this.setState({selectedStatus: item})
     this.onSelectStatus()
   }
 
   renderGoodsStatus = () => {
-    const {statusList, selectedStatus, showMoreGoodsStatus} = this.state
+    const {statusList, showStatusList, selectedStatus, showMoreGoodsStatus} = this.state
     return (
       <>
         <View style={styles.headerGoodsStatusWrap}>
           {
-            statusList.map((item, index) => {
-              if (index > 3)
-                return
+            showStatusList.map((item, index) => {
               const isSelect = selectedStatus.value === item.value
               return (
                 <View key={index} style={isSelect ? styles.selectGoodsStatusWrap : styles.goodsStatusWrap}>
@@ -556,7 +566,7 @@ class StoreGoodsList extends Component {
                 return (
                   <TouchableOpacity key={index}
                                     style={isSelect ? styles.selectShowMoreGoodsStatusWrap : styles.showMoreGoodsStatusWrap}
-                                    onPress={() => this.selectGoodsStatus(item)}>
+                                    onPress={() => this.selectGoodsStatus(item, index)}>
                     <Text style={isSelect ? styles.selectShowMoreGoodsStatusText : styles.showMoreGoodsStatusText}>
                       {item.label}
                     </Text>
@@ -572,9 +582,8 @@ class StoreGoodsList extends Component {
 
   jumpToGoodsEdit = (upcCode = '') => {
     let {navigation} = this.props;
-    let {priceType} = this.state
     this.mixpanel.track('商品页面_上新')
-    navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add', priceType: priceType, upcCode: upcCode})
+    navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add', upcCode: upcCode})
   }
 
   jumpToSearchGoodsList = (value) => {
@@ -629,7 +638,8 @@ class StoreGoodsList extends Component {
     )
   }
 
-  opBar = (onSale, onStrict, item) => {
+  opBar = (onSale, onStrict, item, price_type) => {
+
     if ('' === item.coverimg) {
       return (
         <View style={[styles.row_center]}>
@@ -640,6 +650,7 @@ class StoreGoodsList extends Component {
         </View>
       )
     }
+
     return (
       <View style={[styles.row_center]}>
         <If condition={onSale}>
@@ -653,13 +664,13 @@ class StoreGoodsList extends Component {
           </TouchableOpacity>
         </If>
         <If condition={onStrict}>
-          <If condition={item?.price_type === 1}>
+          <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
               <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
             </TouchableOpacity>
           </If>
-          <If condition={item?.price_type === 0 || item?.price_type === undefined}>
+          <If condition={!price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
               <Text style={styles.goodsOperationBtn}>报价/库存 </Text>
@@ -667,13 +678,13 @@ class StoreGoodsList extends Component {
           </If>
         </If>
         <If condition={!onStrict}>
-          <If condition={item?.price_type === 1}>
+          <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
               <Text style={styles.goodsOperationBtn}>价格 </Text>
             </TouchableOpacity>
           </If>
-          <If condition={item?.price_type === 0}>
+          <If condition={!price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('set_price', item)}>
               <Text style={styles.goodsOperationBtn}>报价 </Text>
             </TouchableOpacity>
@@ -693,14 +704,15 @@ class StoreGoodsList extends Component {
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
   renderItem = (order) => {
+    const {price_type} = this.props.global.vendor_info
     let {item} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={item.id}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    price_type={item.price_type || 0}
-                    opBar={this.opBar(onSale, onStrict, item)}
+                    price_type={price_type}
+                    opBar={this.opBar(onSale, onStrict, item, price_type)}
       />
     );
   }

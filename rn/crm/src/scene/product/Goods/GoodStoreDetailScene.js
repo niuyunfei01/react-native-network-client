@@ -208,14 +208,14 @@ class GoodStoreDetailScene extends PureComponent {
 
   getStoreProdWithProd = () => {
     this.getproduct()
+    const {product_id, store_id} = this.state
     const {accessToken} = this.props.global;
-    const storeId = this.state.store_id || 0;
-    const pid = this.state.product_id || 0;
+    global.product_id = product_id
     const {params} = this.props.route
-    const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
+    const url = `/api_products/get_prod_with_store_detail/${store_id}/${product_id}?access_token=${accessToken}`;
     //showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      const product = pid === 0 ? params.item : data.p
+      const product = product_id === 0 ? params.item : data.p
       const spec = {...product, ...data.sp}
       const retail_price_enabled = data.vendor?.retail_price_enabled ? data.vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
@@ -242,7 +242,7 @@ class GoodStoreDetailScene extends PureComponent {
       selectedSpecArray.sort((a, b) => {
         return a.label > b.label ? 1 : -1
       })
-      if (pid === 0) {
+      if (product_id === 0) {
         this.setState({
           ext_stores: data.ext_stores,
           product: params.item,

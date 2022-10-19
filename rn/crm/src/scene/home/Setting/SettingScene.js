@@ -268,11 +268,7 @@ class SettingScene extends PureComponent {
       <View style={styles.item_body}>
         <Text style={styles.item_title}>提醒 </Text>
 
-        <View style={{
-          backgroundColor: colors.white,
-          borderRadius: 8,
-          paddingHorizontal: 12,
-        }}>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
           <If condition={Platform.OS !== 'ios'}>
             <TouchableOpacity onPress={() => {
               let val = !enable_new_order_notify;
@@ -380,11 +376,7 @@ class SettingScene extends PureComponent {
       <View>
         <View style={styles.item_body}>
           <Text style={styles.item_title}>备注 </Text>
-          <View style={{
-            backgroundColor: colors.white,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-          }}>
+          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
 
             <TouchableOpacity onPress={() => {
               let val = !show_remark_to_rider
@@ -395,9 +387,8 @@ class SettingScene extends PureComponent {
                 <Text style={styles.row_label}>展示订单备注 </Text>
                 <Text style={styles.row_label_desc}>开启后骑手端可见客户下单备注 </Text>
               </View>
-              <Switch onValueChange={(val) => {
-                this.setConfig('show_remark_to_rider', val)
-              }} color={colors.main_color}
+              <Switch onValueChange={(val) => this.setConfig('show_remark_to_rider', val)}
+                      color={colors.main_color}
                       value={show_remark_to_rider}
               />
             </TouchableOpacity>
@@ -413,14 +404,8 @@ class SettingScene extends PureComponent {
       <View>
         <View style={styles.item_body}>
           <Text style={styles.item_title}>小票设置 </Text>
-          <View style={{
-            backgroundColor: colors.white,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-          }}>
-            <TouchableOpacity onPress={() => {
-              this.setConfig('invoice_serial_font', 0)
-            }}
+          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+            <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 0)}
                               style={{
                                 borderBottomWidth: 1,
                                 borderColor: colors.colorEEE,
@@ -429,38 +414,19 @@ class SettingScene extends PureComponent {
                                 paddingHorizontal: 8,
                                 height: pxToDp(90),
                               }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>使用平台店名与平台单号 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>
+                使用平台店名与平台单号
+              </Text>
               <If condition={invoice_serial_font === 0}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
+                <Entypo name={'check'} size={22} color={colors.main_color}/>
               </If>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {
-              this.setConfig('invoice_serial_font', 1)
-            }}
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>使用商家名称与总单号 </Text>
+            <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 1)}
+                              style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: pxToDp(90)}}>
+              <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>使用商家名称与总单号 </Text>
               <If condition={invoice_serial_font === 1}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
+                <Entypo name={'check'} size={22} color={colors.main_color}/>
               </If>
             </TouchableOpacity>
           </View>
@@ -478,20 +444,16 @@ class SettingScene extends PureComponent {
         <View style={styles.item_body}>
           <Text style={styles.item_title}>商品 </Text>
 
-          <View style={{
-            backgroundColor: colors.white,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-          }}>
+          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
             <TouchableOpacity onPress={() => {
               let val = !hide_good_titles_to_shipper;
               this.setConfig('hide_good_titles_to_shipper', val)
             }}
                               style={styles.item_row}>
               <Text style={styles.row_label}>隐藏商品敏感信息 </Text>
-              <Switch onValueChange={(val) => {
-                this.setConfig('hide_good_titles_to_shipper', val)
-              }} color={colors.main_color} value={hide_good_titles_to_shipper}
+              <Switch onValueChange={(val) => this.setConfig('hide_good_titles_to_shipper', val)}
+                      color={colors.main_color}
+                      value={hide_good_titles_to_shipper}
               />
             </TouchableOpacity>
 
@@ -502,9 +464,9 @@ class SettingScene extends PureComponent {
               }}
                                 style={styles.item_row}>
                 <Text style={styles.row_label}>按照商品实际重量上传 </Text>
-                <Switch onValueChange={(val) => {
-                  this.setConfig('use_real_weight', val)
-                }} color={colors.main_color} value={use_real_weight}
+                <Switch onValueChange={(val) => this.setConfig('use_real_weight', val)}
+                        color={colors.main_color}
+                        value={use_real_weight}
                 />
               </TouchableOpacity>
             </If>
@@ -519,9 +481,8 @@ class SettingScene extends PureComponent {
                 <Text style={styles.row_label}>订单列表页展示商品 </Text>
                 <Text style={styles.row_label_desc}>开启后，订单列表页可见商品信息 </Text>
               </View>
-              <Switch onValueChange={(val) => {
-                this.setConfig('order_list_show_product', val)
-              }} color={colors.main_color}
+              <Switch onValueChange={(val) => this.setConfig('order_list_show_product', val)}
+                      color={colors.main_color}
                       value={order_list_show_product}
               />
             </TouchableOpacity>
@@ -535,15 +496,10 @@ class SettingScene extends PureComponent {
   renderMarket = () => {
     let {show_bd, bd_mobile} = this.state
     if (!show_bd) {
-      return null;
+      return;
     }
     return (
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginBottom: 10,
-        paddingHorizontal: 12,
-      }}>
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, paddingHorizontal: 12}}>
         <TouchableOpacity onPress={() => {
           if (!bd_mobile) {
             this.setState({
@@ -569,11 +525,7 @@ class SettingScene extends PureComponent {
 
       <View style={styles.item_body}>
         <Text style={styles.item_title}>选择服务器 </Text>
-        <View style={{
-          backgroundColor: colors.white,
-          borderRadius: 8,
-          paddingHorizontal: 12,
-        }}>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
           <For index='idx' each='item' of={servers}>
             <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
               <Text style={styles.row_label}>{item.name}resp, msg </Text>
@@ -592,15 +544,8 @@ class SettingScene extends PureComponent {
 
   renderPrivacyPolicy = () => {
     return (
-      <View style={{
-        backgroundColor: colors.white,
-        borderRadius: 8,
-        marginBottom: 10,
-        paddingHorizontal: 12,
-      }}>
-        <TouchableOpacity onPress={() => {
-          this.onReadProtocol()
-        }}
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, paddingHorizontal: 12}}>
+        <TouchableOpacity onPress={ this.onReadProtocol}
                           style={styles.item_row}>
           <Text style={styles.row_label}>外送帮隐私政策 </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
