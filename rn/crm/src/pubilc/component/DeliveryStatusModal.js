@@ -225,7 +225,7 @@ class deliveryStatusModal extends React.Component {
       native.dialNumber(info?.driver_phone)
     } else if (str === '骑手位置') {
       this.closeModal()
-      this.props.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info?.delivery_id})
+      this.props.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info?.id})
     } else {
       Clipboard.setString(info?.delivery_id)
       ToastLong('已复制到剪切板')
