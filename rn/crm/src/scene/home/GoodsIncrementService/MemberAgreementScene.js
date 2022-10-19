@@ -13,7 +13,11 @@ export default class MemberAgreementScene extends React.PureComponent {
 
   render() {
     return (
-      <ScrollView style={Styles.zoneWrap}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={Styles.zoneWrap}>
         <Text style={[styles.content]}>
           <Text style={styles.bold}>
             &emsp;&emsp;外送帮会员服务由北京家帮帮科技有限公司（以下亦称“家帮帮”）提供。《外送帮会员服务协议》由您和家帮帮进行缔结，对双方具有同等

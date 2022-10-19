@@ -267,7 +267,10 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (
-      <ScrollView style={{
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false} style={{
         flex: 1,
         padding: 12,
         backgroundColor: colors.f3,

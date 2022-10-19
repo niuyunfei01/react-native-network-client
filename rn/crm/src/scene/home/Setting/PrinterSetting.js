@@ -160,6 +160,9 @@ class PrinterSetting extends PureComponent {
     const {printer_status, printer_status_color} = this.state
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}

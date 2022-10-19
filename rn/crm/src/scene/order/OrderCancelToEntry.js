@@ -175,7 +175,11 @@ class OrderCancelToEntry extends BaseComponent {
 
   render() {
     return (
-      <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
         <For of={this.state.orderItems} each="item" index="idx">
           <View key={item.id} style={styles.productBox}>
             {Number(item.num) - item.dealNum <= 0 ? <View style={styles.checkImage}/> :

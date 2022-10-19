@@ -257,7 +257,11 @@ class Refund extends Component {
         </BottomModal>
 
         {this.state.isShowHeaderType && this.renderHeaderTab()}
-        <ScrollView style={{backgroundColor: '#EEEEEE', height: '100%'}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: '#EEEEEE', height: '100%'}}>
           {this.state.headerType === 1 ? this.renderRefund() : this.renderSpread()}
         </ScrollView>
         {this.rendenBtn()}

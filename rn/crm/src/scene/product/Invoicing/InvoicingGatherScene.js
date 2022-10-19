@@ -100,7 +100,12 @@ class InvoicingGatherScene extends PureComponent {
 
     return (
       <View>
-        <ScrollView refreshControl={
+        <ScrollView
+
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}

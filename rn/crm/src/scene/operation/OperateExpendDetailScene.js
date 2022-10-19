@@ -98,7 +98,11 @@ class OperateExpendScene extends PureComponent {
   render() {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1}}>
           {
             this.renderList()
           }

@@ -122,7 +122,11 @@ class SettlementDetailsScene extends React.Component {
     const {date, totalPrice, icon, status} = this.state
     return (
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
           <View style={styles.header}>
             <Text style={styles.headerDate}>时间：{date} </Text>
             <View style={styles.amountRow}>

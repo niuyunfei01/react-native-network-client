@@ -184,7 +184,11 @@ export default class ModalSelector extends BaseComponent {
       <TouchableWithoutFeedback key={'modalSelector' + (componentIndex++)} onPress={() => closeOverlay && this.close()}>
         <View style={[styles.overlayStyle, this.props.overlayStyle]}>
           <View style={[styles.optionContainer, this.props.optionContainerStyle]}>
-            <ScrollView keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}>
+            <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}>
               <View style={{paddingHorizontal: 10}}>
                 {options}
               </View>

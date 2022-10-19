@@ -270,7 +270,11 @@ class GoodsWorkNewProductScene extends PureComponent {
   render() {
     let {name, price_desc, slogan, images} = this.state;
     return (
-      <ScrollView style={{flex: 1}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1}}>
         {this.state.visual ? this.modal() : null}
         <View>
           <Cells style={styles.my_cells}>

@@ -516,7 +516,11 @@ class OrderTransferThird extends Component {
       <View style={{flexGrow: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
 
-        <ScrollView refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
           <RefreshControl
             refreshing={this.state.isLoading}
             onRefresh={() => this.fetchThirdWays()}

@@ -48,10 +48,7 @@ class FeedBackModal extends React.Component {
       is_legible: checked,
       feedback: suggest
     }
-    HttpUtils.post.bind(this.props)(url, params).then(res => {
-      console.log(res)
-    }, () => {
-    })
+    HttpUtils.post.bind(this.props)(url, params).then()
   }
 
   closeRemindModal = () => {

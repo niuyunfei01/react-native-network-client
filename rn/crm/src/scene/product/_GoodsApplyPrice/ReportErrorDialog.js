@@ -62,7 +62,10 @@ class ReportErrorDialog extends React.Component {
         onClickCancel={() => this.onClickCancel()}
         onClickConfirm={() => this.onClickConfirm()}
       >
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
           <GoodsBaseItem
             image={this.props.productImg}
             name={this.props.productName}

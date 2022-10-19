@@ -149,7 +149,10 @@ class SendRedeemCoupon extends BaseComponent {
     const self = this
     return (
       <View style={styles.itemContainer}>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false} >
           <List renderHeader={() => '优惠详情'}>
             <List.Item
               arrow="horizontal"

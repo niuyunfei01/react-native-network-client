@@ -123,7 +123,11 @@ class RegisterScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
         flex: 1,
         padding: 12,
         backgroundColor: colors.f3,

@@ -128,7 +128,11 @@ class PreferenceBillingSetting extends PureComponent {
     const {menus, selectArr, checked_item, deploy_time} = this.state;
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={styles.container}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.container}
                     refreshControl={
                       <RefreshControl
                         refreshing={this.state.isRefreshing}

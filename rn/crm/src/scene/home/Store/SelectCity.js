@@ -103,7 +103,11 @@ class SelectCity extends Component {
             />
           </View>
         </View>
-        <ScrollView style={styles.cityContentWrap} ref={scrollView => this.scrollView = scrollView}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.cityContentWrap} ref={scrollView => this.scrollView = scrollView}>
           {/*城市列表*/}
           {/*按字母显示城市列表 (看下后台是怎么给的数据)*/}
           <View style={{width: height * 19 / 20}}>

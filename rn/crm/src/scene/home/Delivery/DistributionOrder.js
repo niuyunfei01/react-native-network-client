@@ -105,7 +105,11 @@ class DistributionOrder extends PureComponent {
       </View>)
     }
     return (<View>
-        <ScrollView style={styles.bodyContainer}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.bodyContainer}>
           {items}
         </ScrollView>
       </View>

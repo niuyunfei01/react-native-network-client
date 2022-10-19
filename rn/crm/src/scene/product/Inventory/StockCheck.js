@@ -206,7 +206,11 @@ class StockCheck extends BaseComponent {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
           <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
         }>
           {this.renderInfo()}

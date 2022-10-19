@@ -527,7 +527,11 @@ class OrderCallDelivery extends Component {
     return (
       <View style={{flexGrow: 1}}>
         {this.renderHead()}
-        <ScrollView refreshControl={
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
           <RefreshControl
             refreshing={isLoading}
             onRefresh={() => this.fetchData()}

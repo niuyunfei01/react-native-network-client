@@ -524,7 +524,11 @@ class StallDetailScene extends PureComponent {
                 操作人员：{item.username}
               </Text>
             </View>
-            <ScrollView style={styles.remarkContentWrap}>
+            <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              style={styles.remarkContentWrap}>
               <Text style={styles.remarkText}>
                 备注信息：{item.deduct_desc}
               </Text>

@@ -158,7 +158,11 @@ class AuditRefundScene extends Component {
       remind_id = {};
     }
     return (
-      <ScrollView style={{flex: 1}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1}}>
         <Cells style={{borderWidth: 0, marginLeft: 0, borderTopWidth: 0, marginTop: pxToDp(5), borderBottomWidth: 0}}>
           <Cell customStyle={styles.my_cell}>
             <CellHeader>

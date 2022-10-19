@@ -200,7 +200,11 @@ class OperateIncomeDetailScene extends PureComponent {
                 }]}
 
         >
-          <ScrollView style={{height: pxToDp(500)}}>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{height: pxToDp(500)}}>
             <Text style={{color: colors.color333}}>项目(不超过15个汉字) </Text>
             <Input
               underlineColorAndroid='transparent'

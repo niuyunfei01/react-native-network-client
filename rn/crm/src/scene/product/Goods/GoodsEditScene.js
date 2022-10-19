@@ -1787,7 +1787,6 @@ class GoodsEditScene extends PureComponent {
   }
   onLoadMore = () => {
     let {page, isLastPage, isLoadingPic, isCanLoadMore, searchPicText} = this.state
-    console.log('page',page)
     if (!isCanLoadMore)
       return;
     if (isLastPage) {
@@ -1823,9 +1822,7 @@ class GoodsEditScene extends PureComponent {
       page: page,
       pageSize: pageSize
     }
-    console.log('params',params)
     HttpUtils.get(url, params).then(res => {
-      console.log('res',res)
       const {lists = [], isLastPage = false, page = 1} = res
       if (Array.isArray(lists))
         this.setState({

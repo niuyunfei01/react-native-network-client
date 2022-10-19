@@ -113,7 +113,11 @@ class OrderCancelShip extends Component {
     const wayOpts = this.state.list.map((item, idx) => {
       return {label: item.info, value: item.id}
     });
-    return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
       <RadioCells
         style={{marginTop: 2}}
         options={wayOpts}

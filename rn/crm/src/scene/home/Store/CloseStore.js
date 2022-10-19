@@ -172,7 +172,11 @@ class StoreClose extends PureComponent {
     const navigation = this.props.navigation
     return (<View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView style={[styles.container]}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.container]}
                     refreshControl={
                       <RefreshControl
                         refreshing={this.state.isRefreshing}

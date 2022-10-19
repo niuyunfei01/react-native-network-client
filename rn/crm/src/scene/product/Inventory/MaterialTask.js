@@ -182,7 +182,11 @@ class MaterialTask extends React.Component {
   render() {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1}}>
           {this.renderPackingTask()}
 
           <View style={styles.getTaskBtnWrap}>

@@ -500,7 +500,11 @@ class GoodsPriceDetails extends PureComponent {
             this.renderNav()
           }
         </View>
-        <ScrollView style={{marginTop: pxToDp(7)}}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{marginTop: pxToDp(7)}}
                     refreshControl={
                       <RefreshControl
                         refreshing={this.state.query}

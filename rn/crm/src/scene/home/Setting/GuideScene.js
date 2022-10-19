@@ -115,6 +115,9 @@ class GuideScene extends PureComponent {
   render() {
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}

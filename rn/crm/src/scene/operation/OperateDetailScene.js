@@ -273,7 +273,11 @@ class OperateDetailScene extends PureComponent {
           <Header text={"运营收益结转"} money={toFixed(balance_money)}/>
         </If>
         <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
-        <ScrollView style={{paddingBottom: pxToDp(50)}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{paddingBottom: pxToDp(50)}}>
           <View style={content.in_box}>
             {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
             <CellAccess
@@ -361,7 +365,11 @@ class OperateDetailScene extends PureComponent {
             }
           ]}
         >
-          <ScrollView style={{height: pxToDp(500)}}>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{height: pxToDp(500)}}>
             <Text style={{color: colors.color333}}>项目(不超过15个汉字) </Text>
             <Input
               underlineColorAndroid="transparent"

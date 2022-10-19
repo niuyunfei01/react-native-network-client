@@ -187,7 +187,11 @@ class GoodsRelatedScene extends PureComponent {
         <View style={{height: pxToDp(70), justifyContent: 'center', paddingHorizontal: pxToDp(30)}}>
           <Text style={{color: colors.color333}}>关联店铺</Text>
         </View>
-        <ScrollView style={{backgroundColor: '#fff', flex: 1}}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: '#fff', flex: 1}}
                     refreshControl={
                       <RefreshControl
                         refreshing={this.state.isRefreshing}

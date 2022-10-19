@@ -125,7 +125,11 @@ class SettlementScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.f3}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, padding: 10, backgroundColor: colors.f3}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.getSupplyList.bind(this)}/>
         <If condition={this.state.show_pay_info}>
           {this.renderPayList()}

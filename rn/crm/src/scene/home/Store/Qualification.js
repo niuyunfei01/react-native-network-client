@@ -173,7 +173,11 @@ class Qualification extends Component {
     });
     return (
       <View style={{flex: 1, backgroundColor: "#fff"}}>
-        <ScrollView style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1}}>
           {this.title("营业执照", "请上传门店执照或身份证")}
           <View style={{justifyContent: "center", alignItems: "center"}}>
             <Upload

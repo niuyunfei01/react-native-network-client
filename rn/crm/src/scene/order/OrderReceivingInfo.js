@@ -244,7 +244,11 @@ class OrderReceivingInfo extends Component {
   render() {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={[styles.container, {flex: 1}]}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.container, {flex: 1}]}>
           {this.renderUserFrom()}
         </ScrollView>
         {this.renderBtn()}
