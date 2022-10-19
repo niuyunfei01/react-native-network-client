@@ -75,7 +75,8 @@ class ErrorBoundary extends React.Component {
         currentRouteName: global.currentRouteName
       }
     };
-
+    if (error.indexOf('product_id') !== -1)
+      params.STACK_TRACE.product_id = global.product_id
     HttpUtils.post(url, params).then(res => {
 
     }).catch(error => {

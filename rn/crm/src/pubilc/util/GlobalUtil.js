@@ -44,7 +44,6 @@ export default class GlobalUtil {
   }
 
   static getHostPort() {
-    return "preview.waisongbang.com/";
     return global.hostPort;
   }
 
