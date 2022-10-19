@@ -120,7 +120,6 @@ class OrderCallDelivery extends Component {
       store_est_all_check: false,
       logistic_fee_map: []
     };
-    this.fetchData();
   }
 
   componentWillUnmount() {

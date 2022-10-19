@@ -1218,12 +1218,6 @@ class OrderInfoNew extends PureComponent {
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={() => this.fetchOrder()}
-              tintColor='gray'
-            />}
           style={styles.Content}>
 
           {this.renderPrinter()}
