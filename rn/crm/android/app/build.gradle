@@ -129,6 +129,7 @@ dependencies {
     implementation(project(':RCTWeChat'))
     implementation(project(':@react-native-picker'))
     implementation(project(':react-native-webview'))
+    implementation(project(':react-native-date-picker'))
     implementation(project(':react-native-pager-view'))
     implementation(project(':react-native-screens'))
     implementation(project(':react-native-reanimated'))

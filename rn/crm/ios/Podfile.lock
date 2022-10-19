@@ -230,6 +230,8 @@ PODS:
     - React-Core
   - react-native-cameraroll (4.1.2):
     - React-Core
+  - react-native-date-picker (4.2.5):
+    - React-Core
   - react-native-geolocation (2.0.2):
     - React
   - react-native-get-random-values (1.7.0):
@@ -420,6 +422,7 @@ DEPENDENCIES:
   - react-native-ble-manager (from `../node_modules/react-native-ble-manager`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -524,6 +527,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-camera"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-community/cameraroll"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
   react-native-get-random-values:
@@ -630,6 +635,7 @@ SPEC CHECKSUMS:
   react-native-ble-manager: b67db4b4c9f8ce8038b4aad4fe29db98878738ea
   react-native-camera: b8cc03e2feec0c04403d0998e37cf519d8fd4c6f
   react-native-cameraroll: 2957f2bce63ae896a848fbe0d5352c1bd4d20866
+  react-native-date-picker: 55193347d8d0f40948f441ffd4e5db6f0a8fbe13
   react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
   react-native-get-random-values: 237bffb1c7e05fb142092681531810a29ba53015
   react-native-image-picker: 3693786b3d5958c8f71deed66ec068b323565e0d
@@ -672,6 +678,6 @@ SPEC CHECKSUMS:
   UTDID: 05c4737c8cf5c210e86d0235570816ed00e023e8
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 05c8a1615771e4033dc4f9420269fb49af6fd53c
+PODFILE CHECKSUM: 61b1b971a6d32e8937222607cd8719912318a541
 
 COCOAPODS: 1.11.3

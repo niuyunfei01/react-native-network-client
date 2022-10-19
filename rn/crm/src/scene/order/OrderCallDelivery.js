@@ -31,6 +31,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import {getContacts} from "../../reducers/store/storeActions";
 import Config from "../../pubilc/common/config";
 import native from "../../pubilc/util/native";
+import DatePicker from "react-native-date-picker";
 
 let width = Dimensions.get("window").width;
 
@@ -101,11 +102,6 @@ class OrderCallDelivery extends Component {
       show_add_tip_modal: false,
       show_remark_modal: false,
       show_worker_delivey_modal: false,
-      datePickerType: 'today',
-      datePickerList: [],
-      datePickerOther: [],
-      callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD'),
-      callDelivery_Time: dayjs(new Date()).format('HH:ii'),
       is_right_once: 1,
       mealTime: '',
       worker_list: [],
@@ -521,8 +517,39 @@ class OrderCallDelivery extends Component {
       })
   }
 
+  checkDatePicker = (date) => {
+    let today = dayjs().format('DD');
+    let today1 = dayjs().add(1, 'day').format('DD');
+    let today2 = dayjs().add(2, 'day').format('DD');
+    let day = dayjs(date).format('DD');
+    let day_str = '';
+
+    switch (day) {
+      case today:
+        day_str = '今天'
+        break;
+      case today1:
+        day_str = '明天'
+        break;
+      case today2:
+        day_str = '后天'
+        break;
+      default:
+        day_str = dayjs(date).format('YY-MM-DD') + '/'
+        break;
+    }
+    this.setState({
+      expect_time: dayjs(date).format('YYYY-MM-DD HH:mm'),
+      show_date_modal: false,
+      mealTime: day_str + '' + dayjs(date).format('HH:mm'),
+      is_right_once: 0,
+    }, () => {
+      this.fetchData()
+    })
+  };
+
   render() {
-    let {isLoading, order_id, add_tips, show_add_tip_modal} = this.state
+    let {isLoading, order_id, add_tips, show_add_tip_modal, show_date_modal} = this.state
     return (
       <View style={{flexGrow: 1}}>
         {this.renderHead()}
@@ -531,12 +558,12 @@ class OrderCallDelivery extends Component {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={() => this.fetchData()}
-            tintColor='gray'
-          />
-        } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={() => this.fetchData()}
+              tintColor='gray'
+            />
+          } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
           {this.renderCollect()}
           {this.renderCancelDelivery()}
           {this.renderWsbDelivery()}
@@ -548,8 +575,23 @@ class OrderCallDelivery extends Component {
         {this.renderWeightModal()}
         {this.renderGoodsPriceModal()}
         {this.renderRemarkModal()}
-        {this.renderDatePicker()}
         {this.renderReasonModal()}
+
+        <DatePicker
+          confirmText={'确定'}
+          cancelText={'取消'}
+          title={'期望送达时间'}
+          modal
+          open={show_date_modal}
+          date={new Date()}
+          minimumDate={new Date()}
+          onConfirm={(date) => {
+            this.checkDatePicker(date)
+          }}
+          onCancel={() => {
+            this.closeModal()
+          }}
+        />
 
         <AddTipModal
           setState={this.setState.bind(this)}
@@ -889,7 +931,6 @@ class OrderCallDelivery extends Component {
           <TouchableOpacity onPress={() => {
             this.setState({
               show_date_modal: true,
-              datePickerList: this.timeSlot(10, true)
             })
           }} style={{
             height: iron_width,
@@ -904,7 +945,7 @@ class OrderCallDelivery extends Component {
               fontSize: 11,
               color: colors.color333,
               marginTop: 5
-            }}>{is_right_once === 0 ? mealTime : '立即送达'}</Text>
+            }}>{is_right_once === 0 ? tool.length((mealTime || '')) > 8 ? '..' + mealTime.substr(-8) : mealTime : '立即送达'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -1346,226 +1387,6 @@ class OrderCallDelivery extends Component {
                     }]}
                     titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
           </View>
-        </View>
-      </JbbModal>
-    )
-  }
-
-
-  timeSlot = (step, isNow) => {
-    let date = new Date()
-    let timeArr = []
-    let slotNum = 24 * 60 / step
-    if (!isNow) {
-      date.setHours(0, 0, 0, 0)
-    } else {
-      slotNum = (24 - date.getHours()) * 60 / step - Math.ceil(date.getMinutes() / 10)
-      date.setHours(date.getHours(), date.getMinutes() - date.getMinutes() % 10 + 10, 0, 0)
-    }
-    for (let f = 0; f < slotNum; f++) {
-      let time = new Date(Number(date.getTime()) + Number(step * 60 * 1000 * f))
-      let hour = '', sec = '';
-      time.getHours() < 10 ? hour = '0' + time.getHours() : hour = time.getHours()
-      time.getMinutes() < 10 ? sec = '0' + time.getMinutes() : sec = time.getMinutes()
-      timeArr.push({label: hour + ':' + sec})
-      if (isNow && timeArr.findIndex((item) => item.label === '立即送达')) {
-        timeArr.unshift({label: '立即送达'})
-      }
-    }
-    return timeArr
-  }
-
-  createDatePickerArray = () => {
-    Date.prototype.addDays = function (days) {
-      let dat = new Date(this.valueOf())
-      dat.setDate(dat.getDate() + days);
-      return dat;
-    }
-
-    function getDates(startDate, stopDate) {
-      let dateArray = [];
-      let currentDate = startDate;
-      while (currentDate <= stopDate) {
-        dateArray.push(dayjs(currentDate).format('YYYY-MM-DD'))
-        currentDate = currentDate.addDays(1);
-      }
-      return dateArray;
-    }
-
-    return getDates(new Date(), (new Date()).addDays(2))
-  }
-
-  checkDateItem = (idx, item) => {
-    let {
-      datePickerType,
-      datePickerList,
-      datePickerOther,
-    } = this.state
-    let datePickerListCopy = datePickerType === 'today' ? datePickerList : datePickerOther
-    datePickerListCopy.forEach(checkedItem => {
-      checkedItem.isChosed = false
-    })
-    datePickerListCopy[idx].isChosed = true
-    let params = {};
-    if (datePickerType === 'today') {
-      params.datePickerList = datePickerListCopy;
-    } else {
-      params.datePickerOther = datePickerListCopy;
-    }
-
-    if (item?.label !== '立即送达') {
-      params.callDelivery_Time = item?.label;
-    }
-    this.setState(params)
-  }
-
-  renderDatePicker = () => {
-    let {
-      show_date_modal,
-      datePickerType,
-      datePickerList,
-      datePickerOther,
-      callDelivery_Day,
-      callDelivery_Time
-    } = this.state
-    let date = datePickerType === 'today' ? '今天' : datePickerType === 'tomorrow' ? '明天' : '后天';
-    let mealtime = date + ' ' + callDelivery_Time
-    let expect_time = callDelivery_Day + ' ' + callDelivery_Time
-    return (
-      <JbbModal onClose={this.closeModal} visible={show_date_modal} HighlightStyle={{padding: 0}}
-                modalStyle={{padding: 0}}
-                modal_type={'bottom'}>
-        <View>
-          <View style={{
-            flexDirection: 'row',
-            padding: 12,
-            justifyContent: 'space-between',
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
-              期望送达时间
-            </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
-          </View>
-
-          <View
-            style={{flexDirection: "row", justifyContent: "space-evenly", paddingHorizontal: 12, paddingVertical: 5}}>
-            <View style={{flexDirection: "column", justifyContent: "space-around", flex: 1}}>
-              <TouchableOpacity style={datePickerType === 'today' ? styles.datePickerActive : styles.datePicker}
-                                onPress={() => {
-                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                                  this.setState({
-                                    datePickerType: 'today',
-                                    callDelivery_Day: dayjs(new Date()).format('YYYY-MM-DD')
-                                  })
-                                }}>
-                <Text style={datePickerType === 'today' ? styles.dateTextActive : styles.dateText}>
-                  今天
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={datePickerType === 'tomorrow' ? styles.datePickerActive : styles.datePicker}
-                                onPress={() => {
-                                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                                  this.setState({
-                                    datePickerType: 'tomorrow',
-                                    callDelivery_Day: this.createDatePickerArray()[1],
-                                    datePickerOther: this.timeSlot(10, false)
-                                  })
-                                }}>
-                <Text style={datePickerType === 'tomorrow' ? styles.dateTextActive : styles.dateText}>
-                  明天
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={datePickerType === 'after-tomorrow' ? styles.datePickerActive : styles.datePicker}
-                onPress={() => {
-                  this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                  this.setState({
-                    datePickerType: 'after-tomorrow',
-                    callDelivery_Day: this.createDatePickerArray()[2],
-                    datePickerOther: this.timeSlot(10, false)
-                  })
-                }}>
-                <Text style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>
-                  后天
-                </Text>
-              </TouchableOpacity>
-
-            </View>
-
-            <View style={{flex: 3, height: 250}}>
-              <ScrollView
-                style={{flex: 1}}
-                ref={(scrollView) => {
-                  this._scrollView = scrollView
-                }}
-                showsVerticalScrollIndicator={false}
-                directionalLockEnabled={true}
-                scrollEventThrottle={16}
-                bounces={false}
-                onMomentumScrollEnd={(e) => {
-                  let offsetY = e.nativeEvent.contentOffset.y;
-                  let contentSizeHeight = e.nativeEvent.contentSize.height;
-                  let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
-                  if (offsetY + oriageScrollHeight >= contentSizeHeight) {
-                    if (datePickerType === 'today') {
-                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                      this.setState({
-                        datePickerType: 'tomorrow',
-                        callDelivery_Day: this.createDatePickerArray()[1],
-                        datePickerOther: this.timeSlot(10, false)
-                      })
-                    } else if (datePickerType === 'tomorrow') {
-                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                      this.setState({
-                        datePickerType: 'after-tomorrow',
-                        callDelivery_Day: this.createDatePickerArray()[2],
-                        datePickerOther: this.timeSlot(10, false)
-                      })
-                    }
-                  }
-                }}
-              >
-                <For of={datePickerType === 'today' ? datePickerList : datePickerOther} index="idx" each='item'>
-                  <TouchableOpacity
-                    key={idx}
-                    style={item?.isChosed ? styles.datePickerItemActive : styles.datePickerItem}
-                    onPress={() => this.checkDateItem(idx, item)}>
-                    <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label} </Text>
-                    <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
-                      {item?.isChosed ?
-                        <View style={styles.datePickerIcon}>
-                          <Entypo name='check' style={{fontSize: 13, color: colors.white,}}/>
-                        </View> :
-                        <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
-                    </View>
-                  </TouchableOpacity>
-                </For>
-              </ScrollView>
-            </View>
-          </View>
-          <Button title={'确 定'}
-                  onPress={() => {
-
-                    this.setState(
-                      {
-                        is_right_once: 0,
-                        expect_time: expect_time,
-                        mealTime: mealtime,
-                        show_date_modal: false
-                      },
-                      () => {
-                        this.fetchData()
-                      })
-                  }}
-                  buttonStyle={[{
-                    backgroundColor: colors.main_color,
-                    borderRadius: 24,
-                    marginHorizontal: 10,
-                    length: 42,
-                  }]}
-                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
         </View>
       </JbbModal>
     )
