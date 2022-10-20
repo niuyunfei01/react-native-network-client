@@ -1007,26 +1007,26 @@ class GoodsEditScene extends PureComponent {
           </View>
           <LineView/>
         </If>
-        <If condition={!this.isAddProdToStore()}>
-          <If condition={price_type && spec_type === 'spec_single'}>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                零售价格
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>
+        <If condition={type === 'add' && price_type && spec_type === 'spec_single'}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              零售价格
+              <Text style={styles.leftFlag}>
+                *
               </Text>
-              <TextInput
-                value={store_price}
-                keyboardType={'numeric'}
-                onChangeText={text => this.setState({store_price: text})}
-                style={styles.textInputStyle}
-                placeholderTextColor={colors.color999}
-                placeholder={'请输入零售价格'}/>
-              <View style={styles.rightEmptyView}/>
-            </View>
-            <LineView/>
-          </If>
+            </Text>
+            <TextInput
+              value={store_price}
+              keyboardType={'numeric'}
+              onChangeText={text => this.setState({store_price: text})}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入零售价格'}/>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
+        <If condition={!this.isAddProdToStore()}>
 
           <If condition={spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>

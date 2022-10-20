@@ -2,14 +2,11 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
-  Animated,
   Dimensions,
-  Image,
   InteractionManager,
   PanResponder,
   PermissionsAndroid,
   Platform,
-  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -46,9 +43,9 @@ import JbbModal from "../../pubilc/component/JbbModal";
 import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
+import FastImage from "react-native-fast-image";
 
-const width = Dimensions.get("window").width;
-const height = Dimensions.get("window").height;
+const {width, height} = Dimensions.get("window")
 
 //记录耗时的对象
 const timeObj = {
@@ -133,12 +130,12 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       showQrcode: false,
       show_delivery_modal: false,
-      map_height: new Animated.Value(290),
+
       toastContext: '',
       add_tip_id: 0,
       show_add_tip_modal: false
     }
-
+    this.map_height = 290
   }
 
   componentDidMount = () => {
@@ -159,24 +156,10 @@ class OrderInfoNew extends PureComponent {
     timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
     this.enableBluetooth()
+
   }
 
-  setMapHeight = (map_height) => {
-    let {isShowMap} = this.state;
-    if (!isShowMap) {
-      return null;
-    }
-    Animated.timing(                       // 随时间变化而执行动画
-      this.state.map_height,            // 动画中的变量值
-      {
-        toValue: map_height,                        // 透明度最终变为1，即完全不透明
-        duration: 400,                   // 让动画持续一段时间
-        useNativeDriver: false
-      }
-    ).start();
-  }
-
-  UNSAFE_componentWillMount() {
+  touchScreenMove = () => {
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
         return true;
@@ -185,27 +168,39 @@ class OrderInfoNew extends PureComponent {
         return true;
       },
       onPanResponderGrant: (evt, gestureState) => {
-        return true;
+        const {pageY, locationY} = evt.nativeEvent;
+        this.preY = pageY - locationY;
+        return true
       },
       onPanResponderMove: (evt, gestureState) => {
-        if (-3 < gestureState.dy && gestureState.dy < 2) {
+
+        if (Math.abs(gestureState.dy) < 3) {
           return;
         }
-        this.setMapHeight((gestureState.dy > 10 ? 0.68 : 0.35) * height)
+        let preHeight = this.preY + gestureState.dy
+        if (preHeight >= 0.7 * height)
+          preHeight = 0.7 * height
+        if (preHeight <= 0)
+          preHeight = 0.3 * height
+        this.viewRef.setNativeProps({height: preHeight})
+
       },
       onPanResponderTerminationRequest: (evt, gestureState) => {
         return true;
       },
       onPanResponderRelease: (evt, gestureState) => {
+        this.scrollViewRef.setNativeProps({canCancelContentTouches: true})
         return true;
 
       },
       onPanResponderTerminate: (evt, gestureState) => {
         return true;
-        // Another component has become the responder, so this gesture
-        // should be cancelled
       }
     });
+  }
+
+  UNSAFE_componentWillMount() {
+    this.touchScreenMove()
 
   }
 
@@ -307,10 +302,7 @@ class OrderInfoNew extends PureComponent {
 
   headerRight = () => {
     return (
-      <TouchableOpacity
-        style={headerRightStyles.resetBind}
-        onPress={() => this.navigateToOrderOperation()}
-      >
+      <TouchableOpacity style={headerRightStyles.resetBind} onPress={() => this.navigateToOrderOperation()}>
         <Entypo name={"dots-three-horizontal"} style={headerRightStyles.text}/>
       </TouchableOpacity>
     )
@@ -714,9 +706,8 @@ class OrderInfoNew extends PureComponent {
       ship_distance_destination,
       ship_distance_store
     } = this.state.order;
-    let {map_height} = this.state;
     return (
-      <Animated.View style={{height: map_height}}>
+      <View ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
         <MapView
           mapType={MapType.Standard}
           initialCameraPosition={{
@@ -730,10 +721,10 @@ class OrderInfoNew extends PureComponent {
             onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}} style={{
-                width: 30,
-                height: 34,
-              }}/>
+              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
+                         style={{width: 30, height: 34,}}
+                         resizeMode={FastImage.resizeMode.contain}
+              />
             </View>
 
           </Marker>
@@ -761,10 +752,10 @@ class OrderInfoNew extends PureComponent {
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
-                  width: 30,
-                  height: 34,
-                }}/>
+                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
+                           style={{width: 30, height: 34,}}
+                           resizeMode={FastImage.resizeMode.contain}
+                />
               </View>
             </Marker>
           </If>
@@ -776,27 +767,25 @@ class OrderInfoNew extends PureComponent {
           >
             <View style={{alignItems: 'center'}}>
               <View style={styles.mapBox}>
-                <Text style={{
-                  color: colors.color333,
-                  fontSize: 12,
-                }}>距门店{numeral(dada_distance / 1000).format('0.00')}公里 </Text>
+                <Text style={{color: colors.color333, fontSize: 12}}>
+                  距门店{numeral(dada_distance / 1000).format('0.00')}公里
+                </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}} style={{
-                width: 23,
-                height: 48,
-              }}/>
+              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
+                         style={{width: 23, height: 48}}
+                         resizeMode={FastImage.resizeMode.contain}/>
             </View>
           </Marker>
         </MapView>
-      </Animated.View>
+      </View>
     )
   }
 
   renderOrderInfo = () => {
     return (
-      <View style={{zIndex: 999, marginTop: -20}}>
+      <View style={{marginTop: -20}}>
         {this.renderOrderInfoHeader()}
         {this.renderOrderInfoCard()}
       </View>
@@ -806,8 +795,9 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View {...this._panResponder.panHandlers} >
+      <View {...this._panResponder.panHandlers}>
         <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                          onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
           <If condition={isShowMap}>
             <View style={styles.orderInfoHeaderFlag}/>
@@ -912,9 +902,8 @@ class OrderInfoNew extends PureComponent {
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
-            <Image
-              source={{uri: order?.platform_icon}}
-              style={styles.orderCardIcon}/>
+            <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
+                       resizeMode={FastImage.resizeMode.contain}/>
             <View style={styles.orderCardInfo}>
               <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
               <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
@@ -952,9 +941,10 @@ class OrderInfoNew extends PureComponent {
               <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
                 this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
               }}>
-                <Image
+                <FastImage
                   source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                   style={styles.productImage}
+                  resizeMode={FastImage.resizeMode.contain}
                 />
                 <View style={styles.productItem}>
                   <Text style={styles.productItemName}>{info?.product_name} </Text>
@@ -1139,28 +1129,28 @@ class OrderInfoNew extends PureComponent {
       </TouchableOpacity>
     )
   }
-
+  menus = [
+    {
+      type: 'default',
+      label: this._cloudPrinterSN,
+      onPress: this._doCloudPrint
+    },
+    {
+      type: 'default',
+      label: '蓝牙打印',
+      onPress: this._doBluetoothPrint
+    },
+    {
+      type: 'default',
+      label: '商米打印',
+      onPress: this._doSunMiPint
+    }
+  ]
   renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
     let {order = {}, modalTip, showPrinterChooser} = this.state;
-    const menus = [
-      {
-        type: 'default',
-        label: this._cloudPrinterSN(),
-        onPress: this._doCloudPrint
-      },
-      {
-        type: 'default',
-        label: '蓝牙打印',
-        onPress: this._doBluetoothPrint
-      },
-      {
-        type: 'default',
-        label: '商米打印',
-        onPress: this._doSunMiPint
-      }
-    ]
+
     return (
       <View>
         <Tips navigation={this.props.navigation} orderId={order.id}
@@ -1171,7 +1161,7 @@ class OrderInfoNew extends PureComponent {
         <ActionSheet
           visible={showPrinterChooser}
           onRequestClose={this._hidePrinterChooser}
-          menus={menus}
+          menus={this.menus}
           actions={this.printAction}
         />
       </View>)
@@ -1228,7 +1218,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   render() {
-    const {isRefreshing, isShowMap, order} = this.state
+    const {isShowMap, order} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1237,11 +1227,11 @@ class OrderInfoNew extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
-        <ScrollView
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={styles.Content}>
+        <ScrollView ref={ref => this.scrollViewRef = ref}
+                    automaticallyAdjustContentInsets={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                    style={styles.Content}>
 
           {this.renderPrinter()}
           <If condition={isShowMap}>
