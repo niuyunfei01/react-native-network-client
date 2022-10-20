@@ -202,18 +202,20 @@ class OrderReceivingInfo extends Component {
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
     }).then(res => {
+      this.setState({
+        smartText: ''
+      })
       if (res.phone === '') {
-        ToastShort('电话号识别失败！')
+        return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
-        ToastShort('姓名识别失败！')
+        return ToastShort('姓名识别失败！')
       } else if (res.address === '') {
-        ToastShort('地址识别失败！')
+        return ToastShort('地址识别失败！')
       }
       this.setState({
         name: res.name,
         address: res.address,
         mobile: res.phone,
-        smartText: ''
       })
       const params = {
         show_select_city: true,
@@ -389,7 +391,7 @@ class OrderReceivingInfo extends Component {
                 backgroundColor: colors.f5,
                 lineHeight: show_smart_input ? 110 : 44,
               }}
-              onBlur={() => {
+              onFocus={() => {
                 this.setState({
                   show_smart_input: true
                 })
@@ -418,7 +420,7 @@ class OrderReceivingInfo extends Component {
                         padding: 0,
                         paddingVertical: 2,
                         paddingHorizontal: 12,
-                        backgroundColor: colors.main_color,
+                        backgroundColor: tool.length(smartText) > 0 ? colors.main_color : colors.color999,
                       }}
                       titleStyle={{color: colors.white, fontSize: 12}}/>
 
