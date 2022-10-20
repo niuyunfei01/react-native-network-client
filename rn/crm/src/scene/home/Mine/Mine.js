@@ -37,7 +37,7 @@ import {
   push,
   Service,
   setting,
-  stores,
+  stores, third_recharge,
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import tool from "../../../pubilc/util/tool";
@@ -568,6 +568,9 @@ class Mine extends PureComponent {
         break;
       case 'history_notice':
         return history_notice()
+        break;
+      case 'third_recharge':
+        return third_recharge()
         break;
       default:
         return order_search()

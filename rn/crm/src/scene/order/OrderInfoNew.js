@@ -950,10 +950,12 @@ class OrderInfoNew extends PureComponent {
           </View>
         </View>
         <View style={styles.cuttingLine}/>
-        <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
-          <Text style={styles.remarkLabel}>备注 </Text>
-          <Text style={styles.remarkValue}>{order?.remark} </Text>
-        </View>
+        <If condition={order?.remark}>
+          <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
+            <Text style={styles.remarkLabel}>备注 </Text>
+            <Text style={styles.remarkValue}>{order?.remark} </Text>
+          </View>
+        </If>
         <View style={styles.cuttingLine}/>
         <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
           <Text style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
