@@ -421,7 +421,10 @@ class Mine extends PureComponent {
     return (
       <View
         style={headerRightStyles.resetBind}>
-        <TouchableOpacity onPress={() => this.navigateToBack()}>
+        <TouchableOpacity style={{
+          width: 90,
+          height: 32,
+        }} onPress={() => this.navigateToBack()}>
           <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => this.JumpToServices()} style={headerRightStyles.rightBtn}>
@@ -432,6 +435,16 @@ class Mine extends PureComponent {
     )
   }
 
+  jumpToAddStore = () => {
+    let {is_mgr} = this.state
+    this.onPress(Config.ROUTE_STORE_ADD,{
+      btn_type: "edit",
+      is_mgr: is_mgr,
+      editStoreId: this.props.global.currStoreId
+    })
+  }
+
+
   renderStoreInfo = () => {
     let {storeInfo} = this.state;
     return (
@@ -440,14 +453,16 @@ class Mine extends PureComponent {
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
-          <View style={styles.storeContent}>
+          <TouchableOpacity onPress={()=>{
+            this.jumpToAddStore()
+          }} style={styles.storeContent}>
             <Text style={styles.storeName}>
               {tool.length((storeInfo?.store_name || '')) > 12 ? storeInfo?.store_name.substring(0, 11) + '...' : storeInfo?.store_name}
             </Text>
             <View style={styles.storeType}>
               <Text style={styles.storeTypeText}>连锁版 </Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.roleBox} onPress={() => this.onPress(Config.ROUTE_PER_IDENTIFY)}>
             <Text style={styles.roleText}>{storeInfo?.role_desc} </Text>
             <Entypo name="chevron-thin-right" style={styles.roleIcon}/>
