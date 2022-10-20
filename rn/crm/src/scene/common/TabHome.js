@@ -57,10 +57,10 @@ class TabHome extends React.Component {
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
-                        tabBarLabel: '控制台',
+                        tabBarLabel: '工作台',
                         tabBarIcon: ({focused}) => (
-                          focused ? <SvgXml xml={bottom_tab_control_check()} width={24} height={24}/> :
-                            <SvgXml xml={bottom_tab_control()} width={24} height={24}/>
+                          focused ? <SvgXml xml={bottom_tab_workbench_check()} width={24} height={24}/> :
+                            <SvgXml xml={bottom_tab_workbench()} width={24} height={24}/>
                         )
                       }}/>
         </If>
@@ -70,11 +70,11 @@ class TabHome extends React.Component {
           component={OrderListScene}
           options={
             {
-              tabBarLabel: "工作台",
+              tabBarLabel: "配送",
               tabBarIcon: ({focused}) => (
                 show_bottom_tab ?
-                  focused ? <SvgXml xml={bottom_tab_workbench_check()} width={24} height={24}/> :
-                    <SvgXml xml={bottom_tab_workbench()} width={24} height={24}/> : <View/>
+                  focused ? <SvgXml xml={bottom_tab_control_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_control()} width={24} height={24}/> : <View/>
               ),
 
             }

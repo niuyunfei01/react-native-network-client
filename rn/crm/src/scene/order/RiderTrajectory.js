@@ -101,13 +101,16 @@ class RiderTrajectory extends Component {
     if (!track_store_lng || !track_destination_lng || !track_horseman_lng) {
       return null;
     }
-
+    let {
+      aLon,
+      aLat
+    } = tool.getCenterLonLat(track_store_lng, track_store_lat, track_destination_lng, track_destination_lat)
     return (
       <MapView
-        mapType={MapType.Navi}
+        mapType={MapType.Standard}
         style={StyleSheet.absoluteFill}
         initialCameraPosition={{
-          target: {latitude: track_horseman_lat, longitude: track_horseman_lng},
+          target: {latitude: aLat, longitude: aLon},
           zoom: zoom
         }}>
 
@@ -119,7 +122,7 @@ class RiderTrajectory extends Component {
             <View style={{alignItems: 'center'}}>
 
               <If condition={msg !== ''}>
-                <View style={{marginBottom: 30, alignItems: 'center'}}>
+                <View style={{alignItems: 'center'}}>
                   <View style={{
                     zIndex: 999,
                     backgroundColor: colors.white,

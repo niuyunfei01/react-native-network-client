@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
+import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -279,12 +279,12 @@ class deliveryStatusModal extends React.Component {
              maskClosable transparent={true}
              animationType="fade"
              visible={show_modal}>
-        <TouchableOpacity onPress={this.closeModal} style={[{
+        <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
           flex: 1
         }]}>
-          <View style={{flexGrow: 1}}/>
-          <TouchableHighlight style={[{
+          <TouchableOpacity onPress={this.closeModal}  style={{flexGrow: 1}}/>
+          <View style={[{
             backgroundColor: colors.white,
             maxHeight: height * 0.8,
             borderTopLeftRadius: 15,
@@ -307,10 +307,10 @@ class deliveryStatusModal extends React.Component {
                 <Entypo onPress={this.closeModal} name="cross" style={styles.QrClose}/>
               </View>
 
-              <ScrollView overScrollMode="always"
-                          automaticallyAdjustContentInsets={false}
+              <ScrollView automaticallyAdjustContentInsets={false}
                           showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false} style={{maxHeight: 350}}>
+                          showsVerticalScrollIndicator={false}
+                          style={{maxHeight: 350}}>
                 <For index='index' each='info' of={delivery_list}>
                   <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
                     <View style={styles.flexC}>
@@ -338,8 +338,8 @@ class deliveryStatusModal extends React.Component {
               {this.renderButton()}
             </View>
 
-          </TouchableHighlight>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     )
   }
@@ -362,8 +362,7 @@ class deliveryStatusModal extends React.Component {
             <View style={[styles.flexC, {marginLeft: 10}]}>
               <Text
                 style={[styles.platform, log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
-              <TouchableOpacity style={styles.descInfo} onPress={() =>
-                this.right_btn(log?.log_right_btn, info)}>
+              <View style={styles.descInfo}>
                 <If condition={tool.length(log?.log_desc) > 0}>
                   <Text style={styles.desc}>{log?.log_desc} </Text>
                 </If>
@@ -372,7 +371,7 @@ class deliveryStatusModal extends React.Component {
                     this.right_btn(log?.log_right_btn, info);
                   }} style={styles.copyText}>{log?.log_right_btn} </Text>
                 </If>
-              </TouchableOpacity>
+              </View>
               <Text style={[styles.platform, {marginTop: 6}]}>{log?.log_call_time} </Text>
             </View>
           </View>
