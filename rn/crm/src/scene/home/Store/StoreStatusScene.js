@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {
-  Alert,
+  Alert, Dimensions,
   Image,
   InteractionManager,
   PixelRatio,
@@ -28,6 +28,7 @@ import {Button} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {SvgXml} from "react-native-svg";
 import {
+  empty_data,
   platformLogoEleme,
   platformLogoJD,
   platformLogoMeiTuan,
@@ -46,6 +47,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+const width = Dimensions.get("window").width;
 
 const timeOptions = [
   {label: '30分钟', value: 30, key: 30},
@@ -333,25 +335,14 @@ class StoreStatusScene extends PureComponent {
 
   renderNoBody() {
     return (
-      <View style={{flexDirection: "column", alignItems: "center"}}>
-        <Text style={{
-          marginTop: '20%',
-          marginBottom: '5%',
-          backgroundColor: '#f5f5f9',
-          textAlignVertical: "center",
-          textAlign: "center",
-          fontWeight: 'bold',
-          fontSize: 25
-        }}>
-          暂时未绑定外卖店铺
-        </Text>
-
+      <View style={styles.noOrderContent}>
+        <SvgXml xml={empty_data()}/>
         <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
-          <Button
-            title={'去绑定'}
-            onPress={() => this.onPress(Config.PLATFORM_BIND)}
-            buttonStyle={{backgroundColor: '#f5f5f9', marginTop: 30, width: "95%"}}
-            titleStyle={{color: colors.fontBlack, textAlign: 'center'}}
+          <Text style={styles.noOrderDesc}>暂无绑定外卖店铺</Text>
+          <Button title={'去绑定'}
+                  onPress={() => this.onPress(Config.PLATFORM_BIND)}
+                  buttonStyle={styles.noOrderBtn}
+                  titleStyle={styles.noOrderBtnTitle}
           />
         </If>
       </View>
@@ -459,7 +450,7 @@ class StoreStatusScene extends PureComponent {
   }]
 
   render() {
-    return (<View style={{flex: 1}}>
+    return (<View style={{flex: 1, backgroundColor: colors.f5}}>
         <View style={{flex: 1}}>
           <If condition={!this.state.show_body}>
             {this.renderNoBody()}
@@ -643,4 +634,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center"
   },
+  noOrderContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50
+  },
+  noOrderDesc: {
+    fontSize: 15,
+    marginTop: 9,
+    marginBottom: 20,
+    color: colors.color999
+  },
+  noOrderBtn: {
+    width: 180,
+    borderRadius: 20,
+    backgroundColor: colors.main_color,
+    paddingVertical: 10,
+    marginTop: 20
+  },
+  noOrderBtnTitle: {
+    color: colors.white,
+    fontSize: 16
+  }
 })
