@@ -183,7 +183,7 @@ export default class TemplateSettingsScene extends PureComponent {
                     <Text style={styles.rowDescription}>
                       {item.text}
                     </Text>
-                    <If condition={tempValue.tpl_type === index + 1}>
+                    <If condition={tempValue.tpl_type === index + 1 || (tempValue.tpl_type === 0 && index === 0)}>
                       <View style={styles.currentApplyWrap}>
                         <Text style={styles.currentApplyText}>
                           当前应用

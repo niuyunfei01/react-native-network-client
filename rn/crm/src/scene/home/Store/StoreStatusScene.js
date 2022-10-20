@@ -66,26 +66,9 @@ const timeOptions = [
 class StoreStatusScene extends PureComponent {
   constructor(props) {
     super(props)
-    const {navigation} = this.props
 
-    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
-    let {currStoreId} = this.props.global
-    navigation.setOptions({
-      headerRight: () => {
-        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
-          return <TouchableOpacity style={{flexDirection: 'row'}}
-                                   onPress={() => {
-                                     this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
-                                   }}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
-              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
-            </View>
-          </TouchableOpacity>
-        }
-      }
-    })
+    let {is_service_mgr} = tool.vendor(this.props.global);
+
 
     this.state = {
       all_close: false,
@@ -112,6 +95,23 @@ class StoreStatusScene extends PureComponent {
 
   componentDidMount() {
     const {navigation, global} = this.props
+    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
+    navigation.setOptions({
+      headerRight: () => {
+        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
+          return <TouchableOpacity style={{flexDirection: 'row'}}
+                                   onPress={() => {
+                                     this.onPress(Config.PLATFORM_BIND)
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
+                                   }}>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
+              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
+            </View>
+          </TouchableOpacity>
+        }
+      }
+    })
     this.focus = navigation.addListener('focus', () => {
       this.fetchData()
     })

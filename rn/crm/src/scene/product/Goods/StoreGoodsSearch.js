@@ -62,7 +62,7 @@ class StoreGoodsSearch extends Component {
     showModal('加载中')
 
     tool.debounces(() => {
-      const {searchKeywords} = this.state
+      const {searchKeywords, selectTagId, page, pageNum} = this.state
       const {type, limit_store, prod_status} = this.props.route.params;
       let params = {};
       if (searchKeywords) {
@@ -71,9 +71,9 @@ class StoreGoodsSearch extends Component {
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
         params = {
           vendor_id: currVendorId,
-          tagId: this.state.selectTagId,
-          page: this.state.page,
-          pageSize: this.state.pageNum,
+          tagId: selectTagId,
+          page: page,
+          pageSize: pageNum,
           storeId: storeId,
         }
         if ('upc' === codeType || !isNaN(parseFloat(searchKeywords)) && isFinite(searchKeywords))
@@ -175,7 +175,7 @@ class StoreGoodsSearch extends Component {
     return (
       <View style={{flexDirection: 'row', alignItems: 'center', margin: 10, flex: 1}}>
         <TextInput value={this.state.searchKeywords}
-                   style={{padding: 4, backgroundColor: colors.white, flex: 3}}
+                   style={{padding: 8, backgroundColor: colors.white, flex: 3, borderRadius: 4}}
                    onChangeText={this.onChange}
                    placeholder={'请输入商品名称、SKU或UPC'}
                    clearButtonMode={'while-editing'}
@@ -296,25 +296,24 @@ class StoreGoodsSearch extends Component {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
   renderNoProduct = () => {
-    const {searchKeywords, goods, isLoading} = this.state
-    return (
-      <If condition={!isLoading}>
+    const {searchKeywords, goods, isLoading, showNone} = this.state
+    if (showNone && !isLoading)
+      return (
         <View style={styles.notGoodTip}>
           {
             tool.length(searchKeywords) > 0 && tool.length(goods) <= 0 ?
-              <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
-              <Text style={{color: colors.color333}}>暂时没有商品</Text>
+              <Text style={{fontSize: 12, color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
+              <Text style={{fontSize: 12, color: colors.color333}}>暂时没有商品</Text>
           }
         </View>
-      </If>
-    )
+      )
   }
   onScrollBeginDrag = () => {
     this.setState({isCanLoadMore: true})
   }
 
   render() {
-    const {selectedProduct, showScan, goods, showNone, isLoading, modalType} = this.state;
+    const {selectedProduct, showScan, goods, modalType} = this.state;
     const {sp} = selectedProduct;
     const {accessToken} = this.props.global;
     const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
@@ -340,9 +339,7 @@ class StoreGoodsSearch extends Component {
                     onEndReached={this.onLoadMore}
           />
 
-          <If condition={showNone && !isLoading}>
-            {this.renderNoProduct()}
-          </If>
+          {this.renderNoProduct()}
 
           {sp && <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)} modalType={modalType}
                                      productName={selectedProduct.name}
@@ -372,14 +369,12 @@ const styles = StyleSheet.create({
   goodsWrap: {
     flex: 10,
     flexDirection: "column",
-    paddingBottom: 80
   },
   notGoodTip: {
     paddingVertical: 9,
     alignItems: "center",
     flexDirection: "row",
-    justifyContent: "center",
-    marginTop: '40%'
+    justifyContent: "center"
   },
   notMoreTip: {
     paddingVertical: 9,
