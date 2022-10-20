@@ -62,7 +62,7 @@ class OrderQueryResultScene extends PureComponent {
     const {navigation, route} = props
     let title = '全部订单'
     let type = 'done'
-    if (route.params.additional !== undefined && route.params.additional) {
+    if (route?.params?.additional !== undefined && route?.params?.additional) {
       title = '补送单'
       type = 'additional'
     }

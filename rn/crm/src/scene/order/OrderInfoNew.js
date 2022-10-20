@@ -813,18 +813,21 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View {...this._panResponder.panHandlers}>
+      <View>
         <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
-          <If condition={isShowMap}>
-            <View style={styles.orderInfoHeaderFlag}/>
-          </If>
-          <View style={styles.orderInfoHeaderStatus}>
-            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+          <View  {...this._panResponder.panHandlers} style={{
+            alignItems: "center"}}>
+            <If condition={isShowMap}>
+              <View style={styles.orderInfoHeaderFlag}/>
+            </If>
+            <View style={styles.orderInfoHeaderStatus}>
+              <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            </View>
+            <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           </View>
-          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           {this.renderOrderInfoHeaderButton()}
         </TouchableOpacity>
       </View>
