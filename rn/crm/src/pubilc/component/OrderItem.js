@@ -24,7 +24,7 @@ import {
   orderCallShip
 } from "../../reducers/order/orderActions";
 
-import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import native from "../../pubilc/util/native";
 import tool from "../util/tool";
@@ -80,10 +80,10 @@ class OrderItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
       }).catch(e => {
-        ToastShort('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 600)
   }
@@ -130,13 +130,15 @@ class OrderItem extends React.PureComponent {
         HttpUtils.get.bind(this.props)(api, {}).then(res => {
           ToastShort(res.desc);
           this.props.fetchData();
+        }).catch(() => {
+          ToastShort("此订单已有骑手接单，取消失败")
         })
       }
     }, {'text': '取消'}]);
   }
 
   toSetOrderComplete = (order_id) => {
-    Alert.alert('确认将订单已送达', '订单置为已送达后无法撤回，是否继续？', [{
+    Alert.alert('当前配送确认完成吗？', '订单送达后无法撤回，请确认顾客已收到货物', [{
       text: '确认', onPress: () => {
         const api = `/api/complete_order/${order_id}?access_token=${this.props.accessToken}`
         HttpUtils.get(api).then(() => {
@@ -144,7 +146,7 @@ class OrderItem extends React.PureComponent {
           this.props.fetchData()
           GlobalUtil.setOrderFresh(1)
         }).catch(() => {
-          showError('置为送达失败')
+          ToastShort('“配送完成失败，请稍后重试”')
         })
       }
     }, {text: '再想想'}])

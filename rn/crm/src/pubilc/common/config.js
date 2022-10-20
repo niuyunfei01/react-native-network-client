@@ -156,6 +156,7 @@ const C = {
   ROUTE_SETTLEMENT: 'Settlement',
   ROUTE_BIND_PAY: 'BindPay',
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
+  ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',

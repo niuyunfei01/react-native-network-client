@@ -1,5 +1,13 @@
 import React, {PureComponent} from 'react'
-import ReactNative, {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import ReactNative, {
+  Dimensions,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -16,6 +24,7 @@ import {InputItem} from "@ant-design/react-native";
 import tool from "../../../pubilc/util/tool";
 
 const {StyleSheet} = ReactNative
+const width = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
   const {global, device} = state;
@@ -179,6 +188,11 @@ class TripartiteRecharge extends PureComponent {
     )
   }
 
+  renderTHIRDContentItem = () => {
+    return (
+      <View></View>
+    )
+  }
 
   renderTHIRDHeader = () => {
     const {prompt_msg} = this.state
@@ -275,7 +289,7 @@ const Styles = StyleSheet.create({
   THIRDContainerNOList: {
     display: "flex",
     flexDirection: "column",
-    flex: 1
+    alignItems: "center"
   },
   THIRDContainerItemBody: {
     display: "flex",
@@ -317,14 +331,12 @@ const Styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     color: '#999999',
-    marginTop: '30%',
-    marginLeft: '20%'
+    marginTop: '20%'
   },
   NoTHIRDListBtn: {
-    width: "96%",
+    width: width * 0.92,
     height: pxToDp(70),
     marginTop: '20%',
-    marginLeft: '2%',
     backgroundColor: '#59B26A',
     borderRadius: pxToDp(10)
   },

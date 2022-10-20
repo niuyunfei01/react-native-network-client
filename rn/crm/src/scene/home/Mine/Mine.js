@@ -198,8 +198,8 @@ class Mine extends PureComponent {
       this.setState({
         balanceInfo: {
           balance: res.balance,
-          disable_recharge: res.disabled_recharge === 1,
-          disable_view_bill: res.disable_view_bill === 1
+          disable_recharge: res.disabled_recharge === 0,
+          disable_view_bill: res.disable_view_bill === 0
         }
       })
     })

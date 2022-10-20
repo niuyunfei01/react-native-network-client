@@ -6,7 +6,7 @@ import {
   InteractionManager,
   PanResponder,
   PermissionsAndroid,
-  Platform,
+  Platform, RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -753,6 +753,7 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
+              onPress={() =>{}}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
@@ -782,6 +783,7 @@ class OrderInfoNew extends PureComponent {
           <Marker
             draggable={false}
             position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+            onPress={() => {}}
           >
             <View style={{alignItems: 'center'}}>
               <View style={styles.mapBox}>
@@ -818,7 +820,8 @@ class OrderInfoNew extends PureComponent {
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
           <View  {...this._panResponder.panHandlers} style={{
-            alignItems: "center"}}>
+            alignItems: "center"
+          }}>
             <If condition={isShowMap}>
               <View style={styles.orderInfoHeaderFlag}/>
             </If>
@@ -953,12 +956,12 @@ class OrderInfoNew extends PureComponent {
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
             <Text style={styles.remarkLabel}>备注 </Text>
-            <Text style={styles.remarkValue}>{order?.remark} </Text>
+            <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>
         <View style={styles.cuttingLine}/>
         <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-          <Text style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
+          <Text style={styles.cardTitle}>商品{order?.product_total_count > 1 ? `【${order?.product_total_count}】` : order?.product_total_count}件 </Text>
           <If condition={order?.items?.length >= 1}>
             <For index='index' each='info' of={order?.items}>
               <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
@@ -970,7 +973,9 @@ class OrderInfoNew extends PureComponent {
                   resizeMode={FastImage.resizeMode.contain}
                 />
                 <View style={styles.productItem}>
-                  <Text style={styles.productItemName}>{info?.product_name} </Text>
+                  <Text style={styles.productItemName}>
+                    {tool.length((info?.product_name || '')) > 16 ? info?.product_name.substring(0, 15) + '...' : info?.product_name}
+                  </Text>
                   <Text style={styles.productItemId}>#{info?.product_id} </Text>
                   <View style={styles.productItemPrice}>
                     <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
@@ -980,18 +985,20 @@ class OrderInfoNew extends PureComponent {
                         <Text style={styles.priceWai}>外</Text>
                         <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                       </If>
-                      <If condition={order?.is_fn_price_controlled && order?.is_fn_show_wm_price}>
+                      <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
                         <If condition={order?.is_fn_price_controlled}>
+                          <Text style={styles.priceBao}>保</Text>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
-                          <Text style={styles.priceBao}>保</Text>
-                          <Text style={styles.price}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                         </If>
                         <If condition={order?.is_fn_show_wm_price}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
+                          <Text
+                            style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                         </If>
                       </If>
                     </View>
@@ -1011,7 +1018,7 @@ class OrderInfoNew extends PureComponent {
           <If condition={order?.is_fn_price_controlled}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>供货价小计 </Text>
-              <Text style={styles.remarkValue}>{numeral(order?.supply_price / 100).format('0.00')}元 </Text>
+              <Text style={styles.remarkValue}>{order?.bill?.income_base[1]}元 </Text>
             </View>
           </If>
           <If condition={is_service_mgr || !order?.is_fn_price_controlled || order?.is_fn_show_wm_price}>
@@ -1019,16 +1026,16 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.remarkLabel}>顾客实付 </Text>
               <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
             </View>
-          </If>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>优惠信息 </Text>
-            <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
-          </View>
-          <If condition={order?.bill && order?.bill?.total_income_from_platform}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>平台结算 </Text>
-              <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform[1]}元 </Text>
+              <Text style={styles.remarkLabel}>优惠信息 </Text>
+              <Text style={styles.remarkValue}>{order?.bill?.activity[1]}元 </Text>
             </View>
+            <If condition={order?.bill && order?.bill?.total_income_from_platform}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>平台结算 </Text>
+                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform[1]}元 </Text>
+              </View>
+            </If>
           </If>
           <If condition={is_service_mgr || !order?.is_fn_price_controlled}>
             <View style={styles.productItemRow}>
@@ -1063,10 +1070,12 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.remarkValue}>{order?.ship_goods_info} </Text>
             </View>
           </If>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>配送方式 </Text>
-            <Text style={styles.remarkValue}>{order?.ship_type_desc} </Text>
-          </View>
+          <If condition={order?.ship_type_desc !== ''}>
+            <View style={styles.productItemRow}>
+              <Text style={styles.remarkLabel}>配送方式 </Text>
+              <Text style={styles.remarkValue}>{order?.ship_type_desc} </Text>
+            </View>
+          </If>
           <If condition={order?.ship_worker_name !== ''}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>骑手姓名 </Text>
@@ -1093,13 +1102,15 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.remarkValue}>{order?.greeting} </Text>
             </View>
           </If>
-          <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(order?.mobile)}>
-            <Text style={styles.remarkLabel}>订购人电话 </Text>
-            <View style={{flexDirection: "row"}}>
-              <Text style={styles.remarkValue}>{order?.mobile} </Text>
-              <Text style={styles.copyText}>拨打 </Text>
-            </View>
-          </TouchableOpacity>
+          <If condition={tool.length(order?.giver_phone) > 0}>
+            <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(order?.giver_phone)}>
+              <Text style={styles.remarkLabel}>订购人电话 </Text>
+              <View style={{flexDirection: "row"}}>
+                <Text style={styles.remarkValue}>{order?.giver_phone} </Text>
+                <Text style={styles.copyText}>拨打 </Text>
+              </View>
+            </TouchableOpacity>
+          </If>
         </View>
       </View>
     )
@@ -1241,7 +1252,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   render() {
-    const {isShowMap, order} = this.state
+    const {isShowMap, order, isRefreshing} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1251,6 +1262,12 @@ class OrderInfoNew extends PureComponent {
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
         <ScrollView ref={ref => this.scrollViewRef = ref}
+                    refreshControl={
+                      <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={() => this.fetchOrder()}
+                        tintColor='gray'
+                      />}
                     automaticallyAdjustContentInsets={false}
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
@@ -1392,7 +1409,7 @@ const styles = StyleSheet.create({
   orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
-    width: width * 0.90,
+    width: width * 0.94,
     backgroundColor: colors.white,
     padding: 12
   },
