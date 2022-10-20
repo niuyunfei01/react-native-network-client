@@ -160,6 +160,14 @@ class OrderInfoNew extends PureComponent {
   }
 
   touchScreenMove = () => {
+
+    this._gestureHandlers = PanResponder.create({
+      // 要求成为响应者：
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+    });
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
         return true;
@@ -707,9 +715,15 @@ class OrderInfoNew extends PureComponent {
       ship_distance_store
     } = this.state.order;
     return (
-      <View ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
+      <View  {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
         <MapView
+          zoomGesturesEnabled={true}
+          scrollGesturesEnabled={true}
+          zoomControlsEnabled={false}
           mapType={MapType.Standard}
+          style={StyleSheet.absoluteFill}
+          minZoom={12}
+          maxZoom={20}
           initialCameraPosition={{
             target: {latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)},
             zoom: 15

@@ -362,8 +362,7 @@ class deliveryStatusModal extends React.Component {
             <View style={[styles.flexC, {marginLeft: 10}]}>
               <Text
                 style={[styles.platform, log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
-              <TouchableOpacity style={styles.descInfo} onPress={() =>
-                this.right_btn(log?.log_right_btn, info)}>
+              <View style={styles.descInfo}>
                 <If condition={tool.length(log?.log_desc) > 0}>
                   <Text style={styles.desc}>{log?.log_desc} </Text>
                 </If>
@@ -372,7 +371,7 @@ class deliveryStatusModal extends React.Component {
                     this.right_btn(log?.log_right_btn, info);
                   }} style={styles.copyText}>{log?.log_right_btn} </Text>
                 </If>
-              </TouchableOpacity>
+              </View>
               <Text style={[styles.platform, {marginTop: 6}]}>{log?.log_call_time} </Text>
             </View>
           </View>
