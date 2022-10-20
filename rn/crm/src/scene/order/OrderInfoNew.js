@@ -813,18 +813,21 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View {...this._panResponder.panHandlers}>
+      <View>
         <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
-          <If condition={isShowMap}>
-            <View style={styles.orderInfoHeaderFlag}/>
-          </If>
-          <View style={styles.orderInfoHeaderStatus}>
-            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+          <View  {...this._panResponder.panHandlers} style={{
+            alignItems: "center"}}>
+            <If condition={isShowMap}>
+              <View style={styles.orderInfoHeaderFlag}/>
+            </If>
+            <View style={styles.orderInfoHeaderStatus}>
+              <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            </View>
+            <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           </View>
-          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           {this.renderOrderInfoHeaderButton()}
         </TouchableOpacity>
       </View>
@@ -977,14 +980,14 @@ class OrderInfoNew extends PureComponent {
                         <Text style={styles.priceWai}>外</Text>
                         <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                       </If>
-                      <If condition={!is_service_mgr && !order?.is_fn_show_wm_price}>
+                      <If condition={order?.is_fn_price_controlled && order?.is_fn_show_wm_price}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceBao}>保</Text>
                           <Text style={styles.price}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                         </If>
-                        <If condition={!order?.is_fn_price_controlled}>
+                        <If condition={order?.is_fn_show_wm_price}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceWai}>外</Text>

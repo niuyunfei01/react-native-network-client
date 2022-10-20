@@ -116,20 +116,22 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    let {authorization, mobile, verifyCode} = this.state;
-    if (!authorization) {
-      return this.setState({
-        show_auth_modal: true
-      })
-    }
-    if (!mobile) {
-      // const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-      return ToastShort("请输入您的手机号", 0)
-    }
-    if (!verifyCode) {
-      return ToastShort("请填写验证码", 0)
-    }
-    this._signIn(mobile, verifyCode);
+    tool.debounces(() => {
+      let {authorization, mobile, verifyCode} = this.state;
+      if (!authorization) {
+        return this.setState({
+          show_auth_modal: true
+        })
+      }
+      if (!mobile) {
+        // const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
+        return ToastShort("请输入您的手机号", 0)
+      }
+      if (!verifyCode) {
+        return ToastShort("请填写验证码", 0)
+      }
+      this._signIn(mobile, verifyCode);
+    })
   }
 
   _signIn = (mobile, password) => {
@@ -164,7 +166,8 @@ class LoginScene extends PureComponent {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
         dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          this.doneSelectStore(store_id, !binded);
+          console.log(cfg?.show_bottom_tab, 'cfg?.show_bottom_tab')
+          this.doneSelectStore(store_id, !binded, cfg?.show_bottom_tab);
         }));
       } else {
         ToastShort(err_msg, 0);
@@ -172,7 +175,7 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false) => {
+  doneSelectStore = (storeId, not_bind = false, show_bottom_tab = false) => {
     const {dispatch, navigation} = this.props;
     dispatch(setCurrentStore(storeId));
 
@@ -182,7 +185,7 @@ class LoginScene extends PureComponent {
       return;
     }
 
-    if (this.props.global.show_bottom_tab) {
+    if (!show_bottom_tab) {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
@@ -200,7 +203,6 @@ class LoginScene extends PureComponent {
     this.setState({
       show_auth_modal: false
     })
-    ToastShort("请手动勾选隐私政策", 0)
   }
 
   onReadProtocol = () => {
@@ -255,7 +257,14 @@ class LoginScene extends PureComponent {
                       style={{position: 'absolute', top: 15, right: 10, fontSize: 18, color: colors.color999}}/>
             </If>
           </View>
-          <View style={{backgroundColor: colors.f5, borderRadius: 4, height: 48, marginTop: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{
+            backgroundColor: colors.f5,
+            borderRadius: 4,
+            height: 48,
+            marginTop: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}>
             <TextInput
               onChangeText={(verifyCode) => this.setState({verifyCode})}
               value={verifyCode}
