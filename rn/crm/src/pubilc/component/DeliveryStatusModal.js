@@ -221,11 +221,12 @@ class deliveryStatusModal extends React.Component {
   }
 
   right_btn = (str, info) => {
+    let {order_id} = this.props;
     if (str === '拨打') {
       native.dialNumber(info?.driver_phone)
     } else if (str === '骑手位置') {
       this.closeModal()
-      this.props.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info?.id})
+      this.props.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info?.id, order_id: order_id})
     } else {
       Clipboard.setString(info?.delivery_id)
       ToastLong('已复制到剪切板')
@@ -283,7 +284,7 @@ class deliveryStatusModal extends React.Component {
           backgroundColor: 'rgba(0,0,0,0.25)',
           flex: 1
         }]}>
-          <TouchableOpacity onPress={this.closeModal}  style={{flexGrow: 1}}/>
+          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
           <View style={[{
             backgroundColor: colors.white,
             maxHeight: height * 0.8,

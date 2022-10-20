@@ -9,6 +9,9 @@ import HttpUtils from "../../pubilc/util/http";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
 import Entypo from "react-native-vector-icons/Entypo";
+import * as PropTypes from "prop-types";
+import numeral from "numeral";
+import FastImage from "react-native-fast-image";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -22,17 +25,24 @@ const mapDispatchToProps = dispatch => {
 }
 
 class RiderTrajectory extends Component {
+
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
-    let {delivery_id} = this.props.route.params;
-    if (!delivery_id) {
+    let {delivery_id, order_id} = this.props.route.params;
+    if (!order_id) {
       ToastLong("参数错误");
       this.props.navigation.goBack()
       return;
     }
     this.state = {
       shops: [],
-      delivery_id,
+      delivery_id: delivery_id ? delivery_id : 0,
+      order_id,
       distance_destination: 0,
       distance_order: 0,
       distance_store: 0,
@@ -47,9 +57,9 @@ class RiderTrajectory extends Component {
   }
 
   fetchData = () => {
-    let {delivery_id} = this.state;
+    let {delivery_id, order_id} = this.state;
     const accessToken = this.props.global.accessToken
-    let api = `/api/get_track/${delivery_id}?access_token=${accessToken}`;
+    let api = `/v4/wsb_order/get_order_track/${order_id}/${delivery_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let msg = ''
       if (res.distance_store > 0 || res.distance_destination > 0) {
@@ -58,18 +68,20 @@ class RiderTrajectory extends Component {
       let zoom = res.distance_order > 0 && res.distance_order > 2000 ? 13 : 14;
       let list = [];
       let item = {};
-      tool.objectMap(res.track_list, (itm, idx) => {
-        item = {latitude: itm[1], longitude: itm[0]}
-        list.push(item)
-      })
+      if (tool.length(res.track_list) > 0) {
+        tool.objectMap(res.track_list, (itm, idx) => {
+          item = {latitude: itm[1], longitude: itm[0]}
+          list.push(item)
+        })
+      }
       this.setState({
         distance_destination: res.distance_destination,
         distance_order: res.distance_order,
         distance_store: res.distance_store,
-        track_destination: res.track_destination,
-        track_horseman: res.track_horseman,
+        track_destination: res?.pos_destination,
+        track_horseman: res?.pos_rider,
         track_list: list,
-        track_store: res.track_store,
+        track_store: res?.pos_store,
         msg,
         zoom,
       })
@@ -77,7 +89,6 @@ class RiderTrajectory extends Component {
       ToastLong("未查询到骑手轨迹");
       this.props.navigation.goBack()
     })
-
   }
 
   render() {
@@ -91,14 +102,14 @@ class RiderTrajectory extends Component {
   }
 
   renderMap() {
-    let {zoom, track_store, track_destination, track_horseman, track_list, msg} = this.state;
+    let {zoom, track_store, track_destination, track_horseman, track_list, msg, distance_order} = this.state;
     let track_store_lng = Number(track_store[0]);
     let track_store_lat = Number(track_store[1]);
     let track_destination_lng = Number(track_destination[0]);
     let track_destination_lat = Number(track_destination[1]);
     let track_horseman_lng = Number(track_horseman[0]);
     let track_horseman_lat = Number(track_horseman[1]);
-    if (!track_store_lng || !track_destination_lng || !track_horseman_lng) {
+    if (!track_store_lng || !track_destination_lng) {
       return null;
     }
     let {
@@ -120,7 +131,6 @@ class RiderTrajectory extends Component {
             position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
           >
             <View style={{alignItems: 'center'}}>
-
               <If condition={msg !== ''}>
                 <View style={{alignItems: 'center'}}>
                   <View style={{
@@ -146,6 +156,7 @@ class RiderTrajectory extends Component {
             </View>
           </Marker>
         </If>
+
         <If condition={track_store_lat && track_store_lng}>
           <Marker
             zIndex={91}
@@ -157,17 +168,33 @@ class RiderTrajectory extends Component {
             }}
           />
         </If>
+
         <If condition={track_destination_lat && track_destination_lng}>
           <Marker
             zIndex={93}
             // centerOffset={{x: 1, y: 1}}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
-            icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
-              width: 22,
-              height: 42,
-            }}
-          />
+          >
+            <View style={{alignItems: 'center'}}>
+              <View style={{
+                zIndex: 990,
+                backgroundColor: colors.white,
+                marginBottom: 15,
+                padding: 8,
+                borderRadius: 6,
+              }}>
+                <Text style={{color: colors.color333, fontSize: 12}}>
+                  距门店{distance_order > 1000 ? numeral(distance_order / 1000).format('0.00') + '公里' : distance_order + '米'}
+                </Text>
+              </View>
+              <Entypo name={'triangle-down'}
+                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+
+              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
+                         style={{width: 22, height: 42}}
+                         resizeMode={FastImage.resizeMode.contain}/>
+            </View>
+          </Marker>
         </If>
         <If condition={track_list}>
           <Polyline width={4} color={colors.warn_color} points={track_list}/>

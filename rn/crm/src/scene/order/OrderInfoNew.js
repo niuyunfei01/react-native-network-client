@@ -6,7 +6,8 @@ import {
   InteractionManager,
   PanResponder,
   PermissionsAndroid,
-  Platform, RefreshControl,
+  Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -141,7 +142,6 @@ class OrderInfoNew extends PureComponent {
   componentDidMount = () => {
     const {deviceInfo} = this.props?.device
     const {currStoreId, currentUser, accessToken} = this.props.global;
-    this.fetchOrder()
     this.navigationOptions()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -318,6 +318,7 @@ class OrderInfoNew extends PureComponent {
 
   fetchOrder = () => {
     let {orderId, isFetching} = this.state
+    // orderId = 36001321
     if (!orderId || isFetching) {
       return false;
     }
@@ -753,7 +754,8 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
-              onPress={() =>{}}
+              onPress={() => {
+              }}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
@@ -783,7 +785,8 @@ class OrderInfoNew extends PureComponent {
           <Marker
             draggable={false}
             position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-            onPress={() => {}}
+            onPress={() => {
+            }}
           >
             <View style={{alignItems: 'center'}}>
               <View style={styles.mapBox}>
@@ -960,90 +963,99 @@ class OrderInfoNew extends PureComponent {
           </View>
         </If>
         <View style={styles.cuttingLine}/>
-        <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-          <Text style={styles.cardTitle}>商品{order?.product_total_count > 1 ? `【${order?.product_total_count}】` : order?.product_total_count}件 </Text>
-          <If condition={order?.items?.length >= 1}>
-            <For index='index' each='info' of={order?.items}>
-              <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
-                this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
-              }}>
-                <FastImage
-                  source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
-                  style={styles.productImage}
-                  resizeMode={FastImage.resizeMode.contain}
-                />
-                <View style={styles.productItem}>
-                  <Text style={styles.productItemName}>
-                    {tool.length((info?.product_name || '')) > 16 ? info?.product_name.substring(0, 15) + '...' : info?.product_name}
-                  </Text>
-                  <Text style={styles.productItemId}>#{info?.product_id} </Text>
-                  <View style={styles.productItemPrice}>
-                    <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                      <If condition={is_service_mgr || order?.is_fn_show_wm_price}>
-                        <Text style={styles.priceBao}>保</Text>
-                        <Text style={styles.price}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
-                        <Text style={styles.priceWai}>外</Text>
-                        <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                      </If>
-                      <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
-                        <If condition={order?.is_fn_price_controlled}>
+        <If condition={order?.product_total_count > 0}>
+          <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
+            <Text
+              style={styles.cardTitle}>商品{order?.product_total_count > 1 ? `【${order?.product_total_count}】` : order?.product_total_count}件 </Text>
+            <If condition={order?.items?.length >= 1}>
+              <For index='index' each='info' of={order?.items}>
+                <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
+                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
+                }}>
+                  <FastImage
+                    source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
+                    style={styles.productImage}
+                    resizeMode={FastImage.resizeMode.contain}
+                  />
+                  <View style={styles.productItem}>
+                    <Text style={styles.productItemName}>
+                      {tool.length((info?.product_name || '')) > 16 ? info?.product_name.substring(0, 15) + '...' : info?.product_name}
+                    </Text>
+                    <Text style={styles.productItemId}>#{info?.product_id} </Text>
+                    <View style={styles.productItemPrice}>
+                      <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                        <If condition={is_service_mgr || order?.is_fn_show_wm_price}>
                           <Text style={styles.priceBao}>保</Text>
-                          <Text
-                            style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
-                          <Text style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
-                        </If>
-                        <If condition={order?.is_fn_show_wm_price}>
-                          <Text
-                            style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text style={styles.price}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                          <Text
-                            style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                         </If>
-                      </If>
+                        <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
+                          <If condition={order?.is_fn_price_controlled}>
+                            <Text style={styles.priceBao}>保</Text>
+                            <Text
+                              style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                            <Text
+                              style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
+                          </If>
+                          <If condition={order?.is_fn_show_wm_price}>
+                            <Text
+                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                            <Text style={styles.priceWai}>外</Text>
+                            <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
+                            <Text
+                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
+                          </If>
+                        </If>
+                      </View>
+                      <Text style={styles.productNum}> x {info?.num} </Text>
                     </View>
-                    <Text style={styles.productNum}> x {info?.num} </Text>
                   </View>
-                </View>
-              </TouchableOpacity>
-            </For>
-          </If>
-        </View>
-        <View style={styles.cuttingLine}/>
-        <View style={[styles.orderCardContainer, {
-          flexDirection: "column",
-          borderBottomLeftRadius: 6,
-          borderBottomRightRadius: 6
-        }]}>
-          <If condition={order?.is_fn_price_controlled}>
-            <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>供货价小计 </Text>
-              <Text style={styles.remarkValue}>{order?.bill?.income_base[1]}元 </Text>
-            </View>
-          </If>
-          <If condition={is_service_mgr || !order?.is_fn_price_controlled || order?.is_fn_show_wm_price}>
-            <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>顾客实付 </Text>
-              <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
-            </View>
-            <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>优惠信息 </Text>
-              <Text style={styles.remarkValue}>{order?.bill?.activity[1]}元 </Text>
-            </View>
-            <If condition={order?.bill && order?.bill?.total_income_from_platform}>
+                </TouchableOpacity>
+              </For>
+            </If>
+          </View>
+          <View style={styles.cuttingLine}/>
+          <View style={[styles.orderCardContainer, {
+            flexDirection: "column",
+            borderBottomLeftRadius: 6,
+            borderBottomRightRadius: 6
+          }]}>
+            <If condition={order?.is_fn_price_controlled}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>平台结算 </Text>
-                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform[1]}元 </Text>
+                <Text style={styles.remarkLabel}>供货价小计 </Text>
+                <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
               </View>
             </If>
-          </If>
-          <If condition={is_service_mgr || !order?.is_fn_price_controlled}>
-            <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>订单原价 </Text>
-              <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
-            </View>
-          </If>
-        </View>
+            <If condition={is_service_mgr || !order?.is_fn_price_controlled || order?.is_fn_show_wm_price}>
+
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>顾客实付 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+              </View>
+
+              <If condition={order?.bill && order?.bill?.activity}>
+                <View style={styles.productItemRow}>
+                  <Text style={styles.remarkLabel}>优惠信息 </Text>
+                  <Text style={styles.remarkValue}>{order?.bill?.activity}元 </Text>
+                </View>
+              </If>
+
+              <If condition={order?.bill && order?.bill?.total_income_from_platform}>
+                <View style={styles.productItemRow}>
+                  <Text style={styles.remarkLabel}>平台结算 </Text>
+                  <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
+                </View>
+              </If>
+            </If>
+            <If condition={is_service_mgr || !order?.is_fn_price_controlled}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>订单原价 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
+              </View>
+            </If>
+          </View>
+        </If>
       </View>
     )
   }
@@ -1054,10 +1066,13 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
           <Text style={styles.cardTitle}>配送信息 </Text>
-          <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>配送门店 </Text>
-            <Text style={styles.remarkValue}>{order?.show_store_name} </Text>
-          </View>
+
+          <If condition={order?.show_store_name}>
+            <View style={styles.productItemRow}>
+              <Text style={styles.remarkLabel}>配送门店 </Text>
+              <Text style={styles.remarkValue}>{order?.store_name} </Text>
+            </View>
+          </If>
           <If condition={order?.ship_create_time !== ''}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>下单时间 </Text>

@@ -501,7 +501,7 @@ export const AppNavigator = (props) => {
 
 
         <Stack.Screen name={Config.RIDER_TRSJECTORY}
-                      options={{headerTitle: '骑手轨迹'}}
+                      options={{headerTitle: '地图'}}
                       getComponent={() => require('../../scene/order/RiderTrajectory').default}/>
         <Stack.Screen name={Config.ROUTE_ADD_MISSING_PICTURE}
                       options={{headerTitle: '添加图片'}}
