@@ -37,7 +37,7 @@ import {
   push,
   Service,
   setting,
-  stores,
+  stores, third_recharge,
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import tool from "../../../pubilc/util/tool";
@@ -96,7 +96,7 @@ class Mine extends PureComponent {
       currVersion,
       co_type
     } = tool.vendor(this.props.global);
-    let json_str = '[{"title":"常用","items":[{"name":"订单查询","type":"Router","path":"OrderSearch","icon":"order_search","badge":{}},{"name":"运营数据","type":"Router","path":"DistributionAnalysis","icon":"operator_data","badge":{}},{"name":"配送回传","type":"Router","path":"ComesBack","icon":"delivery_sync","badge":{"label":"达标","color":"white","bg_color":"#26B942"}},{"name":"调价","type":"Router","path":"GoodsApplyRecord","icon":"adjust","badge":{}},{"name":"订单补偿","type":"Router","path":"OrderSurcharge","icon":"order_compensate","badge":{}},{"name":"费用账单","type":"Router","path":"OldSeparatedExpense","icon":"fee_bills","badge":{}}]},{"title":"配送设置","items":[{"name":"外卖门店","type":"Router","path":"StoreStatus","icon":"ext_store","badge":{}},{"name":"配送管理","type":"Router","path":"DeliveryList","icon":"deliveries","badge":{}},{"name":"门店管理","type":"Router","path":"Store","icon":"stores","badge":{}},{"name":"打印设置","type":"Router","path":"PrinterSetting","icon":"printer","badge":{}}]},{"title":"其他","items":[{"name":"通知设置","type":"Router","path":"PushSetting","icon":"push","badge":{}},{"name":"系统设置","type":"Router","path":"Setting","icon":"setting","badge":{}},{"name":"帮助","type":"Router","path":"Help","icon":"help","badge":{}},{"name":"公告","type":"Router","path":"HistoryNoticeScene","icon":"history_notice","badge":{}}]}]'
+    let json_str = '[{"title":"常用","items":[{"name":"订单查询","type":"Router","path":"OrderSearch","icon":"order_search","badge":{}},{"name":"运营数据","type":"Router","path":"DistributionAnalysis","icon":"operator_data","badge":{}},{"name":"配送回传","type":"Router","path":"ComesBack","icon":"delivery_sync","badge":{"label":"达标","color":"white","bg_color":"#26B942"}}]},{"title":"配送设置","items":[{"name":"外卖门店","type":"Router","path":"StoreStatus","icon":"ext_store","badge":{}},{"name":"配送管理","type":"Router","path":"DeliveryList","icon":"deliveries","badge":{}},{"name":"门店管理","type":"Router","path":"Store","icon":"stores","badge":{}},{"name":"打印设置","type":"Router","path":"PrinterSetting","icon":"printer","badge":{}}]},{"title":"其他","items":[{"name":"通知设置","type":"Router","path":"PushSetting","icon":"push","badge":{}},{"name":"系统设置","type":"Router","path":"Setting","icon":"setting","badge":{}},{"name":"帮助","type":"Router","path":"Help","icon":"help","badge":{}},{"name":"公告","type":"Router","path":"HistoryNoticeScene","icon":"history_notice","badge":{}}]}]'
     this.state = {
       isRefreshing: false,
       currStoreId: currStoreId,
@@ -421,7 +421,10 @@ class Mine extends PureComponent {
     return (
       <View
         style={headerRightStyles.resetBind}>
-        <TouchableOpacity onPress={() => this.navigateToBack()}>
+        <TouchableOpacity style={{
+          width: 90,
+          height: 32,
+        }} onPress={() => this.navigateToBack()}>
           <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => this.JumpToServices()} style={headerRightStyles.rightBtn}>
@@ -432,6 +435,16 @@ class Mine extends PureComponent {
     )
   }
 
+  jumpToAddStore = () => {
+    let {is_mgr} = this.state
+    this.onPress(Config.ROUTE_STORE_ADD,{
+      btn_type: "edit",
+      is_mgr: is_mgr,
+      editStoreId: this.props.global.currStoreId
+    })
+  }
+
+
   renderStoreInfo = () => {
     let {storeInfo} = this.state;
     return (
@@ -440,14 +453,16 @@ class Mine extends PureComponent {
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
-          <View style={styles.storeContent}>
+          <TouchableOpacity onPress={()=>{
+            this.jumpToAddStore()
+          }} style={styles.storeContent}>
             <Text style={styles.storeName}>
               {tool.length((storeInfo?.store_name || '')) > 12 ? storeInfo?.store_name.substring(0, 11) + '...' : storeInfo?.store_name}
             </Text>
             <View style={styles.storeType}>
               <Text style={styles.storeTypeText}>连锁版 </Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.roleBox} onPress={() => this.onPress(Config.ROUTE_PER_IDENTIFY)}>
             <Text style={styles.roleText}>{storeInfo?.role_desc} </Text>
             <Entypo name="chevron-thin-right" style={styles.roleIcon}/>
@@ -554,6 +569,12 @@ class Mine extends PureComponent {
       case 'history_notice':
         return history_notice()
         break;
+      case 'third_recharge':
+        return third_recharge()
+        break;
+      case 'stall_settlement':
+        return stall_settlement()
+        break;
       default:
         return order_search()
         break;
@@ -565,9 +586,7 @@ class Mine extends PureComponent {
     return (
       <For of={menu_list} each='item' index='index'>
         <View style={[styles.zoneWrap]} key={index}>
-          <Text style={styles.zoneWrapTitle}>
-            {item?.title}
-          </Text>
+          <Text style={styles.zoneWrapTitle}>{item?.title} </Text>
           <View style={{flexDirection: 'row', justifyContent: 'center', flex: 1}}>
             <View style={styles.flexRowWrap}>
               <For of={item?.items} each='info' index='index'>
