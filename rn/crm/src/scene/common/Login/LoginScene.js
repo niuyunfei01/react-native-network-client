@@ -200,7 +200,6 @@ class LoginScene extends PureComponent {
     this.setState({
       show_auth_modal: false
     })
-    ToastShort("请手动勾选隐私政策", 0)
   }
 
   onReadProtocol = () => {

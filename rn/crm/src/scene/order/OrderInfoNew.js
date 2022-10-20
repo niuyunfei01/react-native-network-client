@@ -977,14 +977,14 @@ class OrderInfoNew extends PureComponent {
                         <Text style={styles.priceWai}>外</Text>
                         <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                       </If>
-                      <If condition={!is_service_mgr && !order?.is_fn_show_wm_price}>
+                      <If condition={order?.is_fn_price_controlled && order?.is_fn_show_wm_price}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceBao}>保</Text>
                           <Text style={styles.price}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                         </If>
-                        <If condition={!order?.is_fn_price_controlled}>
+                        <If condition={order?.is_fn_show_wm_price}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
                           <Text style={styles.priceWai}>外</Text>

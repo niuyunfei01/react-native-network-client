@@ -138,7 +138,7 @@ class GoodsListModal extends React.Component {
                       </If>
 
                       {/*商户看到的*/}
-                      <If condition={!is_service_mgr && !is_fn_show_wm_price}>
+                      <If condition={is_fn_price_controlled || is_fn_show_wm_price}>
                         {/*保底模式*/}
                         <If condition={is_fn_price_controlled}>
                           <Text style={[Styles.priceMode]}>保</Text>
@@ -146,7 +146,7 @@ class GoodsListModal extends React.Component {
                         </If>
 
                         {/*联营模式*/}
-                        <If condition={!is_fn_price_controlled}>
+                        <If condition={is_fn_show_wm_price}>
                           <Text style={Styles.priceMode}>外</Text>
                           <Text style={Styles.color44140}>{numeral(item.price).format('0.00')} </Text>
                         </If>

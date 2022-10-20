@@ -17,7 +17,7 @@ import dayjs from "dayjs";
 import {Button, CheckBox, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 
-import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
@@ -282,7 +282,7 @@ class OrderCallDelivery extends Component {
         }, {'text': '取消'}]);
       }
     }).catch(e => {
-      showError(`${e.reason}`)
+      ToastShort(e.reason, 0)
     })
   }
 
@@ -290,7 +290,7 @@ class OrderCallDelivery extends Component {
   onWorkerDelivery() {
     let {worker_delivery_id, order_id} = this.state;
     if (!this.state.worker_delivery_id > 0) {
-      ToastLong('请选择员工');
+      ToastShort('请选择员工');
       return;
     }
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
@@ -518,30 +518,10 @@ class OrderCallDelivery extends Component {
   }
 
   checkDatePicker = (date) => {
-    let today = dayjs().format('DD');
-    let today1 = dayjs().add(1, 'day').format('DD');
-    let today2 = dayjs().add(2, 'day').format('DD');
-    let day = dayjs(date).format('DD');
-    let day_str = '';
-
-    switch (day) {
-      case today:
-        day_str = '今天'
-        break;
-      case today1:
-        day_str = '明天'
-        break;
-      case today2:
-        day_str = '后天'
-        break;
-      default:
-        day_str = dayjs(date).format('YY-MM-DD') + '/'
-        break;
-    }
     this.setState({
       expect_time: dayjs(date).format('YYYY-MM-DD HH:mm'),
       show_date_modal: false,
-      mealTime: day_str + '' + dayjs(date).format('HH:mm'),
+      mealTime: dayjs(date).format('HH:mm'),
       is_right_once: 0,
     }, () => {
       this.fetchData()
@@ -813,11 +793,12 @@ class OrderCallDelivery extends Component {
           </View>
 
           <View style={{marginRight: 1}}>
-            <Text style={{fontSize: 12, color: colors.color333}}>
+            <Text style={{fontSize: 12, color: colors.color333, width: 60, textAlign: 'right'}}>
               <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
-              <Text style={{fontSize: 12, color: '#FF8309'}}>优惠{item?.coupons_amount}元</Text>
+              <Text
+                style={{fontSize: 12, color: '#FF8309', width: 60, textAlign: 'right'}}>优惠{item?.coupons_amount}元</Text>
             </If>
           </View>
           <CheckBox
@@ -912,7 +893,7 @@ class OrderCallDelivery extends Component {
         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 12}}>
           <TouchableOpacity onPress={() => {
             if (is_alone_pay_vendor) {
-              return ToastLong('不支持修改商品重量');
+              return ToastShort('不支持修改商品重量');
             }
             this.setState({
               show_weight_modal: true
@@ -945,7 +926,7 @@ class OrderCallDelivery extends Component {
               fontSize: 11,
               color: colors.color333,
               marginTop: 5
-            }}>{is_right_once === 0 ? tool.length((mealTime || '')) > 8 ? '..' + mealTime.substr(-8) : mealTime : '立即送达'}</Text>
+            }}>{is_right_once === 0 ? mealTime : '立即送达'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -1220,6 +1201,9 @@ class OrderCallDelivery extends Component {
             </View>
             <Button title={'确 定'}
                     onPress={() => {
+                      if (weight_input_value <= 0) {
+                        return ToastShort('请选择物品重量')
+                      }
                       this.setState({
                         weight: weight_input_value
                       }, () => {
@@ -1315,6 +1299,10 @@ class OrderCallDelivery extends Component {
             <Button title={'确 定'}
                     onPress={() => {
                       let order_money = order_money_input_value === 0 ? order_money_value : order_money_input_value;
+
+                      if (order_money <= 0) {
+                        return ToastShort('请选择物品价值')
+                      }
                       this.setState({
                         order_money
                       }, () => {
