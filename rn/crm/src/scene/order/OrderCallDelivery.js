@@ -289,7 +289,7 @@ class OrderCallDelivery extends Component {
 
   onWorkerDelivery() {
     let {worker_delivery_id, order_id} = this.state;
-    if (!this.state.worker > 0) {
+    if (!this.state.worker_delivery_id > 0) {
       ToastLong('请选择员工');
       return;
     }
