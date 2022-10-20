@@ -46,7 +46,7 @@ class RemindModal extends React.Component {
     }, () => {
     })
 
-    let api = 'v4/wsbServerConfig/getServer?accessToken=' + accessToken
+    let api = 'v4/wsbServerConfig/getServer?access_token=' + accessToken
     let data = {
       store_id: currStoreId,
     }
