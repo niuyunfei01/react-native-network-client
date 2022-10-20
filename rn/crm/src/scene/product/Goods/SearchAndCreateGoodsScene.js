@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   HeaderInputWrap: {
     flex: 9, flexDirection: 'row', alignItems: 'center', borderRadius: 17, backgroundColor: '#f7f7f7'
   },
-  searchTextInput: {flex: 1, padding: 4, marginLeft: 13},
+  searchTextInput: {flex: 1, padding: 8, marginLeft: 13},
   itemWrap: {
     height: 100,
     borderRadius: 4,
@@ -40,8 +40,10 @@ const styles = StyleSheet.create({
   itemImage: {width: 80, height: 80, margin: 10},
   itemTitle: {fontSize: 14, fontWeight: 'bold', color: colors.color333, width: width - 120, paddingTop: 10},
   itemCategoryName: {fontSize: 12, color: colors.color666, width: width - 120},
-  itemGoodsExistFlagWrap: {backgroundColor: '#FFB454', borderRadius: 2, position: 'absolute', top: 4, right: 6},
+  itemGoodsExistFlagWrap: {backgroundColor: colors.red, borderRadius: 2, position: 'absolute', top: 4, right: 6},
   itemGoodsExistFlagText: {fontSize: 10, color: colors.white, paddingVertical: 1, paddingHorizontal: 4},
+  itemGoodsMultiFlagWrap: {backgroundColor: '#FFB454', borderRadius: 2, position: 'absolute', bottom: 4, right: 6},
+  itemGoodsMultiFlagText: {fontSize: 10, color: colors.white, paddingVertical: 1, paddingHorizontal: 4},
   bottomWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,10 +72,11 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
   }
 
   onChangeText = (value) => {
-    this.setState({searchKeywords: value}, () => setTimeout(() => {
-      this.search()
-      Keyboard.dismiss()
-    }, 500))
+    this.setState({searchKeywords: value})
+  }
+
+  searchGoods = () => {
+    this.setState({page: 1}, () => this.search())
   }
 
   getHeader() {
@@ -82,19 +85,28 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
       <View style={styles.HeaderWrap}>
         <View style={styles.HeaderInputWrap}>
           <AntDesign name={'search1'} size={18} style={{marginLeft: 10}}/>
-          <TextInput value={searchKeywords} onChangeText={text => this.onChangeText(text)}
+          <TextInput value={searchKeywords}
+                     onChangeText={text => this.onChangeText(text)}
+                     returnKeyType={'search'}
+                     onSubmitEditing={this.searchGoods}
                      style={styles.searchTextInput}
                      underlineColorAndroid={'transparent'}
                      placeholderTextColor={colors.color999}
                      placeholder={'请输入商品名称'}/>
+
         </View>
+        <If condition={searchKeywords}>
+          <Text onPress={this.searchGoods} style={{fontSize: 16, padding: 8, color: colors.color333}}>
+            搜索
+          </Text>
+        </If>
       </View>
     )
   }
 
 
   renderItem = ({item}) => {
-    const {store_had, name, sg_tag_name_list, sg_tag_id, pic} = item
+    const {store_had, name, sg_tag_name_list, sg_tag_id, pic, series_id} = item
     return (
       <TouchableOpacity style={store_had ? styles.storeHasItemWrap : styles.itemWrap}
                         onPress={() => this.jumpToGoodsEdit(item)}
@@ -116,6 +128,13 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
           <View style={styles.itemGoodsExistFlagWrap}>
             <Text style={styles.itemGoodsExistFlagText}>
               商品已存在
+            </Text>
+          </View>
+        </If>
+        <If condition={parseInt(series_id) > 0}>
+          <View style={styles.itemGoodsMultiFlagWrap}>
+            <Text style={styles.itemGoodsMultiFlagText}>
+              多规格
             </Text>
           </View>
         </If>
@@ -154,29 +173,24 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
           isLoading: false
         })
     }, () => {
-      this.setState({
-        isLoading: false
-      })
+      this.setState({isLoading: false})
       hideModal()
     })
       .catch(() => {
         hideModal()
-        this.setState({
-          isLoading: false
-        })
+        this.setState({isLoading: false})
       })
-
+    Keyboard.dismiss()
   }
   onLoadMore = () => {
     let {page, isLastPage, isLoading, isCanLoadMore} = this.state
-
+    if (!isCanLoadMore || isLoading)
+      return;
     if (isLastPage) {
       showError('没有更多商品')
       this.setState({isCanLoadMore: false})
       return
     }
-    if (!isCanLoadMore || isLoading)
-      return;
     this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
   }
   getGoodsList = () => {

@@ -628,7 +628,7 @@ class StoreGoodsList extends Component {
         <View style={styles.HeaderInputWrap}>
           <AntDesign name={'search1'} size={18} style={{marginLeft: 10}}/>
           <TextInput value={searchKeywords}
-                     style={{flex: 1, padding: 4, marginLeft: 13}}
+                     style={{flex: 1, padding: 8, marginLeft: 13}}
                      onFocus={() => this.jumpToSearchGoodsList(searchKeywords)}
                      placeholderTextColor={colors.color999}
                      placeholder={'请输入商品名称、SKU或UPC'}/>

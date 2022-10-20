@@ -130,19 +130,22 @@ class AutomaticFeedbackScene extends PureComponent {
 
     const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
-      // list.map(item => {
-      //   item.value = item.id
-      //   item.label = item.name
-      // })
+
       const lists = [{id: '0', name: '全部', platform: '0', store: currStoreId}].concat(list)
-      let _selectStore = tool.length(lists) > 0 ? lists[0] : selectStore
-      Object.keys(settings).map(key => {
-        if (_selectStore.id === key)
-          _selectStore = {..._selectStore, status: settings[key].status};
-      })
+      if (!selectStore.id) {
+        let _selectStore = tool.length(lists) > 0 ? lists[0] : selectStore
+        Object.keys(settings).map(key => {
+          if (_selectStore.id === key)
+            _selectStore = {..._selectStore, status: settings[key].status};
+        })
+        this.setState({
+          storeList: lists,
+          selectStore: _selectStore
+        })
+        return
+      }
       this.setState({
-        storeList: lists,
-        selectStore: _selectStore
+        storeList: lists
       })
     }).catch(error => showError(error.reason))
   }
@@ -322,6 +325,7 @@ class AutomaticFeedbackScene extends PureComponent {
     }
     HttpUtils.post(api, params).then(() => {
       showSuccess('保存成功')
+      this.getSetting()
     }).catch(error => showError('保存失败，原因：' + error.reason))
   }
 
