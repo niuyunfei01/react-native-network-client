@@ -220,7 +220,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
           <Text style={styles.bottomTextNormal}>
             未找到合适的商品可
           </Text>
-          <Text style={styles.bottomTextBtn} onPress={this.jumpToGoodsEdit}>
+          <Text style={styles.bottomTextBtn} onPress={() => this.jumpToGoodsEdit(null)}>
             手动创建
           </Text>
         </View>
