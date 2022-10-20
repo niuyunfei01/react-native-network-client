@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
+import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -279,12 +279,12 @@ class deliveryStatusModal extends React.Component {
              maskClosable transparent={true}
              animationType="fade"
              visible={show_modal}>
-        <TouchableOpacity onPress={this.closeModal} style={[{
+        <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
           flex: 1
         }]}>
           <View style={{flexGrow: 1}}/>
-          <TouchableHighlight style={[{
+          <View style={[{
             backgroundColor: colors.white,
             maxHeight: height * 0.8,
             borderTopLeftRadius: 15,
@@ -307,10 +307,10 @@ class deliveryStatusModal extends React.Component {
                 <Entypo onPress={this.closeModal} name="cross" style={styles.QrClose}/>
               </View>
 
-              <ScrollView overScrollMode="always"
-                          automaticallyAdjustContentInsets={false}
+              <ScrollView automaticallyAdjustContentInsets={false}
                           showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false} style={{maxHeight: 350}}>
+                          showsVerticalScrollIndicator={false}
+                          style={{maxHeight: 350}}>
                 <For index='index' each='info' of={delivery_list}>
                   <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
                     <View style={styles.flexC}>
@@ -338,8 +338,8 @@ class deliveryStatusModal extends React.Component {
               {this.renderButton()}
             </View>
 
-          </TouchableHighlight>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     )
   }
