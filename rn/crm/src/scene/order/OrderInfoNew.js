@@ -714,6 +714,13 @@ class OrderInfoNew extends PureComponent {
       ship_distance_destination,
       ship_distance_store
     } = this.state.order;
+
+
+    let {
+      aLon,
+      aLat
+    } = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
+
     return (
       <View  {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
         <MapView
@@ -725,8 +732,8 @@ class OrderInfoNew extends PureComponent {
           minZoom={12}
           maxZoom={20}
           initialCameraPosition={{
-            target: {latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)},
-            zoom: 15
+            target: {latitude: Number(aLat), longitude: Number(aLon)},
+            zoom: dada_distance > 2000 ? 13 : 14
           }}>
           {/*门店定位*/}
           <Marker
