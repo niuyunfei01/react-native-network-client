@@ -283,7 +283,7 @@ class deliveryStatusModal extends React.Component {
           backgroundColor: 'rgba(0,0,0,0.25)',
           flex: 1
         }]}>
-          <View style={{flexGrow: 1}}/>
+          <TouchableOpacity onPress={this.closeModal}  style={{flexGrow: 1}}/>
           <View style={[{
             backgroundColor: colors.white,
             maxHeight: height * 0.8,
