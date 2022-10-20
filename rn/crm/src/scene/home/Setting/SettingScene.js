@@ -151,6 +151,9 @@ class SettingScene extends PureComponent {
     this.setState({
       [field]: value
     })
+    if (typeof (value) === 'boolean') {
+      value = value ? 1 : 0
+    }
     tool.debounces(() => {
       const {currStoreId, accessToken} = this.props.global;
       const api = `/v4/wsb_store/setStoreConfig?access_token=${accessToken}`
@@ -423,7 +426,12 @@ class SettingScene extends PureComponent {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 1)}
-                              style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: pxToDp(90)}}>
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 8,
+                                height: pxToDp(90)
+                              }}>
               <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>使用商家名称与总单号 </Text>
               <If condition={invoice_serial_font === 1}>
                 <Entypo name={'check'} size={22} color={colors.main_color}/>
@@ -545,7 +553,7 @@ class SettingScene extends PureComponent {
   renderPrivacyPolicy = () => {
     return (
       <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, paddingHorizontal: 12}}>
-        <TouchableOpacity onPress={ this.onReadProtocol}
+        <TouchableOpacity onPress={this.onReadProtocol}
                           style={styles.item_row}>
           <Text style={styles.row_label}>外送帮隐私政策 </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
