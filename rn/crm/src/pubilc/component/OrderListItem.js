@@ -370,8 +370,9 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
+    let {order_id} = this.state
     this.setState({showDeliveryModal: false}, () => {
-      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val})
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val, order_id: order_id})
     })
     this.mixpanel.track('查看位置')
   }

@@ -1675,8 +1675,9 @@ class OrderInfo extends Component {
   }
 
   canViewPosition = (info) => {
+    let {order_id} = this.state
     this.setState({showDeliveryModal: false}, () => {
-      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id})
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id, order_id: order_id})
     })
     this.mixpanel.track('配送调度页_查看位置')
   }

@@ -197,9 +197,11 @@ class OrderItem extends React.PureComponent {
 
   touchLocation = () => {
     let {item} = this.props;
-    this.mixpanel.track('订单列表页_点击位置')
-    const path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
-    this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
+    this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: 0, order_id: item?.id})
+
+    // this.mixpanel.track('订单列表页_点击位置')
+    // const path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
+    // this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
   }
 
   routeOrder = () => {
