@@ -63,7 +63,7 @@ class OrderCallDelivery extends Component {
     super(props);
     let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
     this.state = {
-      isLoading: true,
+      isLoading: false,
       order_id: order_id,
       store_id: store_id,
       if_reship: if_reship,
@@ -87,11 +87,11 @@ class OrderCallDelivery extends Component {
       wm_address: '',
       wm_user_name: '',
       wm_mobile: '',
-      expect_time: expect_time ? expect_time : dayjs(new Date()).format('YYYY-MM-DD HH:ii:ss'),
+      expect_time: expect_time ? expect_time : dayjs(new Date()).format('YYYY-MM-DD HH:MM:ss'),
       order_money: 20,
       order_money_input_value: 20,
       order_money_value: '',
-      add_tips: '',
+      add_tips: 0,
       add_tips_input_value: '',
       remark: '',
       remark_input_value: '',
@@ -114,7 +114,8 @@ class OrderCallDelivery extends Component {
       mobile: '',
       est_all_check: false,
       store_est_all_check: false,
-      logistic_fee_map: []
+      logistic_fee_map: [],
+      params_str: '',
     };
   }
 
@@ -137,11 +138,7 @@ class OrderCallDelivery extends Component {
   }
 
   fetchData = () => {
-    this.setState({
-      isLoading: true
-    })
-    showModal('加载中')
-    let {order_id, weight, expect_time, remark, add_tips, order_money} = this.state;
+    let {order_id, weight, expect_time, remark, add_tips, order_money, params_str, isLoading} = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
       weight,
@@ -153,10 +150,19 @@ class OrderCallDelivery extends Component {
       store_id,
     }
 
+    let params_json_str = JSON.stringify(params);
+    if (params_str == params_json_str || isLoading) {
+      return;
+    }
+    showModal('加载中')
+    this.setState({
+      isLoading: true
+    })
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
       hideModal();
       this.setState({
+        params_str: params_json_str,
         store_est: obj?.store_est,
         est: obj?.est,
         exist_waiting_delivery: obj?.exist_waiting_delivery,
@@ -166,10 +172,10 @@ class OrderCallDelivery extends Component {
         wm_user_name: obj?.wm_user_name,
         wm_mobile: obj?.wm_mobile,
         order_expect_time: obj?.expect_time,
-        order_money: obj?.wm_order_money,
-        order_money_input_value: obj?.wm_order_money,
-        weight: obj?.weight,
-        weight_input_value: obj?.weight,
+        order_money: Number(obj?.wm_order_money),
+        order_money_input_value: Number(obj?.wm_order_money),
+        weight: Number(obj?.weight),
+        weight_input_value: Number(obj?.weight),
         weight_max: obj?.weight_max,
         weight_min: obj?.weight_min,
         weight_step: obj?.weight_step,
@@ -572,7 +578,6 @@ class OrderCallDelivery extends Component {
             this.closeModal()
           }}
         />
-
         <AddTipModal
           setState={this.setState.bind(this)}
           fetchData={this.fetchData.bind(this)}
@@ -793,12 +798,12 @@ class OrderCallDelivery extends Component {
           </View>
 
           <View style={{marginRight: 1}}>
-            <Text style={{fontSize: 12, color: colors.color333, width: 60, textAlign: 'right'}}>
+            <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
               <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
               <Text
-                style={{fontSize: 12, color: '#FF8309', width: 60, textAlign: 'right'}}>优惠{item?.coupons_amount}元</Text>
+                style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>优惠{item?.coupons_amount}元</Text>
             </If>
           </View>
           <CheckBox
@@ -1261,10 +1266,10 @@ class OrderCallDelivery extends Component {
                 <Text key={index} style={{
                   borderWidth: 0.5,
                   height: 36,
-                  borderColor: Number(info.value) === order_money_input_value ? colors.main_color : colors.colorDDD,
+                  borderColor: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
-                  color: Number(info.value) === order_money_input_value ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === order_money_input_value ? '#DFFAE2' : colors.white,
+                  color: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.color333,
+                  backgroundColor: Number(info.value) === Number(order_money_input_value) ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
                   textAlign: 'center',
                   paddingVertical: 8,
@@ -1298,11 +1303,13 @@ class OrderCallDelivery extends Component {
             </View>
             <Button title={'确 定'}
                     onPress={() => {
-                      let order_money = order_money_input_value === 0 ? order_money_value : order_money_input_value;
 
-                      if (order_money <= 0) {
+                      if (order_money_value <= 0 && order_money_input_value <= 0) {
                         return ToastShort('请选择物品价值')
                       }
+
+                      let order_money = order_money_input_value === 0 ? order_money_value : order_money_input_value;
+
                       this.setState({
                         order_money
                       }, () => {

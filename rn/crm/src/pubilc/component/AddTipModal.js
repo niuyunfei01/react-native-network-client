@@ -68,7 +68,7 @@ class AddTipModal extends React.Component {
     }
 
     if (set_add_tip_money) { //修改上级页面加小费金额
-      return this.closeModal(add_money);
+      return this.closeModal(Number(add_money));
     }
     if (orders_add_tip) { //批量加小费
       return dispatch(addTipMoneys(id, add_money, accessToken, (resp) => {
@@ -102,7 +102,7 @@ class AddTipModal extends React.Component {
         add_tip_id: 0,
       }
       if (set_add_tip_money) {
-        params.add_tips = add_money;
+        params.add_tips = typeof add_money === 'number' ? add_money : 0;
         setState && setState(params, () => {
           if (add_money > 0) {
             fetchData && fetchData()
@@ -149,7 +149,7 @@ class AddTipModal extends React.Component {
                   borderWidth: 0.5,
                   borderColor: Number(info.value) === add_money ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
-                  height:36,
+                  height: 36,
                   color: Number(info.value) === add_money ? colors.main_color : colors.color333,
                   backgroundColor: Number(info.value) === add_money ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
@@ -174,7 +174,7 @@ class AddTipModal extends React.Component {
                   fontSize: 14,
                   width: width * 0.25,
                   borderWidth: 0.5,
-                  height:36,
+                  height: 36,
                   color: colors.color333,
                   borderColor: input_add_money === add_money ? colors.main_color : colors.colorDDD,
                   textAlign: 'center',
