@@ -572,6 +572,9 @@ class Mine extends PureComponent {
       case 'third_recharge':
         return third_recharge()
         break;
+      case 'stall_settlement':
+        return stall_settlement()
+        break;
       default:
         return order_search()
         break;
@@ -583,9 +586,7 @@ class Mine extends PureComponent {
     return (
       <For of={menu_list} each='item' index='index'>
         <View style={[styles.zoneWrap]} key={index}>
-          <Text style={styles.zoneWrapTitle}>
-            {item?.title}
-          </Text>
+          <Text style={styles.zoneWrapTitle}>{item?.title} </Text>
           <View style={{flexDirection: 'row', justifyContent: 'center', flex: 1}}>
             <View style={styles.flexRowWrap}>
               <For of={item?.items} each='info' index='index'>
