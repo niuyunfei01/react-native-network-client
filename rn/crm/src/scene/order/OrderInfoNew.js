@@ -818,7 +818,8 @@ class OrderInfoNew extends PureComponent {
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
           <View  {...this._panResponder.panHandlers} style={{
-            alignItems: "center"}}>
+            alignItems: "center"
+          }}>
             <If condition={isShowMap}>
               <View style={styles.orderInfoHeaderFlag}/>
             </If>
@@ -980,7 +981,7 @@ class OrderInfoNew extends PureComponent {
                         <Text style={styles.priceWai}>外</Text>
                         <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                       </If>
-                      <If condition={order?.is_fn_price_controlled && order?.is_fn_show_wm_price}>
+                      <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text
                             style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
