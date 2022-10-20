@@ -131,7 +131,7 @@ class OrderSettingScene extends Component {
       states.address = res.name;
     }
     if (res?.address) {
-      states.street_block = res?.address;
+      // states.street_block = res?.address;
     }
     this.setState({...states})
   }

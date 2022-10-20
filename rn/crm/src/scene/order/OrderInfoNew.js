@@ -739,7 +739,6 @@ class OrderInfoNew extends PureComponent {
           <Marker
             draggable={false}
             position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-            onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
               <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
@@ -754,7 +753,6 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
-              onPress={() => alert("onPress")}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
@@ -784,7 +782,6 @@ class OrderInfoNew extends PureComponent {
           <Marker
             draggable={false}
             position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-            onPress={() => alert("onPress")}
           >
             <View style={{alignItems: 'center'}}>
               <View style={styles.mapBox}>
