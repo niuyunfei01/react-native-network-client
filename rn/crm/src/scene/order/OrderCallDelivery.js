@@ -142,7 +142,17 @@ class OrderCallDelivery extends Component {
   }
 
   fetchData = () => {
-    let {order_id, weight, expect_time, remark, add_tips, order_money, params_str, isLoading} = this.state;
+    let {
+      order_id,
+      weight,
+      expect_time,
+      remark,
+      add_tips,
+      order_money,
+      params_str,
+      isLoading,
+      logistic_fee_map
+    } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
       weight,
@@ -155,7 +165,7 @@ class OrderCallDelivery extends Component {
     }
 
     let params_json_str = JSON.stringify(params);
-    if (params_str == params_json_str || isLoading) {
+    if (params_str === params_json_str || isLoading) {
       return;
     }
     showModal('加载中')
@@ -165,10 +175,40 @@ class OrderCallDelivery extends Component {
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
       hideModal();
+      let store_est = obj?.store_est || [];
+      let est = obj?.est || [];
+      if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
+        let check = false
+        for (let i in logistic_fee_map) {
+          if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
+            for (let idx in est) {
+              if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+                est[idx].ischeck = true
+                check = true
+              }
+            }
+          }
+          if (logistic_fee_map[i]?.paid_partner_id === -1 && tool.length(store_est) > 0) {
+            for (let idx in store_est) {
+              if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+
+                store_est[idx].ischeck = true
+                check = true
+              }
+            }
+          }
+          if (!check) {
+            logistic_fee_map.splice(i, 1)
+          }
+        }
+      } else {
+        logistic_fee_map = [];
+      }
+
       this.setState({
         params_str: params_json_str,
-        store_est: obj?.store_est,
-        est: obj?.est,
+        store_est: store_est,
+        est: est,
         exist_waiting_delivery: obj?.exist_waiting_delivery,
         wm_platform: obj?.wm_platform,
         wm_platform_day_id: obj?.wm_platform_day_id,
@@ -821,7 +861,8 @@ class OrderCallDelivery extends Component {
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
               <If condition={tool.length(item?.marking) > 0}>
                 <For of={item?.marking} each='info' index='index'>
-                  <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
+                  <View key={index}
+                        style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
                     <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>{info} </Text>
                   </View>
                 </For>
