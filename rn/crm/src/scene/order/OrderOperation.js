@@ -240,7 +240,16 @@ class OrderOperation extends Component {
     // const url = Config.serverUrl(path, Config.https);
     switch (option?.key) {
       case MENU_PRINT_AGAIN:
-        this.onPrint(order?.printer_sn)
+        Alert.alert('提醒', '当前订单已打印，是否继续打印？', [
+          {
+            text: '确定',
+            onPress: () => {
+              this.onPrint(order?.printer_sn)
+            },
+          }, {
+            text: '取消'
+          }
+        ])
         break
       case MENU_COMPLAINT_RIDER:
         this.toComplan(order?.ship_id)
@@ -368,7 +377,6 @@ class OrderOperation extends Component {
   renderModal = () => {
     const {
       showCallStore,
-      order,
       showDeliveryModal,
       showErrorModal,
       errMsg,

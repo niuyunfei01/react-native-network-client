@@ -819,15 +819,12 @@ class OrderCallDelivery extends Component {
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
-              <If condition={tool.length(item?.marking[0]) > 0}>
-                <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
-                  <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>常用</Text>
-                </View>
-              </If>
-              <If condition={tool.length(item?.marking[0]) > 0}>
-                <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
-                  <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>最便宜</Text>
-                </View>
+              <If condition={tool.length(item?.marking) > 0}>
+                <For of={item?.marking} each='info' index='index'>
+                  <View style={{borderRadius: 2, paddingHorizontal: 4, marginLeft: 4, backgroundColor: '#FF8309'}}>
+                    <Text style={{fontSize: 11, color: colors.white, lineHeight: 16}}>{info} </Text>
+                  </View>
+                </For>
               </If>
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>

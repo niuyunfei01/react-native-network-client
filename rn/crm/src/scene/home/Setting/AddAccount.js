@@ -26,14 +26,11 @@ class AddAccount extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      workerRoles: [
-        {label: '店长', value: 1},
-        {label: '店助', value: 2},
-        {label: '店员', value: 3}
-      ],
+      workerRoles: [],
       storeList: [
         {label: '所有门店', value: 0}
       ],
+      roleStoreList: [],
       worker_role_grade: '',
       worker_role_grade_value: 0,
       worker_store_id_belong: '',
@@ -46,25 +43,26 @@ class AddAccount extends PureComponent {
   }
 
   componentDidMount() {
-    this.getStoreList()
+    this.getListStoreCanRead()
   }
 
-  getStoreList = () => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/v4/wsb_store/getOwnerStores`
+  getListStoreCanRead = () => {
+    const {accessToken} = this.props.global;
+    const api = `/v4/wsb_store/listStoreCanRead`
     HttpUtils.get.bind(this.props)(api, {
-      access_token: accessToken,
-      store_id: currStoreId
+      access_token: accessToken
     }).then(res => {
       let stores = []
-      res.map(item => {
+      res?.stores.map(item => {
         stores.push({
           label: item.name,
           value: Number(item.id)
         })
       })
       this.setState({
-        storeList: this.state.storeList.concat(stores)
+        storeList: this.state.storeList.concat(stores),
+        workerRoles: res?.roles,
+        roleStoreList: stores
       })
     })
   }
@@ -129,7 +127,7 @@ class AddAccount extends PureComponent {
   }
 
   renderEditInfo = () => {
-    let {workerRoles, worker_role_grade, worker_store_id_belong, worker_name, worker_account, storeList} = this.state
+    let {workerRoles, worker_role_grade, worker_store_id_belong, worker_name, worker_account, storeList, roleStoreList} = this.state
     return (
       <View style={styles.InfoBox}>
         <View style={styles.item_body}>
@@ -141,6 +139,10 @@ class AddAccount extends PureComponent {
                   this.setState({
                     worker_role_grade: option.label,
                     worker_role_grade_value: option.value
+                  }, () => {
+                    this.setState({
+                      worker_store_id_belong: ''
+                    })
                   })
                 }}
                 data={workerRoles}
@@ -164,7 +166,7 @@ class AddAccount extends PureComponent {
                     worker_store_id_belong_value: option.value
                   })
                 }}
-                data={storeList}
+                data={this.state.worker_role_grade_value === 1 ? roleStoreList : storeList}
                 skin="customer"
                 defaultKey={-999}
               >

@@ -789,23 +789,25 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View {...this._panResponder.panHandlers}>
-        <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
-                          onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
-                          onPress={() => this.deliveryModalFlag()}>
-          <View style={{
-            alignItems: "center"
-          }}>
-            <If condition={isShowMap}>
-              <View style={styles.orderInfoHeaderFlag}/>
-            </If>
-            <View style={styles.orderInfoHeaderStatus}>
-              <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+      <View>
+        <View {...this._panResponder.panHandlers}>
+          <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                            onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
+                            onPress={() => this.deliveryModalFlag()}>
+            <View style={{
+              alignItems: "center"
+            }}>
+              <If condition={isShowMap}>
+                <View style={styles.orderInfoHeaderFlag}/>
+              </If>
+              <View style={styles.orderInfoHeaderStatus}>
+                <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+                <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+              </View>
+              <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
             </View>
-            <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
         {this.renderOrderInfoHeaderButton()}
       </View>
     )
@@ -830,7 +832,16 @@ class OrderInfoNew extends PureComponent {
           <Button title={'再次打印'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_再次打印')
-                    this.onPrint()
+                    Alert.alert('提醒', '当前订单已打印，是否继续打印？', [
+                      {
+                        text: '确定',
+                        onPress: () => {
+                          this.onPrint()
+                        },
+                      }, {
+                        text: '取消'
+                      }
+                    ])
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -1378,9 +1389,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
     paddingBottom: 20,
-    backgroundColor: colors.white,
-    width: width * 0.94,
-    marginLeft: width * 0.03
+    backgroundColor: colors.white
   },
   orderInfoHeaderButtonNoMap: {
     flexDirection: "row",
