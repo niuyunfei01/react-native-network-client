@@ -11,6 +11,7 @@ import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 import pxToDp from "../../pubilc/util/pxToDp";
 import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   return {
@@ -23,6 +24,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderCancelShip extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
 
   constructor(props: Object) {
     super(props);
@@ -110,7 +115,7 @@ class OrderCancelShip extends Component {
   }
 
   render() {
-    const wayOpts = this.state.list.map((item, idx) => {
+    const wayOpts = this.state.list.map((item, ) => {
       return {label: item.info, value: item.id}
     });
     return <ScrollView

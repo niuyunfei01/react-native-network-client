@@ -627,53 +627,24 @@ class OrderInfoNew extends PureComponent {
   cancelDelivery = (orderId) => {
     const {global} = this.props;
     const {accessToken} = global;
-    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
+    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${accessToken}`;
     let params = {
       order_id: orderId
     }
-    let {order, toastContext} = this.state;
-
+    let {order} = this.state;
     HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (res?.deduct_fee < 0) {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: 0,
-                onCancelled: () => {
-                  this.fetchOrder()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
-      } else if (res?.deduct_fee == 0) {
-        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-          {
-            order: order,
-            ship_id: 0,
-            onCancelled: () => {
-              this.fetchOrder()
-            }
-          });
-      } else {
-        this.setState({
-          toastContext: res.deduct_fee
-        }, () => {
-          Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${toastContext}元`, [{
-            text: '确定', onPress: () => {
-              this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                {
-                  order: order,
-                  ship_id: 0,
-                  onCancelled: () => {
-                    this.fetchOrder()
-                  }
-                });
-            }
-          }, {'text': '取消'}]);
-        })
-      }
+      Alert.alert('提示', res?.alert_msg, [{
+        text: '确定', onPress: () => {
+          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: order,
+              ship_id: 0,
+              onCancelled: () => {
+                this.fetchOrder()
+              }
+            });
+        }
+      }, {'text': '取消'}]);
     }).catch(e => {
       showError(`${e.reason}`)
     })
@@ -998,7 +969,11 @@ class OrderInfoNew extends PureComponent {
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
                 <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
-                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
+                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
+                    pid: info?.product_id,
+                    storeId: currStoreId,
+                    item: info
+                  })
                 }}>
                   <FastImage
                     source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
@@ -1018,7 +993,8 @@ class OrderInfoNew extends PureComponent {
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                         </If>
-                        <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
+                        <If
+                          condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
                           <If condition={order?.is_fn_price_controlled}>
                             <Text style={styles.priceBao}>保</Text>
                             <Text
