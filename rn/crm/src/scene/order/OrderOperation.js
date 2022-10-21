@@ -1,14 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Alert,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {Alert, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {ActionSheet} from "../../weui";
@@ -28,6 +19,7 @@ import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import {printInCloud} from "../../reducers/order/orderActions";
+
 const width = Dimensions.get("window").width;
 
 // 订单操作常量
@@ -200,17 +192,35 @@ class OrderOperation extends Component {
   touchItem = (actionSheet, idx) => {
     actionSheet[idx].checked = true;
     switch (actionSheet[idx].key) {
-      case 5:
-        this.mixpanel.track('点击修改门店')
+      case 1:
+        this.mixpanel.track('订单操作_再次打印')
+        break
+      case 2:
+        this.mixpanel.track('订单操作_投诉骑手')
         break
       case 3:
-        this.mixpanel.track('点击取消订单')
+        this.mixpanel.track('订单操作_取消订单')
         this.setState({
           showDeliveryModal: true
         })
         break
+      case 4:
+        this.mixpanel.track('订单操作_修改订单')
+        break
+      case 5:
+        this.mixpanel.track('订单操作_修改门店')
+        break
       case 9:
-        this.mixpanel.track('点击置为完成')
+        this.mixpanel.track('订单操作_置为完成')
+        break
+      case 10:
+        this.mixpanel.track('订单操作_订单过机')
+        break
+      case 11:
+        this.mixpanel.track('订单操作_扫码入库')
+        break
+      case 12:
+        this.mixpanel.track('订单操作_退单入库')
         break
     }
     this.setState({
@@ -531,7 +541,10 @@ class OrderOperation extends Component {
           showsVerticalScrollIndicator={false}>
           <View style={styles.Content}>
             <For index='index' of={actionSheet} each='info'>
-              <TouchableOpacity key={index} style={[styles.checkItem, {borderTopWidth: index === 0 ? 0 : 0.5, borderTopColor: colors.e5}]} onPress={() => this.touchItem(actionSheet, index)}>
+              <TouchableOpacity key={index} style={[styles.checkItem, {
+                borderTopWidth: index === 0 ? 0 : 0.5,
+                borderTopColor: colors.e5
+              }]} onPress={() => this.touchItem(actionSheet, index)}>
                 <Text style={styles.checkItemLabel}>
                   {info?.label}
                 </Text>

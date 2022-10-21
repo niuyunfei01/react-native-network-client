@@ -73,6 +73,7 @@ class OrderItem extends React.PureComponent {
   }
 
   onOverlookDelivery = (order_id) => {
+    this.mixpanel.track('V4订单列表_忽略配送')
     const self = this;
     showModal("请求中")
     tool.debounces(() => {
@@ -89,6 +90,11 @@ class OrderItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+    if(if_reship === 0){
+      this.mixpanel.track('V4订单列表_下配送单')
+    }else {
+      this.mixpanel.track('V4订单列表_追加配送')
+    }
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
@@ -338,7 +344,12 @@ class OrderItem extends React.PureComponent {
     return (
       <View style={styles.btnContent}>
         <Button title={'门店核销'}
-                onPress={() => this.closePickModal()}
+                onPress={() => {
+                  this.mixpanel.track('V4订单列表_到店核销')
+                  this.setState({
+                    verification_modal:true,
+                  })
+                }}
                 buttonStyle={styles.veriFicationBtn}
                 titleStyle={{color: colors.white, fontSize: 16}}
         />
@@ -482,6 +493,7 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.batch_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4订单列表_一键取消')
                     this.cancelDeliverys(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -501,7 +513,7 @@ class OrderItem extends React.PureComponent {
                       add_tip_id: item?.id,
                       show_add_tip_modal: true
                     })
-                    this.mixpanel.track('订单列表页_加小费')
+                    this.mixpanel.track('V4订单列表_一键加小费')
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -542,7 +554,10 @@ class OrderItem extends React.PureComponent {
 
         <If condition={item?.btn_list && item?.btn_list?.btn_contact_rider}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(item?.ship_worker_mobile)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_联系骑手')
+                    this.dialNumber(item?.ship_worker_mobile)
+                  }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
                     width: width * btn_width,
@@ -554,7 +569,7 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived}>
           <Button title={'配送完成'}
                   onPress={() => {
-                    this.mixpanel.track('确认送达')
+                    this.mixpanel.track('V4订单列表_完成配送')
                     this.toSetOrderComplete(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {

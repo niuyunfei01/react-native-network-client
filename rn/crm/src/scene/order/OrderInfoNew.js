@@ -100,6 +100,8 @@ class OrderInfoNew extends PureComponent {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.mixpanel = MixpanelInstance;
+
+    this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
@@ -847,21 +849,30 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoHeaderButton}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
           <Button title={'打印订单'}
-                  onPress={() => this.onPrint()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_打印订单')
+                    this.onPrint()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_print_again === 1}>
           <Button title={'再次打印'}
-                  onPress={() => this.onPrint()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_再次打印')
+                    this.onPrint()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_call_third_delivery === 1}>
           <Button title={'下配送单'}
-                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_下配送单')
+                    this.onCallThirdShips(order?.id, order?.store_id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -869,6 +880,7 @@ class OrderInfoNew extends PureComponent {
         <If condition={btn_list && btn_list?.batch_cancel_delivery === 1}>
           <Button title={'取消配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4订单详情_取消配送')
                     Alert.alert('提示', `确定取消当前配送吗?`, [
                       {text: '取消'},
                       {
@@ -885,35 +897,51 @@ class OrderInfoNew extends PureComponent {
         </If>
         <If condition={btn_list && btn_list?.btn_resend === 1}>
           <Button title={'再次配送'}
-                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id, 1)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_再次配送')
+                    this.onCallThirdShips(order?.id, order?.store_id, 1)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_call_third_delivery_again}>
           <Button title={'追加配送'}
-                  onPress={() => this.callSelfAgain()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_追加配送')
+                    this.callSelfAgain()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_confirm_arrived === 1}>
           <Button title={'完成配送'}
-                  onPress={() => this.toSetOrderComplete(order?.id)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_完成配送')
+                    this.toSetOrderComplete(order?.id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_contact_rider === 1}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(order?.ship_worker_mobile)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_联系骑手')
+                    this.dialNumber(order?.ship_worker_mobile)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.batch_add_delivery_tips === 1}>
           <Button title={'加小费'}
-                  onPress={() => this.openAddTipModal(order?.id)}
+                  onPress={() => {
+
+                    this.mixpanel.track('V4订单详情_加小费')
+                    this.openAddTipModal(order?.id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -938,7 +966,10 @@ class OrderInfoNew extends PureComponent {
           </View>
           <If condition={order?.pickType === '1'}>
             <Button title={'查看取货码'}
-                    onPress={() => this.showQrcodeFlag()}
+                    onPress={() => {
+                      this.mixpanel.track('V4订单详情_查看取货码')
+                      this.showQrcodeFlag()
+                    }}
                     buttonStyle={styles.qrCodeBtn}
                     titleStyle={styles.qrCodeBtnTitle}
             />

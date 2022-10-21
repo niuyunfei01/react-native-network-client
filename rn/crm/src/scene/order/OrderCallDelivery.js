@@ -32,6 +32,7 @@ import {getContacts} from "../../reducers/store/storeActions";
 import Config from "../../pubilc/common/config";
 import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
+import {MixpanelInstance} from "../../pubilc/util/analytics";
 
 let width = Dimensions.get("window").width;
 
@@ -117,6 +118,9 @@ class OrderCallDelivery extends Component {
       logistic_fee_map: [],
       params_str: '',
     };
+
+    this.mixpanel = MixpanelInstance;
+
   }
 
   componentWillUnmount() {
@@ -327,6 +331,9 @@ class OrderCallDelivery extends Component {
       remark,
       worker_delivery_id
     } = this.state;
+
+    this.mixpanel.track("V4配送下单_立即发单")
+
     if (worker_delivery_id > 0) {
       return this.onWorkerDelivery();
     }

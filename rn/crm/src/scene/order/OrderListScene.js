@@ -87,7 +87,7 @@ const initState = {
   sort_list: [
     {"label": '最新来单', 'value': 'orderTime desc'},
     {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '尽快送达', 'value': 'expectTime desc'},
+    {"label": '送达时间', 'value': 'expectTime desc'},
   ],
   ListData: [],
   orderStatus: 9,
@@ -128,7 +128,7 @@ class OrderListScene extends Component {
       this.mixpanel.identify(currentUser);
     }
 
-    this.mixpanel.track("orderpage_view", {})
+    this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
   }
 
@@ -508,9 +508,10 @@ class OrderListScene extends Component {
   onSelect = (e) => {
     let {showSortModal} = this.state;
     if (e === 1) {
-      this.mixpanel.track('新建订单')
+      this.mixpanel.track('V4订单列表_手动下单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
     } else if (e === 0) {
+      this.mixpanel.track('V4订单列表_订单排序')
       this.setState({showSortModal: !showSortModal})
     } else {
       this.mixpanel.track('订单列表扫描')
@@ -519,17 +520,6 @@ class OrderListScene extends Component {
       })
     }
   }
-
-  onPressActivity = (info) => {
-    const {currStoreId, accessToken} = this.props.global;
-    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
-    this.mixpanel.track("act_user_ref_ad_click", {
-      img_name: info.name,
-      pos: info.pos_name,
-      store_id: currStoreId,
-    });
-  }
-
 
   onScanSuccess = (code) => {
     if (code) {
@@ -629,6 +619,13 @@ class OrderListScene extends Component {
   }
 
   setOrderBy = (order_by) => {
+    if(order_by === 'orderTime desc'){
+      this.mixpanel.track('V4订单列表_最新来单')
+    }else if(order_by === 'orderTime asc'){
+      this.mixpanel.track('V4订单列表_最早来单')
+    }else {
+      this.mixpanel.track('V4订单列表_送达时间')
+    }
     let {user_config} = this.props.global
     let {dispatch} = this.props
     user_config.order_list_by = order_by
@@ -646,7 +643,7 @@ class OrderListScene extends Component {
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
-              物品价值
+              订单排序
             </Text>
             <Entypo onPress={this.closeModal} name="cross"
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
@@ -727,7 +724,10 @@ class OrderListScene extends Component {
         backgroundColor: colors.white,
         paddingHorizontal: 12
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => this.onPress(Config.ROUTE_MINE_NEW)}
+        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => {
+          this.mixpanel.track('V4订单列表_我的')
+          this.onPress(Config.ROUTE_MINE_NEW)
+        }}
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {
@@ -740,7 +740,10 @@ class OrderListScene extends Component {
           <SvgXml xml={this_down()}/>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+          onPress={() => {
+            this.mixpanel.track('V4订单列表_搜索')
+            this.onPress(Config.ROUTE_ORDER_SEARCH)
+          }}
           style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
           <SvgXml xml={search_icon()}/>
         </TouchableOpacity>
@@ -874,9 +877,9 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {orderStatus} = this.state;
-    let {vendor_info, accessToken} = this.props.global
+    let {accessToken} = this.props.global
     return (
-      <OrderItem showBtn={'1' === vendor_info.wsb_store_account}
+      <OrderItem showBtn={item?.show_button_list}
                  key={index}
                  fetchData={() => this.onRefresh()}
                  item={item}

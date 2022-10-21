@@ -37,6 +37,8 @@ import {
   push,
   Service,
   setting,
+  settlement,
+  stall_settlement,
   stores,
   third_recharge,
 } from "../../../svg/svg";
@@ -575,6 +577,9 @@ class Mine extends PureComponent {
         break;
       case 'stall_settlement':
         return stall_settlement()
+        break;
+      case 'settlement':
+        return settlement()
         break;
       default:
         return order_search()

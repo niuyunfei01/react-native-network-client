@@ -50,7 +50,7 @@ class OrderSettingScene extends Component {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    this.mixpanel.track("创建订单");
+    this.mixpanel.track("手动发单页");
     let {currStoreId, accessToken, store_info} = this.props.global
     this.state = {
       accessToken: accessToken,
@@ -288,11 +288,11 @@ class OrderSettingScene extends Component {
       hideModal()
       showSuccess("保存成功！")
       if (status === 1) {
-        this.mixpanel.track('新建订单_保存')
+        this.mixpanel.track("V4手动下单_保存订单");
         this.timeOutBack(300);
       } else {
-        this.mixpanel.track('新建订单_保存并发单')
-        if (res.WaimaiOrder.id) {
+        this.mixpanel.track("V4手动下单_立即下单");
+        if (res?.WaimaiOrder?.id) {
           this.onCallThirdShips(res.WaimaiOrder.id, store_id)
         } else {
           showError('保存失败请重试！')
