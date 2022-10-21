@@ -754,7 +754,7 @@ class OrderListScene extends Component {
           onSelect={(e) => this.onSelect(e)}
         >
           <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color666}}/>
+            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color333}}/>
           </View>
         </ModalDropdown>
 

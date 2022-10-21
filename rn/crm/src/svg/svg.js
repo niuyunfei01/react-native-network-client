@@ -1189,7 +1189,7 @@ export const menu_left = (width = 24, height = 24) => {
   return (
     `
 <svg width="${width}" height="${height}" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
-    <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="工作台-新订单" stroke="none" stroke-width="1" fill="#333333" fill-rule="evenodd">
         <g id="工作台-导航" transform="translate(-12.000000, -51.000000)">
             <rect fill="#F5F5F5" x="0" y="0" width="375" height="918"></rect>
             <g id="编组-10" transform="translate(0.000000, 44.000000)">
@@ -1197,7 +1197,7 @@ export const menu_left = (width = 24, height = 24) => {
                     <rect id="矩形" x="0" y="0" width="375" height="44"></rect>
                 </g>
                 <g id="更多我的" transform="translate(12.000000, 7.000000)">
-                    <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+                    <rect id="矩形" fill="#333333" opacity="0" x="0" y="0" width="24" height="24"></rect>
                     <g id="更多" transform="translate(3.000000, 5.000000)" fill="#333333">
                         <rect id="矩形" x="0" y="0" width="18" height="2" rx="1"></rect>
                         <rect id="矩形备份-2" x="0" y="6" width="14" height="2" rx="1"></rect>
@@ -1218,7 +1218,7 @@ export const this_down = (width = 16, height = 16) => {
     `
 <svg width="${width}" height="${height}" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="工作台-导航" transform="translate(-180.000000, -56.000000)" fill="#999999" fill-rule="nonzero" stroke="#999999" stroke-width="0.5">
+        <g id="工作台-导航" transform="translate(-180.000000, -56.000000)" fill="#333333" fill-rule="nonzero" stroke="#999999" stroke-width="0.5">
             <g id="编组-10" transform="translate(0.000000, 44.000000)">
                 <g id="编组-4" transform="translate(52.000000, 10.000000)">
                     <g id="副导航图标/箭头-未选中" transform="translate(128.000000, 2.000000)">
@@ -1241,7 +1241,7 @@ export const search_icon = (width = 24, height = 24) => {
     <g id="手动发单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="图标/搜索栏/搜索备份">
             <rect id="Rectangle-3" x="0" y="0" width="20" height="20"></rect>
-            <g id="icon" transform="translate(3.000000, 3.000000)" stroke="#999999" stroke-width="1.5">
+            <g id="icon" transform="translate(3.000000, 3.000000)" stroke="#333333" stroke-width="1.5">
                 <line x1="11.5" y1="11.5" x2="13.894359" y2="13.8963032" id="路径-2" stroke-linecap="round" stroke-linejoin="round"></line>
                 <circle id="Oval-2" cx="7" cy="7" r="6.25"></circle>
             </g>
@@ -1551,7 +1551,6 @@ export const order_search = () => {
 }
 
 
-
 export const operator_data = () => {
   return (
     `
@@ -1800,7 +1799,6 @@ export const help = () => {
     `
   )
 }
-
 
 
 export const history_notice = () => {

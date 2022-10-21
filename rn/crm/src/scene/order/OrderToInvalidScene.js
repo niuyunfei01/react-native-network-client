@@ -140,6 +140,8 @@ class OrderToInvalidScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={20}
                 placeholder="请输入自定义内容"
                 onChange={(v) => {

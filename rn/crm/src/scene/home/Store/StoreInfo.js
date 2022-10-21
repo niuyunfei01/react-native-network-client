@@ -1393,6 +1393,8 @@ class StoreInfo extends Component {
         <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', padding: 8}}>
           <Text style={{fontSize: 14, marginTop: 5}}>备注: </Text>
           <TextArea
+            multiline={true}
+            numberOfLines={4}
             value={this.state.remark}
             onChange={(remark) => {
               if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {

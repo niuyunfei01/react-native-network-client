@@ -104,6 +104,8 @@ class AuditRefundScene extends Component {
       return (
         <View style={styles.bottom_box}>
           <TextArea
+            multiline={true}
+            numberOfLines={4}
             maxLength={20}
             value={this.state.reason}
             onChangeText={(text) => {

@@ -273,6 +273,8 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
         paddingHorizontal: 12,
         height: 65,
+        borderTopLeftRadius: 6,
+        borderTopRightRadius: 6,
         backgroundColor: colors.f9
       }}>
 
@@ -325,7 +327,7 @@ class OrderItem extends React.PureComponent {
             marginTop: 2
           }}> {item.store_name}&nbsp; #{item.dayId} </Text>
         </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 
       </View>
     )
@@ -621,6 +623,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 12,
     borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
   modalBtn: {
     flex: 1,

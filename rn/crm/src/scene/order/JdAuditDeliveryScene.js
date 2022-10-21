@@ -135,6 +135,9 @@ class JdAuditDeliveryScene extends Component {
             <Cell>
               <CellBody>
                 <TextArea
+
+                  multiline={true}
+                  numberOfLines={4}
                   maxLength={20}
                   placeholder="请输入拒绝理由"
                   onChange={(v) => {

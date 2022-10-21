@@ -294,12 +294,13 @@ class OrderCallDelivery extends Component {
 
 
   onWorkerDelivery() {
+    let {accessToken} = this.props.global;
     let {worker_delivery_id, order_id} = this.state;
     if (!this.state.worker_delivery_id > 0) {
       ToastShort('请选择员工');
       return;
     }
-    const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
+    const api = `/api/order_transfer_self?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
       orderId: order_id,
       userId: worker_delivery_id,
@@ -313,7 +314,7 @@ class OrderCallDelivery extends Component {
 
   onCallDelivery = () => {
     showModal('正在呼叫配送，请稍等')
-    let {vendor_id, store_id,} = this.props.global;
+    let {vendor_id, store_id, accessToken} = this.props.global;
     let {
       order_id,
       logistic_fee_map,
@@ -343,7 +344,7 @@ class OrderCallDelivery extends Component {
         order_tips: add_tips,
         remark
       }
-      const api = `/v4/wsb_delivery/call_delivery?access_token=${this.state.accessToken}`;
+      const api = `/v4/wsb_delivery/call_delivery?access_token=${accessToken}`;
       HttpUtils.post.bind(this.props)(api, params).then(res => {
         hideModal();
         this.props.route.params.onBack && this.props.route.params.onBack(res);
@@ -633,6 +634,9 @@ class OrderCallDelivery extends Component {
         </View>
 
         <TouchableOpacity onPress={() => {
+          if (tool.length(this.state.worker_list) <= 0) {
+            return ToastShort('暂无可选自配信息');
+          }
           this.setState({
             show_worker_delivey_modal: true
           })
@@ -713,13 +717,26 @@ class OrderCallDelivery extends Component {
               color: colors.color333,
             }}>省钱配送</Text>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text>全选</Text>
+
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            right: -10,
+            top: 0,
+            position: 'relative',
+          }}>
+            <Text style={{
+              fontSize: 12,
+              color: colors.color333,
+            }}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
+              containerStyle={{
+                margin: 0,
+                padding: 0,
+              }}
               checked={est_all_check}
               onPress={() => this.onSelectDeliveyAll(1)}
             />
@@ -750,13 +767,25 @@ class OrderCallDelivery extends Component {
               color: colors.color333,
             }}>自有账号</Text>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text>全选</Text>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            right: -10,
+            top: 0,
+            position: 'relative',
+          }}>
+            <Text style={{
+              fontSize: 12,
+              color: colors.color333,
+            }}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
+              containerStyle={{
+                margin: 0,
+                padding: 0,
+              }}
               checked={store_est_all_check}
               onPress={() => this.onSelectDeliveyAll(2)}
             />
@@ -797,7 +826,12 @@ class OrderCallDelivery extends Component {
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
 
-          <View style={{marginRight: 1}}>
+          <View style={{
+            marginRight: 1,
+            right: -10,
+            top: 0,
+            position: 'relative',
+          }}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
               <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
@@ -810,7 +844,13 @@ class OrderCallDelivery extends Component {
             size={20}
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
-            containerStyle={{margin: 0, padding: 0}}
+            containerStyle={{
+              margin: 0,
+              padding: 0,
+              right: -10,
+              top: 0,
+              position: 'relative',
+            }}
             checked={item?.ischeck}
             onPress={() => {
               this.onSelectDelivey(item, key, type)
@@ -1119,7 +1159,7 @@ class OrderCallDelivery extends Component {
                   }}
                   buttonStyle={[{
                     marginTop: 20,
-                    backgroundColor: colors.main_color,
+                    backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
                     borderRadius: 24,
                     marginHorizontal: 10,
                     length: 42,
@@ -1349,6 +1389,8 @@ class OrderCallDelivery extends Component {
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea
+              multiline={true}
+              numberOfLines={4}
               value={remark_input_value}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}

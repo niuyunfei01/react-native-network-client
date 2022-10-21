@@ -37,7 +37,8 @@ import {
   push,
   Service,
   setting,
-  stores, third_recharge,
+  stores,
+  third_recharge,
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import tool from "../../../pubilc/util/tool";
@@ -437,7 +438,7 @@ class Mine extends PureComponent {
 
   jumpToAddStore = () => {
     let {is_mgr} = this.state
-    this.onPress(Config.ROUTE_STORE_ADD,{
+    this.onPress(Config.ROUTE_STORE_ADD, {
       btn_type: "edit",
       is_mgr: is_mgr,
       editStoreId: this.props.global.currStoreId
@@ -453,7 +454,7 @@ class Mine extends PureComponent {
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
-          <TouchableOpacity onPress={()=>{
+          <TouchableOpacity onPress={() => {
             this.jumpToAddStore()
           }} style={styles.storeContent}>
             <Text style={styles.storeName}>
@@ -878,8 +879,8 @@ const block_styles = StyleSheet.create({
     textAlign: "center"
   },
   deliveryTip: {
-    width: 41,
-    height: 11,
+    paddingHorizontal: 4,
+    height: 14,
     borderRadius: 7,
     right: 0,
     top: 10,
@@ -887,7 +888,7 @@ const block_styles = StyleSheet.create({
     zIndex: 99,
   },
   deliveryTipText: {
-    fontSize: 7, fontWeight: '400', color: colors.white, lineHeight: 11, textAlign: 'center'
+    fontSize: 10, fontWeight: '500', color: colors.white, lineHeight: 14, textAlign: 'center'
   }
 });
 

@@ -155,6 +155,8 @@ class OrderTodoScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={60}
                 placeholder="输入需要给处理人的其他信息"
                 onChange={(v) => {

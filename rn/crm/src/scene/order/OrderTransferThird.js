@@ -1088,6 +1088,8 @@ class OrderTransferThird extends Component {
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </TouchableOpacity>
             <TextArea
+              multiline={true}
+              numberOfLines={4}
               value={this.state.remark}
               onChange={(remark) => this.setState({remark})}
               showCounter={false}

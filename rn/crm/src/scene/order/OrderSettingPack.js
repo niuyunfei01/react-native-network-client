@@ -70,7 +70,7 @@ class OrderSettingScene extends Component {
       weight_min: 1,
       weight_max: 20,
       goods_price: 0,
-      goods_price_value: 0,
+      goods_price_value: 20,
       remark: '',
       showDateModal: false,
       showWeightModal: false,
@@ -536,7 +536,7 @@ class OrderSettingScene extends Component {
                      maxLength={4}
                      underlineColorAndroid="transparent"
                      style={{
-                       width: 90,
+                       width: 100,
                        fontSize: 14,
                        color: colors.color333,
                        textAlign: 'right',
@@ -569,6 +569,8 @@ class OrderSettingScene extends Component {
                 show_smart_input: true
               })
             }}
+            multiline={true}
+            numberOfLines={4}
             placeholder={show_smart_input ? "复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
               : "智能地址识别"}
             placeholderTextColor={colors.color999}
@@ -1017,6 +1019,8 @@ class OrderSettingScene extends Component {
               placeholder={'请在此填写备注信息，最多不超过30个字符'}
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent" //取消安卓下划线
+              multiline={true}
+              numberOfLines={4}
               style={{
                 marginBottom: 12,
                 height: 100,

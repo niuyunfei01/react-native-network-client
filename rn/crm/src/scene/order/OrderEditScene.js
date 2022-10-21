@@ -468,6 +468,8 @@ class OrderEditScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={60}
                 placeholder=""
                 onChange={v => {
