@@ -23,7 +23,6 @@ import tool from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import {Button} from "react-native-elements";
 import pxToDp from "../../pubilc/util/pxToDp";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import native from "../../pubilc/util/native";
 import numeral from "numeral";
 import Clipboard from "@react-native-community/clipboard";
@@ -45,6 +44,8 @@ import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import FastImage from "react-native-fast-image";
+import {SvgXml} from "react-native-svg";
+import {call} from "../../svg/svg";
 
 const {width, height} = Dimensions.get("window")
 
@@ -187,12 +188,12 @@ class OrderInfoNew extends PureComponent {
         if (Math.abs(gestureState.dy) < 3) {
           return;
         }
-        let preHeight = this.preY + gestureState.dy
+        let preHeight = this.preY + gestureState.dy - 70
         if (preHeight >= 0.7 * height)
           preHeight = 0.7 * height
         if (preHeight <= 0)
           preHeight = 0.3 * height
-        this.viewRef.setNativeProps({height: preHeight})
+        this.viewRef.setNativeProps({height: preHeight || this.preY})
 
       },
       onPanResponderTerminationRequest: (evt, gestureState) => {
@@ -211,7 +212,6 @@ class OrderInfoNew extends PureComponent {
 
   UNSAFE_componentWillMount() {
     this.touchScreenMove()
-
   }
 
   componentDidUpdate = () => {
@@ -320,7 +320,6 @@ class OrderInfoNew extends PureComponent {
 
   fetchOrder = () => {
     let {orderId, isFetching} = this.state
-    // orderId = 36001321
     if (!orderId || isFetching) {
       return false;
     }
@@ -359,7 +358,6 @@ class OrderInfoNew extends PureComponent {
       this.fetchShipData()
       this.logOrderViewed();
       this.fetchThirdWays()
-
     }, ((res) => {
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       ToastLong('操作失败：' + res.reason)
@@ -820,11 +818,11 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View>
+      <View {...this._panResponder.panHandlers}>
         <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
-          <View  {...this._panResponder.panHandlers} style={{
+          <View style={{
             alignItems: "center"
           }}>
             <If condition={isShowMap}>
@@ -836,8 +834,8 @@ class OrderInfoNew extends PureComponent {
             </View>
             <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           </View>
-          {this.renderOrderInfoHeaderButton()}
         </TouchableOpacity>
+        {this.renderOrderInfoHeaderButton()}
       </View>
     )
   }
@@ -846,7 +844,7 @@ class OrderInfoNew extends PureComponent {
     let {order} = this.state;
     let {btn_list} = order;
     return (
-      <View style={styles.orderInfoHeaderButton}>
+      <View style={this.state.isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
           <Button title={'打印订单'}
                   onPress={() => {
@@ -982,8 +980,7 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile}</Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
-            <FontAwesome5 solid={false} onPress={() => this.dialNumber(order?.mobile)} name={'phone'}
-                          style={styles.cardTitlePhone}/>
+            <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
           </View>
         </View>
         <View style={styles.cuttingLine}/>
@@ -1351,7 +1348,7 @@ const styles = StyleSheet.create({
     color: colors.main_color
   },
   orderInfoHeader: {
-    height: 138,
+    height: 88,
     backgroundColor: colors.white,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -1359,9 +1356,10 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   orderInfoHeaderNoMap: {
-    height: 128,
+    height: 78,
     backgroundColor: colors.white,
     flexDirection: "column",
+    alignItems: "flex-start",
     paddingLeft: 20,
     paddingTop: 20,
     width: width * 0.94,
@@ -1401,7 +1399,22 @@ const styles = StyleSheet.create({
   orderInfoHeaderButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10
+    justifyContent: "center",
+    marginBottom: 10,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    width: width * 0.94,
+    marginLeft: width * 0.03
+  },
+  orderInfoHeaderButtonNoMap: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    width: width * 0.94,
+    marginLeft: width * 0.03
   },
   orderInfoHeaderButtonLeft: {
     width: 100,
@@ -1455,7 +1468,7 @@ const styles = StyleSheet.create({
   orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
-    width: width * 0.94,
+    width: width * 0.92,
     backgroundColor: colors.white,
     padding: 12
   },
@@ -1496,7 +1509,7 @@ const styles = StyleSheet.create({
   },
   cuttingLine: {
     backgroundColor: colors.e5,
-    height: 0.5,
+    height: pxToDp(0.5),
     width: width * 0.86,
     marginLeft: width * 0.03
   },
@@ -1558,7 +1571,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10
+    marginVertical: pxToDp(10)
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
