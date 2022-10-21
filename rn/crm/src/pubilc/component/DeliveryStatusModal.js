@@ -11,6 +11,7 @@ import HttpUtils from "../util/http";
 import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
 import native from "../util/native";
+import {MixpanelInstance} from "../util/analytics";
 
 const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
@@ -146,6 +147,11 @@ const styles = StyleSheet.create({
 })
 
 class deliveryStatusModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('配送调度页')
+  }
   static propTypes = {
     order_id: PropTypes.oneOfType([
       PropTypes.number,
@@ -400,6 +406,7 @@ class deliveryStatusModal extends React.Component {
         <If condition={btn_list?.btn_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4配送调度页_取消配送')
                     this.cancelDeliverys()
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -414,7 +421,11 @@ class deliveryStatusModal extends React.Component {
 
         <If condition={btn_list?.btn_contact_rider}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber()}
+                  onPress={() => {
+
+                    this.mixpanel.track('V4配送调度页_联系骑手')
+                    this.dialNumber()
+                  }}
 
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
@@ -428,6 +439,8 @@ class deliveryStatusModal extends React.Component {
         <If condition={btn_list?.btn_call_third_delivery}>
           <Button title={'下配送单'}
                   onPress={() => {
+
+                    this.mixpanel.track('V4配送调度页_下配送单')
                     this.onCallThirdShips()
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -441,6 +454,8 @@ class deliveryStatusModal extends React.Component {
         <If condition={btn_list?.batch_add_tip}>
           <Button title={'一键加小费'}
                   onPress={() => {
+
+                    this.mixpanel.track('V4配送调度页_加小费')
                     this.setState({show_modal: false}, () => {
                       openAddTipModal && openAddTipModal(order_id)
                     })
@@ -459,6 +474,7 @@ class deliveryStatusModal extends React.Component {
         <If condition={btn_list?.btn_append_call_third_delivery}>
           <Button title={'追加配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4配送调度页_追加配送')
                     this.onCallThirdShips()
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -472,6 +488,7 @@ class deliveryStatusModal extends React.Component {
         <If condition={btn_list?.complaint_rider}>
           <Button title={'投诉骑手'}
                   onPress={() => {
+                    this.mixpanel.track('V4配送调度页_投诉骑手')
                     this.complain()
                   }}
                   buttonStyle={[styles.modalBtn, {

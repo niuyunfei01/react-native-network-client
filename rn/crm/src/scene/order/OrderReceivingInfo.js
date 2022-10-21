@@ -360,7 +360,7 @@ class OrderReceivingInfo extends Component {
                      maxLength={4}
                      underlineColorAndroid="transparent"
                      style={{
-                       width: 90,
+                       width: 100,
                        fontSize: 14,
                        color: colors.color333,
                        textAlign: 'right'

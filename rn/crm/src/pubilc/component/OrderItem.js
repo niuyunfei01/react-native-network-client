@@ -73,6 +73,7 @@ class OrderItem extends React.PureComponent {
   }
 
   onOverlookDelivery = (order_id) => {
+    this.mixpanel.track('V4订单列表_忽略配送')
     const self = this;
     showModal("请求中")
     tool.debounces(() => {
@@ -89,6 +90,11 @@ class OrderItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+    if (if_reship === 0) {
+      this.mixpanel.track('V4订单列表_下配送单')
+    } else {
+      this.mixpanel.track('V4订单列表_追加配送')
+    }
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
@@ -135,6 +141,32 @@ class OrderItem extends React.PureComponent {
         })
       }
     }, {'text': '取消'}]);
+  }
+
+
+  cancelDelivery = () => {
+    const {accessToken} = this.props.global;
+    let order = this.props.item
+    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${accessToken}`;
+    let params = {
+      order_id: order?.id
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      Alert.alert('提示', res?.alert_msg, [{
+        text: '确定', onPress: () => {
+          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: order,
+              ship_id: 0,
+              onCancelled: () => {
+                this.props.fetchData();
+              }
+            });
+        }
+      }, {'text': '取消'}]);
+    }).catch(e => {
+      ToastShort(`${e.reason}`)
+    })
   }
 
   toSetOrderComplete = (order_id) => {
@@ -273,6 +305,8 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
         paddingHorizontal: 12,
         height: 65,
+        borderTopLeftRadius: 6,
+        borderTopRightRadius: 6,
         backgroundColor: colors.f9
       }}>
 
@@ -325,7 +359,7 @@ class OrderItem extends React.PureComponent {
             marginTop: 2
           }}> {item.store_name}&nbsp; #{item.dayId} </Text>
         </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 
       </View>
     )
@@ -336,7 +370,12 @@ class OrderItem extends React.PureComponent {
     return (
       <View style={styles.btnContent}>
         <Button title={'门店核销'}
-                onPress={() => this.closePickModal()}
+                onPress={() => {
+                  this.mixpanel.track('V4订单列表_到店核销')
+                  this.setState({
+                    verification_modal: true,
+                  })
+                }}
                 buttonStyle={styles.veriFicationBtn}
                 titleStyle={{color: colors.white, fontSize: 16}}
         />
@@ -395,7 +434,7 @@ class OrderItem extends React.PureComponent {
             marginTop: 4,
           }}>{item?.goods_info?.short_names} </Text>
         </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
     )
   }
@@ -415,7 +454,7 @@ class OrderItem extends React.PureComponent {
     return (
       <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
         <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>{item?.ship_status_desc} </Text>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
     )
   }
@@ -437,7 +476,7 @@ class OrderItem extends React.PureComponent {
             }}>{item?.ship_worker_name} &nbsp; {item?.ship_worker_mobile} </Text>
           </View>
         </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
     )
   }
@@ -480,7 +519,24 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.batch_cancel_delivery}>
           <Button title={'取消配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4订单列表_一键取消')
                     this.cancelDeliverys(item.id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 0.5,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
+          />
+        </If>
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_cancel_delivery}>
+          <Button title={'取消配送'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_取消配送')
+                    this.cancelDelivery(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -499,7 +555,7 @@ class OrderItem extends React.PureComponent {
                       add_tip_id: item?.id,
                       show_add_tip_modal: true
                     })
-                    this.mixpanel.track('订单列表页_加小费')
+                    this.mixpanel.track('V4订单列表_一键加小费')
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -540,7 +596,10 @@ class OrderItem extends React.PureComponent {
 
         <If condition={item?.btn_list && item?.btn_list?.btn_contact_rider}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(item?.ship_worker_mobile)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_联系骑手')
+                    this.dialNumber(item?.ship_worker_mobile)
+                  }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
                     width: width * btn_width,
@@ -552,7 +611,7 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived}>
           <Button title={'配送完成'}
                   onPress={() => {
-                    this.mixpanel.track('确认送达')
+                    this.mixpanel.track('V4订单列表_完成配送')
                     this.toSetOrderComplete(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -621,6 +680,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 12,
     borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
   modalBtn: {
     flex: 1,

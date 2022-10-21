@@ -23,7 +23,6 @@ import tool from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import {Button} from "react-native-elements";
 import pxToDp from "../../pubilc/util/pxToDp";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import native from "../../pubilc/util/native";
 import numeral from "numeral";
 import Clipboard from "@react-native-community/clipboard";
@@ -45,6 +44,8 @@ import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import FastImage from "react-native-fast-image";
+import {SvgXml} from "react-native-svg";
+import {call} from "../../svg/svg";
 
 const {width, height} = Dimensions.get("window")
 
@@ -100,6 +101,8 @@ class OrderInfoNew extends PureComponent {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.mixpanel = MixpanelInstance;
+
+    this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
@@ -185,12 +188,12 @@ class OrderInfoNew extends PureComponent {
         if (Math.abs(gestureState.dy) < 3) {
           return;
         }
-        let preHeight = this.preY + gestureState.dy
+        let preHeight = this.preY + gestureState.dy - 70
         if (preHeight >= 0.7 * height)
           preHeight = 0.7 * height
         if (preHeight <= 0)
           preHeight = 0.3 * height
-        this.viewRef.setNativeProps({height: preHeight})
+        this.viewRef.setNativeProps({height: preHeight || this.preY})
 
       },
       onPanResponderTerminationRequest: (evt, gestureState) => {
@@ -209,7 +212,6 @@ class OrderInfoNew extends PureComponent {
 
   UNSAFE_componentWillMount() {
     this.touchScreenMove()
-
   }
 
   componentDidUpdate = () => {
@@ -318,7 +320,6 @@ class OrderInfoNew extends PureComponent {
 
   fetchOrder = () => {
     let {orderId, isFetching} = this.state
-    // orderId = 36001321
     if (!orderId || isFetching) {
       return false;
     }
@@ -357,7 +358,6 @@ class OrderInfoNew extends PureComponent {
       this.fetchShipData()
       this.logOrderViewed();
       this.fetchThirdWays()
-
     }, ((res) => {
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       ToastLong('操作失败：' + res.reason)
@@ -627,53 +627,24 @@ class OrderInfoNew extends PureComponent {
   cancelDelivery = (orderId) => {
     const {global} = this.props;
     const {accessToken} = global;
-    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
+    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${accessToken}`;
     let params = {
       order_id: orderId
     }
-    let {order, toastContext} = this.state;
-
+    let {order} = this.state;
     HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (res?.deduct_fee < 0) {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: 0,
-                onCancelled: () => {
-                  this.fetchOrder()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
-      } else if (res?.deduct_fee == 0) {
-        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-          {
-            order: order,
-            ship_id: 0,
-            onCancelled: () => {
-              this.fetchOrder()
-            }
-          });
-      } else {
-        this.setState({
-          toastContext: res.deduct_fee
-        }, () => {
-          Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${toastContext}元`, [{
-            text: '确定', onPress: () => {
-              this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-                {
-                  order: order,
-                  ship_id: 0,
-                  onCancelled: () => {
-                    this.fetchOrder()
-                  }
-                });
-            }
-          }, {'text': '取消'}]);
-        })
-      }
+      Alert.alert('提示', res?.alert_msg, [{
+        text: '确定', onPress: () => {
+          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: order,
+              ship_id: 0,
+              onCancelled: () => {
+                this.fetchOrder()
+              }
+            });
+        }
+      }, {'text': '取消'}]);
     }).catch(e => {
       showError(`${e.reason}`)
     })
@@ -818,11 +789,11 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View>
+      <View {...this._panResponder.panHandlers}>
         <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
                           onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
                           onPress={() => this.deliveryModalFlag()}>
-          <View  {...this._panResponder.panHandlers} style={{
+          <View style={{
             alignItems: "center"
           }}>
             <If condition={isShowMap}>
@@ -834,8 +805,8 @@ class OrderInfoNew extends PureComponent {
             </View>
             <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
           </View>
-          {this.renderOrderInfoHeaderButton()}
         </TouchableOpacity>
+        {this.renderOrderInfoHeaderButton()}
       </View>
     )
   }
@@ -844,24 +815,33 @@ class OrderInfoNew extends PureComponent {
     let {order} = this.state;
     let {btn_list} = order;
     return (
-      <View style={styles.orderInfoHeaderButton}>
+      <View style={this.state.isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
           <Button title={'打印订单'}
-                  onPress={() => this.onPrint()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_打印订单')
+                    this.onPrint()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_print_again === 1}>
           <Button title={'再次打印'}
-                  onPress={() => this.onPrint()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_再次打印')
+                    this.onPrint()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_call_third_delivery === 1}>
           <Button title={'下配送单'}
-                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_下配送单')
+                    this.onCallThirdShips(order?.id, order?.store_id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -869,6 +849,7 @@ class OrderInfoNew extends PureComponent {
         <If condition={btn_list && btn_list?.batch_cancel_delivery === 1}>
           <Button title={'取消配送'}
                   onPress={() => {
+                    this.mixpanel.track('V4订单详情_取消配送')
                     Alert.alert('提示', `确定取消当前配送吗?`, [
                       {text: '取消'},
                       {
@@ -885,35 +866,51 @@ class OrderInfoNew extends PureComponent {
         </If>
         <If condition={btn_list && btn_list?.btn_resend === 1}>
           <Button title={'再次配送'}
-                  onPress={() => this.onCallThirdShips(order?.id, order?.store_id, 1)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_再次配送')
+                    this.onCallThirdShips(order?.id, order?.store_id, 1)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_call_third_delivery_again}>
           <Button title={'追加配送'}
-                  onPress={() => this.callSelfAgain()}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_追加配送')
+                    this.callSelfAgain()
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_confirm_arrived === 1}>
           <Button title={'完成配送'}
-                  onPress={() => this.toSetOrderComplete(order?.id)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_完成配送')
+                    this.toSetOrderComplete(order?.id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
         </If>
         <If condition={btn_list && btn_list?.btn_contact_rider === 1}>
           <Button title={'联系骑手'}
-                  onPress={() => this.dialNumber(order?.ship_worker_mobile)}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_联系骑手')
+                    this.dialNumber(order?.ship_worker_mobile)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
         <If condition={btn_list && btn_list?.batch_add_delivery_tips === 1}>
           <Button title={'加小费'}
-                  onPress={() => this.openAddTipModal(order?.id)}
+                  onPress={() => {
+
+                    this.mixpanel.track('V4订单详情_加小费')
+                    this.openAddTipModal(order?.id)
+                  }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
           />
@@ -938,7 +935,10 @@ class OrderInfoNew extends PureComponent {
           </View>
           <If condition={order?.pickType === '1'}>
             <Button title={'查看取货码'}
-                    onPress={() => this.showQrcodeFlag()}
+                    onPress={() => {
+                      this.mixpanel.track('V4订单详情_查看取货码')
+                      this.showQrcodeFlag()
+                    }}
                     buttonStyle={styles.qrCodeBtn}
                     titleStyle={styles.qrCodeBtnTitle}
             />
@@ -951,8 +951,7 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile}</Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
-            <FontAwesome5 solid={false} onPress={() => this.dialNumber(order?.mobile)} name={'phone'}
-                          style={styles.cardTitlePhone}/>
+            <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
           </View>
         </View>
         <View style={styles.cuttingLine}/>
@@ -970,7 +969,11 @@ class OrderInfoNew extends PureComponent {
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
                 <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
-                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: info?.product_id, storeId: currStoreId, item: info})
+                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
+                    pid: info?.product_id,
+                    storeId: currStoreId,
+                    item: info
+                  })
                 }}>
                   <FastImage
                     source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
@@ -990,7 +993,8 @@ class OrderInfoNew extends PureComponent {
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                         </If>
-                        <If condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
+                        <If
+                          condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
                           <If condition={order?.is_fn_price_controlled}>
                             <Text style={styles.priceBao}>保</Text>
                             <Text
@@ -1320,7 +1324,7 @@ const styles = StyleSheet.create({
     color: colors.main_color
   },
   orderInfoHeader: {
-    height: 138,
+    height: 88,
     backgroundColor: colors.white,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -1328,9 +1332,10 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   orderInfoHeaderNoMap: {
-    height: 128,
+    height: 78,
     backgroundColor: colors.white,
     flexDirection: "column",
+    alignItems: "flex-start",
     paddingLeft: 20,
     paddingTop: 20,
     width: width * 0.94,
@@ -1370,7 +1375,22 @@ const styles = StyleSheet.create({
   orderInfoHeaderButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10
+    justifyContent: "center",
+    marginBottom: 10,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    width: width * 0.94,
+    marginLeft: width * 0.03
+  },
+  orderInfoHeaderButtonNoMap: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    width: width * 0.94,
+    marginLeft: width * 0.03
   },
   orderInfoHeaderButtonLeft: {
     width: 100,
@@ -1424,7 +1444,7 @@ const styles = StyleSheet.create({
   orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
-    width: width * 0.94,
+    width: width * 0.92,
     backgroundColor: colors.white,
     padding: 12
   },
@@ -1465,7 +1485,7 @@ const styles = StyleSheet.create({
   },
   cuttingLine: {
     backgroundColor: colors.e5,
-    height: 0.5,
+    height: pxToDp(0.5),
     width: width * 0.86,
     marginLeft: width * 0.03
   },
@@ -1527,7 +1547,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10
+    marginVertical: pxToDp(10)
   },
   qrCodeBtn: {
     backgroundColor: colors.white,

@@ -596,6 +596,8 @@ class newRefundScene extends Component {
             </For>
             <If condition={refused_code === -1}>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 value={refused_msg_content}
                 onChange={(refused_msg_content) => {
                   this.setState({refused_msg_content})

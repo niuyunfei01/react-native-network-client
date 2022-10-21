@@ -86,6 +86,8 @@ class ReportErrorDialog extends React.Component {
             <Cell customStyle={{borderTopWidth: 0}}>
               <CellBody>
                 <TextArea
+                  multiline={true}
+                  numberOfLines={4}
                   value={this.state.remark}
                   onChange={(remark) => self.setState({remark: remark})}
                   showCounter={false}

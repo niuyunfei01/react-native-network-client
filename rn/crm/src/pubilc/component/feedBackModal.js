@@ -102,6 +102,8 @@ class FeedBackModal extends React.Component {
               </For>
               <If condition={checked === 1}>
                 <TextArea
+                  multiline={true}
+                  numberOfLines={4}
                   maxLength={60}
                   style={styles.suggestInput}
                   placeholder=" 请输入修改建议"

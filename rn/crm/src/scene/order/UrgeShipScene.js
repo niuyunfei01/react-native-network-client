@@ -141,6 +141,8 @@ class UrgeShipScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={20}
                 placeholder="请输入自定义回复内容"
                 onChange={(v) => {

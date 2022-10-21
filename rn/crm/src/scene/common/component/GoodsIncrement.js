@@ -113,22 +113,23 @@ class GoodsIncrement extends PureComponent {
 
   notActivate = (vip_info) => {
     return (
-      <ImageBackground
-        onPress={() => this.useIncrementService}
-        style={[{flex: 1, height: 50}, styles.notActivateHeader]}
-        source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
-        imageStyle={{flex: 1, height: 53}}>
-        <View style={styles.ValueAddBoxLeft}>
-          <Text style={styles.ValueAddLabel}>增值服务 </Text>
-          <Text style={styles.ValueAddDesc}>开通年包立省999元 发单更便宜 </Text>
-        </View>
-        <If condition={!vip_info.exist_vip}>
+      <TouchableOpacity onPress={() => this.useIncrementService()}>
+        <ImageBackground
+          style={[{flex: 1, height: 50}, styles.notActivateHeader]}
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%A2%9E%E5%80%BC%E6%9C%8D%E5%8A%A1-bj%403x.png'}}
+          imageStyle={{flex: 1, height: 53}}>
           <View style={styles.ValueAddBoxLeft}>
-            <Text style={styles.ValueAddBtn}>立即查看 </Text>
-            <Entypo name="chevron-thin-right" style={styles.ValueAddIcon}/>
+            <Text style={styles.ValueAddLabel}>增值服务 </Text>
+            <Text style={styles.ValueAddDesc}>开通年包立省999元发单更便宜 </Text>
           </View>
-        </If>
-      </ImageBackground>
+          <If condition={!vip_info.exist_vip}>
+            <View style={styles.ValueAddBoxLeft}>
+              <Text style={styles.ValueAddBtn}>立即查看 </Text>
+              <Entypo name="chevron-thin-right" style={styles.ValueAddIcon}/>
+            </View>
+          </If>
+        </ImageBackground>
+      </TouchableOpacity>
     )
   }
 

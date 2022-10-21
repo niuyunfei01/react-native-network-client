@@ -6,7 +6,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../util/http";
 import tool from "../util/tool";
 import JbbModal from "./JbbModal";
-import {hideModal, showModal} from "../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import numeral from "numeral";
 import Config from "../common/config";
@@ -48,6 +48,10 @@ class GoodsListModal extends React.Component {
     const url = '/v4/wsb_order/order_items/' + order_id
     const params = {access_token: accessToken}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
+      if (tool.length(res?.list) <= 0) {
+        ToastShort('暂无商品信息');
+        return this.closeModal();
+      }
       this.setState({
         goods_list: res?.list,
         is_fn_show_wm_price: res?.is_fn_show_wm_price,

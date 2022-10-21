@@ -51,7 +51,7 @@ class TabHome extends React.Component {
           style: {backgroundColor: colors.white, height: show_bottom_tab ? 49 : 0},
           animationEnabled: false,
           lazy: true,
-          labelStyle: {fontSize: 15, opacity: show_bottom_tab ? 1 : 0}
+          labelStyle: {textAlign: 'center', fontSize: 12, opacity: show_bottom_tab ? 1 : 0}
         }}>
         <If condition={Number(work) === 1}>
           <Tab.Screen name={'Console'}

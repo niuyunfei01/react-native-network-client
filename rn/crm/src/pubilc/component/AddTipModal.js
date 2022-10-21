@@ -40,7 +40,7 @@ class AddTipModal extends React.Component {
 
   state = {
     show_modal: false,
-    add_money: this.props.add_money || '',
+    add_money: this.props.add_money || 1,
     input_add_money: '',
     respReason: '',
   }
