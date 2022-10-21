@@ -44,7 +44,6 @@ export default class GlobalUtil {
   }
 
   static getHostPort() {
-    return 'fire8.waisongbang.com'
     return global.hostPort;
   }
 
