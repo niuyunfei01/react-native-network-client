@@ -548,18 +548,15 @@ class GoodsEditScene extends PureComponent {
       name: name
     }
     HttpUtils.get(url, params).then(res => {
-      const {self, sg} = res
+      const {self = [], sg} = res
       setTimeout(() => {
         if (sg.id)
           this.getBasicCategory(sg.id)
-        const {store_categories} = this.state
-        store_categories.length = 0
-        if (self.id) {
-          store_categories.push(self.id)
-          this.setState({store_categories: [...store_categories]})
+        if (Array.isArray(self)) {
+          this.setState({store_categories: self})
         }
       }, 100)
-    }).catch(error => {
+    }).catch(() => {
     })
 
   }
@@ -2006,6 +2003,22 @@ class GoodsEditScene extends PureComponent {
     length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index
   })
 
+  getCategoryIdBySGId = (sg_tag_id) => {
+    const {accessToken, vendor_id, currStoreId} = this.props.global
+    const url = `/api_products/get_self_tags_by_sg?access_token=${accessToken}`
+    const params = {
+      vendor_id: vendor_id,
+      store_id: currStoreId,
+      sg_id: sg_tag_id
+    }
+    HttpUtils.get(url, params).then(res => {
+      const {self = []} = res
+      if (Array.isArray(self))
+        this.setState({store_categories: self})
+    }).catch(() => {
+    })
+  }
+
   selectItem = (item, category) => {
     switch (category) {
       case 1:
@@ -2026,6 +2039,7 @@ class GoodsEditScene extends PureComponent {
         break
       case 3:
         this.setState({basic_category_obj: {...item}, sg_tag_id: item.id, buttonDisabled: false})
+        this.getCategoryIdBySGId(item.id)
         break
     }
   }
