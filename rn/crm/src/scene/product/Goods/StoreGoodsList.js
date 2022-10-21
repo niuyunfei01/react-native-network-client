@@ -343,21 +343,19 @@ class StoreGoodsList extends Component {
           </Text>
           <If condition={items.children.length > 0}>
             <AntDesign name={selectedTagId === items.id ? 'up' : 'down'} color={colors.color999} size={14}
-                       style={{paddingVertical: 14}}/>
+                       style={{paddingVertical: 7}}/>
           </If>
         </TouchableOpacity>
-        <If condition={selectedTagId === items.id}>
-          <If condition={items.children.length > 0}>
-            <For index='index' of={items.children} each='item'>
-              <TouchableOpacity key={index} onPress={() => this.selectCategoryChildren(items, item)}
-                                style={selectedChildTagId === item.id ? styles.selectCategoryChildrenWrap : {backgroundColor: colors.white}}>
-                <Text
-                  style={selectedChildTagId === item.id ? styles.selectCategoryChildrenText : styles.categoryChildrenText}>
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            </For>
-          </If>
+        <If condition={selectedTagId === items.id && items.children.length > 0}>
+          <For index='index' of={items.children} each='item'>
+            <TouchableOpacity key={index} onPress={() => this.selectCategoryChildren(items, item)}
+                              style={selectedChildTagId === item.id ? styles.selectCategoryChildrenWrap : styles.cateChildrenWrap}>
+              <Text
+                style={selectedChildTagId === item.id ? styles.selectCategoryChildrenText : styles.categoryChildrenText}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          </For>
         </If>
       </For>
     )
@@ -739,14 +737,19 @@ const styles = StyleSheet.create({
   selectShowMoreGoodsStatusText: {color: colors.white, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
   showMoreGoodsStatusText: {color: colors.color333, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
   selectCategoryChildrenWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.white,
     borderTopColor: colors.main_color,
     borderBottomColor: colors.main_color,
     borderTopWidth: 1,
     borderBottomWidth: 1
   },
-  selectCategoryChildrenText: {fontSize: 12, color: colors.main_color, paddingVertical: 7},
-  categoryChildrenText: {fontSize: 12, color: colors.color666, paddingVertical: 7},
+  cateChildrenWrap: {
+    backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center'
+  },
+  selectCategoryChildrenText: {fontSize: 14, color: colors.main_color, paddingVertical: 7},
+  categoryChildrenText: {fontSize: 14, color: colors.color666, paddingVertical: 7},
   bottomButtonWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -829,9 +832,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    height: pxToDp(70),
-    flexWrap: 'wrap',
     paddingRight: 8,
+    flexWrap: 'wrap',
   },
   categoryItemActive: {
     justifyContent: 'space-between',
@@ -840,7 +842,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingRight: 8,
     flexWrap: 'wrap',
-    height: pxToDp(70),
 
   },
   noFoundBtnRow: {
@@ -876,11 +877,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: colors.color333,
-    paddingVertical: 14,
+    paddingVertical: 7,
     fontWeight: 'bold',
     textAlign: 'center'
   },
-  categoriesText: {flex: 1, color: colors.color666, textAlign: 'center', paddingVertical: 14,},
+  categoriesText: {flex: 1, fontSize: 12, color: colors.color666, textAlign: 'center', paddingVertical: 7,},
   n2grey6: {
     color: colors.color666,
     fontSize: 12

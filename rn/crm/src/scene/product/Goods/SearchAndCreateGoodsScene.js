@@ -106,11 +106,11 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
 
 
   renderItem = ({item}) => {
-    const {store_had, name, sg_tag_name_list, sg_tag_id, pic, series_id} = item
+    const {store_has, name, sg_tag_name_list, sg_tag_id, pic, series_id} = item
     return (
-      <TouchableOpacity style={store_had ? styles.storeHasItemWrap : styles.itemWrap}
+      <TouchableOpacity style={store_has ? styles.storeHasItemWrap : styles.itemWrap}
                         onPress={() => this.jumpToGoodsEdit(item)}
-                        disabled={store_had}>
+                        disabled={store_has}>
         <FastImage style={styles.itemImage} source={{uri: pic}} resizeMode={FastImage.resizeMode.contain}/>
         <View>
           <Text style={styles.itemTitle} numberOfLines={2}>
@@ -124,7 +124,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
             UPC：{sg_tag_id}
           </Text>
         </View>
-        <If condition={store_had}>
+        <If condition={store_has}>
           <View style={styles.itemGoodsExistFlagWrap}>
             <Text style={styles.itemGoodsExistFlagText}>
               商品已存在
