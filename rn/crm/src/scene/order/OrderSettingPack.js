@@ -535,12 +535,7 @@ class OrderSettingScene extends Component {
           <TextInput placeholder="分机号(选填)"
                      maxLength={4}
                      underlineColorAndroid="transparent"
-                     style={{
-                       width: 100,
-                       fontSize: 14,
-                       color: colors.color333,
-                       textAlign: 'right',
-                     }}
+                     style={{width: 100, fontSize: 14, color: colors.color333, textAlign: 'right'}}
                      placeholderTextColor={colors.color666}
                      keyboardType={'numeric'}
                      value={mobile_suffix}
@@ -609,36 +604,14 @@ class OrderSettingScene extends Component {
   renderGoodsFrom = () => {
     let {weight, goods_price, is_right_once, expect_time} = this.state;
     return (
-      <View
-        style={{
-          borderRadius: 4,
-          backgroundColor: colors.white,
-          paddingHorizontal: 12,
-          marginTop: 10,
-          height: 184,
-        }}>
-        <TouchableOpacity onPress={() => {
-          this.setState({
-            showWeightModal: true
-          })
-        }} style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderColor: colors.e5,
-          borderBottomWidth: 1,
-          height: 56,
-        }}>
+      <View style={{borderRadius: 4, backgroundColor: colors.white, paddingHorizontal: 12, marginTop: 10, height: 184}}>
+        <TouchableOpacity onPress={() => this.setState({showWeightModal: true})}
+                          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.e5, borderBottomWidth: 1, height: 56,}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品重量 </Text>
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 14,
-              color: weight > 0 ? colors.color333 : colors.color999,
-              textAlign: 'right'
-            }}>{weight > 0 ? weight + 'Kg' : '请选择物品重量'}</Text>
-          <Entypo name='chevron-thin-right'
-                  style={styles.locationIcon}/>
+          <Text style={{flex: 1, fontSize: 14, color: weight > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+            {weight > 0 ? weight + 'Kg' : '请选择物品重量'}
+          </Text>
+          <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {
           this.setState({
@@ -654,39 +627,22 @@ class OrderSettingScene extends Component {
         }}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品价值 </Text>
 
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 14,
-              color: goods_price > 0 ? colors.color333 : colors.color999,
-              textAlign: 'right'
-            }}>{goods_price > 0 ? goods_price + '元' : '请选择物品价值'}</Text>
+          <Text style={{flex: 1, fontSize: 14, color: goods_price > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+            {goods_price > 0 ? goods_price + '元' : '请选择物品价值'}
+          </Text>
 
           <Entypo name='chevron-thin-right'
                   style={styles.locationIcon}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
-          this.setState({
-            showDateModal: true,
-          })
-        }} style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: 63,
-        }}>
+        <TouchableOpacity onPress={() => this.setState({showDateModal: true})}
+                          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 63}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>期望送达 </Text>
 
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 14,
-              color: colors.color333,
-              textAlign: 'right'
-            }}>{is_right_once === 0 ? expect_time : '立即送达'}</Text>
+          <Text style={{flex: 1, fontSize: 14,color: colors.color333, textAlign: 'right'}}>
+            {is_right_once === 0 ? expect_time : '立即送达'}
+          </Text>
 
-          <Entypo name='chevron-thin-right'
-                  style={styles.locationIcon}/>
+          <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
         </TouchableOpacity>
       </View>
     )
@@ -695,35 +651,15 @@ class OrderSettingScene extends Component {
   renderContent = () => {
     let {remark} = this.state;
     return (
-      <TouchableOpacity onPress={() => {
-        this.setState({
-          showContentModal: true
-        })
-      }}
-                        style={{
-                          borderRadius: 4,
-                          backgroundColor: colors.white,
-                          paddingHorizontal: 12,
-                          marginTop: 10,
-                        }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: 63,
-        }}>
+      <TouchableOpacity onPress={() => this.setState({showContentModal: true})}
+                        style={{borderRadius: 4, backgroundColor: colors.white, paddingHorizontal: 12, marginTop: 10}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 63}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>备注信息 </Text>
+          <Text style={{flex: 1, fontSize: 14, color: tool.length(remark) > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+            {tool.length(remark) > 0 ? '已备注' : '请填写备注信息'}
+          </Text>
 
-          <Text
-            style={{
-              flex: 1,
-              fontSize: 14,
-              color: tool.length(remark) > 0 ? colors.color333 : colors.color999,
-              textAlign: 'right'
-            }}>{tool.length(remark) > 0 ? '已备注' : '请填写备注信息'}</Text>
-
-          <Entypo name='chevron-thin-right'
-                  style={styles.locationIcon}/>
+          <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
         </View>
       </TouchableOpacity>
     )
@@ -785,15 +721,8 @@ class OrderSettingScene extends Component {
                   minimumValue={weight_min}
                   step={1}
                   trackStyle={{height: 6, borderRadius: 7}}
-                  thumbStyle={{
-                    height: 26,
-                    width: 26,
-                    borderRadius: 13,
-                    backgroundColor: colors.colorEEE
-                  }}
-                  onValueChange={(value) => {
-                    this.setState({weight_input_value: value})
-                  }}
+                  thumbStyle={{height: 26, width: 26, borderRadius: 13, backgroundColor: colors.colorEEE}}
+                  onValueChange={(value) => this.setState({weight_input_value: value})}
                 />
               </View>
               <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>
@@ -801,12 +730,7 @@ class OrderSettingScene extends Component {
               </Text>
             </View>
 
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignContent: 'center',
-              marginBottom: 10,
-            }}>
+            <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center', marginBottom: 10}}>
               <Text style={{fontSize: 14, color: colors.color999}}>请合理填写物品的实际重量</Text>
             </View>
             <Button title={'确 定'}
@@ -840,11 +764,7 @@ class OrderSettingScene extends Component {
                 onClose={this.closeModal}
                 modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
         <View style={{marginBottom: 20}}>
-          <View style={{
-            flexDirection: 'row',
-            padding: 12,
-            justifyContent: 'space-between',
-          }}>
+          <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
@@ -852,14 +772,7 @@ class OrderSettingScene extends Component {
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 10,
-                justifyContent: "space-around",
-                flexWrap: "wrap"
-              }}>
+            <View style={{flexDirection: "row", alignItems: "center", marginBottom: 10, justifyContent: "space-around",flexWrap: "wrap"}}>
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
@@ -1016,7 +929,8 @@ class OrderSettingScene extends Component {
               value={remark}
               onChange={(remark) => this.setState({remark})}
               showCounter={false}
-              placeholder={'请在此填写备注信息，最多不超过30个字符'}
+              placeholder={'请在此填写备注信息，最多不超过40个字符'}
+              maxLength={40}
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent" //取消安卓下划线
               multiline={true}
