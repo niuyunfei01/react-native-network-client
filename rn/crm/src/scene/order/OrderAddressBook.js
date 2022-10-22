@@ -1,6 +1,15 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+  Image,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
@@ -116,7 +125,7 @@ class OrderAddressBook extends Component {
   }
 
   render() {
-    let {headerShown, isRefreshing} = this.state
+    let {headerShown, isRefreshing, addressBook} = this.state
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
@@ -132,7 +141,18 @@ class OrderAddressBook extends Component {
           />
         }>
           {this.renderHeader()}
-          {this.renderList()}
+          <If condition={addressBook?.length <= 0}>
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
+                     style={{width: 100, height: 100, marginBottom: 20}}/>
+              <Text style={{fontSize: 18, color: colors.b2}}>
+                暂无数据
+              </Text>
+            </View>
+          </If>
+          <If condition={addressBook?.length > 0}>
+            {this.renderList()}
+          </If>
         </ScrollView>
 
         <If condition={headerShown}>
