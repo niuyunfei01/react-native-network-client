@@ -70,7 +70,7 @@ class SeparatedExpenseInfo extends PureComponent {
 
   onItemClicked(item) {
     if (item.wm_id) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
+      this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: item.wm_id});
     }
   }
 
@@ -116,16 +116,10 @@ class SeparatedExpenseInfo extends PureComponent {
                     height: 40,
                     backgroundColor: "#f7f7f7"
                   }}>
-                    <Text style={{
-                      paddingLeft: '5%',
-                      width: '93%',
-                      fontSize: pxToDp(20),
-                    }}>
-                      <Icon
-                        name="question-circle"
-                        style={{fontSize: pxToEm(30), color: "red"}}
-                      />
-                      &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看 </Text>
+                    <Text style={{paddingLeft: '5%', width: '93%', fontSize: pxToDp(20),}}>
+                      <Icon name="question-circle" style={{fontSize: pxToEm(30), color: "red"}}/>
+                      &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看
+                    </Text>
                   </View>
                 </If>
               }}
@@ -138,11 +132,8 @@ class SeparatedExpenseInfo extends PureComponent {
                               extra={
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                   <If condition={item.by === '-1-0'}>
-                                    <Text style={[{
-                                      textAlign: 'right',
-                                      marginLeft: 'auto',
-                                      color: 'black'
-                                    }]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                    <Text style={[{textAlign: 'right', marginLeft: 'auto', color: 'black'}]}>
+                                      {`${item.amount > 0 && '+' || ''}${item.amount}`}
                                     </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
                                       <Text style={{color: 'black'}}>{this.state.by_labels[item.by]} </Text>
@@ -150,34 +141,27 @@ class SeparatedExpenseInfo extends PureComponent {
                                   </If>
 
                                   <If condition={item.by !== '-1-0'}>
-                                    <Text style={[{
-                                      textAlign: 'right',
-                                      marginLeft: 'auto',
-                                      fontWeight: "bold"
-                                    }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                    <Text style={[{textAlign: 'right', marginLeft: 'auto', fontWeight: "bold"}, this.onItemAccountStyle(item)]}>
+                                      {`${item.amount > 0 && '+' || ''}${item.amount}`}
                                     </Text>
-                                    <Text style={[this.onItemAccountStyle(item), {
-                                      color: colors.color999,
-                                      fontSize: 13,
-                                      textAlign: 'right'
-                                    }]}>
+                                    <Text style={[this.onItemAccountStyle(item), {color: colors.color999, fontSize: 13, textAlign: 'right'}]}>
                                       余额：{item.left_balance}
                                     </Text>
                                   </If>
                                 </View>}>
               <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
                 <Text style={{color: colors.color333, fontWeight: "bold"}}>{this.state.data_labels[item.wm_id]}</Text>
-                <Text style={{
-                  color: colors.color333,
-                  marginLeft: 10,
-                  fontWeight: "bold"
-                }}>{item.name}({this.state.platform_labels[item.wm_id]})</Text>
+                <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "bold"}}>
+                  {item.name}({this.state.platform_labels[item.wm_id]})
+                </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
-                <Text
-                  style={{color: colors.color999, marginRight: 14}}>{item.hm} </Text>
-                <Text
-                  style={[this.onItemAccountStyle(item), {fontSize: 13}]}>{this.state.by_labels[item.by]} </Text>
+                <Text style={{color: colors.color999, marginRight: 14}}>
+                  {item.hm}
+                </Text>
+                <Text style={[this.onItemAccountStyle(item), {fontSize: 13}]}>
+                  {this.state.by_labels[item.by]}
+                </Text>
               </View>
             </List.Item>
           })}

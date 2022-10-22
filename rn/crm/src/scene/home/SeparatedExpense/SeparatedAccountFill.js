@@ -48,7 +48,7 @@ class SeparatedAccountFill extends PureComponent {
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('三方支付')
     this.state = {
-      to_fill_yuan: '',
+      to_fill_yuan: 100,
       pay_by: PAY_ALI_APP,
       balance: 0,
       authorization: false,
@@ -126,9 +126,13 @@ class SeparatedAccountFill extends PureComponent {
 
   onPay = () => {
     let {to_fill_yuan, pay_by, authorization} = this.state;
-    if (!authorization) ToastLong('请先勾选隐私政策', 0)
+    if (!authorization) {
+      ToastLong('请先勾选隐私政策', 0)
+      return
+    }
     if (to_fill_yuan < 1) {
-      return ToastLong("充值金额不应少于1元");
+      ToastLong("充值金额不应少于1元");
+      return
     }
     if (pay_by === PAY_WECHAT_APP) {
       this.wechatPay()
@@ -255,7 +259,7 @@ class SeparatedAccountFill extends PureComponent {
                     marginHorizontal: 8,
                     backgroundColor: colors.main_color,
                     borderRadius: 24,
-                    length: 48,
+                    length: 48
                   }]}
                   titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 16, lineHeight: 28}}
           />

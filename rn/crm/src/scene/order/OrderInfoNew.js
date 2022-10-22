@@ -12,7 +12,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Animated
 } from 'react-native';
 import HttpUtils from "../../pubilc/util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -135,7 +136,8 @@ class OrderInfoNew extends PureComponent {
 
       toastContext: '',
       add_tip_id: 0,
-      show_add_tip_modal: false
+      show_add_tip_modal: false,
+      allowRefresh: true
     }
     this.map_height = 290
   }
@@ -158,58 +160,6 @@ class OrderInfoNew extends PureComponent {
     calcMs(timeObj, accessToken)
     this.enableBluetooth()
 
-  }
-
-  touchScreenMove = () => {
-
-    this._gestureHandlers = PanResponder.create({
-      // 要求成为响应者：
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-    });
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => {
-        return true;
-      },
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return true;
-      },
-      onPanResponderGrant: (evt, gestureState) => {
-        const {pageY, locationY} = evt.nativeEvent;
-        this.preY = pageY - locationY;
-        return true
-      },
-      onPanResponderMove: (evt, gestureState) => {
-
-        if (Math.abs(gestureState.dy) < 3) {
-          return;
-        }
-        let preHeight = this.preY + gestureState.dy - 70
-        if (preHeight >= 0.7 * height)
-          preHeight = 0.7 * height
-        if (preHeight <= 0)
-          preHeight = 0.3 * height
-        this.viewRef.setNativeProps({height: preHeight || this.preY})
-
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => {
-        return true;
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        this.scrollViewRef.setNativeProps({canCancelContentTouches: true})
-        return true;
-
-      },
-      onPanResponderTerminate: (evt, gestureState) => {
-        return true;
-      }
-    });
-  }
-
-  UNSAFE_componentWillMount() {
-    this.touchScreenMove()
   }
 
   componentDidUpdate = () => {
@@ -700,13 +650,10 @@ class OrderInfoNew extends PureComponent {
     } = this.state.order;
 
 
-    let {
-      aLon,
-      aLat
-    } = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
+    let {aLon, aLat} = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
 
     return (
-      <View  {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
+      <View ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
         <MapView
           zoomGesturesEnabled={true}
           scrollGesturesEnabled={true}
@@ -743,16 +690,14 @@ class OrderInfoNew extends PureComponent {
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
-                    <Text style={{
-                      color: colors.color333,
-                      fontSize: 12,
-                    }}>骑手距离顾客{numeral(ship_distance_destination / 1000).format('0.00')}公里 </Text>
+                    <Text style={{color: colors.color333, fontSize: 12}}>
+                      骑手距离顾客{numeral(ship_distance_destination / 1000).format('0.00')}公里
+                    </Text>
                   </If>
                   <If condition={ship_distance_store > 0}>
-                    <Text style={{
-                      color: colors.color333,
-                      fontSize: 12,
-                    }}>骑手距离商家{numeral(ship_distance_store / 1000).format('0.00')}公里 </Text>
+                    <Text style={{color: colors.color333, fontSize: 12}}>
+                      骑手距离商家{numeral(ship_distance_store / 1000).format('0.00')}公里
+                    </Text>
                   </If>
                 </View>
                 <Entypo name={'triangle-down'}
@@ -800,30 +745,81 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+
+  UNSAFE_componentWillMount() {
+    this.touchScreenMove()
+  }
+
+  touchScreenMove = () => {
+
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        this.scrollViewRef && this.scrollViewRef.setNativeProps({canCancelContentTouches: false})
+        this.setState({allowRefresh: false})
+        return true;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+
+        return true;
+      },
+      onPanResponderGrant: (evt, gestureState) => {
+        const {pageY, locationY} = evt.nativeEvent;
+        this.preY = pageY - locationY;
+
+        return true
+      },
+      onPanResponderMove: (evt, gestureState) => {
+
+        if (Math.abs(gestureState.dy) < 3) {
+          return;
+        }
+        let preHeight = this.preY + gestureState.dy - 70
+        if (preHeight >= 0.7 * height)
+          preHeight = 0.7 * height
+        if (preHeight <= 0)
+          preHeight = 0.3 * height
+        this.viewRef && this.viewRef.setNativeProps({height: preHeight || this.preY})
+
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+
+        this.scrollViewRef.setNativeProps({canCancelContentTouches: true})
+        if (Math.abs(gestureState.dy) < 3) {
+          this.deliveryModalFlag()
+        }
+        if (gestureState.vy === 0)
+          this.setState({allowRefresh: true})
+        return true;
+
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        return true;
+      }
+    });
+  }
+
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View>
-        <View {...this._panResponder.panHandlers}>
-          <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
-                            onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
-                            onPress={() => this.deliveryModalFlag()}>
-            <View style={{
-              alignItems: "center"
-            }}>
-              <If condition={isShowMap}>
-                <View style={styles.orderInfoHeaderFlag}/>
-              </If>
-              <View style={styles.orderInfoHeaderStatus}>
-                <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-                <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
-              </View>
-              <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+      <>
+        <Animated.View {...this._panResponder.panHandlers}
+                       style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}>
+
+          <If condition={isShowMap}>
+            <View style={styles.orderInfoHeaderFlag}/>
+          </If>
+          <View style={styles.orderInfoHeaderStatus}>
+            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+          </View>
+          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
+
+        </Animated.View>
         {this.renderOrderInfoHeaderButton()}
-      </View>
+      </>
     )
   }
 
@@ -1025,7 +1021,7 @@ class OrderInfoNew extends PureComponent {
                               style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                           </If>
                         </If>
-                        <If condition={order?.is_fn_show_wm_price && this.props.global?.vendor_info?.wsb_store_account === "1"}>
+                        <If condition={order?.is_fn_show_wm_price && order.is_peisong_coop}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                           <If condition={!is_service_mgr}>
@@ -1293,7 +1289,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   render() {
-    const {isShowMap, order, isRefreshing} = this.state
+    const {isShowMap, order, isRefreshing, allowRefresh} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1305,6 +1301,7 @@ class OrderInfoNew extends PureComponent {
         <ScrollView ref={ref => this.scrollViewRef = ref}
                     refreshControl={
                       <RefreshControl
+                        enabled={allowRefresh}
                         refreshing={isRefreshing}
                         onRefresh={() => this.fetchOrder()}
                         tintColor='gray'
@@ -1325,9 +1322,9 @@ class OrderInfoNew extends PureComponent {
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}
           {this.renderQrCode()}
-          {this.renderDeliveryModal()}
-          {this.renderAddTipModal()}
         </ScrollView>
+        {this.renderDeliveryModal()}
+        {this.renderAddTipModal()}
       </View>
     );
   }
