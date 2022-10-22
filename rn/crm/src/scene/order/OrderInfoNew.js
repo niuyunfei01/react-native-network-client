@@ -434,7 +434,7 @@ class OrderInfoNew extends PureComponent {
 
   copyToClipboard = (val) => {
     Clipboard.setString(val)
-    ToastLong('已复制到剪切板')
+    ToastLong('复制成功')
   }
 
   onPrint = () => {
@@ -1060,10 +1060,10 @@ class OrderInfoNew extends PureComponent {
                 <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
               </View>
 
-              <If condition={order?.bill && order?.bill?.activity}>
+              <If condition={order?.self_activity_fee}>
                 <View style={styles.productItemRow}>
                   <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{order?.bill?.activity}元 </Text>
+                  <Text style={styles.remarkValue}>{order?.self_activity_fee}元 </Text>
                 </View>
               </If>
 
@@ -1319,7 +1319,9 @@ class OrderInfoNew extends PureComponent {
             {this.renderMap()}
           </If>
           {this.renderOrderInfo()}
-          {this.renderDeliveryInfo()}
+          <If condition={order?.show_ship_info}>
+            {this.renderDeliveryInfo()}
+          </If>
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}
           {this.renderQrCode()}
