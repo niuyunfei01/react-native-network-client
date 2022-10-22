@@ -48,7 +48,7 @@ class SeparatedAccountFill extends PureComponent {
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('三方支付')
     this.state = {
-      to_fill_yuan: '',
+      to_fill_yuan: 100,
       pay_by: PAY_ALI_APP,
       balance: 0,
       authorization: false,
