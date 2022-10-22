@@ -257,16 +257,24 @@ class deliveryStatusModal extends React.Component {
 
   cancelDeliverys = () => {
     let {order_id, accessToken, fetchData} = this.props;
-    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
-      text: '确定', onPress: () => {
-        const api = `/api/batch_cancel_third_ship/${order_id}?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          ToastShort(res.desc);
-          fetchData();
-          this.closeModal();
-        })
-      }
-    }, {'text': '取消'}]);
+    const api = `/v4/wsb_delivery/preCancelDelivery`;
+    HttpUtils.get.bind(this.props)(api, {
+      order_id: order_id,
+      access_token: accessToken
+    }).then(res => {
+      Alert.alert('提示', `${res.alert_msg}`, [{
+        text: '确定', onPress: () => {
+          const api = `/api/batch_cancel_third_ship/${order_id}?access_token=${accessToken}`;
+          HttpUtils.get.bind(this.props)(api, {}).then(res => {
+            ToastShort(res.desc);
+            fetchData();
+            this.closeModal();
+          })
+        }
+      }, {'text': '取消'}]);
+      fetchData();
+      this.closeModal();
+    })
   }
 
   dialNumber = () => {

@@ -145,9 +145,9 @@ class OrderItem extends React.PureComponent {
 
 
   cancelDelivery = () => {
-    const {accessToken} = this.props.global;
+    let token = this.props.accessToken
     let order = this.props.item
-    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${accessToken}`;
+    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${token}`;
     let params = {
       order_id: order?.id
     }

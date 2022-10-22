@@ -126,9 +126,7 @@ class OrderInfoNew extends PureComponent {
       show_no_rider_tips: false,
       delivery_status: '',
       itemsEdited: {},
-      pickCodeStatus: false,
       allow_merchants_cancel_order: false,
-      qrcode: '',
       reminds: [],
       showPrinterChooser: false,
       modalTip: false,
@@ -337,9 +335,7 @@ class OrderInfoNew extends PureComponent {
         order: obj,
         isFetching: false,
         itemsEdited: this._extract_edited_items(obj.items),
-        pickCodeStatus: parseInt(obj.pickType) === 1,
-        allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
-        qrcode: tool.length(obj.pickup_code) > 0 ? obj.pickup_code : ''
+        allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1
       }, () => {
 
         if (res?.loc_lat !== '' && res?.loc_lng !== '') {
@@ -438,7 +434,7 @@ class OrderInfoNew extends PureComponent {
 
   copyToClipboard = (val) => {
     Clipboard.setString(val)
-    ToastLong('已复制到剪切板')
+    ToastLong('复制成功')
   }
 
   onPrint = () => {
@@ -650,6 +646,22 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
+  cancelDeliverys = (id) => {
+    const {global} = this.props;
+    const {accessToken} = global;
+    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
+      text: '确定', onPress: () => {
+        const api = `/api/batch_cancel_third_ship/${id}?access_token=${accessToken}`;
+        HttpUtils.get.bind(this.props)(api, {}).then(res => {
+          ToastShort(res.desc);
+          this.fetchOrder()
+        }).catch(() => {
+          ToastShort("此订单已有骑手接单，取消失败")
+        })
+      }
+    }, {'text': '取消'}]);
+  }
+
   toSetOrderComplete = (order_id) => {
     const {global} = this.props;
     const {accessToken} = global;
@@ -760,11 +772,13 @@ class OrderInfoNew extends PureComponent {
             }}
           >
             <View style={{alignItems: 'center'}}>
-              <View style={styles.mapBox}>
-                <Text style={{color: colors.color333, fontSize: 12}}>
-                  距门店{numeral(dada_distance / 1000).format('0.00')}公里
-                </Text>
-              </View>
+              <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
+                <View style={styles.mapBox}>
+                  <Text style={{color: colors.color333, fontSize: 12}}>
+                    距门店{numeral(dada_distance / 1000).format('0.00')}公里
+                  </Text>
+                </View>
+              </If>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
@@ -789,23 +803,25 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeader = () => {
     let {delivery_status, delivery_desc, isShowMap} = this.state;
     return (
-      <View {...this._panResponder.panHandlers}>
-        <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
-                          onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
-                          onPress={() => this.deliveryModalFlag()}>
-          <View style={{
-            alignItems: "center"
-          }}>
-            <If condition={isShowMap}>
-              <View style={styles.orderInfoHeaderFlag}/>
-            </If>
-            <View style={styles.orderInfoHeaderStatus}>
-              <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+      <View>
+        <View {...this._panResponder.panHandlers}>
+          <TouchableOpacity style={isShowMap ? styles.orderInfoHeader : styles.orderInfoHeaderNoMap}
+                            onPressIn={() => this.scrollViewRef.setNativeProps({canCancelContentTouches: false})}
+                            onPress={() => this.deliveryModalFlag()}>
+            <View style={{
+              alignItems: "center"
+            }}>
+              <If condition={isShowMap}>
+                <View style={styles.orderInfoHeaderFlag}/>
+              </If>
+              <View style={styles.orderInfoHeaderStatus}>
+                <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+                <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+              </View>
+              <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
             </View>
-            <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
         {this.renderOrderInfoHeaderButton()}
       </View>
     )
@@ -830,7 +846,16 @@ class OrderInfoNew extends PureComponent {
           <Button title={'再次打印'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_再次打印')
-                    this.onPrint()
+                    Alert.alert('提醒', '当前订单已打印，是否继续打印？', [
+                      {
+                        text: '确定',
+                        onPress: () => {
+                          this.onPrint()
+                        },
+                      }, {
+                        text: '取消'
+                      }
+                    ])
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -849,15 +874,19 @@ class OrderInfoNew extends PureComponent {
         <If condition={btn_list && btn_list?.batch_cancel_delivery === 1}>
           <Button title={'取消配送'}
                   onPress={() => {
-                    this.mixpanel.track('V4订单详情_取消配送')
-                    Alert.alert('提示', `确定取消当前配送吗?`, [
-                      {text: '取消'},
-                      {
-                        text: '确定', onPress: () => {
-                          this.cancelDelivery(order?.id)
-                        }
-                      }
-                    ])
+                    this.mixpanel.track('V4订单详情_取消全部配送')
+                    this.cancelDeliverys(order?.id)
+                  }}
+                  buttonStyle={styles.orderInfoHeaderButtonLeft}
+                  titleStyle={styles.orderInfoHeaderButtonTitleLeft}
+          />
+
+        </If>
+        <If condition={btn_list && btn_list?.btn_cancel_delivery === 1}>
+          <Button title={'取消配送'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单详情_取消单个配送')
+                    this.cancelDelivery(order?.id)
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -933,7 +962,7 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
             </View>
           </View>
-          <If condition={order?.pickType === '1'}>
+          <If condition={order?.platform === '6'}>
             <Button title={'查看取货码'}
                     onPress={() => {
                       this.mixpanel.track('V4订单详情_查看取货码')
@@ -987,28 +1016,21 @@ class OrderInfoNew extends PureComponent {
                     <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                        <If condition={is_service_mgr || order?.is_fn_show_wm_price}>
+                        <If condition={order?.is_fn_price_controlled}>
                           <Text style={styles.priceBao}>保</Text>
-                          <Text style={styles.price}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
-                          <Text style={styles.priceWai}>外</Text>
-                          <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                        </If>
-                        <If
-                          condition={!is_service_mgr && (order?.is_fn_price_controlled || order?.is_fn_show_wm_price)}>
-                          <If condition={order?.is_fn_price_controlled}>
-                            <Text style={styles.priceBao}>保</Text>
-                            <Text
-                              style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text
+                            style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <If condition={!is_service_mgr}>
                             <Text
                               style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                           </If>
-                          <If condition={order?.is_fn_show_wm_price}>
+                        </If>
+                        <If condition={order?.is_fn_show_wm_price && this.props.global?.vendor_info?.wsb_store_account === "1"}>
+                          <Text style={styles.priceWai}>外</Text>
+                          <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
+                          <If condition={!is_service_mgr}>
                             <Text
-                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price / 100).format('0.00')}元 </Text>
-                            <Text style={styles.priceWai}>外</Text>
-                            <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                            <Text
-                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
+                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.price * info?.num / 100).format('0.00')}元 </Text>
                           </If>
                         </If>
                       </View>
@@ -1038,10 +1060,10 @@ class OrderInfoNew extends PureComponent {
                 <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
               </View>
 
-              <If condition={order?.bill && order?.bill?.activity}>
+              <If condition={order?.self_activity_fee}>
                 <View style={styles.productItemRow}>
                   <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{order?.bill?.activity}元 </Text>
+                  <Text style={styles.remarkValue}>{order?.self_activity_fee}元 </Text>
                 </View>
               </If>
 
@@ -1221,7 +1243,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderQrCode = () => {
-    let {showQrcode, qrcode} = this.state;
+    let {showQrcode, order} = this.state;
     return (
       <JbbModal visible={showQrcode} onClose={this.closeQrCodeModal} modal_type={'center'}>
         <View style={styles.QrBox}>
@@ -1230,8 +1252,8 @@ class OrderInfoNew extends PureComponent {
             <Entypo onPress={this.closeQrCodeModal} name="cross" style={styles.QrClose}/>
           </View>
           <View style={styles.QrImg}>
-            <QRCode value={qrcode} color="black" size={200}/>
-            <Text style={styles.QrCode}>{qrcode} </Text>
+            <QRCode value={order?.platform_oid} color="black" size={200}/>
+            <Text style={styles.QrCode}>{order?.platform_oid} </Text>
           </View>
         </View>
       </JbbModal>
@@ -1297,7 +1319,9 @@ class OrderInfoNew extends PureComponent {
             {this.renderMap()}
           </If>
           {this.renderOrderInfo()}
-          {this.renderDeliveryInfo()}
+          <If condition={order?.show_ship_info}>
+            {this.renderDeliveryInfo()}
+          </If>
           {this.renderOrderDescInfo()}
           {this.renderOperationLog()}
           {this.renderQrCode()}
@@ -1378,9 +1402,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
     paddingBottom: 20,
-    backgroundColor: colors.white,
-    width: width * 0.94,
-    marginLeft: width * 0.03
+    backgroundColor: colors.white
   },
   orderInfoHeaderButtonNoMap: {
     flexDirection: "row",
