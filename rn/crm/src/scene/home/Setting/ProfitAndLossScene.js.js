@@ -321,7 +321,6 @@ class ProfitAndLoss extends PureComponent {
   }
 
   renderProfitItem = (info) => {
-    console.log(info, 'info')
     let {item, index} = info
     return (
       <TouchableOpacity style={[styles.orderInfoCard, {marginTop: 10}]} key={index} onPress={() => this.navigateToOrderInfoDetail(item?.id)}>

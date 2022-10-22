@@ -1021,7 +1021,7 @@ class OrderInfoNew extends PureComponent {
                               style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
                           </If>
                         </If>
-                        <If condition={order?.is_fn_show_wm_price && order.is_peisong_coop}>
+                        <If condition={order?.is_fn_show_wm_price && order?.is_peisong_coop}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                           <If condition={!is_service_mgr}>
@@ -1059,7 +1059,7 @@ class OrderInfoNew extends PureComponent {
               <If condition={order?.self_activity_fee}>
                 <View style={styles.productItemRow}>
                   <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{order?.self_activity_fee}元 </Text>
+                  <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee).format('0.00')}元 </Text>
                 </View>
               </If>
 

@@ -69,8 +69,8 @@ class OrderSettingScene extends Component {
       weight_input_value: 1,
       weight_min: 1,
       weight_max: 20,
-      goods_price: 0,
-      goods_price_value: 20,
+      goods_price: 20,
+      goods_price_value: '',
       remark: '',
       showDateModal: false,
       showWeightModal: false,
@@ -84,6 +84,7 @@ class OrderSettingScene extends Component {
       show_smart_input: false,
       isSaveToBook: false,
       address_id: '',
+      wmStoreLength: 0
     };
 
   }
@@ -147,6 +148,7 @@ class OrderSettingScene extends Component {
 
   componentDidMount() {
     this.getClipboardText()
+    this.getExtStoreList()
   }
 
   getClipboardText = () => {
@@ -351,9 +353,19 @@ class OrderSettingScene extends Component {
     })
   };
 
+  getExtStoreList = () => {
+    const {global} = this.props
+    const {accessToken, currStoreId} = global
+    const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get(api).then(list => {
+      this.setState({
+        wmStoreLength: list?.length
+      })
+    }).catch(error => showError(error.reason))
+  }
 
   render() {
-    let {store_name, store_address, showDateModal} = this.state
+    let {store_name, store_address, showDateModal, wmStoreLength} = this.state
     return (
       <View style={{flex: 1,}}>
         <KeyboardAwareScrollView enableOnAndroid={false}>
@@ -402,7 +414,9 @@ class OrderSettingScene extends Component {
                   }}>{tool.length((store_address || '')) > 18 ? '...' + store_address.substr(-18) : store_address}  </Text>
                 </View>
               </View>
-              <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
+              <If condition={wmStoreLength >= 1}>
+                <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
+              </If>
             </TouchableOpacity>
 
             {this.renderUserFrom()}
@@ -566,7 +580,7 @@ class OrderSettingScene extends Component {
             }}
             multiline={true}
             numberOfLines={4}
-            placeholder={show_smart_input ? "复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
+            placeholder={show_smart_input ? "将复制的收货人信息黏贴至此，系统可自动识别。姓名电话和地址，如：任志峰 13812345678，北京市朝阳区国贸大厦"
               : "智能地址识别"}
             placeholderTextColor={colors.color999}
             onChange={value => {
