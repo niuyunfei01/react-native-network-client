@@ -237,77 +237,79 @@ class OrderSettingScene extends Component {
 
 
   orderToSave = (status) => {
-    let {
-      store_id,
-      name,
-      mobile,
-      mobile_suffix,
-      loc_lng,
-      loc_lat,
-      address,
-      street_block,
-      weight,
-      goods_price,
-      expect_time,
-      remark,
-      is_right_once,
-      isSaveToBook,
-      accessToken,
-      address_id
-    } = this.state
+    tool.debounces(() => {
+      let {
+        store_id,
+        name,
+        mobile,
+        mobile_suffix,
+        loc_lng,
+        loc_lat,
+        address,
+        street_block,
+        weight,
+        goods_price,
+        expect_time,
+        remark,
+        is_right_once,
+        isSaveToBook,
+        accessToken,
+        address_id
+      } = this.state
 
-    if (!loc_lng && !loc_lng) {
-      ToastShort('请先选择定位', 0);
-      return this.goSelectAddress()
-    }
-    if (Number(goods_price) <= 0) {
-      return ToastShort('请选择物品价值');
-    }
-
-    if (Number(weight) <= 0) {
-      return ToastShort('请选择物品重量');
-    }
-
-    if (isSaveToBook) {
-      this.updateAddressBook()
-    }
-
-    let params = {
-      store_id,
-      receiver: name,
-      mobile,
-      mobile_suffix,
-      address: address + street_block,
-      loc_lng,
-      loc_lat,
-      is_right_once,
-      expect_time,
-      remark,
-      address_id,
-      weight,
-      money: goods_price,
-    }
-
-    showModal('正在保存订单，请稍等');
-    const api = `/api/order_manual_create?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(api, params).then(res => {
-      hideModal()
-      if (status === 1) {
-        showSuccess("保存成功！")
-        this.mixpanel.track("V4手动下单_保存订单");
-        this.timeOutBack(300);
-      } else {
-        this.mixpanel.track("V4手动下单_立即下单");
-        if (res?.WaimaiOrder?.id) {
-          this.timeOutBack(300, () => {
-            this.onCallThirdShips(res.WaimaiOrder.id, store_id)
-          });
-        } else {
-          showError('保存失败请重试！')
-        }
+      if (!loc_lng && !loc_lng) {
+        ToastShort('请先选择定位', 0);
+        return this.goSelectAddress()
       }
-    }).catch(() => {
-      hideModal()
+      if (Number(goods_price) <= 0) {
+        return ToastShort('请选择物品价值');
+      }
+
+      if (Number(weight) <= 0) {
+        return ToastShort('请选择物品重量');
+      }
+
+      if (isSaveToBook) {
+        this.updateAddressBook()
+      }
+
+      let params = {
+        store_id,
+        receiver: name,
+        mobile,
+        mobile_suffix,
+        address: address + street_block,
+        loc_lng,
+        loc_lat,
+        is_right_once,
+        expect_time,
+        remark,
+        address_id,
+        weight,
+        money: goods_price,
+      }
+
+      showModal('正在保存订单，请稍等');
+      const api = `/api/order_manual_create?access_token=${accessToken}`;
+      HttpUtils.post.bind(this.props)(api, params).then(res => {
+        hideModal()
+        if (status === 1) {
+          showSuccess("保存成功！")
+          this.mixpanel.track("V4手动下单_保存订单");
+          this.timeOutBack(300);
+        } else {
+          this.mixpanel.track("V4手动下单_立即下单");
+          if (res?.WaimaiOrder?.id) {
+            this.timeOutBack(300, () => {
+              this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+            });
+          } else {
+            showError('保存失败请重试！')
+          }
+        }
+      }).catch(() => {
+        hideModal()
+      })
     })
   }
 
@@ -912,7 +914,7 @@ class OrderSettingScene extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 14
-                }}>{tool.jbbsubstr(address,9)} </Text>
+                }}>{tool.jbbsubstr(address, 9)} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>
