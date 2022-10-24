@@ -142,9 +142,11 @@ class OrderAddressBook extends Component {
         }>
           {this.renderHeader()}
           <If condition={addressBook?.length <= 0}>
-            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
-                     style={{width: 100, height: 100, marginBottom: 20}}/>
+            <View
+              style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
+              <Image
+                source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
+                style={{width: 100, height: 100, marginBottom: 20}}/>
               <Text style={{fontSize: 18, color: colors.b2}}>
                 暂无数据
               </Text>
@@ -227,10 +229,12 @@ class OrderAddressBook extends Component {
               this.onCheck(info)
             }} style={{paddingVertical: 20, borderColor: colors.e5, borderBottomWidth: 0.5}}>
               <View style={{flexDirection: 'row', alignContent: 'center'}}>
-                {/*<View*/}
-                {/*  style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>*/}
-                {/*  <Text style={{color: colors.white, fontSize: 12}}>常用</Text>*/}
-                {/*</View>*/}
+                <If condition={info?.is_often_use}>
+                  <View
+                    style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>
+                    <Text style={{color: colors.white, fontSize: 12}}>常用</Text>
+                  </View>
+                </If>
                 <Text style={{
                   color: colors.color333,
                   fontSize: 16,
