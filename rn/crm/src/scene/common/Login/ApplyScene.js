@@ -230,7 +230,6 @@ class ApplyScene extends PureComponent {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
-    navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT

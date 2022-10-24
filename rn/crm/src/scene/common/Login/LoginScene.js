@@ -171,31 +171,22 @@ class LoginScene extends PureComponent {
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
-        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          this.doneSelectStore(store_id, !binded, cfg?.show_bottom_tab);
-        }));
+        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
         ToastShort(err_msg, 0);
       }
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false, show_bottom_tab = false) => {
+  doneSelectStore = (storeId, show_bottom_tab = false) => {
     const {dispatch, navigation} = this.props;
     dispatch(setCurrentStore(storeId));
-
-    if (not_bind) {
-      navigation.navigate(Config.ROUTE_STORE_STATUS)
-      hideModal()
-      return;
-    }
 
     if (!show_bottom_tab) {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
 
-    navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT
