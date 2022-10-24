@@ -63,6 +63,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
+    let est_json_str = '[{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\NewDada","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\NewDadaShop","logisticName":"达达经济","logisticDesc":"0.16公里","tips":[],"logisticCode":2,"codeV1":2,"thirdCode":304,"autoShipActive":true,"addConfig":["appKey"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/dada.png","marking":["最便宜"],"min_price":4.4,"delivery_fee":4.4,"distance":163,"deliveryNo":"Dadad0b2c671730d424891be7af99dd1a4f5","do_uuid":"2c11500c23b7f83","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\FengNiaoZb","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\FengNiaoZbShop","logisticName":"蜂鸟众包","logisticDesc":"0.24公里","tips":[],"logisticCode":10,"codeV1":14,"thirdCode":311,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/fnzb.png","marking":[],"min_price":4.9,"delivery_fee":4.9,"distance":243,"deliveryNo":"3a689098-c3dd-4ed4-a439-809a398e1d67","do_uuid":"439fccad7677718","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\SfExpress","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\SfExpressShop","logisticName":"顺丰同城","logisticDesc":"0.16公里","tips":[],"logisticCode":7,"codeV1":12,"thirdCode":309,"autoShipActive":true,"addConfig":["appKey","shopId","storeType"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/sf.png","marking":[],"min_price":5.65,"delivery_fee":5.65,"distance":163,"deliveryNo":"","do_uuid":"","coupons_amount":0.45,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\MeiTuanPeisong","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\MeituanPeisongShop","logisticName":"美团快速达","logisticDesc":"0.25公里","tips":["不溢价","接单率93%"],"logisticCode":3,"codeV1":7,"thirdCode":302,"autoShipActive":true,"addConfig":["appKey","appSecret","serviceCode"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/mtps.png","marking":["不溢价"],"min_price":5.9,"delivery_fee":5.9,"distance":246,"deliveryNo":"","do_uuid":"d16b0bfbe6c358387a3ee5a6137bf7bf","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\ShanSong","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\ShanSongShop","logisticName":"闪送","logisticDesc":"0.2公里","tips":["一对一专送"],"logisticCode":8,"codeV1":13,"thirdCode":306,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/shansong.png","marking":[],"min_price":9.4,"delivery_fee":9.4,"distance":200,"deliveryNo":"DH2022102423397240","do_uuid":"d7b489a99a9d37b1b0a05fa49490b120","coupons_amount":2.2,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\UUPT","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\UUPTShop","logisticName":"UU跑腿","logisticDesc":"0.38公里","tips":[],"logisticCode":11,"codeV1":15,"thirdCode":312,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/uupt.png","marking":[],"min_price":10,"delivery_fee":10,"distance":375,"deliveryNo":"58d038198748452889c635174fa5e077","do_uuid":"9df97f57db3ee5b","coupons_amount":1.4,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\GuoXiaoDi","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\GuoXiaoDiShop","logisticName":"裹小递","logisticDesc":"0.17公里","tips":[],"logisticCode":13,"codeV1":17,"thirdCode":314,"autoShipActive":true,"addConfig":["appKey","appSecret","accountId"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/gxd.png","marking":[],"min_price":10.4,"delivery_fee":10.4,"distance":170,"deliveryNo":"XDcclexnf33h","do_uuid":"","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\NewDada","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\NewDadaShop","logisticName":"达达急送","logisticDesc":"0.16公里","tips":[],"logisticCode":17,"codeV1":70,"thirdCode":318,"autoShipActive":true,"addConfig":["appKey"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/dada.png","marking":[],"min_price":10.6,"delivery_fee":10.6,"distance":163,"deliveryNo":"Dada6266d1ee79154cbf9f596ba06ce0ce71","do_uuid":"83559649b94c3b4","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0}]'
     this.state = {
       isLoading: false,
       order_id: order_id,
@@ -70,7 +71,7 @@ class OrderCallDelivery extends Component {
       if_reship: if_reship,
       address_id: address_id,
       store_est: [],
-      est: [],
+      est: JSON.parse(est_json_str),
       exist_waiting_delivery: [],
       maxPrice: 0,
       minPrice: 0,
@@ -82,8 +83,8 @@ class OrderCallDelivery extends Component {
       weight_step: 1,
       logisticFeeMap: [],
       dateArray: [],
-      wm_platform: '',
-      wm_platform_day_id: '',
+      wm_platform: '美团',
+      wm_platform_day_id: '1',
       order_expect_time: '',
       wm_address: '',
       wm_user_name: '',
@@ -204,7 +205,6 @@ class OrderCallDelivery extends Component {
       } else {
         logistic_fee_map = [];
       }
-
       this.setState({
         params_str: params_json_str,
         store_est: store_est,
@@ -220,18 +220,15 @@ class OrderCallDelivery extends Component {
         order_money_input_value: Number(obj?.wm_order_money),
         weight: Number(obj?.weight),
         weight_input_value: Number(obj?.weight),
-        weight_max: obj?.weight_max,
-        weight_min: obj?.weight_min,
-        weight_step: obj?.weight_step,
+        weight_max: Number(obj?.weight_max),
+        weight_min: Number(obj?.weight_min),
+        weight_step: Number(obj?.weight_step),
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         isLoading: false,
       })
       this.priceFn();
     }).catch(() => {
       hideModal();
-      this.setState({
-        isLoading: false,
-      })
     })
   }
 
@@ -344,11 +341,15 @@ class OrderCallDelivery extends Component {
       order_money,
       add_tips,
       remark,
-      worker_delivery_id
+      worker_delivery_id,
+      isLoading
     } = this.state;
 
     this.mixpanel.track("V4配送下单_立即发单")
 
+    if (isLoading) {
+      return ToastShort("请刷新页面重试")
+    }
     if (worker_delivery_id > 0) {
       return this.onWorkerDelivery();
     }
@@ -452,7 +453,12 @@ class OrderCallDelivery extends Component {
   }
 
   onSelectDeliveyAll = (type, cancel = 0) => {
-    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map} = this.state;
+    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, isLoading} = this.state;
+
+    if (isLoading) {
+      return ToastShort('请刷新页面重试')
+    }
+
     let list = type === 1 ? est : store_est;
     let lists = type === 1 ? store_est : est;
     let bool = type === 1 ? !est_all_check : !store_est_all_check;
@@ -503,7 +509,10 @@ class OrderCallDelivery extends Component {
       })
   }
   onSelectDelivey = (item, key, type) => {
-    let {est, store_est, logistic_fee_map} = this.state;
+    let {est, store_est, logistic_fee_map, isLoading} = this.state;
+    if (isLoading) {
+      return ToastShort('请刷新页面重试')
+    }
     let list = type === 0 ? est : store_est;
     let lists = type === 0 ? store_est : est
     item.ischeck = item?.ischeck !== undefined ? !item?.ischeck : true;
@@ -883,7 +892,7 @@ class OrderCallDelivery extends Component {
 
   renderCollect = () => {
     let {wm_address, wm_user_name, wm_mobile, exist_waiting_delivery} = this.state;
-    if (tool.length(exist_waiting_delivery) > 0) {
+    if (tool.length(exist_waiting_delivery) > 0 || tool.length(wm_address) <= 0) {
       return;
     }
     return (

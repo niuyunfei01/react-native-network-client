@@ -106,26 +106,20 @@ class OrderInfoNew extends PureComponent {
     this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
+    let order_json_str = JSON.parse('{"id":"37341517","dayId":"1","platform_oid":"wsb2022102429899","orderTime":"2022-10-24 11:18:11","platform":"2","expectTime":"2022-10-24 12:08:11","orderStatus":"1","orderMoney":"20","mobile":"18173133093,6484","real_mobile":"18173133093","mobile_suffix":"6484","userName":"何清望","address":"新时空大厦1","remark":"","platform_dayId":"1","time_ready":null,"time_start_ship":null,"time_arrived":null,"time_invalid":null,"store_remark":"","ship_worker_id":null,"pack_done_logger":"0","pack_operator":null,"delay_reason":null,"deleted":"0","store_id":"33347","vendor_id":"68","invalid_reason":"","order_times":"6","paid_done":"1","street_block":"","is_right_once":"1","review_deliver":"0","review_quality":"0","print_times":"0","ship_money":"0","ship_score":"0","ship_spent_min":"0","ship_review":"0","dada_status":"5","dada_call_at":"1970-01-01 00:00:00","dada_distance":115,"dada_order_id":"0","dada_fee":"0","dada_id":"","dada_mobile":"","dada_dm_name":"","dada_update_time":"0","user_id":"5098383","paid_by_user":"0","final_price":"0","invoice":"","taxer_id":null,"invoice_amount":"0","ext_store_id":"0","score_talk":"-1","jd_ship_worker_name":"","jd_ship_worker_mobile":"","pack_workers":"","additional_to_pay":"0","deliver_fee":"0","platform_fee":"0","self_activity_fee":"0","wm_activity_fee":"0","update_fee_time":"0","total_goods_price":"2000","total_we_got":"-1","total_pack_score":"0","loc_lat":"28.160611","loc_lng":"112.985074","auto_ship_type":"40","fee_ship_to_platform":"0","total_sku_promo":"0","dada_tips":"0","dada_tips_by":"0","phone_backup":null,"zs_status":"0","ext_user_id":"0","jd_pick_deadline":"1970-01-01 00:00:00","ele_id":null,"init_by_work_order_id":"","eb_order_from":"0","view_times":"0","pickType":"0","assign_to_uid":"0","assign_time":null,"mt_user_num":"","platform_icon":"https://goods-image.qiniu.cainiaoshicai.cn/platform_icon/zijian.png","pl_name":"微信","ship_worker_mobile":"","ship_worker_name":"","direction":"未知","store_name":"咯咯可以","fullStoreName":"咯咯可以","brandName":"配送","printFooter1":"感谢您的光临。售后问题","printFooter2":"请致电客服：13010211858","printFooter3":"","show_seq":"微信#1","show_store_name":"咯咯可以","gd_lat":"28.160611","gd_lng":"112.985074","auto_plat":"未知平台","remark_warning":false,"store_loc_lat":"28.160606","store_loc_lng":"112.986249","ship_worker_lat":0,"ship_worker_lng":0,"ship_distance_destination":0,"ship_distance_store":0,"ship_create_time":"","ship_goods_info":"中餐","ship_fee":0,"ship_id":0,"ship_type_desc":"","items":[],"allow_merchants_cancel_order":"1","is_fn_price_controlled":false,"is_fn_show_wm_price":false,"fn_full_fin":false,"supply_price":0,"wm_price":0,"product_total_count":0,"expectTimeStrInList":"预计10/24 12:08送达","status_show":"待打包","mobileReadable":"18173133093转6484","bill":{"bill_ok":false,"bill_info":"暂不支持"},"greeting":"","pickup_code":"","giver_phone":"","is_split_package":false,"cancel_to_entry":true,"fn_scan_items":"0","fn_scan_ready":false,"fn_coupon_redeem_good":false,"is_wsb_account":"1","is_peisong_coop":true,"btn_list":{"batch_add_delivery_tips":0,"batch_cancel_delivery":0,"btn_cancel_delivery":0,"btn_resend":0,"btn_contact_rider":0,"btn_confirm_arrived":0,"btn_print":1,"btn_print_again":0,"btn_call_third_delivery":1,"btn_call_third_delivery_again":0},"printer_sn":"4004645378"}');
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       orderId: order_id,
       is_service_mgr: is_service_mgr,
       isFetching: false,
-      order: {
-        orderStatus: '',
-        id: '',
-        pickType: '',
-        printer_sn: '',
-        store_id: '',
-        platform: '',
-      },
+      order: order_json_str,
       actionSheet: [],
-      isShowMap: false,
+      isShowMap: true,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,
-      delivery_status: '',
+      delivery_status: '配送状态',
       itemsEdited: {},
       allow_merchants_cancel_order: false,
       reminds: [],
@@ -281,19 +275,14 @@ class OrderInfoNew extends PureComponent {
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
+
       this.setState({
         order: obj,
         isFetching: false,
         itemsEdited: this._extract_edited_items(obj.items),
-        allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1
+        allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
+        isShowMap: res?.loc_lat !== '' && res?.loc_lng !== ''
       }, () => {
-
-        if (res?.loc_lat !== '' && res?.loc_lng !== '') {
-          this.setState({
-            isShowMap: true
-          })
-        }
-
         this.navigationOptions()
       })
       dispatch(getRemindForOrderPage(accessToken, orderId, (ok, desc, data) => {
