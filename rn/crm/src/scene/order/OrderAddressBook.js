@@ -230,7 +230,7 @@ class OrderAddressBook extends Component {
                   marginLeft: info?.is_often_use ? 4 : 0,
                   fontWeight: 'bold'
                   // eslint-disable-next-line no-undef
-                }}>{tool.length(info.address + info.street_block, 18)} </Text>
+                }}>{tool.jbbsubstr(info.address + info.street_block, 18)} </Text>
               </View>
               <View style={{flexDirection: 'row', marginTop: 10}}>
                 {/* eslint-disable-next-line no-undef */}

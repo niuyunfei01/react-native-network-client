@@ -76,7 +76,7 @@ class OrderCallDelivery extends Component {
       maxPrice: 0,
       minPrice: 0,
       wayNums: 0,
-      weight: 1,
+      weight: 0,
       weight_input_value: 1,
       weight_max: 20,
       weight_min: 1,
