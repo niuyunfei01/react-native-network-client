@@ -197,7 +197,7 @@ class LoginScene extends PureComponent {
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
 
-    navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
+    navigation.navigate(this.next || Config.ROUTE_ORDER_NEW, this.nextParams)
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT

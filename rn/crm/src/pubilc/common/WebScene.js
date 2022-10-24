@@ -220,7 +220,7 @@ class WebScene extends PureComponent {
       stop = true;
     } else if (url.indexOf("/stores/view_order") >= 0) {
       if (navState && !navState.loading) {
-        navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
+        navigation.navigate(Config.ROUTE_ORDERS, {orderId: tool.parameterByName('wm_id', url)});
       }
       stop = true;
     } else if (url.indexOf("/users/login/crm/") >= 0

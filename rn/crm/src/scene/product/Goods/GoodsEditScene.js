@@ -413,6 +413,7 @@ class GoodsEditScene extends PureComponent {
       list_img: [],
       selectedItems: [],
       upload_files: [],
+      price: '',
       supply_price: "",
       basic_category_obj: {},
       basic_category: [],
@@ -744,12 +745,7 @@ class GoodsEditScene extends PureComponent {
       if (this.state.uploading) {
         return false;
       }
-      if (this.isAddProdToStore()) {
-        this.addProdToStore(save_done)
-      } else {
-
-        dispatch(productSave(formData, accessToken, save_done));
-      }
+      dispatch(productSave(formData, accessToken, save_done));
     }
   };
 
@@ -904,20 +900,6 @@ class GoodsEditScene extends PureComponent {
         showError(`${desc}`)
       }
     }))
-  }
-
-  addProdToStore = (save_done_callback) => {
-    const {accessToken, currStoreId} = this.props.global;
-    const url = `api_products/add_prod_to_store?access_token=${accessToken}`
-    const params = {
-      product_id: this.state.id,
-      store_id: currStoreId,
-      sale_status: this.state.sale_status,
-      price: this.state.supply_price
-    };
-    HttpUtils.post.bind(this.props)(url, params).then(obj => {
-      save_done_callback(true, '', obj)
-    }, save_done_callback)
   }
 
   startUploadImg = (imgPath, imgName) => {
