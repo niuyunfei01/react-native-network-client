@@ -477,7 +477,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     marginLeft: width * 0.03,
     borderRadius: 6,
-    marginBottom: 10
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.3,
+    elevation: 10,
+    shadowRadius: 12
   },
   orderCardHeader: {
     width: width * 0.94,
