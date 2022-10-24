@@ -274,7 +274,7 @@ class LoginScene extends PureComponent {
           }}>
             <TextInput
               onChangeText={(verifyCode) => {
-                if(/^[A-Za-z0-9]*$/.test(verifyCode)){
+                if (/^[A-Za-z0-9]*$/.test(verifyCode)) {
                   this.setState({verifyCode})
                 }
               }}

@@ -174,7 +174,7 @@ class Detail extends BaseComponent {
     return (
       <View style={Styles.item}>
         <View style={Styles.itemRow}>
-          <Text style={Styles.itemRowText}> 商品：{tool.jbbsubstr(item.name,17)} </Text>
+          <Text style={Styles.itemRowText}> 商品：{tool.jbbsubstr(item.name, 17)} </Text>
           <Text style={Styles.itemRowText}> 规格：{item.sku_name} </Text>
         </View>
         <View style={Styles.itemRow}>

@@ -51,7 +51,7 @@ class RemindModal extends React.Component {
       store_id: currStoreId,
     }
     HttpUtils.post.bind(this.props)(api, data).then(res => {
-      if(res?.host && res?.host !== GlobalUtil.getHostPort()){
+      if (res?.host && res?.host !== GlobalUtil.getHostPort()) {
         const {dispatch} = this.props;
         dispatch({type: HOST_UPDATED, host: res?.host});
         GlobalUtil.setHostPort(res?.host)

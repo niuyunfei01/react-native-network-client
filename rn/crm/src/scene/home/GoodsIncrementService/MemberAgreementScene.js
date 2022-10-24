@@ -1,5 +1,5 @@
 import React from "react";
-import {Text, StyleSheet, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Text} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {Styles} from "./GoodsIncrementServiceStyle";
 
@@ -92,7 +92,7 @@ export default class MemberAgreementScene extends React.PureComponent {
           &emsp;&emsp;如果您有任何需要投诉或申诉的内容，请在APP在线联系客服办理，我们会立即处理您的情况，如需核实，我们会在7个工作日内将处理结果或意见反馈到您。{`\n`}
           <Text style={styles.bold}>
             &emsp;&emsp;八、其他{`\n`}
-         </Text>
+          </Text>
           &emsp;&emsp;1.本协议的生效、履行、解释及争议的解决均适用中华人民共和国法律。{`\n`}
           &emsp;&emsp;2.如就本协议的签订、履行等发生任何争议的，双方应尽量友好协商解决；协商不成时，任何一方均可向家帮帮住所地的人民法院提起诉讼。{`\n`}
           &emsp;&emsp;3.如本协议因与中华人民共和国现行法律相抵触而导致部分无效的，不影响本协议其他条款的效力。{`\n`}

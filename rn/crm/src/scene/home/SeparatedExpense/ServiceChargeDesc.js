@@ -51,12 +51,12 @@ class ServiceChargeDesc extends PureComponent {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={{
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        flex: 1,
-        backgroundColor: colors.f3,
-        borderRadius: 4
-      }}>
+          paddingVertical: 12,
+          paddingHorizontal: 10,
+          flex: 1,
+          backgroundColor: colors.f3,
+          borderRadius: 4
+        }}>
         <View style={{
           padding: 12,
           backgroundColor: colors.white,

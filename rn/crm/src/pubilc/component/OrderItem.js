@@ -163,13 +163,13 @@ class OrderItem extends React.PureComponent {
       order_id: order?.id
     }
     HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if(tool.length(res?.alert_msg) > 0){
+      if (tool.length(res?.alert_msg) > 0) {
         Alert.alert('提示', res?.alert_msg, [{
           text: '确定', onPress: () => {
             this.goCancelDelivery(order?.id)
           }
         }, {'text': '取消'}]);
-      }else {
+      } else {
         this.goCancelDelivery(order?.id)
       }
     })
@@ -403,7 +403,7 @@ class OrderItem extends React.PureComponent {
             color: colors.color333,
             fontSize: 14,
             fontWeight: '500'
-          }}> {tool.jbbsubstr(item.address , 16)} </Text>
+          }}> {tool.jbbsubstr(item.address, 16)} </Text>
         </View>
 
         <TouchableOpacity style={{paddingHorizontal: 10}}

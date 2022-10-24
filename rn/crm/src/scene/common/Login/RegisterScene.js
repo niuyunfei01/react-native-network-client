@@ -128,10 +128,10 @@ class RegisterScene extends PureComponent {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={{
-        flex: 1,
-        padding: 12,
-        backgroundColor: colors.f3,
-      }}>
+          flex: 1,
+          padding: 12,
+          backgroundColor: colors.f3,
+        }}>
         <View style={{
           paddingTop: 30,
           flex: 1,

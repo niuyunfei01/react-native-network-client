@@ -143,7 +143,7 @@ class SendRedeemCoupon extends BaseComponent {
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false} >
+          showsVerticalScrollIndicator={false}>
           <List renderHeader={() => '优惠详情'}>
             <List.Item
               arrow="horizontal"
@@ -210,14 +210,14 @@ class SendRedeemCoupon extends BaseComponent {
           </If>
 
           {!this.state.preview.sent_coupon_id &&
-            <View style={[styles.printBtnBox,]}>
-              <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
-                      disalbed={!this.state.preview.code}
-                      style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
-                      onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
-              <Button type={'ghost'} size="small" style={[styles.printBtn,]}
-                      onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
-            </View>
+          <View style={[styles.printBtnBox,]}>
+            <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
+                    disalbed={!this.state.preview.code}
+                    style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
+                    onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+            <Button type={'ghost'} size="small" style={[styles.printBtn,]}
+                    onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+          </View>
           }
         </ScrollView>
       </View>

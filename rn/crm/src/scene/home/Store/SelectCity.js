@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions} from "react-native";
+import {Dimensions, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {cloneDeep} from "lodash";
 import {Line} from "../../common/component/All";
@@ -154,7 +154,7 @@ class SelectCity extends Component {
 }
 
 const styles = StyleSheet.create({
-  cityContentWrap:{
+  cityContentWrap: {
     flex: 1, backgroundColor: colors.white
   },
   cityKeyText: {

@@ -457,6 +457,14 @@ class OrderInfoNew extends PureComponent {
     this.setState({showPrinterChooser: false})
   }
 
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
   closeModal = () => {
     this.setState({
       modalTip: false
@@ -505,14 +513,6 @@ class OrderInfoNew extends PureComponent {
         break
     }
   }
-
-  printAction = [
-    {
-      type: 'default',
-      label: '取消',
-      onPress: this._hidePrinterChooser
-    }
-  ]
 
   showQrcodeFlag = () => {
     this.setState({
@@ -1000,7 +1000,7 @@ class OrderInfoNew extends PureComponent {
                   />
                   <View style={styles.productItem}>
                     <Text style={styles.productItemName}>
-                      {tool.length(info?.product_name , 16)}
+                      {tool.length(info?.product_name, 16)}
                     </Text>
                     <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     <View style={styles.productItemPrice}>

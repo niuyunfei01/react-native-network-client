@@ -461,7 +461,7 @@ class OrderReceivingInfo extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 14
-                }}>{tool.jbbsubstr(address ,10)} </Text>
+                }}>{tool.jbbsubstr(address, 10)} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

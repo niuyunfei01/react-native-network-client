@@ -2,12 +2,12 @@ import React, {PureComponent} from "react";
 import {
   Dimensions,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  KeyboardAvoidingView,
   TouchableOpacity,
   View
 } from 'react-native'
@@ -229,7 +229,7 @@ export default class MultiSpecsModal extends PureComponent {
         <KeyboardAvoidingView style={styles.container} behavior={Platform.select({android: 'height', ios: 'padding'})}>
           <View style={styles.visibleArea}>
             <View style={styles.btn}>
-              <TouchableOpacity style={styles.btnWrap}  onPress={onClose}>
+              <TouchableOpacity style={styles.btnWrap} onPress={onClose}>
                 <Text style={styles.cancelBtn}>
                   取消
                 </Text>

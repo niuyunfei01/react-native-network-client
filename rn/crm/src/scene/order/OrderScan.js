@@ -292,11 +292,11 @@ class OrderScan extends BaseComponent {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             refreshControl={
-            <RefreshControl
-              refreshing={this.state.isLoading}
-              onRefresh={() => this.fetchOrder(currentOrder.id)}
-            />
-          }>
+              <RefreshControl
+                refreshing={this.state.isLoading}
+                onRefresh={() => this.fetchOrder(currentOrder.id)}
+              />
+            }>
             {this.renderOrderInfo(this.state.currentOrder)}
             <OrderList
               scanCount={this.state.scanCount}

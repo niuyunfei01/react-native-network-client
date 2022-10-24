@@ -112,12 +112,11 @@ const timeObj = {
 }
 
 class OrderListScene extends Component {
-  state = initState;
-
   static propTypes = {
     dispatch: PropTypes.func,
     device: PropTypes.object,
   }
+  state = initState;
 
   constructor(props) {
     super(props);
@@ -619,11 +618,11 @@ class OrderListScene extends Component {
   }
 
   setOrderBy = (order_by) => {
-    if(order_by === 'orderTime desc'){
+    if (order_by === 'orderTime desc') {
       this.mixpanel.track('V4订单列表_最新来单')
-    }else if(order_by === 'orderTime asc'){
+    } else if (order_by === 'orderTime asc') {
       this.mixpanel.track('V4订单列表_最早来单')
-    }else {
+    } else {
       this.mixpanel.track('V4订单列表_送达时间')
     }
     let {user_config} = this.props.global

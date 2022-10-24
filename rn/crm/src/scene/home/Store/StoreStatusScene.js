@@ -66,6 +66,30 @@ const timeOptions = [
 ]
 
 class StoreStatusScene extends PureComponent {
+  buttons = [{
+    type: 'default',
+    label: '取消',
+    sty: {
+      borderColor: 'gray',
+      borderWidth: pxToDp(1),
+    },
+    onPress: () => this.setState({dialogVisible: false})
+  }, {
+    type: 'primary',
+    label: '允许',
+    sty: {
+      backgroundColor: colors.b2,
+      borderColor: 'gray',
+      borderWidth: pxToDp(1),
+    },
+    textsty: {
+      color: colors.white,
+    },
+    onPress: () => this.setState({dialogVisible: false}, () => {
+      this.setAutoTaskOrder()
+    })
+  }]
+
   constructor(props) {
     super(props)
 
@@ -162,7 +186,6 @@ class StoreStatusScene extends PureComponent {
       _this.props.navigation.navigate(route, params, callback);
     });
   }
-
 
   openStore() {
     showModal('请求中...')
@@ -334,7 +357,6 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
-
   renderNoBody() {
     return (
       <View style={styles.noOrderContent}>
@@ -426,30 +448,6 @@ class StoreStatusScene extends PureComponent {
       showError('操作失败');
     })
   }
-
-  buttons = [{
-    type: 'default',
-    label: '取消',
-    sty: {
-      borderColor: 'gray',
-      borderWidth: pxToDp(1),
-    },
-    onPress: () => this.setState({dialogVisible: false})
-  }, {
-    type: 'primary',
-    label: '允许',
-    sty: {
-      backgroundColor: colors.b2,
-      borderColor: 'gray',
-      borderWidth: pxToDp(1),
-    },
-    textsty: {
-      color: colors.white,
-    },
-    onPress: () => this.setState({dialogVisible: false}, () => {
-      this.setAutoTaskOrder()
-    })
-  }]
 
   render() {
     return (<View style={{flex: 1, backgroundColor: colors.f5}}>

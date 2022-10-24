@@ -160,6 +160,15 @@ class OrderInfo extends Component {
     route: PropTypes.object,
     device: PropTypes.object,
   }
+  buttons = [
+    {
+      text: '确定',
+      onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+    },
+    {
+      text: '取消'
+    }
+  ]
 
   constructor(props) {
     super(props);
@@ -603,16 +612,6 @@ class OrderInfo extends Component {
     }
 
   }
-
-  buttons = [
-    {
-      text: '确定',
-      onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-    },
-    {
-      text: '取消'
-    }
-  ]
 
   _doSunMiPint = () => {
     const {order} = this.state

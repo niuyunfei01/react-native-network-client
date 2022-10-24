@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  Alert,
   Dimensions,
   RefreshControl,
   ScrollView,
@@ -7,7 +8,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View, Platform, Alert
+  View
 } from "react-native";
 import {connect} from "react-redux";
 import pxToDp from "../../../pubilc/util/pxToDp";

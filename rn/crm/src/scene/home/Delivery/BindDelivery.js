@@ -37,7 +37,7 @@ class BindDelivery extends PureComponent {
       app_key: '',
       app_secret: '',
       shop_id: '',
-      storename : store_info?.name
+      storename: store_info?.name
     }
 
     this.onChange = value => {
@@ -77,12 +77,12 @@ class BindDelivery extends PureComponent {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={{
-        marginBottom: pxToDp(22),
-        backgroundColor: colors.white
-      }}
-                  automaticallyAdjustContentInsets={false}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
+          marginBottom: pxToDp(22),
+          backgroundColor: colors.white
+        }}
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <Text style={{fontSize: 16, color: colors.color333, padding: 10}}>{this.state.storename} </Text>
         <Text style={{

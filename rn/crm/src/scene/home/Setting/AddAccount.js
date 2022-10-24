@@ -1,12 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text, TextInput,
-  View
-} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../../pubilc/styles/colors";
@@ -69,7 +63,14 @@ class AddAccount extends PureComponent {
 
   addWorker = () => {
     const {currStoreId, accessToken, vendor_id} = this.props.global;
-    let {worker_role_grade_value, worker_store_id_belong_value, worker_name, worker_account, worker_id, worker_password} = this.state
+    let {
+      worker_role_grade_value,
+      worker_store_id_belong_value,
+      worker_name,
+      worker_account,
+      worker_id,
+      worker_password
+    } = this.state
     if (worker_role_grade_value < 1) {
       ToastLong('请选择账号权限')
       return
@@ -127,7 +128,15 @@ class AddAccount extends PureComponent {
   }
 
   renderEditInfo = () => {
-    let {workerRoles, worker_role_grade, worker_store_id_belong, worker_name, worker_account, storeList, roleStoreList} = this.state
+    let {
+      workerRoles,
+      worker_role_grade,
+      worker_store_id_belong,
+      worker_name,
+      worker_account,
+      storeList,
+      roleStoreList
+    } = this.state
     return (
       <View style={styles.InfoBox}>
         <View style={styles.item_body}>
@@ -170,7 +179,8 @@ class AddAccount extends PureComponent {
                 skin="customer"
                 defaultKey={-999}
               >
-                <Text style={[styles.row_desc, {color: worker_store_id_belong === '' ? colors.color999 : colors.color333}]}>
+                <Text
+                  style={[styles.row_desc, {color: worker_store_id_belong === '' ? colors.color999 : colors.color333}]}>
                   {worker_store_id_belong || '请选择归属门店'}
                 </Text>
               </ModalSelector>

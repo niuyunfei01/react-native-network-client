@@ -1,9 +1,18 @@
-import React, {memo, useRef, useState, useCallback} from 'react'
-import {Dimensions, LayoutRectangle} from 'react-native'
-import {View, ViewStyle, TouchableOpacity} from 'react-native'
-import {Animated, Easing, EasingFunction} from 'react-native'
-import {ScrollView, ScrollViewProps} from 'react-native'
-import {PanResponder, PanResponderInstance} from 'react-native'
+import React, {memo, useCallback, useRef, useState} from 'react'
+import {
+    Animated,
+    Dimensions,
+    Easing,
+    EasingFunction,
+    LayoutRectangle,
+    PanResponder,
+    PanResponderInstance,
+    ScrollView,
+    ScrollViewProps,
+    TouchableOpacity,
+    View,
+    ViewStyle
+} from 'react-native'
 import _ from 'lodash'
 
 const {width: screenWidth} = Dimensions.get('window')

@@ -107,7 +107,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     this.props.navigation.goBack();
   }
 
-   changeTaskStatus(status, reason = '') {
+  changeTaskStatus(status, reason = '') {
     let {task_id} = this.props.route.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -155,7 +155,7 @@ class GoodsWorkNewProductScene extends PureComponent {
               }
               await this.setState({upReason: true});
               showModal('提交中..')
-               this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+              this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
             }}
           >
             <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新 </Text>

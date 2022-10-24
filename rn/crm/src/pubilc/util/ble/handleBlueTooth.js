@@ -12,7 +12,7 @@ let isScanning = false
 
 const startScan = async () => {
   try {
-    if(isScanning)
+    if (isScanning)
       return
     await BleManager.scan([], 10, false)
     isScanning = true

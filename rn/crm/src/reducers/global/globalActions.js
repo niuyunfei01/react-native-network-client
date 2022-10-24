@@ -296,7 +296,7 @@ export function signIn(mobile, password, props, callback) {
 
         } else {
           if (Number(json.error_code) === 401)
-            return  callback(false, Number(json.error_code))
+            return callback(false, Number(json.error_code))
           //fixme: 需要给出明确提示
           callback(false, "验证码错误")
         }

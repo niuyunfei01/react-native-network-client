@@ -1,5 +1,5 @@
 import React from "react";
-import {TextInput, Text, View, StyleSheet, Dimensions, FlatList, TouchableOpacity, Keyboard} from 'react-native'
+import {Dimensions, FlatList, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";

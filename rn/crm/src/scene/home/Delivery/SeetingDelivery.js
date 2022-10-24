@@ -212,16 +212,16 @@ class SeetingDelivery extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={styles.container}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => this.onHeaderRefresh()}
-                        tintColor='gray'
-                      />
-                    }
-                    automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          }
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
 
           {this.state.showBind ?

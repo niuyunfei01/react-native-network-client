@@ -87,7 +87,8 @@ class PrinterSetting extends PureComponent {
     this.focus()
   }
 
-  get_print_settings(callback = () => {}) {
+  get_print_settings(callback = () => {
+  }) {
     const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
@@ -206,7 +207,8 @@ class PrinterSetting extends PureComponent {
         </View>
 
         <If condition={Platform.OS === 'android'}>
-          <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
+          <View
+            style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
             <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
               <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold',}}>
                 蓝牙打印机

@@ -460,7 +460,7 @@ class Mine extends PureComponent {
             this.jumpToAddStore()
           }} style={styles.storeContent}>
             <Text style={styles.storeName}>
-              {tool.jbbsubstr(storeInfo?.store_name , 12 )}
+              {tool.jbbsubstr(storeInfo?.store_name, 12)}
             </Text>
             <View style={styles.storeType}>
               <Text style={styles.storeTypeText}>连锁版 </Text>

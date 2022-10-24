@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import { ScrollView, Text, View} from 'react-native'
+import {ScrollView, Text, View} from 'react-native'
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 
 const DESCRIPTION_LIST = [

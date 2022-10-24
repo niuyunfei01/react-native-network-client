@@ -1,20 +1,21 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
+  Dimensions,
   FlatList,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   Text,
-  Dimensions,
   TextInput,
   TouchableOpacity,
-  View,
-  Keyboard
+  View
 } from "react-native";
 import {ActionSheet, Button, Dialog} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
+import {setSGCategory} from "../../../reducers/global/globalActions";
 import {fetchSgTagTree, getProdDetailByUpc, productSave} from "../../../reducers/product/productActions";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
@@ -43,7 +44,6 @@ import {imageKey} from "../../../pubilc/util/md5";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import FastImage from "react-native-fast-image";
 import GridView from '../../../pubilc/component/DraggableGridView'
-import {setSGCategory} from "../../../reducers/global/globalActions";
 
 const {height} = Dimensions.get("window");
 

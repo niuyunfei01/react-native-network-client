@@ -8,7 +8,7 @@ import * as globalActions from '../../../reducers/global/globalActions';
 
 function mapStateToProps(state) {
   const {global} = state;
-  return { global: global}
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {

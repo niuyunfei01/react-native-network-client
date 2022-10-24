@@ -141,10 +141,18 @@ class SeparatedExpenseInfo extends PureComponent {
                                   </If>
 
                                   <If condition={item.by !== '-1-0'}>
-                                    <Text style={[{textAlign: 'right', marginLeft: 'auto', fontWeight: "bold"}, this.onItemAccountStyle(item)]}>
+                                    <Text style={[{
+                                      textAlign: 'right',
+                                      marginLeft: 'auto',
+                                      fontWeight: "bold"
+                                    }, this.onItemAccountStyle(item)]}>
                                       {`${item.amount > 0 && '+' || ''}${item.amount}`}
                                     </Text>
-                                    <Text style={[this.onItemAccountStyle(item), {color: colors.color999, fontSize: 13, textAlign: 'right'}]}>
+                                    <Text style={[this.onItemAccountStyle(item), {
+                                      color: colors.color999,
+                                      fontSize: 13,
+                                      textAlign: 'right'
+                                    }]}>
                                       余额：{item.left_balance}
                                     </Text>
                                   </If>

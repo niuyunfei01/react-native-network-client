@@ -148,19 +148,19 @@ class SeetingMiniNumDelivery extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={{
-          marginBottom: pxToDp(22),
-          backgroundColor: colors.f7
-        }}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => this.onHeaderRefresh()}
-                        tintColor='gray'
-                      />
-                    }
-                    automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+            marginBottom: pxToDp(22),
+            backgroundColor: colors.f7
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          }
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.row}>
             <Text style={styles.descriptionText}>

@@ -8,8 +8,7 @@ import {copyStoreGoods, saveOfflineStore} from "../../../reducers/mine/mineActio
 
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import tool from "../../../pubilc/util/tool";
-import {simpleBarrier} from "../../../pubilc/util/tool";
+import tool, {simpleBarrier} from "../../../pubilc/util/tool";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
@@ -795,7 +794,8 @@ class StoreInfo extends Component {
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
-        <KeyboardAwareScrollView enableOnAndroid={false} style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
+        <KeyboardAwareScrollView enableOnAndroid={false}
+                                 style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
           {this.renderErrmsg()}
           {this.renderStoreInfo()}
           {this.renderWorker()}
@@ -1148,7 +1148,13 @@ class StoreInfo extends Component {
             underlineColorAndroid="transparent"
           />
         </View>
-        <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', alignItems: 'center', padding: 8}}>
+        <View style={{
+          borderBottomWidth: 1,
+          borderColor: colors.colorCCC,
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8
+        }}>
           <Text style={{fontSize: 14, width: 80}}>收款密钥 </Text>
           {receiveSecretKey ?
             <View style={{flexDirection: "row"}}>
@@ -1250,7 +1256,14 @@ class StoreInfo extends Component {
           </Text>
         </View>
 
-        <View style={{borderBottomWidth: 1, borderColor: colors.colorCCC, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: pxToDp(90),}}>
+        <View style={{
+          borderBottomWidth: 1,
+          borderColor: colors.colorCCC,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 8,
+          height: pxToDp(90),
+        }}>
           <Text style={{fontSize: 14}}>
             门店类型
           </Text>
@@ -1314,7 +1327,7 @@ class StoreInfo extends Component {
         }}>
           <Text style={{fontSize: 14}}>身份证号 </Text>
           <TextInput
-            onChangeText={owner_nation_id =>this.setState({owner_nation_id})}
+            onChangeText={owner_nation_id => this.setState({owner_nation_id})}
             value={owner_nation_id}
             maxLength={18} // 可输入的最大长度
             placeholder="请输入本人身份证号"
@@ -1628,16 +1641,16 @@ class StoreInfo extends Component {
                   })
                 }}
               ><Text style={{
-                  height: 40,
-                  backgroundColor: colors.main_color,
-                  color: 'white',
-                  fontSize: pxToDp(30),
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  paddingTop: pxToDp(15),
-                  paddingHorizontal: pxToDp(30),
-                  borderRadius: pxToDp(10)
-                }}>修 改</Text></TouchableOpacity>
+                height: 40,
+                backgroundColor: colors.main_color,
+                color: 'white',
+                fontSize: pxToDp(30),
+                fontWeight: "bold",
+                textAlign: "center",
+                paddingTop: pxToDp(15),
+                paddingHorizontal: pxToDp(30),
+                borderRadius: pxToDp(10)
+              }}>修 改</Text></TouchableOpacity>
             </View>
           </View>
         </ScrollView>

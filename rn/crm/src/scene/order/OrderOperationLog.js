@@ -1,11 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Dimensions,
-  ScrollView,
-  StyleSheet, Text, TouchableOpacity,
-  View
-} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
 import tool from "../../pubilc/util/tool";
 import {orderChangeLog} from "../../reducers/order/orderActions";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
@@ -60,7 +55,7 @@ class OrderOperationLog extends PureComponent {
               {info?.what}
             </Text>
             <If condition={index !== operationLog?.length - 1}>
-              <View style={styles.cuttingLine1} />
+              <View style={styles.cuttingLine1}/>
             </If>
           </View>
         </For>

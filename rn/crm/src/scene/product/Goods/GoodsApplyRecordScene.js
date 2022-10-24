@@ -39,6 +39,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
+  buttons = [
+    {
+      type: "default",
+      label: "确定",
+      onPress: () => this.setState({dialog: false})
+    }
+  ]
+
   constructor(props) {
     super(props);
     const {is_service_mgr = false} = tool.vendor(this.props.global)
@@ -343,14 +351,6 @@ class GoodsApplyRecordScene extends Component {
       );
     }
   }
-
-  buttons = [
-    {
-      type: "default",
-      label: "确定",
-      onPress: () => this.setState({dialog: false})
-    }
-  ]
 
   render() {
     const {audit_status, dialog, shouldShowModal, selectedItem, errMsg} = this.state
