@@ -229,9 +229,6 @@ class OrderCallDelivery extends Component {
       this.priceFn();
     }).catch(() => {
       hideModal();
-      this.setState({
-        isLoading: false,
-      })
     })
   }
 
