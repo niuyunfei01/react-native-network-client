@@ -63,6 +63,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
+    let est_json_str = '[{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\NewDada","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\NewDadaShop","logisticName":"达达经济","logisticDesc":"0.16公里","tips":[],"logisticCode":2,"codeV1":2,"thirdCode":304,"autoShipActive":true,"addConfig":["appKey"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/dada.png","marking":["最便宜"],"min_price":4.4,"delivery_fee":4.4,"distance":163,"deliveryNo":"Dadad0b2c671730d424891be7af99dd1a4f5","do_uuid":"2c11500c23b7f83","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\FengNiaoZb","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\FengNiaoZbShop","logisticName":"蜂鸟众包","logisticDesc":"0.24公里","tips":[],"logisticCode":10,"codeV1":14,"thirdCode":311,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/fnzb.png","marking":[],"min_price":4.9,"delivery_fee":4.9,"distance":243,"deliveryNo":"3a689098-c3dd-4ed4-a439-809a398e1d67","do_uuid":"439fccad7677718","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\SfExpress","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\SfExpressShop","logisticName":"顺丰同城","logisticDesc":"0.16公里","tips":[],"logisticCode":7,"codeV1":12,"thirdCode":309,"autoShipActive":true,"addConfig":["appKey","shopId","storeType"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/sf.png","marking":[],"min_price":5.65,"delivery_fee":5.65,"distance":163,"deliveryNo":"","do_uuid":"","coupons_amount":0.45,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\MeiTuanPeisong","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\MeituanPeisongShop","logisticName":"美团快速达","logisticDesc":"0.25公里","tips":["不溢价","接单率93%"],"logisticCode":3,"codeV1":7,"thirdCode":302,"autoShipActive":true,"addConfig":["appKey","appSecret","serviceCode"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/mtps.png","marking":["不溢价"],"min_price":5.9,"delivery_fee":5.9,"distance":246,"deliveryNo":"","do_uuid":"d16b0bfbe6c358387a3ee5a6137bf7bf","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\ShanSong","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\ShanSongShop","logisticName":"闪送","logisticDesc":"0.2公里","tips":["一对一专送"],"logisticCode":8,"codeV1":13,"thirdCode":306,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/shansong.png","marking":[],"min_price":9.4,"delivery_fee":9.4,"distance":200,"deliveryNo":"DH2022102423397240","do_uuid":"d7b489a99a9d37b1b0a05fa49490b120","coupons_amount":2.2,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\UUPT","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\UUPTShop","logisticName":"UU跑腿","logisticDesc":"0.38公里","tips":[],"logisticCode":11,"codeV1":15,"thirdCode":312,"autoShipActive":true,"addConfig":["appKey","appSecret"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/uupt.png","marking":[],"min_price":10,"delivery_fee":10,"distance":375,"deliveryNo":"58d038198748452889c635174fa5e077","do_uuid":"9df97f57db3ee5b","coupons_amount":1.4,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\GuoXiaoDi","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\GuoXiaoDiShop","logisticName":"裹小递","logisticDesc":"0.17公里","tips":[],"logisticCode":13,"codeV1":17,"thirdCode":314,"autoShipActive":true,"addConfig":["appKey","appSecret","accountId"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/gxd.png","marking":[],"min_price":10.4,"delivery_fee":10.4,"distance":170,"deliveryNo":"XDcclexnf33h","do_uuid":"","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0},{"class":"WSB\\\\DeliveryFactory\\\\Api\\\\NewDada","shopClass":"WSB\\\\DeliveryFactory\\\\Shop\\\\NewDadaShop","logisticName":"达达急送","logisticDesc":"0.16公里","tips":[],"logisticCode":17,"codeV1":70,"thirdCode":318,"autoShipActive":true,"addConfig":["appKey"],"icon":"https://cnsc-pics.cainiaoshicai.cn/deliveries/new_icon/dada.png","marking":[],"min_price":10.6,"delivery_fee":10.6,"distance":163,"deliveryNo":"Dada6266d1ee79154cbf9f596ba06ce0ce71","do_uuid":"83559649b94c3b4","coupons_amount":0,"discount_fee":0,"error_msg":"","label":"","cheaper":0,"weight":1000,"fee_by":0,"premium":{"weight_premium":0,"remote_premium":0,"special_time_premium":0,"transport_lack_premium":0,"other_premium":0},"add_tips":0}]'
     this.state = {
       isLoading: false,
       order_id: order_id,
@@ -70,7 +71,7 @@ class OrderCallDelivery extends Component {
       if_reship: if_reship,
       address_id: address_id,
       store_est: [],
-      est: [],
+      est: JSON.parse(est_json_str),
       exist_waiting_delivery: [],
       maxPrice: 0,
       minPrice: 0,
@@ -82,8 +83,8 @@ class OrderCallDelivery extends Component {
       weight_step: 1,
       logisticFeeMap: [],
       dateArray: [],
-      wm_platform: '',
-      wm_platform_day_id: '',
+      wm_platform: '美团',
+      wm_platform_day_id: '1',
       order_expect_time: '',
       wm_address: '',
       wm_user_name: '',
@@ -204,7 +205,6 @@ class OrderCallDelivery extends Component {
       } else {
         logistic_fee_map = [];
       }
-
       this.setState({
         params_str: params_json_str,
         store_est: store_est,
@@ -220,18 +220,15 @@ class OrderCallDelivery extends Component {
         order_money_input_value: Number(obj?.wm_order_money),
         weight: Number(obj?.weight),
         weight_input_value: Number(obj?.weight),
-        weight_max: obj?.weight_max,
-        weight_min: obj?.weight_min,
-        weight_step: obj?.weight_step,
+        weight_max: Number(obj?.weight_max),
+        weight_min: Number(obj?.weight_min),
+        weight_step: Number(obj?.weight_step),
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         isLoading: false,
       })
       this.priceFn();
     }).catch(() => {
       hideModal();
-      this.setState({
-        isLoading: false,
-      })
     })
   }
 
@@ -285,54 +282,39 @@ class OrderCallDelivery extends Component {
     this.props.navigation.navigate(route, params);
   }
 
+  goCancelDelivery = (order_id, ship_id = 0) => {
+    this.closeModal();
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+      {
+        order: {id: order_id,},
+        ship_id: ship_id,
+        onCancelled: () => {
+          this.fetchData();
+        }
+      });
+  }
+
+
   cancelDelivery = (ship_id) => {
     let {accessToken, order_id} = this.props.global
-    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
-    let params = {
-      order_id: order_id
-    }
-    let order = {
-      id: order_id
-    }
-    HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (res?.deduct_fee < 0) {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: ship_id,
-                onCancelled: () => {
-                  this.fetchData()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
-      } else if (Number(res?.deduct_fee) === 0) {
-        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+    const api = `/v4/wsb_delivery/preCancelDelivery`;
+    HttpUtils.get.bind(this.props)(api, {
+      order_id: order_id,
+      access_token: accessToken
+    }).then(res => {
+
+      if (tool.length(res?.alert_msg) > 0) {
+        Alert.alert('提示', `${res.alert_msg}`, [
           {
-            order: order,
-            ship_id: ship_id,
-            onCancelled: () => {
-              this.fetchData()
+            text: '确定',
+            onPress: () => {
+              this.goCancelDelivery(order_id, ship_id)
             }
-          });
+          },
+          {text: '取消'}]);
       } else {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${res?.deduct_fee}元`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: ship_id,
-                onCancelled: () => {
-                  this.fetchData()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
+        this.goCancelDelivery(order_id, ship_id)
       }
-    }).catch(e => {
-      ToastShort(e.reason, 0)
     })
   }
 
@@ -369,11 +351,15 @@ class OrderCallDelivery extends Component {
       order_money,
       add_tips,
       remark,
-      worker_delivery_id
+      worker_delivery_id,
+      isLoading
     } = this.state;
 
     this.mixpanel.track("V4配送下单_立即发单")
 
+    if (isLoading) {
+      return ToastShort("请刷新页面重试")
+    }
     if (worker_delivery_id > 0) {
       return this.onWorkerDelivery();
     }
@@ -415,7 +401,8 @@ class OrderCallDelivery extends Component {
         if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
             {
-              text: '去充值', onPress: () => {
+              text: '去充值',
+              onPress: () => {
                 this.onPress(Config.ROUTE_ACCOUNT_FILL, {
                   onBack: (res) => {
                     this.showAlert(res)
@@ -434,7 +421,8 @@ class OrderCallDelivery extends Component {
       Alert.alert('充值成功，是否立即发配送', ``, [
         {text: '取消发单'},
         {
-          text: '立即发单', onPress: () => {
+          text: '立即发单',
+          onPress: () => {
             this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: (res) => {
                 if (res) {
@@ -449,7 +437,8 @@ class OrderCallDelivery extends Component {
       Alert.alert('充值失败', ``, [
         {text: '取消'},
         {
-          text: '再次充值', onPress: () => {
+          text: '再次充值',
+          onPress: () => {
             this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: () => {
                 this.onPress(Config.ROUTE_ACCOUNT_FILL, {
@@ -477,7 +466,12 @@ class OrderCallDelivery extends Component {
   }
 
   onSelectDeliveyAll = (type, cancel = 0) => {
-    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map} = this.state;
+    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, isLoading} = this.state;
+
+    if (isLoading) {
+      return ToastShort('请刷新页面重试')
+    }
+
     let list = type === 1 ? est : store_est;
     let lists = type === 1 ? store_est : est;
     let bool = type === 1 ? !est_all_check : !store_est_all_check;
@@ -528,7 +522,10 @@ class OrderCallDelivery extends Component {
       })
   }
   onSelectDelivey = (item, key, type) => {
-    let {est, store_est, logistic_fee_map} = this.state;
+    let {est, store_est, logistic_fee_map, isLoading} = this.state;
+    if (isLoading) {
+      return ToastShort('请刷新页面重试')
+    }
     let list = type === 0 ? est : store_est;
     let lists = type === 0 ? store_est : est
     item.ischeck = item?.ischeck !== undefined ? !item?.ischeck : true;
@@ -647,15 +644,8 @@ class OrderCallDelivery extends Component {
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
 
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>呼叫中</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>呼叫中</Text>
           </View>
         </View>
         {this.renderCancalDeliveryItem(exist_waiting_delivery)}
@@ -668,15 +658,8 @@ class OrderCallDelivery extends Component {
     return (
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4, marginBottom: 100}}>
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>其他配送</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>其他配送</Text>
           </View>
         </View>
 
@@ -726,9 +709,7 @@ class OrderCallDelivery extends Component {
             </Text>
           </View>
           <Button title={'取消'}
-                  onPress={() => {
-                    this.cancelDelivery(item.id)
-                  }}
+                  onPress={() => this.cancelDelivery(item.id)}
                   buttonStyle={{
                     width: 67,
                     borderRadius: 20,
@@ -754,36 +735,17 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity
           onPress={() => this.onSelectDeliveyAll(1)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>省钱配送</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>省钱配送</Text>
           </View>
 
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
-            <Text style={{
-              fontSize: 12,
-              color: colors.color333,
-            }}>全选</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{
-                margin: 0,
-                padding: 0,
-              }}
+              containerStyle={{margin: 0, padding: 0}}
               checked={est_all_check}
               onPress={() => this.onSelectDeliveyAll(1)}
             />
@@ -804,35 +766,16 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity
           onPress={() => this.onSelectDeliveyAll(2)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>自有账号</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>自有账号</Text>
           </View>
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
-            <Text style={{
-              fontSize: 12,
-              color: colors.color333,
-            }}>全选</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{
-                margin: 0,
-                padding: 0,
-              }}
+              containerStyle={{margin: 0, padding: 0}}
               checked={store_est_all_check}
               onPress={() => this.onSelectDeliveyAll(2)}
             />
@@ -853,9 +796,7 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
-            source={{uri: item?.icon}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <Image source={{uri: item?.icon}} style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
@@ -871,18 +812,14 @@ class OrderCallDelivery extends Component {
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
 
-          <View style={{
-            marginRight: 1,
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
+          <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
               <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
-              <Text
-                style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>优惠{item?.coupons_amount}元</Text>
+              <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
+                优惠{item?.coupons_amount}元
+              </Text>
             </If>
           </View>
           <CheckBox
@@ -908,7 +845,7 @@ class OrderCallDelivery extends Component {
 
   renderCollect = () => {
     let {wm_address, wm_user_name, wm_mobile, exist_waiting_delivery} = this.state;
-    if (tool.length(exist_waiting_delivery) > 0) {
+    if (tool.length(exist_waiting_delivery) > 0 || tool.length(wm_address) <= 0) {
       return;
     }
     return (
@@ -1046,25 +983,20 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
-            <Text style={{
-              fontSize: 11,
-              color: colors.color333,
-              marginTop: 5
-            }}>{add_tips > 0 ? '加' + add_tips + '元' : '加小费'}</Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+              {add_tips > 0 ? '加' + add_tips + '元' : '加小费'}
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_remark_modal: true
-            })
-          }} style={{
-            height: iron_width,
-            width: iron_width,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            alignItems: 'center'
-          }}>
+          <TouchableOpacity onPress={() => this.setState({show_remark_modal: true})}
+                            style={{
+                              height: iron_width,
+                              width: iron_width,
+                              borderRadius: 4,
+                              borderColor: colors.e5,
+                              borderWidth: 0.5,
+                              alignItems: 'center'
+                            }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
             <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
               {tool.length(remark) > 0 ? '已' : ''}备注
@@ -1098,11 +1030,9 @@ class OrderCallDelivery extends Component {
             <If condition={worker_delivery_id <= 0 && wayNums > 0}>
               <View style={{marginLeft: 30}}>
                 <Text style={{color: colors.white, fontSize: 11}}>
-                  预计<Text style={{
-                  fontWeight: '500',
-                  color: colors.white,
-                  fontSize: 16
-                }}> {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice} </Text>元
+                  预计 <Text style={{fontWeight: '500', color: colors.white, fontSize: 16}}>
+                  {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice}
+                </Text>元
                 </Text>
                 <Text style={{color: colors.colorCCC, fontSize: 11}}>已选择{wayNums}个运力 </Text>
               </View>
@@ -1151,10 +1081,7 @@ class OrderCallDelivery extends Component {
         }}
         modal_type={'bottom'}>
         <View style={{marginBottom: 30,}}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               自配信息
             </Text>
@@ -1187,10 +1114,7 @@ class OrderCallDelivery extends Component {
                   <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
                 </View>
                 <If condition={worker_delivery_id === worker?.id}>
-                  <Entypo name={'check'} style={{
-                    fontSize: 22,
-                    color: colors.main_color,
-                  }}/>
+                  <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
                 </If>
               </TouchableOpacity>
             </For>
@@ -1237,21 +1161,12 @@ class OrderCallDelivery extends Component {
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
-            <View
-              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'space-between'}}>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
-                <Text style={{color: '#E32321', fontSize: 20}}>
-                  {weight_input_value}
-                </Text>
-                千克 </Text>
+            <View style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
+              <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
+                {weight_input_value}kg
+              </Text>
             </View>
-            <View style={{
-              flexDirection: 'row',
-              marginVertical: 20,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
+            <View style={{flexDirection: 'row', marginVertical: 20, justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{color: colors.color333, fontSize: 12, marginRight: 10}}>
                 {weight_min}千克
               </Text>
@@ -1271,9 +1186,7 @@ class OrderCallDelivery extends Component {
                     borderRadius: 13,
                     backgroundColor: colors.colorEEE
                   }}
-                  onValueChange={(value) => {
-                    this.setState({weight_input_value: value})
-                  }}
+                  onValueChange={(value) => this.setState({weight_input_value: value})}
                 />
               </View>
               <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>

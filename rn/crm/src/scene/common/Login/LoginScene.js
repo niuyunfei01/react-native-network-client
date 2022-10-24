@@ -53,7 +53,7 @@ class LoginScene extends PureComponent {
       mobile: '',
       password: '',
       canAskReqSmsCode: false,
-      reRequestAfterSeconds: 60,
+      reRequestAfterSeconds: 50,
       verifyCode: '',
       doingSign: false,
       doingSignKey: '',
@@ -92,7 +92,7 @@ class LoginScene extends PureComponent {
         show_auth_modal: true
       })
     }
-    if (canAskReqSmsCode) return null;
+    if (canAskReqSmsCode) return;
     if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
       dispatch(sendDverifyCode(mobile, 0, 1, (success, msg) => {
@@ -119,7 +119,7 @@ class LoginScene extends PureComponent {
   }
 
   onCounterReReqEnd = () => {
-    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
+    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 50});
   }
 
   onLogin = () => {
@@ -235,12 +235,7 @@ class LoginScene extends PureComponent {
 
   render() {
     let {
-      mobile,
-      verifyCode,
-      canAskReqSmsCode,
-      reRequestAfterSeconds,
-      authorization,
-      show_repetition_button
+      mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization, show_repetition_button
     } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
@@ -293,7 +288,7 @@ class LoginScene extends PureComponent {
               alignItems: 'center',
             }} onPress={this.onRequestSmsCode}>
               <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
-                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? "重新获取" : '获取验证码'}
+                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>

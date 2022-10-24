@@ -159,13 +159,14 @@ class OrderOperation extends Component {
       '确认是否取消订单', '取消订单后无法撤回，是否继续？',
       [
         {
-          text: '确认', onPress: () => {
-            HttpUtils.get(url).then(res => {
+          text: '确认',
+          onPress: () => {
+            HttpUtils.get(url).then(() => {
               showSuccess('订单取消成功即将返回!')
               setTimeout(() => {
                 this.props.navigation.goBack();
               }, 1000);
-            }).catch((error) => {
+            }).catch(() => {
               this.setState({
                 showDeliveryModal: false,
                 showErrorModal: true,
@@ -175,19 +176,12 @@ class OrderOperation extends Component {
           }
         },
         {
-          "text": '返回', onPress: () => {
-            this.setState({
-              showDeliveryModal: true
-            })
-          }
+          text: '返回', onPress: () => this.setState({showDeliveryModal: true})
         }
       ]
     )
   }
 
-  toComplan = (val) => {
-    this.onPress(Config.ROUTE_COMPLAIN, {id: val})
-  }
 
   touchItem = (actionSheet, idx) => {
     actionSheet[idx].checked = true;
@@ -243,16 +237,15 @@ class OrderOperation extends Component {
         Alert.alert('提醒', '当前订单已打印，是否继续打印？', [
           {
             text: '确定',
-            onPress: () => {
-              this.onPrint(order?.printer_sn)
-            },
-          }, {
+            onPress: () => this.onPrint(order?.printer_sn),
+          },
+          {
             text: '取消'
           }
         ])
         break
       case MENU_COMPLAINT_RIDER:
-        this.toComplan(order?.ship_id)
+        navigation.navigate(Config.ROUTE_COMPLAIN, {id: order?.ship_id})
         break
       case MENU_EDIT_BASIC:
         navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});

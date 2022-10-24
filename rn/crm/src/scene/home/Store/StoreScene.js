@@ -56,6 +56,7 @@ class StoreScene extends PureComponent {
       currVendorName: currVendorName,
       curr_user_list: curr_user_list,
       cityList: [],
+      tabCityList: [],
       storeGroupByCity: [],
       is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false
     };
@@ -77,10 +78,16 @@ class StoreScene extends PureComponent {
     showModal('加载中')
     const api = `api/get_vendor_store_list_by_city/${vendor_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(stores_by_city => {
+      const tabCityList = [], cityList = []
+      Object.keys(stores_by_city).map(key => {
+        tabCityList.push({title: key})
+        cityList.push(key)
+      })
       this.setState({
-        cityList: Object.keys(stores_by_city),
+        cityList: cityList,
         storeGroupByCity: stores_by_city,
-        isRefreshing: false
+        isRefreshing: false,
+        tabCityList: tabCityList
       })
       hideModal()
     }, (res) => {
@@ -230,14 +237,10 @@ class StoreScene extends PureComponent {
   }
 
   render() {
-    const {cityList} = this.state
+    const {cityList, tabCityList} = this.state
     if (!tool.length(cityList) > 0) {
       return null;
     }
-    let tabCityList = [];
-    cityList.map(function (city, index) {
-      tabCityList.push({title: city});
-    })
     return (
       <Tabs tabs={tabCityList}>
         {this.renderScrollTabs()}

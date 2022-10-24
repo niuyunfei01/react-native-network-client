@@ -218,24 +218,17 @@ class ApplyScene extends PureComponent {
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
-        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          this.doneSelectStore(store_id, !binded);
-        }));
+        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
         ToastShort(err_msg);
       }
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false) => {
+  doneSelectStore = (storeId, show_bottom_tab = true) => {
     const {dispatch, navigation} = this.props;
     dispatch(setCurrentStore(storeId));
-    if (not_bind) {
-      navigation.navigate(Config.ROUTE_STORE_STATUS)
-      hideModal()
-      return;
-    }
-    if (this.props.global.show_bottom_tab) {
+    if (show_bottom_tab) {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }

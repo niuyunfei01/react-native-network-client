@@ -142,9 +142,11 @@ class OrderAddressBook extends Component {
         }>
           {this.renderHeader()}
           <If condition={addressBook?.length <= 0}>
-            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
-                     style={{width: 100, height: 100, marginBottom: 20}}/>
+            <View
+              style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
+              <Image
+                source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
+                style={{width: 100, height: 100, marginBottom: 20}}/>
               <Text style={{fontSize: 18, color: colors.b2}}>
                 暂无数据
               </Text>
@@ -227,28 +229,30 @@ class OrderAddressBook extends Component {
               this.onCheck(info)
             }} style={{paddingVertical: 20, borderColor: colors.e5, borderBottomWidth: 0.5}}>
               <View style={{flexDirection: 'row', alignContent: 'center'}}>
-                {/*<View*/}
-                {/*  style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>*/}
-                {/*  <Text style={{color: colors.white, fontSize: 12}}>常用</Text>*/}
-                {/*</View>*/}
+                <If condition={info?.is_often_use}>
+                  <View
+                    style={{backgroundColor: '#FF8309', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8,}}>
+                    <Text style={{color: colors.white, fontSize: 12}}>常用</Text>
+                  </View>
+                </If>
                 <Text style={{
                   color: colors.color333,
                   fontSize: 16,
-                  marginLeft: 4,
+                  marginLeft: info?.is_often_use ? 4 : 0,
                   fontWeight: '500'
                   // eslint-disable-next-line no-undef
                 }}>{tool.length((info.address + info.street_block || '')) > 18 ? (info.address + info.street_block).substring(0, 17) + '...' : (info.address + info.street_block)} </Text>
               </View>
               <View style={{flexDirection: 'row', marginTop: 10}}>
                 {/* eslint-disable-next-line no-undef */}
-                <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name}</Text>
+                <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name} </Text>
                 {/* eslint-disable-next-line no-undef */}
-                <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone}</Text>
+                <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone} </Text>
                 {/*<Text style={{fontSize: 14, color: colors.main_color, width: 56}}>收藏</Text>*/}
                 <Text onPress={() => {
                   // eslint-disable-next-line no-undef
                   this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {info, type: 'edit'})
-                }} style={{fontSize: 14, color: colors.main_color}}>编辑</Text>
+                }} style={{fontSize: 14, color: colors.main_color}}>编辑 </Text>
               </View>
             </TouchableOpacity>
           </For>
