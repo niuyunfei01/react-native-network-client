@@ -301,7 +301,7 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
-                      getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene.js').default}
+                      getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
         />
         <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} options={{headerTitle: '批量改价'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsBatchPriceScene').default}

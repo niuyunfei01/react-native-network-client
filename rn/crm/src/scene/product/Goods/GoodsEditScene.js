@@ -2384,7 +2384,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#464646',
     opacity: 0.71,
     fontSize: 10,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.white,
     lineHeight: 14
   },

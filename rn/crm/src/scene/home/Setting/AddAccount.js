@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.color333,
     flex: 1,
-    fontWeight: '500'
+    fontWeight: 'bold'
   },
   row_desc: {
     fontSize: 15,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   btnTitle: {
     color: colors.white,
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 16,
     lineHeight: 22
   },

@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   memberMonthRecommendText: {
     fontSize: 11,
     color: colors.white,
-    fontWeight: '500',
+    fontWeight: 'bold',
     paddingVertical: 2,
     paddingHorizontal: 8
   },

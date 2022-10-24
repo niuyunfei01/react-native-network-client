@@ -707,7 +707,7 @@ class SettingScene extends PureComponent {
 
         <JbbModal visible={showDeleteModal} onClose={this.closeModal} modal_type={'center'}>
           <View style={{margin: 20}}>
-            <Text style={{fontSize: 17, color: colors.color333, fontWeight: '500', textAlign: 'center'}}>
+            <Text style={{fontSize: 17, color: colors.color333, fontWeight: 'bold', textAlign: 'center'}}>
               确定要注销账号吗？
             </Text>
 
@@ -720,13 +720,13 @@ class SettingScene extends PureComponent {
                       onPress={this.closeModal}
                       containerStyle={{flex: 1, borderRadius: 20, length: 40, marginRight: 10}}
                       buttonStyle={{backgroundColor: colors.f5}}
-                      titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
 
               <Button title={'确定'}
                       onPress={this.cancel}
                       containerStyle={{flex: 1, borderRadius: 20, length: 40,}}
                       buttonStyle={{backgroundColor: colors.main_color}}
-                      titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
             </View>
           </View>
         </JbbModal>

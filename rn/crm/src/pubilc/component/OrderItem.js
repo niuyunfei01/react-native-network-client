@@ -288,7 +288,7 @@ class OrderItem extends React.PureComponent {
           borderRadius: 24,
           length: 48,
         }}
-        btnTitleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
+        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
         onPressClose={() => this.closeModal()}>
         <TextInput placeholder={"请输入核销码"}
                    onChangeText={(pickupCode) => {
@@ -333,7 +333,7 @@ class OrderItem extends React.PureComponent {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{
               fontSize: 16,
-              fontWeight: '500',
+              fontWeight: 'bold',
               color: colors.color333,
               marginRight: 10
             }}>#{item.platform_dayId} </Text>
@@ -402,7 +402,7 @@ class OrderItem extends React.PureComponent {
           <Text style={{
             color: colors.color333,
             fontSize: 14,
-            fontWeight: '500'
+            fontWeight: 'bold'
           }}> {tool.jbbsubstr(item.address, 16)} </Text>
         </View>
 
@@ -431,7 +431,7 @@ class OrderItem extends React.PureComponent {
         })
       }} style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>商品 {item?.goods_info?.count} 件 </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商品 {item?.goods_info?.count} 件 </Text>
           <Text style={{
             fontSize: 12,
             color: colors.color666,
@@ -471,9 +471,9 @@ class OrderItem extends React.PureComponent {
     return (
       <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-            <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>{item?.ship_platform_name} </Text>
+            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_platform_name} </Text>
             <Text style={{
               fontSize: 14,
               color: colors.color666
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: 'bold',
     position: 'absolute',
     top: 1,
     left: 4,

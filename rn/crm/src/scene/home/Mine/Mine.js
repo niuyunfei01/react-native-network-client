@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
   },
   storeName: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.white
   },
   storeType: {
@@ -752,7 +752,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   walletValue: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 24,
     color: colors.color333
   },
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
   },
   walletBtnTitle: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.white
   },
   ValueAddBox: {
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
   },
   ValueAddLabel: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#985800',
     marginRight: 5
   },
@@ -809,7 +809,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 10
   },
-  zoneWrapTitle: {fontSize: 16, fontWeight: '500', color: colors.color333},
+  zoneWrapTitle: {fontSize: 16, fontWeight: 'bold', color: colors.color333},
   flexRowWrap: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
   companyInfoWrap: {
     justifyContent: 'center', alignItems: 'center', height: 50, marginTop: 50
@@ -857,7 +857,7 @@ const headerRightStyles = StyleSheet.create({
   },
   rightText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.white,
     marginLeft: 3
   }
@@ -893,7 +893,7 @@ const block_styles = StyleSheet.create({
     zIndex: 99,
   },
   deliveryTipText: {
-    fontSize: 10, fontWeight: '500', color: colors.white, lineHeight: 14, textAlign: 'center'
+    fontSize: 10, fontWeight: 'bold', color: colors.white, lineHeight: 14, textAlign: 'center'
   }
 });
 

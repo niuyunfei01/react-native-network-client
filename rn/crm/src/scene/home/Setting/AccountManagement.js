@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   workerDesc: {
     fontSize: 14,
     color: '#42C15A',
-    fontWeight: '500',
+    fontWeight: 'bold',
     padding: pxToDp(5)
   },
   row_right: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   workerName: {
     color: colors.color333,
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 14
   },
   workerPhone: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   btnTitle: {
     color: colors.white,
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 16,
     lineHeight: 22
   }

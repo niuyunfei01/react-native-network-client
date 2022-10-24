@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   currentDate: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21,
     marginRight: 4

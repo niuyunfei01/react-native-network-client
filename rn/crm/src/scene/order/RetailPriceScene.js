@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   },
   specTitle: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21,
     padding: 12,

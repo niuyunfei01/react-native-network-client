@@ -281,7 +281,7 @@ class OrderReceivingInfo extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>地址 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>地址 </Text>
           <View style={{
             flex: 1,
           }}>
@@ -300,7 +300,7 @@ class OrderReceivingInfo extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>门牌号 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门牌号 </Text>
           <TextInput placeholder="详细楼号，单元，门牌号（选填） "
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
@@ -321,7 +321,7 @@ class OrderReceivingInfo extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>联系人 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系人 </Text>
           <TextInput placeholder="收件人姓名"
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
@@ -342,7 +342,7 @@ class OrderReceivingInfo extends Component {
           borderBottomWidth: type === 'add' ? 1 : 0,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>电话 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>电话 </Text>
           <View style={{
             flex: 1,
             borderColor: colors.e5,
@@ -494,7 +494,7 @@ class OrderReceivingInfo extends Component {
                       buttonStyle={{
                         backgroundColor: colors.f5,
                       }}
-                      titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
 
               <Button title={'确定'}
                       onPress={this.closeModal}
@@ -506,7 +506,7 @@ class OrderReceivingInfo extends Component {
                       buttonStyle={{
                         backgroundColor: colors.main_color,
                       }}
-                      titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
             </View>
           </View>
         </View>
@@ -527,7 +527,7 @@ class OrderReceivingInfo extends Component {
                   borderRadius: 24,
                   length: 48,
                 }]}
-                titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
+                titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
         />
       </View>
     )
@@ -550,7 +550,7 @@ class OrderReceivingInfo extends Component {
             style={{
               fontSize: 17,
               color: colors.color333,
-              fontWeight: '500',
+              fontWeight: 'bold',
               marginVertical: 30,
               textAlign: 'center',
             }}>确定要删除该收件人吗？ </Text>
@@ -567,7 +567,7 @@ class OrderReceivingInfo extends Component {
                     buttonStyle={{
                       backgroundColor: colors.f5,
                     }}
-                    titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                    titleStyle={{color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
 
             <Button title={'删 除'}
                     onPress={this.deleteAddressItem}
@@ -579,7 +579,7 @@ class OrderReceivingInfo extends Component {
                     buttonStyle={{
                       backgroundColor: colors.main_color,
                     }}
-                    titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                    titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>

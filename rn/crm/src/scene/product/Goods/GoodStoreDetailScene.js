@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingBottom: 12,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21
   },

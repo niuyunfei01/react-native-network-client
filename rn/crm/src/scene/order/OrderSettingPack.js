@@ -414,7 +414,7 @@ class OrderSettingScene extends Component {
                 padding: 12,
               }}>
               <View>
-                <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
+                <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold'}}>
                   {tool.jbbsubstr(store_name, 12)} </Text>
                 <View style={{marginTop: 6, flexDirection: 'row', alignItems: 'center'}}>
                   <Entypo style={{fontSize: 16, color: colors.color666}} name={'location-pin'}/>
@@ -462,7 +462,7 @@ class OrderSettingScene extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>地址 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>地址 </Text>
           <TouchableOpacity onPress={this.goSelectAddress} style={{
             flex: 1,
             borderColor: colors.e5,
@@ -495,7 +495,7 @@ class OrderSettingScene extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>门牌号 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门牌号 </Text>
           <TextInput placeholder="详细楼号，单元，门牌号（选填） "
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
@@ -516,7 +516,7 @@ class OrderSettingScene extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>联系人 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系人 </Text>
           <TextInput placeholder="收件人姓名"
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
@@ -537,7 +537,7 @@ class OrderSettingScene extends Component {
           borderBottomWidth: 1,
           height: 54,
         }}>
-          <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>电话 </Text>
+          <Text style={{width: 54, fontWeight: 'bold', fontSize: 14, color: colors.color333}}>电话 </Text>
           <View style={{
             flex: 1,
           }}>
@@ -640,7 +640,7 @@ class OrderSettingScene extends Component {
                             borderBottomWidth: 1,
                             height: 56,
                           }}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品重量 </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>物品重量 </Text>
           <Text
             style={{flex: 1, fontSize: 14, color: weight > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
             {weight > 0 ? weight + 'Kg' : '请选择物品重量'}
@@ -659,7 +659,7 @@ class OrderSettingScene extends Component {
           borderBottomWidth: 1,
           height: 63,
         }}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品价值 </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>物品价值 </Text>
 
           <Text style={{
             flex: 1,
@@ -680,7 +680,7 @@ class OrderSettingScene extends Component {
                             alignItems: 'center',
                             height: 63
                           }}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>期望送达 </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>期望送达 </Text>
 
           <Text style={{flex: 1, fontSize: 14, color: colors.color333, textAlign: 'right'}}>
             {is_right_once === 0 ? expect_time : '立即送达'}
@@ -698,7 +698,7 @@ class OrderSettingScene extends Component {
       <TouchableOpacity onPress={() => this.setState({showContentModal: true})}
                         style={{borderRadius: 4, backgroundColor: colors.white, paddingHorizontal: 12, marginTop: 10}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 63}}>
-          <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>备注信息 </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>备注信息 </Text>
           <Text style={{
             flex: 1,
             fontSize: 14,
@@ -748,7 +748,7 @@ class OrderSettingScene extends Component {
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View
               style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
-              <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
+              <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: 16}}>
                 {weight_input_value}kg
               </Text>
             </View>
@@ -795,7 +795,7 @@ class OrderSettingScene extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
@@ -893,7 +893,7 @@ class OrderSettingScene extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
@@ -956,7 +956,7 @@ class OrderSettingScene extends Component {
                       buttonStyle={{
                         backgroundColor: colors.f5,
                       }}
-                      titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
 
               <Button title={'确定'}
                       onPress={this.closeModal}
@@ -968,7 +968,7 @@ class OrderSettingScene extends Component {
                       buttonStyle={{
                         backgroundColor: colors.main_color,
                       }}
-                      titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
+                      titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}/>
             </View>
           </View>
         </View>
@@ -1025,7 +1025,7 @@ class OrderSettingScene extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
@@ -1050,7 +1050,7 @@ class OrderSettingScene extends Component {
                   borderRadius: 20,
                   length: 42,
                 }}
-                titleStyle={{color: colors.main_color, fontWeight: '500', fontSize: 16, lineHeight: 22}}
+                titleStyle={{color: colors.main_color, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
         />
         <Button title={'下配送单'}
                 onPress={() => this.orderToSave(0)}
@@ -1060,7 +1060,7 @@ class OrderSettingScene extends Component {
                   borderRadius: 20,
                   length: 42,
                 }}
-                titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 22}}
+                titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
         />
       </View>
     )
