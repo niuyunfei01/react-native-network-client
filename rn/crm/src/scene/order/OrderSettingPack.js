@@ -198,6 +198,7 @@ class OrderSettingScene extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort("请粘贴地址", 0)
     }
+    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -205,6 +206,7 @@ class OrderSettingScene extends Component {
       this.setState({
         smartText: ''
       })
+      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
