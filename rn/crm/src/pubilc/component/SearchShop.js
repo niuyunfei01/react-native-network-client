@@ -229,7 +229,7 @@ class SearchShop extends Component {
             >
               <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
                 <Entypo name={'location-pin'} style={styles.map_icon}/>
-                {tool.length(cityname) > 4 ? cityname.slice(0, 4) + '...' : cityname}
+                {tool.jbbsubstr(cityname, 4)}
               </Text>
             </TouchableOpacity>
           </If>
