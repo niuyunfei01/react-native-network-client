@@ -19,6 +19,7 @@ import tool from "../../../pubilc/util/tool";
 import config from "../../../pubilc/common/config";
 
 const width = Dimensions.get("window").width;
+const height = Dimensions.get("window").height;
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -67,8 +68,9 @@ class PermissionToIdentify extends PureComponent {
       page: page,
       page_size: pageSize
     }).then(worker_info => {
+      let workers = this.state.workerList.concat(worker_info?.lists)
       this.setState({
-        workerList: worker_info.lists,
+        workerList: workers,
         query: {
           page: worker_info.page,
           pageSize: worker_info.pageSize
@@ -102,8 +104,7 @@ class PermissionToIdentify extends PureComponent {
   onEndReached() {
     const {query, isLastPage} = this.state;
     if (isLastPage) {
-      ToastShort('没有更多数据了')
-      return null
+      return ToastShort('没有更多数据了')
     }
     query.page += 1
     this.setState({query}, () => {
@@ -193,20 +194,10 @@ class PermissionToIdentify extends PureComponent {
   }
 
   render() {
-    const {isRefreshing} = this.state
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.get_wsb_workers}/>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={() => this.onRefresh()}
-              tintColor='gray'
-            />}
-          style={styles.Content}>
-          {this.renderWorkerList()}
-        </ScrollView>
+        {this.renderWorkerList()}
         {this.renderBtn()}
       </View>
     );
@@ -228,7 +219,7 @@ class PermissionToIdentify extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  Content: {backgroundColor: '#F5F5F5'},
+  Content: {backgroundColor: '#F5F5F5',  height: height * 0.9},
   ListBox: {
     width: width * 0.94,
     marginLeft: width * 0.03,
