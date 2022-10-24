@@ -46,7 +46,7 @@ import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import FastImage from "react-native-fast-image";
 import {SvgXml} from "react-native-svg";
-import {call} from "../../svg/svg";
+import {call, cross_icon} from "../../svg/svg";
 
 const {width, height} = Dimensions.get("window")
 
@@ -1237,7 +1237,9 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.QrBox}>
           <View style={styles.QrTitle}>
             <Text style={styles.QrDesc}>查看取货码</Text>
-            <Entypo onPress={this.closeQrCodeModal} name="cross" style={styles.QrClose}/>
+
+            <SvgXml onPress={this.closeQrCodeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={styles.QrImg}>
             <QRCode value={order?.platform_oid} color="black" size={200}/>

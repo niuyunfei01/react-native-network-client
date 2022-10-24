@@ -10,6 +10,8 @@ import {hideModal, showModal, ToastShort} from "../util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import numeral from "numeral";
 import Config from "../common/config";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 class GoodsListModal extends React.Component {
   static propTypes = {
@@ -97,8 +99,9 @@ class GoodsListModal extends React.Component {
             <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
               商品{count}件
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: 23, color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
 
           <View style={{paddingHorizontal: 12,}}>

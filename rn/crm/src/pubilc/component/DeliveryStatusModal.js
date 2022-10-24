@@ -12,6 +12,8 @@ import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
 import native from "../util/native";
 import {MixpanelInstance} from "../util/analytics";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
@@ -268,13 +270,12 @@ class deliveryStatusModal extends React.Component {
   }
 
   cancelDelivery = () => {
-    let {order_id, accessToken, fetchData} = this.props;
+    let {order_id, accessToken} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
     HttpUtils.get.bind(this.props)(api, {
       order_id: order_id,
       access_token: accessToken
     }).then(res => {
-
       if (tool.length(res?.alert_msg) > 0) {
         Alert.alert('提示', `${res.alert_msg}`, [{
           text: '确定', onPress: () => {
@@ -329,7 +330,9 @@ class deliveryStatusModal extends React.Component {
                     <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-                <Entypo onPress={this.closeModal} name="cross" style={styles.QrClose}/>
+
+                <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}

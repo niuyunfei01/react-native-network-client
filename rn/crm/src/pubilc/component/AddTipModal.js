@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dimensions, Platform, Text, TextInput, View} from 'react-native'
+import {Dimensions, Platform, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../util/tool";
@@ -8,6 +8,8 @@ import JbbModal from "./JbbModal";
 import {ToastShort} from "../util/ToastUtils";
 import {addTipMoneyNew, addTipMoneys} from "../../reducers/order/orderActions";
 import {Button} from "react-native-elements";
+import {check_icon, cross_circle_icon, cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 const {width} = Dimensions.get("window");
 
@@ -130,10 +132,11 @@ class AddTipModal extends React.Component {
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333, lineHeight: 30}}>
               加小费
-              <Text style={{fontSize: 12, color: colors.color999, marginLeft: 4}}>有助更快接起哦</Text>
+              <Text style={{fontWeight: 'normal',fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: 23, color: colors.fontGray}}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
+
           </View>
           <View style={{paddingHorizontal: 12,}}>
             <View
@@ -145,20 +148,26 @@ class AddTipModal extends React.Component {
                 flexWrap: "wrap"
               }}>
               <For index='index' each='info' of={tip_list}>
-                <Text key={index} style={{
-                  borderWidth: 0.5,
-                  borderColor: Number(info.value) === add_money ? colors.main_color : colors.colorDDD,
-                  fontSize: 14,
-                  height: 36,
-                  color: Number(info.value) === add_money ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === add_money ? '#DFFAE2' : colors.white,
-                  width: width * 0.25,
-                  textAlign: 'center',
-                  paddingVertical: 8,
-                  marginVertical: 5
-                }} onPress={() => {
+
+                <TouchableOpacity onPress={() => {
                   this.setState({add_money: Number(info.value)})
-                }}>{info.label} </Text>
+                }} key={index} style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: width * 0.25,
+                  height: 36,
+                  marginVertical: 5,
+                  borderWidth: 0.5,
+                  borderRadius: 4,
+                  backgroundColor: Number(info.value) === add_money ? '#DFFAE2' : colors.white,
+                  borderColor: Number(info.value) === add_money ? colors.main_color : colors.colorDDD,
+                }}>
+                  <Text style={{
+                    fontSize: 14,
+                    color: Number(info.value) === add_money ? colors.main_color : colors.color333,
+                  }}>{info.label} </Text>
+                </TouchableOpacity>
               </For>
               <TextInput
                 onChangeText={(input_add_money) => {
@@ -173,6 +182,7 @@ class AddTipModal extends React.Component {
                 style={{
                   fontSize: 14,
                   width: width * 0.25,
+                  borderRadius: 4,
                   borderWidth: 0.5,
                   height: 36,
                   color: colors.color333,

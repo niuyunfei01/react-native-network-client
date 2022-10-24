@@ -22,7 +22,7 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
-import {add_tip, cost, remarkIcon, time, weighticon} from "../../svg/svg";
+import {add_tip, check_icon, cost, cross_icon, remarkIcon, time, weighticon} from "../../svg/svg";
 import PropTypes from "prop-types";
 import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
@@ -715,7 +715,7 @@ class OrderCallDelivery extends Component {
                     borderRadius: 20,
                     backgroundColor: colors.white,
                     borderColor: colors.colorDDD,
-                    borderWidth: 0.5
+                    borderWidth: 0.2
                   }}
                   titleStyle={{color: colors.color666, fontSize: 14, lineHeight: 20}}
           />
@@ -742,7 +742,8 @@ class OrderCallDelivery extends Component {
           <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
-              size={20}
+              size={18}
+              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
               containerStyle={{margin: 0, padding: 0}}
@@ -772,7 +773,8 @@ class OrderCallDelivery extends Component {
           <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
-              size={20}
+              size={18}
+              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
               containerStyle={{margin: 0, padding: 0}}
@@ -823,7 +825,8 @@ class OrderCallDelivery extends Component {
             </If>
           </View>
           <CheckBox
-            size={20}
+            size={18}
+            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
             containerStyle={{
@@ -930,7 +933,7 @@ class OrderCallDelivery extends Component {
             width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
@@ -945,7 +948,7 @@ class OrderCallDelivery extends Component {
             width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={time()}/>
@@ -964,7 +967,7 @@ class OrderCallDelivery extends Component {
             width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
@@ -979,7 +982,7 @@ class OrderCallDelivery extends Component {
             width: iron_width,
             borderRadius: 4,
             borderColor: colors.e5,
-            borderWidth: 0.5,
+            borderWidth: 0.2,
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
@@ -994,7 +997,7 @@ class OrderCallDelivery extends Component {
                               width: iron_width,
                               borderRadius: 4,
                               borderColor: colors.e5,
-                              borderWidth: 0.5,
+                              borderWidth: 0.2,
                               alignItems: 'center'
                             }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
@@ -1085,13 +1088,15 @@ class OrderCallDelivery extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               自配信息
             </Text>
-            <Entypo onPress={() => {
+
+
+            <SvgXml onPress={() => {
               this.setState({
                 worker_delivery_id: 0
               })
               this.closeModal()
-            }} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            }} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <If condition={tool.length(worker_list) > 0}>
             <For each='worker' index='idx' of={worker_list}>
@@ -1107,7 +1112,7 @@ class OrderCallDelivery extends Component {
                 justifyContent: 'space-between',
                 paddingVertical: 14,
                 borderColor: colors.colorDDD,
-                borderBottomWidth: 0.5
+                borderBottomWidth: 0.2
               }}>
                 <View style={{flexDirection: 'row', alignItems: 'center',}}>
                   <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.label} </Text>
@@ -1151,14 +1156,14 @@ class OrderCallDelivery extends Component {
             flexDirection: 'row',
             padding: 12,
             justifyContent: 'space-between',
-            borderBottomWidth: 0.5,
+            borderBottomWidth: 0.2,
             borderColor: '#EEEEEE'
           }}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品重量
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
@@ -1248,8 +1253,9 @@ class OrderCallDelivery extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View
@@ -1261,20 +1267,26 @@ class OrderCallDelivery extends Component {
                 flexWrap: "wrap"
               }}>
               <For index='index' each='info' of={goods_price_list}>
-                <Text key={index} style={{
-                  borderWidth: 0.5,
-                  height: 36,
-                  borderColor: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.colorDDD,
-                  fontSize: 14,
-                  color: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === Number(order_money_input_value) ? '#DFFAE2' : colors.white,
-                  width: width * 0.25,
-                  textAlign: 'center',
-                  paddingVertical: 8,
-                  marginVertical: 5
-                }} onPress={() => {
+
+                <TouchableOpacity onPress={() => {
                   this.setOrderMoney(Number(info.value))
-                }}>{info.label} </Text>
+                }} key={index} style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: width * 0.25,
+                  height: 36,
+                  marginVertical: 5,
+                  borderWidth: 0.5,
+                  borderRadius: 4,
+                  backgroundColor: Number(info.value) === Number(order_money_input_value) ? '#DFFAE2' : colors.white,
+                  borderColor: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.colorDDD,
+                }}>
+                  <Text style={{
+                    fontSize: 14,
+                    color: Number(info.value) === Number(order_money_input_value) ? colors.main_color : colors.color333,
+                  }}>{info.label} </Text>
+                </TouchableOpacity>
               </For>
               <TextInput
                 onChangeText={(order_money_value) => {
@@ -1289,8 +1301,9 @@ class OrderCallDelivery extends Component {
                 style={{
                   fontSize: 14,
                   height: 36,
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
-                  borderWidth: 0.5,
+                  borderRadius: 4,
+                  width: width * (Platform.OS !== 'ios' ? 0.50 : 0.52),
+                  borderWidth: 0.2,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
                   textAlign: 'center',
@@ -1342,8 +1355,9 @@ class OrderCallDelivery extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               备注
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea

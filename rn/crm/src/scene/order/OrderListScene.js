@@ -5,7 +5,7 @@ import {
   Dimensions,
   FlatList,
   InteractionManager,
-  Platform,
+  Platform, StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -36,7 +36,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
+import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import store from "../../pubilc/util/configureStore";
@@ -644,8 +644,9 @@ class OrderListScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               订单排序
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{
@@ -721,9 +722,8 @@ class OrderListScene extends Component {
         height: 44,
         width: width,
         backgroundColor: colors.white,
-        paddingHorizontal: 12
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => {
+        <SvgXml style={{height: 44, marginRight: 16, marginLeft: 12}} onPress={() => {
           this.mixpanel.track('V4订单列表_我的')
           this.onPress(Config.ROUTE_MINE_NEW)
         }}
@@ -751,6 +751,7 @@ class OrderListScene extends Component {
           dropdownStyle={styles.modalDropDown}
           dropdownTextStyle={styles.modalDropDownText}
           dropdownTextHighlightStyle={{color: colors.color333}}
+          style={{paddingRight: 12}}
           options={['订单排序', '手动下单']}
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
@@ -920,21 +921,24 @@ const styles = StyleSheet.create({
   modalDropDown: {
     width: 128,
     height: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: colors.white,
     borderColor: colors.colorDDD,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
+    shadowOpacity: 0.3,
+    elevation: 10,
+    shadowRadius: 12,
     borderRadius: 10,
     borderWidth: 0.5,
+    marginTop: -StatusBar.currentHeight,
   },
   modalDropDownText: {
     textAlignVertical: 'center',
     textAlign: 'center',
-    paddingVertical: 14,
-    borderRadius: 10,
-    lineHeight: 23,
+    lineHeight: 20,
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.color333,

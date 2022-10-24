@@ -7,6 +7,8 @@ import colors from "../styles/colors";
 import {Button} from "react-native-elements";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
@@ -85,7 +87,7 @@ class BottomModal extends React.Component {
                   {this.props.title}
                 </Text>
                 <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
-                  <Entypo name="cross" color={colors.fontGray} size={22}/>
+                  <SvgXml xml={cross_icon()} width={18} height={18}/>
                 </TouchableOpacity>
               </View>
               <View style={{paddingHorizontal: 10}}>

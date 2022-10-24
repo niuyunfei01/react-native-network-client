@@ -339,7 +339,7 @@ class OrderItem extends React.PureComponent {
             }}>#{item.platform_dayId} </Text>
             <If condition={Number(item?.pickType) === 1}>
               <Text style={{
-                borderWidth: 0.5,
+                borderWidth: 0.2,
                 borderColor: colors.main_color,
                 borderRadius: 2,
                 color: colors.main_color,
@@ -500,7 +500,7 @@ class OrderItem extends React.PureComponent {
       <View
         style={{
           paddingTop: 12,
-          borderTopWidth: 0.5,
+          borderTopWidth: 0.2,
           borderColor: colors.e5,
           flexDirection: 'row',
           alignItems: 'center',
@@ -513,7 +513,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.5,
+                    borderWidth: 0.2,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -529,7 +529,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.5,
+                    borderWidth: 0.2,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -545,7 +545,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.5,
+                    borderWidth: 0.2,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -564,7 +564,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.5,
+                    borderWidth: 0.2,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
   humanExpectTime: {fontWeight: "bold", fontSize: 14, color: "#FF8854"},
   contentHeader: {
     paddingBottom: 12,
-    borderTopWidth: 0.5,
+    borderTopWidth: 0.2,
     borderColor: colors.e5,
     flexDirection: 'row',
     alignItems: 'center',
@@ -686,7 +686,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.3,
+    elevation: 10,
     shadowRadius: 8,
   },
   modalBtn: {

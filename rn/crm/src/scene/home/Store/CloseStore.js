@@ -669,6 +669,7 @@ class StoreClose extends PureComponent {
           backgroundColor: colors.white,
           shadowOffset: {width: -4, height: -4},
           shadowOpacity: 0.75,
+          elevation: 10,
           shadowRadius: 4
         }}>
           <Button title={'确定'}

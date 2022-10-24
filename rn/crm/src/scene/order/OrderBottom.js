@@ -127,6 +127,7 @@ class OrderBottom extends PureComponent {
         shadowColor: '#000',
         shadowOffset: {width: -4, height: -4},
         shadowOpacity: 0.75,
+        elevation: 10,
         shadowRadius: 4,
       }}>
         <If condition={btn_list && btn_list.btn_pack_green}>

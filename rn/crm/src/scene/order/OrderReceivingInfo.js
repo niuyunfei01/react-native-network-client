@@ -14,6 +14,8 @@ import PropTypes from "prop-types";
 import JbbModal from "../../pubilc/component/JbbModal";
 import Entypo from "react-native-vector-icons/Entypo";
 import {TextArea} from "../../weui";
+import {SvgXml} from "react-native-svg";
+import {cross_icon} from "../../svg/svg";
 
 function mapStateToProps(state) {
   return {
@@ -450,8 +452,9 @@ class OrderReceivingInfo extends Component {
             <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
               使用复制的收件信息？
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: 23, color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
 
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

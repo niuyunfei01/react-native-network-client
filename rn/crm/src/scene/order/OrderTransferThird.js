@@ -19,6 +19,8 @@ import {TextArea} from "../../weui";
 import dayjs from "dayjs";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   return {
@@ -1180,8 +1182,9 @@ class OrderTransferThird extends Component {
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
                 商品重量
               </Text>
-              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="cross"
-                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+              <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
               <Text style={{color: colors.color999, fontSize: 12,}}>

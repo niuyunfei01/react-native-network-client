@@ -1,14 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {
-  check_is_bind_ext,
-  getConfig,
-  logout,
-  sendDverifyCode,
-  setCurrentStore,
-  signIn,
-} from '../../../reducers/global/globalActions'
+import {getConfig, logout, sendDverifyCode, setCurrentStore, signIn,} from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -22,6 +15,8 @@ import BottomModal from "../../../pubilc/component/BottomModal";
 import {setDeviceInfo} from "../../../reducers/device/deviceActions";
 import PropTypes from "prop-types";
 import Entypo from "react-native-vector-icons/Entypo";
+import {check_icon} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   return {
@@ -252,7 +247,7 @@ class LoginScene extends PureComponent {
             />
             <If condition={tool.length(mobile) > 0}>
               <Entypo onPress={this.cancelValue} name="circle-with-cross"
-                      style={{position: 'absolute', top: 15, right: 10, fontSize: 18, color: colors.color999}}/>
+                      style={{position: 'absolute', top: 15, right: 10, fontSize: 16, color: colors.color999}}/>
             </If>
           </View>
           <View style={{
@@ -288,6 +283,7 @@ class LoginScene extends PureComponent {
         </View>
         <TouchableOpacity onPress={this.setCheckd} style={{flexDirection: 'row', alignItems: 'center',}}>
           <CheckBox
+            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
             containerStyle={{margin: 0, padding: 0}}

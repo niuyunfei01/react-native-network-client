@@ -19,6 +19,8 @@ import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 import Clipboard from '@react-native-community/clipboard'
 import DatePicker from 'react-native-date-picker'
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 
 let width = Dimensions.get("window").width;
@@ -538,8 +540,6 @@ class OrderSettingScene extends Component {
           <Text style={{width: 54, fontWeight: '500', fontSize: 14, color: colors.color333}}>电话 </Text>
           <View style={{
             flex: 1,
-            borderColor: colors.e5,
-            borderRightWidth: 1,
           }}>
             <TextInput placeholder="联系电话 "
                        maxLength={11}
@@ -553,7 +553,11 @@ class OrderSettingScene extends Component {
                        }}
             />
           </View>
-
+          <View style={{
+            height: 16,
+            borderColor: colors.e5,
+            borderRightWidth: 1,
+          }}/>
           <TextInput placeholder="分机号(选填)"
                      maxLength={4}
                      underlineColorAndroid="transparent"
@@ -731,14 +735,15 @@ class OrderSettingScene extends Component {
             flexDirection: 'row',
             padding: 12,
             justifyContent: 'space-between',
-            borderBottomWidth: 0.5,
+            borderBottomWidth: 0.2,
             borderColor: '#EEEEEE'
           }}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品重量
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View
@@ -813,8 +818,9 @@ class OrderSettingScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{
@@ -825,20 +831,25 @@ class OrderSettingScene extends Component {
               flexWrap: "wrap"
             }}>
               <For index='index' each='info' of={goods_price_list}>
-                <Text key={index} style={{
-                  borderWidth: 0.5,
-                  borderColor: Number(info.value) === goods_price_input_value ? colors.main_color : colors.colorDDD,
-                  fontSize: 14,
-                  color: Number(info.value) === goods_price_input_value ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === goods_price_input_value ? '#DFFAE2' : colors.white,
+                <TouchableOpacity onPress={() => {
+                  this.setGoodsPirce(Number(info.value))
+                }} key={index} style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   width: width * 0.25,
                   height: 36,
-                  textAlign: 'center',
-                  paddingVertical: 8,
-                  marginVertical: 5
-                }} onPress={() => {
-                  this.setGoodsPirce(Number(info.value))
-                }}>{info.label} </Text>
+                  marginVertical: 5,
+                  borderWidth: 0.5,
+                  borderRadius: 4,
+                  backgroundColor: Number(info.value) === goods_price_input_value ? '#DFFAE2' : colors.white,
+                  borderColor: Number(info.value) === goods_price_input_value ? colors.main_color : colors.colorDDD,
+                }}>
+                  <Text style={{
+                    fontSize: 14,
+                    color: Number(info.value) === goods_price_input_value ? colors.main_color : colors.color333,
+                  }}>{info.label} </Text>
+                </TouchableOpacity>
               </For>
               <TextInput
                 onChangeText={(goods_price_value) => {
@@ -851,10 +862,11 @@ class OrderSettingScene extends Component {
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
-                  fontSize: 14,
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
+                  width: width * (Platform.OS !== 'ios' ? 0.50 : 0.52),
                   height: 36,
+                  borderRadius: 4,
                   borderWidth: 0.5,
+                  fontSize: 14,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
                   textAlign: 'center',
@@ -903,8 +915,8 @@ class OrderSettingScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               使用复制的收件信息？
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
           </View>
 
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -979,8 +991,8 @@ class OrderSettingScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               备注
             </Text>
-            <Entypo onPress={this.closeModal} name="cross"
-                    style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea
@@ -1057,7 +1069,7 @@ class OrderSettingScene extends Component {
 
 const styles = StyleSheet.create({
   container: {flex: 1},
-  locationIcon: {fontSize: 16, fontWeight: "bold", color: colors.color666},
+  locationIcon: {fontSize: 16, fontWeight: "bold", color: colors.color999},
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderSettingScene);

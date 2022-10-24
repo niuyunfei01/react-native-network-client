@@ -543,6 +543,7 @@ class MaterialList extends React.Component {
       drawer: {
         shadowColor: '#000000',
         shadowOpacity: 0.8,
+        elevation: 10,
         shadowRadius: 3,
         borderLeftWidth: 1,
         borderLeftColor: colors.theme
