@@ -130,9 +130,8 @@ class LoginScene extends PureComponent {
           show_auth_modal: true
         })
       }
-      if (!mobile) {
-        // const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-        return ToastShort("请输入您的手机号", 0)
+      if (tool.length(mobile) < 10) {
+        return ToastShort("请输入正确的手机号", 0)
       }
       if (!verifyCode) {
         return ToastShort("请填写验证码", 0)
@@ -173,7 +172,6 @@ class LoginScene extends PureComponent {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
         dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          console.log(cfg?.show_bottom_tab, 'cfg?.show_bottom_tab')
           this.doneSelectStore(store_id, !binded, cfg?.show_bottom_tab);
         }));
       } else {
@@ -275,7 +273,11 @@ class LoginScene extends PureComponent {
             justifyContent: 'space-between'
           }}>
             <TextInput
-              onChangeText={(verifyCode) => this.setState({verifyCode})}
+              onChangeText={(verifyCode) => {
+                if(/^[A-Za-z0-9]*$/.test(verifyCode)){
+                  this.setState({verifyCode})
+                }
+              }}
               value={verifyCode}
               placeholderTextColor={colors.color999}
               underlineColorAndroid='transparent'

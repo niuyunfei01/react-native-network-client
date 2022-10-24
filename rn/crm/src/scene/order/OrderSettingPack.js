@@ -69,7 +69,8 @@ class OrderSettingScene extends Component {
       weight_input_value: 1,
       weight_min: 1,
       weight_max: 20,
-      goods_price: 20,
+      goods_price: 0,
+      goods_price_input_value: 20,
       goods_price_value: '',
       remark: '',
       showDateModal: false,
@@ -410,13 +411,13 @@ class OrderSettingScene extends Component {
               }}>
               <View>
                 <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
-                  {tool.length((store_name || '')) > 12 ? store_name.substring(0, 11) + '...' : store_name} </Text>
+                  {tool.jbbsubstr(store_name, 0, 12)} </Text>
                 <View style={{marginTop: 6, flexDirection: 'row', alignItems: 'center'}}>
                   <Entypo style={{fontSize: 16, color: colors.color666}} name={'location-pin'}/>
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}>{tool.length((store_address || '')) > 18 ? '...' + store_address.substr(-18) : store_address}  </Text>
+                  }}> {tool.jbbsubstr(store_address, 0, -18)}</Text>
                 </View>
               </View>
               <If condition={wmStoreLength >= 1}>
@@ -795,12 +796,12 @@ class OrderSettingScene extends Component {
   }
   setGoodsPirce = (price) => {
     this.setState({
-      goods_price: price
+      goods_price_input_value: price
     })
   }
 
   renderGoodsPriceModal = () => {
-    let {showGoodsPriceModal, goods_price_value, goods_price} = this.state;
+    let {showGoodsPriceModal, goods_price_value, goods_price_input_value, goods_price} = this.state;
     return (
       <JbbModal visible={showGoodsPriceModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -824,10 +825,10 @@ class OrderSettingScene extends Component {
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
-                  borderColor: Number(info.value) === goods_price ? colors.main_color : colors.colorDDD,
+                  borderColor: Number(info.value) === goods_price_input_value ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
-                  color: Number(info.value) === goods_price ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === goods_price ? '#DFFAE2' : colors.white,
+                  color: Number(info.value) === goods_price_input_value ? colors.main_color : colors.color333,
+                  backgroundColor: Number(info.value) === goods_price_input_value ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
                   height: 36,
                   textAlign: 'center',
@@ -839,7 +840,7 @@ class OrderSettingScene extends Component {
               </For>
               <TextInput
                 onChangeText={(goods_price_value) => {
-                  this.setState({goods_price_value: Number(goods_price_value), goods_price: 0})
+                  this.setState({goods_price_value: Number(goods_price_value), goods_price_input_value: 0})
                 }}
                 defaultValue={`${goods_price_value}`}
                 value={`${goods_price_value}`}
@@ -862,7 +863,14 @@ class OrderSettingScene extends Component {
             </View>
             <Button title={'确 定'}
                     onPress={() => {
-                      if (goods_price === 0) this.setGoodsPirce(goods_price_value)
+
+                      if (goods_price_value <= 0 && goods_price_input_value <= 0) {
+                        return ToastShort('请选择物品价值')
+                      }
+                      let goods_price = goods_price_input_value === 0 ? goods_price_value : goods_price_input_value;
+                      this.setState({
+                        goods_price,
+                      })
                       this.closeModal()
                     }}
                     buttonStyle={[{

@@ -115,7 +115,7 @@ class OrderInfoNew extends PureComponent {
       isFetching: false,
       order: order_json_str,
       actionSheet: [],
-      isShowMap: true,
+      isShowMap: false,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,

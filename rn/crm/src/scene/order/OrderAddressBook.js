@@ -36,16 +36,6 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class OrderAddressBook extends Component {
 
   static propTypes = {
@@ -128,7 +118,6 @@ class OrderAddressBook extends Component {
     let {headerShown, isRefreshing, addressBook} = this.state
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}

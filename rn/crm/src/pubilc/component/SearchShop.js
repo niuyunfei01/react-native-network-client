@@ -374,7 +374,7 @@ class SearchShop extends Component {
     if (!lat || !lng) {
       return null
     }
-
+    let address = shopmsg?.name ? shopmsg?.name : shopmsg?.address;
     return (
       <View style={{height: 300}}>
         <MapView
@@ -418,7 +418,7 @@ class SearchShop extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 12,
-                }}>{tool.length((shopmsg?.address || '标注点')) > 5 ? shopmsg?.address.substring(0, 5) + '...' : (shopmsg?.address || '标注点')}  </Text>
+                }}>{tool.jbbsubstr(address,0,5, '标注点')} </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>
