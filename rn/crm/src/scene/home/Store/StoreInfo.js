@@ -8,7 +8,7 @@ import {copyStoreGoods, saveOfflineStore} from "../../../reducers/mine/mineActio
 
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import * as tool from "../../../pubilc/util/tool";
+import tool from "../../../pubilc/util/tool";
 import {simpleBarrier} from "../../../pubilc/util/tool";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
@@ -477,8 +477,8 @@ class StoreInfo extends Component {
   }
 
   setAddress(res) {
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    let lat = res.location.split(",")[1];
+    let Lng = res.location.split(",")[0];
     let states = {
       location_long: Lng,
       location_lat: lat,

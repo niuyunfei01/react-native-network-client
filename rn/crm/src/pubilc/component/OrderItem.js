@@ -403,7 +403,7 @@ class OrderItem extends React.PureComponent {
             color: colors.color333,
             fontSize: 14,
             fontWeight: '500'
-          }}> {tool.length((item.address || '')) > 16 ? item.address.substring(0, 15) + '...' : item.address} </Text>
+          }}> {tool.jbbsubstr(item.address , 16)} </Text>
         </View>
 
         <TouchableOpacity style={{paddingHorizontal: 10}}

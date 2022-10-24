@@ -1,6 +1,7 @@
 import React, {PureComponent} from "react";
 import {
-  Alert, Dimensions,
+  Alert,
+  Dimensions,
   Image,
   InteractionManager,
   PixelRatio,
@@ -11,7 +12,7 @@ import {
   View
 } from 'react-native'
 import {connect} from "react-redux";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import {Dialog} from "../../../weui";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
@@ -23,7 +24,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
-import * as tool from "../../../pubilc/util/tool";
+import tool from "../../../pubilc/util/tool";
 import {Button} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {SvgXml} from "react-native-svg";
@@ -33,7 +34,8 @@ import {
   platformLogoJD,
   platformLogoMeiTuan,
   platformLogoTaoXianDa,
-  platformLogoWechat, platformLogoWSB
+  platformLogoWechat,
+  platformLogoWSB
 } from "../../../svg/svg";
 
 function mapStateToProps(state) {
@@ -260,7 +262,7 @@ class StoreStatusScene extends PureComponent {
                       position: "relative"
                     }}>
                       <Text style={styles.wm_store_name}>
-                        {store.name && tool.length(store.name) >= 13 ? store.name.substring(0, 13) + '...' : store.name}
+                        {tool.jbbsubstr(store?.name, 13)}
                       </Text>
                       <Text
                         style={[!store.open ? styles.close_text : styles.open_text, {

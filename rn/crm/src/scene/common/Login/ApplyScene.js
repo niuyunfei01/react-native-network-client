@@ -10,8 +10,6 @@ import {
   logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
-
-import native from "../../../pubilc/util/native";
 import stringEx from "../../../pubilc/util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from '../../../pubilc/util/pxToDp';
@@ -23,7 +21,7 @@ import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
@@ -241,8 +239,9 @@ class ApplyScene extends PureComponent {
   }
 
   setAddress(res) {
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, tool.length(res.location));
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    let lat = res.location.split(",")[1];
+    let Lng = res.location.split(",")[0];
+
     let states = {
       location_long: Lng,
       location_lat: lat,

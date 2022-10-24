@@ -1000,7 +1000,7 @@ class OrderInfoNew extends PureComponent {
                   />
                   <View style={styles.productItem}>
                     <Text style={styles.productItemName}>
-                      {tool.length((info?.product_name || '')) > 16 ? info?.product_name.substring(0, 15) + '...' : info?.product_name}
+                      {tool.length(info?.product_name , 16)}
                     </Text>
                     <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     <View style={styles.productItemPrice}>

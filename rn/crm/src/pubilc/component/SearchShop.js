@@ -418,7 +418,7 @@ class SearchShop extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 12,
-                }}>{tool.jbbsubstr(address,0,5, '标注点')} </Text>
+                }}>{tool.jbbsubstr(address,5, '标注点')} </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>

@@ -735,7 +735,7 @@ class OrderListScene extends Component {
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{fontSize: 15, color: colors.color333}}>
-            {tool.length((store_info?.name || '')) > 8 ? store_info?.name.substring(0, 7) + '...' : (store_info?.name || '')}
+            {tool.jbbsubstr(store_info?.name, 8)}
           </Text>
           <SvgXml xml={this_down()}/>
         </TouchableOpacity>

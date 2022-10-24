@@ -14,7 +14,7 @@ import HttpUtils from "../../pubilc/util/http";
 import pxToDp from "../../pubilc/util/pxToDp";
 import Config from "../../pubilc/common/config";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-import * as tool from "../../pubilc/util/tool";
+import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 import Clipboard from '@react-native-community/clipboard'
@@ -411,13 +411,13 @@ class OrderSettingScene extends Component {
               }}>
               <View>
                 <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
-                  {tool.jbbsubstr(store_name, 0, 12)} </Text>
+                  {tool.jbbsubstr(store_name, 12)} </Text>
                 <View style={{marginTop: 6, flexDirection: 'row', alignItems: 'center'}}>
                   <Entypo style={{fontSize: 16, color: colors.color666}} name={'location-pin'}/>
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}> {tool.jbbsubstr(store_address, 0, -18)}</Text>
+                  }}> {tool.jbbsubstr(store_address, -18)}</Text>
                 </View>
               </View>
               <If condition={wmStoreLength >= 1}>
@@ -912,7 +912,7 @@ class OrderSettingScene extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 14
-                }}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
+                }}>{tool.jbbsubstr(address,9)} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

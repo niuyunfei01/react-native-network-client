@@ -171,13 +171,10 @@ class Detail extends BaseComponent {
 
   renderItem = (val) => {
     let {item} = val
-    if (item.name && tool.length(item.name) >= 17) {
-      item.name = item.name.substring(0, 17) + '...'
-    }
     return (
       <View style={Styles.item}>
         <View style={Styles.itemRow}>
-          <Text style={Styles.itemRowText}> 商品：{item.name} </Text>
+          <Text style={Styles.itemRowText}> 商品：{tool.jbbsubstr(item.name,17)} </Text>
           <Text style={Styles.itemRowText}> 规格：{item.sku_name} </Text>
         </View>
         <View style={Styles.itemRow}>
