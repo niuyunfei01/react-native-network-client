@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 16,
     lineHeight: 22,
-    height: 44,
+    height: 48,
     paddingVertical: 13,
     textAlign: 'center'
   },
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
     color: colors.main_color,
-    height: 44,
+    height: 48,
     paddingVertical: 13,
     textAlign: 'center'
   },
@@ -341,7 +341,7 @@ class AutomaticFeedbackScene extends PureComponent {
   }
 
   getItemLayout = (data, index) => ({
-    length: 44.5, offset: 44.5 * index, index
+    length: 48, offset: 48 * index, index
   })
 
   render() {
@@ -360,7 +360,7 @@ class AutomaticFeedbackScene extends PureComponent {
             </Text>
           </TouchableOpacity>
         </View>
-        <CommonModal visible={visible} position={'flex-end'}>
+        <CommonModal visible={visible} position={'flex-end'} onRequestClose={() => this.setState({visible: false})}>
           <View style={styles.storeWrap}>
             <View style={styles.headerWrap}>
               <View/>

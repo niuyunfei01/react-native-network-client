@@ -779,12 +779,11 @@ class OrderInfoNew extends PureComponent {
       },
       onPanResponderRelease: (evt, gestureState) => {
 
-        this.scrollViewRef.setNativeProps({canCancelContentTouches: true})
         if (Math.abs(gestureState.dy) < 3) {
           this.deliveryModalFlag()
         }
-        if (gestureState.vy === 0)
-          this.setState({allowRefresh: true})
+        this.scrollViewRef.setNativeProps({canCancelContentTouches: true})
+        this.setState({allowRefresh: true})
         return true;
 
       },
@@ -1007,23 +1006,26 @@ class OrderInfoNew extends PureComponent {
                       <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text style={styles.priceBao}>保</Text>
-                          <Text
-                            style={[styles.price, {marginRight: 10}]}>{numeral(info?.supply_price / 100).format('0.00')}元 </Text>
+                          <Text style={[styles.price, {marginRight: 10}]}>
+                            {numeral(info?.supply_price / 100).format('0.00')}元
+                          </Text>
                           <If condition={!is_service_mgr}>
-                            <Text
-                              style={styles.price}>总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元 </Text>
+                            <Text style={styles.price}>
+                              总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
+                            </Text>
                           </If>
                         </If>
-                        <If condition={order?.is_fn_show_wm_price && order?.is_peisong_coop}>
+                        <If condition={order?.is_fn_show_wm_price || order?.is_peisong_coop}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                           <If condition={!is_service_mgr}>
-                            <Text
-                              style={[styles.price, {marginRight: 10}]}>总价 {numeral(info?.price * info?.num / 100).format('0.00')}元 </Text>
+                            <Text style={[styles.price, {marginRight: 10}]}>
+                              总价 {numeral(info?.price * info?.num / 100).format('0.00')}元
+                            </Text>
                           </If>
                         </If>
                       </View>
-                      <Text style={styles.productNum}> x {info?.num} </Text>
+                      <Text style={styles.productNum}> [x {info?.num}] </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -1031,11 +1033,7 @@ class OrderInfoNew extends PureComponent {
             </If>
           </View>
           <View style={styles.cuttingLine}/>
-          <View style={[styles.orderCardContainer, {
-            flexDirection: "column",
-            borderBottomLeftRadius: 6,
-            borderBottomRightRadius: 6
-          }]}>
+          <View style={[styles.orderCardContainer, {flexDirection: "column", borderBottomLeftRadius: 6, borderBottomRightRadius: 6}]}>
             <If condition={order?.is_fn_price_controlled}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>供货价小计 </Text>
@@ -1052,7 +1050,7 @@ class OrderInfoNew extends PureComponent {
               <If condition={order?.self_activity_fee}>
                 <View style={styles.productItemRow}>
                   <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee).format('0.00')}元 </Text>
+                  <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
                 </View>
               </If>
 

@@ -38,7 +38,7 @@ class SeparatedExpenseInfo extends PureComponent {
 
   onItemClicked(item) {
     if (item.order_id) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.order_id});
+      this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: item.order_id});
     }
   }
 

@@ -527,7 +527,7 @@ class OrderListScene extends Component {
       const api = `/v1/new_api/orders/barcode_decode/${code}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then((res) => {
         if (res.order_id && Number(res.order_id) > 0) {
-          this.onPress(Config.ROUTE_ORDER, {orderId: res.order_id})
+          this.onPress(Config.ROUTE_ORDER_NEW, {orderId: res.order_id})
         }
       })
     }
