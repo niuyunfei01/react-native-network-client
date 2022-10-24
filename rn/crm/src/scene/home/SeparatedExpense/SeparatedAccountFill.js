@@ -319,6 +319,7 @@ class SeparatedAccountFill extends PureComponent {
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"
+                maxLength={6}
                 keyboardType={'numeric'}
                 style={{
                   fontSize: 14,
