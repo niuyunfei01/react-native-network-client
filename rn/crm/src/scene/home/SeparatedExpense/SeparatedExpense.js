@@ -76,11 +76,6 @@ class SeparatedExpense extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillMount() {
-    this.fetchExpenses()
-    this.fetchServiceCharge()
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (tool.length(timeObj.method) > 0) {
       const endTime = getTime()
