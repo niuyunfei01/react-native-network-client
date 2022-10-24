@@ -229,6 +229,9 @@ class OrderCallDelivery extends Component {
       this.priceFn();
     }).catch(() => {
       hideModal();
+      this.setState({
+        isLoading: false,
+      })
     })
   }
 
@@ -292,19 +295,25 @@ class OrderCallDelivery extends Component {
       order_id: order_id,
       access_token: accessToken
     }).then(res => {
-      Alert.alert('提示', `${res.alert_msg}`, [{
-        text: '确定', onPress: () => {
-          this.closeModal();
-          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: order,
-              ship_id: ship_id,
-              onCancelled: () => {
-                this.fetchData()
-              }
-            });
+      Alert.alert('提示', `${res.alert_msg}`, [
+        {
+          text: '确定',
+          onPress: () => {
+            this.closeModal();
+            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+              {
+                order: order,
+                ship_id: ship_id,
+                onCancelled: () => {
+                  this.fetchData()
+                }
+              });
+          }
+        },
+        {
+          text: '取消'
         }
-      }, {'text': '取消'}]);
+      ]);
     })
   }
 
@@ -391,7 +400,8 @@ class OrderCallDelivery extends Component {
         if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
             {
-              text: '去充值', onPress: () => {
+              text: '去充值',
+              onPress: () => {
                 this.onPress(Config.ROUTE_ACCOUNT_FILL, {
                   onBack: (res) => {
                     this.showAlert(res)
@@ -410,7 +420,8 @@ class OrderCallDelivery extends Component {
       Alert.alert('充值成功，是否立即发配送', ``, [
         {text: '取消发单'},
         {
-          text: '立即发单', onPress: () => {
+          text: '立即发单',
+          onPress: () => {
             this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: (res) => {
                 if (res) {
@@ -425,7 +436,8 @@ class OrderCallDelivery extends Component {
       Alert.alert('充值失败', ``, [
         {text: '取消'},
         {
-          text: '再次充值', onPress: () => {
+          text: '再次充值',
+          onPress: () => {
             this.onPress(Config.ROUTE_ACCOUNT_FILL, {
               onBack: () => {
                 this.onPress(Config.ROUTE_ACCOUNT_FILL, {
@@ -631,15 +643,8 @@ class OrderCallDelivery extends Component {
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
 
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>呼叫中</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>呼叫中</Text>
           </View>
         </View>
         {this.renderCancalDeliveryItem(exist_waiting_delivery)}
@@ -652,15 +657,8 @@ class OrderCallDelivery extends Component {
     return (
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4, marginBottom: 100}}>
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>其他配送</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>其他配送</Text>
           </View>
         </View>
 
@@ -710,9 +708,7 @@ class OrderCallDelivery extends Component {
             </Text>
           </View>
           <Button title={'取消'}
-                  onPress={() => {
-                    this.cancelDelivery(item.id)
-                  }}
+                  onPress={() => this.cancelDelivery(item.id)}
                   buttonStyle={{
                     width: 67,
                     borderRadius: 20,
@@ -738,36 +734,17 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity
           onPress={() => this.onSelectDeliveyAll(1)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>省钱配送</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>省钱配送</Text>
           </View>
 
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
-            <Text style={{
-              fontSize: 12,
-              color: colors.color333,
-            }}>全选</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{
-                margin: 0,
-                padding: 0,
-              }}
+              containerStyle={{margin: 0, padding: 0}}
               checked={est_all_check}
               onPress={() => this.onSelectDeliveyAll(1)}
             />
@@ -788,35 +765,16 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity
           onPress={() => this.onSelectDeliveyAll(2)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
-          <View style={{
-            borderBottomWidth: 4,
-            borderColor: 'rgba(38,185,66,0.2)'
-          }}>
-            <Text style={{
-              fontWeight: '500',
-              fontSize: 17,
-              color: colors.color333,
-            }}>自有账号</Text>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>自有账号</Text>
           </View>
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
-            <Text style={{
-              fontSize: 12,
-              color: colors.color333,
-            }}>全选</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
             <CheckBox
               size={20}
               checkedColor={colors.main_color}
               uncheckedColor={'#DDDDDD'}
-              containerStyle={{
-                margin: 0,
-                padding: 0,
-              }}
+              containerStyle={{margin: 0, padding: 0}}
               checked={store_est_all_check}
               onPress={() => this.onSelectDeliveyAll(2)}
             />
@@ -837,9 +795,7 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
-            source={{uri: item?.icon}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <Image source={{uri: item?.icon}} style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
@@ -855,18 +811,14 @@ class OrderCallDelivery extends Component {
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
 
-          <View style={{
-            marginRight: 1,
-            right: -10,
-            top: 0,
-            position: 'relative',
-          }}>
+          <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
               <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
-              <Text
-                style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>优惠{item?.coupons_amount}元</Text>
+              <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
+                优惠{item?.coupons_amount}元
+              </Text>
             </If>
           </View>
           <CheckBox
@@ -1030,25 +982,20 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
-            <Text style={{
-              fontSize: 11,
-              color: colors.color333,
-              marginTop: 5
-            }}>{add_tips > 0 ? '加' + add_tips + '元' : '加小费'}</Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+              {add_tips > 0 ? '加' + add_tips + '元' : '加小费'}
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_remark_modal: true
-            })
-          }} style={{
-            height: iron_width,
-            width: iron_width,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.5,
-            alignItems: 'center'
-          }}>
+          <TouchableOpacity onPress={() => this.setState({show_remark_modal: true})}
+                            style={{
+                              height: iron_width,
+                              width: iron_width,
+                              borderRadius: 4,
+                              borderColor: colors.e5,
+                              borderWidth: 0.5,
+                              alignItems: 'center'
+                            }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
             <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
               {tool.length(remark) > 0 ? '已' : ''}备注
@@ -1082,11 +1029,9 @@ class OrderCallDelivery extends Component {
             <If condition={worker_delivery_id <= 0 && wayNums > 0}>
               <View style={{marginLeft: 30}}>
                 <Text style={{color: colors.white, fontSize: 11}}>
-                  预计<Text style={{
-                  fontWeight: '500',
-                  color: colors.white,
-                  fontSize: 16
-                }}> {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice} </Text>元
+                  预计 <Text style={{fontWeight: '500', color: colors.white, fontSize: 16}}>
+                  {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice}
+                </Text>元
                 </Text>
                 <Text style={{color: colors.colorCCC, fontSize: 11}}>已选择{wayNums}个运力 </Text>
               </View>
@@ -1135,10 +1080,7 @@ class OrderCallDelivery extends Component {
         }}
         modal_type={'bottom'}>
         <View style={{marginBottom: 30,}}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               自配信息
             </Text>
@@ -1171,10 +1113,7 @@ class OrderCallDelivery extends Component {
                   <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
                 </View>
                 <If condition={worker_delivery_id === worker?.id}>
-                  <Entypo name={'check'} style={{
-                    fontSize: 22,
-                    color: colors.main_color,
-                  }}/>
+                  <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
                 </If>
               </TouchableOpacity>
             </For>
@@ -1221,18 +1160,12 @@ class OrderCallDelivery extends Component {
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
-            <View
-              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
+            <View style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
               <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
                 {weight_input_value}kg
               </Text>
             </View>
-            <View style={{
-              flexDirection: 'row',
-              marginVertical: 20,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
+            <View style={{flexDirection: 'row', marginVertical: 20, justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{color: colors.color333, fontSize: 12, marginRight: 10}}>
                 {weight_min}千克
               </Text>
@@ -1252,9 +1185,7 @@ class OrderCallDelivery extends Component {
                     borderRadius: 13,
                     backgroundColor: colors.colorEEE
                   }}
-                  onValueChange={(value) => {
-                    this.setState({weight_input_value: value})
-                  }}
+                  onValueChange={(value) => this.setState({weight_input_value: value})}
                 />
               </View>
               <Text style={{color: colors.color333, fontSize: 12, textAlign: 'right', marginLeft: 10}}>
