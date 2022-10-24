@@ -149,7 +149,7 @@ class LoginScene extends PureComponent {
     })
     dispatch(signIn(mobile, password, this.props, (ok, msg, uid) => {
       if (ok && uid) {
-        this.queryConfig(uid)
+        this.queryConfig()
         this.mixpanel.getDistinctId().then(res => {
           if (res !== uid) {
             mergeMixpanelId(res, uid);
@@ -165,7 +165,7 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  queryConfig = (uid) => {
+  queryConfig = () => {
     let {accessToken, currStoreId} = this.props.global;
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {

@@ -196,7 +196,7 @@ class ApplyScene extends PureComponent {
       this.setState({doingApply: false})
       if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");
-        this.queryConfig(res?.user?.user_id, res?.user?.token?.access_token, res?.OfflineStore?.id)
+        this.queryConfig(res?.user?.token?.access_token, res?.OfflineStore?.id)
         this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
         this.mixpanel.getDistinctId().then(mixpanel_id => {
           if (mixpanel_id !== res.user.user_id) {
@@ -211,7 +211,7 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (uid, accessToken, currStoreId) => {
+  queryConfig = (accessToken, currStoreId) => {
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
