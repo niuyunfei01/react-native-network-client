@@ -376,9 +376,8 @@ class OrderInfoNew extends PureComponent {
     ToastLong('复制成功')
   }
 
-  onPrint = () => {
-    const {order} = this.state
-    if (order?.printer_sn) {
+  onPrint = (printer_sn) => {
+    if (printer_sn) {
       this.setState({showPrinterChooser: true})
     } else {
       this._doBluetoothPrint()
@@ -821,7 +820,7 @@ class OrderInfoNew extends PureComponent {
           <Button title={'打印订单'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_打印订单')
-                    this.onPrint()
+                    this.onPrint(order?.printer_sn)
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -835,7 +834,7 @@ class OrderInfoNew extends PureComponent {
                       {
                         text: '确定',
                         onPress: () => {
-                          this.onPrint()
+                          this.onPrint(order?.printer_sn)
                         },
                       }, {
                         text: '取消'
@@ -1189,27 +1188,28 @@ class OrderInfoNew extends PureComponent {
       </TouchableOpacity>
     )
   }
-  menus = [
-    {
-      type: 'default',
-      label: this._cloudPrinterSN,
-      onPress: this._doCloudPrint
-    },
-    {
-      type: 'default',
-      label: '蓝牙打印',
-      onPress: this._doBluetoothPrint
-    },
-    {
-      type: 'default',
-      label: '商米打印',
-      onPress: this._doSunMiPint
-    }
-  ]
+
   renderPrinter = () => {
     const remindNicks = tool.length(this.state.reminds) > 0 ? this.state.reminds.nicknames : '';
     const reminds = tool.length(this.state.reminds) > 0 ? this.state.reminds.reminds : [];
     let {order = {}, modalTip, showPrinterChooser} = this.state;
+    const menus = [
+      {
+        type: 'default',
+        label: this._cloudPrinterSN(),
+        onPress: this._doCloudPrint
+      },
+      {
+        type: 'default',
+        label: '蓝牙打印',
+        onPress: this._doBluetoothPrint
+      },
+      {
+        type: 'default',
+        label: '商米打印',
+        onPress: this._doSunMiPint
+      }
+    ]
 
     return (
       <View>
@@ -1221,7 +1221,7 @@ class OrderInfoNew extends PureComponent {
         <ActionSheet
           visible={showPrinterChooser}
           onRequestClose={this._hidePrinterChooser}
-          menus={this.menus}
+          menus={menus}
           actions={this.printAction}
         />
       </View>)

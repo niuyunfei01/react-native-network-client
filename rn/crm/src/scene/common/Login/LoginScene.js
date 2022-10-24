@@ -59,6 +59,7 @@ class LoginScene extends PureComponent {
       doingSignKey: '',
       authorization: false,
       show_auth_modal: true,
+      show_repetition_button: false,
     };
 
     const params = (this.props.route.params || {});
@@ -85,7 +86,12 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode = () => {
-    let {mobile, canAskReqSmsCode} = this.state
+    let {mobile, canAskReqSmsCode, authorization} = this.state
+    if (!authorization) {
+      return this.setState({
+        show_auth_modal: true
+      })
+    }
     if (canAskReqSmsCode) return null;
     if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
@@ -94,6 +100,7 @@ class LoginScene extends PureComponent {
         if (success) {
           this.interval = setInterval(() => {
             this.setState({
+              show_repetition_button: true,
               reRequestAfterSeconds: this.getCountdown() - 1
             }, () => {
               if (this.state.reRequestAfterSeconds <= 0) {
@@ -227,7 +234,14 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    let {mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization} = this.state;
+    let {
+      mobile,
+      verifyCode,
+      canAskReqSmsCode,
+      reRequestAfterSeconds,
+      authorization,
+      show_repetition_button
+    } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
         <Text style={{fontSize: 28, fontWeight: '500', color: colors.color333}}>
@@ -279,7 +293,7 @@ class LoginScene extends PureComponent {
               alignItems: 'center',
             }} onPress={this.onRequestSmsCode}>
               <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
-                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : '获取验证码'}
+                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? "重新获取" : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>

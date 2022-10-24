@@ -170,11 +170,12 @@ class OrderSettingScene extends Component {
     this.props.navigation.navigate(route, params);
   }
 
-  timeOutBack = (time) => {
+  timeOutBack = (time, callback) => {
     this.cancelData()
     let _this = this;
     setTimeout(() => {
       _this.props.navigation.goBack()
+      callback && callback()
     }, time)
   }
 
@@ -198,6 +199,7 @@ class OrderSettingScene extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort("请粘贴地址", 0)
     }
+    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -205,6 +207,7 @@ class OrderSettingScene extends Component {
       this.setState({
         smartText: ''
       })
+      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
@@ -288,14 +291,16 @@ class OrderSettingScene extends Component {
     const api = `/api/order_manual_create?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(api, params).then(res => {
       hideModal()
-      showSuccess("保存成功！")
       if (status === 1) {
+        showSuccess("保存成功！")
         this.mixpanel.track("V4手动下单_保存订单");
         this.timeOutBack(300);
       } else {
         this.mixpanel.track("V4手动下单_立即下单");
         if (res?.WaimaiOrder?.id) {
-          this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+          this.timeOutBack(300, () => {
+            this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+          });
         } else {
           showError('保存失败请重试！')
         }
@@ -620,9 +625,17 @@ class OrderSettingScene extends Component {
     return (
       <View style={{borderRadius: 4, backgroundColor: colors.white, paddingHorizontal: 12, marginTop: 10, height: 184}}>
         <TouchableOpacity onPress={() => this.setState({showWeightModal: true})}
-                          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderColor: colors.e5, borderBottomWidth: 1, height: 56,}}>
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderColor: colors.e5,
+                            borderBottomWidth: 1,
+                            height: 56,
+                          }}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品重量 </Text>
-          <Text style={{flex: 1, fontSize: 14, color: weight > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+          <Text
+            style={{flex: 1, fontSize: 14, color: weight > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
             {weight > 0 ? weight + 'Kg' : '请选择物品重量'}
           </Text>
           <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
@@ -641,7 +654,12 @@ class OrderSettingScene extends Component {
         }}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>物品价值 </Text>
 
-          <Text style={{flex: 1, fontSize: 14, color: goods_price > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+          <Text style={{
+            flex: 1,
+            fontSize: 14,
+            color: goods_price > 0 ? colors.color333 : colors.color999,
+            textAlign: 'right'
+          }}>
             {goods_price > 0 ? goods_price + '元' : '请选择物品价值'}
           </Text>
 
@@ -649,10 +667,15 @@ class OrderSettingScene extends Component {
                   style={styles.locationIcon}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => this.setState({showDateModal: true})}
-                          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 63}}>
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            height: 63
+                          }}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>期望送达 </Text>
 
-          <Text style={{flex: 1, fontSize: 14,color: colors.color333, textAlign: 'right'}}>
+          <Text style={{flex: 1, fontSize: 14, color: colors.color333, textAlign: 'right'}}>
             {is_right_once === 0 ? expect_time : '立即送达'}
           </Text>
 
@@ -669,7 +692,12 @@ class OrderSettingScene extends Component {
                         style={{borderRadius: 4, backgroundColor: colors.white, paddingHorizontal: 12, marginTop: 10}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 63}}>
           <Text style={{fontWeight: '500', fontSize: 14, color: colors.color333}}>备注信息 </Text>
-          <Text style={{flex: 1, fontSize: 14, color: tool.length(remark) > 0 ? colors.color333 : colors.color999, textAlign: 'right'}}>
+          <Text style={{
+            flex: 1,
+            fontSize: 14,
+            color: tool.length(remark) > 0 ? colors.color333 : colors.color999,
+            textAlign: 'right'
+          }}>
             {tool.length(remark) > 0 ? '已备注' : '请填写备注信息'}
           </Text>
 
@@ -786,7 +814,13 @@ class OrderSettingScene extends Component {
                     style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
-            <View style={{flexDirection: "row", alignItems: "center", marginBottom: 10, justifyContent: "space-around",flexWrap: "wrap"}}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              justifyContent: "space-around",
+              flexWrap: "wrap"
+            }}>
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
