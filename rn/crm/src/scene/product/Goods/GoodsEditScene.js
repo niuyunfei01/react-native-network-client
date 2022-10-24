@@ -471,7 +471,7 @@ class GoodsEditScene extends PureComponent {
   onReloadProd = (product_detail) => {
     const {
       basic_category, sg_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
-      promote_name, mid_list_img, upc, store_has, spec_list, series_id
+      promote_name, mid_list_img, upc, store_has, spec_list, series_id, actualNum, price, supply_price
     } = product_detail;
     let upload_files = [], list_img = [];
     mid_list_img && Object.keys(mid_list_img).map(img_id => {
@@ -501,7 +501,10 @@ class GoodsEditScene extends PureComponent {
       spec_type: parseInt(series_id) > 0 ? 'spec_multi' : 'spec_single',
       multiSpecsList: spec_list,
       store_has: store_has === 1 && this.props.route.params.type === 'add',
-      allow_switch_multi: false
+      allow_switch_multi: false,
+      actualNum: actualNum || '',
+      price: price || '',
+      supply_price: supply_price || ''
     });
   }
 
@@ -878,20 +881,23 @@ class GoodsEditScene extends PureComponent {
     dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
       if (ok) {
         hideModal()
-        if (p && p['id']) {
+        const {id, upc_data} = p
+        if (id) {
           this.onReloadProd(p)
-        } else if (p && p['upc_data']) {
-          this.onReloadUpc(p['upc_data'])
-          if (p['upc_data'].category_id) {
-            this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
+          return
+        }
+        if (upc_data) {
+          this.onReloadUpc(upc_data)
+          const {category_id, sg_tag_id, weight} = upc_data
+          if (category_id) {
+            this.onSelectedItemsChange([category_id])
           }
-          if (p['upc_data']['sg_tag_id']) {
-            this.setState({sg_tag_id: `${p['upc_data']['sg_tag_id']}`})
-            this.getBasicCategory(p['upc_data']['sg_tag_id'])
-            //this.SearchCommodityCategories(p['upc_data']['sg_tag_id'], 'id')
+          if (sg_tag_id) {
+            this.setState({sg_tag_id: sg_tag_id})
+            this.getBasicCategory(sg_tag_id)
           }
-          if (p['upc_data']['weight'])
-            this.setState({weight: p.upc_data.weight})
+          if (weight)
+            this.setState({weight: weight})
         }
       } else {
         hideModal()
@@ -1098,25 +1104,28 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-          <If condition={fnProviding === '1' && this.isStoreProdEditable() && spec_type === 'spec_single'}>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                库存
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>
+
+        </If>
+        <If condition={fnProviding === '1' && this.isStoreProdEditable() && spec_type === 'spec_single'}>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              库存
+              <Text style={styles.leftFlag}>
+                *
               </Text>
-              <TextInput
-                value={actualNum}
-                keyboardType={'numeric'}
-                onChangeText={text => this.setState({actualNum: text})}
-                style={styles.textInputStyle}
-                placeholderTextColor={colors.color999}
-                placeholder={'请输入商品库存'}/>
-              <View style={styles.rightEmptyView}/>
-            </View>
-            <LineView/>
-          </If>
+            </Text>
+            <TextInput
+              value={actualNum}
+              keyboardType={'numeric'}
+              onChangeText={text => this.setState({actualNum: text})}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入商品库存'}/>
+            <View style={styles.rightEmptyView}/>
+          </View>
+          <LineView/>
+        </If>
+        <If condition={!this.isAddProdToStore()}>
           <If condition={this.isStoreProdEditable() && !vendor_has && !store_has}>
             <TouchableOpacity style={styles.baseRowCenterWrap}
                               onPress={() => this.setSelectHeaderText('闪购类目', true)}>
@@ -1349,7 +1358,7 @@ class GoodsEditScene extends PureComponent {
               <TextInput
                 keyboardType={'numeric'}
                 value={price}
-                onChangeText={value => this.setMultiSpecsInfo(index, 'supply_price', value)}
+                onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
                 style={styles.textInputStyle}
                 placeholderTextColor={colors.color999}
                 placeholder={'请输入商品零售价格'}/>

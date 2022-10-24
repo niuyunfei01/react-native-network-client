@@ -22,8 +22,6 @@
     
     // Modify the notification content here...
 //    self.bestAttemptContent.title = [NSString stringWithFormat:@"%@ [modified]", self.bestAttemptContent.title];
-  self.bestAttemptContent.title=@"修改标题";
-  self.bestAttemptContent.body=@"修改内容";
     self.contentHandler(self.bestAttemptContent);
 }
 

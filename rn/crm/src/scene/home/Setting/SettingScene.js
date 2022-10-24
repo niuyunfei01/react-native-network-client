@@ -538,10 +538,7 @@ class SettingScene extends PureComponent {
             <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
               <Text style={styles.row_label}>{item.name}resp, msg </Text>
               <If condition={host === item.host}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
+                <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
               </If>
             </TouchableOpacity>
           </For>
@@ -569,22 +566,9 @@ class SettingScene extends PureComponent {
     return (
       <View style={{flexDirection: 'row', justifyContent: 'center', marginVertical: 20}}>
         <Button title={'注销账号'}
-                onPress={() => {
-                  this.setState({
-                    showDeleteModal: true,
-                  })
-                }}
-                buttonStyle={{
-                  width: 132,
-                  borderRadius: 21,
-                  backgroundColor: colors.f2,
-                  borderColor: colors.colorDDD,
-                  borderWidth: 0.5
-                }}
-                titleStyle={{
-                  color: colors.color666,
-                  fontSize: 14
-                }}
+                onPress={() => this.setState({showDeleteModal: true})}
+                buttonStyle={{width: 132, borderRadius: 21, backgroundColor: colors.f2, borderColor: colors.colorDDD, borderWidth: 0.5}}
+                titleStyle={{color: colors.color666, fontSize: 14}}
         />
       </View>
     )
@@ -611,43 +595,25 @@ class SettingScene extends PureComponent {
     } = this.state;
     return (
       <View>
-        <BottomModal
-          title={'绑定销售经理'}
-          actionText={'绑定'}
-          onPress={() => this.band_bd()}
-          visible={shouldShowModal}
-          onClose={this.closeModal}
-        >
-          <View style={{
-            flexDirection: 'row',
-            marginTop: 10,
-            borderColor: colors.fontGray,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-            <Text style={{fontSize: 16}}>手机号: </Text>
-            <TextInput
-              underlineColorAndroid="transparent"
-              style={[{marginLeft: 10, height: 40, flex: 1}]}
-              placeholderTextColor={"#7A7A7A"}
-              value={shopId}
-              onChangeText={text => this.setState({bd_mobile: text})}
-            />
-          </View>
-          <If condition={bd_err}>
-            <View style={{
-              marginVertical: pxToDp(15),
-              paddingHorizontal: pxToDp(40),
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row'
-            }}>
-              <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
-              <Text style={{color: colors.color333}}>{bd_err}   </Text>
-            </View>
-          </If>
+        <BottomModal title={'绑定销售经理'} actionText={'绑定'} onPress={() => this.band_bd()} visible={shouldShowModal} onClose={this.closeModal}>
+         <>
+           <View style={{flexDirection: 'row', marginTop: 10, borderColor: colors.fontGray, borderTopWidth: 1, borderBottomWidth: 1, justifyContent: 'center', alignItems: 'center'}}>
+             <Text style={{fontSize: 16}}>手机号: </Text>
+             <TextInput
+               underlineColorAndroid="transparent"
+               style={[{marginLeft: 10, height: 40, flex: 1}]}
+               placeholderTextColor={"#7A7A7A"}
+               value={shopId}
+               onChangeText={text => this.setState({bd_mobile: text})}
+             />
+           </View>
+           <If condition={bd_err}>
+             <View style={{marginVertical: pxToDp(15), paddingHorizontal: pxToDp(40), justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+               <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
+               <Text style={{color: colors.color333}}>{bd_err}   </Text>
+             </View>
+           </If>
+         </>
         </BottomModal>
 
         <JbbModal visible={showAlertModal} onClose={this.closeModal}>
@@ -655,14 +621,7 @@ class SettingScene extends PureComponent {
             <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: pxToDp(60)}}>设置通知</Text>
             <Text style={{color: 'red', lineHeight: 20}}>{this.get_msg()} </Text>
 
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              marginTop: 15,
-              alignItems: 'center',
-              flexWrap: "wrap",
-            }}>
+            <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-around', marginTop: 15, alignItems: 'center', flexWrap: "wrap"}}>
               <For each="item" index='idx' of={funds_threshold_mapping}>
                 <Button key={idx} title={item === -1 ? '不通知' : "≤" + item + '元'}
                         onPress={() => {
@@ -679,21 +638,12 @@ class SettingScene extends PureComponent {
                           borderWidth: funds_thresholds === item ? 0 : pxToDp(1),
                           borderColor: colors.color999,
                         }}
-                        titleStyle={{
-                          color: funds_thresholds === item ? colors.white : colors.color333,
-                          fontSize: 16
-                        }}
+                        titleStyle={{color: funds_thresholds === item ? colors.white : colors.color333, fontSize: 16}}
                 />
               </For>
             </View>
 
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 15,
-            }}>
+            <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 15}}>
               <Button title={'取消'}
                       onPress={() => this.closeModal()}
                       buttonStyle={{
@@ -701,26 +651,15 @@ class SettingScene extends PureComponent {
                         borderRadius: pxToDp(10),
                         backgroundColor: colors.colorCCC,
                       }}
-                      titleStyle={{
-                        color: colors.white,
-                        fontSize: 16
-                      }}
+                      titleStyle={{color: colors.white, fontSize: 16}}
               />
               <Button title={'确定'}
                       onPress={() => {
                         this.closeModal()
                         this.setConfig('funds_threshold', funds_thresholds)
                       }}
-                      buttonStyle={{
-                        width: width * 0.3,
-                        marginLeft: width * 0.2,
-                        borderRadius: pxToDp(10),
-                        backgroundColor: colors.main_color,
-                      }}
-                      titleStyle={{
-                        color: colors.white,
-                        fontSize: 16
-                      }}
+                      buttonStyle={{width: width * 0.3, marginLeft: width * 0.2, borderRadius: pxToDp(10), backgroundColor: colors.main_color,}}
+                      titleStyle={{color: colors.white, fontSize: 16}}
               />
             </View>
 
@@ -729,46 +668,25 @@ class SettingScene extends PureComponent {
 
         <JbbModal visible={showDeleteModal} onClose={this.closeModal} modal_type={'center'}>
           <View style={{margin: 20}}>
-            <Text
-              style={{
-                fontSize: 17,
-                color: colors.color333,
-                fontWeight: '500',
-                textAlign: 'center',
-              }}>确定要注销账号吗？ </Text>
+            <Text style={{fontSize: 17, color: colors.color333, fontWeight: '500', textAlign: 'center'}}>
+              确定要注销账号吗？
+            </Text>
 
-            <Text
-              style={{
-                fontSize: 16,
-                color: colors.color333,
-                marginVertical: 12,
-                lineHeight: 22,
-              }}>注销账号会清空所有信息和数据，请确认是否要注销？ </Text>
+            <Text style={{fontSize: 16, color: colors.color333,marginVertical: 12, lineHeight: 22}}>
+              注销账号会清空所有信息和数据，请确认是否要注销？
+            </Text>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Button title={'取消'}
                       onPress={this.closeModal}
-                      containerStyle={{
-                        flex: 1,
-                        borderRadius: 20,
-                        length: 40,
-                        marginRight: 10
-                      }}
-                      buttonStyle={{
-                        backgroundColor: colors.f5,
-                      }}
+                      containerStyle={{flex: 1, borderRadius: 20, length: 40, marginRight: 10}}
+                      buttonStyle={{backgroundColor: colors.f5}}
                       titleStyle={{color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
 
               <Button title={'确定'}
                       onPress={this.cancel}
-                      containerStyle={{
-                        flex: 1,
-                        borderRadius: 20,
-                        length: 40,
-                      }}
-                      buttonStyle={{
-                        backgroundColor: colors.main_color,
-                      }}
+                      containerStyle={{flex: 1, borderRadius: 20, length: 40,}}
+                      buttonStyle={{backgroundColor: colors.main_color}}
                       titleStyle={{color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}}/>
             </View>
           </View>

@@ -48,7 +48,9 @@ class SeparatedAccountFill extends PureComponent {
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('三方支付')
     this.state = {
-      to_fill_yuan: 100,
+      to_fill_yuan: '100',
+      customMoney: '',
+      isCustomMoney: false,
       pay_by: PAY_ALI_APP,
       balance: 0,
       authorization: false,
@@ -83,10 +85,7 @@ class SeparatedAccountFill extends PureComponent {
         return (
           <TouchableOpacity
             style={{width: 80, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}
-            onPress={() => {
-              // this.onPress(Config.ROUTE_TRIPARTITE_RECHARGE)
-              this.onPress(Config.ROUTE_SEP_EXPENSE)
-            }}
+            onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
           >
             <Text style={{color: colors.color333, fontSize: 15, marginRight: 12}}>账单</Text>
           </TouchableOpacity>
@@ -125,12 +124,12 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   onPay = () => {
-    let {to_fill_yuan, pay_by, authorization} = this.state;
+    let {to_fill_yuan, pay_by, authorization, customMoney, isCustomMoney} = this.state;
     if (!authorization) {
       ToastLong('请先勾选隐私政策', 0)
       return
     }
-    if (to_fill_yuan < 1) {
+    if (!isCustomMoney && Number(to_fill_yuan) < 1 || isCustomMoney && Number(customMoney) < 1) {
       ToastLong("充值金额不应少于1元");
       return
     }
@@ -143,9 +142,12 @@ class SeparatedAccountFill extends PureComponent {
 
   aliPay = () => {
     const {accessToken, currStoreId, vendor_id} = this.props.global;
-    let {to_fill_yuan} = this.state;
+    let {to_fill_yuan, customMoney, isCustomMoney} = this.state;
     showModal("支付跳转中...")
-    const url = `/api/gen_pay_app_order/${to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
+    let payMoney = to_fill_yuan
+    if (isCustomMoney)
+      payMoney = customMoney
+    const url = `/api/gen_pay_app_order/${payMoney}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
       hideModal();
       const resule = await Alipay.alipay(res.result);
@@ -153,10 +155,10 @@ class SeparatedAccountFill extends PureComponent {
         ToastLong("请先安装支付宝应用")
       } else if (resule.resultStatus === "9000") {
         ToastShort("支付成功")
-        this.PayCallback()
+        //this.PayCallback()
       } else {
         ToastLong(`支付失败`);
-        this.PayCallback()
+        // this.PayCallback()
       }
     }, () => {
       hideModal();
@@ -164,10 +166,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   PayCallback = () => {
-    if (this.props.route.params.onBack) {
-      this.props.route.params.onBack(true)
-      this.props.navigation.goBack()
-    }
+    this.props.navigation.goBack()
   }
 
   wechatPay = () => {
@@ -175,7 +174,11 @@ class SeparatedAccountFill extends PureComponent {
       .then((isInstalled) => {
         if (isInstalled) {
           const {accessToken} = this.props.global;
-          const url = `api/gen_pay_app_order/${this.state.to_fill_yuan}?access_token=${accessToken}`;
+          let {to_fill_yuan, customMoney, isCustomMoney} = this.state;
+          let payMoney = to_fill_yuan
+          if (isCustomMoney)
+            payMoney = customMoney
+          const url = `api/gen_pay_app_order/${payMoney}?access_token=${accessToken}`;
           HttpUtils.post.bind(this.props)(url).then(res => {
             res = res.result;
             const params = {
@@ -189,11 +192,11 @@ class SeparatedAccountFill extends PureComponent {
             wechat.pay(params).then((requestJson) => {
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                this.PayCallback()
+                // this.PayCallback()
               }
-            }).catch((err) => {
-              ToastLong(`支付失败:${err}`);
-              this.PayCallback()
+            }).catch(() => {
+              ToastLong(`支付失败`);
+              // this.PayCallback()
 
             });
           });
@@ -268,9 +271,16 @@ class SeparatedAccountFill extends PureComponent {
     )
   }
 
+  setCustomMoney = (input_add_money) => {
+    this.setState({customMoney: input_add_money, isCustomMoney: true, to_fill_yuan: ''})
+  }
+
+  setMoney = (value) => {
+    this.setState({customMoney: '', isCustomMoney: false, to_fill_yuan: value,})
+  }
 
   renderWechat() {
-    let {to_fill_yuan, recharge_amount, balance, pay_by} = this.state
+    let {to_fill_yuan, recharge_amount, balance, pay_by, customMoney} = this.state
     return (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <KeyboardAwareScrollView
@@ -285,37 +295,32 @@ class SeparatedAccountFill extends PureComponent {
           </View>
 
           <View style={style.item_body}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 10,
-                justifyContent: "space-around",
-                flexWrap: "wrap"
-              }}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              justifyContent: "space-around",
+              flexWrap: "wrap"
+            }}>
               <For index='index' each='info' of={recharge_amount}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
-                  borderColor: Number(info.value) === to_fill_yuan ? colors.main_color : colors.colorDDD,
+                  borderColor: info.value === to_fill_yuan ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
-                  color: Number(info.value) === to_fill_yuan ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === to_fill_yuan ? '#DFFAE2' : colors.white,
+                  color: info.value === to_fill_yuan ? colors.main_color : colors.color333,
+                  backgroundColor: info.value === to_fill_yuan ? '#DFFAE2' : colors.white,
                   width: width * 0.26,
                   textAlign: 'center',
                   paddingVertical: 14,
                   borderRadius: 4,
                   marginVertical: 5
-                }} onPress={() => {
-                  this.setState({to_fill_yuan: Number(info.value)})
-                }}>{info.label} </Text>
+                }} onPress={() => this.setMoney(info.value)}>{info.label} </Text>
               </For>
 
               <TextInput
-                onChangeText={(input_add_money) => {
-                  this.setState({to_fill_yuan: Number(input_add_money)})
-                }}
-                defaultValue={to_fill_yuan}
-                value={to_fill_yuan}
+                onChangeText={(input_add_money) => this.setCustomMoney(input_add_money)}
+                value={customMoney}
+                onFocus={() => this.setState({isCustomMoney: true, to_fill_yuan: ''})}
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"

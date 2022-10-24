@@ -106,7 +106,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
 
 
   renderItem = ({item}) => {
-    const {store_has, name, sg_tag_name_list, sg_tag_id, pic, series_id} = item
+    const {store_has, name, sg_tag_name_list, barcode, pic, series_id} = item
     return (
       <TouchableOpacity style={store_has ? styles.storeHasItemWrap : styles.itemWrap}
                         onPress={() => this.jumpToGoodsEdit(item)}
@@ -121,7 +121,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
             类目：{sg_tag_name_list}
           </Text>
           <Text style={styles.itemCategoryName}>
-            UPC：{sg_tag_id}
+            UPC：{barcode}
           </Text>
         </View>
         <If condition={store_has}>

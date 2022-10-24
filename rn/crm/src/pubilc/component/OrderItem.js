@@ -405,9 +405,7 @@ class OrderItem extends React.PureComponent {
           <SvgXml xml={locationIcon()}/>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{paddingHorizontal: 10}} onPress={() => {
-          this.touchMobile()
-        }}>
+        <TouchableOpacity style={{paddingHorizontal: 10}} onPress={() => this.touchMobile()}>
           <SvgXml xml={call()}/>
         </TouchableOpacity>
       </View>
