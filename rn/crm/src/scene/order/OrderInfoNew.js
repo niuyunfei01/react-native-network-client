@@ -1336,7 +1336,8 @@ const styles = StyleSheet.create({
   copyText: {
     fontSize: 12,
     fontWeight: '400',
-    color: colors.main_color
+    color: colors.main_color,
+    marginLeft: 10
   },
   orderInfoHeader: {
     height: 88,
@@ -1374,7 +1375,7 @@ const styles = StyleSheet.create({
   orderStatusDesc: {
     fontSize: 18,
     color: colors.color333,
-    fontWeight: '500'
+    fontWeight: 'bold'
   },
   orderStatusRightIcon: {
     fontSize: 14,
@@ -1415,7 +1416,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   orderInfoHeaderButtonTitleLeft: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 14,
     color: colors.main_color
   },
@@ -1427,7 +1428,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   orderInfoHeaderButtonTitleRight: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 14,
     color: colors.white
   },
@@ -1436,7 +1437,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     marginLeft: width * 0.03,
     borderRadius: 6,
-    marginBottom: 10
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.3,
+    elevation: 10,
+    shadowRadius: 12
   },
   orderCardHeader: {
     width: width * 0.94,
@@ -1454,22 +1460,23 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: 11
   },
-  orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
+  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
-    padding: 12
+    padding: 12,
+    paddingRight: pxToDp(12)
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     marginBottom: 10
   },
   logLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333
   },
   cardTitleInfo: {
@@ -1491,7 +1498,7 @@ const styles = StyleSheet.create({
   cardTitleAddress: {
     fontSize: 12,
     color: colors.color333,
-    fontWeight: '500'
+    fontWeight: 'bold'
   },
   cardTitlePhone: {
     fontSize: 16
@@ -1575,10 +1582,10 @@ const styles = StyleSheet.create({
   },
   QrBox: {marginBottom: 20, padding: 12, flexDirection: "column"},
   QrTitle: {flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 20},
-  QrDesc: {fontSize: 17, fontWeight: '500', color: colors.color333},
+  QrDesc: {fontSize: 17, fontWeight: 'bold', color: colors.color333},
   QrClose: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
-  QrCode: {fontSize: 18, fontWeight: '500', color: colors.color333, marginTop: 20}
+  QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20}
 });
 
 const headerRightStyles = StyleSheet.create({

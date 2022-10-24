@@ -283,6 +283,7 @@ class LoginScene extends PureComponent {
         </View>
         <TouchableOpacity onPress={this.setCheckd} style={{flexDirection: 'row', alignItems: 'center',}}>
           <CheckBox
+            size={18}
             checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
