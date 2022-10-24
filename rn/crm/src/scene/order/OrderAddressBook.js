@@ -228,7 +228,7 @@ class OrderAddressBook extends Component {
                   color: colors.color333,
                   fontSize: 16,
                   marginLeft: info?.is_often_use ? 4 : 0,
-                  fontWeight: '500'
+                  fontWeight: 'bold'
                   // eslint-disable-next-line no-undef
                 }}>{tool.length(info.address + info.street_block, 18)} </Text>
               </View>
@@ -260,7 +260,7 @@ class OrderAddressBook extends Component {
                   borderRadius: 24,
                   length: 48,
                 }]}
-                titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
+                titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
         />
       </View>
     )

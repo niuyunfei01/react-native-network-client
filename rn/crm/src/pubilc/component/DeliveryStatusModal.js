@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   f16: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333
   },
   f14: {
@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
   },
   platform: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
   },
   expectTime: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#FF8309'
   },
   logItem: {
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   orderNum: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#FF8309'
   },
   logBox: {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     borderColor: colors.colorCCC
   },
   deliveryStatusBtnWhiteTitle: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 16,
     color: colors.color666
   },
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.main_color
   },
   deliveryStatusBtnGreenTitle: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 16,
     color: colors.white
   },

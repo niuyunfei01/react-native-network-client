@@ -207,7 +207,7 @@ class AddTipModal extends React.Component {
                 <Text style={{
                   color: colors.warn_red,
                   fontSize: 14,
-                  fontWeight: "500"
+                  fontWeight: 'bold'
                 }}>{respReason}</Text>
               </View>
             </If>
@@ -221,7 +221,7 @@ class AddTipModal extends React.Component {
                       borderRadius: 24,
                       length: 48,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>

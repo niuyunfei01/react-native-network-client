@@ -263,7 +263,7 @@ class SeparatedAccountFill extends PureComponent {
                     borderRadius: 24,
                     length: 48
                   }]}
-                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 16, lineHeight: 28}}
+                  titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 28}}
           />
         </View>
       </View>
@@ -290,7 +290,7 @@ class SeparatedAccountFill extends PureComponent {
           showsVerticalScrollIndicator={false}>
           <View style={[style.item_body, {flexDirection: 'row', alignItems: 'center'}]}>
             <Text style={{fontSize: 14, color: colors.color666}}>外送帮余额： </Text>
-            <Text style={{fontSize: 18, color: colors.color333, fontWeight: '500'}}>{balance}元 </Text>
+            <Text style={{fontSize: 18, color: colors.color333, fontWeight: 'bold'}}>{balance}元 </Text>
           </View>
 
           <View style={style.item_body}>
@@ -350,7 +350,7 @@ class SeparatedAccountFill extends PureComponent {
               marginTop: 10
             }}>
               <FontAwesome5 size={24} name={'weixin'} style={style.wechatIcon}/>
-              <Text style={{flex: 1, fontSize: 12, fontWeight: '500', color: colors.color333}}>微信 </Text>
+              <Text style={{flex: 1, fontSize: 12, fontWeight: 'bold', color: colors.color333}}>微信 </Text>
               {pay_by === PAY_WECHAT_APP ?
                 <FontAwesome5 size={20} name={'check-circle'} style={style.circle}/> :
                 <FontAwesome5 size={20} name={'circle'} style={style.circle}/>
@@ -367,7 +367,7 @@ class SeparatedAccountFill extends PureComponent {
               marginTop: 10
             }}>
               <FontAwesome5 size={24} name={'alipay'} style={style.alipayIcon}/>
-              <Text style={{flex: 1, fontSize: 12, fontWeight: '500', color: colors.color333}}>支付宝 </Text>
+              <Text style={{flex: 1, fontSize: 12, fontWeight: 'bold', color: colors.color333}}>支付宝 </Text>
               {pay_by === PAY_ALI_APP ?
                 <FontAwesome5 size={20} name={'check-circle'} style={style.circle}/> :
                 <FontAwesome5 size={20} name={'circle'} style={style.circle}/>

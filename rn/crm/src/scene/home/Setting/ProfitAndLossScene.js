@@ -410,7 +410,7 @@ class ProfitAndLoss extends PureComponent {
           height: 50,
           marginHorizontal: 30
         }}>
-          <Text style={{fontSize: 18, fontWeight: '500', color: colors.color333}}>时间选择</Text>
+          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>时间选择</Text>
           <Text style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}} onPress={() => {
             this.setState({showModal: false})
             this.get_profit_list()
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: 11
   },
-  orderCardInfoTop: {fontSize: 16, fontWeight: '500', color: colors.color333, marginBottom: pxToDp(5)},
+  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: pxToDp(5)},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color666},
   orderCardContainer: {
     width: width * 0.90,

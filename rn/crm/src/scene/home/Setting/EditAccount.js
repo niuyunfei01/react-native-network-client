@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.color333,
     flex: 1,
-    fontWeight: '500'
+    fontWeight: 'bold'
   },
   row_desc: {
     fontSize: 15,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   btnTitle: {
     color: colors.white,
-    fontWeight: '500',
+    fontWeight: 'bold',
     fontSize: 16,
     lineHeight: 22
   },
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   modalDesc: {
     fontSize: 17,
     color: colors.color333,
-    fontWeight: '500',
+    fontWeight: 'bold',
     marginVertical: 30,
     textAlign: 'center',
   },
@@ -402,8 +402,8 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20
   },
-  modalBtnCancelTitle: {color: colors.color333, fontWeight: '500', fontSize: 16, lineHeight: 28},
-  modalBtnSure: {color: colors.white, fontWeight: '500', fontSize: 16, lineHeight: 28}
+  modalBtnCancelTitle: {color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 28},
+  modalBtnSure: {color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 28}
 });
 
 export default connect(mapStateToProps)(AddAccount)

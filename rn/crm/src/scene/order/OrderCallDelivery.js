@@ -645,7 +645,7 @@ class OrderCallDelivery extends Component {
 
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
-            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>呼叫中</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>呼叫中</Text>
           </View>
         </View>
         {this.renderCancalDeliveryItem(exist_waiting_delivery)}
@@ -659,7 +659,7 @@ class OrderCallDelivery extends Component {
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4, marginBottom: 100}}>
         <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
-            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>其他配送</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>其他配送</Text>
           </View>
         </View>
 
@@ -676,7 +676,7 @@ class OrderCallDelivery extends Component {
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>自配送 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>自配送 </Text>
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>
               {worker_delivery_id > 0 ? worker_name + '' + worker_mobile : '骑手信息'}
@@ -702,7 +702,7 @@ class OrderCallDelivery extends Component {
             style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.platform_name} </Text>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.platform_name} </Text>
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>
               已等待 <Text style={{fontSize: 12, color: "#FF8309"}}>{item?.waiting_time} </Text>分钟
@@ -736,7 +736,7 @@ class OrderCallDelivery extends Component {
           onPress={() => this.onSelectDeliveyAll(1)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
-            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>省钱配送</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>省钱配送</Text>
           </View>
 
           <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
@@ -768,7 +768,7 @@ class OrderCallDelivery extends Component {
           onPress={() => this.onSelectDeliveyAll(2)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
-            <Text style={{fontWeight: '500', fontSize: 17, color: colors.color333}}>自有账号</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>自有账号</Text>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
@@ -801,7 +801,7 @@ class OrderCallDelivery extends Component {
           <Image source={{uri: item?.icon}} style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color333, fontWeight: '500'}}>{item?.logisticName} </Text>
+              <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.logisticName} </Text>
               <If condition={tool.length(item?.marking) > 0}>
                 <For of={item?.marking} each='info' index='index'>
                   <View key={index}
@@ -816,7 +816,7 @@ class OrderCallDelivery extends Component {
 
           <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
-              <Text style={{fontWeight: '500', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
+              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
               <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
@@ -863,10 +863,10 @@ class OrderCallDelivery extends Component {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            <Text style={{fontSize: 15, color: colors.white, fontWeight: '500'}}>收</Text>
+            <Text style={{fontSize: 15, color: colors.white, fontWeight: 'bold'}}>收</Text>
           </View>
           <View style={{marginLeft: 9}}>
-            <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
+            <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold'}}>
               {tool.jbbsubstr(wm_address, 18)}
             </Text>
             <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>{wm_user_name}&nbsp;{wm_mobile} </Text>
@@ -890,7 +890,7 @@ class OrderCallDelivery extends Component {
         </TouchableOpacity>
         <View style={{flex: 1,}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{fontWeight: '500', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
+            <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
             <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
           </View>
           <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
@@ -1019,13 +1019,13 @@ class OrderCallDelivery extends Component {
           }}>
             <If condition={worker_delivery_id > 0}>
               <View style={{marginLeft: 30}}>
-                <Text style={{color: colors.white, fontWeight: '500', fontSize: 13}}>0元 </Text>
+                <Text style={{color: colors.white, fontWeight: 'bold', fontSize: 13}}>0元 </Text>
                 <Text style={{color: colors.colorCCC, fontSize: 11}}>已选择自配送 </Text>
               </View>
             </If>
             <If condition={worker_delivery_id <= 0 && wayNums <= 0}>
               <View style={{marginLeft: 30}}>
-                <Text style={{color: colors.white, fontWeight: '500', fontSize: 13}}>暂无费用 </Text>
+                <Text style={{color: colors.white, fontWeight: 'bold', fontSize: 13}}>暂无费用 </Text>
                 <Text style={{color: colors.colorCCC, fontSize: 11}}>至少选择1个运力 </Text>
               </View>
             </If>
@@ -1033,7 +1033,7 @@ class OrderCallDelivery extends Component {
             <If condition={worker_delivery_id <= 0 && wayNums > 0}>
               <View style={{marginLeft: 30}}>
                 <Text style={{color: colors.white, fontSize: 11}}>
-                  预计 <Text style={{fontWeight: '500', color: colors.white, fontSize: 16}}>
+                  预计 <Text style={{fontWeight: 'bold', color: colors.white, fontSize: 16}}>
                   {wayNums === 1 ? minPrice : minPrice + '～' + maxPrice}
                 </Text>元
                 </Text>
@@ -1062,7 +1062,7 @@ class OrderCallDelivery extends Component {
             borderTopRightRadius: 24,
             borderBottomRightRadius: 24,
           }}>
-            <Text style={{color: colors.white, fontWeight: '500', fontSize: 16}}>配送下单 </Text>
+            <Text style={{color: colors.white, fontWeight: 'bold', fontSize: 16}}>配送下单 </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1138,7 +1138,7 @@ class OrderCallDelivery extends Component {
                     marginHorizontal: 10,
                     length: 42,
                   }]}
-                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                  titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
         </View>
       </JbbModal>
     )
@@ -1167,7 +1167,7 @@ class OrderCallDelivery extends Component {
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
-              <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
+              <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: 16}}>
                 {weight_input_value}kg
               </Text>
             </View>
@@ -1225,7 +1225,7 @@ class OrderCallDelivery extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
@@ -1334,7 +1334,7 @@ class OrderCallDelivery extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
@@ -1394,7 +1394,7 @@ class OrderCallDelivery extends Component {
                       marginHorizontal: 10,
                       length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>

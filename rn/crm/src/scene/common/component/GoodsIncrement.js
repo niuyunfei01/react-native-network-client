@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   ValueAddBoxLeft: {flexDirection: "row", alignItems: "center"},
   ValueAddLabel: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#985800',
     marginRight: 5
   },

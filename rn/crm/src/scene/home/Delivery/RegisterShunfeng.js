@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   titleStyle: {
     color: '#333333',
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     lineHeight: 21
   },
   textStyle: {

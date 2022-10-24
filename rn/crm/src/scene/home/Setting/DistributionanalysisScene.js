@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.main_color,
     marginVertical: pxToDp(10),
-    fontWeight: '500'
+    fontWeight: 'bold'
   },
   cell_rowTitleTextR2: {
     fontSize: pxToDp(30),

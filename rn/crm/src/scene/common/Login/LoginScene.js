@@ -223,7 +223,7 @@ class LoginScene extends PureComponent {
     } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
-        <Text style={{fontSize: 28, fontWeight: '500', color: colors.color333}}>
+        <Text style={{fontSize: 28, fontWeight: 'bold', color: colors.color333}}>
           登录外送帮
         </Text>
         <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17, marginVertical: 4}}>
@@ -320,7 +320,7 @@ class LoginScene extends PureComponent {
           <Button title={'登 录'}
                   onPress={this.onLogin}
                   buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, length: 48}]}
-                  titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}
+                  titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
           />
         </View>
 

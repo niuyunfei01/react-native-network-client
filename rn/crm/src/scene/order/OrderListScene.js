@@ -672,7 +672,7 @@ class OrderListScene extends Component {
                         style={{
                           fontSize: 14,
                           color: info.value === sort ? colors.main_color : colors.color333,
-                          fontWeight: info.value === sort ? '500' : '400'
+                          fontWeight: info.value === sort ? 'bold' : '400'
                         }}
                         onPress={() => this.setOrderBy(info.value)}>
                     {info.label}
@@ -686,7 +686,7 @@ class OrderListScene extends Component {
                       this.closeModal()
                     }}
                     buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, height: 48}]}
-                    titleStyle={{color: colors.f7, fontWeight: '500', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
           </View>
         </View>
       </JbbModal>
