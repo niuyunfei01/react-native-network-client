@@ -287,52 +287,27 @@ class OrderCallDelivery extends Component {
 
   cancelDelivery = (ship_id) => {
     let {accessToken, order_id} = this.props.global
-    const api = `/api/pre_cancel_order?access_token=${accessToken}`;
-    let params = {
-      order_id: order_id
-    }
     let order = {
       id: order_id
     }
-    HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (res?.deduct_fee < 0) {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: ship_id,
-                onCancelled: () => {
-                  this.fetchData()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
-      } else if (Number(res?.deduct_fee) === 0) {
-        this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-          {
-            order: order,
-            ship_id: ship_id,
-            onCancelled: () => {
-              this.fetchData()
-            }
-          });
-      } else {
-        Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${res?.deduct_fee}元`, [{
-          text: '确定', onPress: () => {
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: ship_id,
-                onCancelled: () => {
-                  this.fetchData()
-                }
-              });
-          }
-        }, {'text': '取消'}]);
-      }
-    }).catch(e => {
-      ToastShort(e.reason, 0)
+    const api = `/v4/wsb_delivery/preCancelDelivery`;
+    HttpUtils.get.bind(this.props)(api, {
+      order_id: order_id,
+      access_token: accessToken
+    }).then(res => {
+      Alert.alert('提示', `${res.alert_msg}`, [{
+        text: '确定', onPress: () => {
+          this.closeModal();
+          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: order,
+              ship_id: ship_id,
+              onCancelled: () => {
+                this.fetchData()
+              }
+            });
+        }
+      }, {'text': '取消'}]);
     })
   }
 
@@ -1238,13 +1213,10 @@ class OrderCallDelivery extends Component {
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View
-              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'space-between'}}>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>当前选择重量 </Text>
-              <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>
-                <Text style={{color: '#E32321', fontSize: 20}}>
-                  {weight_input_value}
-                </Text>
-                千克 </Text>
+              style={{flexDirection: 'row', marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
+              <Text style={{color: colors.color333, fontWeight: '500', fontSize: 16}}>
+                {weight_input_value}kg
+              </Text>
             </View>
             <View style={{
               flexDirection: 'row',

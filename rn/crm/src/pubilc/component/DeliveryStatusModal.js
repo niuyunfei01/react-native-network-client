@@ -152,6 +152,7 @@ class deliveryStatusModal extends React.Component {
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('配送调度页')
   }
+
   static propTypes = {
     order_id: PropTypes.oneOfType([
       PropTypes.number,
@@ -255,7 +256,7 @@ class deliveryStatusModal extends React.Component {
     });
   }
 
-  cancelDeliverys = () => {
+  cancelDelivery = () => {
     let {order_id, accessToken, fetchData} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
     HttpUtils.get.bind(this.props)(api, {
@@ -264,16 +265,18 @@ class deliveryStatusModal extends React.Component {
     }).then(res => {
       Alert.alert('提示', `${res.alert_msg}`, [{
         text: '确定', onPress: () => {
-          const api = `/api/batch_cancel_third_ship/${order_id}?access_token=${accessToken}`;
-          HttpUtils.get.bind(this.props)(api, {}).then(res => {
-            ToastShort(res.desc);
-            fetchData();
-            this.closeModal();
-          })
+          this.closeModal();
+          let order = {id: order_id}
+          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+            {
+              order: order,
+              ship_id: 0,
+              onCancelled: () => {
+                fetchData();
+              }
+            });
         }
       }, {'text': '取消'}]);
-      fetchData();
-      this.closeModal();
     })
   }
 
@@ -415,7 +418,7 @@ class deliveryStatusModal extends React.Component {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_取消配送')
-                    this.cancelDeliverys()
+                    this.cancelDelivery()
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
