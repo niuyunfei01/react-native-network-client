@@ -83,7 +83,7 @@ class AddAccount extends PureComponent {
       return
     }
     if (worker_account === '') {
-      ToastLong('请填写登陆账号')
+      ToastLong('请填写登录账号')
       return
     }
     ToastShort('提交中')
@@ -190,21 +190,21 @@ class AddAccount extends PureComponent {
             />
           </View>
           <View style={[styles.item_row, styles.borderTop]}>
-            <Text style={styles.row_label}>登陆账号 </Text>
+            <Text style={styles.row_label}>登录账号 </Text>
             <TextInput
               onChangeText={code => this.setState({worker_account: code})}
               value={worker_account}
               maxLength={11}
               keyboardType={'numeric'}
               style={{textAlign: 'right', fontSize: 14, marginRight: pxToDp(5)}}
-              placeholder="请填写登陆账号"
+              placeholder="请填写登录账号"
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent"
             />
           </View>
           <View style={[styles.item_row, styles.borderTop]}>
             <Text style={styles.row_label}>账号密码 </Text>
-            <Text style={[styles.row_desc, {color: colors.color999}]}>暂不支持，请使用验证码登陆 </Text>
+            <Text style={[styles.row_desc, {color: colors.color999}]}>暂不支持，请使用验证码登录 </Text>
           </View>
         </View>
       </View>
