@@ -57,7 +57,7 @@ class ServiceChargeInfo extends PureComponent {
   }
   onItemClicked = (item) => {
     if (item.wm_id) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
+      this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: item.wm_id});
     }
   }
   onServiceDesc = () => {

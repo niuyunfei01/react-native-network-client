@@ -86,7 +86,7 @@ class SettlementDetailsScene extends React.Component {
   }
 
   to_order = (id) => {
-    this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})
+    this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: id})
   };
 
   renderHeader() {

@@ -106,7 +106,7 @@ class NoticeItem extends PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         if (item.order_id > 0) {
-          onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
+          onPress(Config.ROUTE_ORDER_NEW, {orderId: item.order_id})
         } else if (parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS) {
           let params = {
             task_id: item.id,
