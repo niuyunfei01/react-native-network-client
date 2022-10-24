@@ -238,21 +238,21 @@ class OrderAddressBook extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 16,
-                  marginLeft: 4,
+                  marginLeft: info?.is_often_use ? 4 : 0,
                   fontWeight: '500'
                   // eslint-disable-next-line no-undef
                 }}>{tool.length((info.address + info.street_block || '')) > 18 ? (info.address + info.street_block).substring(0, 17) + '...' : (info.address + info.street_block)} </Text>
               </View>
               <View style={{flexDirection: 'row', marginTop: 10}}>
                 {/* eslint-disable-next-line no-undef */}
-                <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name}</Text>
+                <Text style={{fontSize: 14, color: colors.color666, width: 60}}>{info.name} </Text>
                 {/* eslint-disable-next-line no-undef */}
-                <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone}</Text>
+                <Text style={{fontSize: 14, color: colors.color666, flex: 1}}>{info.phone} </Text>
                 {/*<Text style={{fontSize: 14, color: colors.main_color, width: 56}}>收藏</Text>*/}
                 <Text onPress={() => {
                   // eslint-disable-next-line no-undef
                   this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {info, type: 'edit'})
-                }} style={{fontSize: 14, color: colors.main_color}}>编辑</Text>
+                }} style={{fontSize: 14, color: colors.main_color}}>编辑 </Text>
               </View>
             </TouchableOpacity>
           </For>
