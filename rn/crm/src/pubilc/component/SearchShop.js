@@ -128,6 +128,7 @@ class SearchShop extends Component {
         let header = 'https://restapi.amap.com/v5/place/around?parameters?'
         const params = {
           location: shopmsg?.location,
+          keywords: shopmsg?.name,
           key: '85e66c49898d2118cc7805f484243909',
         }
         Object.keys(params).forEach(key => {
