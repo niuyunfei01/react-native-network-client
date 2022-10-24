@@ -256,6 +256,19 @@ class deliveryStatusModal extends React.Component {
     });
   }
 
+  goCancelDelivery = (ship_id = 0) => {
+    let {order_id, fetchData} = this.props;
+    this.closeModal();
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+      {
+        order: {id: order_id},
+        ship_id: ship_id,
+        onCancelled: () => {
+          fetchData();
+        }
+      });
+  }
+
   cancelDelivery = () => {
     let {order_id, accessToken, fetchData} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
@@ -263,20 +276,16 @@ class deliveryStatusModal extends React.Component {
       order_id: order_id,
       access_token: accessToken
     }).then(res => {
-      Alert.alert('提示', `${res.alert_msg}`, [{
-        text: '确定', onPress: () => {
-          this.closeModal();
-          let order = {id: order_id}
-          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: order,
-              ship_id: 0,
-              onCancelled: () => {
-                fetchData();
-              }
-            });
-        }
-      }, {'text': '取消'}]);
+
+      if (tool.length(res?.alert_msg) > 0) {
+        Alert.alert('提示', `${res.alert_msg}`, [{
+          text: '确定', onPress: () => {
+            this.goCancelDelivery()
+          }
+        }, {'text': '取消'}]);
+      } else {
+        this.goCancelDelivery()
+      }
     })
   }
 

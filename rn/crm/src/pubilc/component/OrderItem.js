@@ -144,6 +144,17 @@ class OrderItem extends React.PureComponent {
   }
 
 
+  goCancelDelivery = (order_id, ship_id = 0) => {
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+      {
+        order: {id: order_id,},
+        ship_id: ship_id,
+        onCancelled: () => {
+          this.props.fetchData();
+        }
+      });
+  }
+
   cancelDelivery = () => {
     let token = this.props.accessToken
     let order = this.props.item
@@ -152,20 +163,15 @@ class OrderItem extends React.PureComponent {
       order_id: order?.id
     }
     HttpUtils.get.bind(this.props)(api, params).then(res => {
-      Alert.alert('提示', res?.alert_msg, [{
-        text: '确定', onPress: () => {
-          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: order,
-              ship_id: 0,
-              onCancelled: () => {
-                this.props.fetchData();
-              }
-            });
-        }
-      }, {'text': '取消'}]);
-    }).catch(e => {
-      ToastShort(`${e.reason}`)
+      if(tool.length(res?.alert_msg) > 0){
+        Alert.alert('提示', res?.alert_msg, [{
+          text: '确定', onPress: () => {
+            this.goCancelDelivery(order?.id)
+          }
+        }, {'text': '取消'}]);
+      }else {
+        this.goCancelDelivery(order?.id)
+      }
     })
   }
 

@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
+  Animated,
   Dimensions,
   InteractionManager,
   PanResponder,
@@ -12,8 +13,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  Animated
+  View
 } from 'react-native';
 import HttpUtils from "../../pubilc/util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -558,6 +558,17 @@ class OrderInfoNew extends PureComponent {
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
+  goCancelDelivery = (order_id, ship_id = 0) => {
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+      {
+        order: {id: order_id,},
+        ship_id: ship_id,
+        onCancelled: () => {
+          this.fetchOrder();
+        }
+      });
+  }
+
   cancelDelivery = (orderId) => {
     const {global} = this.props;
     const {accessToken} = global;
@@ -565,22 +576,16 @@ class OrderInfoNew extends PureComponent {
     let params = {
       order_id: orderId
     }
-    let {order} = this.state;
     HttpUtils.get.bind(this.props)(api, params).then(res => {
-      Alert.alert('提示', res?.alert_msg, [{
-        text: '确定', onPress: () => {
-          this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-            {
-              order: order,
-              ship_id: 0,
-              onCancelled: () => {
-                this.fetchOrder()
-              }
-            });
-        }
-      }, {'text': '取消'}]);
-    }).catch(e => {
-      showError(`${e.reason}`)
+      if (tool.length(res?.alert_msg) > 0) {
+        Alert.alert('提示', res?.alert_msg, [{
+          text: '确定', onPress: () => {
+            this.goCancelDelivery(orderId)
+          }
+        }, {'text': '取消'}]);
+      } else {
+        this.goCancelDelivery(orderId)
+      }
     })
   }
 

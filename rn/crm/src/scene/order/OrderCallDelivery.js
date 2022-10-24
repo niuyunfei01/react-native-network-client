@@ -282,35 +282,39 @@ class OrderCallDelivery extends Component {
     this.props.navigation.navigate(route, params);
   }
 
+  goCancelDelivery = (order_id, ship_id = 0) => {
+    this.closeModal();
+    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+      {
+        order: {id: order_id,},
+        ship_id: ship_id,
+        onCancelled: () => {
+          this.fetchData();
+        }
+      });
+  }
+
+
   cancelDelivery = (ship_id) => {
     let {accessToken, order_id} = this.props.global
-    let order = {
-      id: order_id
-    }
     const api = `/v4/wsb_delivery/preCancelDelivery`;
     HttpUtils.get.bind(this.props)(api, {
       order_id: order_id,
       access_token: accessToken
     }).then(res => {
-      Alert.alert('提示', `${res.alert_msg}`, [
-        {
-          text: '确定',
-          onPress: () => {
-            this.closeModal();
-            this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-              {
-                order: order,
-                ship_id: ship_id,
-                onCancelled: () => {
-                  this.fetchData()
-                }
-              });
-          }
-        },
-        {
-          text: '取消'
-        }
-      ]);
+
+      if (tool.length(res?.alert_msg) > 0) {
+        Alert.alert('提示', `${res.alert_msg}`, [
+          {
+            text: '确定',
+            onPress: () => {
+              this.goCancelDelivery(order_id, ship_id)
+            }
+          },
+          {text: '取消'}]);
+      } else {
+        this.goCancelDelivery(order_id, ship_id)
+      }
     })
   }
 
