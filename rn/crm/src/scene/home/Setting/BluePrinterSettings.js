@@ -331,11 +331,11 @@ class BluePrinterSettings extends PureComponent {
                     keyExtractor={item => item.id}/>
         </View>}
         {(tool.length(this.state.list) === 0 && !this.state.isScanning) &&
-          <View style={{flex: 1, margin: 20}}>
-            <Text style={{textAlign: 'center'}}>
-              {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}
-            </Text>
-          </View>}
+        <View style={{flex: 1, margin: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}
+          </Text>
+        </View>}
 
         <View style={{backgroundColor: colors.f2}}>
           <If condition={this.state.askEnableBle}>

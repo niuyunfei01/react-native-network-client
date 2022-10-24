@@ -98,10 +98,10 @@ class BottomModal extends React.Component {
                   <Button buttonStyle={[styles.closeBtn, closeBtnStyle]}
                           titleStyle={[{color: colors.color666}, closeBtnTitleStyle]}
                           title={closeText}
-                          onPress={()=>{
-                            if(onPressClose){
+                          onPress={() => {
+                            if (onPressClose) {
                               onPressClose()
-                            }else {
+                            } else {
                               onClose()
                             }
                           }}/>

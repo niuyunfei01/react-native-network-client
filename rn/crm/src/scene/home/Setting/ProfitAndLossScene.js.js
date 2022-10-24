@@ -1,10 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity, FlatList, Image, Dimensions, InteractionManager
-} from 'react-native';
+import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -111,7 +106,7 @@ class ProfitAndLoss extends PureComponent {
     }).catch(error => showError(error.reason))
   }
 
-  formatArr (arr) {
+  formatArr(arr) {
     let map = new Map()
     for (let item of arr) {
       if (!map.has(item)) {
@@ -209,7 +204,10 @@ class ProfitAndLoss extends PureComponent {
     return (
       <View style={styles.header}>
         <ModalSelector skin="customer" data={head_store}
-                       onChange={option => this.setState({ext_store_id: option.key, selectTipStore: option.label}, () => this.get_profit_list())}>
+                       onChange={option => this.setState({
+                         ext_store_id: option.key,
+                         selectTipStore: option.label
+                       }, () => this.get_profit_list())}>
           <View style={styles.flexRow}>
             <Text style={styles.selectTipText}>
               {selectTipStore}
@@ -218,7 +216,10 @@ class ProfitAndLoss extends PureComponent {
           </View>
         </ModalSelector>
         <ModalSelector skin="customer" data={head_order}
-                       onChange={option => this.setState({order_type: option.key, selectTipOrder: option.label}, () => this.get_profit_list())}>
+                       onChange={option => this.setState({
+                         order_type: option.key,
+                         selectTipOrder: option.label
+                       }, () => this.get_profit_list())}>
           <View style={styles.flexRow}>
             <Text style={styles.selectTipText}>
               {selectTipOrder}
@@ -323,7 +324,8 @@ class ProfitAndLoss extends PureComponent {
   renderProfitItem = (info) => {
     let {item, index} = info
     return (
-      <TouchableOpacity style={[styles.orderInfoCard, {marginTop: 10}]} key={index} onPress={() => this.navigateToOrderInfoDetail(item?.id)}>
+      <TouchableOpacity style={[styles.orderInfoCard, {marginTop: 10}]} key={index}
+                        onPress={() => this.navigateToOrderInfoDetail(item?.id)}>
         <View style={styles.orderCardHeader}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <Image
@@ -345,7 +347,8 @@ class ProfitAndLoss extends PureComponent {
               </View>
               <View style={styles.flexRow1}>
                 <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台结算：</Text>
-                <Text style={styles.orderCardItemValue}>{numeral(item?.bill.total_income_from_platform / 100).format('0.00')}元 </Text>
+                <Text
+                  style={styles.orderCardItemValue}>{numeral(item?.bill.total_income_from_platform / 100).format('0.00')}元 </Text>
               </View>
             </View>
             <View style={{flex: 1}}>
@@ -383,8 +386,9 @@ class ProfitAndLoss extends PureComponent {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', height: 300}}>
         <If condition={!isLoading}>
-          <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
-                 style={{width: 100, height: 100, marginBottom: 20}}/>
+          <Image
+            source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E8%AE%A2%E5%8D%95%403x.png'}}
+            style={{width: 100, height: 100, marginBottom: 20}}/>
           <Text style={{fontSize: 18, color: colors.b2}}>
             暂无数据
           </Text>

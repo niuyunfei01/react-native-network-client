@@ -1,14 +1,5 @@
 import React, {Component} from "react"
-import {
-  Alert,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native"
+import {Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
@@ -25,9 +16,9 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Scanner from "../../../pubilc/component/Scanner";
 import {addGoods, scan, search} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import * as globalActions from "../../../reducers/global/globalActions";
 import {setSGCategory} from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import * as globalActions from "../../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   const {global} = state

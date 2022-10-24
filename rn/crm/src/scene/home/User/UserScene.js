@@ -157,7 +157,7 @@ class UserScene extends PureComponent {
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
-      tool.resetNavStack(navigation,Config.ROUTE_LOGIN,{})
+      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
     }));
   }
 

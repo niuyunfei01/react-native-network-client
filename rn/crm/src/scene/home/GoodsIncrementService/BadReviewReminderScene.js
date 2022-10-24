@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import DateTimePicker from "react-native-modal-datetime-picker";

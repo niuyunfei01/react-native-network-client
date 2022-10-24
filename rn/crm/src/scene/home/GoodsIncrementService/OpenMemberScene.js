@@ -11,7 +11,9 @@ import {
   autoReplyMember,
   badReminderMember,
   contactCustomerService,
-  notActivateMemberIcon, radioSelected, radioUnSelected
+  notActivateMemberIcon,
+  radioSelected,
+  radioUnSelected
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import AntDesign from "react-native-vector-icons/AntDesign";

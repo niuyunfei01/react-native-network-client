@@ -130,9 +130,8 @@ class LoginScene extends PureComponent {
           show_auth_modal: true
         })
       }
-      if (!mobile) {
-        // const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-        return ToastShort("请输入您的手机号", 0)
+      if (tool.length(mobile) < 10) {
+        return ToastShort("请输入正确的手机号", 0)
       }
       if (!verifyCode) {
         return ToastShort("请填写验证码", 0)
@@ -150,7 +149,7 @@ class LoginScene extends PureComponent {
     })
     dispatch(signIn(mobile, password, this.props, (ok, msg, uid) => {
       if (ok && uid) {
-        this.queryConfig(uid)
+        this.queryConfig()
         this.mixpanel.getDistinctId().then(res => {
           if (res !== uid) {
             mergeMixpanelId(res, uid);
@@ -166,38 +165,28 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  queryConfig = (uid) => {
+  queryConfig = () => {
     let {accessToken, currStoreId} = this.props.global;
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
-        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          console.log(cfg?.show_bottom_tab, 'cfg?.show_bottom_tab')
-          this.doneSelectStore(store_id, !binded, cfg?.show_bottom_tab);
-        }));
+        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
         ToastShort(err_msg, 0);
       }
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false, show_bottom_tab = false) => {
+  doneSelectStore = (storeId, show_bottom_tab = false) => {
     const {dispatch, navigation} = this.props;
     dispatch(setCurrentStore(storeId));
-
-    if (not_bind) {
-      navigation.navigate(Config.ROUTE_STORE_STATUS)
-      hideModal()
-      return;
-    }
 
     if (!show_bottom_tab) {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
 
-    navigation.navigate(this.next || Config.ROUTE_ORDER_NEW, this.nextParams)
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT
@@ -275,7 +264,11 @@ class LoginScene extends PureComponent {
             justifyContent: 'space-between'
           }}>
             <TextInput
-              onChangeText={(verifyCode) => this.setState({verifyCode})}
+              onChangeText={(verifyCode) => {
+                if (/^[A-Za-z0-9]*$/.test(verifyCode)) {
+                  this.setState({verifyCode})
+                }
+              }}
               value={verifyCode}
               placeholderTextColor={colors.color999}
               underlineColorAndroid='transparent'

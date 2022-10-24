@@ -521,12 +521,12 @@ class OrderTransferThird extends Component {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           refreshControl={
-          <RefreshControl
-            refreshing={this.state.isLoading}
-            onRefresh={() => this.fetchThirdWays()}
-            tintColor='gray'
-          />
-        } style={{flex: 1}}>
+            <RefreshControl
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.fetchThirdWays()}
+              tintColor='gray'
+            />
+          } style={{flex: 1}}>
           {this.renderContent()}
           {!tool.length(this.state.logistics) > 0 && !this.state.isLoading ?
             <EmptyData containerStyle={{marginBottom: 40}} placeholder={'无可用配送方式'}/> : this.renderList()}

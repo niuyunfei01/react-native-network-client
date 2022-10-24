@@ -211,7 +211,7 @@ class UserTagPopup extends React.Component {
           {tool.length(this.state.tagList) > 0 ? <ScrollView
               automaticallyAdjustContentInsets={false}
               showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false} >
+              showsVerticalScrollIndicator={false}>
               <List>
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>

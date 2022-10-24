@@ -505,17 +505,17 @@ class GoodsPriceDetails extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={{marginTop: pxToDp(7)}}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.query}
-                        onRefresh={() => {
-                          this.setState({query: true});
-                          showModal("加载中")
-                          this.getListStoresGoods();
-                        }}
-                        tintColor='gray'
-                      />
-                    }
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.query}
+              onRefresh={() => {
+                this.setState({query: true});
+                showModal("加载中")
+                this.getListStoresGoods();
+              }}
+              tintColor='gray'
+            />
+          }
         >
           {
             this.renderList()

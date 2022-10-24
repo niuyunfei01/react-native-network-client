@@ -9,7 +9,6 @@ import Entypo from "react-native-vector-icons/Entypo";
 import SearchStoreItem from "../../../pubilc/component/SearchStoreItem";
 import Loadmore from 'react-native-loadmore'
 import tool from "../../../pubilc/util/tool";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 
 function mapStateToProps(state) {

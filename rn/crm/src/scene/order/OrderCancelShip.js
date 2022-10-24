@@ -115,7 +115,7 @@ class OrderCancelShip extends Component {
   }
 
   render() {
-    const wayOpts = this.state.list.map((item, ) => {
+    const wayOpts = this.state.list.map((item,) => {
       return {label: item.info, value: item.id}
     });
     return <ScrollView

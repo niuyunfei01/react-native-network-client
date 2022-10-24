@@ -55,7 +55,7 @@ export const Styles = StyleSheet.create({
     color: colors.color333,
     lineHeight: 21
   },
-  memberTitleText:{
+  memberTitleText: {
     padding: 12,
     fontSize: 15,
     fontWeight: 'bold',

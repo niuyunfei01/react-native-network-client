@@ -1,13 +1,14 @@
 import React, {PureComponent} from 'react'
 import {
+  Appearance,
+  InteractionManager,
   PixelRatio,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  Appearance, InteractionManager
+  View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
@@ -281,7 +282,10 @@ class DistributionAnalysisScene extends PureComponent {
                 key={i}
                 style={[filterPlatform === info.id ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
                 onPress={() => this.setFilterPlatform(info.id)}>
-                <Text style={{fontSize: 12, color: filterPlatform === info.id ? colors.white : colors.fontBlack}}>{info.label}</Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: filterPlatform === info.id ? colors.white : colors.fontBlack
+                }}>{info.label}</Text>
               </TouchableOpacity>
             </For>
           </View>
@@ -292,7 +296,10 @@ class DistributionAnalysisScene extends PureComponent {
                 style={[dateStatus === info.value ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
                 onPress={() => this.setLeftDateStatus(info.value)}
               >
-                <Text style={{fontSize: 12, color: dateStatus === info.value ? colors.white : colors.fontBlack}}> {info.label} </Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: dateStatus === info.value ? colors.white : colors.fontBlack
+                }}> {info.label} </Text>
               </TouchableOpacity>
             </For>
           </View>
@@ -356,16 +363,25 @@ class DistributionAnalysisScene extends PureComponent {
                 style={[dateStatus === info.value ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
                 onPress={() => this.setRightDateStatus(info.value)}
               >
-                <Text style={{fontSize: 12, color: dateStatus === info.value ? colors.white : colors.fontBlack}}> {info.label} </Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: dateStatus === info.value ? colors.white : colors.fontBlack
+                }}> {info.label} </Text>
               </TouchableOpacity>
             </For>
           </View>
           <For of={profitAndLoss} each='item' index='idx'>
             <View style={styles.profitItemBox} key={idx}>
               <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name} </Text>
-              <View style={item?.default ? {flexDirection: "row", justifyContent: "space-between"} : {flexDirection: "column", alignItems: "center"}}>
+              <View style={item?.default ? {
+                flexDirection: "row",
+                justifyContent: "space-between"
+              } : {flexDirection: "column", alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleTextR2]}>毛利额/毛利率</Text>
-                <Text style={[item?.default ? {fontSize: pxToDp(28)} : {fontSize: pxToDp(38), fontWeight: "bold"}, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
+                <Text style={[item?.default ? {fontSize: pxToDp(28)} : {
+                  fontSize: pxToDp(38),
+                  fontWeight: "bold"
+                }, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
                   ¥{item.good_profit}/{item.good_profit_ratio}%
                 </Text>
               </View>
@@ -401,7 +417,9 @@ class DistributionAnalysisScene extends PureComponent {
                   </TouchableOpacity>
                 </View>
               </If>
-              <TouchableOpacity style={[styles.cardContent, {borderBottomWidth: 1, borderBottomColor: colors.e5, borderStyle: "solid"}]} onPress={() => this.navigateToProfitDetail(item)}>
+              <TouchableOpacity
+                style={[styles.cardContent, {borderBottomWidth: 1, borderBottomColor: colors.e5, borderStyle: "solid"}]}
+                onPress={() => this.navigateToProfitDetail(item)}>
                 <Text style={[styles.cell_rowTitleTextR3]}>盈亏明细 </Text>
                 <View style={styles.cardContent}>
                   <Text style={{color: colors.main_color}}>查看 </Text>
@@ -410,11 +428,11 @@ class DistributionAnalysisScene extends PureComponent {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10
+                  flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10
                 }}
                 onPress={() => this.downProfitInfo(idx)}
               >
-                <View />
+                <View/>
                 <View style={styles.cardContent}>
                   <Text style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`}</Text>
                   {item?.default_show ?
@@ -428,7 +446,7 @@ class DistributionAnalysisScene extends PureComponent {
           <Dialog visible={showRightDateModal} onRequestClose={() => this.onRequestClose()}>
             {this.showDatePicker()}
           </Dialog>
-      </View>
+        </View>
       )
     }
   }
@@ -719,7 +737,14 @@ const styles = StyleSheet.create({
     color: colors.main_color,
     fontWeight: '400'
   },
-  profitItemBox: {width: width * 0.94, marginLeft: width * 0.03, borderRadius: 6, marginTop: 10, backgroundColor: colors.white, padding: 10}
+  profitItemBox: {
+    width: width * 0.94,
+    marginLeft: width * 0.03,
+    borderRadius: 6,
+    marginTop: 10,
+    backgroundColor: colors.white,
+    padding: 10
+  }
 });
 
 const Styles = StyleSheet.create({

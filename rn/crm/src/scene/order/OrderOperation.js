@@ -309,6 +309,14 @@ class OrderOperation extends Component {
     this.setState({showPrinterChooser: false})
   }
 
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
   _doBluetoothPrint = () => {
     this._hidePrinterChooser()
     let {order} = this.state;
@@ -473,14 +481,6 @@ class OrderOperation extends Component {
       </View>
     )
   }
-
-  printAction = [
-    {
-      type: 'default',
-      label: '取消',
-      onPress: this._hidePrinterChooser
-    }
-  ]
 
   _cloudPrinterSN = () => {
     const {order} = this.state

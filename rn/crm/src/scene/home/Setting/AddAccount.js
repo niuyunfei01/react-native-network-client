@@ -1,12 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text, TextInput,
-  View
-} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../../pubilc/styles/colors";
@@ -69,7 +63,14 @@ class AddAccount extends PureComponent {
 
   addWorker = () => {
     const {currStoreId, accessToken, vendor_id} = this.props.global;
-    let {worker_role_grade_value, worker_store_id_belong_value, worker_name, worker_account, worker_id, worker_password} = this.state
+    let {
+      worker_role_grade_value,
+      worker_store_id_belong_value,
+      worker_name,
+      worker_account,
+      worker_id,
+      worker_password
+    } = this.state
     if (worker_role_grade_value < 1) {
       ToastLong('请选择账号权限')
       return
@@ -83,7 +84,7 @@ class AddAccount extends PureComponent {
       return
     }
     if (worker_account === '') {
-      ToastLong('请填写登陆账号')
+      ToastLong('请填写登录账号')
       return
     }
     ToastShort('提交中')
@@ -127,7 +128,15 @@ class AddAccount extends PureComponent {
   }
 
   renderEditInfo = () => {
-    let {workerRoles, worker_role_grade, worker_store_id_belong, worker_name, worker_account, storeList, roleStoreList} = this.state
+    let {
+      workerRoles,
+      worker_role_grade,
+      worker_store_id_belong,
+      worker_name,
+      worker_account,
+      storeList,
+      roleStoreList
+    } = this.state
     return (
       <View style={styles.InfoBox}>
         <View style={styles.item_body}>
@@ -170,7 +179,8 @@ class AddAccount extends PureComponent {
                 skin="customer"
                 defaultKey={-999}
               >
-                <Text style={[styles.row_desc, {color: worker_store_id_belong === '' ? colors.color999 : colors.color333}]}>
+                <Text
+                  style={[styles.row_desc, {color: worker_store_id_belong === '' ? colors.color999 : colors.color333}]}>
                   {worker_store_id_belong || '请选择归属门店'}
                 </Text>
               </ModalSelector>
@@ -190,21 +200,21 @@ class AddAccount extends PureComponent {
             />
           </View>
           <View style={[styles.item_row, styles.borderTop]}>
-            <Text style={styles.row_label}>登陆账号 </Text>
+            <Text style={styles.row_label}>登录账号 </Text>
             <TextInput
               onChangeText={code => this.setState({worker_account: code})}
               value={worker_account}
               maxLength={11}
               keyboardType={'numeric'}
               style={{textAlign: 'right', fontSize: 14, marginRight: pxToDp(5)}}
-              placeholder="请填写登陆账号"
+              placeholder="请填写登录账号"
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent"
             />
           </View>
           <View style={[styles.item_row, styles.borderTop]}>
             <Text style={styles.row_label}>账号密码 </Text>
-            <Text style={[styles.row_desc, {color: colors.color999}]}>暂不支持，请使用验证码登陆 </Text>
+            <Text style={[styles.row_desc, {color: colors.color999}]}>暂不支持，请使用验证码登录 </Text>
           </View>
         </View>
       </View>

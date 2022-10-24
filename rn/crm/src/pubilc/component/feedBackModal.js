@@ -2,11 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
-import {Button} from "react-native-elements";
+import {Button, CheckBox} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../util/http";
 import pxToDp from "../util/pxToDp";
-import { CheckBox } from 'react-native-elements';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {TextArea} from "../../weui";
 
@@ -71,7 +70,7 @@ class FeedBackModal extends React.Component {
     })
   }
 
-  render =  () => {
+  render = () => {
     let {showAdvicesVisible, checked, suggest} = this.state
     return <Modal hardwareAccelerated={true}
                   onRequestClose={() => this.closeRemindModal()}
@@ -95,7 +94,8 @@ class FeedBackModal extends React.Component {
               <For each="info" of={options} index="key">
                 <TouchableOpacity style={styles.TouchBox} onPress={() => this.setItem(info.key)}>
                   <Text>{info.label} </Text>
-                  <CheckBox center type={'material'} size={16} checkedIcon={'dot-circle-o'} checkedColor={colors.main_color}
+                  <CheckBox center type={'material'} size={16} checkedIcon={'dot-circle-o'}
+                            checkedColor={colors.main_color}
                             uncheckedIcon={'circle-o'} checked={checked === info.key}
                             onPress={() => this.setItem(info.key)}/>
                 </TouchableOpacity>

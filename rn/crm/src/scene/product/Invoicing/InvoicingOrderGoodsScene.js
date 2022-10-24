@@ -808,12 +808,12 @@ class InvoicingOrderGoodsScene extends Component {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.reloadData()}
-            tintColor='gray'
-          />
-        }>
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.reloadData()}
+              tintColor='gray'
+            />
+          }>
           {this.tab()}
           {this.renderItems()}
         </ScrollView>

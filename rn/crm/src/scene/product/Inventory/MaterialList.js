@@ -25,6 +25,7 @@ import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
 // import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {

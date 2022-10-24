@@ -496,7 +496,7 @@ function throttle(fn, wait) {
   }
 }
 
-function getCenterLonLat (oneLon, oneLat, twoLon, twoLat)  {
+function getCenterLonLat(oneLon, oneLat, twoLon, twoLat) {
   //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
   let aLon = 0, aLat = 0;
   let bLon = Number(oneLon) - Number(twoLon);
@@ -515,6 +515,12 @@ function getCenterLonLat (oneLon, oneLat, twoLon, twoLat)  {
   return {aLon, aLat};
 }
 
+function jbbsubstr(str = '', height = 0, start = 0, default_str = '') {
+  if (typeof str !== 'string' && typeof str !== 'number') {
+    return default_str;
+  }
+  return length((str || default_str)) > height ? height > 0 ? str.substring(start, height - 1) + '...' : '...' + str.substr(height) : (str || default_str)
+}
 
 export default {
   objectMap,
@@ -549,4 +555,5 @@ export default {
   debounces,
   throttle,
   getCenterLonLat,
+  jbbsubstr
 };

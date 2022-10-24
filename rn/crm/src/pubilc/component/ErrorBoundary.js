@@ -15,6 +15,7 @@ class ErrorBoundary extends React.Component {
     device: PropTypes.object,
     children: PropTypes.object,
   }
+
   constructor(props) {
     super(props)
     this.state = {hasError: false, error: '', errorInfo: ''}

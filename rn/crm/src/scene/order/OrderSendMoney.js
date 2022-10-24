@@ -15,7 +15,7 @@ import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {global} = state;
-  return { global}
+  return {global}
 }
 
 function mapDispatchToProps(dispatch) {

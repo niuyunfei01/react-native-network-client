@@ -177,16 +177,16 @@ class StoreClose extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={[styles.container]}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => this.fetchData()}
-                        tintColor='gray'
-                      />
-                    }
-                    automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.fetchData()}
+              tintColor='gray'
+            />
+          }
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
           <For index="index" each="element" of={timeOptions}>
             <Cells style={{

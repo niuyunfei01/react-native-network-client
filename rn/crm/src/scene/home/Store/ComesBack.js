@@ -66,12 +66,12 @@ class ComesBack extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={() => this.fetchData()}
-            tintColor="gray"
-          />
-        }>
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={() => this.fetchData()}
+              tintColor="gray"
+            />
+          }>
           <View
             style={{flexDirection: 'row', backgroundColor: colors.white, paddingHorizontal: 18, paddingVertical: 9}}>
             <FontAwesome

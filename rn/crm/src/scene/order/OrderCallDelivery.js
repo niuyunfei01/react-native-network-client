@@ -864,7 +864,7 @@ class OrderCallDelivery extends Component {
           </View>
           <View style={{marginLeft: 9}}>
             <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
-              {tool.length((wm_address)) > 18 ? wm_address.substring(0, 17) + '...' : wm_address}
+              {tool.jbbsubstr(wm_address, 18)}
             </Text>
             <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>{wm_user_name}&nbsp;{wm_mobile} </Text>
           </View>

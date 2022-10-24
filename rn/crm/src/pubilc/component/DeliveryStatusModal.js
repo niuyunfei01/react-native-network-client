@@ -147,12 +147,6 @@ const styles = StyleSheet.create({
 })
 
 class deliveryStatusModal extends React.Component {
-  constructor(props) {
-    super(props);
-    this.mixpanel = MixpanelInstance;
-    this.mixpanel.track('配送调度页')
-  }
-
   static propTypes = {
     order_id: PropTypes.oneOfType([
       PropTypes.number,
@@ -169,7 +163,6 @@ class deliveryStatusModal extends React.Component {
     fetchData: PropTypes.func,
     openAddTipModal: PropTypes.func,
   }
-
   state = {
     show_modal: false,
     order_platform_desc: '',
@@ -181,6 +174,11 @@ class deliveryStatusModal extends React.Component {
     delivery_list: []
   }
 
+  constructor(props) {
+    super(props);
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.track('配送调度页')
+  }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {accessToken, order_id, show_modal} = nextProps;

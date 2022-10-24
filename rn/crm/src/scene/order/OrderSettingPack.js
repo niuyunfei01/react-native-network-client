@@ -14,7 +14,7 @@ import HttpUtils from "../../pubilc/util/http";
 import pxToDp from "../../pubilc/util/pxToDp";
 import Config from "../../pubilc/common/config";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-import * as tool from "../../pubilc/util/tool";
+import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 import Clipboard from '@react-native-community/clipboard'
@@ -69,7 +69,8 @@ class OrderSettingScene extends Component {
       weight_input_value: 1,
       weight_min: 1,
       weight_max: 20,
-      goods_price: 20,
+      goods_price: 0,
+      goods_price_input_value: 20,
       goods_price_value: '',
       remark: '',
       showDateModal: false,
@@ -236,77 +237,79 @@ class OrderSettingScene extends Component {
 
 
   orderToSave = (status) => {
-    let {
-      store_id,
-      name,
-      mobile,
-      mobile_suffix,
-      loc_lng,
-      loc_lat,
-      address,
-      street_block,
-      weight,
-      goods_price,
-      expect_time,
-      remark,
-      is_right_once,
-      isSaveToBook,
-      accessToken,
-      address_id
-    } = this.state
+    tool.debounces(() => {
+      let {
+        store_id,
+        name,
+        mobile,
+        mobile_suffix,
+        loc_lng,
+        loc_lat,
+        address,
+        street_block,
+        weight,
+        goods_price,
+        expect_time,
+        remark,
+        is_right_once,
+        isSaveToBook,
+        accessToken,
+        address_id
+      } = this.state
 
-    if (!loc_lng && !loc_lng) {
-      ToastShort('请先选择定位', 0);
-      return this.goSelectAddress()
-    }
-    if (Number(goods_price) <= 0) {
-      return ToastShort('请选择物品价值');
-    }
-
-    if (Number(weight) <= 0) {
-      return ToastShort('请选择物品重量');
-    }
-
-    if (isSaveToBook) {
-      this.updateAddressBook()
-    }
-
-    let params = {
-      store_id,
-      receiver: name,
-      mobile,
-      mobile_suffix,
-      address: address + street_block,
-      loc_lng,
-      loc_lat,
-      is_right_once,
-      expect_time,
-      remark,
-      address_id,
-      weight,
-      money: goods_price,
-    }
-
-    showModal('正在保存订单，请稍等');
-    const api = `/api/order_manual_create?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(api, params).then(res => {
-      hideModal()
-      if (status === 1) {
-        showSuccess("保存成功！")
-        this.mixpanel.track("V4手动下单_保存订单");
-        this.timeOutBack(300);
-      } else {
-        this.mixpanel.track("V4手动下单_立即下单");
-        if (res?.WaimaiOrder?.id) {
-          this.timeOutBack(300, () => {
-            this.onCallThirdShips(res.WaimaiOrder.id, store_id)
-          });
-        } else {
-          showError('保存失败请重试！')
-        }
+      if (!loc_lng && !loc_lng) {
+        ToastShort('请先选择定位', 0);
+        return this.goSelectAddress()
       }
-    }).catch(() => {
-      hideModal()
+      if (Number(goods_price) <= 0) {
+        return ToastShort('请选择物品价值');
+      }
+
+      if (Number(weight) <= 0) {
+        return ToastShort('请选择物品重量');
+      }
+
+      if (isSaveToBook) {
+        this.updateAddressBook()
+      }
+
+      let params = {
+        store_id,
+        receiver: name,
+        mobile,
+        mobile_suffix,
+        address: address + street_block,
+        loc_lng,
+        loc_lat,
+        is_right_once,
+        expect_time,
+        remark,
+        address_id,
+        weight,
+        money: goods_price,
+      }
+
+      showModal('正在保存订单，请稍等');
+      const api = `/api/order_manual_create?access_token=${accessToken}`;
+      HttpUtils.post.bind(this.props)(api, params).then(res => {
+        hideModal()
+        if (status === 1) {
+          showSuccess("保存成功！")
+          this.mixpanel.track("V4手动下单_保存订单");
+          this.timeOutBack(300);
+        } else {
+          this.mixpanel.track("V4手动下单_立即下单");
+          if (res?.WaimaiOrder?.id) {
+            this.timeOutBack(300, () => {
+              this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+            });
+          } else {
+            showError('保存失败请重试！')
+          }
+        }
+      }).catch(() => {
+        hideModal()
+      })
     })
   }
 
@@ -410,13 +413,13 @@ class OrderSettingScene extends Component {
               }}>
               <View>
                 <Text style={{fontSize: 16, color: colors.color333, fontWeight: '500'}}>
-                  {tool.length((store_name || '')) > 12 ? store_name.substring(0, 11) + '...' : store_name} </Text>
+                  {tool.jbbsubstr(store_name, 12)} </Text>
                 <View style={{marginTop: 6, flexDirection: 'row', alignItems: 'center'}}>
                   <Entypo style={{fontSize: 16, color: colors.color666}} name={'location-pin'}/>
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}>{tool.length((store_address || '')) > 18 ? '...' + store_address.substr(-18) : store_address}  </Text>
+                  }}> {tool.jbbsubstr(store_address, -18)}</Text>
                 </View>
               </View>
               <If condition={wmStoreLength >= 1}>
@@ -795,12 +798,12 @@ class OrderSettingScene extends Component {
   }
   setGoodsPirce = (price) => {
     this.setState({
-      goods_price: price
+      goods_price_input_value: price
     })
   }
 
   renderGoodsPriceModal = () => {
-    let {showGoodsPriceModal, goods_price_value, goods_price} = this.state;
+    let {showGoodsPriceModal, goods_price_value, goods_price_input_value, goods_price} = this.state;
     return (
       <JbbModal visible={showGoodsPriceModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -824,10 +827,10 @@ class OrderSettingScene extends Component {
               <For index='index' each='info' of={goods_price_list}>
                 <Text key={index} style={{
                   borderWidth: 0.5,
-                  borderColor: Number(info.value) === goods_price ? colors.main_color : colors.colorDDD,
+                  borderColor: Number(info.value) === goods_price_input_value ? colors.main_color : colors.colorDDD,
                   fontSize: 14,
-                  color: Number(info.value) === goods_price ? colors.main_color : colors.color333,
-                  backgroundColor: Number(info.value) === goods_price ? '#DFFAE2' : colors.white,
+                  color: Number(info.value) === goods_price_input_value ? colors.main_color : colors.color333,
+                  backgroundColor: Number(info.value) === goods_price_input_value ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
                   height: 36,
                   textAlign: 'center',
@@ -839,7 +842,7 @@ class OrderSettingScene extends Component {
               </For>
               <TextInput
                 onChangeText={(goods_price_value) => {
-                  this.setState({goods_price_value: Number(goods_price_value), goods_price: 0})
+                  this.setState({goods_price_value: Number(goods_price_value), goods_price_input_value: 0})
                 }}
                 defaultValue={`${goods_price_value}`}
                 value={`${goods_price_value}`}
@@ -862,7 +865,14 @@ class OrderSettingScene extends Component {
             </View>
             <Button title={'确 定'}
                     onPress={() => {
-                      if (goods_price === 0) this.setGoodsPirce(goods_price_value)
+
+                      if (goods_price_value <= 0 && goods_price_input_value <= 0) {
+                        return ToastShort('请选择物品价值')
+                      }
+                      let goods_price = goods_price_input_value === 0 ? goods_price_value : goods_price_input_value;
+                      this.setState({
+                        goods_price,
+                      })
                       this.closeModal()
                     }}
                     buttonStyle={[{
@@ -904,7 +914,7 @@ class OrderSettingScene extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 14
-                }}>{tool.length((address || '')) > 10 ? address.substring(0, 9) + '...' : address} </Text>
+                }}>{tool.jbbsubstr(address, 9)} </Text>
               </View>
               <View style={{flexDirection: "row", alignItems: 'center', marginTop: 10}}>
                 <Text style={{color: colors.color999, fontSize: 14, width: 80, textAlign: 'right'}}>门牌号： </Text>

@@ -166,7 +166,8 @@ class GoodsAdjustRemind extends PureComponent {
         }]}
         title={'修改价格'}
         titleStyle={{textAlign: 'center'}}
-        onRequestClose={() => {}}
+        onRequestClose={() => {
+        }}
       >
         <View>
           <Text style={styles.dialogTopText}>优势品不高于线下的价格的9折，采购他人的加价不超过10%</Text>

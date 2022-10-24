@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingBottom: 4
   },
-  selectContent:{
+  selectContent: {
     width: '70%',
     justifyContent: 'center',
     borderRadius: 4,

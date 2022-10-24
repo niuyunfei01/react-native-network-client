@@ -115,7 +115,7 @@ class OrderInfoNew extends PureComponent {
       isFetching: false,
       order: order_json_str,
       actionSheet: [],
-      isShowMap: true,
+      isShowMap: false,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,
@@ -457,6 +457,14 @@ class OrderInfoNew extends PureComponent {
     this.setState({showPrinterChooser: false})
   }
 
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
   closeModal = () => {
     this.setState({
       modalTip: false
@@ -505,14 +513,6 @@ class OrderInfoNew extends PureComponent {
         break
     }
   }
-
-  printAction = [
-    {
-      type: 'default',
-      label: '取消',
-      onPress: this._hidePrinterChooser
-    }
-  ]
 
   showQrcodeFlag = () => {
     this.setState({
@@ -999,7 +999,7 @@ class OrderInfoNew extends PureComponent {
                   />
                   <View style={styles.productItem}>
                     <Text style={styles.productItemName}>
-                      {tool.length((info?.product_name || '')) > 16 ? info?.product_name.substring(0, 15) + '...' : info?.product_name}
+                      {tool.length(info?.product_name, 16)}
                     </Text>
                     <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     <View style={styles.productItemPrice}>

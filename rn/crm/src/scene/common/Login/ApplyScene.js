@@ -10,8 +10,6 @@ import {
   logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
-
-import native from "../../../pubilc/util/native";
 import stringEx from "../../../pubilc/util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from '../../../pubilc/util/pxToDp';
@@ -23,7 +21,7 @@ import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
@@ -198,7 +196,7 @@ class ApplyScene extends PureComponent {
       this.setState({doingApply: false})
       if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");
-        this.queryConfig(res?.user?.user_id, res?.user?.token?.access_token, res?.OfflineStore?.id)
+        this.queryConfig(res?.user?.token?.access_token, res?.OfflineStore?.id)
         this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
         this.mixpanel.getDistinctId().then(mixpanel_id => {
           if (mixpanel_id !== res.user.user_id) {
@@ -213,7 +211,7 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (uid, accessToken, currStoreId) => {
+  queryConfig = (accessToken, currStoreId) => {
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
@@ -232,7 +230,6 @@ class ApplyScene extends PureComponent {
       hideModal()
       return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
-    navigation.navigate(this.next || Config.ROUTE_ORDER_NEW, this.nextParams)
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT
@@ -241,8 +238,9 @@ class ApplyScene extends PureComponent {
   }
 
   setAddress(res) {
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, tool.length(res.location));
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    let lat = res.location.split(",")[1];
+    let Lng = res.location.split(",")[0];
+
     let states = {
       location_long: Lng,
       location_lat: lat,

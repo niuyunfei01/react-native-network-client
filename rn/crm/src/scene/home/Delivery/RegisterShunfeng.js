@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, Image, ImageBackground, Pressable, StyleSheet, Text, TextInput, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {ActionSheet} from "../../../weui";

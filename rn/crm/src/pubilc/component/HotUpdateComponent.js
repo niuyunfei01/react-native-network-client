@@ -147,6 +147,10 @@ const Progress = (downloadFileProgress = 0) => {
 
 export default class HotUpdateComponent extends PureComponent {
 
+  static propTypes = {
+    currStoreId: PropTypes.string,
+    accessToken: PropTypes.string,
+  }
   state = {
     showNewVersionVisible: false,
     newVersionInfo: {},
@@ -154,12 +158,6 @@ export default class HotUpdateComponent extends PureComponent {
     downloadFileFinish: false,
     errorMsg: ''
   }
-
-  static propTypes = {
-    currStoreId: PropTypes.string,
-    accessToken: PropTypes.string,
-  }
-
 
   constructor(props) {
     super(props);
@@ -173,7 +171,7 @@ export default class HotUpdateComponent extends PureComponent {
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
     let {accessToken, currStoreId} = this.props;
-    const version  = Cts.BUNDLE_VERSION;
+    const version = Cts.BUNDLE_VERSION;
     const params = {
       store_id: currStoreId,
       accessToken: accessToken,

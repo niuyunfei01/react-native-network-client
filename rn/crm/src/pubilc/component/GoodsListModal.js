@@ -122,7 +122,7 @@ class GoodsListModal extends React.Component {
                 <View style={{height: 60, flex: 1}}>
                   <Text style={Styles.ContentText}>
                     <If condition={item.shelf_no}>{item.shelf_no} </If>
-                    {tool.length((item.name || '')) > 21 ? item.name.substring(0, 20) + '...' : (item.name || '')}
+                    {tool.jbbsubstr(item.name, 21)}
                   </Text>
                   <Text style={Styles.productIdText}>
                     (#{item.product_id}

@@ -36,16 +36,6 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class OrderAddressBook extends Component {
 
   static propTypes = {
@@ -128,7 +118,6 @@ class OrderAddressBook extends Component {
     let {headerShown, isRefreshing, addressBook} = this.state
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
@@ -241,7 +230,7 @@ class OrderAddressBook extends Component {
                   marginLeft: info?.is_often_use ? 4 : 0,
                   fontWeight: '500'
                   // eslint-disable-next-line no-undef
-                }}>{tool.length((info.address + info.street_block || '')) > 18 ? (info.address + info.street_block).substring(0, 17) + '...' : (info.address + info.street_block)} </Text>
+                }}>{tool.length(info.address + info.street_block, 18)} </Text>
               </View>
               <View style={{flexDirection: 'row', marginTop: 10}}>
                 {/* eslint-disable-next-line no-undef */}
