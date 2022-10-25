@@ -735,7 +735,7 @@ class OrderListScene extends Component {
   }
 
   renderHead = () => {
-    let {store_info} = this.props.global;
+    let {store_info, only_one_store} = this.props.global;
     return (
       <View style={{
         flexDirection: 'row',
@@ -751,6 +751,9 @@ class OrderListScene extends Component {
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {
+          if (only_one_store) {
+            return;
+          }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
@@ -759,6 +762,7 @@ class OrderListScene extends Component {
           </Text>
           <SvgXml xml={this_down()}/>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
