@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Modal,
   Platform,
   RefreshControl,
   ScrollView,
@@ -34,7 +35,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 
-let width = Dimensions.get("window").width;
+let {height, width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   return {
@@ -1072,75 +1073,86 @@ class OrderCallDelivery extends Component {
   renderWorkerDeliveryModal = () => {
     let {show_worker_delivey_modal, worker_list, worker_delivery_id} = this.state;
     return (
-      <JbbModal
-        visible={show_worker_delivey_modal}
-        HighlightStyle={{padding: 0}}
-        modalStyle={{padding: 20}}
-        onClose={() => {
-          this.setState({
-            worker_delivery_id: 0
-          })
-          this.closeModal()
-        }}
-        modal_type={'bottom'}>
-        <View style={{marginBottom: 30,}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
-              自配信息
-            </Text>
+      <Modal hardwareAccelerated={true}
+             onRequestClose={this.closeModal}
+             maskClosable transparent={true}
+             animationType="fade"
+             visible={show_worker_delivey_modal}>
+        <View style={[{
+          backgroundColor: 'rgba(0,0,0,0.25)',
+          flex: 1
+        }]}>
+          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
+          <View style={[{
+            backgroundColor: colors.white,
+            maxHeight: height * 0.8,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            padding: 20
+          }]}>
 
+            <View style={{marginBottom: 30,}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
+                <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+                  自配信息
+                </Text>
+                <SvgXml onPress={() => {
+                  this.setState({
+                    worker_delivery_id: 0
+                  })
+                  this.closeModal()
+                }} xml={cross_icon()} width={18} height={18}/>
+              </View>
 
-            <SvgXml onPress={() => {
-              this.setState({
-                worker_delivery_id: 0
-              })
-              this.closeModal()
-            }} xml={cross_icon()} width={18} height={18}/>
-
-          </View>
-          <If condition={tool.length(worker_list) > 0}>
-            <For each='worker' index='idx' of={worker_list}>
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  worker_delivery_id: worker?.id,
-                  worker_name: worker?.label,
-                  worker_mobile: worker?.mobile,
-                })
-              }} key={idx} style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingVertical: 14,
-                borderColor: colors.colorDDD,
-                borderBottomWidth: 0.2
-              }}>
-                <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                  <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.label} </Text>
-                  <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
-                </View>
-                <If condition={worker_delivery_id === worker?.id}>
-                  <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+              <ScrollView automaticallyAdjustContentInsets={false}
+                          showsHorizontalScrollIndicator={false}
+                          showsVerticalScrollIndicator={false}
+                          style={{maxHeight: 350}}>
+                <If condition={tool.length(worker_list) > 0}>
+                  <For each='worker' index='idx' of={worker_list}>
+                    <TouchableOpacity onPress={() => {
+                      this.setState({
+                        worker_delivery_id: worker?.id,
+                        worker_name: worker?.label,
+                        worker_mobile: worker?.mobile,
+                      })
+                    }} key={idx} style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingVertical: 14,
+                      borderColor: colors.colorDDD,
+                      borderBottomWidth: 0.2
+                    }}>
+                      <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                        <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.label} </Text>
+                        <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
+                      </View>
+                      <If condition={worker_delivery_id === worker?.id}>
+                        <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+                      </If>
+                    </TouchableOpacity>
+                  </For>
                 </If>
-              </TouchableOpacity>
-            </For>
-          </If>
-
-          <Button title={'确 定'}
-                  onPress={() => {
-                    this.onSelectDeliveyAll(1, 1)
-                    this.onSelectDeliveyAll(2, 1)
-                    this.closeModal()
-                  }}
-                  buttonStyle={[{
-                    marginTop: 20,
-                    backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
-                    borderRadius: 24,
-                    marginHorizontal: 10,
-                    length: 42,
-                  }]}
-                  titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+              </ScrollView>
+              <Button title={'确 定'}
+                      onPress={() => {
+                        this.onSelectDeliveyAll(1, 1)
+                        this.onSelectDeliveyAll(2, 1)
+                        this.closeModal()
+                      }}
+                      buttonStyle={[{
+                        marginTop: 20,
+                        backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
+                        borderRadius: 24,
+                        marginHorizontal: 10,
+                        length: 42,
+                      }]}
+                      titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+            </View>
+          </View>
         </View>
-      </JbbModal>
+      </Modal>
     )
   }
 

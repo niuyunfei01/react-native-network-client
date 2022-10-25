@@ -326,13 +326,10 @@ class deliveryStatusModal extends React.Component {
                     <Text style={styles.f14}>#{platform_dayId} </Text>
                   </View>
                   <View style={[styles.flexR, {marginTop: 5}]}>
-                    {/*<Text style={styles.f12}>预计送达时间 </Text>*/}
                     <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-
                 <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
-
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}
