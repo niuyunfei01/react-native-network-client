@@ -259,7 +259,7 @@ class OpenMemberScene extends PureComponent {
             <SvgXml xml={notActivateMemberIcon(19, 17)}/>
           </View>
           <Text style={styles.memberStatus}>
-            {!vip_info.vip_invalid ? `${vip_info.expire_date}到期` : vip_info.exist_vip ? '会员已到期' : '未开通'}
+            {vip_info.exist_vip ? `${vip_info.expire_date}到期` : vip_info.vip_invalid ? '会员已到期' : '未开通'}
           </Text>
         </View>
         <View style={styles.memberItemWrap}>
