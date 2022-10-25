@@ -629,6 +629,15 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
+  filterDistance = (val = 0) => {
+    let flag = val / 1000
+    if (flag >= 1) {
+      return `${numeral(val / 1000).format('0.0')}公里`
+    } else {
+      return `${val}米`
+    }
+  }
+
   renderMap = () => {
     let {
       loc_lat,
@@ -684,12 +693,12 @@ class OrderInfoNew extends PureComponent {
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
-                      骑手距离顾客{numeral(ship_distance_destination / 1000).format('0.00')}公里
+                      骑手距离顾客{this.filterDistance(ship_distance_destination)}
                     </Text>
                   </If>
                   <If condition={ship_distance_store > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
-                      骑手距离商家{numeral(ship_distance_store / 1000).format('0.00')}公里
+                      骑手距离商家{this.filterDistance(ship_distance_store)}
                     </Text>
                   </If>
                 </View>
@@ -713,7 +722,7 @@ class OrderInfoNew extends PureComponent {
               <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
                 <View style={styles.mapBox}>
                   <Text style={{color: colors.color333, fontSize: 12}}>
-                    距门店{numeral(dada_distance / 1000).format('0.00')}公里
+                    距门店{this.filterDistance(dada_distance)}
                   </Text>
                 </View>
               </If>
@@ -1006,8 +1015,8 @@ class OrderInfoNew extends PureComponent {
                     resizeMode={FastImage.resizeMode.contain}
                   />
                   <View style={styles.productItem}>
-                    <If condition={info?.shelf_no}>{info?.shelf_no} </If>
                     <Text style={styles.productItemName}>
+                      <If condition={info?.shelf_no}>{info?.shelf_no} </If>
                       {info?.product_name}
                     </Text>
                     <If condition={info?.product_id > 0}>
