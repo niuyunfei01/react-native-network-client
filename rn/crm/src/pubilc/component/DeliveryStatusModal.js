@@ -256,10 +256,11 @@ class deliveryStatusModal extends React.Component {
     });
   }
 
+
   goCancelDelivery = (ship_id = 0) => {
     let {order_id, fetchData} = this.props;
     this.closeModal();
-    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+    this.props.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
       {
         order: {id: order_id},
         ship_id: ship_id,
@@ -293,7 +294,7 @@ class deliveryStatusModal extends React.Component {
   }
 
   complain = () => {
-    this.onPress(Config.ROUTE_COMPLAIN, {id: this.state.complaint_rider_delivery_id})
+    this.props.onPress(Config.ROUTE_COMPLAIN, {id: this.state.complaint_rider_delivery_id})
   }
 
   render = () => {
