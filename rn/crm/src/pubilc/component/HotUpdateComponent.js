@@ -148,7 +148,10 @@ const Progress = (downloadFileProgress = 0) => {
 export default class HotUpdateComponent extends PureComponent {
 
   static propTypes = {
-    currStoreId: PropTypes.string,
+    currStoreId: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     accessToken: PropTypes.string,
   }
   state = {

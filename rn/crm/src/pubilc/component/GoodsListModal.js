@@ -20,7 +20,10 @@ class GoodsListModal extends React.Component {
       PropTypes.number,
       PropTypes.string
     ]),
-    currStoreId: PropTypes.string,
+    currStoreId: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     setState: PropTypes.func,
     onPress: PropTypes.func,
     show_goods_list: PropTypes.bool,
