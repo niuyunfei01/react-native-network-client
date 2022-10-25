@@ -1,9 +1,18 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  InteractionManager,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
@@ -50,6 +59,7 @@ class PermissionToIdentify extends PureComponent {
   }
 
   get_wsb_workers = () => {
+    showModal('加载中')
     const {currStoreId, accessToken, vendor_id} = this.props.global;
     let {page, pageSize} = this.state.query
     const api = `/v4/wsb_worker/workerList?access_token=${accessToken}`
@@ -60,6 +70,7 @@ class PermissionToIdentify extends PureComponent {
       page: page,
       page_size: pageSize
     }).then(worker_info => {
+      hideModal()
       let workers = this.state.workerList.concat(worker_info?.lists)
       this.setState({
         workerList: workers,
@@ -189,7 +200,7 @@ class PermissionToIdentify extends PureComponent {
   render() {
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.get_wsb_workers}/>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh}/>
         {this.renderWorkerList()}
         {this.renderBtn()}
       </View>

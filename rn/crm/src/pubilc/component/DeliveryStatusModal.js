@@ -256,10 +256,11 @@ class deliveryStatusModal extends React.Component {
     });
   }
 
+
   goCancelDelivery = (ship_id = 0) => {
     let {order_id, fetchData} = this.props;
     this.closeModal();
-    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
+    this.props.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
       {
         order: {id: order_id},
         ship_id: ship_id,
@@ -293,7 +294,8 @@ class deliveryStatusModal extends React.Component {
   }
 
   complain = () => {
-    this.onPress(Config.ROUTE_COMPLAIN, {id: this.state.complaint_rider_delivery_id})
+    this.closeModal()
+    this.props.onPress(Config.ROUTE_COMPLAIN, {id: this.state.complaint_rider_delivery_id})
   }
 
   render = () => {
@@ -326,13 +328,10 @@ class deliveryStatusModal extends React.Component {
                     <Text style={styles.f14}>#{platform_dayId} </Text>
                   </View>
                   <View style={[styles.flexR, {marginTop: 5}]}>
-                    {/*<Text style={styles.f12}>预计送达时间 </Text>*/}
                     <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-
                 <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
-
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}

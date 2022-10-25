@@ -24,7 +24,10 @@ const initState = {
 class RemindModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
-    currStoreId: PropTypes.string,
+    currStoreId: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     onPress: PropTypes.func,
     dispatch: PropTypes.func,
   }

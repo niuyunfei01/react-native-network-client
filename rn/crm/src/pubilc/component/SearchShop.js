@@ -128,7 +128,7 @@ class SearchShop extends Component {
         let header = 'https://restapi.amap.com/v5/place/around?parameters?'
         const params = {
           location: shopmsg?.location,
-          keywords: shopmsg?.name,
+          keywords: shopmsg?.name ? shopmsg?.name: shopmsg?.address,
           key: '85e66c49898d2118cc7805f484243909',
         }
         Object.keys(params).forEach(key => {
@@ -229,7 +229,7 @@ class SearchShop extends Component {
             >
               <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
                 <Entypo name={'location-pin'} style={styles.map_icon}/>
-                {tool.length(cityname) > 4 ? cityname.slice(0, 4) + '...' : cityname}
+                {tool.jbbsubstr(cityname, 4)}
               </Text>
             </TouchableOpacity>
           </If>
@@ -419,7 +419,7 @@ class SearchShop extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 12,
-                }}>{tool.jbbsubstr(address, 5, '标注点')} </Text>
+                }}>{tool.jbbsubstr(address, 5, 0,'标注点')} </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>

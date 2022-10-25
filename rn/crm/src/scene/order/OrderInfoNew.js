@@ -629,6 +629,15 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
+  filterDistance = (val = 0) => {
+    let flag = val / 1000
+    if (flag >= 1) {
+      return `${numeral(val / 1000).format('0.0')}公里`
+    } else {
+      return `${val}米`
+    }
+  }
+
   renderMap = () => {
     let {
       loc_lat,
@@ -646,7 +655,7 @@ class OrderInfoNew extends PureComponent {
     let {aLon, aLat} = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
 
     return (
-      <View ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
+      <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
         <MapView
           zoomGesturesEnabled={true}
           scrollGesturesEnabled={true}
@@ -684,12 +693,12 @@ class OrderInfoNew extends PureComponent {
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
-                      骑手距离顾客{numeral(ship_distance_destination / 1000).format('0.00')}公里
+                      骑手距离顾客{this.filterDistance(ship_distance_destination)}
                     </Text>
                   </If>
                   <If condition={ship_distance_store > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
-                      骑手距离商家{numeral(ship_distance_store / 1000).format('0.00')}公里
+                      骑手距离商家{this.filterDistance(ship_distance_store)}
                     </Text>
                   </If>
                 </View>
@@ -713,7 +722,7 @@ class OrderInfoNew extends PureComponent {
               <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
                 <View style={styles.mapBox}>
                   <Text style={{color: colors.color333, fontSize: 12}}>
-                    距门店{numeral(dada_distance / 1000).format('0.00')}公里
+                    距门店{this.filterDistance(dada_distance)}
                   </Text>
                 </View>
               </If>
@@ -744,6 +753,14 @@ class OrderInfoNew extends PureComponent {
   }
 
   touchScreenMove = () => {
+
+    this._gestureHandlers = PanResponder.create({
+      // 要求成为响应者：
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+    });
 
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
@@ -982,7 +999,7 @@ class OrderInfoNew extends PureComponent {
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
             <Text
-              style={styles.cardTitle}>商品{order?.product_total_count > 1 ? `【${order?.product_total_count}】` : order?.product_total_count}件 </Text>
+              style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
                 <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
@@ -999,9 +1016,14 @@ class OrderInfoNew extends PureComponent {
                   />
                   <View style={styles.productItem}>
                     <Text style={styles.productItemName}>
-                      {tool.length(info?.product_name, 16)}
+                      <If condition={info?.shelf_no}>{info?.shelf_no} </If>
+                      {info?.product_name}
                     </Text>
-                    <Text style={styles.productItemId}>#{info?.product_id} </Text>
+                    <If condition={info?.product_id > 0}>
+                      <Text style={styles.productItemId}>(#{info?.product_id}
+                        <If condition={info?.tag_code}>[{info?.tag_code}]</If>)
+                      </Text>
+                    </If>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
@@ -1010,7 +1032,7 @@ class OrderInfoNew extends PureComponent {
                             {numeral(info?.supply_price / 100).format('0.00')}元
                           </Text>
                           <If condition={!is_service_mgr}>
-                            <Text style={styles.price}>
+                            <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
                             </Text>
                           </If>
@@ -1020,12 +1042,12 @@ class OrderInfoNew extends PureComponent {
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                           <If condition={!is_service_mgr}>
                             <Text style={[styles.price, {marginRight: 10}]}>
-                              总价 {numeral(info?.price * info?.num / 100).format('0.00')}元
+                              总价 {numeral(info?.price * info?.num).format('0.00')}元
                             </Text>
                           </If>
                         </If>
                       </View>
-                      <Text style={styles.productNum}> [x {info?.num}] </Text>
+                      <Text style={styles.productNum}> {info?.num > 1 ? `[x ${info?.num}]` : `x ${info?.num}`} </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -1527,7 +1549,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: pxToDp(10)
   },
-  productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
+  productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614', width: width * 0.7},
   productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
   productItemPrice: {
     flexDirection: "row",
@@ -1558,8 +1580,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#26B942',
     textAlign: "center",
-    marginRight: pxToDp(10),
-    marginLeft: 20
+    marginRight: pxToDp(10)
   },
   price: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
   productNum: {fontWeight: '400', fontSize: 12, color: colors.color666},

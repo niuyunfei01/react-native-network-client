@@ -5,7 +5,8 @@ import {
   Dimensions,
   FlatList,
   InteractionManager,
-  Platform, StatusBar,
+  Platform,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -846,6 +847,7 @@ class OrderListScene extends Component {
     return (
       <View style={styles.orderListContent}>
         <FlatList
+          contentContainerStyle={{flexGrow: 1}}
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
