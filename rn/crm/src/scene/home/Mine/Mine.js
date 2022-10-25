@@ -526,64 +526,64 @@ class Mine extends PureComponent {
     switch (icon) {
       case 'order_search':
         return order_search();
-        break;
+
       case 'operator_data':
         return operator_data()
-        break;
+
       case 'delivery_sync':
         return delivery_sync()
-        break;
+
       case 'adjust':
         return adjust()
-        break;
+
       case 'order_compensate':
         return order_compensate()
-        break;
+
       case 'product':
         return product()
-        break;
+
       case 'performance':
         return performance()
-        break;
+
       case 'fee_bills':
         return fee_bills()
-        break;
+
       case 'ext_store':
         return ext_store()
-        break;
+
       case 'deliveries':
         return deliveries()
-        break;
+
       case 'stores':
         return stores()
-        break;
+
       case 'printer':
         return printer()
-        break;
+
       case 'push':
         return push()
-        break;
+
       case 'setting':
         return setting()
-        break;
+
       case 'help':
         return help()
-        break;
+
       case 'history_notice':
         return history_notice()
-        break;
+
       case 'third_recharge':
         return third_recharge()
-        break;
+
       case 'stall_settlement':
         return stall_settlement()
-        break;
+
       case 'settlement':
         return settlement()
-        break;
+
       default:
         return order_search()
-        break;
+
     }
   }
 

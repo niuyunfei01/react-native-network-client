@@ -8,6 +8,9 @@ import {autoPackage, autoReply, bell} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import Entypo from "react-native-vector-icons/Entypo";
+import {getConfig} from "../../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../../reducers/global/globalActions";
 
 
 const styles = StyleSheet.create({
@@ -87,22 +90,30 @@ class GoodsIncrement extends PureComponent {
 
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount() {
-    const {store_info} = this.props.global
-    const currentDate = dayjs().format('YYYY-MM-DD')
-    const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
-    if (calc < 5 && calc >= 0)
-      Alert.alert('提醒', `服务将在${store_info.vip_info.expire_date}过期，是否续费？`, [
-        {
-          text: '取消',
-          style: 'cancel'
-        },
-        {
-          text: '确定',
-          style: 'default',
-          onPress: () => this.useIncrementService()
-        }
-      ]);
+    const {global, navigation, dispatch} = this.props
+    const {store_info, currStoreId, accessToken} = global
+    this.focus = navigation.addListener('focus', () => {
+      dispatch(getConfig(accessToken, currStoreId));
+      const currentDate = dayjs().format('YYYY-MM-DD')
+      const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
+      if (calc < 5 && calc >= 0)
+        Alert.alert('提醒', `服务将在${store_info.vip_info.expire_date}过期，是否续费？`, [
+          {
+            text: '取消',
+            style: 'cancel'
+          },
+          {
+            text: '确定',
+            style: 'default',
+            onPress: () => this.useIncrementService()
+          }
+        ]);
+    })
   }
 
   useIncrementService = () => {
@@ -112,6 +123,11 @@ class GoodsIncrement extends PureComponent {
   }
 
   notActivate = (vip_info) => {
+    const {pay_type_items = []} = vip_info || {}
+    const pay_money = pay_type_items.filter(item => item.months === 12)
+    let annualFee = {}
+    if (pay_money.length > 0)
+      annualFee = pay_money[0];
     return (
       <TouchableOpacity onPress={() => this.useIncrementService()}>
         <ImageBackground
@@ -120,7 +136,11 @@ class GoodsIncrement extends PureComponent {
           imageStyle={{flex: 1, height: 53}}>
           <View style={styles.ValueAddBoxLeft}>
             <Text style={styles.ValueAddLabel}>增值服务 </Text>
-            <Text style={styles.ValueAddDesc}>开通年包立省999元发单更便宜 </Text>
+            <If condition={annualFee}>
+              <Text style={styles.ValueAddDesc}>
+                开通年包立省{annualFee.pay_money - annualFee.pay_money_actual}元发单更便宜
+              </Text>
+            </If>
           </View>
           <If condition={!vip_info.exist_vip}>
             <View style={styles.ValueAddBoxLeft}>
@@ -203,7 +223,7 @@ class GoodsIncrement extends PureComponent {
     return (
       <View style={styles.zoneWrap}>
         {this.renderHeader()}
-        {store_info.vip_info.exist_vip ? this.renderContent() : null}
+        {!store_info.vip_info.vip_invalid && store_info.vip_info.exist_vip ? this.renderContent() : null}
       </View>
     )
   }
@@ -214,4 +234,16 @@ function mapStateToProps(state) {
   return {global: global};
 }
 
-export default connect(mapStateToProps)(GoodsIncrement)
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+    ...bindActionCreators(
+      {
+        ...globalActions
+      },
+      dispatch
+    )
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GoodsIncrement)
