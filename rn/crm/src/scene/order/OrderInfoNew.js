@@ -1007,7 +1007,7 @@ class OrderInfoNew extends PureComponent {
                   />
                   <View style={styles.productItem}>
                     <Text style={styles.productItemName}>
-                      {tool.length(info?.product_name, 16)}
+                      {tool.jbbsubstr(info?.product_name, 16)}
                     </Text>
                     <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     <View style={styles.productItemPrice}>
