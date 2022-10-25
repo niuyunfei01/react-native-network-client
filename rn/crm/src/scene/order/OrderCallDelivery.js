@@ -34,6 +34,7 @@ import Config from "../../pubilc/common/config";
 import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 
 let {height, width} = Dimensions.get("window");
 
@@ -119,6 +120,8 @@ class OrderCallDelivery extends Component {
       store_est_all_check: false,
       logistic_fee_map: [],
       params_str: '',
+      show_cancel_delivery_modal: false,
+      ship_id: 0,
     };
 
     this.mixpanel = MixpanelInstance;
@@ -283,43 +286,6 @@ class OrderCallDelivery extends Component {
     this.props.navigation.navigate(route, params);
   }
 
-  goCancelDelivery = (order_id, ship_id = 0) => {
-    this.closeModal();
-    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-      {
-        order: {id: order_id,},
-        ship_id: ship_id,
-        onCancelled: () => {
-          this.fetchData();
-        }
-      });
-  }
-
-
-  cancelDelivery = (ship_id) => {
-    let {accessToken, order_id} = this.props.global
-    const api = `/v4/wsb_delivery/preCancelDelivery`;
-    HttpUtils.get.bind(this.props)(api, {
-      order_id: order_id,
-      access_token: accessToken
-    }).then(res => {
-
-      if (tool.length(res?.alert_msg) > 0) {
-        Alert.alert('提示', `${res.alert_msg}`, [
-          {
-            text: '确定',
-            onPress: () => {
-              this.goCancelDelivery(order_id, ship_id)
-            }
-          },
-          {text: '取消'}]);
-      } else {
-        this.goCancelDelivery(order_id, ship_id)
-      }
-    })
-  }
-
-
   onWorkerDelivery() {
     let {accessToken} = this.props.global;
     let {worker_delivery_id, order_id} = this.state;
@@ -463,6 +429,7 @@ class OrderCallDelivery extends Component {
       show_date_modal: false,
       show_add_tip_modal: false,
       show_remark_modal: false,
+      show_cancel_delivery_modal: false,
     })
   }
 
@@ -581,7 +548,16 @@ class OrderCallDelivery extends Component {
   };
 
   render() {
-    let {isLoading, order_id, add_tips, show_add_tip_modal, show_date_modal} = this.state
+    let {accessToken} = this.props.global;
+    let {
+      isLoading,
+      order_id,
+      add_tips,
+      show_add_tip_modal,
+      show_date_modal,
+      ship_id,
+      show_cancel_delivery_modal
+    } = this.state
     return (
       <View style={{flexGrow: 1}}>
         {this.renderHead()}
@@ -624,6 +600,7 @@ class OrderCallDelivery extends Component {
             this.closeModal()
           }}
         />
+
         <AddTipModal
           setState={this.setState.bind(this)}
           fetchData={this.fetchData.bind(this)}
@@ -631,6 +608,16 @@ class OrderCallDelivery extends Component {
           add_money={add_tips}
           set_add_tip_money={true}
           show_add_tip_modal={show_add_tip_modal}/>
+
+        <CancelDeliveryModal
+          order_id={order_id}
+          ship_id={ship_id}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.fetchData.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
+        />
 
       </View>
     )
@@ -710,7 +697,13 @@ class OrderCallDelivery extends Component {
             </Text>
           </View>
           <Button title={'取消'}
-                  onPress={() => this.cancelDelivery(item.id)}
+                  onPress={() => {
+                    this.setState({
+                      show_cancel_delivery_modal: true,
+                      ship_id: item?.id
+                    })
+                    this.cancelDelivery(item.id)
+                  }}
                   buttonStyle={{
                     width: 67,
                     borderRadius: 20,

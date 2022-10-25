@@ -36,6 +36,7 @@ import BottomModal from "./BottomModal";
 import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {call, locationIcon} from "../../svg/svg";
+import AlertModal from "./AlertModal";
 
 let width = Dimensions.get("window").width;
 
@@ -54,10 +55,12 @@ class OrderItem extends React.PureComponent {
     showBtn: PropTypes.bool,
     fetchData: PropType.func,
     setState: PropType.func,
+    openCancelDeliveryModal: PropType.func,
     comesBackBtn: PropType.bool,
   };
   state = {
     verification_modal: false,
+    show_finish_delivery_modal: false,
     pickupCode: '',
   }
 
@@ -143,51 +146,17 @@ class OrderItem extends React.PureComponent {
     }, {'text': '取消'}]);
   }
 
-
-  goCancelDelivery = (order_id, ship_id = 0) => {
-    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-      {
-        order: {id: order_id,},
-        ship_id: ship_id,
-        onCancelled: () => {
-          this.props.fetchData();
-        }
-      });
-  }
-
-  cancelDelivery = () => {
-    let token = this.props.accessToken
-    let order = this.props.item
-    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${token}`;
-    let params = {
-      order_id: order?.id
-    }
-    HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (tool.length(res?.alert_msg) > 0) {
-        Alert.alert('提示', res?.alert_msg, [{
-          text: '确定', onPress: () => {
-            this.goCancelDelivery(order?.id)
-          }
-        }, {'text': '取消'}]);
-      } else {
-        this.goCancelDelivery(order?.id)
-      }
+  toSetOrderComplete = () => {
+    this.closeModal();
+    let {item} = this.props;
+    const api = `/api/complete_order/${item?.id}?access_token=${this.props.accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('订单已送达')
+      this.props.fetchData()
+      GlobalUtil.setOrderFresh(1)
+    }).catch(() => {
+      ToastShort('“配送完成失败，请稍后重试”')
     })
-  }
-
-  toSetOrderComplete = (order_id) => {
-    Alert.alert('当前配送确认完成吗？', '订单送达后无法撤回，请确认顾客已收到货物', [{
-      text: '确认', onPress: () => {
-        const api = `/api/complete_order/${order_id}?access_token=${this.props.accessToken}`
-        HttpUtils.get(api).then(() => {
-          ToastLong('订单已送达')
-          this.props.fetchData()
-          GlobalUtil.setOrderFresh(1)
-        }).catch(() => {
-          ToastShort('“配送完成失败，请稍后重试”')
-        })
-      }
-    }, {text: '再想想'}])
   }
 
   dialNumber = (val) => {
@@ -212,6 +181,7 @@ class OrderItem extends React.PureComponent {
   closeModal = () => {
     this.setState({
       verification_modal: false,
+      show_finish_delivery_modal: false,
     })
   }
 
@@ -267,12 +237,29 @@ class OrderItem extends React.PureComponent {
             </If>
           </View>
           {this.renderPickModal()}
+          {this.renderFinishDeliveryModal()}
         </View>
 
       </TouchableWithoutFeedback>
     )
   }
 
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
+  }
 
   renderPickModal = () => {
     let {verification_modal, pickupCode} = this.state;
@@ -431,7 +418,8 @@ class OrderItem extends React.PureComponent {
         })
       }} style={[styles.contentHeader, {paddingTop: 12}]}>
         <View style={{flex: 1}}>
-          <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商品 {item?.goods_info?.count} 件 </Text>
+          <Text
+            style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商品 {item?.goods_info?.count} 件 </Text>
           <Text style={{
             fontSize: 12,
             color: colors.color666,
@@ -540,7 +528,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_取消配送')
-                    this.cancelDelivery(item.id)
+                    this.props.openCancelDeliveryModal(item?.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -616,7 +604,9 @@ class OrderItem extends React.PureComponent {
           <Button title={'配送完成'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_完成配送')
-                    this.toSetOrderComplete(item.id)
+                    this.setState({
+                      show_finish_delivery_modal: true
+                    })
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,

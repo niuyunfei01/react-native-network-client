@@ -52,6 +52,7 @@ import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 
 const {width} = Dimensions.get("window");
 
@@ -102,6 +103,7 @@ const initState = {
   add_tip_id: 0,
   show_add_tip_modal: false,
   show_delivery_modal: false,
+  show_cancel_delivery_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -538,16 +540,19 @@ class OrderListScene extends Component {
     ToastLong('编码不合法，请重新扫描')
   }
 
-  closeDeliveryModal = () => {
-    this.setState({
-      order_id: 0,
-      show_delivery_modal: false
-    })
-  }
   openAddTipModal = (order_id) => {
     this.setState({
       add_tip_id: order_id,
       show_add_tip_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
+
+  openCancelDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_cancel_delivery_modal: true,
       show_delivery_modal: false
     })
   }
@@ -562,6 +567,7 @@ class OrderListScene extends Component {
       show_goods_list,
       show_delivery_modal,
       show_add_tip_modal,
+      show_cancel_delivery_modal,
       add_tip_id,
     } = this.state
 
@@ -591,9 +597,20 @@ class OrderListScene extends Component {
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
+          openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
           accessToken={accessToken}
           show_modal={show_delivery_modal}
-          onClose={this.closeDeliveryModal}
+          onClose={this.closeModal}
+        />
+
+        <CancelDeliveryModal
+          order_id={order_id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
         />
 
         <AddTipModal
@@ -614,6 +631,9 @@ class OrderListScene extends Component {
 
   closeModal = () => {
     this.setState({
+      order_id: 0,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
       showSortModal: false
     })
   }
@@ -888,6 +908,7 @@ class OrderListScene extends Component {
                  accessToken={accessToken}
                  navigation={this.props.navigation}
                  setState={this.setState.bind(this)}
+                 openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  orderStatus={orderStatus}
       />
     );

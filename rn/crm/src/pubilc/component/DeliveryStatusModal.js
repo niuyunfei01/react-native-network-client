@@ -164,6 +164,7 @@ class deliveryStatusModal extends React.Component {
     onPress: PropTypes.func,
     fetchData: PropTypes.func,
     openAddTipModal: PropTypes.func,
+    openCancelDeliveryModal: PropTypes.func,
   }
   state = {
     show_modal: false,
@@ -187,13 +188,13 @@ class deliveryStatusModal extends React.Component {
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
       return null;
     }
+    showModal('请求中...')
     tool.debounces(() => {
       this.getInfo(accessToken, order_id)
     })
   }
 
   getInfo = (accessToken, order_id) => {
-    showModal('请求中...')
     const url = '/v4/wsb_delivery/deliveryRecord'
     const params = {access_token: accessToken, order_id: order_id}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
@@ -254,39 +255,6 @@ class deliveryStatusModal extends React.Component {
         }
       }
     });
-  }
-
-
-  goCancelDelivery = (ship_id = 0) => {
-    let {order_id, fetchData} = this.props;
-    this.closeModal();
-    this.props.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-      {
-        order: {id: order_id},
-        ship_id: ship_id,
-        onCancelled: () => {
-          fetchData();
-        }
-      });
-  }
-
-  cancelDelivery = () => {
-    let {order_id, accessToken} = this.props;
-    const api = `/v4/wsb_delivery/preCancelDelivery`;
-    HttpUtils.get.bind(this.props)(api, {
-      order_id: order_id,
-      access_token: accessToken
-    }).then(res => {
-      if (tool.length(res?.alert_msg) > 0) {
-        Alert.alert('提示', `${res.alert_msg}`, [{
-          text: '确定', onPress: () => {
-            this.goCancelDelivery()
-          }
-        }, {'text': '取消'}]);
-      } else {
-        this.goCancelDelivery()
-      }
-    })
   }
 
   dialNumber = () => {
@@ -427,7 +395,7 @@ class deliveryStatusModal extends React.Component {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_取消配送')
-                    this.cancelDelivery()
+                    this.props.openCancelDeliveryModal(order_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,

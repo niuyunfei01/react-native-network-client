@@ -47,6 +47,8 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import FastImage from "react-native-fast-image";
 import {SvgXml} from "react-native-svg";
 import {call, cross_icon} from "../../svg/svg";
+import AlertModal from "../../pubilc/component/AlertModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 
 const {width, height} = Dimensions.get("window")
 
@@ -131,7 +133,9 @@ class OrderInfoNew extends PureComponent {
       toastContext: '',
       add_tip_id: 0,
       show_add_tip_modal: false,
-      allowRefresh: true
+      allowRefresh: true,
+      show_finish_delivery_modal: false,
+      show_cancel_delivery_modal: false
     }
     this.map_height = 290
   }
@@ -467,7 +471,9 @@ class OrderInfoNew extends PureComponent {
 
   closeModal = () => {
     this.setState({
-      modalTip: false
+      modalTip: false,
+      show_finish_delivery_modal: false,
+      show_cancel_delivery_modal: false,
     })
   }
 
@@ -605,20 +611,17 @@ class OrderInfoNew extends PureComponent {
     }, {'text': '取消'}]);
   }
 
-  toSetOrderComplete = (order_id) => {
-    const {global} = this.props;
-    const {accessToken} = global;
-    Alert.alert('当前配送确认完成吗？', '订单送达后无法撤回，请确认顾客已收到货物？', [{
-      text: '确认', onPress: () => {
-        const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
-        HttpUtils.get(api).then(() => {
-          ToastLong('配送已完成')
-          this.fetchOrder()
-        }).catch(() => {
-          showError('配送完成失败，请稍后重试')
-        })
-      }
-    }, {text: '再想想'}])
+  toSetOrderComplete = () => {
+    const {accessToken} = this.props.global;
+    let {order} = this.state;
+    const api = `/api/complete_order/${order?.id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('配送已完成')
+      this.closeModal();
+      this.fetchOrder()
+    }).catch(() => {
+      showError('配送完成失败，请稍后重试')
+    })
   }
 
   openAddTipModal = (order_id) => {
@@ -891,7 +894,7 @@ class OrderInfoNew extends PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_取消单个配送')
-                    this.cancelDelivery(order?.id)
+                    this.openCancelDeliveryModal()
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -922,7 +925,9 @@ class OrderInfoNew extends PureComponent {
           <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_完成配送')
-                    this.toSetOrderComplete(order?.id)
+                    this.setState({
+                      show_finish_delivery_modal: true
+                    })
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
@@ -1055,7 +1060,11 @@ class OrderInfoNew extends PureComponent {
             </If>
           </View>
           <View style={styles.cuttingLine}/>
-          <View style={[styles.orderCardContainer, {flexDirection: "column", borderBottomLeftRadius: 6, borderBottomRightRadius: 6}]}>
+          <View style={[styles.orderCardContainer, {
+            flexDirection: "column",
+            borderBottomLeftRadius: 6,
+            borderBottomRightRadius: 6
+          }]}>
             <If condition={order?.is_fn_price_controlled}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>供货价小计 </Text>
@@ -1272,6 +1281,13 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+  openCancelDeliveryModal = () => {
+    this.setState({
+      show_cancel_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   renderDeliveryModal = () => {
     let {show_delivery_modal, orderId, currStoreId} = this.state;
     const {global} = this.props;
@@ -1282,6 +1298,7 @@ class OrderInfoNew extends PureComponent {
         store_id={currStoreId}
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}
+        openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
         accessToken={accessToken}
         show_modal={show_delivery_modal}
         onClose={this.closeDeliveryModal}
@@ -1305,7 +1322,8 @@ class OrderInfoNew extends PureComponent {
   }
 
   render() {
-    const {isShowMap, order, isRefreshing, allowRefresh} = this.state
+    let {accessToken} = this.props.global;
+    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1341,8 +1359,37 @@ class OrderInfoNew extends PureComponent {
         </ScrollView>
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
+        {this.renderFinishDeliveryModal()}
+
+        <CancelDeliveryModal
+          order_id={order?.id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.fetchOrder.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
+        />
+
       </View>
     );
+  }
+
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
   }
 }
 

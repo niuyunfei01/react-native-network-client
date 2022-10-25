@@ -43,13 +43,13 @@ class GoodsListModal extends React.Component {
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_goods_list) {
       return null;
     }
+    showModal('请求中...')
     tool.debounces(() => {
       this.getOrderGoodsList(accessToken, order_id)
     })
   }
 
   getOrderGoodsList = (accessToken, order_id) => {
-    showModal('请求中...')
     const url = '/v4/wsb_order/order_items/' + order_id
     const params = {access_token: accessToken}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
