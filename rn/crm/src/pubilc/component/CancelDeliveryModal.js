@@ -51,7 +51,6 @@ class CancelDeliveryModal extends React.Component {
   getInfo = () => {
     let {order_id, accessToken} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
-    order_id = 15720314
     HttpUtils.get.bind(this.props)(api, {
       order_id: order_id,
       access_token: accessToken
