@@ -862,7 +862,7 @@ class OrderSettingScene extends Component {
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
-                  width: width * (Platform.OS !== 'ios' ? 0.50 : 0.52),
+                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
                   height: 36,
                   borderRadius: 4,
                   borderWidth: 0.5,
