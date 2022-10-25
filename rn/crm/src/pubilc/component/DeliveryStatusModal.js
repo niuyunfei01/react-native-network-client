@@ -294,6 +294,7 @@ class deliveryStatusModal extends React.Component {
   }
 
   complain = () => {
+    this.closeModal()
     this.props.onPress(Config.ROUTE_COMPLAIN, {id: this.state.complaint_rider_delivery_id})
   }
 
