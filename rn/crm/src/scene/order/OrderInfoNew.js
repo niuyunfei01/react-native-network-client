@@ -990,7 +990,7 @@ class OrderInfoNew extends PureComponent {
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
             <Text
-              style={styles.cardTitle}>商品{order?.product_total_count > 1 ? `【${order?.product_total_count}】` : order?.product_total_count}件 </Text>
+              style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
                 <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
@@ -1006,10 +1006,15 @@ class OrderInfoNew extends PureComponent {
                     resizeMode={FastImage.resizeMode.contain}
                   />
                   <View style={styles.productItem}>
+                    <If condition={info?.shelf_no}>{info?.shelf_no} </If>
                     <Text style={styles.productItemName}>
-                      {tool.jbbsubstr(info?.product_name, 16)}
+                      {info?.product_name}
                     </Text>
-                    <Text style={styles.productItemId}>#{info?.product_id} </Text>
+                    <If condition={info?.product_id > 0}>
+                      <Text style={styles.productItemId}>(#{info?.product_id}
+                        <If condition={info?.tag_code}>[{info?.tag_code}]</If>)
+                      </Text>
+                    </If>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
@@ -1018,7 +1023,7 @@ class OrderInfoNew extends PureComponent {
                             {numeral(info?.supply_price / 100).format('0.00')}元
                           </Text>
                           <If condition={!is_service_mgr}>
-                            <Text style={styles.price}>
+                            <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
                             </Text>
                           </If>
@@ -1028,12 +1033,12 @@ class OrderInfoNew extends PureComponent {
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
                           <If condition={!is_service_mgr}>
                             <Text style={[styles.price, {marginRight: 10}]}>
-                              总价 {numeral(info?.price * info?.num / 100).format('0.00')}元
+                              总价 {numeral(info?.price * info?.num).format('0.00')}元
                             </Text>
                           </If>
                         </If>
                       </View>
-                      <Text style={styles.productNum}> [x {info?.num}] </Text>
+                      <Text style={styles.productNum}> {info?.num > 1 ? `[x ${info?.num}]` : `x ${info?.num}`} </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -1535,7 +1540,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: pxToDp(10)
   },
-  productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
+  productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614', width: width * 0.7},
   productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
   productItemPrice: {
     flexDirection: "row",
@@ -1566,8 +1571,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#26B942',
     textAlign: "center",
-    marginRight: pxToDp(10),
-    marginLeft: 20
+    marginRight: pxToDp(10)
   },
   price: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
   productNum: {fontWeight: '400', fontSize: 12, color: colors.color666},

@@ -160,7 +160,7 @@ class GoodsListModal extends React.Component {
                       </If>
 
                     </View>
-                    <Text style={{fontSize: 12, color: colors.color666}}>x{item.num} </Text>
+                    <Text style={{fontSize: 12, color: colors.color666}}>{item.num > 1 ? `[x${item.num}]` : `x${item.num}`} </Text>
                   </View>
                 </View>
 
