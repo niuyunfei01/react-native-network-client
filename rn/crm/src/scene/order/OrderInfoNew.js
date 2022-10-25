@@ -1031,7 +1031,7 @@ class OrderInfoNew extends PureComponent {
                           <Text style={[styles.price, {marginRight: 10}]}>
                             {numeral(info?.supply_price / 100).format('0.00')}元
                           </Text>
-                          <If condition={!is_service_mgr}>
+                          <If condition={!is_service_mgr && !order?.is_baodi_coop}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
                             </Text>
@@ -1040,7 +1040,7 @@ class OrderInfoNew extends PureComponent {
                         <If condition={order?.is_fn_show_wm_price || order?.is_peisong_coop}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                          <If condition={!is_service_mgr}>
+                          <If condition={!is_service_mgr && !order?.is_baodi_coop}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.price * info?.num).format('0.00')}元
                             </Text>
