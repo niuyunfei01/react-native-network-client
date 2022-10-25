@@ -4,7 +4,7 @@ import {
   DeviceEventEmitter,
   Dimensions,
   FlatList,
-  InteractionManager,
+  InteractionManager, NativeEventEmitter, NativeModules,
   Platform,
   StatusBar,
   StyleSheet,
@@ -52,6 +52,7 @@ import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
+import {initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
 
 const {width} = Dimensions.get("window");
 
@@ -157,47 +158,85 @@ class OrderListScene extends Component {
       this.ptListener.remove();
     }
     this.ptListener = null;
+    unInitBlueTooth()
+    this.iosBluetooth && this.iosBluetooth.remove()
   }
 
-  componentDidMount() {
-    initJPush()
-    this.whiteNoLoginInfo()
-    this.getVendor()
-    const {global, navigation, device} = this.props
-    if (Platform.OS === 'android') {
-      native.xunfeiIdentily().then()
-      this.calcAppStartTime()
+  printByBluetooth = () => {
+    switch (Platform.OS) {
+      case "ios":
+        this.printByBluetoothIOS()
+        break
+      case "android":
+        this.printByBluetoothAndroid()
+        break
     }
-    timeObj.method[0].endTime = getTime()
-    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
-    timeObj.method[0].executeStatus = 'success'
-    timeObj.method[0].interfaceName = ""
-    timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken} = global;
-    if (this.ptListener) {
-      this.ptListener.remove()
-    }
+  }
 
-    native.getAutoBluePrint(() => {
-      if (!this.state.bleStarted) {
-        BleManager.start({showAlert: false}).then();
-        this.setState({bleStarted: true})
-        store.dispatch(setBleStarted(true));
+  printByBluetoothIOS = () => {
+    let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = this.props.global;
+    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+    this.iosBluetooth = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+      console.log('obj', obj, ' printer_id', printer_id, 'autoBluetoothPrint', autoBluetoothPrint)
+      if (obj.order_type !== 'new_order')
+        return
+      if (printer_id && autoBluetoothPrint) {
+
+        // if (!bleStarted) {
+        //   BleManager.start({showAlert: false}).then();
+        //   store.dispatch(setBleStarted(true));
+        // }
+        const clb = (msg, error) => {
+          // noinspection JSIgnoredPromiseFromCall
+          sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+        };
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          // console.log('准备打印：', obj.wm_id)
+          print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+        }).catch((error) => {
+          //蓝牙尚未启动时，会导致App崩溃
+          //console.log('蓝牙尚未启动时，会导致App崩溃：', error)
+          if (!bleStarted) {
+            sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
+          }
+          //重新连接
+          BleManager.connect(printer_id).then(() => {
+            //console.log('重新连接：', obj.wm_id)
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+            })
+          }).catch((error2) => {
+            //console.log('蓝牙无法自动打印：', obj.wm_id)
+            // noinspection JSIgnoredPromiseFromCall
+            sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+            Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
+              {text: '确定', onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)},
+              {text: '取消'}
+            ]);
+          });
+        });
+        return;
       }
-    }).then()
+      //console.log('尚未连接到打印机：', obj.wm_id)
+      // noinspection JSIgnoredPromiseFromCall
+      sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
+      Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
+        {
+          text: '确定',
+          onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        },
+        {text: '取消'}
+      ]);
+    })
+  }
 
-
-    let {lastCheckVersion = 0, printer_id, bleStarted} = global;
+  printByBluetoothAndroid = () => {
+    let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = this.props.global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      if (printer_id) {
-        if (!bleStarted) {
-          BleManager.start({showAlert: false}).then();
-          store.dispatch(setBleStarted(true));
-        }
+      if (printer_id && autoBluetoothPrint) {
         setTimeout(() => {
           const clb = (msg, error) => {
-            // noinspection JSIgnoredPromiseFromCall
             sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
           };
           BleManager.retrieveServices(printer_id).then((peripheral) => {
@@ -216,29 +255,52 @@ class OrderListScene extends Component {
             }).catch((error2) => {
               // noinspection JSIgnoredPromiseFromCall
               sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
-              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [{
-                text: '确定', onPress: () => {
-                  this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-                }
-              }, {'text': '取消'}]);
+              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
+                {
+                  text: '确定',
+                  onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+                },
+                {text: '取消'}
+              ]);
             });
           });
         }, 300);
-      } else {
-        // noinspection JSIgnoredPromiseFromCall
-        sendDeviceStatus(accessToken, {...obj, btConnected: '未连接'})
-        Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
-          text: '确定', onPress: () => {
-            this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-          }
-        }, {'text': '取消'}]);
+        return
       }
+      sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
+      Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
+        {
+          text: '确定',
+          onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        },
+        {text: '取消'}
+      ]);
+
+    })
+  }
+
+  componentDidMount() {
+    initJPush()
+    this.whiteNoLoginInfo()
+    this.getVendor()
+    const {global, navigation, device} = this.props
+    if (Platform.OS === 'android') {
+      native.xunfeiIdentily().then()
+      this.calcAppStartTime()
+    }
+    timeObj.method[0].endTime = getTime()
+    timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
+    timeObj.method[0].executeStatus = 'success'
+    timeObj.method[0].interfaceName = ""
+    timeObj.method[0].methodName = "componentDidMount"
+    const {currStoreId, currentUser, accessToken, lastCheckVersion = 0} = global;
+    if (this.ptListener) {
+      this.ptListener.remove()
+    }
+    initBlueTooth(global).then(() => {
     })
 
-    //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
-      sendDeviceStatus(accessToken, obj)
-    })
+    this.printByBluetooth()
     doJPushSetAlias(currentUser);
 
     const currentTs = dayjs(new Date()).unix();
@@ -311,6 +373,7 @@ class OrderListScene extends Component {
       currVendorId: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
       show_bottom_tab: reduxGlobal.show_bottom_tab,
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))

@@ -26,7 +26,9 @@ const {
   SET_EXT_STORE,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
-  SET_BLUETOOTH_DEVICE_LIST
+  SET_BLUETOOTH_DEVICE_LIST,
+  SET_SCANNING_BLUETOOTH_DEVICE,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -60,8 +62,7 @@ const initialState = {
   user_config: {
     order_list_by: 'orderTime asc',
   },
-  bleStarted: false,
-  printer_id: '0',
+
   show_bottom_tab: false,
   menu_list: {
     delivery: 1,
@@ -72,7 +73,11 @@ const initialState = {
     work: 0
   },
   basic_categories: [],
-  bluetoothDeviceList: []
+  bluetoothDeviceList: [],
+  bleStarted: false,
+  printer_id: '0',
+  isScanningBluetoothDevice: false,
+  autoBluetoothPrint: true
 };
 
 /**
@@ -83,11 +88,22 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_AUTO_PRINT:
+      return {
+        ...state,
+        autoBluetoothPrint: action.payload
+      }
+    case SET_SCANNING_BLUETOOTH_DEVICE:
+      return {
+        ...state,
+        isScanningBluetoothDevice: action.payload
+      }
+
     case SET_BLUETOOTH_DEVICE_LIST:
       if (action.payload) {
         return {
           ...state,
-          bluetoothDeviceList: action.payload
+          bluetoothDeviceList: action.payload,
         }
       }
       break
@@ -107,7 +123,8 @@ export default function globalReducer(state = initialState, action) {
           accessToken: action.payload.accessToken,
           currStoreId: action.payload.currStoreId,
           host: action.payload.host,
-          printer_id: action.payload.printer_id
+          printer_id: action.payload.printer_id,
+          autoBluetoothPrint: action.payload.autoBluetoothPrint
         }
       }
       break

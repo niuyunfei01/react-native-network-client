@@ -50,17 +50,32 @@ const {
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
-  SET_BLUETOOTH_DEVICE_LIST
+  SET_BLUETOOTH_DEVICE_LIST,
+  SET_SCANNING_BLUETOOTH_DEVICE,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
 }
 
-export const setBlueToothDeviceList = (list) => {
+export const setAutoPrint = (autoBluetoothPrint) => {
+  return {
+    type: SET_AUTO_PRINT,
+    payload: autoBluetoothPrint
+  }
+}
+export const setIsScanningBlueTooth = (status) => {
+  return {
+    type: SET_SCANNING_BLUETOOTH_DEVICE,
+    payload: status
+  }
+}
+
+export const setBlueToothDeviceList = (bluetoothDeviceList) => {
   return {
     type: SET_BLUETOOTH_DEVICE_LIST,
-    payload: list
+    payload: bluetoothDeviceList
   }
 }
 
@@ -267,9 +282,9 @@ export function sendDverifyCode(mobile, type, is_agree, callback) {
       device_uuid: getDeviceUUID(),
     })
       .then(() => {
-        callback(true, '发送成功')
+        callback(true, '发送成功：')
       }).catch((error) => {
-        callback(false, '发送失败' + error)
+        callback(false, '发送失败：' + error)
       })
   }
 }
