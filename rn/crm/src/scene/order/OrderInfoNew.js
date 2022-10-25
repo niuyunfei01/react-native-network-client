@@ -1025,22 +1025,22 @@ class OrderInfoNew extends PureComponent {
                       </Text>
                     </If>
                     <View style={styles.productItemPrice}>
-                      <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                      <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text style={styles.priceBao}>保</Text>
                           <Text style={[styles.price, {marginRight: 10}]}>
                             {numeral(info?.supply_price / 100).format('0.00')}元
                           </Text>
-                          <If condition={!is_service_mgr && !order?.is_baodi_coop}>
+                          <If condition={order?.is_fn_total_price}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
                             </Text>
                           </If>
                         </If>
-                        <If condition={order?.is_fn_show_wm_price || order?.is_peisong_coop}>
+                        <If condition={order?.is_fn_show_wm_price}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                          <If condition={!is_service_mgr && !order?.is_baodi_coop}>
+                          <If condition={order?.is_fn_total_price}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.price * info?.num).format('0.00')}元
                             </Text>
