@@ -775,8 +775,8 @@ const styles = StyleSheet.create({
   goodsStatusText: {color: colors.color999, paddingVertical: 6},
   headerWrap: {
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.2,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    elevation: 5,
     shadowRadius: 8,
   },
   stockWrap: {

@@ -104,8 +104,8 @@ const GridView = memo((props: GridViewProps) => {
     const selectedStyle = rest.selectedStyle || {
         shadowColor: '#000',
         shadowRadius: 8,
-        shadowOpacity: 0.2,
-        elevation: 10,
+        shadowOpacity: 0.1,
+        elevation: 5,
     }
 
     const [selectedItem, setSelectedItem] = useState<Item>(null)
