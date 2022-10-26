@@ -47,6 +47,8 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import FastImage from "react-native-fast-image";
 import {SvgXml} from "react-native-svg";
 import {call, cross_icon} from "../../svg/svg";
+import AlertModal from "../../pubilc/component/AlertModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 
 const {width, height} = Dimensions.get("window")
 
@@ -131,7 +133,9 @@ class OrderInfoNew extends PureComponent {
       toastContext: '',
       add_tip_id: 0,
       show_add_tip_modal: false,
-      allowRefresh: true
+      allowRefresh: true,
+      show_finish_delivery_modal: false,
+      show_cancel_delivery_modal: false
     }
     this.map_height = 290
   }
@@ -467,7 +471,9 @@ class OrderInfoNew extends PureComponent {
 
   closeModal = () => {
     this.setState({
-      modalTip: false
+      modalTip: false,
+      show_finish_delivery_modal: false,
+      show_cancel_delivery_modal: false,
     })
   }
 
@@ -605,20 +611,17 @@ class OrderInfoNew extends PureComponent {
     }, {'text': '取消'}]);
   }
 
-  toSetOrderComplete = (order_id) => {
-    const {global} = this.props;
-    const {accessToken} = global;
-    Alert.alert('当前配送确认完成吗？', '订单送达后无法撤回，请确认顾客已收到货物？', [{
-      text: '确认', onPress: () => {
-        const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
-        HttpUtils.get(api).then(() => {
-          ToastLong('配送已完成')
-          this.fetchOrder()
-        }).catch(() => {
-          showError('配送完成失败，请稍后重试')
-        })
-      }
-    }, {text: '再想想'}])
+  toSetOrderComplete = () => {
+    const {accessToken} = this.props.global;
+    let {order} = this.state;
+    const api = `/api/complete_order/${order?.id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('配送已完成')
+      this.closeModal();
+      this.fetchOrder()
+    }).catch(() => {
+      showError('配送完成失败，请稍后重试')
+    })
   }
 
   openAddTipModal = (order_id) => {
@@ -669,18 +672,20 @@ class OrderInfoNew extends PureComponent {
             zoom: dada_distance > 2000 ? 13 : 14
           }}>
           {/*门店定位*/}
-          <Marker
-            draggable={false}
-            position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-          >
-            <View style={{alignItems: 'center'}}>
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
-                         style={{width: 30, height: 34,}}
-                         resizeMode={FastImage.resizeMode.contain}
-              />
-            </View>
+          <If condition={ship_distance_destination <= 0}>
+            <Marker
+              draggable={false}
+              position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
+            >
+              <View style={{alignItems: 'center'}}>
+                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
+                           style={{width: 30, height: 34,}}
+                           resizeMode={FastImage.resizeMode.contain}
+                />
+              </View>
 
-          </Marker>
+            </Marker>
+          </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
             <Marker
@@ -712,27 +717,29 @@ class OrderInfoNew extends PureComponent {
             </Marker>
           </If>
           {/*用户定位*/}
-          <Marker
-            draggable={false}
-            position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-            onPress={() => {
-            }}
-          >
-            <View style={{alignItems: 'center'}}>
-              <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
-                <View style={styles.mapBox}>
-                  <Text style={{color: colors.color333, fontSize: 12}}>
-                    距门店{this.filterDistance(dada_distance)}
-                  </Text>
-                </View>
-              </If>
-              <Entypo name={'triangle-down'}
-                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
-                         style={{width: 23, height: 48}}
-                         resizeMode={FastImage.resizeMode.contain}/>
-            </View>
-          </Marker>
+          <If condition={ship_distance_destination > 0 || (ship_worker_lng === 0 && ship_worker_lat === 0)}>
+            <Marker
+              draggable={false}
+              position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+              onPress={() => {
+              }}
+            >
+              <View style={{alignItems: 'center'}}>
+                <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
+                  <View style={styles.mapBox}>
+                    <Text style={{color: colors.color333, fontSize: 12}}>
+                      距门店{this.filterDistance(dada_distance)}
+                    </Text>
+                  </View>
+                </If>
+                <Entypo name={'triangle-down'}
+                        style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
+                           style={{width: 23, height: 48}}
+                           resizeMode={FastImage.resizeMode.contain}/>
+              </View>
+            </Marker>
+          </If>
         </MapView>
       </View>
     )
@@ -891,7 +898,7 @@ class OrderInfoNew extends PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_取消单个配送')
-                    this.cancelDelivery(order?.id)
+                    this.openCancelDeliveryModal()
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -922,7 +929,9 @@ class OrderInfoNew extends PureComponent {
           <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_完成配送')
-                    this.toSetOrderComplete(order?.id)
+                    this.setState({
+                      show_finish_delivery_modal: true
+                    })
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
@@ -1025,22 +1034,22 @@ class OrderInfoNew extends PureComponent {
                       </Text>
                     </If>
                     <View style={styles.productItemPrice}>
-                      <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                      <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
                           <Text style={styles.priceBao}>保</Text>
                           <Text style={[styles.price, {marginRight: 10}]}>
                             {numeral(info?.supply_price / 100).format('0.00')}元
                           </Text>
-                          <If condition={!is_service_mgr}>
+                          <If condition={order?.is_fn_total_price}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.supply_price * info?.num / 100).format('0.00')}元
                             </Text>
                           </If>
                         </If>
-                        <If condition={order?.is_fn_show_wm_price || order?.is_peisong_coop}>
+                        <If condition={order?.is_fn_show_wm_price}>
                           <Text style={styles.priceWai}>外</Text>
                           <Text style={styles.price}>{numeral(info?.price).format('0.00')}元 </Text>
-                          <If condition={!is_service_mgr}>
+                          <If condition={order?.is_fn_total_price}>
                             <Text style={[styles.price, {marginRight: 10}]}>
                               总价 {numeral(info?.price * info?.num).format('0.00')}元
                             </Text>
@@ -1055,35 +1064,38 @@ class OrderInfoNew extends PureComponent {
             </If>
           </View>
           <View style={styles.cuttingLine}/>
-          <View style={[styles.orderCardContainer, {flexDirection: "column", borderBottomLeftRadius: 6, borderBottomRightRadius: 6}]}>
-            <If condition={order?.is_fn_price_controlled}>
+          <View style={[styles.orderCardContainer, {
+            flexDirection: "column",
+            borderBottomLeftRadius: 6,
+            borderBottomRightRadius: 6
+          }]}>
+            <If condition={order?.is_show_purchasing_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>供货价小计 </Text>
                 <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
               </View>
             </If>
-            <If condition={is_service_mgr || !order?.is_fn_price_controlled || order?.is_fn_show_wm_price}>
-
+            <If condition={order?.is_show_actual_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>顾客实付 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
               </View>
-
-              <If condition={order?.self_activity_fee}>
-                <View style={styles.productItemRow}>
-                  <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
-                </View>
-              </If>
-
-              <If condition={order?.bill && order?.bill?.total_income_from_platform}>
-                <View style={styles.productItemRow}>
-                  <Text style={styles.remarkLabel}>平台结算 </Text>
-                  <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
-                </View>
-              </If>
             </If>
-            <If condition={is_service_mgr || !order?.is_fn_price_controlled}>
+
+            <If condition={order?.is_show_activity_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>优惠信息 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
+              </View>
+            </If>
+
+            <If condition={order?.is_show_platform_income}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>平台结算 </Text>
+                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
+              </View>
+            </If>
+            <If condition={order?.is_show_original_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>订单原价 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
@@ -1272,6 +1284,13 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+  openCancelDeliveryModal = () => {
+    this.setState({
+      show_cancel_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   renderDeliveryModal = () => {
     let {show_delivery_modal, orderId, currStoreId} = this.state;
     const {global} = this.props;
@@ -1282,6 +1301,7 @@ class OrderInfoNew extends PureComponent {
         store_id={currStoreId}
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}
+        openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
         accessToken={accessToken}
         show_modal={show_delivery_modal}
         onClose={this.closeDeliveryModal}
@@ -1305,7 +1325,8 @@ class OrderInfoNew extends PureComponent {
   }
 
   render() {
-    const {isShowMap, order, isRefreshing, allowRefresh} = this.state
+    let {accessToken} = this.props.global;
+    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1341,8 +1362,37 @@ class OrderInfoNew extends PureComponent {
         </ScrollView>
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
+        {this.renderFinishDeliveryModal()}
+
+        <CancelDeliveryModal
+          order_id={order?.id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.fetchOrder.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
+        />
+
       </View>
     );
+  }
+
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
   }
 }
 
@@ -1414,16 +1464,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
     backgroundColor: colors.white
   },
   orderInfoHeaderButtonNoMap: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
     backgroundColor: colors.white,
     width: width * 0.94,
     marginLeft: width * 0.03
@@ -1462,8 +1510,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.3,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    elevation: 5,
     shadowRadius: 12
   },
   orderCardHeader: {

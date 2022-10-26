@@ -52,6 +52,7 @@ import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import {initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
 
 const {width} = Dimensions.get("window");
@@ -103,6 +104,7 @@ const initState = {
   add_tip_id: 0,
   show_add_tip_modal: false,
   show_delivery_modal: false,
+  show_cancel_delivery_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -601,12 +603,6 @@ class OrderListScene extends Component {
     ToastLong('编码不合法，请重新扫描')
   }
 
-  closeDeliveryModal = () => {
-    this.setState({
-      order_id: 0,
-      show_delivery_modal: false
-    })
-  }
   openAddTipModal = (order_id) => {
     this.setState({
       add_tip_id: order_id,
@@ -615,9 +611,17 @@ class OrderListScene extends Component {
     })
   }
 
+
+  openCancelDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_cancel_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   render() {
     const {currStoreId, accessToken} = this.props.global;
-    const {is_service_mgr = false} = tool.vendor(this.props.global);
     let {dispatch} = this.props;
     const {
       ListData,
@@ -625,6 +629,7 @@ class OrderListScene extends Component {
       show_goods_list,
       show_delivery_modal,
       show_add_tip_modal,
+      show_cancel_delivery_modal,
       add_tip_id,
     } = this.state
 
@@ -642,7 +647,6 @@ class OrderListScene extends Component {
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
-          is_service_mgr={is_service_mgr}
           accessToken={accessToken}
           order_id={order_id}
           currStoreId={currStoreId}
@@ -654,9 +658,20 @@ class OrderListScene extends Component {
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
+          openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
           accessToken={accessToken}
           show_modal={show_delivery_modal}
-          onClose={this.closeDeliveryModal}
+          onClose={this.closeModal}
+        />
+
+        <CancelDeliveryModal
+          order_id={order_id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
         />
 
         <AddTipModal
@@ -677,6 +692,9 @@ class OrderListScene extends Component {
 
   closeModal = () => {
     this.setState({
+      order_id: 0,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
       showSortModal: false
     })
   }
@@ -778,7 +796,7 @@ class OrderListScene extends Component {
   }
 
   renderHead = () => {
-    let {store_info} = this.props.global;
+    let {store_info, only_one_store} = this.props.global;
     return (
       <View style={{
         flexDirection: 'row',
@@ -794,6 +812,9 @@ class OrderListScene extends Component {
                 xml={menu_left()}/>
 
         <TouchableOpacity onPress={() => {
+          if (only_one_store) {
+            return;
+          }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
@@ -802,6 +823,7 @@ class OrderListScene extends Component {
           </Text>
           <SvgXml xml={this_down()}/>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
@@ -951,6 +973,7 @@ class OrderListScene extends Component {
                  accessToken={accessToken}
                  navigation={this.props.navigation}
                  setState={this.setState.bind(this)}
+                 openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  orderStatus={orderStatus}
       />
     );
@@ -993,8 +1016,8 @@ const styles = StyleSheet.create({
     borderColor: colors.colorDDD,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.3,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    elevation: 5,
     shadowRadius: 12,
     borderRadius: 10,
     borderWidth: 0.5,
@@ -1019,7 +1042,6 @@ const styles = StyleSheet.create({
   noOrderContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     marginTop: 80,
   },
   noOrderDesc: {

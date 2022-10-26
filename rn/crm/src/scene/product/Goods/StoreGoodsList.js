@@ -397,9 +397,11 @@ class StoreGoodsList extends Component {
     if (shouldShowNotificationBar)
       return (
         <View style={styles.notificationBar}>
-          <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
+          <Text style={[styles.n2grey6, {paddingHorizontal: 10, paddingVertical: 6}]}>
+            您申请的调价商品有更新，请及时查看
+          </Text>
           <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
-            <Text style={{color: 'white'}}>查看</Text>
+            <Text style={styles.readNotificationText}>查看</Text>
           </TouchableOpacity>
         </View>
       )
@@ -765,18 +767,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingLeft: 10,
     paddingVertical: 8,
+
   },
   selectGoodsStatusWrap: {marginRight: 10, borderBottomColor: colors.main_color, borderBottomWidth: 2},
   goodsStatusWrap: {marginRight: 10, color: colors.color999},
   selectGoodsStatusText: {color: colors.color333, paddingVertical: 6},
   goodsStatusText: {color: colors.color999, paddingVertical: 6},
   headerWrap: {
-    flexDirection: 'row',
-    height: 40,
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderBottomColor: colors.fontGray,
-    borderBottomWidth: pxToDp(1)
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.1,
+    elevation: 5,
+    shadowRadius: 8,
   },
   stockWrap: {
     flexDirection: 'row',
@@ -815,9 +816,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    backgroundColor: '#EEDEE0',
-    height: pxToDp(150)
+    backgroundColor: 'rgba(238,38,38,0.09)',
+    justifyContent: 'space-between'
   },
   categoryItem: {
     justifyContent: 'space-between',
@@ -886,11 +886,12 @@ const styles = StyleSheet.create({
     marginLeft: 4
   },
   readNotification: {
-    marginRight: 10,
-    marginBottom: 8,
-    flex: 2,
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    backgroundColor: '#E26A6E',
+    marginVertical: 6,
+    marginHorizontal: 10,
+    backgroundColor: '#EE2626',
+    borderRadius: 2
+  },
+  readNotificationText: {
+    color: colors.white, paddingHorizontal: 8, paddingVertical: 1, fontSize: 12
   }
 })

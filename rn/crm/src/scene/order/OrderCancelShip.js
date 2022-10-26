@@ -82,7 +82,7 @@ class OrderCancelShip extends Component {
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
       } else {
-        ToastLong(`错误: ${resp.desc}`)
+        ToastLong(`操作失败，请刷新后重试 ${resp.desc}`)
         this.timeOutBack(300);
       }
     }));

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -164,6 +164,7 @@ class deliveryStatusModal extends React.Component {
     onPress: PropTypes.func,
     fetchData: PropTypes.func,
     openAddTipModal: PropTypes.func,
+    openCancelDeliveryModal: PropTypes.func,
   }
   state = {
     show_modal: false,
@@ -187,13 +188,13 @@ class deliveryStatusModal extends React.Component {
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
       return null;
     }
+    showModal('请求中...')
     tool.debounces(() => {
       this.getInfo(accessToken, order_id)
     })
   }
 
   getInfo = (accessToken, order_id) => {
-    showModal('请求中...')
     const url = '/v4/wsb_delivery/deliveryRecord'
     const params = {access_token: accessToken, order_id: order_id}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
@@ -256,39 +257,6 @@ class deliveryStatusModal extends React.Component {
     });
   }
 
-
-  goCancelDelivery = (ship_id = 0) => {
-    let {order_id, fetchData} = this.props;
-    this.closeModal();
-    this.props.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-      {
-        order: {id: order_id},
-        ship_id: ship_id,
-        onCancelled: () => {
-          fetchData();
-        }
-      });
-  }
-
-  cancelDelivery = () => {
-    let {order_id, accessToken} = this.props;
-    const api = `/v4/wsb_delivery/preCancelDelivery`;
-    HttpUtils.get.bind(this.props)(api, {
-      order_id: order_id,
-      access_token: accessToken
-    }).then(res => {
-      if (tool.length(res?.alert_msg) > 0) {
-        Alert.alert('提示', `${res.alert_msg}`, [{
-          text: '确定', onPress: () => {
-            this.goCancelDelivery()
-          }
-        }, {'text': '取消'}]);
-      } else {
-        this.goCancelDelivery()
-      }
-    })
-  }
-
   dialNumber = () => {
     native.dialNumber(this.state.driver_phone)
   }
@@ -346,10 +314,13 @@ class deliveryStatusModal extends React.Component {
                         <Text style={styles.f14}>第<Text style={styles.orderNum}>{info?.call_rank} </Text>次下单 </Text>
                       </View>
                       <View style={[styles.flexR, {marginTop: 10}]}>
-                        <Text style={[styles.f12, {marginRight: 10}]}>状态： </Text>
-                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_status} </Text>
-                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_time} </Text>
-                        <Text style={styles.f12}>{info?.fee}元 </Text>
+                        <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
+                        <If condition={info?.tip > 0}>
+                          <Text style={styles.f12}>小费：{info?.tip}元 </Text>
+                        </If>
                       </View>
                     </View>
                     {info?.default_show ?
@@ -427,7 +398,7 @@ class deliveryStatusModal extends React.Component {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_取消配送')
-                    this.cancelDelivery()
+                    this.props.openCancelDeliveryModal(order_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,

@@ -151,7 +151,6 @@ class OrderSettingScene extends Component {
 
   componentDidMount() {
     this.getClipboardText()
-    this.getExtStoreList()
   }
 
   getClipboardText = () => {
@@ -363,19 +362,9 @@ class OrderSettingScene extends Component {
     })
   };
 
-  getExtStoreList = () => {
-    const {global} = this.props
-    const {accessToken, currStoreId} = global
-    const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get(api).then(list => {
-      this.setState({
-        wmStoreLength: list?.length
-      })
-    }).catch(error => showError(error.reason))
-  }
-
   render() {
-    let {store_name, store_address, showDateModal, wmStoreLength} = this.state
+    let {only_one_store} = this.props.global;
+    let {store_name, store_address, showDateModal} = this.state
     return (
       <View style={{flex: 1,}}>
         <KeyboardAwareScrollView enableOnAndroid={false}>
@@ -398,6 +387,9 @@ class OrderSettingScene extends Component {
 
             <TouchableOpacity
               onPress={() => {
+                if (only_one_store) {
+                  return;
+                }
                 this.onPress(Config.ROUTE_STORE_SELECT, {
                   onBack: (item) => {
                     this.selectStore(item)
@@ -424,7 +416,7 @@ class OrderSettingScene extends Component {
                   }}> {tool.jbbsubstr(store_address, -18)}</Text>
                 </View>
               </View>
-              <If condition={wmStoreLength >= 1}>
+              <If condition={!only_one_store}>
                 <Entypo name='chevron-thin-right' style={styles.locationIcon}/>
               </If>
             </TouchableOpacity>
