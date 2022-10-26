@@ -69,7 +69,7 @@ class SearchShop extends Component {
       is_default: is_default,
       cityname: cityNames,
       shopmsg: map,
-      placeholderText: placeholderText !== undefined ? placeholderText : '请在此输入地址'
+      placeholderText: placeholderText !== undefined ? placeholderText : '请在此输入地址',
     }
 
     if (tool.length(center) <= 0 && keywords) {
@@ -120,15 +120,15 @@ class SearchShop extends Component {
     }, 1000)
   }
 
-  searchLngLat = (seach_name = true) => {   //submit 事件 (点击键盘的 enter)
-    let {shopmsg} = this.state;
+  searchLngLat = () => {   //submit 事件 (点击键盘的 enter)
+    let {shopmsg, searchKeywords} = this.state;
     this.setState({loading: true})
     tool.debounces(() => {
       if (shopmsg?.location) {
-        let header = 'https://restapi.amap.com/v5/place/around?parameters?'
+        let header = 'https://restapi.amap.com/v5/place/around?parameters?sortrule=distance&types=120000|120100|120200|120201|120202|120203|120300|120301|120302|120303|120304'
         const params = {
           location: shopmsg?.location,
-          keywords: seach_name ? shopmsg?.name ? shopmsg?.name : shopmsg?.address : '',
+          keywords: searchKeywords,
           key: '85e66c49898d2118cc7805f484243909',
         }
         Object.keys(params).forEach(key => {
@@ -138,23 +138,10 @@ class SearchShop extends Component {
         //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
           if (data.status === "1") {
-            // let shopmsg = data?.pois[0];
-            // let item = {
-            //   address: shopmsg?.name,
-            //   adname: shopmsg?.adname,
-            //   citycode: shopmsg?.citycode,
-            //   cityname: shopmsg?.cityname,
-            //   id: shopmsg?.id,
-            //   location: shopmsg?.location,
-            //   name: shopmsg?.name,
-            //   pcode: shopmsg?.pcode,
-            //   pname: shopmsg?.pname,
-            //   type: shopmsg?.type,
-            //   typecode: shopmsg?.typecode,
-            // }
             this.setState({
               ret_list: data?.pois,
               loading: false,
+              searchKeywords: ''
             })
           }
         });
@@ -165,14 +152,14 @@ class SearchShop extends Component {
   }
 
 
-  setLatLng = (latitude, longitude, seach_name = true) => {
+  setLatLng = (latitude, longitude) => {
     let {shopmsg} = this.state;
     shopmsg.location = longitude + ',' + latitude
     this.setState({
       is_default: false,
       shopmsg
     }, () => {
-      this.searchLngLat(seach_name)
+      this.searchLngLat()
     })
   }
 
@@ -327,6 +314,7 @@ class SearchShop extends Component {
                 flexDirection: "row",
                 justifyContent: "center",
                 marginTop: '30%',
+                marginBottom: '60%',
                 flex: 1
               }}>
                 <If condition={loading}>
@@ -394,7 +382,7 @@ class SearchShop extends Component {
               aLat
             } = tool.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
             if (aLon, aLat) {
-              this.setLatLng(aLat, aLon, false)
+              this.setLatLng(aLat, aLon)
             }
           }}
           initialCameraPosition={{
