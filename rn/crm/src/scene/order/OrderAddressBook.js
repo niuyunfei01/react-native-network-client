@@ -214,7 +214,7 @@ class OrderAddressBook extends Component {
       <View style={{paddingHorizontal: 12, paddingVertical: 10}}>
         <View style={{borderRadius: 8, flex: 1, paddingHorizontal: 12, backgroundColor: colors.white}}>
           <For index="index" each="info" of={addressBook}>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity key={index} onPress={() => {
               this.onCheck(info)
             }} style={{paddingVertical: 20, borderColor: colors.e5, borderBottomWidth: 0.5}}>
               <View style={{flexDirection: 'row', alignContent: 'center'}}>

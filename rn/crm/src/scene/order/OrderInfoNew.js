@@ -831,7 +831,7 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
             <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
           </View>
-          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
+          <Text style={styles.orderStatusNotice}>{tool.jbbsubstr(delivery_desc, 18)} </Text>
 
         </Animated.View>
         {this.renderOrderInfoHeaderButton()}

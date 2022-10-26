@@ -29,7 +29,6 @@ import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 import AddTipModal from "../../pubilc/component/AddTipModal";
-import {getContacts} from "../../reducers/store/storeActions";
 import Config from "../../pubilc/common/config";
 import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
@@ -140,10 +139,15 @@ class OrderCallDelivery extends Component {
   }
 
   fetchWorker() {
-    const {dispatch, global} = this.props;
-    dispatch(getContacts(global.accessToken, global.store_id, (ok, msg, contacts) => {
-      this.setState({worker_list: contacts || []})
-    }));
+    const {store_id, accessToken} = this.props.global;
+    const api = `/v4/wsb_worker/workerListOfStore`;
+    let params = {
+      store_id: store_id,
+      access_token: accessToken,
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      this.setState({worker_list: res || []})
+    })
   }
 
   fetchData = () => {
@@ -1106,7 +1110,7 @@ class OrderCallDelivery extends Component {
                     <TouchableOpacity onPress={() => {
                       this.setState({
                         worker_delivery_id: worker?.id,
-                        worker_name: worker?.label,
+                        worker_name: worker?.nickname,
                         worker_mobile: worker?.mobile,
                       })
                     }} key={idx} style={{
@@ -1118,7 +1122,8 @@ class OrderCallDelivery extends Component {
                       borderBottomWidth: 0.2
                     }}>
                       <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                        <Text style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.label} </Text>
+                        <Text
+                          style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.nickname} </Text>
                         <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
                       </View>
                       <If condition={worker_delivery_id === worker?.id}>
