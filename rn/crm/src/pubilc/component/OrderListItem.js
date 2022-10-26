@@ -202,10 +202,10 @@ class OrderListItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
       }).catch(e => {
-        ToastShort('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 600)
   }
@@ -310,8 +310,8 @@ class OrderListItem extends React.PureComponent {
 
   loseDelivery = (val) => {
     this.mixpanel.track('订单列表页_忽略配送')
-    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-      text: '继续忽略配送',
+    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+      text: '忽略',
       onPress: () => {
         this.onOverlookDelivery(val)
       }
