@@ -1,9 +1,12 @@
 import React, {Component} from 'react'
 import {
   Alert,
+  DeviceEventEmitter,
   Dimensions,
   FlatList,
   InteractionManager,
+  NativeEventEmitter,
+  NativeModules,
   Platform,
   StatusBar,
   StyleSheet,
@@ -43,14 +46,14 @@ import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
-import {doJPushSetAlias, initJPush} from "../../pubilc/component/jpushManage";
+import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
 import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {initBlueTooth, printByBluetooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
+import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
 
 const {width} = Dimensions.get("window");
 
@@ -150,10 +153,43 @@ class OrderListScene extends Component {
     }).then()
   }
 
+  printByBluetoothIOS = () => {
+    const {global} = this.props
+    let {accessToken} = global;
+    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+    this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+      if (obj.order_type !== 'new_order') {
+        sendDeviceStatus(accessToken, {...obj, btConnected: '收到极光推送，不是新订单不需要打印'})
+        return
+      }
+      await handlePrintOrder(this.props, obj)
+    })
+  }
+
+
+  printByBluetoothAndroid = () => {
+    this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+      await handlePrintOrder(this.props, obj)
+
+    })
+  }
+
+  printByBluetooth = () => {
+    switch (Platform.OS) {
+      case "ios":
+        this.printByBluetoothIOS()
+        break
+      case "android":
+        this.printByBluetoothAndroid()
+        break
+    }
+  }
+
   componentWillUnmount() {
     this.focus()
     this.unSubscribe()
-
+    this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
+    this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
   }
 
@@ -174,7 +210,7 @@ class OrderListScene extends Component {
     timeObj.method[0].methodName = "componentDidMount"
     const {currStoreId, currentUser, accessToken, lastCheckVersion = 0} = global;
 
-    initBlueTooth(global).then(() => printByBluetooth(navigation))
+    initBlueTooth(global).then(() => this.printByBluetooth())
 
     doJPushSetAlias(currentUser);
 
