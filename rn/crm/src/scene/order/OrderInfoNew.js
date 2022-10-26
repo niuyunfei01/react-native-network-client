@@ -638,8 +638,10 @@ class OrderInfoNew extends PureComponent {
       ship_distance_store
     } = this.state.order;
 
-
-    let {aLon, aLat} = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
+    let {
+      aLon,
+      aLat
+    } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
 
     return (
       <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
@@ -701,21 +703,29 @@ class OrderInfoNew extends PureComponent {
             </Marker>
           </If>
           {/*用户定位*/}
-          <If condition={ship_distance_destination > 0 || (ship_worker_lng === 0 && ship_worker_lat === 0)}>
+          <If condition={ship_distance_destination > 0 && loc_lat && loc_lng}>
+
+            <Marker
+              zIndex={93}
+              position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+              icon={{
+                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
+                width: 22,
+                height: 42,
+              }}
+            />
+          </If>
+          <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng}>
             <Marker
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-              onPress={() => {
-              }}
             >
               <View style={{alignItems: 'center'}}>
-                <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
-                  <View style={styles.mapBox}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
-                      距门店{this.filterDistance(dada_distance)}
-                    </Text>
-                  </View>
-                </If>
+                <View style={styles.mapBox}>
+                  <Text style={{color: colors.color333, fontSize: 12}}>
+                    距门店{this.filterDistance(dada_distance)}
+                  </Text>
+                </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
