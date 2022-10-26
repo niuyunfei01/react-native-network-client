@@ -79,7 +79,10 @@ const initialState = {
   bleStarted: false,
   printer_id: '0',
   isScanningBluetoothDevice: false,
-  autoBluetoothPrint: true
+  autoBluetoothPrint: true,
+  accessToken: '',
+  refreshToken: '',
+  getTokenTs: 0
 };
 
 /**
@@ -126,7 +129,10 @@ export default function globalReducer(state = initialState, action) {
           currStoreId: action.payload.currStoreId,
           host: action.payload.host,
           printer_id: action.payload.printer_id,
-          autoBluetoothPrint: action.payload.autoBluetoothPrint
+          autoBluetoothPrint: action.payload.autoBluetoothPrint,
+          refreshToken: action.payload.refreshToken,
+          expireTs: action.payload.expireTs,
+          getTokenTs: action.payload.getTokenTs
         }
       }
       break
@@ -153,6 +159,7 @@ export default function globalReducer(state = initialState, action) {
         accessToken: action.payload.access_token,
         refreshToken: action.payload.refresh_token,
         expireTs: action.payload.expires_in_ts,
+        getTokenTs: action.payload.getTokenTs
       };
 
     case CHECK_VERSION_AT:

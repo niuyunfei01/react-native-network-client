@@ -1,12 +1,9 @@
 import React, {Component} from 'react'
 import {
   Alert,
-  DeviceEventEmitter,
   Dimensions,
   FlatList,
   InteractionManager,
-  NativeEventEmitter,
-  NativeModules,
   Platform,
   StatusBar,
   StyleSheet,
@@ -18,7 +15,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import BleManager from "react-native-ble-manager";
 import DeviceInfo from "react-native-device-info";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
@@ -27,7 +23,7 @@ import {AMapSdk} from "react-native-amap3d";
 import ModalDropdown from "react-native-modal-dropdown";
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getConfig, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
+import {getConfig, setAccessToken, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 
 import colors from "../../pubilc/styles/colors";
@@ -47,15 +43,14 @@ import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
-import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
-import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
+import {doJPushSetAlias, initJPush} from "../../pubilc/component/jpushManage";
 import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
+import {initBlueTooth, printByBluetooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
 
 const {width} = Dimensions.get("window");
 
@@ -158,130 +153,10 @@ class OrderListScene extends Component {
   componentWillUnmount() {
     this.focus()
     this.unSubscribe()
-    if (this.ptListener != null) {
-      this.ptListener.remove();
-    }
-    this.ptListener = null;
+
     unInitBlueTooth()
-    this.iosBluetooth && this.iosBluetooth.remove()
   }
 
-  printByBluetooth = () => {
-    switch (Platform.OS) {
-      case "ios":
-        this.printByBluetoothIOS()
-        break
-      case "android":
-        this.printByBluetoothAndroid()
-        break
-    }
-  }
-
-  printByBluetoothIOS = () => {
-    let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = this.props.global;
-    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-    this.iosBluetooth = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      console.log('obj', obj, ' printer_id', printer_id, 'autoBluetoothPrint', autoBluetoothPrint)
-      if (obj.order_type !== 'new_order')
-        return
-      if (printer_id && autoBluetoothPrint) {
-
-        // if (!bleStarted) {
-        //   BleManager.start({showAlert: false}).then();
-        //   store.dispatch(setBleStarted(true));
-        // }
-        const clb = (msg, error) => {
-          // noinspection JSIgnoredPromiseFromCall
-          sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
-        };
-        BleManager.retrieveServices(printer_id).then((peripheral) => {
-          // console.log('准备打印：', obj.wm_id)
-          print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
-        }).catch((error) => {
-          //蓝牙尚未启动时，会导致App崩溃
-          //console.log('蓝牙尚未启动时，会导致App崩溃：', error)
-          if (!bleStarted) {
-            sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
-          }
-          //重新连接
-          BleManager.connect(printer_id).then(() => {
-            //console.log('重新连接：', obj.wm_id)
-            BleManager.retrieveServices(printer_id).then((peripheral) => {
-              print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
-            })
-          }).catch((error2) => {
-            //console.log('蓝牙无法自动打印：', obj.wm_id)
-            // noinspection JSIgnoredPromiseFromCall
-            sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
-            Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
-              {text: '确定', onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)},
-              {text: '取消'}
-            ]);
-          });
-        });
-        return;
-      }
-      //console.log('尚未连接到打印机：', obj.wm_id)
-      // noinspection JSIgnoredPromiseFromCall
-      sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
-      Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
-        {
-          text: '确定',
-          onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-        },
-        {text: '取消'}
-      ]);
-    })
-  }
-
-  printByBluetoothAndroid = () => {
-    let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = this.props.global;
-    //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      if (printer_id && autoBluetoothPrint) {
-        setTimeout(() => {
-          const clb = (msg, error) => {
-            sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
-          };
-          BleManager.retrieveServices(printer_id).then((peripheral) => {
-            print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
-          }).catch((error) => {
-            //蓝牙尚未启动时，会导致App崩溃
-            if (!bleStarted) {
-              sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
-              return;
-            }
-            //重新连接
-            BleManager.connect(printer_id).then(() => {
-              BleManager.retrieveServices(printer_id).then((peripheral) => {
-                print_order_to_bt(peripheral, clb, obj.wm_id, false, 1);
-              })
-            }).catch((error2) => {
-              // noinspection JSIgnoredPromiseFromCall
-              sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
-              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
-                {
-                  text: '确定',
-                  onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-                },
-                {text: '取消'}
-              ]);
-            });
-          });
-        }, 300);
-        return
-      }
-      sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
-      Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
-        {
-          text: '确定',
-          onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-        },
-        {text: '取消'}
-      ]);
-
-    })
-  }
 
   componentDidMount() {
     initJPush()
@@ -298,13 +173,9 @@ class OrderListScene extends Component {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {currStoreId, currentUser, accessToken, lastCheckVersion = 0} = global;
-    if (this.ptListener) {
-      this.ptListener.remove()
-    }
-    initBlueTooth(global).then(() => {
-    })
 
-    this.printByBluetooth()
+    initBlueTooth(global).then(() => printByBluetooth(navigation))
+
     doJPushSetAlias(currentUser);
 
     const currentTs = dayjs(new Date()).unix();
@@ -377,10 +248,25 @@ class OrderListScene extends Component {
       currVendorId: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
       show_bottom_tab: reduxGlobal.show_bottom_tab,
-      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
+      refreshToken: reduxGlobal.refreshToken,
+      expireTs: reduxGlobal.expireTs,
+      getTokenTs: reduxGlobal.getTokenTs
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
+    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
+      this.refreshAccessToken(reduxGlobal.refreshToken)
+  }
+
+  refreshAccessToken = (refreshToken) => {
+    const url = `/v4/WsbUser/refreshToken`
+    const params = {refresh_token: refreshToken}
+    const {dispatch} = this.props
+    HttpUtils.post(url, params).then(res => {
+      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
+    })
   }
 
   checkVersion = () => {

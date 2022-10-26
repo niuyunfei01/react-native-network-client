@@ -25,6 +25,7 @@ import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
+import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -86,17 +87,25 @@ export const setSGCategory = (basic_categories) => {
   }
 }
 
-export function setAccessToken(oauthToken) {
+export function setAccessToken(obj) {
   return {
     type: SESSION_TOKEN_SUCCESS,
-    payload: oauthToken
+    payload: {
+      access_token: obj.access_token,
+      refresh_token: obj.refresh_token,
+      expires_in_ts: obj.expires_in_ts,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
 export function setNoLoginInfo(info) {
   return {
     type: SET_NO_LOGIN_INFO,
-    payload: info
+    payload: {
+      ...info,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
@@ -296,7 +305,7 @@ export function signIn(mobile, password, props, callback) {
       .then(json => {
         const {access_token, refresh_token, expires_in: expires_in_ts} = json;
         if (access_token) {
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+          dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
 
           const authCallback = (ok, msg, profile) => {

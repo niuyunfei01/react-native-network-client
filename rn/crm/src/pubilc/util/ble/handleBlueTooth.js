@@ -1,11 +1,14 @@
 import BleManager from 'react-native-ble-manager';
-import {Alert, NativeEventEmitter, NativeModules, PermissionsAndroid, Platform} from "react-native";
+import {Alert, DeviceEventEmitter, NativeEventEmitter, NativeModules, PermissionsAndroid, Platform} from "react-native";
 import store from '../../util/configureStore'
 import {
   setBleStarted, setBlueToothDeviceList, setIsScanningBlueTooth, setPrinterId
 } from "../../../reducers/global/globalActions";
 import ESC from "./Ecs";
 import tool from "../tool";
+import Config from "../../common/config";
+import {sendDeviceStatus} from "../../component/jpushManage";
+import {print_order_to_bt} from './OrderPrinter'
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -13,6 +16,8 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 let initBleResult = null
 let global = null
 const peripherals = new Map()
+let iosBluetoothPrintListener = null
+let androidBluetoothPrintListener = null
 export const startScan = async () => {
   try {
     if (global.isScanningBluetoothDevice)
@@ -49,8 +54,9 @@ export const handleDisconnectedPeripheral = async (id) => {
   }
 }
 
-const openBluetooth = async (printer_id) => {
-  if (Platform.OS === 'android' && Platform.Version >= 23 && printer_id) {
+const openBluetooth = async () => {
+  needShowOpenBluetoothStatus = false
+  if (Platform.OS === 'android' && Platform.Version >= 23) {
     try {
       await BleManager.enableBluetooth()
       const result = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
@@ -61,12 +67,30 @@ const openBluetooth = async (printer_id) => {
     }
   }
 }
+let needShowOpenBluetoothStatus = true//防止多次提示
 const handleDidUpdateState = (args, printer_id) => {
-  if (args.state === 'off' && printer_id) {
-    Alert.alert('蓝牙未开启', '请打开蓝牙，使用蓝牙打印机', [
-      {text: '取消'},
-      {text: '开启蓝牙', onPress: () => openBluetooth(printer_id)}
-    ])
+  switch (Platform.OS) {
+    case "android":
+      if (args.state === 'off' && printer_id && needShowOpenBluetoothStatus) {
+        Alert.alert('蓝牙未开启', '请打开蓝牙，使用蓝牙打印机', [
+          {text: '取消', onPress: () => needShowOpenBluetoothStatus = false},
+          {text: '开启蓝牙', onPress: () => openBluetooth()}
+        ])
+      }
+      break
+    case "ios":
+      if (args.state === 'off' && printer_id && needShowOpenBluetoothStatus) {
+        Alert.alert('蓝牙未开启', '请到设置打开蓝牙，使用蓝牙打印机', [
+          {
+            text: '确定',
+            onPress: () => needShowOpenBluetoothStatus = false
+          }
+        ])
+      }
+      break
+  }
+  if (args.state === 'on') {
+    needShowOpenBluetoothStatus = true
   }
 }
 
@@ -132,6 +156,10 @@ export const unInitBlueTooth = () => {
   bleManagerEmitter.removeListener('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral);
   bleManagerEmitter.removeListener("BleManagerDidUpdateState", handleDidUpdateState)
   bleManagerEmitter.removeListener('BleManagerCentralManagerWillRestoreState', handleCentralManagerWillRestoreState)
+  iosBluetoothPrintListener && iosBluetoothPrintListener.remove()
+  androidBluetoothPrintListener && androidBluetoothPrintListener.remove()
+  iosBluetoothPrintListener = null
+  androidBluetoothPrintListener = null
 }
 
 const testPrintData = (data) => {
@@ -197,4 +225,84 @@ export const retrieveConnected = async () => {
     peripherals.set(peripheral.id, peripheral);
   }
   store.dispatch(setBlueToothDeviceList(Array.from(peripherals.values())))
+}
+
+const handlePrintOrder = (navigation, obj) => {
+  let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = global;
+  if (!autoBluetoothPrint) {
+    sendDeviceStatus(accessToken, obj)
+    return;
+  }
+  if (printer_id && autoBluetoothPrint) {
+    setTimeout(async () => {
+      const clb = (msg, error) => {
+        sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+      };
+
+      try {
+        const peripheral = await BleManager.retrieveServices(printer_id)
+        print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+      } catch (error) {
+        //蓝牙尚未启动时，会导致App崩溃
+        if (!bleStarted) {
+          sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
+          return;
+        }
+        try {
+          await BleManager.connect(printer_id)
+          const peripheral = await BleManager.retrieveServices(printer_id)
+          print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+        } catch (error2) {
+          sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+          Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
+            {
+              text: '确定',
+              onPress: () => navigation.navigate(Config.ROUTE_PRINTERS)
+            },
+            {text: '取消'}
+          ]);
+        }
+      }
+    }, 300);
+    return
+  }
+  sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
+  Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
+    {
+      text: '确定',
+      onPress: () => navigation.navigate(Config.ROUTE_PRINTERS)
+    },
+    {text: '取消'}
+  ]);
+}
+const printByBluetoothIOS = (navigation) => {
+  let {accessToken} = global;
+  const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+  iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+    if (obj.order_type !== 'new_order') {
+      sendDeviceStatus(accessToken, {...obj, btConnected: '收到极光推送，不是新订单不需要打印'})
+      return
+    }
+    handlePrintOrder(navigation, obj)
+  })
+}
+
+
+const printByBluetoothAndroid = (navigation) => {
+
+  androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+    handlePrintOrder(navigation, obj)
+
+  })
+}
+
+export const printByBluetooth = (navigation) => {
+  switch (Platform.OS) {
+    case "ios":
+      printByBluetoothIOS(navigation)
+      break
+    case "android":
+      printByBluetoothAndroid(navigation)
+      break
+  }
 }
