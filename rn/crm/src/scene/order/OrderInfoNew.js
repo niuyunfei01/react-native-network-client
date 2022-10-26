@@ -265,6 +265,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   fetchOrder = () => {
+    showModal('加载中')
     let {orderId, isFetching} = this.state
     if (!orderId || isFetching) {
       return false;
@@ -276,6 +277,7 @@ class OrderInfoNew extends PureComponent {
     const {dispatch} = this.props;
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
+      hideModal()
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
@@ -298,10 +300,12 @@ class OrderInfoNew extends PureComponent {
       this.logOrderViewed();
       this.fetchThirdWays()
     }, ((res) => {
+      hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       ToastLong('操作失败：' + res.reason)
       this.setState({isFetching: false})
     })).catch((e) => {
+      hideModal()
       ToastLong('操作失败：' + e.desc)
       this.setState({isFetching: false})
     })
@@ -533,7 +537,8 @@ class OrderInfoNew extends PureComponent {
   }
 
   deliveryModalFlag = () => {
-    if (this.state.delivery_status !== '待呼叫配送') {
+    let {order} = this.state;
+    if (order?.orderStatus != Cts.ORDER_STATUS_TO_READY) {
       this.mixpanel.track('订单详情页_>')
       this.setState({show_delivery_modal: true})
     }
@@ -818,7 +823,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoHeader = () => {
-    let {delivery_status, delivery_desc, isShowMap} = this.state;
+    let {delivery_status, delivery_desc, isShowMap, order} = this.state;
     return (
       <>
         <Animated.View {...this._panResponder.panHandlers}
@@ -829,7 +834,9 @@ class OrderInfoNew extends PureComponent {
           </If>
           <View style={styles.orderInfoHeaderStatus}>
             <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            <If condition={order?.orderStatus != Cts.ORDER_STATUS_TO_READY}>
+              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            </If>
           </View>
           <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
 
@@ -1075,30 +1082,28 @@ class OrderInfoNew extends PureComponent {
                 <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
               </View>
             </If>
-            <If condition={order?.is_show_actual_price}>
+            <If condition={order?.is_show_original_price}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>顾客实付 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+                <Text style={styles.remarkLabel}>订单原价 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
               </View>
             </If>
-
             <If condition={order?.is_show_activity_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>优惠信息 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
               </View>
             </If>
-
+            <If condition={order?.is_show_actual_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>顾客实付 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+              </View>
+            </If>
             <If condition={order?.is_show_platform_income}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>平台结算 </Text>
                 <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
-              </View>
-            </If>
-            <If condition={order?.is_show_original_price}>
-              <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>订单原价 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
               </View>
             </If>
           </View>

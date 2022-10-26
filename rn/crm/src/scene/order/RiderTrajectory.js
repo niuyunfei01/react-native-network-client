@@ -12,6 +12,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import * as PropTypes from "prop-types";
 import numeral from "numeral";
 import FastImage from "react-native-fast-image";
+import {rgbaColor} from "react-native-reanimated/src/reanimated2/Colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -178,27 +179,34 @@ class RiderTrajectory extends Component {
             }}
           />
         </If>
-        {/*顾客定位*/}
-        <If condition={distance_store === 0 && track_destination_lat && track_destination_lng}>
+        <If condition={distance_destination > 0 || (track_horseman_lng === 0 && track_horseman_lat === 0)}>
           <Marker
-            zIndex={93}
-            // centerOffset={{x: 1, y: 1}}
+            draggable={false}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
+            onPress={() => {
+            }}
           >
             <View style={{alignItems: 'center'}}>
-              <View style={{
-                zIndex: 990,
-                backgroundColor: colors.white,
-                marginBottom: 15,
-                padding: 8,
-                borderRadius: 6,
-              }}>
-                <If condition={distance_destination <= 0}>
+              <If condition={track_horseman_lng === 0 && track_horseman_lat === 0}>
+                <View style={{
+                  zIndex: 999,
+                  backgroundColor: colors.white,
+                  marginBottom: 15,
+                  padding: 8,
+                  borderRadius: 6
+                }}>
                   <Text style={{color: colors.color333, fontSize: 12}}>
                     距门店{this.filterDistance(distance_order)}
                   </Text>
-                </If>
-              </View>
+                </View>
+              </If>
+              <If condition={distance_destination > 0}>
+                <View style={{backgroundColor: rgbaColor(255,255,255, 0)}}>
+                  <Text style={{color: rgbaColor(255,255,255, 0)}}>
+                    骑手正在路上
+                  </Text>
+                </View>
+              </If>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
