@@ -4,9 +4,11 @@ import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import FastImage from "react-native-fast-image";
-import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
+import {SvgXml} from "react-native-svg";
+import {noSearchGoodsData} from "../../../svg/svg";
 
 const {width} = Dimensions.get('window')
 const styles = StyleSheet.create({
@@ -53,7 +55,13 @@ const styles = StyleSheet.create({
     borderTopColor: colors.colorEEE
   },
   bottomTextNormal: {fontSize: 14, color: colors.color666},
-  bottomTextBtn: {fontSize: 14, color: colors.main_color, marginLeft: 12}
+  bottomTextBtn: {fontSize: 14, color: colors.main_color, marginLeft: 12},
+  center: {flex: 1, alignItems: 'center', marginTop: 80},
+  notHasGoodsDesc: {
+    fontSize: 15,
+    marginTop: 9,
+    color: colors.color999
+  },
 })
 
 class SearchAndCreateGoodsScene extends React.PureComponent {
@@ -67,7 +75,9 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
       pageSize: 10,
       isLastPage: false,
       isLoading: false,
-      isCanLoadMore: false
+      isCanLoadMore: false,
+      hasGoodsResult: false,
+      showBottomView: false
     }
   }
 
@@ -165,13 +175,18 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
     showModal('加载中')
     HttpUtils.get(url, params).then(res => {
       hideModal()
-      if (Array.isArray(res.lists))
+      if (Array.isArray(res.lists)) {
+
         this.setState({
           goodsList: Number(res.page) === 1 ? res.lists : goodsList.concat(res.lists),
           page: res.page,
           isLastPage: res.isLastPage,
-          isLoading: false
+          isLoading: false,
+          hasGoodsResult: !res.lists.length,
+          showBottomView: true
         })
+
+      }
     }, () => {
       this.setState({isLoading: false})
       hideModal()
@@ -194,17 +209,28 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
     this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
   }
   getGoodsList = () => {
-    const {goodsList} = this.state
+    const {goodsList, hasGoodsResult} = this.state
+    if (goodsList.length > 0)
+      return (
+        <FlatList data={goodsList}
+                  renderItem={this.renderItem}
+                  getItemLayout={this.getItemLayout}
+                  initialNumToRender={10}
+                  onScrollBeginDrag={this.onScrollBeginDrag}
+                  onEndReachedThreshold={0.2}
+                  onEndReached={this.onLoadMore}
+                  keyExtractor={(item, index) => `${index}`}
+        />
+      )
     return (
-      <FlatList data={goodsList}
-                renderItem={this.renderItem}
-                getItemLayout={this.getItemLayout}
-                initialNumToRender={10}
-                onScrollBeginDrag={this.onScrollBeginDrag}
-                onEndReachedThreshold={0.2}
-                onEndReached={this.onLoadMore}
-                keyExtractor={(item, index) => `${index}`}
-      />
+      <If condition={hasGoodsResult}>
+        <View style={styles.center}>
+          <SvgXml xml={noSearchGoodsData()}/>
+          <Text style={styles.notHasGoodsDesc}>
+            暂无搜索结果
+          </Text>
+        </View>
+      </If>
     )
   }
 
@@ -213,8 +239,8 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
     navigation.navigate(Config.ROUTE_GOODS_EDIT, {goodsInfo: goodsInfo, type: 'add'})
   }
   getBottomView = () => {
-    const {searchKeywords} = this.state
-    if (searchKeywords)
+    const {showBottomView} = this.state
+    if (showBottomView)
       return (
         <View style={styles.bottomWrap}>
           <Text style={styles.bottomTextNormal}>
@@ -233,6 +259,7 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
         {this.getHeader()}
         {this.getGoodsList()}
         {this.getBottomView()}
+
       </>
     )
   }
