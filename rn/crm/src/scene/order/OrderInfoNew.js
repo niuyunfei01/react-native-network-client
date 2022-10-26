@@ -6,8 +6,6 @@ import {
   Dimensions,
   InteractionManager,
   PanResponder,
-  PermissionsAndroid,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -156,8 +154,6 @@ class OrderInfoNew extends PureComponent {
     timeObj['componentName'] = "OrderInfo"
     timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
-    this.enableBluetooth()
-
   }
 
   componentDidUpdate = () => {
@@ -186,23 +182,6 @@ class OrderInfoNew extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
-  }
-
-  enableBluetooth = () => {
-    const {printer_id} = this.props.global
-    if (Platform.OS === 'android' && Platform.Version >= 23 && printer_id !== '0') {
-      BleManager.enableBluetooth().then().catch(() => {
-        this.setState({askEnableBle: true})
-      });
-
-      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (!result) {
-          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then(() => {
-          });
-        }
-      });
-    }
-
   }
 
   handleActionSheet = (order, allow_merchants_cancel_order) => {
