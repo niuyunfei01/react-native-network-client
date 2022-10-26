@@ -63,6 +63,8 @@ const initialState = {
   bleStarted: false,
   printer_id: '0',
   show_bottom_tab: false,
+  only_one_store: false,
+  is_vendor_admin: false,
   menu_list: {
     delivery: 1,
     myself: 1,
@@ -179,6 +181,8 @@ export default function globalReducer(state = initialState, action) {
         customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
         menu_list: action.payload.menu_list || state.menu_list,
         show_bottom_tab: Boolean(action.payload.show_bottom_tab),
+        is_vendor_admin: Boolean(action.payload.is_vendor_admin),
+        only_one_store: Boolean(action.payload.only_one_store),
       } : state;
 
     case HOST_UPDATED:

@@ -37,7 +37,7 @@ class ProfitAndLoss extends PureComponent {
       selectTipOrder: '全部订单',
       head_order: [
         {label: '全部订单', key: 1},
-        {label: '盈亏订单', key: 2}
+        {label: '亏损订单', key: 2}
       ],
       profitList: [],
       isRefreshing: false,
@@ -212,7 +212,7 @@ class ProfitAndLoss extends PureComponent {
             <Text style={styles.selectTipText}>
               {selectTipStore}
             </Text>
-            <Entypo name="chevron-thin-right" style={styles.selectTipText}/>
+            <Entypo name="chevron-thin-down" style={styles.selectTipText}/>
           </View>
         </ModalSelector>
         <ModalSelector skin="customer" data={head_order}
@@ -224,7 +224,7 @@ class ProfitAndLoss extends PureComponent {
             <Text style={styles.selectTipText}>
               {selectTipOrder}
             </Text>
-            <Entypo name="chevron-thin-right" style={styles.selectTipText}/>
+            <Entypo name="chevron-thin-down" style={styles.selectTipText}/>
           </View>
         </ModalSelector>
         <TouchableOpacity style={styles.flexRow} onPress={() => this.setState({showModal: true})}>
@@ -246,7 +246,7 @@ class ProfitAndLoss extends PureComponent {
               请选择时间
             </Text>
           </If>
-          <Entypo name="chevron-thin-right" style={styles.selectTipText}/>
+          <Entypo name="chevron-thin-down" style={styles.selectTipText}/>
         </TouchableOpacity>
       </View>
     )

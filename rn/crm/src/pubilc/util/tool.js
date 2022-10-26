@@ -519,7 +519,8 @@ function jbbsubstr(str = '', height = 0, start = 0, default_str = '') {
   if (typeof str !== 'string' && typeof str !== 'number') {
     return default_str;
   }
-  return length((str || default_str)) > height ? height > 0 ? str.substring(start, height - 1) + '...' : '...' + str.substr(height) : (str || default_str)
+  let str_height = height > 0 ? height : height * -1;
+  return length(str || default_str) > str_height ? height > 0 ? str.substring(start, height - 1) + '...' : '...' + str.substr(height) : (str || default_str)
 }
 
 export default {
