@@ -83,6 +83,9 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
 
   onChangeText = (value) => {
     this.setState({searchKeywords: value})
+    if (!value) {
+      this.setState({hasGoodsResult: false, showBottomView: false})
+    }
   }
 
   searchGoods = () => {
