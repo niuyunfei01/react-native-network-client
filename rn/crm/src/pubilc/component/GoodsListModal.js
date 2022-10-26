@@ -26,8 +26,7 @@ class GoodsListModal extends React.Component {
     ]),
     setState: PropTypes.func,
     onPress: PropTypes.func,
-    show_goods_list: PropTypes.bool,
-    is_service_mgr: PropTypes.bool,
+    show_goods_list: PropTypes.bool
   }
 
   state = {
@@ -35,6 +34,7 @@ class GoodsListModal extends React.Component {
     show_goods_list_modal: false,
     is_fn_price_controlled: false,
     is_fn_show_wm_price: false,
+    is_fn_total_price: false,
     count: false,
   }
 
@@ -61,6 +61,7 @@ class GoodsListModal extends React.Component {
         goods_list: res?.list,
         is_fn_show_wm_price: res?.is_fn_show_wm_price,
         is_fn_price_controlled: res?.is_fn_price_controlled,
+        is_fn_total_price: res?.is_fn_total_price,
         count: res?.count,
         show_goods_list_modal: true
       }, hideModal)
@@ -83,8 +84,8 @@ class GoodsListModal extends React.Component {
 
 
   render(): React.ReactNode {
-    let {is_service_mgr, currStoreId, onPress} = this.props;
-    let {show_goods_list_modal, goods_list, count, is_fn_show_wm_price, is_fn_price_controlled} = this.state;
+    let {currStoreId, onPress} = this.props;
+    let {show_goods_list_modal, goods_list, count, is_fn_show_wm_price, is_fn_price_controlled, is_fn_total_price} = this.state;
     if (tool.length(goods_list) <= 0) {
       return null
     }
@@ -151,31 +152,28 @@ class GoodsListModal extends React.Component {
 
                       <View style={Styles.isMgrContent}>
                         <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-
-                          {/*管理员看到的*/}
-                          <If condition={is_service_mgr || is_fn_show_wm_price}>
+                          <If condition={is_fn_price_controlled}>
                             <Text style={Styles.priceMode}>保</Text>
-                            <Text style={Styles.color44140}>{numeral(item.supply_price / 100).format('0.00')} </Text>
-                            <View style={Styles.ml30}/>
+                            <Text style={Styles.color44140}>
+                              {numeral(item?.supply_price / 100).format('0.00')}元
+                            </Text>
+                            <If condition={is_fn_total_price}>
+                              <View style={Styles.ml30}/>
+                              <Text style={Styles.color44140}>
+                                总价 {numeral(item?.supply_price * item?.num / 100).format('0.00')}元
+                              </Text>
+                            </If>
+                          </If>
+                          <If condition={is_fn_show_wm_price}>
                             <Text style={Styles.priceModes}>外</Text>
-                            <Text style={Styles.color44140}>{numeral(item.price).format('0.00')} </Text>
-                          </If>
-
-                          {/*商户看到的*/}
-                          <If condition={!is_service_mgr && (is_fn_price_controlled || is_fn_show_wm_price)}>
-                            {/*保底模式*/}
-                            <If condition={is_fn_price_controlled}>
-                              <Text style={[Styles.priceMode]}>保</Text>
-                              <Text style={Styles.color44140}>{numeral(item.supply_price / 100).format('0.00')} </Text>
-                            </If>
-
-                            {/*联营模式*/}
-                            <If condition={is_fn_show_wm_price}>
-                              <Text style={Styles.priceMode}>外</Text>
-                              <Text style={Styles.color44140}>{numeral(item.price).format('0.00')} </Text>
+                            <Text style={Styles.color44140}>{numeral(item?.price).format('0.00')}元 </Text>
+                            <If condition={is_fn_total_price}>
+                              <View style={Styles.ml30}/>
+                              <Text style={Styles.color44140}>
+                                总价 {numeral(item?.price * item?.num).format('0.00')}元
+                              </Text>
                             </If>
                           </If>
-
                         </View>
                         <Text style={{
                           fontSize: 12,
@@ -217,7 +215,7 @@ const Styles = StyleSheet.create({
   },
   productIdText: {fontSize: 12, color: colors.color999},
   isMgrContent: {flexDirection: 'row', alignItems: 'center', marginTop: 10},
-  color44140: {color: colors.color333, fontSize: 12, marginLeft: 4},
+  color44140: {color: colors.color333, fontSize: 12, marginLeft: 4, marginRight: 20},
   ml30: {marginLeft: 30},
   priceMode: {
     borderWidth: 0.5,

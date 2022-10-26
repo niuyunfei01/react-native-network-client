@@ -559,7 +559,6 @@ class OrderListScene extends Component {
 
   render() {
     const {currStoreId, accessToken} = this.props.global;
-    const {is_service_mgr = false} = tool.vendor(this.props.global);
     let {dispatch} = this.props;
     const {
       ListData,
@@ -585,7 +584,6 @@ class OrderListScene extends Component {
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
-          is_service_mgr={is_service_mgr}
           accessToken={accessToken}
           order_id={order_id}
           currStoreId={currStoreId}
@@ -981,7 +979,6 @@ const styles = StyleSheet.create({
   noOrderContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     marginTop: 80,
   },
   noOrderDesc: {

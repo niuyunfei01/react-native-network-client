@@ -672,18 +672,20 @@ class OrderInfoNew extends PureComponent {
             zoom: dada_distance > 2000 ? 13 : 14
           }}>
           {/*门店定位*/}
-          <Marker
-            draggable={false}
-            position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-          >
-            <View style={{alignItems: 'center'}}>
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
-                         style={{width: 30, height: 34,}}
-                         resizeMode={FastImage.resizeMode.contain}
-              />
-            </View>
+          <If condition={ship_distance_destination <= 0}>
+            <Marker
+              draggable={false}
+              position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
+            >
+              <View style={{alignItems: 'center'}}>
+                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
+                           style={{width: 30, height: 34,}}
+                           resizeMode={FastImage.resizeMode.contain}
+                />
+              </View>
 
-          </Marker>
+            </Marker>
+          </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
             <Marker
@@ -715,27 +717,29 @@ class OrderInfoNew extends PureComponent {
             </Marker>
           </If>
           {/*用户定位*/}
-          <Marker
-            draggable={false}
-            position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-            onPress={() => {
-            }}
-          >
-            <View style={{alignItems: 'center'}}>
-              <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
-                <View style={styles.mapBox}>
-                  <Text style={{color: colors.color333, fontSize: 12}}>
-                    距门店{this.filterDistance(dada_distance)}
-                  </Text>
-                </View>
-              </If>
-              <Entypo name={'triangle-down'}
-                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
-                         style={{width: 23, height: 48}}
-                         resizeMode={FastImage.resizeMode.contain}/>
-            </View>
-          </Marker>
+          <If condition={ship_distance_destination > 0 || (ship_worker_lng === 0 && ship_worker_lat === 0)}>
+            <Marker
+              draggable={false}
+              position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+              onPress={() => {
+              }}
+            >
+              <View style={{alignItems: 'center'}}>
+                <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
+                  <View style={styles.mapBox}>
+                    <Text style={{color: colors.color333, fontSize: 12}}>
+                      距门店{this.filterDistance(dada_distance)}
+                    </Text>
+                  </View>
+                </If>
+                <Entypo name={'triangle-down'}
+                        style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
+                           style={{width: 23, height: 48}}
+                           resizeMode={FastImage.resizeMode.contain}/>
+              </View>
+            </Marker>
+          </If>
         </MapView>
       </View>
     )
@@ -1065,34 +1069,33 @@ class OrderInfoNew extends PureComponent {
             borderBottomLeftRadius: 6,
             borderBottomRightRadius: 6
           }]}>
-            <If condition={order?.is_fn_price_controlled}>
+            <If condition={order?.is_show_purchasing_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>供货价小计 </Text>
                 <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
               </View>
             </If>
-            <If condition={is_service_mgr || !order?.is_fn_price_controlled || order?.is_fn_show_wm_price}>
-
+            <If condition={order?.is_show_actual_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>顾客实付 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
               </View>
-
-              <If condition={order?.self_activity_fee}>
-                <View style={styles.productItemRow}>
-                  <Text style={styles.remarkLabel}>优惠信息 </Text>
-                  <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
-                </View>
-              </If>
-
-              <If condition={order?.bill && order?.bill?.total_income_from_platform}>
-                <View style={styles.productItemRow}>
-                  <Text style={styles.remarkLabel}>平台结算 </Text>
-                  <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
-                </View>
-              </If>
             </If>
-            <If condition={is_service_mgr || !order?.is_fn_price_controlled}>
+
+            <If condition={order?.is_show_activity_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>优惠信息 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
+              </View>
+            </If>
+
+            <If condition={order?.is_show_platform_income}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>平台结算 </Text>
+                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
+              </View>
+            </If>
+            <If condition={order?.is_show_original_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>订单原价 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
@@ -1461,16 +1464,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
     backgroundColor: colors.white
   },
   orderInfoHeaderButtonNoMap: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
     backgroundColor: colors.white,
     width: width * 0.94,
     marginLeft: width * 0.03

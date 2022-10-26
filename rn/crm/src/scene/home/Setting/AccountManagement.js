@@ -54,14 +54,13 @@ class PermissionToIdentify extends PureComponent {
     }
   }
 
-  componentDidMount() {
-    this.get_wsb_workers()
-  }
-
   get_wsb_workers = () => {
     showModal('加载中')
     const {currStoreId, accessToken, vendor_id} = this.props.global;
     let {page, pageSize} = this.state.query
+    if (this.state.isLoading)
+      return
+    this.setState({isLoading: true})
     const api = `/v4/wsb_worker/workerList?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
@@ -79,7 +78,8 @@ class PermissionToIdentify extends PureComponent {
           pageSize: worker_info.pageSize
         },
         count: worker_info.count,
-        isLastPage: worker_info.isLastPage
+        isLastPage: worker_info.isLastPage,
+        isLoading: false
       })
     })
   }
@@ -163,8 +163,8 @@ class PermissionToIdentify extends PureComponent {
         <TouchableOpacity style={styles.ListItem} onPress={() => this.editWorker(item)}>
           <View style={styles.ListItemLeft}>
             <View style={styles.workerPhoto}>
-              <Text style={styles.workerDesc}>
-                {item?.role_desc === '管理员' ? '店长' : item?.role_desc}
+              <Text style={[styles.workerDesc, item?.role_desc === '管理员' ? {fontSize: 12} : {fontSize: 14}]}>
+                {item?.role_desc}
               </Text>
             </View>
             <View style={{marginLeft: pxToDp(20)}}>
@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   workerDesc: {
-    fontSize: 14,
     color: '#42C15A',
     fontWeight: 'bold',
     padding: pxToDp(5)
