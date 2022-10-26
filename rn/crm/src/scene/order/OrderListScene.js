@@ -4,7 +4,9 @@ import {
   DeviceEventEmitter,
   Dimensions,
   FlatList,
-  InteractionManager, NativeEventEmitter, NativeModules,
+  InteractionManager,
+  NativeEventEmitter,
+  NativeModules,
   Platform,
   StatusBar,
   StyleSheet,
@@ -25,7 +27,7 @@ import {AMapSdk} from "react-native-amap3d";
 import ModalDropdown from "react-native-modal-dropdown";
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getConfig, setBleStarted, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
+import {getConfig, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 
 import colors from "../../pubilc/styles/colors";
@@ -821,7 +823,9 @@ class OrderListScene extends Component {
           <Text style={{fontSize: 15, color: colors.color333}}>
             {tool.jbbsubstr(store_info?.name, 8)}
           </Text>
-          <SvgXml xml={this_down()}/>
+          <If condition={!only_one_store}>
+            <SvgXml xml={this_down()}/>
+          </If>
         </TouchableOpacity>
 
         <TouchableOpacity
