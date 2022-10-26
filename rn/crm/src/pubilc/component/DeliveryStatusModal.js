@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -314,10 +314,13 @@ class deliveryStatusModal extends React.Component {
                         <Text style={styles.f14}>第<Text style={styles.orderNum}>{info?.call_rank} </Text>次下单 </Text>
                       </View>
                       <View style={[styles.flexR, {marginTop: 10}]}>
-                        <Text style={[styles.f12, {marginRight: 10}]}>状态： </Text>
-                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_status} </Text>
-                        <Text style={[styles.f12, {marginRight: 10}]}>{info?.call_time} </Text>
-                        <Text style={styles.f12}>{info?.fee}元 </Text>
+                        <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
+                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
+                        <If condition={info?.tip}>
+                          <Text style={styles.f12}>小费：{info?.tip}元 </Text>
+                        </If>
                       </View>
                     </View>
                     {info?.default_show ?
