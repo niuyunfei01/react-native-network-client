@@ -1277,8 +1277,7 @@ export const menu = (width = 24, height = 24) => {
 export const empty_data = () => {
   return (
     `
-<svg width="122px" height="94px" viewBox="0 0 122 94" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>编组</title>
+<svg width="122px" height="94px" viewBox="0 0 122 94" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <linearGradient x1="0.318170704%" y1="100%" x2="99.6818293%" y2="0%" id="linearGradient-1">
             <stop stop-color="#F8F8F8" offset="0%"></stop>
@@ -1356,8 +1355,7 @@ export const empty_data = () => {
 export const call = (width = 24, height = 24) => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>打电话备份</title>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="打电话备份">
             <rect id="BG" fill="#FFFFFF" opacity="0" x="0" y="0" width="23.9999" height="24"></rect>
@@ -1374,7 +1372,7 @@ export const call = (width = 24, height = 24) => {
 
 export const locationIcon = (width = 24, height = 24) => {
   return (
-    `<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    `<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>定位备份</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="定位备份">
@@ -1394,7 +1392,7 @@ export const locationIcon = (width = 24, height = 24) => {
 export const weighticon = () => {
   return (
     `
-    <svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>重量</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="手动发单-发配送" transform="translate(-34.000000, -904.000000)">
@@ -1424,7 +1422,7 @@ export const weighticon = () => {
 export const time = () => {
   return (
     `
-   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>时间</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="手动发单-发配送" transform="translate(-104.000000, -904.000000)">
@@ -1453,7 +1451,7 @@ export const time = () => {
 export const cost = () => {
   return (
     `
-   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>费用</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="手动发单-发配送" transform="translate(-176.000000, -904.000000)">
@@ -1481,7 +1479,7 @@ export const cost = () => {
 export const add_tip = () => {
   return (
     `
-   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>加小费</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="手动发单-发配送" transform="translate(-247.000000, -904.000000)">
@@ -1505,7 +1503,7 @@ export const add_tip = () => {
 export const remarkIcon = () => {
   return (
     `
-   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>备注</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="手动发单-发配送" transform="translate(-319.000000, -904.000000)">
@@ -1533,7 +1531,7 @@ export const remarkIcon = () => {
 export const order_search = () => {
   return (
     `
-   <svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>订单查询@2x</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="30" height="30"></rect>
@@ -1554,7 +1552,7 @@ export const order_search = () => {
 export const operator_data = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>数据看板@1x</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="数据看板">
@@ -1575,7 +1573,7 @@ export const operator_data = () => {
 export const delivery_sync = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>配送回传@1x</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="配送回传">
@@ -1595,7 +1593,7 @@ export const delivery_sync = () => {
 export const adjust = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>调价</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="调价">
@@ -1615,7 +1613,7 @@ export const adjust = () => {
 export const order_compensate = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>订单补偿</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="订单补偿" fill-rule="nonzero">
@@ -1638,7 +1636,7 @@ export const order_compensate = () => {
 export const fee_bills = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>费用账单</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="文件-账单">
@@ -1660,7 +1658,7 @@ export const fee_bills = () => {
 export const ext_store = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>外卖门店</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="外卖门店">
@@ -1680,7 +1678,7 @@ export const ext_store = () => {
 export const deliveries = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>配送管理</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="配送管理">
@@ -1702,7 +1700,7 @@ export const deliveries = () => {
 export const stores = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>门店管理</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="门店管理">
@@ -1723,7 +1721,7 @@ export const stores = () => {
 export const printer = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>打印</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="打印">
@@ -1744,7 +1742,7 @@ export const printer = () => {
 export const push = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>通知设置</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="通知设置s">
@@ -1764,7 +1762,7 @@ export const push = () => {
 export const setting = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>编组 21备份</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组-21备份" fill-rule="nonzero">
@@ -1784,7 +1782,7 @@ export const setting = () => {
 export const help = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>编组 23备份</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="帮助">
@@ -1804,7 +1802,7 @@ export const help = () => {
 export const history_notice = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>编组 27备份</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组-27备份" fill-rule="nonzero">
@@ -1827,7 +1825,7 @@ export const history_notice = () => {
 export const product = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>商品管理@1x</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="商品管理">
@@ -1845,7 +1843,7 @@ export const product = () => {
 export const third_recharge = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>充值@1x</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="充值">
@@ -1864,7 +1862,7 @@ export const third_recharge = () => {
 export const stall_settlement = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>摊位结算</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="摊位结算" fill-rule="nonzero">
@@ -1884,7 +1882,7 @@ export const stall_settlement = () => {
 export const settlement = () => {
   return (
     `
-<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>编组 31备份 4</title>
     <g id="我的" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组-31备份-4">
@@ -1963,7 +1961,7 @@ export const addGoods = (width = 18, height = 18) => {
 export const bottom_tab_workbench = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>工作台</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组">
@@ -1986,7 +1984,7 @@ export const bottom_tab_workbench = () => {
 export const bottom_tab_workbench_check = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>工作台-hover</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="工作台">
@@ -2005,7 +2003,7 @@ export const bottom_tab_workbench_check = () => {
 export const bottom_tab_goods = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>商品</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组">
@@ -2023,7 +2021,7 @@ export const bottom_tab_goods = () => {
 export const bottom_tab_goods_check = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>商品-hover</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="商品_commodity-(1)" transform="translate(1.999853, 3.000000)" fill="#59B26A" fill-rule="nonzero">
@@ -2037,7 +2035,7 @@ export const bottom_tab_goods_check = () => {
 export const bottom_tab_message = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>消息</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组">
@@ -2056,7 +2054,7 @@ export const bottom_tab_message = () => {
 export const bottom_tab_message_check = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>消息-hover</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="提醒_remind-(2)" transform="translate(3.000000, 3.000000)" fill="#59B26A" fill-rule="nonzero">
@@ -2072,7 +2070,7 @@ export const bottom_tab_message_check = () => {
 export const bottom_tab_control = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>配送 2</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="编组">
@@ -2091,7 +2089,7 @@ export const bottom_tab_control = () => {
 export const bottom_tab_control_check = () => {
   return (
     `
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>配送-hover</title>
     <g id="工作台-新订单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="仪表盘_dashboard-car-(1)" transform="translate(4.000000, 4.000000)" fill="#59B26A">
@@ -2108,7 +2106,7 @@ export const bottom_tab_control_check = () => {
 export const check_icon = () => {
   return (
     `
-<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>勾选</title>
     <g id="注册" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="勾选">
@@ -2123,7 +2121,7 @@ export const check_icon = () => {
 export const cross_icon = () => {
   return (
     `
-<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>叉号</title>
     <g id="手动发单" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="叉号">
@@ -2140,7 +2138,7 @@ export const cross_icon = () => {
 export const cross_circle_icon = () => {
   return (
     `
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" >
     <title>叉号</title>
     <g id="注册" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="叉号">
@@ -2152,6 +2150,107 @@ export const cross_circle_icon = () => {
     </g>
 </svg>
   `)
+}
+
+export const noSearchGoodsData = (width = 122, height = 93) => {
+  return (
+    `
+<svg width="${width}" height="${height}" viewBox="0 0 122 93" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#CCCCCC" offset="0%"></stop>
+            <stop stop-color="#E1E1E1" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.318170704%" y1="100%" x2="99.6818293%" y2="0%" id="linearGradient-2">
+            <stop stop-color="#F8F8F8" offset="0%"></stop>
+            <stop stop-color="#CECECE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="0%" id="linearGradient-4">
+            <stop stop-color="#F3F3F3" offset="0%"></stop>
+            <stop stop-color="#ECECEC" offset="100%"></stop>
+        </linearGradient>
+        <path d="M17.6874304,48.4388504 L17.6874304,53.2180073 C17.6874304,55.8615694 15.6037585,58 13.034061,58 L58.4373262,58 C58.5159333,58 58.5917807,57.9970782 58.6675445,57.9941564 C59.8639603,57.9336574 60.9366955,57.4140886 61.7286197,56.6003609 C62.5711366,55.7344701 63.0906957,54.5397884 63.0906957,53.2180073 L63.0906957,48.4388504 L17.6874304,48.4388504 Z" id="path-5"></path>
+        <linearGradient x1="0%" y1="36.4133436%" x2="90.3184289%" y2="69.5535018%" id="linearGradient-7">
+            <stop stop-color="#E7E7E7" offset="0%"></stop>
+            <stop stop-color="#CACACA" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-8">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-9">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-10" points="4.60784894 0 0 13.6518597 4.60784894 14.8581007"></polygon>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-12">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-13">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-14" points="3.42708765 0 0 10.2388948 3.42708765 11.1435755"></polygon>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-16">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="启动界面/缺省界面" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="账号管理-暂无设置" transform="translate(-132.000000, -168.000000)">
+            <g id="编组-4" transform="translate(131.994548, 168.000000)">
+                <ellipse id="椭圆形" fill="#E7E7E7" cx="60.5768806" cy="84.3888889" rx="54.8571429" ry="8.61111111"></ellipse>
+                <g id="编组-2" transform="translate(20.914756, 20.000000)">
+                    <path d="M8.51918067,7 C11.5184573,7 13.9475821,9.4964398 13.9475821,12.5756973 L13.9475821,12.5756973 L13.9475821,58.1075796 C13.9475821,59.4293606 14.4699844,60.6241284 15.3096581,61.4899332 L15.3096581,61.4899332 C16.152175,62.3556521 17.3176498,62.8895723 18.6010351,62.8895723 L18.6010351,62.8895723 C21.1705654,62.8895723 23.2544046,60.7510558 23.2544046,58.1075796 L23.2544046,58.1075796 L23.2544046,53.5464423 L54.3508473,53.5464423 L54.3508473,12.5756973 C54.3508473,11.0374435 53.7442351,9.64064035 52.7613963,8.63347083 L52.7613963,8.63347083 C51.7784738,7.62337949 50.4220006,7 48.9224459,7 L48.9224459,7 L8.51918067,7 Z" id="Clip-4"></path>
+                    <path d="M3.51918067,0 C6.51845732,0 8.94758207,2.4964398 8.94758207,5.57569731 L8.94758207,53.1075796 C8.94758207,54.4293606 9.46998438,55.6241284 10.3096581,56.4899332 C11.152175,57.3556521 12.3176498,57.8895723 13.6010351,57.8895723 C16.1705654,57.8895723 18.2544046,55.7510558 18.2544046,53.1075796 L18.2544046,48.5464423 L54.3508473,48.5464423 L54.3508473,5.57569731 C54.3508473,4.03744353 53.7442351,2.64064035 52.7613963,1.63347083 C51.7784738,0.623379493 50.4220006,0 48.9224459,0 L3.51918067,0 Z" id="Fill-3" fill="url(#linearGradient-1)"></path>
+                    <ellipse id="椭圆形" fill="url(#linearGradient-2)" transform="translate(82.149898, 35.114639) rotate(24.000000) translate(-82.149898, -35.114639) " cx="82.1498979" cy="35.1146393" rx="7.53484289" ry="7.55893157"></ellipse>
+                    <ellipse id="椭圆形" fill="url(#linearGradient-2)" transform="translate(82.149898, 35.114639) rotate(24.000000) translate(-82.149898, -35.114639) " cx="82.1498979" cy="35.1146393" rx="7.53484289" ry="7.55893157"></ellipse>
+                    <path d="M4.45507778,0.0145231782 C4.36290849,0.0145231782 4.2684058,0.0168206575 4.17850128,0.0258754288 L4.17850128,0.0258754288 C3.05840077,0.0916914534 2.04893086,0.565985782 1.30450772,1.29894925 L1.30450772,1.29894925 C0.497837699,2.09097145 0,3.18923413 0,4.39878941 L0,4.39878941 L0,7.09238116 L8.91008693,7.09238116 L8.91008693,4.39878941 C8.91008693,1.97744895 6.91653999,0.0145231782 4.45507778,0.0145231782 Z" id="Fill-1" fill="url(#linearGradient-3)"></path>
+                    <mask id="mask-6" fill="white">
+                        <use xlink:href="#path-5"></use>
+                    </mask>
+                    <use id="Fill-5" fill="url(#linearGradient-4)" xlink:href="#path-5"></use>
+                </g>
+                <polygon id="Line备份" fill="#ECECEC" fill-rule="nonzero" points="36.3931074 33.3013752 36.3931074 30.8602546 68.8926348 30.8602546 68.8926348 33.3013752"></polygon>
+                <polygon id="Line备份-2" fill="#ECECEC" fill-rule="nonzero" points="36.3931074 42.0990366 36.3931074 39.657916 64.944094 39.657916 64.944094 42.0990366"></polygon>
+                <polygon id="Line备份-3" fill="#ECECEC" fill-rule="nonzero" points="36.3931074 50.2018381 36.3931074 47.7607175 57.0470126 47.7607175 57.0470126 50.2018381"></polygon>
+                <polygon id="Star-Copy-2" fill="#CCCCCC" transform="translate(90.528171, 17.236147) rotate(-45.000000) translate(-90.528171, -17.236147) " points="90.5275333 18.0502611 87.6475865 20.1167316 89.714057 17.2367849 87.6520986 14.3600741 90.5288095 16.4220325 93.4087562 14.355562 91.3422857 17.2355087 93.4042441 20.1122195"></polygon>
+                <polygon id="Star" fill="#CCCCCC" transform="translate(83.693458, 36.403958) rotate(-45.000000) translate(-83.693458, -36.403958) " points="83.6919615 38.3125802 80.9921418 39.1052733 81.7848349 36.4054536 80.9963731 33.7068732 83.6949535 34.4953349 86.3947732 33.7026419 85.6020802 36.4024616 86.3905419 39.101042"></polygon>
+                <polygon id="Star-Copy-3" fill="#EDEDED" transform="translate(23.985968, 41.381446) rotate(-45.000000) translate(-23.985968, -41.381446) " points="23.8939863 43.3263455 21.105383 44.2620308 22.0410683 41.4734274 21.1098951 38.5053732 24.0779494 39.4365464 26.8665527 38.5008611 25.9308674 41.2894644 26.8620406 44.2575187"></polygon>
+                <polygon id="Star-Copy-4" fill="#CCCCCC" transform="translate(26.844949, 67.404192) rotate(-45.000000) translate(-26.844949, -67.404192) " points="26.843702 68.9947108 24.5938522 69.6552883 25.2544298 67.4054386 24.5973783 65.1566216 26.8461953 65.8136731 29.0960451 65.1530955 28.4354675 67.4029453 29.092519 69.6517623"></polygon>
+                <polygon id="Star-Copy" fill="#CCCCCC" transform="translate(92.849632, 70.259998) rotate(-45.000000) translate(-92.849632, -70.259998) " points="92.8486777 71.4778356 91.1260005 71.9836302 91.6317951 70.260953 91.1287004 68.5390666 92.8505868 69.0421613 94.573264 68.5363667 94.0674694 70.2590439 94.5705641 71.9809303"></polygon>
+                <g id="编组" transform="translate(62.446685, 48.488239)" fill="url(#linearGradient-7)">
+                    <path d="M12.8438465,3.06435826 L13.1937339,3.07097368 C14.8276042,3.12919885 16.4732348,3.57126642 17.9997101,4.43486447 L17.9997101,4.43486447 L18.2585279,4.58605001 C22.9795118,7.43223346 24.7796521,13.4466153 22.48981,18.457139 L33.7679163,24.5975045 L33.8586879,24.6558939 C34.1421402,24.869295 34.2318946,25.2618126 34.0529182,25.5760558 L34.0529182,25.5760558 L33.4156192,26.6953802 L33.3514292,26.7897715 C33.209998,26.9657333 32.9941043,27.0636982 32.7729509,27.0643583 L32.7729509,27.0643583 L32.7680827,27.0643583 L32.6779558,27.0586247 C32.5879161,27.0474223 32.4986517,27.0196623 32.4147834,26.9739863 L32.4147834,26.9739863 L21.0505002,20.787465 C17.8419796,24.7612312 12.2000855,25.9600172 7.6241877,23.3712737 L7.6241877,23.3712737 L7.36536647,23.2200882 C2.41669225,20.2366753 0.67751601,13.7722478 3.49403678,8.6316323 L3.49403678,8.6316323 L3.6601182,8.33911988 C5.64218228,4.96847593 9.16626134,3.0718225 12.799083,3.06435826 L12.799083,3.06435826 L12.8438465,3.06435826 Z M16.2912917,7.01697369 C12.6533064,5.11628805 8.1609998,6.47892128 6.15632794,10.1377985 L6.15632794,10.1377985 L6.03523038,10.3676703 C4.16471227,14.0642009 5.50564749,18.6290368 9.10644592,20.6661138 C10.2797786,21.3299278 11.5510493,21.6449951 12.8049992,21.6449951 L12.8049992,21.6449951 L13.0813329,21.6398937 C15.6569446,21.5447929 18.1224535,20.1235013 19.4676412,17.6683397 L19.4676412,17.6683397 L19.5887387,17.4384637 C21.4592569,13.7418707 20.1183216,9.17717235 16.5175232,7.1400244 L16.5175232,7.1400244 Z" id="形状结合" transform="translate(18.145302, 15.064358) rotate(12.000000) translate(-18.145302, -15.064358) "></path>
+                </g>
+                <g id="编组" transform="translate(13.005452, 64.000000)">
+                    <polygon id="Fill-1" fill="#D8D8D8" points="3.89684224 20 4.98873743 20 4.98873743 4.18432198"></polygon>
+                    <polygon id="Fill-3" fill="url(#linearGradient-8)" points="4.55418385 0 4.55418385 14.8809689 9.41176471 13.6517487"></polygon>
+                    <mask id="mask-11" fill="white">
+                        <use xlink:href="#path-10"></use>
+                    </mask>
+                    <use id="Fill-1" fill="url(#linearGradient-9)" xlink:href="#path-10"></use>
+                </g>
+                <g id="编组-3" transform="translate(99.005452, 72.000000)">
+                    <polygon id="Fill-1" fill="#D8D8D8" points="2.89827641 15 3.71037346 15 3.71037346 3.13824148"></polygon>
+                    <polygon id="Fill-3" fill="url(#linearGradient-12)" points="3.38717424 0 3.38717424 11.1607267 7 10.2388115"></polygon>
+                    <mask id="mask-15" fill="white">
+                        <use xlink:href="#path-14"></use>
+                    </mask>
+                    <use id="Fill-1" fill="url(#linearGradient-13)" xlink:href="#path-14"></use>
+                </g>
+                <path d="M3.70056853,3.9385425 L19.1898465,3.92795688 C20.200654,6.15910133 20.7046362,9.30361568 20.7017932,13.3614999 C20.6989501,17.4193841 21.9113078,20.9692026 24.3388662,24.0109553 L8.84958819,24.0215409 C6.42245252,20.3764282 5.21023699,16.6237155 5.2129416,12.7634029 C5.21564621,8.90309028 4.71152186,5.96147015 3.70056853,3.9385425 Z" id="矩形" fill="url(#linearGradient-16)" transform="translate(14.019717, 13.974749) rotate(-31.000000) translate(-14.019717, -13.974749) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
 }
 
 

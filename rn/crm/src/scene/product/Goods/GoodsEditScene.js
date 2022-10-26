@@ -731,14 +731,13 @@ class GoodsEditScene extends PureComponent {
           if (type === "add") {
             this.mixpanel.track('商品新增页面_点击保存')
             this.setState({selectToWhere: true});
-          } else {
-            showSuccess("修改成功");
-            navigation.goBack();
+            return
           }
-        } else {
-
-          ToastLong(reason);
+          showSuccess("修改成功");
+          navigation.goBack();
+          return
         }
+        ToastLong(reason);
       }
       showModal('提交中')
       this.setState({uploading: true});
@@ -784,7 +783,7 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入商品库存')
           return false
         }
-        if (parseInt(inventory.actualNum) < 0 && fnProviding === '1') {
+        if (Number(inventory.actualNum) < 0 && fnProviding === '1') {
           ToastLong('请输入正确的商品库存')
           return false
         }
@@ -824,7 +823,7 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入多规格重量')
           return false
         }
-        if (type === 'add' && !spec_list[i].actualNum && fnProviding === '1') {
+        if (type === 'add' && !spec_list[i].inventory.actualNum && fnProviding === '1') {
           ToastLong('请输入多规格库存')
           return false
         }
