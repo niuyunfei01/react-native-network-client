@@ -126,7 +126,7 @@ class SeparatedAccountFill extends PureComponent {
   onPay = () => {
     let {to_fill_yuan, pay_by, authorization, customMoney, isCustomMoney} = this.state;
     if (!authorization) {
-      ToastLong('请先勾选隐私政策', 0)
+      ToastLong('请先勾选充值协议', 0)
       return
     }
     if (!isCustomMoney && Number(to_fill_yuan) < 1 || isCustomMoney && Number(customMoney) < 1) {
@@ -223,7 +223,7 @@ class SeparatedAccountFill extends PureComponent {
 
   onReadProtocol = () => {
     const {navigation} = this.props;
-    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://preview.waisongbang.com/RechargeTerm.html"});
   }
 
   render() {
@@ -251,7 +251,7 @@ class SeparatedAccountFill extends PureComponent {
           <Text style={{color: colors.color999, fontSize: 12}}>
             我已阅读并同意
           </Text>
-          <Text onPress={this.onReadProtocol} style={{color: colors.main_color, fontSize: 12}}>《外送帮隐私政策》 </Text>
+          <Text onPress={this.onReadProtocol} style={{color: colors.main_color, fontSize: 12}}>《外送帮充值协议》 </Text>
         </TouchableOpacity>
 
         <View style={{marginTop: 10}}>

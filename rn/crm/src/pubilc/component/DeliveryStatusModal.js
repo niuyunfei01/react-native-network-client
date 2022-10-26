@@ -318,7 +318,7 @@ class deliveryStatusModal extends React.Component {
                         <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
                         <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
                         <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
-                        <If condition={info?.tip}>
+                        <If condition={info?.tip > 0}>
                           <Text style={styles.f12}>小费：{info?.tip}元 </Text>
                         </If>
                       </View>
