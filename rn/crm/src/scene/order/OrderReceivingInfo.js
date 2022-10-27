@@ -393,7 +393,6 @@ class OrderReceivingInfo extends Component {
                 paddingLeft: 10,
                 borderRadius: 5,
                 backgroundColor: colors.f5,
-                lineHeight: show_smart_input ? 110 : 44,
               }}
               onFocus={() => {
                 this.setState({
