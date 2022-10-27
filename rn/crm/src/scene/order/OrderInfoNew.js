@@ -1325,7 +1325,7 @@ class OrderInfoNew extends PureComponent {
 
   renderNoInfo = () => {
     return (
-      <View style={{flexGrow: 1, backgroundColor: 'red'}}>
+      <View style={{flexGrow: 1}}>
         <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%8D%A0%E4%BD%8D%E5%9B%BE.png'}}
                    style={{width: width, height: height,}}
                    resizeMode={FastImage.resizeMode.contain}
