@@ -88,29 +88,29 @@ class SearchShop extends Component {
     });
   }
 
-  search = () => {   //submit 事件 (点击键盘的 enter)
+  search = (isMap = false) => {   //submit 事件 (点击键盘的 enter)
     let {searchKeywords, cityname} = this.state;
     this.setState({loading: true})
     tool.debounces(() => {
       if (searchKeywords) {
-        let header = 'https://restapi.amap.com/v5/place/text?parameters?'
+        let header = 'https://restapi.amap.com/v3/assistant/inputtips?parameters?'
         const params = {
           keywords: searchKeywords,
           key: '85e66c49898d2118cc7805f484243909',
-          region: cityname,
-          city_limit: true,
+          city: cityname,
+          citylimit: true
         }
         Object.keys(params).forEach(key => {
             header += '&' + key + '=' + params[key]
           }
         )
-        //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
           if (data.status === "1") {
             this.setState({
-              shops: data?.pois,
+              shops: data?.tips,
+              ret_list: data?.tips,
               loading: false,
-              isMap: false,
+              isMap: isMap,
             })
           }
         });
@@ -121,25 +121,33 @@ class SearchShop extends Component {
   }
 
   searchLngLat = () => {   //submit 事件 (点击键盘的 enter)
-    let {shopmsg, searchKeywords} = this.state;
+    let {shopmsg, searchKeywords, cityname} = this.state;
     this.setState({loading: true})
     tool.debounces(() => {
       if (shopmsg?.location) {
-        let header = 'https://restapi.amap.com/v5/place/around?parameters?sortrule=distance&types=120000|120100|120200|120201|120202|120203|120300|120301|120302|120303|120304'
+        let header = 'https://restapi.amap.com/v5/place/around?'
         const params = {
+          region: cityname,
           location: shopmsg?.location,
           keywords: searchKeywords,
+          radius: 100,
           key: '85e66c49898d2118cc7805f484243909',
+          types: '120100|120200|120202|120203|120300|120301|120302|120303|120304|120201|190108|190400|190403|991401|150500|060100|100100|150501|991000|991001|991001|010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000|160000|170000|180000|190000|200000|',
         }
         Object.keys(params).forEach(key => {
             header += '&' + key + '=' + params[key]
           }
         )
-        //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
-          if (data.status === "1") {
+          if (data.status === "1" && tool.length(data?.pois) > 0) {
             this.setState({
               ret_list: data?.pois,
+              loading: false,
+              searchKeywords: ''
+            })
+          } else {
+            this.search(true)
+            this.setState({
               loading: false,
               searchKeywords: ''
             })
@@ -290,7 +298,6 @@ class SearchShop extends Component {
           shopmsg: item
         })
       }
-
     })
   }
 
@@ -341,12 +348,15 @@ class SearchShop extends Component {
                                 }}
                                 onPress={() => this.onClickItrm(item)}>
                 <View>
-                  <Text style={{color: colors.color333, fontSize: 16}}> {item.name} </Text>
+                  <Text style={{
+                    color: colors.color333,
+                    fontSize: 16
+                  }}> {item?.name}  </Text>
                   <Text
                     style={{
                       color: colors.color666,
                       fontSize: 12
-                    }}> {item.adname}-{item.address} </Text>
+                    }}> {tool.jbbsubstr(item?.address, 18)}</Text>
                 </View>
               </TouchableOpacity>
             )
@@ -390,11 +400,7 @@ class SearchShop extends Component {
             zoom: 17
           }}>
           <Marker
-            // draggable={true}
             position={{latitude: Number(lat), longitude: Number(lng)}}
-            // onDragEnd={({nativeEvent}) => {
-            //   this.setLatLng(nativeEvent.latitude, nativeEvent.longitude)
-            // }}
           >
             <View style={{alignItems: 'center'}}>
               <View style={{
