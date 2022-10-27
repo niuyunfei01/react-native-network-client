@@ -165,6 +165,7 @@ class deliveryStatusModal extends React.Component {
     fetchData: PropTypes.func,
     openAddTipModal: PropTypes.func,
     openCancelDeliveryModal: PropTypes.func,
+    openFinishDeliveryModal: PropTypes.func,
   }
   state = {
     show_modal: false,
@@ -489,6 +490,21 @@ class deliveryStatusModal extends React.Component {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+
+        <If condition={btn_list?.btn_confirm_arrived}>
+          <Button title={'完成配送'}
+                  onPress={() => {
+                    this.mixpanel.track('V4配送调度页_完成配送')
+                    this.props.openFinishDeliveryModal(order_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
       </View>
     )
   }

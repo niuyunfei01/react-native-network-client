@@ -708,7 +708,6 @@ class OrderCallDelivery extends Component {
                       show_cancel_delivery_modal: true,
                       ship_id: item?.id
                     })
-                    this.cancelDelivery(item.id)
                   }}
                   buttonStyle={{
                     width: 67,

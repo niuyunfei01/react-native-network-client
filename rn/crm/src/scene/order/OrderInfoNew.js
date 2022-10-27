@@ -47,7 +47,6 @@ import {SvgXml} from "react-native-svg";
 import {call, cross_icon} from "../../svg/svg";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {setDefaultOrderInfo} from "../../reducers/global/globalActions";
 
 const {width, height} = Dimensions.get("window")
 
@@ -553,37 +552,6 @@ class OrderInfoNew extends PureComponent {
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
-  goCancelDelivery = (order_id, ship_id = 0) => {
-    this.onPress(Config.ROUTE_ORDER_CANCEL_SHIP,
-      {
-        order: {id: order_id,},
-        ship_id: ship_id,
-        onCancelled: () => {
-          this.fetchOrder();
-        }
-      });
-  }
-
-  cancelDelivery = (orderId) => {
-    const {global} = this.props;
-    const {accessToken} = global;
-    const api = `/v4/wsb_delivery/preCancelDelivery?access_token=${accessToken}`;
-    let params = {
-      order_id: orderId
-    }
-    HttpUtils.get.bind(this.props)(api, params).then(res => {
-      if (tool.length(res?.alert_msg) > 0) {
-        Alert.alert('提示', res?.alert_msg, [{
-          text: '确定', onPress: () => {
-            this.goCancelDelivery(orderId)
-          }
-        }, {'text': '取消'}]);
-      } else {
-        this.goCancelDelivery(orderId)
-      }
-    })
-  }
-
   cancelDeliverys = (id) => {
     const {global} = this.props;
     const {accessToken} = global;
@@ -828,7 +796,7 @@ class OrderInfoNew extends PureComponent {
           </If>
           <View style={styles.orderInfoHeaderStatus}>
             <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <If condition={order?.orderStatus != Cts.ORDER_STATUS_TO_READY}>
+            <If condition={order?.orderStatus !== Cts.ORDER_STATUS_TO_READY}>
               <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
             </If>
           </View>
@@ -838,6 +806,13 @@ class OrderInfoNew extends PureComponent {
         {this.renderOrderInfoHeaderButton()}
       </>
     )
+  }
+
+  openFinishDeliveryModal = () => {
+    this.setState({
+      show_finish_delivery_modal: true,
+      show_delivery_modal: false,
+    })
   }
 
   renderOrderInfoHeaderButton = () => {
@@ -930,9 +905,7 @@ class OrderInfoNew extends PureComponent {
           <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_完成配送')
-                    this.setState({
-                      show_finish_delivery_modal: true
-                    })
+                    this.openFinishDeliveryModal()
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}
@@ -1301,6 +1274,7 @@ class OrderInfoNew extends PureComponent {
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}
         openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+        openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
         accessToken={accessToken}
         show_modal={show_delivery_modal}
         onClose={this.closeDeliveryModal}
