@@ -842,7 +842,7 @@ class OrderInfoNew extends PureComponent {
 
   renderOrderInfoHeaderButton = () => {
     let {order, isShowMap} = this.state;
-    let btn_list = order?.order;
+    let btn_list = order?.btn_list;
     return (
       <View style={isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
