@@ -27,7 +27,6 @@ export default keyMirror({
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
   SET_USER_CONFIG: null,
-  SET_SHOW_EXT_STORE: null,
   SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
 
@@ -122,4 +121,6 @@ export default keyMirror({
   ACTIVITY_GOODS_LIST: null,
   GET_MANAGE_SELECT: null,
   ACTIVITY_MANAGER_REFRESH: null,
+  SET_CALL_DELIVERY_LIST: null,
+  SET_DEFAULT_ORDER_INFO: null,
 })

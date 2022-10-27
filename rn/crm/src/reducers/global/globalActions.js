@@ -46,7 +46,8 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_SHOW_EXT_STORE,
+  SET_CALL_DELIVERY_LIST,
+  SET_DEFAULT_ORDER_INFO,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
@@ -158,12 +159,20 @@ export function setPrinterName(printerInfo) {
   }
 }
 
-export function setOrderListExtStore(show) {
+export function setCallDeliveryList(list) {
   return {
-    type: SET_SHOW_EXT_STORE,
-    show: show
+    type: SET_CALL_DELIVERY_LIST,
+    list: list
   }
 }
+
+export function setDefaultOrderInfo(info) {
+  return {
+    type: SET_DEFAULT_ORDER_INFO,
+    info: info
+  }
+}
+
 
 export function setFloatSerciceIcon(show) {
   return {

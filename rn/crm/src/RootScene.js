@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo, setUserCfg, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
@@ -58,6 +58,7 @@ class RootScene extends PureComponent {
   getInfo = () => {
     const startTime = dayjs().valueOf()
     getNoLoginInfo().then(info => {
+      console.log(info,'onfo')
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
@@ -76,6 +77,7 @@ class RootScene extends PureComponent {
           rehydrated: true,
         });
       }
+      store.dispatch(setUserCfg(noLoginInfo?.user_config));
       SplashScreen.hide();
     }).catch(() => {
       SplashScreen.hide();
