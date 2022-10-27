@@ -210,7 +210,7 @@ class ProfitAndLoss extends PureComponent {
                        }, () => this.get_profit_list())}>
           <View style={styles.flexRow}>
             <Text style={styles.selectTipText}>
-              {selectTipStore}
+              {tool.jbbsubstr(selectTipStore, 5)}
             </Text>
             <Entypo name="chevron-thin-down" style={styles.selectTipText}/>
           </View>
@@ -480,8 +480,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.3,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    elevation: 5,
     shadowRadius: 12
   },
   orderCardHeader: {
