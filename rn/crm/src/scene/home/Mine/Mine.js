@@ -263,20 +263,6 @@ class Mine extends PureComponent {
     }
   }
 
-  navigateToDistributionAnalysis = () => {
-    this.mixpanel.track('数据分析页')
-    this.onPress(Config.ROUTE_DistributionAnalysis)
-  }
-
-  navigateToSelfDelivery = () => {
-    this.props.navigation.navigate(Config.ROUTE_COMES_BACK);
-    this.mixpanel.track('我的_查看回传率')
-  }
-
-  navigateToOrderSearch = () => {
-    this.mixpanel.track('订单搜索')
-    this.onPress(Config.ROUTE_ORDER_SEARCH)
-  }
 
   navigateToPlatformSetting = () => {
     this.onPress(Config.ROUTE_STORE_STATUS, {
@@ -294,25 +280,6 @@ class Mine extends PureComponent {
     this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})
   }
 
-  navigateToPrinterSetting = () => {
-    this.mixpanel.track('打印页')
-    this.onPress(Config.ROUTE_PRINTERS)
-  }
-
-  navigateToPushSetting = () => {
-    this.mixpanel.track('推送页')
-    this.onPress(Config.ROUTE_PUSH)
-  }
-
-  navigateToVersionInfo = () => {
-    this.mixpanel.track('版本信息页')
-    this.onPress(Config.ROUTE_VERSION);
-  }
-
-  navigateToHelpPage = () => {
-    this.mixpanel.track('帮助页')
-    this.onPress(Config.ROUTE_HELP)
-  }
 
   navigateToStoreManager = () => {
     const {currentUser, vendor_info} = this.props.global;
@@ -335,10 +302,6 @@ class Mine extends PureComponent {
     });
   }
 
-  navigateToSettingPage = () => {
-    this.mixpanel.track('设置页')
-    this.onPress(Config.ROUTE_SETTING)
-  }
 
   onPressActivity = (info) => {
     const {currStoreId, accessToken} = this.props.global;
