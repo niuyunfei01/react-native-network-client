@@ -80,7 +80,7 @@ const initialState = {
   bleStarted: false,
   printer_id: '0',
   isScanningBluetoothDevice: false,
-  autoBluetoothPrint: true,
+  autoBluetoothPrint: false,
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,

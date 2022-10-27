@@ -399,7 +399,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认置为无效？',
       '订货单已无效',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, trashSupplyOrder)},
       ],
       {cancelable: false}
@@ -411,7 +411,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认收货？',
       '订货单已经收货',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, receivedSupplyOrder)},
       ],
       {cancelable: false}
@@ -423,7 +423,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认审核？',
       '订货单已经审核',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, reviewSupplyOrder)},
       ],
       {cancelable: false}
@@ -435,7 +435,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认结算？',
       '订货单已经结算',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, balanceSupplyOrder)},
       ],
       {cancelable: false}

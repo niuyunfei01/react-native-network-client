@@ -168,7 +168,6 @@ class DistributionAnalysisScene extends PureComponent {
       default:
         break
     }
-    console.log('7天前', new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
