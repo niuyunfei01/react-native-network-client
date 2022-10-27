@@ -69,7 +69,7 @@ let needShowOpenBluetoothStatus = true//防止多次提示
 const handleDidUpdateState = (args, printer_id) => {
   switch (Platform.OS) {
     case "android":
-      if (args.state === 'off' && printer_id && needShowOpenBluetoothStatus) {
+      if (args.state === 'off' && printer_id !== '0' && needShowOpenBluetoothStatus) {
         Alert.alert('蓝牙未开启', '请打开蓝牙，使用蓝牙打印机', [
           {text: '取消', onPress: () => needShowOpenBluetoothStatus = false},
           {text: '开启蓝牙', onPress: () => openBluetooth()}
@@ -77,7 +77,7 @@ const handleDidUpdateState = (args, printer_id) => {
       }
       break
     case "ios":
-      if (args.state === 'off' && printer_id && needShowOpenBluetoothStatus) {
+      if (args.state === 'off' && printer_id !== '0' && needShowOpenBluetoothStatus) {
         Alert.alert('蓝牙未开启', '请到设置打开蓝牙，使用蓝牙打印机', [
           {
             text: '确定',

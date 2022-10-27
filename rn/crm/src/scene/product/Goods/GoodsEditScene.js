@@ -116,7 +116,6 @@ class GoodsEditScene extends PureComponent {
       sku_having_unit: "1",
       tag_info_nur: "",
       promote_name: "",
-      list_img: [],
       selectedItems: [],
       upload_files: [],
       price: '',//零售价格
@@ -229,8 +228,7 @@ class GoodsEditScene extends PureComponent {
         weight: weight,
         sku_unit: sku_unit,
         store_categories: category_id,
-        upload_files: [{id: '0', name: pic, path: pic}],
-        list_img: [{id: '0', url: pic, name: pic}],
+        upload_files: [{id: '0', url: pic, name: pic, path: pic}],
         selectWeight: {value: '1', label: sku_unit},
         vendor_has: Number(vendor_has) === 1,
         store_has: Number(store_has) === 1,
@@ -251,23 +249,18 @@ class GoodsEditScene extends PureComponent {
       },
       onComplete: (data) => {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
-          const {list_img, upload_files, newImageKey, selectPicType, selectPreviewPic} = this.state;
+          let {upload_files, newImageKey, selectPicType, selectPreviewPic} = this.state;
           const uri = res + newImageKey
-          let file_id = '1';
-          upload_files.map((file, index) => {
-            if (index + 1 === upload_files.length && file.id)
-              file_id = file.id + '1'
-          })
+          const img = {id: 0, url: uri, name: newImageKey, path: uri}
           if (selectPicType) {
-            list_img.push({id: file_id, url: uri, name: newImageKey})
-            upload_files.push({id: 0, name: newImageKey, path: uri});
+            upload_files.push(img);
           } else {
-            list_img[selectPreviewPic.index] = {id: file_id, url: uri, name: newImageKey}
-            upload_files[selectPreviewPic.index] = {id: 0, name: newImageKey, path: uri}
+            selectPreviewPic = {...selectPreviewPic, url: uri}
+            upload_files[selectPreviewPic.index] = img
           }
           hideModal()
           this.setState({
-            list_img: list_img,
+            selectPreviewPic: selectPreviewPic,
             upload_files: upload_files,
             isUploadImg: false
           })
@@ -323,7 +316,6 @@ class GoodsEditScene extends PureComponent {
 
       if (task_id && name) {
         let upload_files = [];
-        let list_img = [];
 
         if (images && _.isArray(images)) {
           let validImages = _.filter(images, function (o) {
@@ -335,9 +327,9 @@ class GoodsEditScene extends PureComponent {
               idx = idx - 1;
               let name = imgUrl.replace(/^.*[\\\/]/, '');
               let imgPath = imgUrl.replace("https://www.cainiaoshicai.cn", "");
-              list_img.push({url: imgUrl, name: name});
               upload_files.push({
                 id: idx,
+                url: imgUrl,
                 name: name,
                 path: imgPath,
                 mid_thumb: imgPath
@@ -350,7 +342,6 @@ class GoodsEditScene extends PureComponent {
           task_id: task_id,
           name: name,
           upload_files: upload_files,
-          list_img: list_img,
         });
       }
     }
@@ -410,7 +401,6 @@ class GoodsEditScene extends PureComponent {
       sku_having_unit: "1",
       tag_info_nur: "",
       promote_name: "",
-      list_img: [],
       selectedItems: [],
       upload_files: [],
       price: '',
@@ -474,11 +464,10 @@ class GoodsEditScene extends PureComponent {
       basic_category, sg_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
       promote_name, mid_list_img, upc, store_has, spec_list, series_id, actualNum, price, supply_price
     } = product_detail;
-    let upload_files = [], list_img = [];
+    let upload_files = []
     mid_list_img && Object.keys(mid_list_img).map(img_id => {
       if (mid_list_img[img_id]) {
-        upload_files.push({id: img_id, name: mid_list_img[img_id].name});
-        list_img.push({id: img_id, name: mid_list_img[img_id].name, url: mid_list_img[img_id].url})
+        upload_files.push({id: img_id, name: mid_list_img[img_id].name, url: mid_list_img[img_id].url})
       }
     })
 
@@ -493,7 +482,6 @@ class GoodsEditScene extends PureComponent {
       name, id, sku_unit, weight, sku_having_unit,
       tag_info_nur: tag_info_nur || "",
       promote_name: promote_name || "",
-      list_img: list_img,
       upload_files: upload_files,
       sg_tag_id: sg_tag_id,
       basic_category: basic_category,
@@ -512,8 +500,7 @@ class GoodsEditScene extends PureComponent {
   onReloadUpc = (upc_data) => {
     if (upc_data.pic) {
       this.setState({
-        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic}],
-        list_img: [{id: '0', name: upc_data.pic, url: upc_data.pic}]
+        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic, url: upc_data.pic}]
       })
     }
     if (tool.length(upc_data.basic_category_obj) !== 0) {
@@ -1640,7 +1627,14 @@ class GoodsEditScene extends PureComponent {
 
   renderModal = () => {
     let {
-      searchValue, visible, buttonDisabled, selectHeaderText, dragPicVisible, list_img, selectPreviewPic, vendor_has,
+      searchValue,
+      visible,
+      buttonDisabled,
+      selectHeaderText,
+      dragPicVisible,
+      upload_files,
+      selectPreviewPic,
+      vendor_has,
       store_has
     } = this.state
     if (visible) {
@@ -1689,7 +1683,7 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
                          onPress={() => this.setState({dragPicVisible: false})}/>
               <Text style={styles.modifyPicHeaderText}>
-                预览（{selectPreviewPic.index + 1}/{tool.length(list_img)}）
+                预览（{selectPreviewPic.index + 1}/{tool.length(upload_files)}）
               </Text>
               <View/>
             </View>
@@ -1700,7 +1694,7 @@ class GoodsEditScene extends PureComponent {
                            style={{height: 2.5 * height / 5.2}}/>
               </If>
             </View>
-            <GridView data={[...list_img, '']}
+            <GridView data={[...upload_files, '']}
                       style={styles.modifyPicList}
                       numColumns={4}
                       renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
@@ -1737,8 +1731,8 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderLockedItem(item, index) {
-    const {list_img, vendor_has, store_has} = this.state
-    if (!vendor_has && !store_has && tool.length(list_img) < 8)
+    const {upload_files, vendor_has, store_has} = this.state
+    if (!vendor_has && !store_has && tool.length(upload_files) < 8)
       return (
         <View style={styles.plusIconWrap}>
           <TouchableOpacity style={[styles.img_add_box]}
@@ -1753,11 +1747,11 @@ class GoodsEditScene extends PureComponent {
     this.setState({selectPreviewPic: {url: item.url, index: index, key: item.id}})
   }
   onReleaseCell = (items) => {
-    const {list_img} = this.state
+    const {upload_files} = this.state
     const list_img1 = items.slice(0, items.length - 1)
 
-    if (!_.isEqual(list_img, list_img1)) {
-      this.setState({list_img: list_img1, upload_files: list_img1})
+    if (!_.isEqual(upload_files, list_img1)) {
+      this.setState({upload_files: list_img1})
     }
   }
   renderSearchPic = () => {
@@ -1886,12 +1880,10 @@ class GoodsEditScene extends PureComponent {
   }
 
   modifyPic = (item) => {
-    let {list_img, selectPreviewPic, upload_files} = this.state
-    list_img[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb}
-    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name}
+    let {selectPreviewPic, upload_files} = this.state
+    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb}
     selectPreviewPic = {...selectPreviewPic, id: item.id, url: item.thumb}
     this.setState({
-      list_img: list_img,
       upload_files: upload_files,
       searchPicVisible: false,
       selectPreviewPic: selectPreviewPic,
@@ -1901,11 +1893,9 @@ class GoodsEditScene extends PureComponent {
   }
 
   addPic = (item) => {
-    let {list_img, upload_files} = this.state
-    list_img.push({id: item.id, name: item.name, url: item.thumb})
-    upload_files.push({id: item.id, name: item.name})
+    let {upload_files} = this.state
+    upload_files.push({id: item.id, name: item.name, url: item.thumb})
     this.setState({
-      list_img: list_img,
       upload_files: upload_files,
       searchPicVisible: false,
       searchPicText: '',
@@ -1933,14 +1923,13 @@ class GoodsEditScene extends PureComponent {
   }
 
   setMainPic = () => {
-    let {list_img, selectPreviewPic, upload_files} = this.state;
-    [list_img[0], list_img[selectPreviewPic.index]] = [list_img[selectPreviewPic.index], list_img[0]];
+    let {selectPreviewPic, upload_files} = this.state;
 
     [upload_files[0], upload_files[selectPreviewPic.index]] = [upload_files[selectPreviewPic.index], upload_files[0]]
 
-    selectPreviewPic = {index: 0, url: list_img[0].url, key: list_img[0].id}
+    selectPreviewPic = {index: 0, url: upload_files[0].url, key: upload_files[0].id}
 
-    this.setState({list_img: [...list_img], upload_files: [...upload_files], selectPreviewPic: selectPreviewPic})
+    this.setState({upload_files: [...upload_files], selectPreviewPic: selectPreviewPic})
   }
 
   renderModalItem = (item, index) => {
@@ -2101,43 +2090,40 @@ class GoodsEditScene extends PureComponent {
   }
 
   deleteUploadImage = (index) => {
-    const {list_img, upload_files, selectPreviewPic} = this.state
-    if (list_img.length > 0) {
-      list_img.splice(index, 1)
+    const {upload_files, selectPreviewPic} = this.state
+    if (upload_files.length > 0) {
       upload_files.splice(index, 1)
     }
 
-    const nextImage = list_img[selectPreviewPic.index]
+    const nextImage = upload_files[selectPreviewPic.index]
     if (nextImage) {
       this.setState({
         selectPreviewPic: {...selectPreviewPic, url: nextImage.url},
-        list_img: [...list_img],
         upload_files: [...upload_files]
       })
       return
     }
-    if (list_img[0]) {
+    if (upload_files[0]) {
       this.setState({
-        selectPreviewPic: {...selectPreviewPic, index: 0, url: list_img[0].url},
-        list_img: [...list_img],
+        selectPreviewPic: {...selectPreviewPic, index: 0, url: upload_files[0].url},
+
         upload_files: [...upload_files]
       })
       return;
     }
     this.setState({
       selectPreviewPic: {...selectPreviewPic, index: -1, url: ''},
-      list_img: [...list_img],
       upload_files: [...upload_files]
     })
   }
 
   renderUploadImg = () => {
-    let {list_img, selectPreviewPic, store_has, vendor_has} = this.state
+    let {upload_files, selectPreviewPic, store_has, vendor_has} = this.state
     return (
       <View style={styles.area_cell}>
-        <If condition={tool.length(list_img) > 0}>
+        <If condition={tool.length(upload_files) > 0}>
           {
-            list_img.map((item, index) => {
+            upload_files.map((item, index) => {
               if (index === 0)
                 selectPreviewPic = {index: 0, url: item.url, key: item.id}
               return (
@@ -2159,12 +2145,12 @@ class GoodsEditScene extends PureComponent {
             })
           }
         </If>
-        <If condition={tool.length(list_img) <= 0}>
+        <If condition={tool.length(upload_files) <= 0}>
           <View style={styles.imageIconWrap}>
             <FontAwesome5 name={'images'} size={32} color={colors.colorCCC}/>
           </View>
         </If>
-        <If condition={!vendor_has && !store_has && tool.length(list_img) < 8}>
+        <If condition={!vendor_has && !store_has && tool.length(upload_files) < 8}>
           <View style={styles.plusIconWrap}>
             <TouchableOpacity style={[styles.img_add_box]}
                               onPress={() => this.setState({showImgMenus: true, selectPicType: true})}>
