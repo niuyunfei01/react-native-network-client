@@ -80,7 +80,7 @@ class RiderTrajectory extends Component {
         zoom,
       })
     }, () => {
-      ToastLong("未查询到骑手轨迹");
+      ToastLong("操作失败，请刷新后再试");
       this.props.navigation.goBack()
     })
   }
@@ -105,7 +105,16 @@ class RiderTrajectory extends Component {
   }
 
   renderMap() {
-    let {zoom, track_store, track_destination, track_horseman, track_list, distance_order, distance_store, distance_destination} = this.state;
+    let {
+      zoom,
+      track_store,
+      track_destination,
+      track_horseman,
+      track_list,
+      distance_order,
+      distance_store,
+      distance_destination
+    } = this.state;
     let track_store_lng = Number(track_store[0]);
     let track_store_lat = Number(track_store[1]);
     let track_destination_lng = Number(track_destination[0]);
@@ -118,7 +127,7 @@ class RiderTrajectory extends Component {
     let {
       aLon,
       aLat
-    } = tool.getCenterLonLat(track_store_lng, track_store_lat, track_destination_lng, track_destination_lat)
+    } = tool.getCenterLonLat(distance_destination > 0 ? track_horseman_lng : track_store_lng, distance_destination > 0 ? track_horseman_lat : track_store_lat, track_destination_lng, track_destination_lat)
     return (
       <MapView
         mapType={MapType.Standard}
@@ -127,6 +136,7 @@ class RiderTrajectory extends Component {
           target: {latitude: aLat, longitude: aLon},
           zoom: zoom
         }}>
+
         {/*骑手定位*/}
         <If condition={track_horseman_lat && track_horseman_lng}>
           <Marker
@@ -134,6 +144,7 @@ class RiderTrajectory extends Component {
             position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
           >
             <View style={{alignItems: 'center'}}>
+
               <View style={{alignItems: 'center'}}>
                 <View style={{
                   zIndex: 999,
@@ -158,6 +169,7 @@ class RiderTrajectory extends Component {
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
+
               <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
                 width: 30,
                 height: 34,
@@ -167,7 +179,7 @@ class RiderTrajectory extends Component {
         </If>
 
         {/*商家定位*/}
-        <If condition={track_store_lat && track_store_lng && distance_destination <= 0}>
+        <If condition={distance_destination <= 0 && track_store_lat && track_store_lng}>
           <Marker
             zIndex={91}
             position={{latitude: track_store_lat, longitude: track_store_lng}}
@@ -178,32 +190,47 @@ class RiderTrajectory extends Component {
             }}
           />
         </If>
+
         {/*顾客定位*/}
-        <If condition={distance_store === 0 && track_destination_lat && track_destination_lng}>
+        <If condition={distance_destination > 0 && track_destination_lat && track_destination_lng}>
           <Marker
             zIndex={93}
-            // centerOffset={{x: 1, y: 1}}
+            position={{latitude: track_destination_lat, longitude: track_destination_lng}}
+            icon={{
+              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
+              width: 22,
+              height: 42,
+            }}
+          />
+        </If>
+
+        {/*顾客定位*/}
+        <If condition={distance_destination <= 0 && track_destination_lat && track_destination_lng}>
+          <Marker
+            zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
           >
             <View style={{alignItems: 'center'}}>
-              <View style={{
-                zIndex: 990,
-                backgroundColor: colors.white,
-                marginBottom: 15,
-                padding: 8,
-                borderRadius: 6,
-              }}>
-                <If condition={distance_destination <= 0}>
+              <View style={{alignItems: 'center'}}>
+                <View style={{
+                  zIndex: 999,
+                  backgroundColor: colors.white,
+                  marginBottom: 15,
+                  padding: 8,
+                  borderRadius: 6,
+                }}>
                   <Text style={{color: colors.color333, fontSize: 12}}>
                     距门店{this.filterDistance(distance_order)}
                   </Text>
-                </If>
+                </View>
+                <Entypo name={'triangle-down'}
+                        style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
-              <Entypo name={'triangle-down'}
-                      style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+
               <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
                          style={{width: 22, height: 42}}
-                         resizeMode={FastImage.resizeMode.contain}/>
+                         resizeMode={FastImage.resizeMode.contain}
+              />
             </View>
           </Marker>
         </If>

@@ -269,7 +269,8 @@ class OrderListScene extends Component {
       co_type === global.noLoginInfo.co_type &&
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
-      reduxGlobal?.printer_id === global.noLoginInfo.printer_id
+      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
+      reduxGlobal?.user_config === global.noLoginInfo.user_config
 
     if (flag) {
       return
@@ -287,7 +288,10 @@ class OrderListScene extends Component {
       autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
       refreshToken: reduxGlobal.refreshToken,
       expireTs: reduxGlobal.expireTs,
-      getTokenTs: reduxGlobal.getTokenTs
+      getTokenTs: reduxGlobal.getTokenTs,
+      user_config: reduxGlobal.user_config,
+      call_delivery_list: reduxGlobal.call_delivery_list,
+      default_order_info: reduxGlobal.default_order_info,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))

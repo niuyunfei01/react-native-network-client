@@ -210,7 +210,7 @@ class ProfitAndLoss extends PureComponent {
                        }, () => this.get_profit_list())}>
           <View style={styles.flexRow}>
             <Text style={styles.selectTipText}>
-              {selectTipStore}
+              {tool.jbbsubstr(selectTipStore, 5)}
             </Text>
             <Entypo name="chevron-thin-down" style={styles.selectTipText}/>
           </View>
@@ -348,7 +348,7 @@ class ProfitAndLoss extends PureComponent {
               <View style={styles.flexRow1}>
                 <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台结算：</Text>
                 <Text
-                  style={styles.orderCardItemValue}>{numeral(item?.bill.total_income_from_platform / 100).format('0.00')}元 </Text>
+                  style={styles.orderCardItemValue}>{numeral(item?.bill?.total_income_from_platform / 100).format('0.00')}元 </Text>
               </View>
             </View>
             <View style={{flex: 1}}>
@@ -480,8 +480,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.3,
-    elevation: 10,
+    shadowOpacity: 0.1,
+    elevation: 5,
     shadowRadius: 12
   },
   orderCardHeader: {

@@ -154,12 +154,13 @@ class DistributionAnalysisScene extends PureComponent {
       return
     }
     let startTime
+    let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 7) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -167,6 +168,7 @@ class DistributionAnalysisScene extends PureComponent {
       default:
         break
     }
+    console.log('7天前', new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
@@ -187,12 +189,13 @@ class DistributionAnalysisScene extends PureComponent {
       return
     }
     let startTime
+    let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 7) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime =  new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -490,7 +493,7 @@ class DistributionAnalysisScene extends PureComponent {
             timeJs = Math.round(new Date(new Date(value).setHours(0, 0, 0, 0)).getTime() / 1000)
             this.setState({startNewDateValue: timeJs, showDateModal: false, startTime: resDate})
           } else if (this.state.timeType === 'end') {
-            timeJs = Math.round(new Date(value).getTime() / 1000)
+            timeJs = Math.floor(new Date(new Date(value).setHours(11, 59, 59, 999)).getTime() / 1000)
             this.setState({endNewDateValue: timeJs, showDateModal: false, endTime: resDate})
           }
         }

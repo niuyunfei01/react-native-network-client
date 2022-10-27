@@ -304,14 +304,14 @@ class StoreGoodsList extends Component {
 
   selectCategory = (category, selectedTagId) => {
     if (category.id === selectedTagId) {
-      this.setState({selectedTagId: '', selectedChildTagId: ''})
+      this.setState({selectedTagId: selectedTagId, selectedChildTagId: '', page: 1}, () => this.search())
       return
     }
     if (category.children.length > 0) {
       this.selectCategoryChildren(category, category.children[0])
       return;
     }
-    this.setState({selectedTagId: category.id, page: 1}, () => this.search())
+    this.setState({selectedTagId: category.id, selectedChildTagId: '', page: 1}, () => this.search())
   }
 
   selectCategoryChildren = (category, categoryChildren) => {

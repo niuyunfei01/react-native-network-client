@@ -45,11 +45,11 @@ class OrderBottom extends PureComponent {
     tool.debounces(() => {
       const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.token}`
       HttpUtils.get.bind(self.props.navigation)(api).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
         GlobalUtil.setOrderFresh(1)
       }).catch(e => {
-        showError('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 1000)
   }
@@ -170,8 +170,8 @@ class OrderBottom extends PureComponent {
           <Button title={'忽略配送'}
                   onPress={() => {
                     this.mixpanel.track('订单详情页_忽略配送')
-                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                      text: '继续忽略配送',
+                    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+                      text: '忽略',
                       onPress: () => {
                         this.onOverlookDelivery(order.id)
                       }
@@ -204,8 +204,8 @@ class OrderBottom extends PureComponent {
           />
           <Button title={'忽略配送'}
                   onPress={() => {
-                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                      text: '继续忽略配送',
+                    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+                      text: '忽略',
                       onPress: () => {
                         this.onOverlookDelivery(order.id)
                       }

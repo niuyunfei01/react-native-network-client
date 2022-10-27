@@ -6,8 +6,6 @@ import {
   Dimensions,
   InteractionManager,
   PanResponder,
-  PermissionsAndroid,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -49,6 +47,7 @@ import {SvgXml} from "react-native-svg";
 import {call, cross_icon} from "../../svg/svg";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import {setDefaultOrderInfo} from "../../reducers/global/globalActions";
 
 const {width, height} = Dimensions.get("window")
 
@@ -108,14 +107,15 @@ class OrderInfoNew extends PureComponent {
     this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
-    let order_json_str = JSON.parse('{"id":"37341517","dayId":"1","platform_oid":"wsb2022102429899","orderTime":"2022-10-24 11:18:11","platform":"2","expectTime":"2022-10-24 12:08:11","orderStatus":"1","orderMoney":"20","mobile":"18173133093,6484","real_mobile":"18173133093","mobile_suffix":"6484","userName":"何清望","address":"新时空大厦1","remark":"","platform_dayId":"1","time_ready":null,"time_start_ship":null,"time_arrived":null,"time_invalid":null,"store_remark":"","ship_worker_id":null,"pack_done_logger":"0","pack_operator":null,"delay_reason":null,"deleted":"0","store_id":"33347","vendor_id":"68","invalid_reason":"","order_times":"6","paid_done":"1","street_block":"","is_right_once":"1","review_deliver":"0","review_quality":"0","print_times":"0","ship_money":"0","ship_score":"0","ship_spent_min":"0","ship_review":"0","dada_status":"5","dada_call_at":"1970-01-01 00:00:00","dada_distance":115,"dada_order_id":"0","dada_fee":"0","dada_id":"","dada_mobile":"","dada_dm_name":"","dada_update_time":"0","user_id":"5098383","paid_by_user":"0","final_price":"0","invoice":"","taxer_id":null,"invoice_amount":"0","ext_store_id":"0","score_talk":"-1","jd_ship_worker_name":"","jd_ship_worker_mobile":"","pack_workers":"","additional_to_pay":"0","deliver_fee":"0","platform_fee":"0","self_activity_fee":"0","wm_activity_fee":"0","update_fee_time":"0","total_goods_price":"2000","total_we_got":"-1","total_pack_score":"0","loc_lat":"28.160611","loc_lng":"112.985074","auto_ship_type":"40","fee_ship_to_platform":"0","total_sku_promo":"0","dada_tips":"0","dada_tips_by":"0","phone_backup":null,"zs_status":"0","ext_user_id":"0","jd_pick_deadline":"1970-01-01 00:00:00","ele_id":null,"init_by_work_order_id":"","eb_order_from":"0","view_times":"0","pickType":"0","assign_to_uid":"0","assign_time":null,"mt_user_num":"","platform_icon":"https://goods-image.qiniu.cainiaoshicai.cn/platform_icon/zijian.png","pl_name":"微信","ship_worker_mobile":"","ship_worker_name":"","direction":"未知","store_name":"咯咯可以","fullStoreName":"咯咯可以","brandName":"配送","printFooter1":"感谢您的光临。售后问题","printFooter2":"请致电客服：13010211858","printFooter3":"","show_seq":"微信#1","show_store_name":"咯咯可以","gd_lat":"28.160611","gd_lng":"112.985074","auto_plat":"未知平台","remark_warning":false,"store_loc_lat":"28.160606","store_loc_lng":"112.986249","ship_worker_lat":0,"ship_worker_lng":0,"ship_distance_destination":0,"ship_distance_store":0,"ship_create_time":"","ship_goods_info":"中餐","ship_fee":0,"ship_id":0,"ship_type_desc":"","items":[],"allow_merchants_cancel_order":"1","is_fn_price_controlled":false,"is_fn_show_wm_price":false,"fn_full_fin":false,"supply_price":0,"wm_price":0,"product_total_count":0,"expectTimeStrInList":"预计10/24 12:08送达","status_show":"待打包","mobileReadable":"18173133093转6484","bill":{"bill_ok":false,"bill_info":"暂不支持"},"greeting":"","pickup_code":"","giver_phone":"","is_split_package":false,"cancel_to_entry":true,"fn_scan_items":"0","fn_scan_ready":false,"fn_coupon_redeem_good":false,"is_wsb_account":"1","is_peisong_coop":true,"btn_list":{"batch_add_delivery_tips":0,"batch_cancel_delivery":0,"btn_cancel_delivery":0,"btn_resend":0,"btn_contact_rider":0,"btn_confirm_arrived":0,"btn_print":1,"btn_print_again":0,"btn_call_third_delivery":1,"btn_call_third_delivery_again":0},"printer_sn":"4004645378"}');
     const {is_service_mgr = false} = tool.vendor(this.props.global);
+    let {default_order_info} = this.props.global
     this.state = {
       isRefreshing: false,
+      loadingImg: true,
       orderId: order_id,
       is_service_mgr: is_service_mgr,
       isFetching: false,
-      order: order_json_str,
+      order: default_order_info,
       actionSheet: [],
       isShowMap: false,
       logistics: [],
@@ -247,6 +247,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   fetchOrder = () => {
+    showModal('加载中')
     let {orderId, isFetching} = this.state
     if (!orderId || isFetching) {
       return false;
@@ -258,13 +259,16 @@ class OrderInfoNew extends PureComponent {
     const {dispatch} = this.props;
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
+      hideModal()
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
 
+      // this.props.dispatch(setDefaultOrderInfo(obj))
       this.setState({
         order: obj,
         isFetching: false,
+        loadingImg: false,
         itemsEdited: this._extract_edited_items(obj.items),
         allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
         isShowMap: res?.loc_lat !== '' && res?.loc_lng !== ''
@@ -280,10 +284,12 @@ class OrderInfoNew extends PureComponent {
       this.logOrderViewed();
       this.fetchThirdWays()
     }, ((res) => {
+      hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       ToastLong('操作失败：' + res.reason)
       this.setState({isFetching: false})
     })).catch((e) => {
+      hideModal()
       ToastLong('操作失败：' + e.desc)
       this.setState({isFetching: false})
     })
@@ -372,7 +378,7 @@ class OrderInfoNew extends PureComponent {
 
   _cloudPrinterSN = () => {
     const {order} = this.state
-    const printerName = order.printer_sn || '未知';
+    const printerName = order?.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
@@ -515,7 +521,8 @@ class OrderInfoNew extends PureComponent {
   }
 
   deliveryModalFlag = () => {
-    if (this.state.delivery_status !== '待呼叫配送') {
+    let {order} = this.state;
+    if (order?.orderStatus != Cts.ORDER_STATUS_TO_READY) {
       this.mixpanel.track('订单详情页_>')
       this.setState({show_delivery_modal: true})
     }
@@ -636,8 +643,10 @@ class OrderInfoNew extends PureComponent {
       ship_distance_store
     } = this.state.order;
 
-
-    let {aLon, aLat} = tool.getCenterLonLat(loc_lng, loc_lat, store_loc_lng, store_loc_lat)
+    let {
+      aLon,
+      aLat
+    } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
 
     return (
       <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
@@ -699,21 +708,29 @@ class OrderInfoNew extends PureComponent {
             </Marker>
           </If>
           {/*用户定位*/}
-          <If condition={ship_distance_destination > 0 || (ship_worker_lng === 0 && ship_worker_lat === 0)}>
+          <If condition={ship_distance_destination > 0 && loc_lat && loc_lng}>
+
+            <Marker
+              zIndex={93}
+              position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
+              icon={{
+                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
+                width: 22,
+                height: 42,
+              }}
+            />
+          </If>
+          <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng}>
             <Marker
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-              onPress={() => {
-              }}
             >
               <View style={{alignItems: 'center'}}>
-                <If condition={ship_worker_lng === 0 && ship_worker_lat === 0}>
-                  <View style={styles.mapBox}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
-                      距门店{this.filterDistance(dada_distance)}
-                    </Text>
-                  </View>
-                </If>
+                <View style={styles.mapBox}>
+                  <Text style={{color: colors.color333, fontSize: 12}}>
+                    距门店{this.filterDistance(dada_distance)}
+                  </Text>
+                </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
@@ -800,7 +817,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoHeader = () => {
-    let {delivery_status, delivery_desc, isShowMap} = this.state;
+    let {delivery_status, delivery_desc, isShowMap, order} = this.state;
     return (
       <>
         <Animated.View {...this._panResponder.panHandlers}
@@ -811,9 +828,11 @@ class OrderInfoNew extends PureComponent {
           </If>
           <View style={styles.orderInfoHeaderStatus}>
             <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            <If condition={order?.orderStatus != Cts.ORDER_STATUS_TO_READY}>
+              <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
+            </If>
           </View>
-          <Text style={styles.orderStatusNotice}>{tool.jbbsubstr(delivery_desc, 18)} </Text>
+          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
 
         </Animated.View>
         {this.renderOrderInfoHeaderButton()}
@@ -822,10 +841,10 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoHeaderButton = () => {
-    let {order} = this.state;
-    let {btn_list} = order;
+    let {order, isShowMap} = this.state;
+    let btn_list = order?.order;
     return (
-      <View style={this.state.isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
+      <View style={isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
           <Button title={'打印订单'}
                   onPress={() => {
@@ -1057,30 +1076,28 @@ class OrderInfoNew extends PureComponent {
                 <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
               </View>
             </If>
-            <If condition={order?.is_show_actual_price}>
+            <If condition={order?.is_show_original_price}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>顾客实付 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+                <Text style={styles.remarkLabel}>订单原价 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
               </View>
             </If>
-
             <If condition={order?.is_show_activity_price}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>优惠信息 </Text>
                 <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
               </View>
             </If>
-
+            <If condition={order?.is_show_actual_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>顾客实付 </Text>
+                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+              </View>
+            </If>
             <If condition={order?.is_show_platform_income}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>平台结算 </Text>
                 <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
-              </View>
-            </If>
-            <If condition={order?.is_show_original_price}>
-              <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>订单原价 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
               </View>
             </If>
           </View>
@@ -1306,9 +1323,20 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+  renderNoInfo = () => {
+    return (
+      <View style={{flexGrow: 1, backgroundColor: 'red'}}>
+        <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%8D%A0%E4%BD%8D%E5%9B%BE.png'}}
+                   style={{width: width, height: height,}}
+                   resizeMode={FastImage.resizeMode.contain}
+        />
+      </View>
+    )
+  }
+
   render() {
     let {accessToken} = this.props.global;
-    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal} = this.state
+    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal, loadingImg} = this.state
     if (order?.orderStatus === '4' || order?.orderStatus === '5') {
       this.setState({
         isShowMap: false
@@ -1317,6 +1345,11 @@ class OrderInfoNew extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
+
+        <If condition={loadingImg}>
+          {this.renderNoInfo()}
+        </If>
+
         <ScrollView ref={ref => this.scrollViewRef = ref}
                     refreshControl={
                       <RefreshControl
@@ -1331,6 +1364,8 @@ class OrderInfoNew extends PureComponent {
                     style={styles.Content}>
 
           {this.renderPrinter()}
+
+
           <If condition={isShowMap}>
             {this.renderMap()}
           </If>
