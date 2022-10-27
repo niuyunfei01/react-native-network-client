@@ -260,12 +260,5 @@ export const handlePrintOrder = async (props, obj) => {
     return
   }
   sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
-  Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [
-    {
-      text: '确定',
-      onPress: () => props.navigation.navigate(Config.ROUTE_PRINTERS)
-    },
-    {text: '取消'}
-  ]);
 }
 
