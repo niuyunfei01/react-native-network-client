@@ -12,7 +12,7 @@ import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBott
 import Scanner from "../../../pubilc/component/Scanner";
 import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
 import {SvgXml} from "react-native-svg";
-import {scan} from "../../../svg/svg";
+import {noSearchGoodsData, scan} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -46,7 +46,9 @@ class StoreGoodsSearch extends Component {
       selectedProduct: {},
       modalType: '',
       showScan: false,
-      isCanLoadMore: false
+      isCanLoadMore: false,
+      hasGoodsResult: false,
+      showBottomView: false
     }
   }
 
@@ -62,11 +64,11 @@ class StoreGoodsSearch extends Component {
     showModal('加载中')
 
     tool.debounces(() => {
-      const {searchKeywords, selectTagId, page, pageNum} = this.state
+      const {searchKeywords, selectTagId, page, pageNum, goods} = this.state
       const {type, limit_store, prod_status} = this.props.route.params;
       let params = {};
       if (searchKeywords) {
-        const accessToken = this.props.global.accessToken;
+        const {accessToken} = this.props.global;
         const {currVendorId} = tool.vendor(this.props.global);
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
         params = {
@@ -89,12 +91,13 @@ class StoreGoodsSearch extends Component {
           hideModal()
           const totalPage = res.count / res.pageSize
           const isLastPage = res.page >= totalPage
-          const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
           this.setState({
-            goods: goods,
+            goods: Number(res.page) === 1 ? res.lists : goods.concat(res.lists),
             isLastPage: isLastPage,
             isLoading: false,
-            showNone: !res.lists
+            showNone: !res.lists,
+            hasGoodsResult: !res.lists.length,
+            showBottomView: true
           })
         })
       } else {
@@ -128,13 +131,16 @@ class StoreGoodsSearch extends Component {
     this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
   }
 
-  onChange = (searchKeywords: any) => {
+  onChange = (searchKeywords) => {
     codeType = 'search'
     const toUpdate = {searchKeywords};
     if (this.state.searchKeywords !== searchKeywords) {
       toUpdate.page = 1
     }
     this.setState(toUpdate);
+    if (!searchKeywords) {
+      this.setState({hasGoodsResult: false, showBottomView: false, goods: []})
+    }
   }
 
   onCancel = () => {
@@ -173,7 +179,7 @@ class StoreGoodsSearch extends Component {
 
   renderSearchBar = () => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center', margin: 10, flex: 1}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
         <TextInput value={this.state.searchKeywords}
                    style={{padding: 8, backgroundColor: colors.white, flex: 3, borderRadius: 4}}
                    onChangeText={this.onChange}
@@ -295,25 +301,40 @@ class StoreGoodsSearch extends Component {
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
-  renderNoProduct = () => {
-    const {searchKeywords, goods, isLoading, showNone} = this.state
-    if (showNone && !isLoading)
-      return (
-        <View style={styles.notGoodTip}>
-          {
-            tool.length(searchKeywords) > 0 && tool.length(goods) <= 0 ?
-              <Text style={{fontSize: 12, color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
-              <Text style={{fontSize: 12, color: colors.color333}}>暂时没有商品</Text>
-          }
-        </View>
-      )
-  }
+
   onScrollBeginDrag = () => {
     this.setState({isCanLoadMore: true})
   }
+  getGoodsList = () => {
+    const {goods, hasGoodsResult} = this.state
+    if (goods.length > 0)
+      return (
+        <FlatList data={goods}
+                  renderItem={this.renderRow}
+                  getItemLayout={this._getItemLayout}
+                  initialNumToRender={10}
+                  refreshing={false}
+                  onRefresh={this.onRefresh}
+                  onScrollBeginDrag={this.onScrollBeginDrag}
+                  onEndReachedThreshold={0.2}
+                  onEndReached={this.onLoadMore}
+                  keyExtractor={(item, index) => `${index}`}
+        />
+      )
+    return (
+      <If condition={hasGoodsResult}>
+        <View style={styles.center}>
+          <SvgXml xml={noSearchGoodsData()}/>
+          <Text style={styles.notHasGoodsDesc}>
+            暂无搜索结果
+          </Text>
+        </View>
+      </If>
+    )
+  }
 
   render() {
-    const {selectedProduct, showScan, goods, modalType} = this.state;
+    const {selectedProduct, showScan, modalType} = this.state;
     const {sp} = selectedProduct;
     const {accessToken} = this.props.global;
     const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
@@ -327,20 +348,7 @@ class StoreGoodsSearch extends Component {
         {this.renderSearchBar()}
 
         <View style={styles.goodsWrap}>
-          <FlatList data={goods}
-                    renderItem={this.renderRow}
-                    initialNumToRender={5}
-                    onRefresh={this.onRefresh}
-                    refreshing={false}
-                    keyExtractor={this._keyExtractor}
-                    getItemLayout={this._getItemLayout}
-                    onScrollBeginDrag={this.onScrollBeginDrag}
-                    onEndReachedThreshold={0.2}
-                    onEndReached={this.onLoadMore}
-          />
-
-          {this.renderNoProduct()}
-
+          {this.getGoodsList()}
           {sp && <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)} modalType={modalType}
                                      productName={selectedProduct.name}
                                      skuName={selectedProduct.sku_name}
@@ -362,6 +370,12 @@ class StoreGoodsSearch extends Component {
 }
 
 const styles = StyleSheet.create({
+  center: {flex: 1, alignItems: 'center', marginTop: 80},
+  notHasGoodsDesc: {
+    fontSize: 15,
+    marginTop: 9,
+    color: colors.color999
+  },
   page: {
     flexDirection: "column",
     flex: 1,

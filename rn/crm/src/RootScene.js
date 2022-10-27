@@ -58,7 +58,6 @@ class RootScene extends PureComponent {
   getInfo = () => {
     const startTime = dayjs().valueOf()
     getNoLoginInfo().then(info => {
-      console.log(info,'onfo')
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
       GlobalUtil.setHostPort(noLoginInfo.host)
