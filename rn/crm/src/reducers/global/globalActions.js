@@ -25,6 +25,7 @@ import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
+import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -50,17 +51,32 @@ const {
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
-  SET_BLUETOOTH_DEVICE_LIST
+  SET_BLUETOOTH_DEVICE_LIST,
+  SET_SCANNING_BLUETOOTH_DEVICE,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
 }
 
-export const setBlueToothDeviceList = (list) => {
+export const setAutoPrint = (autoBluetoothPrint) => {
+  return {
+    type: SET_AUTO_PRINT,
+    payload: autoBluetoothPrint
+  }
+}
+export const setIsScanningBlueTooth = (status) => {
+  return {
+    type: SET_SCANNING_BLUETOOTH_DEVICE,
+    payload: status
+  }
+}
+
+export const setBlueToothDeviceList = (bluetoothDeviceList) => {
   return {
     type: SET_BLUETOOTH_DEVICE_LIST,
-    payload: list
+    payload: bluetoothDeviceList
   }
 }
 
@@ -71,17 +87,25 @@ export const setSGCategory = (basic_categories) => {
   }
 }
 
-export function setAccessToken(oauthToken) {
+export function setAccessToken(obj) {
   return {
     type: SESSION_TOKEN_SUCCESS,
-    payload: oauthToken
+    payload: {
+      access_token: obj.access_token,
+      refresh_token: obj.refresh_token,
+      expires_in_ts: obj.expires_in_ts,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
 export function setNoLoginInfo(info) {
   return {
     type: SET_NO_LOGIN_INFO,
-    payload: info
+    payload: {
+      ...info,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
@@ -267,9 +291,9 @@ export function sendDverifyCode(mobile, type, is_agree, callback) {
       device_uuid: getDeviceUUID(),
     })
       .then(() => {
-        callback(true, '发送成功')
+        callback(true, '发送成功：')
       }).catch((error) => {
-        callback(false, '发送失败' + error)
+        callback(false, '发送失败：' + error)
       })
   }
 }
@@ -281,7 +305,7 @@ export function signIn(mobile, password, props, callback) {
       .then(json => {
         const {access_token, refresh_token, expires_in: expires_in_ts} = json;
         if (access_token) {
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+          dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
 
           const authCallback = (ok, msg, profile) => {

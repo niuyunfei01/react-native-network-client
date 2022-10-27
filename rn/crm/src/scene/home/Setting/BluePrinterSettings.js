@@ -1,11 +1,7 @@
 import React, {PureComponent} from 'react'
 import {
-  Alert,
+
   FlatList,
-  NativeEventEmitter,
-  NativeModules,
-  PermissionsAndroid,
-  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -16,18 +12,19 @@ import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {setBleStarted, setPrinterId} from '../../../reducers/global/globalActions';
 import {Button} from "@ant-design/react-native";
-import BleManager from 'react-native-ble-manager';
-import ESC from "../../../pubilc/util/ble/Ecs"
 import {CellsTitle} from "../../../weui";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import tool from "../../../pubilc/util/tool";
+import {
+  connectBluetoothDevice,
+  handleDisconnectedPeripheral,
+  retrieveConnected,
+  startScan,
+  testPrint
+} from "../../../pubilc/util/ble/handleBlueTooth";
 
 const _ = require('lodash');
-
-const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -51,224 +48,12 @@ class BluePrinterSettings extends PureComponent {
       isRefreshing: false,
       isScanning: false,
       didSearch: false,
-      peripherals: new Map(),
-      list: [],
       askEnableBle: false
     }
   }
 
-  startScan = () => {
-    if (!this.state.isScanning) {
-      BleManager.scan([], 10, false).then(() => {
-        this.setState({isScanning: true});
-      }).catch(err => {
-        console.error("scanning ", err);
-      });
-    }
-  }
-
-  handleStopScan = () => {
-    this.setState({isScanning: false})
-  }
-
-  handleDisconnectedPeripheral = (id) => {
-    let peripheral = this.state.peripherals.get(id);
-    if (peripheral) {
-      if (peripheral.connected) {
-        BleManager.disconnect(peripheral.id).then();
-        peripheral.connected = false;
-      }
-
-      const {dispatch} = this.props
-      const {printer_id} = this.props.global
-      if (printer_id === id) {
-        dispatch(setPrinterId('0'))
-      }
-
-      let {peripherals} = this.state;
-      peripherals.set(peripheral.id, peripheral)
-
-      this.setState({
-        list: Array.from(peripherals.values()),
-        peripherals: peripherals
-      });
-    }
-  }
-
-
-  retrieveConnected = () => {
-    BleManager.getConnectedPeripherals([]).then((results) => {
-      if (tool.length(results) === 0) {
-        return
-      }
-      for (let i = 0; i < tool.length(results); i++) {
-        const peripheral = results[i];
-        peripheral.connected = true;
-        this.state.peripherals.set(peripheral.id, peripheral);
-      }
-      this.setState({list: Array.from(this.state.peripherals.values())});
-    });
-  }
-
-  handleDiscoverPeripheral = (peripheral) => {
-    if (!peripheral.name) {
-      peripheral.name = '未名设备';
-    }
-    this.state.peripherals.set(peripheral.id, peripheral);
-    this.setState({list: Array.from(this.state.peripherals.values())});
-  }
-
-  handleUpdateValueForCharacteristic = (data) => {
-    //console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
-  }
-
-  testPrintData = (data) => {
-    ESC.resetByte()
-    ESC.fontNormalHeightWidth();
-    ESC.alignLeft();
-    ESC.startLine(32);
-    ESC.fontHeightTimes();
-    ESC.text('   打印测试单');
-    ESC.printAndNewLine();
-    ESC.fontHeightTimes();
-    if (data)
-      ESC.text(`   ${data}`);
-    else
-      ESC.text("合计        X100");
-    ESC.printAndNewLine();
-    ESC.startLine(32);
-    ESC.fontNormalHeightWidth();
-    ESC.text('外送帮祝您生意兴隆！');
-    ESC.printAndNewLine();
-    ESC.hex("0D 0D 0D")
-    ESC.walkPaper(4)
-    return ESC.getByte()
-  }
-
-  testPrint = (peripheral, data = null) => {
-    setTimeout(() => {
-      BleManager.retrieveServices(peripheral.id).then(() => {
-        const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
-        const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
-        setTimeout(() => {
-          BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-            setTimeout(() => {
-              const testData = this.testPrintData(data);
-              BleManager.write(peripheral.id, service, bakeCharacteristic, testData).then(() => {
-                this.alert("打印成功，请查看小票")
-              }).catch(() => {
-                this.alert("蓝牙打印失败，请重试")
-              });
-            }, 500);
-          }).catch(() => {
-            this.alert("蓝牙打印失败，请重试",)
-          });
-        }, 200);
-      }).catch(() => {
-        this.alert("蓝牙打印机连接失败")
-      });
-    })
-  }
-
-  connectPrinter = (peripheral) => {
-    BleManager.stopScan().then()
-    if (peripheral.connected) {
-      BleManager.disconnect(peripheral.id).then();
-      return
-    }
-
-    BleManager.connect(peripheral.id).then(() => {
-      const {peripherals} = this.state;
-      let p = peripherals.get(peripheral.id);
-      if (p) {
-        p.connected = true;
-        peripherals.set(peripheral.id, p);
-        this.setState({list: Array.from(peripherals.values())});
-      }
-      const {dispatch} = this.props
-      dispatch(setPrinterId(peripheral.id))
-      this.peripheral = peripheral
-      setTimeout(() => {
-        BleManager.retrieveServices(peripheral.id).then(() => {
-          BleManager.readRSSI(peripheral.id).then((rssi) => {
-            let p = peripherals.get(peripheral.id);
-            if (p) {
-              p.rssi = rssi;
-              peripherals.set(peripheral.id, p);
-              this.setState({list: Array.from(peripherals.values())});
-            }
-          });
-        });
-      }, 900);
-    }).catch(() => {
-      this.alert("蓝牙连接失败，请重试")
-    });
-  }
-
-  alert(text) {
-    Alert.alert('提示', text, [{
-      text: '确定',
-      onPress: () => {
-      }
-    }]);
-  }
-
-
-  componentDidMount() {
-
-    switch (Platform.OS) {
-      case "android":
-        BleManager.start({}).then(() => {
-
-        })
-        break
-      case "ios":
-        BleManager.start({
-          showAlert: true,
-          restoreIdentifierKey: 'com.waisongbang.app.bt.restoreIdentifierKey',
-          queueIdentifierKey: 'com.waisongbang.app.bt.queueIdentifierKey'
-        }).then(() => {
-        })
-        break
-    }
-
-    // eslint-disable-next-line react/prop-types
-    const {dispatch} = this.props
-    dispatch(setBleStarted(true));
-    BleManager.checkState();
-    bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
-    bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);
-    bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
-    bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
-
-    if (Platform.OS === 'android' && Platform.Version >= 23) {
-      BleManager.enableBluetooth()
-        .then()
-        .catch(() => {
-          this.setState({askEnableBle: true})
-        });
-
-      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (!result) {
-          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-            if (result) {
-              // console.log("User 接受");
-            } else {
-              // console.log("User 拒绝");
-            }
-          });
-        }
-      });
-    }
-
-    this.retrieveConnected()
-  }
-
-  componentWillUnmount() {
-    bleManagerEmitter.removeListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
-    bleManagerEmitter.removeListener('BleManagerStopScan', this.handleStopScan);
-    bleManagerEmitter.removeListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
-    bleManagerEmitter.removeListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
+  componentDidMount = async () => {
+    await retrieveConnected()
   }
 
   renderItem = (item) => {
@@ -276,24 +61,18 @@ class BluePrinterSettings extends PureComponent {
       <TouchableHighlight>
         <View style={[styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
           <View style={[styles.columnStart]}>
-            <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}  </Text>
+            <Text style={{fontSize: 16, padding: 2}}>{item.name}  </Text>
           </View>
           <View style={[styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
             <If condition={item.connected}>
               <View style={[styles.between]}>
                 <View style={{marginEnd: 10}}>
-                  <Button
-                    size="small"
-                    type={"primary"}
-                    style={styles.testPrintBtn}
-                    onPress={() => this.testPrint(item)}>
+                  <Button size="small" type={"primary"} style={styles.testPrintBtn} onPress={() => testPrint(item)}>
                     测试打印
                   </Button>
                 </View>
-                <Button size="small"
-                        type={"primary"}
-                        style={styles.disConnectBTBtn}
-                        onPress={() => this.handleDisconnectedPeripheral(item.id)}>
+                <Button size="small" type={"primary"} style={styles.disConnectBTBtn}
+                        onPress={() => handleDisconnectedPeripheral(item.id)}>
                   断开
                 </Button>
               </View>
@@ -302,7 +81,7 @@ class BluePrinterSettings extends PureComponent {
               <Button type={'primary'}
                       size={'small'}
                       style={styles.connectBTBtn}
-                      onPress={() => this.connectPrinter(item)}>
+                      onPress={() => connectBluetoothDevice(item)}>
                 连接
               </Button>
             </If>
@@ -313,48 +92,42 @@ class BluePrinterSettings extends PureComponent {
   }
 
   render() {
-    const connectedList = _.filter(this.state.list, "connected");
-    const notConnectedList = _.filter(this.state.list, function (o) {
+    const {bluetoothDeviceList, isScanningBluetoothDevice} = this.props.global
+    const connectedList = _.filter(bluetoothDeviceList, "connected");
+    const notConnectedList = _.filter(bluetoothDeviceList, function (o) {
       return !o.connected;
     });
-
-    return (<SafeAreaView style={{flex: 1}}>
-        {this.state.list && <View style={[{flex: 1}, styles.columnStart]}>
-          <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
-          <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}}
-                    data={connectedList}
-                    renderItem={({item}) => this.renderItem(item)}
-                    keyExtractor={item => item.id}/>
-          <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
-          <FlatList data={notConnectedList}
-                    renderItem={({item}) => this.renderItem(item)}
-                    keyExtractor={item => item.id}/>
-        </View>}
-        {(tool.length(this.state.list) === 0 && !this.state.isScanning) &&
-        <View style={{flex: 1, margin: 20}}>
-          <Text style={{textAlign: 'center'}}>
-            {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}
-          </Text>
-        </View>}
+    return (
+      <SafeAreaView style={{flex: 1}}>
+        <If condition={bluetoothDeviceList}>
+          <View style={[{flex: 1}, styles.columnStart]}>
+            <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
+            <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}}
+                      data={connectedList}
+                      initialNumToRender={1}
+                      renderItem={({item}) => this.renderItem(item)}
+                      keyExtractor={item => item.id}/>
+            <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
+            <FlatList data={notConnectedList}
+                      initialNumToRender={10}
+                      renderItem={({item}) => this.renderItem(item)}
+                      keyExtractor={item => item.id}/>
+          </View>
+        </If>
+        <If condition={tool.length(bluetoothDeviceList) === 0 && !isScanningBluetoothDevice}>
+          <View style={{flex: 1, margin: 20}}>
+            <Text style={{textAlign: 'center'}}>
+              {this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}
+            </Text>
+          </View>
+        </If>
 
         <View style={{backgroundColor: colors.f2}}>
-          <If condition={this.state.askEnableBle}>
-            <View style={{margin: 10}}>
-              <Button>开启蓝牙打印</Button>
-            </View>
-          </If>
           <View style={{margin: 10}}>
-            <Button
-              type={'primary'}
-              style={{
-                backgroundColor: '#4a98e7',
-                marginHorizontal: pxToDp(30),
-                borderRadius: pxToDp(20),
-                textAlign: 'center',
-                marginBottom: pxToDp(30),
-              }}
-              onPress={() => this.startScan()}>
-              搜索蓝牙打印机 {this.state.isScanning ? `(搜索中...${this.state.list.length})` : `(共${this.state.list.length}个)`}
+            <Button type={'primary'}
+                    style={styles.searchBluetoothBtn}
+                    onPress={() => startScan()}>
+              搜索蓝牙打印机 {isScanningBluetoothDevice ? `(搜索中...${bluetoothDeviceList.length})` : `(共${bluetoothDeviceList.length}个)`}
             </Button>
           </View>
         </View>
@@ -364,6 +137,13 @@ class BluePrinterSettings extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  searchBluetoothBtn: {
+    backgroundColor: '#4a98e7',
+    marginHorizontal: pxToDp(30),
+    borderRadius: pxToDp(20),
+    textAlign: 'center',
+    marginBottom: pxToDp(30),
+  },
   testPrintBtn: {
     color: colors.white,
     paddingVertical: 2,

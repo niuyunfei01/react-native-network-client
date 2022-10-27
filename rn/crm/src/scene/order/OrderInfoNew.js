@@ -154,6 +154,7 @@ class OrderInfoNew extends PureComponent {
     timeObj['componentName'] = "OrderInfo"
     timeObj['is_record_request_monitor'] = this.props.global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
+
   }
 
   componentDidUpdate = () => {
@@ -827,7 +828,7 @@ class OrderInfoNew extends PureComponent {
               <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
             </If>
           </View>
-          <Text style={styles.orderStatusNotice}>{delivery_desc} </Text>
+          <Text style={styles.orderStatusNotice}>{tool.jbbsubstr(delivery_desc, 18)} </Text>
 
         </Animated.View>
         {this.renderOrderInfoHeaderButton()}
