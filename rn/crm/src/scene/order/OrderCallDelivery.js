@@ -231,7 +231,7 @@ class OrderCallDelivery extends Component {
         weight_max: Number(obj?.weight_max),
         weight_min: Number(obj?.weight_min),
         weight_step: Number(obj?.weight_step),
-        is_right_once: obj?.is_right_once || 1,
+        is_right_once: obj?.is_right_once,
         mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:MM') : '',
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         remark: obj?.remark || '',
