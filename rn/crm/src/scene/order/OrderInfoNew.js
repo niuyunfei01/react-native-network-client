@@ -676,7 +676,7 @@ class OrderInfoNew extends PureComponent {
             </Marker>
           </If>
           {/*用户定位*/}
-          <If condition={ship_distance_destination > 0 && loc_lat && loc_lng}>
+          <If condition={ship_distance_destination > 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
 
             <Marker
               zIndex={93}
@@ -688,7 +688,7 @@ class OrderInfoNew extends PureComponent {
               }}
             />
           </If>
-          <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng}>
+          <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}

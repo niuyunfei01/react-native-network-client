@@ -192,7 +192,7 @@ class RiderTrajectory extends Component {
         </If>
 
         {/*顾客定位*/}
-        <If condition={distance_destination > 0 && track_destination_lat && track_destination_lng}>
+        <If condition={distance_destination > 0 && track_destination_lat && track_destination_lng && distance_store <= 0}>
           <Marker
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
@@ -205,7 +205,7 @@ class RiderTrajectory extends Component {
         </If>
 
         {/*顾客定位*/}
-        <If condition={distance_destination <= 0 && track_destination_lat && track_destination_lng}>
+        <If condition={distance_store <= 0 && distance_destination <= 0 && track_destination_lat && track_destination_lng}>
           <Marker
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
