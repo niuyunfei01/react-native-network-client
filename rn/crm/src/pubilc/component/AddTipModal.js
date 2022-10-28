@@ -66,7 +66,7 @@ class AddTipModal extends React.Component {
     let {add_money} = this.state;
 
     if (Number(add_money) < 1) {
-      return this.setState({add_money: 1, respReason: '加小费的金额必须大于1元', ok: false});
+      return this.setState({add_money: 1, respReason: '加小费的金额必须大于等于1元', ok: false});
     }
 
     if (set_add_tip_money) { //修改上级页面加小费金额
@@ -177,7 +177,7 @@ class AddTipModal extends React.Component {
                 value={`${input_add_money}`}
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
-                maxLength={6}
+                maxLength={2}
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
