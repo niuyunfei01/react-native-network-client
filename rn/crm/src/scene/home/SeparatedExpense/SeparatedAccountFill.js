@@ -311,6 +311,7 @@ class SeparatedAccountFill extends PureComponent {
                   width: width * 0.26,
                   textAlign: 'center',
                   paddingVertical: 14,
+                  height: 36,
                   borderRadius: 4,
                   marginVertical: 5
                 }} onPress={() => this.setMoney(info.value)}>{info.label} </Text>
@@ -329,6 +330,7 @@ class SeparatedAccountFill extends PureComponent {
                   fontSize: 14,
                   width: width * 0.25,
                   borderWidth: 0.5,
+                  height: 36,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
                   textAlign: 'center',
