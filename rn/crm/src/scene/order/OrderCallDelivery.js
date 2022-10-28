@@ -1306,6 +1306,7 @@ class OrderCallDelivery extends Component {
                 defaultValue={order_money_value}
                 value={order_money_value}
                 placeholderTextColor={colors.color999}
+                maxLength={6}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"
                 keyboardType={'numeric'}

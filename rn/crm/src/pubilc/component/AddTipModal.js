@@ -177,6 +177,7 @@ class AddTipModal extends React.Component {
                 value={`${input_add_money}`}
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
+                maxLength={6}
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{

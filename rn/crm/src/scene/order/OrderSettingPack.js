@@ -859,6 +859,7 @@ class OrderSettingScene extends Component {
                 defaultValue={`${goods_price_value}`}
                 value={`${goods_price_value}`}
                 placeholderTextColor={colors.color999}
+                maxLength={6}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"
                 keyboardType={'numeric'}

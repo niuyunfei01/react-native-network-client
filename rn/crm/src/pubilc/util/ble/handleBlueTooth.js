@@ -2,7 +2,10 @@ import BleManager from 'react-native-ble-manager';
 import {Alert, NativeEventEmitter, NativeModules, PermissionsAndroid, Platform} from "react-native";
 import store from '../../util/configureStore'
 import {
-  setBleStarted, setBlueToothDeviceList, setIsScanningBlueTooth, setPrinterId
+  setBleStarted,
+  setBlueToothDeviceList,
+  setIsScanningBlueTooth,
+  setPrinterId
 } from "../../../reducers/global/globalActions";
 import ESC from "./Ecs";
 import tool from "../tool";
@@ -87,9 +90,7 @@ const handleDidUpdateState = (args, printer_id) => {
       }
       break
   }
-  if (args.state === 'on') {
-    needShowOpenBluetoothStatus = true
-  }
+  needShowOpenBluetoothStatus = args.state === 'on'
 }
 
 const handleCentralManagerWillRestoreState = () => {
