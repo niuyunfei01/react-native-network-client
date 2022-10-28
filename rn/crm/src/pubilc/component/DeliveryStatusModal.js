@@ -159,6 +159,10 @@ class deliveryStatusModal extends React.Component {
       PropTypes.string
     ]),
     accessToken: PropTypes.string,
+    order_status: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     show_modal: PropTypes.bool,
     onClose: PropTypes.func,
     onPress: PropTypes.func,
@@ -185,19 +189,19 @@ class deliveryStatusModal extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {accessToken, order_id, show_modal} = nextProps;
+    const {accessToken, order_id, show_modal, order_status} = nextProps;
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
       return null;
     }
     showModal('请求中...')
     tool.debounces(() => {
-      this.getInfo(accessToken, order_id)
+      this.getInfo(accessToken, order_id, order_status)
     })
   }
 
-  getInfo = (accessToken, order_id) => {
+  getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
-    const params = {access_token: accessToken, order_id: order_id}
+    const params = {access_token: accessToken, order_id: order_id,order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         delivery_list: res?.do_list,

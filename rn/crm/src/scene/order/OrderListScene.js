@@ -569,6 +569,7 @@ class OrderListScene extends Component {
       show_add_tip_modal,
       show_cancel_delivery_modal,
       add_tip_id,
+      orderStatus,
     } = this.state
 
     return (
@@ -593,6 +594,7 @@ class OrderListScene extends Component {
 
         <DeliveryStatusModal
           order_id={order_id}
+          order_status={orderStatus}
           store_id={currStoreId}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
