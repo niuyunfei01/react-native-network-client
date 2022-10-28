@@ -1264,14 +1264,14 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderDeliveryModal = () => {
-    let {show_delivery_modal, orderId, currStoreId, order} = this.state;
+    let {show_delivery_modal, orderId, currStoreId} = this.state;
     const {global} = this.props;
     const {accessToken} = global;
     return (
       <DeliveryStatusModal
         order_id={orderId}
         store_id={currStoreId}
-        order_status={order?.orderStatus}
+        order_status={0}
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}
         openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
