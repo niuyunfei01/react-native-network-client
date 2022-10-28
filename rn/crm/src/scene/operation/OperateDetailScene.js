@@ -138,9 +138,6 @@ class OperateDetailScene extends PureComponent {
         isLoading: false
       });
       hideModal()
-    }, res => {
-
-    }).catch(error => {
     })
 
   }

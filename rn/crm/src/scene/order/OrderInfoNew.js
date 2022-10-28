@@ -415,8 +415,6 @@ class OrderInfoNew extends PureComponent {
           BleManager.connect(printer_id).then(() => {
             BleManager.retrieveServices(printer_id).then((peripheral) => {
               print_order_to_bt(accessToken, peripheral, clb, order.id, order);
-            }).catch(() => {
-              //忽略第二次的结果
             })
           }).catch(() => {
             Alert.alert('提示', '打印机已断开连接', this.buttons);

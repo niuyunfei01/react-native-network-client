@@ -81,8 +81,6 @@ class UserTagPopup extends React.Component {
           self.setState({originTagList: list, tagList: list})
         }
       })
-      .catch(e => {
-      })
   }
 
   setSelectTags() {

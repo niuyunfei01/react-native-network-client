@@ -52,7 +52,7 @@ class DistributionOrder extends PureComponent {
       ToastLong('添加成功')
       this.get_map_store();
     }).catch((reason) => {
-      ToastLong(reason)
+      ToastLong(reason?.desc)
     })
   }
 
@@ -64,7 +64,7 @@ class DistributionOrder extends PureComponent {
         business_status: res
       })
     }).catch((reason) => {
-      ToastLong(reason)
+      ToastLong(reason?.desc)
     })
   }
 
@@ -77,7 +77,7 @@ class DistributionOrder extends PureComponent {
       ToastLong('删除成功')
       this.get_map_store();
     }).catch((reason) => {
-      ToastLong(reason)
+      ToastLong(reason?.desc)
     })
   }
 

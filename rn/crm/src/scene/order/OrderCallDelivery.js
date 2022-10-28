@@ -64,7 +64,7 @@ class OrderCallDelivery extends Component {
 
   constructor(props: Object) {
     super(props);
-    let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
+    let {order_id, store_id, if_reship, address_id} = this.props.route.params;
     let {call_delivery_list} = this.props.global
     this.state = {
       isLoading: false,
@@ -91,7 +91,7 @@ class OrderCallDelivery extends Component {
       wm_address: '',
       wm_user_name: '',
       wm_mobile: '',
-      expect_time: expect_time ? expect_time : dayjs(new Date()).format('YYYY-MM-DD HH:MM:ss'),
+      expect_time: '',
       order_money: 0,
       order_money_input_value: 20,
       order_money_value: '',
@@ -231,9 +231,10 @@ class OrderCallDelivery extends Component {
         weight_max: Number(obj?.weight_max),
         weight_min: Number(obj?.weight_min),
         weight_step: Number(obj?.weight_step),
-        is_right_once: obj?.is_right_once ? Number(obj?.is_right_once) : 1,
-        mealTime: dayjs(obj?.expect_time).format('HH:MM'),
+        is_right_once: obj?.is_right_once || 1,
+        mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:MM') : '',
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
+        remark: obj?.remark || '',
         isLoading: false,
       })
       this.priceFn();
@@ -542,7 +543,7 @@ class OrderCallDelivery extends Component {
 
   checkDatePicker = (date) => {
     this.setState({
-      expect_time: dayjs(date).format('YYYY-MM-DD HH:mm'),
+      expect_time: dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
       show_date_modal: false,
       mealTime: dayjs(date).format('HH:mm'),
       is_right_once: 0,

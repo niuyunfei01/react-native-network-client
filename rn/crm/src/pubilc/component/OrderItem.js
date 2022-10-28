@@ -87,7 +87,7 @@ class OrderItem extends React.PureComponent {
         showSuccess('配送已完成')
         this.props.fetchData();
       }).catch(e => {
-        ToastShort('忽略配送失败' + e.desc)
+        ToastShort('忽略配送失败' + e?.desc)
       })
     }, 600)
   }
@@ -180,7 +180,7 @@ class OrderItem extends React.PureComponent {
     HttpUtils.get(api).then(() => {
       ToastShort(`核销成功，订单已完成`)
     }).catch((reason) => {
-      ToastShort(`操作失败：${reason.reason}`)
+      ToastShort(`操作失败：${reason?.reason}`)
     })
   }
 

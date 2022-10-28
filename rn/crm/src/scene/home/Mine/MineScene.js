@@ -562,7 +562,6 @@ class MineScene extends Component {
         activity_img: res.icon,
         activity_url: res.url + '?access_token=' + accessToken,
       })
-    }).catch(() => {
     })
   }
 

@@ -79,7 +79,6 @@ class VersionScene extends PureComponent {
         curr_version_name: version_name,
         isRefreshing: false
       })
-    }).catch(() => {
     })
   }
 
