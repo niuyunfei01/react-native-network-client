@@ -34,7 +34,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {setCallDeliveryList, setDefaultOrderInfo} from "../../reducers/global/globalActions";
+import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
 
@@ -64,7 +64,7 @@ class OrderCallDelivery extends Component {
 
   constructor(props: Object) {
     super(props);
-    let {order_id, store_id, expect_time, if_reship, address_id} = this.props.route.params;
+    let {order_id, store_id, if_reship, address_id} = this.props.route.params;
     let {call_delivery_list} = this.props.global
     this.state = {
       isLoading: false,
@@ -91,8 +91,8 @@ class OrderCallDelivery extends Component {
       wm_address: '',
       wm_user_name: '',
       wm_mobile: '',
-      expect_time: expect_time ? expect_time : dayjs(new Date()).format('YYYY-MM-DD HH:MM:ss'),
-      order_money: 20,
+      expect_time: '',
+      order_money: 0,
       order_money_input_value: 20,
       order_money_value: '',
       add_tips: 0,
@@ -185,6 +185,7 @@ class OrderCallDelivery extends Component {
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
       let store_est = obj?.store_est || [];
       let est = obj?.est || [];
+      this.props.dispatch(setCallDeliveryList(est))
       if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
         let check = false
         for (let i in logistic_fee_map) {
@@ -212,7 +213,6 @@ class OrderCallDelivery extends Component {
       } else {
         logistic_fee_map = [];
       }
-      this.props.dispatch(setCallDeliveryList(est))
       this.setState({
         params_str: params_json_str,
         store_est: store_est,
@@ -231,7 +231,10 @@ class OrderCallDelivery extends Component {
         weight_max: Number(obj?.weight_max),
         weight_min: Number(obj?.weight_min),
         weight_step: Number(obj?.weight_step),
+        is_right_once: obj?.is_right_once,
+        mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:MM') : '',
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
+        remark: obj?.remark || '',
         isLoading: false,
       })
       this.priceFn();
@@ -540,7 +543,7 @@ class OrderCallDelivery extends Component {
 
   checkDatePicker = (date) => {
     this.setState({
-      expect_time: dayjs(date).format('YYYY-MM-DD HH:mm'),
+      expect_time: dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
       show_date_modal: false,
       mealTime: dayjs(date).format('HH:mm'),
       is_right_once: 0,
@@ -1297,7 +1300,7 @@ class OrderCallDelivery extends Component {
               </For>
               <TextInput
                 onChangeText={(order_money_value) => {
-                  this.setState({order_money_value: Number(order_money_value), order_money: 0})
+                  this.setState({order_money_value: Number(order_money_value), order_money_input_value: 0})
                 }}
                 defaultValue={order_money_value}
                 value={order_money_value}
@@ -1330,7 +1333,7 @@ class OrderCallDelivery extends Component {
                       let order_money = order_money_input_value === 0 ? order_money_value : order_money_input_value;
 
                       this.setState({
-                        order_money
+                        order_money,
                       }, () => {
                         this.fetchData()
                         this.closeModal()
@@ -1371,6 +1374,7 @@ class OrderCallDelivery extends Component {
             <TextArea
               multiline={true}
               numberOfLines={4}
+              maxLength={30}
               value={remark_input_value}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}

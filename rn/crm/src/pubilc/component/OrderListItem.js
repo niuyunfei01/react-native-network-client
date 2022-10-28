@@ -127,7 +127,7 @@ class OrderListItem extends React.PureComponent {
           ToastShort('暂无数据')
         }
       }).catch((obj) => {
-        ToastShort(`操作失败：${obj.reason}`)
+        ToastShort(`操作失败：${obj?.reason}`)
       })
       this.setState({
         order_id: item.id,

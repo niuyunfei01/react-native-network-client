@@ -302,7 +302,7 @@ export function sendDverifyCode(mobile, type, is_agree, callback) {
       .then(() => {
         callback(true, '发送成功')
       }).catch((error) => {
-        callback(false, '发送失败' + error)
+        callback(false, '发送失败' + error?.desc)
       })
   }
 }

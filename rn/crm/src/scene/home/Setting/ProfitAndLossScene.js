@@ -82,7 +82,6 @@ class ProfitAndLoss extends PureComponent {
           pageSize: profit_info.data.pageSize
         }
       })
-    }).catch(() => {
     })
   }
 

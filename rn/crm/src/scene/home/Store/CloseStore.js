@@ -83,7 +83,6 @@ class StoreClose extends PureComponent {
         refundReasonStopBusiness: res.reason_list['STOP_TO_BUSINESS'],
         refundReasonCloseFifteen: res.reason_list['CLOSE_FIFTY_DAY']
       })
-    }).catch(() => {
     })
   }
 
@@ -130,7 +129,6 @@ class StoreClose extends PureComponent {
       setTimeout(() => {
         navigation.goBack();
       }, 1000)
-    }).catch(() => {
     })
 
   }
@@ -154,7 +152,6 @@ class StoreClose extends PureComponent {
         }
       }])
       this.fetchData()
-    }).catch(() => {
     })
   }
 
@@ -293,7 +290,6 @@ class StoreClose extends PureComponent {
                       setTimeout(() => {
                         navigation.goBack();
                       }, 1000)
-                    }).catch(() => {
                     })
                   }
                 }, {text: '取消'}])
@@ -412,7 +408,6 @@ class StoreClose extends PureComponent {
                       setTimeout(() => {
                         navigation.goBack();
                       }, 1000)
-                    }).catch(() => {
                     })
                   }
                 }, {text: '取消'}])
