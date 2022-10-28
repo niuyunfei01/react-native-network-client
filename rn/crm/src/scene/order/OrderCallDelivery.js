@@ -34,7 +34,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {setCallDeliveryList} from "../../reducers/global/globalActions";
+// import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
 
@@ -65,7 +65,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
-    let {call_delivery_list} = this.props.global
+    // let {call_delivery_list} = this.props.global
     this.state = {
       isLoading: false,
       order_id: order_id,
@@ -73,7 +73,7 @@ class OrderCallDelivery extends Component {
       if_reship: if_reship,
       address_id: address_id,
       store_est: [],
-      est: call_delivery_list,
+      est: [],
       exist_waiting_delivery: [],
       maxPrice: 0,
       minPrice: 0,
@@ -185,7 +185,7 @@ class OrderCallDelivery extends Component {
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
       let store_est = obj?.store_est || [];
       let est = obj?.est || [];
-      this.props.dispatch(setCallDeliveryList(est))
+      // this.props.dispatch(setCallDeliveryList(est))
       if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
         let check = false
         for (let i in logistic_fee_map) {

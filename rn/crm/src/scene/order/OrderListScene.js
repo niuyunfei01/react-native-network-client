@@ -292,7 +292,7 @@ class OrderListScene extends Component {
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
       user_config: reduxGlobal.user_config,
-      call_delivery_list: reduxGlobal.call_delivery_list,
+      // call_delivery_list: reduxGlobal.call_delivery_list,
       default_order_info: reduxGlobal.default_order_info,
     }
     global.noLoginInfo = noLoginInfo

@@ -150,24 +150,25 @@ class OrderSettingScene extends Component {
   }
 
   componentDidMount() {
-    this.getClipboardText()
+    // this.getClipboardText()
   }
 
-  getClipboardText = () => {
-    Clipboard.getString().then(res => {
-      if (tool.length(res) > 0) {
-        Alert.alert('"外送帮"想从粘贴板粘贴', '你允许这样做吗？', [{
-          text: '允许', onPress: () => {
-            this.setState({
-              smartText: res,
-            }, () => {
-              this.intelligentIdentification()
-            })
-          }
-        }, {'text': '不允许'}]);
-      }
-    });
-  }
+  // getClipboardText = () => {
+  //   Clipboard.getString().then(res => {
+  //     if (tool.length(res) > 0) {
+  //       Alert.alert('"外送帮"想从粘贴板粘贴', '你允许这样做吗？', [{
+  //         text: '允许', onPress: () => {
+  //           this.setState({
+  //             smartText: res,
+  //           }, () => {
+  //             this.intelligentIdentification()
+  //           })
+  //         }
+  //       }, {'text': '不允许'}]);
+  //     }
+  //   });
+  // }
+
   onPress = (route, params = {}) => {
     this.props.navigation.navigate(route, params);
   }
