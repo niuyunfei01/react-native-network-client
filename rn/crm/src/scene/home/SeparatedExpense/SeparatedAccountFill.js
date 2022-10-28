@@ -48,7 +48,7 @@ class SeparatedAccountFill extends PureComponent {
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track('三方支付')
     this.state = {
-      to_fill_yuan: '100',
+      to_fill_yuan: 100,
       customMoney: '',
       isCustomMoney: false,
       pay_by: PAY_ALI_APP,
@@ -275,7 +275,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   setMoney = (value) => {
-    this.setState({customMoney: '', isCustomMoney: false, to_fill_yuan: value,})
+    this.setState({customMoney: '', isCustomMoney: false, to_fill_yuan: Number(value),})
   }
 
   renderWechat() {
@@ -302,19 +302,27 @@ class SeparatedAccountFill extends PureComponent {
               flexWrap: "wrap"
             }}>
               <For index='index' each='info' of={recharge_amount}>
-                <Text key={index} style={{
-                  borderWidth: 0.5,
-                  borderColor: info.value === to_fill_yuan ? colors.main_color : colors.colorDDD,
-                  fontSize: 14,
-                  color: info.value === to_fill_yuan ? colors.main_color : colors.color333,
-                  backgroundColor: info.value === to_fill_yuan ? '#DFFAE2' : colors.white,
-                  width: width * 0.26,
-                  textAlign: 'center',
-                  paddingVertical: 14,
+
+                <TouchableOpacity onPress={() => {
+                  this.setMoney(info.value)
+                }} key={index} style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: width * 0.25,
                   height: 36,
+                  marginVertical: 5,
+                  borderWidth: 0.5,
                   borderRadius: 4,
-                  marginVertical: 5
-                }} onPress={() => this.setMoney(info.value)}>{info.label} </Text>
+                  backgroundColor: Number(info.value) === to_fill_yuan ? '#DFFAE2' : colors.white,
+                  borderColor: Number(info.value) === to_fill_yuan ? colors.main_color : colors.colorDDD,
+                }}>
+                  <Text style={{
+                    fontSize: 14,
+                    color: Number(info.value) === to_fill_yuan ? colors.main_color : colors.color333,
+                  }}>{info.label} </Text>
+                </TouchableOpacity>
+
               </For>
 
               <TextInput

@@ -316,7 +316,7 @@ class deliveryStatusModal extends React.Component {
                     <View style={styles.flexC}>
                       <View style={styles.flexR}>
                         <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
-                        <Text style={styles.f14}>第<Text style={styles.orderNum}>{info?.call_rank} </Text>次下单 </Text>
+                        <Text style={styles.f14}>第<Text style={styles.orderNum}> {info?.call_rank} </Text>次下单 </Text>
                       </View>
                       <View style={[styles.flexR, {marginTop: 10}]}>
                         <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
