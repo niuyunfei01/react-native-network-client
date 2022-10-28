@@ -190,8 +190,7 @@ class OrderInfoNew extends PureComponent {
     const as = [
       {key: MENU_PRINT_AGAIN, label: '再次打印'},
       {key: MENU_EDIT_BASIC, label: '修改订单'},
-      {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_CALL_STAFF, label: '联系门店'},
+      {key: MENU_EDIT_STORE, label: '修改门店'}
     ];
     const {is_service_mgr} = this.state
     if (order && order?.ship_id > 0) {
@@ -200,6 +199,7 @@ class OrderInfoNew extends PureComponent {
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
+      as.push({key: MENU_CALL_STAFF, label: '联系门店'})
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
