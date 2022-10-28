@@ -178,13 +178,11 @@ class OrderCallDelivery extends Component {
     if (params_str === params_json_str || isLoading) {
       return;
     }
-    showModal('加载中')
     this.setState({
       isLoading: true
     })
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
-      hideModal();
       let store_est = obj?.store_est || [];
       let est = obj?.est || [];
       if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
@@ -237,8 +235,6 @@ class OrderCallDelivery extends Component {
         isLoading: false,
       })
       this.priceFn();
-    }).catch(() => {
-      hideModal();
     })
   }
 

@@ -116,7 +116,6 @@ class OrderTransferThird extends Component {
     this.setState({
       isLoading: true
     })
-    showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
     HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       let deliverys = []

@@ -55,7 +55,6 @@ class PermissionToIdentify extends PureComponent {
   }
 
   get_wsb_workers = () => {
-    showModal('加载中')
     const {currStoreId, accessToken, vendor_id} = this.props.global;
     let {page, pageSize} = this.state.query
     if (this.state.isLoading)
@@ -69,7 +68,6 @@ class PermissionToIdentify extends PureComponent {
       page: page,
       page_size: pageSize
     }).then(worker_info => {
-      hideModal()
       let workers = this.state.workerList.concat(worker_info?.lists)
       this.setState({
         workerList: workers,
