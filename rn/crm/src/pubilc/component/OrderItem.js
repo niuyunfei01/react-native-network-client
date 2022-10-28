@@ -56,11 +56,11 @@ class OrderItem extends React.PureComponent {
     fetchData: PropType.func,
     setState: PropType.func,
     openCancelDeliveryModal: PropType.func,
+    openFinishDeliveryModal: PropType.func,
     comesBackBtn: PropType.bool,
   };
   state = {
     verification_modal: false,
-    show_finish_delivery_modal: false,
     pickupCode: '',
   }
 
@@ -146,18 +146,6 @@ class OrderItem extends React.PureComponent {
     }, {'text': '取消'}]);
   }
 
-  toSetOrderComplete = () => {
-    this.closeModal();
-    let {item} = this.props;
-    const api = `/api/complete_order/${item?.id}?access_token=${this.props.accessToken}`
-    HttpUtils.get(api).then(() => {
-      ToastLong('订单已送达')
-      this.props.fetchData()
-      GlobalUtil.setOrderFresh(1)
-    }).catch(() => {
-      ToastShort('“配送完成失败，请稍后重试”')
-    })
-  }
 
   dialNumber = (val) => {
     native.dialNumber(val)
@@ -181,7 +169,6 @@ class OrderItem extends React.PureComponent {
   closeModal = () => {
     this.setState({
       verification_modal: false,
-      show_finish_delivery_modal: false,
     })
   }
 
@@ -237,27 +224,9 @@ class OrderItem extends React.PureComponent {
             </If>
           </View>
           {this.renderPickModal()}
-          {this.renderFinishDeliveryModal()}
         </View>
 
       </TouchableWithoutFeedback>
-    )
-  }
-
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
-      </View>
     )
   }
 
@@ -604,9 +573,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'配送完成'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_完成配送')
-                    this.setState({
-                      show_finish_delivery_modal: true
-                    })
+                    this.props.openFinishDeliveryModal(item?.id);
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,

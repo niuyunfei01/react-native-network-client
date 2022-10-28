@@ -1111,44 +1111,44 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'right'} style={styles.rightEmptyView} color={colors.colorCCC} size={16}/>
             </TouchableOpacity>
             <LineView/>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                商品分类
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>
-              </Text>
-              {/*<TouchableOpacity style={styles.textInputStyle}*/}
-              {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
-              {/*  <Text style={styles.selectTipText}>*/}
-              {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
-              {/*  </Text>*/}
-
-              {/*</TouchableOpacity>*/}
-              {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
-              <View style={styles.textInputStyle}>
-                <SectionedMultiSelect
-                  items={store_tags || []}
-                  IconRenderer={MaterialIcons}
-                  uniqueKey="id"
-                  subKey="children"
-                  selectText="请选择分类"
-                  showDropDowns={true}
-                  readOnlyHeadings={true}
-                  onSelectedItemsChange={this.onSelectedItemsChange}
-                  selectChildren={true}
-                  highlightChildren={true}
-                  selectedItems={store_categories}
-                  selectedText={"个已选中"}
-                  searchPlaceholderText='搜索门店分类'
-                  confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
-
-                  colors={{primary: colors.main_color}}
-                />
-              </View>
-            </View>
-            <LineView/>
           </If>
+          <View style={styles.baseRowCenterWrap}>
+            <Text style={styles.leftText}>
+              商品分类
+              <Text style={styles.leftFlag}>
+                *
+              </Text>
+            </Text>
+            {/*<TouchableOpacity style={styles.textInputStyle}*/}
+            {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
+            {/*  <Text style={styles.selectTipText}>*/}
+            {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
+            {/*  </Text>*/}
+
+            {/*</TouchableOpacity>*/}
+            {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
+            <View style={styles.textInputStyle}>
+              <SectionedMultiSelect
+                items={store_tags || []}
+                IconRenderer={MaterialIcons}
+                uniqueKey="id"
+                subKey="children"
+                selectText="请选择分类"
+                showDropDowns={true}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={this.onSelectedItemsChange}
+                selectChildren={true}
+                highlightChildren={true}
+                selectedItems={store_categories}
+                selectedText={"个已选中"}
+                searchPlaceholderText='搜索门店分类'
+                confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
+
+                colors={{primary: colors.main_color}}
+              />
+            </View>
+          </View>
+          <LineView/>
           <If condition={allow_multi_spec === 1 && 'add' === type && allow_switch_multi}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>

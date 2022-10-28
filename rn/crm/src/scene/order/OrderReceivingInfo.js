@@ -161,6 +161,14 @@ class OrderReceivingInfo extends Component {
       return ToastShort('请选择定位地址!', 0)
     }
 
+    if (tool.length(mobile) !== 11) {
+      return ToastShort('请输入正确的手机号');
+    }
+
+    if (tool.length(name) <= 0) {
+      return ToastShort('请输入收件人姓名');
+    }
+
     let params = {
       name: name,
       phone: mobile,

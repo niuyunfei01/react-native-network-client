@@ -262,6 +262,15 @@ class OrderSettingScene extends Component {
         ToastShort('请先选择定位', 0);
         return this.goSelectAddress()
       }
+
+      if (tool.length(mobile) !== 11) {
+        return ToastShort('请输入正确的手机号');
+      }
+
+      if (tool.length(name) <= 0) {
+        return ToastShort('请输入收件人姓名');
+      }
+
       if (Number(goods_price) <= 0) {
         return ToastShort('请选择物品价值');
       }
@@ -850,6 +859,7 @@ class OrderSettingScene extends Component {
                 defaultValue={`${goods_price_value}`}
                 value={`${goods_price_value}`}
                 placeholderTextColor={colors.color999}
+                maxLength={6}
                 underlineColorAndroid='transparent'
                 placeholder="自定义"
                 keyboardType={'numeric'}

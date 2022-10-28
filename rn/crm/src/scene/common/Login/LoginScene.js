@@ -48,7 +48,7 @@ class LoginScene extends PureComponent {
       mobile: '',
       password: '',
       canAskReqSmsCode: false,
-      reRequestAfterSeconds: 50,
+      reRequestAfterSeconds: 60,
       verifyCode: '',
       doingSign: false,
       doingSignKey: '',
@@ -114,7 +114,7 @@ class LoginScene extends PureComponent {
   }
 
   onCounterReReqEnd = () => {
-    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 50});
+    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
   }
 
   onLogin = () => {

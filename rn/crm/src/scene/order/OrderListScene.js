@@ -36,7 +36,7 @@ import tool from "../../pubilc/util/tool";
 import native from "../../pubilc/util/native";
 import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
-import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
@@ -54,6 +54,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
+import AlertModal from "../../pubilc/component/AlertModal";
 
 const {width} = Dimensions.get("window");
 
@@ -105,6 +106,7 @@ const initState = {
   show_add_tip_modal: false,
   show_delivery_modal: false,
   show_cancel_delivery_modal: false,
+  show_finish_delivery_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -548,6 +550,14 @@ class OrderListScene extends Component {
     })
   }
 
+  openFinishDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_finish_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   render() {
     const {currStoreId, accessToken} = this.props.global;
     let {dispatch} = this.props;
@@ -559,6 +569,7 @@ class OrderListScene extends Component {
       show_add_tip_modal,
       show_cancel_delivery_modal,
       add_tip_id,
+      orderStatus,
     } = this.state
 
     return (
@@ -569,6 +580,7 @@ class OrderListScene extends Component {
         {this.renderStatusTabs()}
         {this.renderContent(ListData)}
         {this.renderSortModal()}
+        {this.renderFinishDeliveryModal()}
         <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
         <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
                      currStoreId={currStoreId}/>
@@ -582,11 +594,13 @@ class OrderListScene extends Component {
 
         <DeliveryStatusModal
           order_id={order_id}
+          order_status={orderStatus}
           store_id={currStoreId}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
           openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+          openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
           accessToken={accessToken}
           show_modal={show_delivery_modal}
           onClose={this.closeModal}
@@ -623,8 +637,40 @@ class OrderListScene extends Component {
       order_id: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      showSortModal: false
+      showSortModal: false,
+      show_finish_delivery_modal: false,
     })
+  }
+
+  toSetOrderComplete = () => {
+    this.closeModal();
+    let {accessToken} = this.props.global;
+    let {order_id} = this.state;
+    const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('订单已送达')
+      this.fetchOrders()
+    }).catch(() => {
+      ToastShort('“配送完成失败，请稍后重试”')
+    })
+  }
+
+
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
   }
 
   setOrderBy = (order_by) => {
@@ -904,6 +950,7 @@ class OrderListScene extends Component {
                  navigation={this.props.navigation}
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+                 openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
                  orderStatus={orderStatus}
       />
     );

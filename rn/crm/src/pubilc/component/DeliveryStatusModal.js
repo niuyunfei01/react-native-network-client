@@ -159,12 +159,17 @@ class deliveryStatusModal extends React.Component {
       PropTypes.string
     ]),
     accessToken: PropTypes.string,
+    order_status: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
     show_modal: PropTypes.bool,
     onClose: PropTypes.func,
     onPress: PropTypes.func,
     fetchData: PropTypes.func,
     openAddTipModal: PropTypes.func,
     openCancelDeliveryModal: PropTypes.func,
+    openFinishDeliveryModal: PropTypes.func,
   }
   state = {
     show_modal: false,
@@ -184,19 +189,19 @@ class deliveryStatusModal extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {accessToken, order_id, show_modal} = nextProps;
+    const {accessToken, order_id, show_modal, order_status} = nextProps;
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
       return null;
     }
     showModal('请求中...')
     tool.debounces(() => {
-      this.getInfo(accessToken, order_id)
+      this.getInfo(accessToken, order_id, order_status)
     })
   }
 
-  getInfo = (accessToken, order_id) => {
+  getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
-    const params = {access_token: accessToken, order_id: order_id}
+    const params = {access_token: accessToken, order_id: order_id,order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         delivery_list: res?.do_list,
@@ -489,6 +494,21 @@ class deliveryStatusModal extends React.Component {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+
+        <If condition={btn_list?.btn_confirm_arrived}>
+          <Button title={'完成配送'}
+                  onPress={() => {
+                    this.mixpanel.track('V4配送调度页_完成配送')
+                    this.props.openFinishDeliveryModal(order_id)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
       </View>
     )
   }

@@ -196,7 +196,6 @@ class OrderQueryResultScene extends PureComponent {
     if (this.state.isLoading) {
       return null;
     }
-    showModal("加载中...")
     this.setState({isLoading: true})
     const {accessToken, currStoreId} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
@@ -250,7 +249,6 @@ class OrderQueryResultScene extends PureComponent {
     if (isLoading) {
       return
     }
-    showModal("加载中...")
     this.setState({isLoading: true})
 
     let params = {

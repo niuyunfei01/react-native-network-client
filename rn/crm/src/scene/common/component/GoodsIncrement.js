@@ -98,7 +98,6 @@ class GoodsIncrement extends PureComponent {
     const {global, navigation, dispatch} = this.props
     const {store_info, currStoreId, accessToken} = global
     this.focus = navigation.addListener('focus', () => {
-      dispatch(getConfig(accessToken, currStoreId));
       const currentDate = dayjs().format('YYYY-MM-DD')
       const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
       if (calc < 5 && calc >= 0)
