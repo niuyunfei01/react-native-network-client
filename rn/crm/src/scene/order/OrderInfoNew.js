@@ -935,11 +935,21 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoCard = () => {
-    let {order, is_service_mgr} = this.state;
+    let {order} = this.state;
     const {currStoreId} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
+          <If condition={order?.is_right_once}>
+            <View style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+            }}>
+              <View style={styles.ItemHeader}/>
+              <Text style={styles.ItemHeaderTitle}>预 </Text>
+            </View>
+          </If>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
                        resizeMode={FastImage.resizeMode.contain}/>
@@ -1001,9 +1011,7 @@ class OrderInfoNew extends PureComponent {
                       {info?.product_name}
                     </Text>
                     <If condition={info?.product_id > 0}>
-                      <Text style={styles.productItemId}>(#{info?.product_id}
-                        <If condition={info?.tag_code}>[{info?.tag_code}]</If>)
-                      </Text>
+                      <Text style={styles.productItemId}>#{info?.product_id}</Text>
                     </If>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
@@ -1644,7 +1652,24 @@ const styles = StyleSheet.create({
   QrDesc: {fontSize: 17, fontWeight: 'bold', color: colors.color333},
   QrClose: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
-  QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20}
+  QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
+  ItemHeader: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 25,
+    borderTopColor: "#FF8309",
+    borderTopLeftRadius: 6,
+    borderRightWidth: 31,
+    borderRightColor: 'transparent',
+  },
+  ItemHeaderTitle: {
+    color: colors.white,
+    fontSize: 11,
+    fontWeight: 'bold',
+    position: 'absolute',
+    top: 1,
+    left: 4,
+  }
 });
 
 const headerRightStyles = StyleSheet.create({

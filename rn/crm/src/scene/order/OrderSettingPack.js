@@ -523,6 +523,7 @@ class OrderSettingScene extends Component {
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
                      placeholderTextColor={'#999'}
+                     maxLength={10}
                      value={name}
                      onChangeText={value => {
                        this.setState({name: value});

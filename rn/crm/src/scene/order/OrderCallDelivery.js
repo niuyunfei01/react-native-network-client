@@ -85,8 +85,8 @@ class OrderCallDelivery extends Component {
       weight_step: 1,
       logisticFeeMap: [],
       dateArray: [],
-      wm_platform: '美团',
-      wm_platform_day_id: '1',
+      wm_platform: '',
+      wm_platform_day_id: '',
       order_expect_time: '',
       wm_address: '',
       wm_user_name: '',
@@ -886,15 +886,17 @@ class OrderCallDelivery extends Component {
           }}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
-        <View style={{flex: 1,}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
-            <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
+        <If condition={wm_platform && wm_platform_day_id && order_expect_time}>
+          <View style={{flex: 1}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
+              <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
+            </View>
+            <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
+              <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间{order_expect_time} </Text>
+            </View>
           </View>
-          <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-            <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间{order_expect_time} </Text>
-          </View>
-        </View>
+        </If>
         <View style={{width: 36}}/>
       </View>
     )

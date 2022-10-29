@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
   copyText: {
     fontSize: 12,
     fontWeight: '400',
-    color: colors.main_color
+    color: colors.main_color,
+    padding: 10
   },
   QrTitle: {
     flexDirection: 'row',
