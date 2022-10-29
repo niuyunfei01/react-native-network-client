@@ -67,6 +67,7 @@ class GoodsListModal extends React.Component {
       }, hideModal)
     }, () => {
       hideModal()
+      this.closeModal()
     })
   }
 
