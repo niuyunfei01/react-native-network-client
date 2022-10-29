@@ -215,6 +215,10 @@ class deliveryStatusModal extends React.Component {
       }, hideModal)
     }, () => {
       hideModal()
+      this.closeModal()
+    }).catch(()=>{
+      hideModal()
+      this.closeModal()
     })
   }
 
