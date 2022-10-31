@@ -51,7 +51,7 @@ import {showError} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout} from "../../../reducers/global/globalActions";
+import {logout, setUserCfg} from "../../../reducers/global/globalActions";
 
 const width = Dimensions.get("window").width;
 
@@ -322,6 +322,7 @@ class Mine extends PureComponent {
         style: 'default',
         onPress: () => {
           const {dispatch, navigation, global} = this.props;
+          let {user_config} = global
           this.mixpanel.reset();
           const noLoginInfo = {
             accessToken: '',
@@ -331,8 +332,13 @@ class Mine extends PureComponent {
             co_type: '',
             enabledGoodMgr: '',
             currVendorId: '',
-            printer_id: global.printer_id || '0'
+            printer_id: global.printer_id || '0',
+            user_config: {
+              order_list_by: 'orderTime asc'
+            }
           }
+          user_config.order_list_by = 'orderTime asc'
+          setUserCfg(user_config)
           setNoLoginInfo(JSON.stringify(noLoginInfo))
           dispatch(logout(() => {
             tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})

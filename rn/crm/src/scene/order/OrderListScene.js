@@ -272,7 +272,7 @@ class OrderListScene extends Component {
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
       reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.user_config === global.noLoginInfo.user_config
+      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
 
     if (flag) {
       return

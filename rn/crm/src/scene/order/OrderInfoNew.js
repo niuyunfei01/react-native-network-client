@@ -519,7 +519,7 @@ class OrderInfoNew extends PureComponent {
 
   deliveryModalFlag = () => {
     let {order} = this.state;
-    if (order?.orderStatus != Cts.ORDER_STATUS_TO_READY) {
+    if (!order?.not_call_delivery) {
       this.mixpanel.track('订单详情页_>')
       this.setState({show_delivery_modal: true})
     }
@@ -794,7 +794,7 @@ class OrderInfoNew extends PureComponent {
           </If>
           <View style={styles.orderInfoHeaderStatus}>
             <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <If condition={order?.orderStatus !== Cts.ORDER_STATUS_TO_READY}>
+            <If condition={!order?.not_call_delivery}>
               <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
             </If>
           </View>

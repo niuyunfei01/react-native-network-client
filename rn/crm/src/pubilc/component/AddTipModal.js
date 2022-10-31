@@ -171,7 +171,11 @@ class AddTipModal extends React.Component {
               </For>
               <TextInput
                 onChangeText={(input_add_money) => {
-                  this.setState({input_add_money: Number(input_add_money), add_money: Number(input_add_money)})
+                  if (/^([0]|[1-9][0-9]*)$/.test(input_add_money)) {
+                    this.setState({input_add_money: Number(input_add_money), add_money: Number(input_add_money)})
+                  } else {
+                    this.setState({input_add_money: '', add_money: ''})
+                  }
                 }}
                 defaultValue={`${input_add_money}`}
                 value={`${input_add_money}`}

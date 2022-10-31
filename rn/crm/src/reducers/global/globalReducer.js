@@ -135,7 +135,8 @@ export default function globalReducer(state = initialState, action) {
           autoBluetoothPrint: action.payload.autoBluetoothPrint,
           refreshToken: action.payload.refreshToken,
           expireTs: action.payload.expireTs,
-          getTokenTs: action.payload.getTokenTs
+          getTokenTs: action.payload.getTokenTs,
+          user_config: action.info
         }
       }
       break
