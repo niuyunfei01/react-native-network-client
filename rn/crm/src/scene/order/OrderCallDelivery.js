@@ -1377,7 +1377,7 @@ class OrderCallDelivery extends Component {
               multiline={true}
               numberOfLines={4}
               maxLength={40}
-              value={remark ? remark : remark_input_value}
+              value={remark_input_value ? remark_input_value : remark}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}
               placeholder={'请在此填写备注信息，最多不超过40个字符'}
