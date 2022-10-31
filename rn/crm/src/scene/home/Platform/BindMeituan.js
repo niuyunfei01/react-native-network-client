@@ -193,7 +193,7 @@ class BindMeituan extends PureComponent {
         }}>
           <Button
             // type={'primary'}
-            onPress={() => {
+            onPress={async () => {
               let {currVendorId} = tool.vendor(this.props.global)
               let data = {
                 v: currVendorId,
@@ -202,7 +202,7 @@ class BindMeituan extends PureComponent {
                 m: this.props.global.currentUserProfile.mobilephone,
                 place: 'bindMeituan'
               }
-              JumpMiniProgram("/pages/service/index", data);
+              await JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {
               //   native.dialNumber(this.state.mobile);
               // } else {
@@ -277,7 +277,8 @@ class BindMeituan extends PureComponent {
 
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
+              <Text
+                style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>

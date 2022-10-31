@@ -136,7 +136,7 @@ class OpenMemberScene extends PureComponent {
     }
   }
 
-  openMiniProgram = () => {
+  openMiniProgram = async () => {
     const {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global
     let data = {
       v: vendor_id,
@@ -145,7 +145,7 @@ class OpenMemberScene extends PureComponent {
       m: currentUserProfile.mobilephone,
       place: 'mine'
     }
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   headerRight = () => {

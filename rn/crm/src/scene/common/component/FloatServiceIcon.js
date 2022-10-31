@@ -48,7 +48,7 @@ class FloatServiceIcon extends React.Component {
     this.openMiniprogarm()
   }
 
-  openMiniprogarm = () => {
+  openMiniprogarm = async () => {
     const {global, fromComponent} = this.props
     let {currStoreId, currentUser, currentUserProfile} = global;
     if (fromComponent)
@@ -61,7 +61,7 @@ class FloatServiceIcon extends React.Component {
       m: currentUserProfile.mobilephone,
       place: 'float'
     }
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   contactService = () => {

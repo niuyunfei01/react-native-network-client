@@ -570,7 +570,7 @@ class MineScene extends Component {
     this.onPress(Config.ROUTE_HELP)
   }
 
-  openMiniprogarm = () => {
+  openMiniprogarm = async () => {
     let {currVendorId} = tool.vendor(this.props.global)
     let data = {
       v: currVendorId,
@@ -579,7 +579,7 @@ class MineScene extends Component {
       m: this.props.global.currentUserProfile.mobilephone,
       place: 'mine'
     }
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   oncloseCallModal = (e = 0) => {

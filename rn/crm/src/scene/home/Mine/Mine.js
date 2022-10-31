@@ -271,7 +271,7 @@ class Mine extends PureComponent {
   }
 
   // 联系客服
-  JumpToServices = () => {
+  JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
     let {currStoreId} = this.state;
     let data = {
@@ -282,7 +282,7 @@ class Mine extends PureComponent {
       place: 'cancelOrder'
     }
     this.mixpanel.track('我的_联系客服')
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   jumpToAccountFill = (flag) => {
@@ -346,6 +346,7 @@ class Mine extends PureComponent {
   }
 
   logOutAccount = () => {
+    const {dispatch, navigation, global} = this.props;
     Alert.alert('提醒', `确定要退出吗？`, [
       {
         text: '取消',
@@ -355,8 +356,6 @@ class Mine extends PureComponent {
         text: '确定',
         style: 'default',
         onPress: () => {
-          const {dispatch, navigation, global} = this.props;
-          let {user_config} = global
           this.mixpanel.reset();
           const noLoginInfo = {
             accessToken: '',
@@ -368,14 +367,16 @@ class Mine extends PureComponent {
             currVendorId: '',
             refreshToken: '',
             expireTs: 0,
-            printer_id: global.printer_id || '0',
+            printer_id: '0',
             user_config: {
               order_list_by: 'orderTime asc'
             }
           }
-          user_config.order_list_by = 'orderTime asc'
-          setUserCfg(user_config)
           setNoLoginInfo(JSON.stringify(noLoginInfo))
+
+          let {user_config = {}} = global
+          user_config.order_list_by = 'orderTime asc'
+          dispatch(setUserCfg(user_config))
           dispatch(logout(() => {
             tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
           }));
