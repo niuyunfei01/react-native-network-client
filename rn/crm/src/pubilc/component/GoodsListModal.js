@@ -147,8 +147,7 @@ class GoodsListModal extends React.Component {
                         {tool.jbbsubstr(item.name, 21)}
                       </Text>
                       <Text style={Styles.productIdText}>
-                        (#{item.product_id}
-                        <If condition={item.tag_code}>[{item.tag_code}]</If>)
+                        #{item.product_id}
                       </Text>
 
                       <View style={Styles.isMgrContent}>
