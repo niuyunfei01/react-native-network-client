@@ -107,14 +107,19 @@ class OrderInfoNew extends PureComponent {
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-    let {default_order_info} = this.props.global
     this.state = {
       isRefreshing: false,
       loadingImg: true,
       orderId: order_id,
       is_service_mgr: is_service_mgr,
       isFetching: false,
-      order: default_order_info,
+      order: {
+        ship_id: '',
+        fn_scan_items: '',
+        fn_scan_ready: '',
+        cancel_to_entry: '',
+        orderStatus: ''
+      },
       actionSheet: [],
       isShowMap: false,
       logistics: [],

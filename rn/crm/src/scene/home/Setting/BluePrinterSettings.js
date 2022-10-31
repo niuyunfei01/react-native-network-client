@@ -126,7 +126,7 @@ class BluePrinterSettings extends PureComponent {
           <View style={{margin: 10}}>
             <Button type={'primary'}
                     style={styles.searchBluetoothBtn}
-                    onPress={() => startScan()}>
+                    onPress={() => startScan(isScanningBluetoothDevice)}>
               搜索蓝牙打印机 {isScanningBluetoothDevice ? `(搜索中...${bluetoothDeviceList.length})` : `(共${bluetoothDeviceList.length}个)`}
             </Button>
           </View>

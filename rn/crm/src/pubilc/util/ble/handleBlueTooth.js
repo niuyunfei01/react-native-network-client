@@ -12,6 +12,7 @@ import tool from "../tool";
 import Config from "../../common/config";
 import {sendDeviceStatus} from "../../component/jpushManage";
 import {print_order_to_bt} from './OrderPrinter'
+import {ToastShort} from "../ToastUtils";
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -19,10 +20,19 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 let initBleResult = null
 let global = null
 const peripherals = new Map()
-export const startScan = async () => {
+let bluetoothStatus = 'off'
+export const startScan = async (isScanningBluetoothDevice) => {
   try {
-    if (global.isScanningBluetoothDevice)
+    if (isScanningBluetoothDevice) {
+      ToastShort('正在搜索中，请稍后...')
       return
+    }
+    if (bluetoothStatus === 'off') {
+      ToastShort('手机蓝牙未开启')
+      return
+    }
+    peripherals.clear()
+    store.dispatch(setBlueToothDeviceList([]))
     await BleManager.scan([], 10, false)
     store.dispatch(setIsScanningBlueTooth(true))
   } catch (e) {
@@ -31,7 +41,7 @@ export const startScan = async () => {
 }
 const handleDiscoverPeripheral = (peripheral) => {
   if (!peripheral.name) {
-    peripheral.name = '未知设备名称'
+    peripheral.name = '未知名称'
   }
   peripherals.set(peripheral.id, peripheral)
 
@@ -91,6 +101,7 @@ const handleDidUpdateState = (args, printer_id) => {
       break
   }
   needShowOpenBluetoothStatus = args.state === 'on'
+  bluetoothStatus = args.state
 }
 
 const handleCentralManagerWillRestoreState = () => {
