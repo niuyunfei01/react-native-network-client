@@ -1355,7 +1355,7 @@ class OrderCallDelivery extends Component {
   }
 
   renderRemarkModal = () => {
-    let {show_remark_modal, remark_input_value} = this.state;
+    let {show_remark_modal, remark_input_value, remark} = this.state;
     return (
       <JbbModal visible={show_remark_modal} onClose={this.closeModal}
                 modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
@@ -1376,11 +1376,11 @@ class OrderCallDelivery extends Component {
             <TextArea
               multiline={true}
               numberOfLines={4}
-              maxLength={30}
-              value={remark_input_value}
+              maxLength={40}
+              value={remark ? remark : remark_input_value}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}
-              placeholder={'请在此填写备注信息，最多不超过30个字符'}
+              placeholder={'请在此填写备注信息，最多不超过40个字符'}
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent" //取消安卓下划线
               style={{

@@ -150,7 +150,7 @@ class AddTipModal extends React.Component {
               <For index='index' each='info' of={tip_list}>
 
                 <TouchableOpacity onPress={() => {
-                  this.setState({add_money: Number(info.value)})
+                  this.setState({add_money: Number(info.value), input_add_money: ''})
                 }} key={index} style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
