@@ -521,9 +521,11 @@ class GoodsEditScene extends PureComponent {
   }
 
   onNameChanged = (name) => {
-    // let {type} = this.props.route.params;
+    let {type} = this.props.route.params;
     this.setState({name: name})
-    this.getProductByName(name)
+    if ('add' === type) {
+      this.getProductByName(name)
+    }
   }
 
   getProductByName = (name) => {

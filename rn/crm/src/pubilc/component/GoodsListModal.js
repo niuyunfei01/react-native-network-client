@@ -46,7 +46,7 @@ class GoodsListModal extends React.Component {
     showModal('请求中...')
     tool.debounces(() => {
       this.getOrderGoodsList(accessToken, order_id)
-    })
+    }, 300)
   }
 
   getOrderGoodsList = (accessToken, order_id) => {
