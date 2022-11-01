@@ -27,8 +27,7 @@ final ANDROID_LIB_VERSION = "27.1.1"
 
 allprojects {
     repositories {
-        mavenLocal()
-        mavenCentral()
+
         maven { url 'https://developer.huawei.com/repo/' }
 //        google()
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -39,6 +38,8 @@ allprojects {
         maven { url "$rootDir/../node_modules/jsc-android/dist" }
         flatDir { dirs "$rootDir/../node_modules/@uiw/react-native-alipay/android/libs" }
         flatDir { dirs 'libs' }
+        mavenLocal()
+        mavenCentral()
         google()
     }
 
