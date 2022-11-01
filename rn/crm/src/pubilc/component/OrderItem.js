@@ -272,7 +272,7 @@ class OrderItem extends React.PureComponent {
         backgroundColor: colors.f9
       }}>
 
-        <If condition={item.is_right_once}>
+        <If condition={!item.is_right_once}>
           <View style={{
             position: 'absolute',
             left: 0,
