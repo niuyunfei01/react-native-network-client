@@ -33,6 +33,7 @@ export const startScan = async (isScanningBluetoothDevice) => {
     }
     peripherals.clear()
     store.dispatch(setBlueToothDeviceList([]))
+    await openBluetooth()
     await BleManager.scan([], 10, false)
     store.dispatch(setIsScanningBlueTooth(true))
   } catch (e) {
