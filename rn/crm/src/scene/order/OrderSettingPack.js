@@ -125,6 +125,7 @@ class OrderSettingScene extends Component {
   }
 
   setAddress = (res) => {
+    this.cancelData()
     let Lng = (res.location).split(',')[0];
     let lat = (res.location).split(',')[1];
     let states = {

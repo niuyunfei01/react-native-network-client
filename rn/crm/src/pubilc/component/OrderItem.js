@@ -202,7 +202,7 @@ class OrderItem extends React.PureComponent {
   routeOrder = () => {
     let {item} = this.props;
     this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
-    this.mixpanel.track('订单详情页')
+    this.mixpanel.track('V4订单详情页')
   }
 
   render() {
