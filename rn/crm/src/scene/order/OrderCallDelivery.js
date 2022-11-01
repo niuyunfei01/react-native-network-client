@@ -346,7 +346,7 @@ class OrderCallDelivery extends Component {
         weight,
         expect_time,
         order_money,
-        order_tips: add_tips,
+        add_tips,
         remark
       }
       const api = `/v4/wsb_delivery/call_delivery?access_token=${accessToken}`;

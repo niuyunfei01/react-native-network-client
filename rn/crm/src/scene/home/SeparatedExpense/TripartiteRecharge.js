@@ -1,14 +1,5 @@
 import React, {PureComponent} from 'react'
-import ReactNative, {
-  ImageBackground,
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import styles from 'rmc-picker/lib/PopupStyles';
+import ReactNative, {ImageBackground, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -16,9 +7,6 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button, Image} from "react-native-elements";
@@ -26,6 +14,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
+
 const {StyleSheet} = ReactNative
 
 function mapStateToProps(state) {
@@ -41,34 +30,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const WSB_ACCOUNT = 0;
-const THIRD_PARTY_ACCOUNT = 1;
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    let date = new Date();
     this.state = {
       isRefreshing: false,
-      switchType: WSB_ACCOUNT,
-      balanceNum: 0,
-      records: [],
-      records2: [],
-      by_labels: [],
-      data_labels: [],
-      date: date,
-      choseTab: 1,
-      start_day: this.format(date),
       freeze_show: false,
       freeze_msg: "",
       prompt_msg: '外送帮仅支持充值，如需查看充值记录和账单明细，请登录配送商家版查看',
@@ -80,72 +46,17 @@ class SeparatedExpense extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
-    this.fetchExpenses()
-    this.fetchBalance()
-    this.fetchFreeze()
+    this.fetchThirdDeliveryList()
   }
 
   onPress(route, params = {}, callback = {}) {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params, callback);
-    });
+    this.props.navigation.navigate(route, params, callback);
   }
 
   onRefresh = () => {
     this.fetchThirdDeliveryList()
   }
 
-  fetchExpenses = () => {
-    showModal('加载中')
-    const {global} = this.props;
-    const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      this.setState({
-        records: res.records,
-        by_labels: res.by_labels,
-        data_labels: res.data_labels
-      }, () => {
-        hideModal()
-      })
-    }, () => {
-      hideModal();
-    })
-  }
-
-  //获取余额
-  fetchBalance = () => {
-    const {global} = this.props;
-    const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      this.setState({
-        balanceNum: res
-      })
-    })
-  }
-
-  //获取冻结
-  fetchFreeze = () => {
-    const {global} = this.props;
-    const url = `/v1/new_api/bill/freeze_info/${global.currStoreId}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      this.setState({
-        freeze_show: res.show !== undefined && res.show === 1,
-        freeze_msg: res.notice !== undefined ? res.notice : ""
-      })
-    })
-  }
-
-  // 获取充值记录
-  fetchRechargeRecord = () => {
-    const {global} = this.props;
-    const url = `new_api/stores/store_recharge_log/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      if (res.records) {
-        this.setState({records2: res.records})
-      }
-    })
-  }
 
   // 获取三方配送充值列表
   fetchThirdDeliveryList = () => {
@@ -158,51 +69,6 @@ class SeparatedExpense extends PureComponent {
         thirdAccountList: res
       })
     })
-  }
-
-  // 切换外送帮钱包 三方配送充值tab
-  onChangeSwitchType = (val) => {
-    if (val === WSB_ACCOUNT) {
-      this.fetchExpenses()
-      this.fetchBalance()
-      this.fetchFreeze()
-    } else if (val === THIRD_PARTY_ACCOUNT) {
-      this.fetchThirdDeliveryList()
-    }
-    this.setState({
-      switchType: val
-    })
-  }
-
-  // 切换费用账单 充值记录tab
-  onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
-      if (this.state.choseTab === 1) {
-        this.fetchExpenses();
-      } else {
-        this.fetchRechargeRecord();
-      }
-    })
-  }
-
-  // 处理月份函数
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
-  }
-
-  onDismiss() {
-  }
-
-  // 跳转到费用账单详情
-  onItemClicked = (item) => {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.onPress(Config.ROUTE_SEP_EXPENSE_INFO, {
-        day: item.day
-      });
-    });
   }
 
   // 顺丰去充值
@@ -227,12 +93,8 @@ class SeparatedExpense extends PureComponent {
         } else {
           this.setState({
             pay_url: res.pay_url,
-            switch_type: THIRD_PARTY_ACCOUNT
           }, () => {
-            ToastLong('即将前往充值...')
-            setTimeout(() => {
-              this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
-            }, 100)
+            this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
           })
         }
       })
@@ -256,7 +118,6 @@ class SeparatedExpense extends PureComponent {
       } else {
         this.setState({
           pay_url: res.pay_url,
-          switch_type: THIRD_PARTY_ACCOUNT
         }, () => {
           ToastLong('即将前往充值...')
           setTimeout(() => {
@@ -280,27 +141,15 @@ class SeparatedExpense extends PureComponent {
   }
 
   render() {
-    const {switchType} = this.state;
+    const {isRefreshing} = this.state;
     return (
       <View style={Styles.containerContent}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <ScrollView style={Styles.containerContent} refreshControl={
-          <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => this.onRefresh()}
                           tintColor='gray'/>
         }>
-          {this.renderHeaderType()}
 
-          <If condition={switchType === WSB_ACCOUNT}>
-            <If condition={this.state.freeze_show}>{this.renderFreezeMsg()}</If>
-            {this.renderWSBHeader()}
-            {this.renderWSBType()}
-            {this.renderWSBContent()}
-          </If>
-
-          <If condition={switchType === THIRD_PARTY_ACCOUNT}>
-            {this.renderTHIRDContainer()}
-          </If>
-
+          {this.renderTHIRDContainer()}
           {this.renderAccountModal()}
 
         </ScrollView>
@@ -308,164 +157,15 @@ class SeparatedExpense extends PureComponent {
     )
   }
 
-  renderFreezeMsg = () => {
-    const {freeze_msg} = this.state
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
-        }}
-        style={Styles.containerHeader}>
-        <Text style={Styles.containerHeaderText}>{freeze_msg} </Text>
-        <Button onPress={() => {this.onPress(Config.ROUTE_FREEZE_LIST)}}
-                title={'查看'}
-                buttonStyle={Styles.containerHeaderBtn}
-                titleStyle={Styles.containerHeaderBtnText}>
-        </Button>
-      </TouchableOpacity>
-    )
-  }
-
-  renderHeaderType = () => {
-    let {switchType} = this.state
-    return (
-      <View style={Styles.headerType}>
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(0)}>
-          <View style={[switchType === WSB_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}> 外送帮钱包 </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.onChangeSwitchType(1)}>
-          <View style={[switchType === THIRD_PARTY_ACCOUNT ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}>三方配送充值</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  renderWSBHeader = () => {
-    return (
-      <View style={Styles.WSBHeader}>
-        <Text style={Styles.WSBHeaderTitle}>当前余额（元） </Text>
-        <Text style={Styles.WSBHeaderBalanceNum}>{this.state.balanceNum} </Text>
-        <TouchableOpacity style={Styles.WSBCZBtn} onPress={() => this.onPress(Config.ROUTE_ACCOUNT_FILL)}>
-          <Text style={Styles.WSBCZText}> 充 值 </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={Styles.WSBSZBtn} onPress={() => this.onPress(Config.ROUTE_SETTING)}>
-          <Text style={Styles.WSBSZText}> 去设置余额不足电话通知 </Text>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  renderWSBType = () => {
-    let choseTab = this.state.choseTab
-    return (
-      <View style={Styles.WSBType}>
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => {
-          this.setState({
-            choseTab: 1
-          })
-          this.fetchExpenses();
-        }}>
-          <View style={[choseTab === 1 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}> 费用账单 </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => {
-          this.setState({
-            choseTab: 2
-          })
-          this.fetchRechargeRecord();
-        }}>
-          <View style={[choseTab === 2 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
-            <Text style={Styles.color333}>充值记录 </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  renderWSBContent = () => {
-    const {date, records, records2, choseTab} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
-
+  renderTHIRDContainer = () => {
+    const {thirdAccountList, prompt_msg} = this.state
     return (
       <View>
-
-        <View style={Styles.expensesHeader}>
-          <Text style={Styles.selectMonthLabel}> 请选择月份 </Text>
-          <PopPicker
-            datePicker={datePicker}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={styles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={date}
-            onDismiss={this.onDismiss}
-            onChange={this.onChange}
-          >
-            <Text style={Styles.selectMonthText}> {this.state.start_day} </Text>
-          </PopPicker>
-          <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+        <View style={Styles.THIRDHeader}>
+          <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
+          <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
         </View>
-
-        <If condition={choseTab === 1}>
-          {records && records.map((item, id) => {
-            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked(item)}>
-              <View style={Styles.recordsBody}>
-                <Text style={Styles.recordsItemTime}>{item.day} </Text>
-                <View style={Styles.flex1}/>
-                <Text style={Styles.recordsItemBalanced}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-                </Text>
-                <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-              </View>
-              <View style={Styles.recordsItemDesc}>
-                <Text style={Styles.recordsItemDescTextLeft}>使用前金额: {item.total_ideal_balanced} </Text>
-                <Text style={Styles.recordsItemDescTextRight}>使用后金额: {item.total_balanced} </Text>
-              </View>
-            </TouchableOpacity>
-          })}
-        </If>
-
-        <If condition={choseTab === 2}>
-          {records2 && records2.map((item, idx) => {
-            return <View key={idx} style={Styles.recordsContainer2}>
-              <View style={Styles.flex3}>
-                <Text style={Styles.fontBold}>{item.remark} </Text>
-                <Text style={Styles.recordsCreated2}>{item.created} </Text>
-              </View>
-              <View style={[Styles.flex1, Styles.fontBold]}>
-                <Text style={Styles.recordsFee2}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
-              </View>
-            </View>
-          })}
-        </If>
-
-      </View>
-    )
-  }
-
-  renderTHIRDHeader = () => {
-    const {prompt_msg} = this.state
-    return (
-      <View style={Styles.THIRDHeader}>
-        <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18} />
-        <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
+        {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
       </View>
     )
   }
@@ -488,7 +188,9 @@ class SeparatedExpense extends PureComponent {
               <Button buttonStyle={Styles.THIRDContainerBtn}
                       titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
                       title={'立即充值'}
-                      onPress={() => {this.toPay(info)}}/>
+                      onPress={() => {
+                        this.toPay(info)
+                      }}/>
             </View>
             <View style={Styles.THIRDContainerItemBody}>
               <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
@@ -509,20 +211,13 @@ class SeparatedExpense extends PureComponent {
         <Button buttonStyle={Styles.NoTHIRDListBtn}
                 titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
                 title={'去授权'}
-                onPress={() => {this.toAuthorization()}}/>
+                onPress={() => {
+                  this.toAuthorization()
+                }}/>
       </View>
     )
   }
 
-  renderTHIRDContainer = () => {
-    const {thirdAccountList} = this.state
-    return (
-      <View>
-        {this.renderTHIRDHeader()}
-        {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
-      </View>
-    )
-  }
 
   renderAccountModal = () => {
     let {dadaAccountModal, dadaAccountNum} = this.state;
@@ -534,7 +229,9 @@ class SeparatedExpense extends PureComponent {
             <Entypo name="circle-with-cross" style={Styles.closeIcon}/>
           </TouchableOpacity>
           <InputItem clear error={dadaAccountNum <= 0} type="number" value={dadaAccountNum}
-                     onChange={dadaAccountNum => {this.setState({dadaAccountNum});}}
+                     onChange={dadaAccountNum => {
+                       this.setState({dadaAccountNum});
+                     }}
                      extra="元"
                      placeholder="帐户充值金额">
           </InputItem>
@@ -542,7 +239,9 @@ class SeparatedExpense extends PureComponent {
             <Button buttonStyle={Styles.modalBtnText}
                     titleStyle={{fontSize: pxToDp(30), color: 'white'}}
                     title={'取消'}
-                    onPress={() => {this.closeAccountModal()}}/>
+                    onPress={() => {
+                      this.closeAccountModal()
+                    }}/>
             <Button buttonStyle={Styles.modalBtnText1}
                     titleStyle={{fontSize: pxToDp(30), color: 'white'}}
                     title={'确定'}

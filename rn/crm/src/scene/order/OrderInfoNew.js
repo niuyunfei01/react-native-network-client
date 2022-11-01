@@ -945,7 +945,7 @@ class OrderInfoNew extends PureComponent {
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
-          <If condition={!order?.is_right_once}>
+          <If condition={order?.is_right_once}>
             <View style={{
               position: 'absolute',
               left: 0,
