@@ -1729,7 +1729,7 @@ class OrderInfo extends Component {
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
                   <Entypo name={"help-with-circle"}
                           style={Styles.addTipHelpIcon}/>
-                  <Text style={Styles.addTipReason}>{this.state.respReason}</Text>
+                  <Text style={Styles.addTipReason}>{this.state.respReason} </Text>
                 </View>
               </If>
             </View>

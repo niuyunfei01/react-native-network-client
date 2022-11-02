@@ -814,7 +814,7 @@ class OrderCallDelivery extends Component {
 
           <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
-              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
+              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
               <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
@@ -893,7 +893,8 @@ class OrderCallDelivery extends Component {
               <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-              <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间{order_expect_time} </Text>
+              <Text
+                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{order_expect_time} </Text>
             </View>
           </View>
         </If>
@@ -937,7 +938,7 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{weight}KG</Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{weight}KG </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -956,7 +957,7 @@ class OrderCallDelivery extends Component {
               fontSize: 11,
               color: colors.color333,
               marginTop: 5
-            }}>{is_right_once === 0 ? mealTime : '立即送达'}</Text>
+            }}>{is_right_once === 0 ? mealTime : '立即送达'} </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -971,7 +972,8 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{order_money}元</Text>
+            <Text
+              style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{order_money}元 </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -986,7 +988,7 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
               {add_tips > 0 ? '加' + add_tips + '元' : '加小费'}
             </Text>
           </TouchableOpacity>
@@ -1001,7 +1003,7 @@ class OrderCallDelivery extends Component {
                               alignItems: 'center'
                             }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
               {tool.length(remark) > 0 ? '已' : ''}备注
             </Text>
           </TouchableOpacity>

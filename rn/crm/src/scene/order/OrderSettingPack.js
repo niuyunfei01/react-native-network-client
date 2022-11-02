@@ -424,7 +424,7 @@ class OrderSettingScene extends Component {
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}> {tool.jbbsubstr(store_address, -18)}</Text>
+                  }}> {tool.jbbsubstr(store_address, -18)} </Text>
                 </View>
               </View>
               <If condition={!only_one_store}>

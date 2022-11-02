@@ -213,7 +213,7 @@ class AddTipModal extends React.Component {
                   color: colors.warn_red,
                   fontSize: 14,
                   fontWeight: 'bold'
-                }}>{respReason}</Text>
+                }}>{respReason} </Text>
               </View>
             </If>
 

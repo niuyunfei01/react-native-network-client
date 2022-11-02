@@ -798,7 +798,7 @@ class OrderInfoNew extends PureComponent {
             <View style={styles.orderInfoHeaderFlag}/>
           </If>
           <View style={styles.orderInfoHeaderStatus}>
-            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
+            <Text style={styles.orderStatusDesc}>{delivery_status} </Text>
             <If condition={!order?.not_call_delivery}>
               <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
             </If>
@@ -978,7 +978,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>收件信息 </Text>
           <View style={styles.cardTitleInfo}>
             <View style={styles.cardTitleInfoLeft}>
-              <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile}</Text>
+              <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile} </Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
             <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
@@ -1016,7 +1016,7 @@ class OrderInfoNew extends PureComponent {
                       {info?.product_name}
                     </Text>
                     <If condition={info?.product_id > 0}>
-                      <Text style={styles.productItemId}>#{info?.product_id}</Text>
+                      <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     </If>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>

@@ -287,7 +287,7 @@ class DistributionAnalysisScene extends PureComponent {
                 <Text style={{
                   fontSize: 12,
                   color: filterPlatform === info.id ? colors.white : colors.fontBlack
-                }}>{info.label}</Text>
+                }}>{info.label} </Text>
               </TouchableOpacity>
             </For>
           </View>
@@ -436,7 +436,7 @@ class DistributionAnalysisScene extends PureComponent {
               >
                 <View/>
                 <View style={styles.cardContent}>
-                  <Text style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`}</Text>
+                  <Text style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`} </Text>
                   {item?.default_show ?
                     <Entypo name='chevron-thin-up' style={styles.iconShow}/> :
                     <Entypo name='chevron-thin-down' style={styles.iconShow}/>

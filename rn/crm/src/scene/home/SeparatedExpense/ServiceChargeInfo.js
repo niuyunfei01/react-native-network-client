@@ -137,7 +137,7 @@ class ServiceChargeInfo extends PureComponent {
                     color: colors.color333,
                     fontSize: 14,
                     fontWeight: "bold"
-                  }}>{this.state.date_labels[item.wm_id]}</Text>
+                  }}>{this.state.date_labels[item.wm_id]} </Text>
                   <Text style={{
                     color: colors.color333,
                     fontSize: 14,

@@ -793,9 +793,7 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{fontSize: 15, color: colors.color333}}>
-            {tool.jbbsubstr(store_info?.name, 8)}
-          </Text>
+          <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={this_down()}/>
           </If>

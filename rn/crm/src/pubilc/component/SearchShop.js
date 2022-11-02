@@ -356,7 +356,7 @@ class SearchShop extends Component {
                     style={{
                       color: colors.color666,
                       fontSize: 12
-                    }}> {tool.jbbsubstr(item?.address, 18)}</Text>
+                    }}> {tool.jbbsubstr(item?.address, 18)} </Text>
                 </View>
               </TouchableOpacity>
             )

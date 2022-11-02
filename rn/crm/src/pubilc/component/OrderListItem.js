@@ -583,14 +583,14 @@ class OrderListItem extends React.PureComponent {
         <If condition={item.show_store_name}>
           <View style={styles.orderInfoContent}>
             <Text style={styles.orderInfoStoreName}>店铺名称 </Text>
-            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name}</Text>
+            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name} </Text>
           </View>
         </If>
 
         <If condition={item.orderTimeInList}>
           <View style={styles.orderTimeList}>
             <Text style={styles.orderTimeLabel}>下单时间 </Text>
-            <Text style={styles.orderTimeValue}>{item.orderTimeInList}</Text>
+            <Text style={styles.orderTimeValue}>{item.orderTimeInList} </Text>
           </View>
         </If>
 
@@ -898,7 +898,7 @@ class OrderListItem extends React.PureComponent {
                 <For index='index' each='info' of={tipList}>
                   <Text key={index} style={styles.amountBtn} onPress={() => {
                     this.onChangeAccount(info.value)
-                  }}>{info.label}</Text>
+                  }}>{info.label} </Text>
                 </For>
               </View>
               <View style={styles.addTipInputBox}>
@@ -916,7 +916,7 @@ class OrderListItem extends React.PureComponent {
                 <View style={styles.addTipIcon}>
                   <Entypo name={"help-with-circle"}
                           style={styles.addTipHelpIcon}/>
-                  <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                  <Text style={styles.addTipReason}>{this.state.respReason} </Text>
                 </View>
               </If>
             </View>

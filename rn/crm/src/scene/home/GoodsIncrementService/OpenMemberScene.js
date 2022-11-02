@@ -316,7 +316,7 @@ class OpenMemberScene extends PureComponent {
                     {item.months}个月
                   </Text>
                   <Text style={styles.memberMonthPresentPrice}>
-                    ￥<Text style={styles.memberMonthPresentPriceLarge}>{item.pay_money_actual}</Text>
+                    ￥<Text style={styles.memberMonthPresentPriceLarge}>{item.pay_money_actual} </Text>
                   </Text>
                   <Text style={styles.memberMonthOriginalPrice}>
                     ￥{item.pay_money}
@@ -372,7 +372,7 @@ class OpenMemberScene extends PureComponent {
               return (
                 <View key={index} style={index > 0 ? {marginLeft: 43} : {}}>
                   {this.getIcon(item.value)}
-                  <Text style={styles.memberExclusiveItemText}>{item.label}</Text>
+                  <Text style={styles.memberExclusiveItemText}>{item.label} </Text>
                 </View>
               )
             })

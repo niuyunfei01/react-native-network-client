@@ -578,7 +578,7 @@ class OrderTransferThird extends Component {
         <If condition={if_reship !== undefined && if_reship === 1 && is_merchant_ship === 1}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <FontAwesome5 name={'exclamation-circle'} size={14} style={{marginRight: 7, color: '#F32B2B'}}/>
-            <Text style={{color: colors.fontGray}}>{merchant_reship_tip}</Text>
+            <Text style={{color: colors.fontGray}}>{merchant_reship_tip} </Text>
           </View>
         </If>
       </View>
@@ -1051,7 +1051,7 @@ class OrderTransferThird extends Component {
                       })
                     }
                   }}>
-                  <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label}</Text>
+                  <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label} </Text>
                   <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
                     {item?.isChosed ?
                       <View style={styles.datePickerIcon}>

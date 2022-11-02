@@ -407,7 +407,7 @@ class ProductInfo extends React.Component {
           }} style={[styles.itemRow, {justifyContent: "space-between", paddingVertical: 5}]}>
             <Text style={styles.item_title}>货架编号: </Text>
             <View style={styles.itemRow}>
-              <Text style={styles.row_right}>{productInfo?.shelf_no || '输入货架编号'}</Text>
+              <Text style={styles.row_right}>{productInfo?.shelf_no || '输入货架编号'} </Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
@@ -416,7 +416,7 @@ class ProductInfo extends React.Component {
             <Text style={styles.item_title}>盘点周期: </Text>
             <View style={styles.itemRow}>
               <Text
-                style={styles.row_right}>{productInfo?.sku?.stock_check_cycle > 0 ? `${productInfo?.sku?.stock_check_cycle}天` : '无'}</Text>
+                style={styles.row_right}>{productInfo?.sku?.stock_check_cycle > 0 ? `${productInfo?.sku?.stock_check_cycle}天` : '无'} </Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
@@ -425,7 +425,7 @@ class ProductInfo extends React.Component {
             <Text style={styles.item_title}>售卖天数: </Text>
             <View style={styles.itemRow}>
               <Text
-                style={styles.row_right}>{productInfo?.sku?.sale_days > 0 ? `${productInfo?.sku?.sale_days}天` : '不限'}</Text>
+                style={styles.row_right}>{productInfo?.sku?.sale_days > 0 ? `${productInfo?.sku?.sale_days}天` : '不限'} </Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
@@ -433,7 +433,7 @@ class ProductInfo extends React.Component {
                             style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>忙日最低库存: </Text>
             <View style={styles.itemRow}>
-              <Text style={styles.row_right}>{productInfo?.risk_min_stat_voc}</Text>
+              <Text style={styles.row_right}>{productInfo?.risk_min_stat_voc} </Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
@@ -441,7 +441,7 @@ class ProductInfo extends React.Component {
                             style={[styles.itemRow, {justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>闲日最低库存: </Text>
             <View style={styles.itemRow}>
-              <Text style={styles.row_right}>{productInfo?.risk_min_stat}</Text>
+              <Text style={styles.row_right}>{productInfo?.risk_min_stat} </Text>
               <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
             </View>
           </TouchableOpacity>
@@ -454,7 +454,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>秤签编号: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{productInfo?.sku?.material_code}</Text>
+                <Text style={styles.row_right}>{productInfo?.sku?.material_code} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -472,7 +472,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>打包工分: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{productInfo?.product?.pre_pack_score}</Text>
+                <Text style={styles.row_right}>{productInfo?.product?.pre_pack_score} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -480,7 +480,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>打包损耗预警: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{tool.toFixed(productInfo?.sku?.pack_loss_warn, 'percent')}</Text>
+                <Text style={styles.row_right}>{tool.toFixed(productInfo?.sku?.pack_loss_warn, 'percent')} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -493,7 +493,7 @@ class ProductInfo extends React.Component {
               <View style={[styles.itemRow, {justifyContent: "space-between"}]}>
                 <Text style={styles.item_title}>打包级别: </Text>
                 <View style={styles.itemRow}>
-                  <Text style={styles.row_right}>{productInfo?.sku?.refine_level_label}</Text>
+                  <Text style={styles.row_right}>{productInfo?.sku?.refine_level_label} </Text>
                   <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
                 </View>
               </View>
@@ -504,7 +504,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>商品码: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{productInfo?.product.upc}</Text>
+                <Text style={styles.row_right}>{productInfo?.product.upc} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -514,7 +514,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>被关联商品数: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{Object.keys(this.state.referred_by).length}</Text>
+                <Text style={styles.row_right}>{Object.keys(this.state.referred_by).length} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -528,7 +528,7 @@ class ProductInfo extends React.Component {
                               style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>温区: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{productInfo?.sku?.fresh_degree_label}</Text>
+                <Text style={styles.row_right}>{productInfo?.sku?.fresh_degree_label} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </TouchableOpacity>
@@ -540,7 +540,7 @@ class ProductInfo extends React.Component {
             <View style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>设置可售时间: </Text>
               <View style={styles.itemRow}>
-                <Text style={styles.row_right}>{this.state.saleTimes[0]?.start}-{this.state.saleTimes[0]?.end}</Text>
+                <Text style={styles.row_right}>{this.state.saleTimes[0]?.start}-{this.state.saleTimes[0]?.end} </Text>
                 <Entypo name="chevron-thin-right" style={[styles.row_right, {fontSize: 19, marginRight: 10}]}/>
               </View>
             </View>
@@ -567,7 +567,7 @@ class ProductInfo extends React.Component {
               <View style={[styles.itemRow, {justifyContent: "space-between"}]}>
                 <Text style={styles.item_title}>关联库存商品: </Text>
                 <View style={styles.itemRow}>
-                  <Text style={styles.row_right}>{productInfo?.refer_prod_name}</Text>
+                  <Text style={styles.row_right}>{productInfo?.refer_prod_name} </Text>
                   <Text style={styles.row_right}>左滑取消关联</Text>
                 </View>
               </View>

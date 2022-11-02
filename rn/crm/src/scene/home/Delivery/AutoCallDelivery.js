@@ -86,7 +86,7 @@ export default class AutoCallDelivery extends PureComponent {
   }
   headerTitle = (txt) => {
     return (
-      <Text style={Styles.titleText}>{txt}</Text>
+      <Text style={Styles.titleText}>{txt} </Text>
     )
   }
 

@@ -163,7 +163,7 @@ class SeparatedExpense extends PureComponent {
       <View>
         <View style={Styles.THIRDHeader}>
           <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
-          <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
+          <Text style={Styles.THIRDHeaderText}>{prompt_msg} </Text>
         </View>
         {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
       </View>
@@ -183,7 +183,7 @@ class SeparatedExpense extends PureComponent {
               <View style={Styles.THIRDContainerItemBody}>
                 <Image source={{uri: info.img}}
                        style={Styles.THIRDContainerItemIcon}/>
-                <Text style={Styles.THIRDContainerItemName}>{info.name}</Text>
+                <Text style={Styles.THIRDContainerItemName}>{info.name} </Text>
               </View>
               <Button buttonStyle={Styles.THIRDContainerBtn}
                       titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
@@ -193,7 +193,7 @@ class SeparatedExpense extends PureComponent {
                       }}/>
             </View>
             <View style={Styles.THIRDContainerItemBody}>
-              <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance}</Text>
+              <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance} </Text>
               <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
             </View>
           </LinearGradient>

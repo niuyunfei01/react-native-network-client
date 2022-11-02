@@ -49,7 +49,7 @@ export default class MemberAgreementScene extends React.PureComponent {
           &emsp;&emsp;4.特别提醒您，使用外送帮会员权益需要满足一定软件版本、设备及/或操作系统要求，因此，家帮帮建议您及时升级应用程序或操作系统
           版本、或更换使用设备以顺利的享受会员权益。{`\n`}
           &emsp;&emsp;5.外送帮会员服务所有权及相关知识产权归家帮帮所有或经过授权使用，您仅拥有本协议项下拥有本协议项下外送帮会员服务的使用权。{`\n`}
-          <Text style={styles.bold}>&emsp;&emsp;三、服务期限{`\n`}</Text>
+          <Text style={styles.bold}>&emsp;&emsp;三、服务期限{`\n`} </Text>
           &emsp;&emsp;1.会员服务的服务期限以支付相应会员费用对应的服务期限为准，您可以通过登录外送帮会员中心查询。
           <Text style={styles.bold}>
             特别提醒您，该期限不因您未使用相应服务而延长。当会员服务期限到期后，外送帮会员服务软件将停止继续向您提供会员服务；但如您在服务期限到期

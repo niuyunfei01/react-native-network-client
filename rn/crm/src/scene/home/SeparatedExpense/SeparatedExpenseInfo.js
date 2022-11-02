@@ -158,7 +158,7 @@ class SeparatedExpenseInfo extends PureComponent {
                                   </If>
                                 </View>}>
               <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
-                <Text style={{color: colors.color333, fontWeight: "bold"}}>{this.state.data_labels[item.wm_id]}</Text>
+                <Text style={{color: colors.color333, fontWeight: "bold"}}>{this.state.data_labels[item.wm_id]} </Text>
                 <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "bold"}}>
                   {item.name}({this.state.platform_labels[item.wm_id]})
                 </Text>
