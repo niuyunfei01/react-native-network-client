@@ -34,7 +34,7 @@ const TextArea = (props) => {
   return (
     <View>
       <TextInput
-        multiline={!false}
+        multiline={true}
         maxLength={maxLength}
         onChangeText={onChangeText || onChange}
         value={value}
@@ -43,10 +43,10 @@ const TextArea = (props) => {
         {...others}
       />
       {showCounter ?
-        <Text
-          style={styles.textareaCounter}
-        >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false} </Text>
-        : false}
+        <Text style={styles.textareaCounter}>
+          {(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false}
+        </Text>
+        : null}
     </View>
   )
 }

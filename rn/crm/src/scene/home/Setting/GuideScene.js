@@ -115,13 +115,16 @@ class GuideScene extends PureComponent {
   render() {
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
+        } style={{backgroundColor: colors.f2, margin: pxToDp(30)}}>
         <JbbText style={{
           fontSize: pxToDp(40),
           color: 'black',

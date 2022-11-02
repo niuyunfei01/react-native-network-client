@@ -253,7 +253,7 @@ class PlatformBind extends React.Component {
             borderRadius: pxToDp(20),
             textAlign: 'center',
             marginBottom: pxToDp(70),
-          }} onPress={() => {
+          }} onPress={async () => {
           let {currVendorId} = tool.vendor(this.props.global)
           let data = {
             v: currVendorId,
@@ -262,7 +262,7 @@ class PlatformBind extends React.Component {
             m: this.props.global.currentUserProfile.mobilephone,
             place: 'bind'
           }
-          JumpMiniProgram("/pages/service/index", data);
+          await JumpMiniProgram("/pages/service/index", data);
         }}>
           <Text style={{color: 'white', textAlign: 'center', lineHeight: pxToDp(80)}}>联系客服</Text>
         </TouchableOpacity>

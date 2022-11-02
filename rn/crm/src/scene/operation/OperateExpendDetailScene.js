@@ -98,7 +98,11 @@ class OperateExpendScene extends PureComponent {
   render() {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1}}>
           {
             this.renderList()
           }
@@ -117,7 +121,7 @@ const content = StyleSheet.create({
   },
   item_time: {
     fontSize: pxToDp(28),
-    color: colors.fontColor
+    color: colors.b2
   },
   cell: {
     height: pxToDp(150),

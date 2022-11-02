@@ -87,7 +87,7 @@ class GoodsAdjustRemind extends PureComponent {
                                      style={{color: colors.main_color, fontSize: 26, marginRight: pxToDp(30)}}/>
                         :
                         <FontAwesome name={'check-circle'}
-                                     style={{color: colors.gray, fontSize: 26, marginRight: pxToDp(30)}}/>
+                                     style={{color: colors.colorCCC, fontSize: 26, marginRight: pxToDp(30)}}/>
                     }
                   </TouchableWithoutFeedback>
                   : null
@@ -158,15 +158,11 @@ class GoodsAdjustRemind extends PureComponent {
         buttons={[{
           label: '取消',
           type: 'default',
-          onPress: () => {
-            this.setState({modifyPriceModalVisible: false})
-          }
+          onPress: () => this.setState({modifyPriceModalVisible: false})
         }, {
           label: '保存',
           type: 'primary',
-          onPress: () => {
-            this.handleModify()
-          }
+          onPress: () => this.handleModify()
         }]}
         title={'修改价格'}
         titleStyle={{textAlign: 'center'}}
@@ -194,14 +190,10 @@ class GoodsAdjustRemind extends PureComponent {
         <LoadMore
           loadMoreType={'scroll'}
           renderList={this.renderItems()}
-          onLoadMore={() => {
-            this.fetchData()
-          }}
-          onRefresh={() => {
-            this.fetchData({pageNum: 1})
-          }}
+          onLoadMore={() => this.fetchData()}
+          onRefresh={() => this.fetchData({pageNum: 1})}
           isLastPage={false}
-        />
+          isLoading={false}/>
         {this.renderModifyPriceModal()}
       </View>
     )

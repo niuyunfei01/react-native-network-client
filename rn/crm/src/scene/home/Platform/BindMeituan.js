@@ -169,7 +169,11 @@ class BindMeituan extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <Text style={{
             marginLeft: 'auto',
             marginRight: 'auto',
@@ -189,7 +193,7 @@ class BindMeituan extends PureComponent {
         }}>
           <Button
             // type={'primary'}
-            onPress={() => {
+            onPress={async () => {
               let {currVendorId} = tool.vendor(this.props.global)
               let data = {
                 v: currVendorId,
@@ -198,7 +202,7 @@ class BindMeituan extends PureComponent {
                 m: this.props.global.currentUserProfile.mobilephone,
                 place: 'bindMeituan'
               }
-              JumpMiniProgram("/pages/service/index", data);
+              await JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {
               //   native.dialNumber(this.state.mobile);
               // } else {
@@ -207,13 +211,13 @@ class BindMeituan extends PureComponent {
             }}
             title={'联系客服'}
             titleStyle={{
-              color: colors.fontColor,
+              color: colors.b2,
             }}
             containerStyle={{width: '40%'}}
             buttonStyle={{
               backgroundColor: colors.white,
               borderRadius: pxToDp(20),
-              borderColor: colors.fontColor,
+              borderColor: colors.b2,
               borderWidth: pxToDp(2)
             }}/>
 
@@ -268,12 +272,13 @@ class BindMeituan extends PureComponent {
             <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团跑腿”配送 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
+              <Text
+                style={{color: colors.color333, fontSize: 14}}>如果美团商户端发起配送时，会跟外送帮上的骑手重复 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>

@@ -70,7 +70,11 @@ class BindMeituanSg extends PureComponent {
           urls={[{url: this.state.showImg}]}
           onClickModal={() => this.onToggleFullScreen()}
         />
-        <ScrollView style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <View style={{
             flexDirection: "row",
             flex: 1,
@@ -250,7 +254,7 @@ class BindMeituanSg extends PureComponent {
                 }}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.b2,
                 }}
                 titleStyle={{
                   color: colors.white,

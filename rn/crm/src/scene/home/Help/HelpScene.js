@@ -139,7 +139,11 @@ class HelpScene extends PureComponent {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{marginBottom: pxToDp(140)}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{marginBottom: pxToDp(140)}}>
           {
             this.renderItem('常见问题')
           }

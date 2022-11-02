@@ -159,7 +159,11 @@ class InvoicingGatherDetailScene extends PureComponent {
     let remark = this.state.reqData.remark;
     return (
       <View style={{flex: 1}}>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
           <TextInput
             underlineColorAndroid='transparent'
             style={{backgroundColor: colors.white, height: pxToDp(200)}}

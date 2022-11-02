@@ -1,47 +1,26 @@
 import React, {PureComponent} from 'react'
-import {
-  Dimensions,
-  Image,
-  ImageBackground,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {
-  check_is_bind_ext,
-  getConfig,
-  logout,
-  requestSmsCode,
-  setCurrentStore,
-  signIn,
-} from '../../../reducers/global/globalActions'
+import {getConfig, logout, sendDverifyCode, setCurrentStore, signIn,} from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from '../../../pubilc/styles/colors'
-import pxToDp from '../../../pubilc/util/pxToDp'
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from '../../../pubilc/common/config'
-import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from '../../../pubilc/util/analytics';
-import {CheckBox} from "react-native-elements";
-import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {Button, CheckBox} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {setDeviceInfo} from "../../../reducers/device/deviceActions";
 import PropTypes from "prop-types";
-
-const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
-let {height, width} = Dimensions.get('window')
+import Entypo from "react-native-vector-icons/Entypo";
+import {check_icon} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   return {
     global: state.global,
-    userProfile: state.global.currentUserPfile
   }
 }
 
@@ -52,7 +31,7 @@ function mapDispatchToProps(dispatch) {
       logout,
       signIn,
       setCurrentStore,
-      requestSmsCode
+      sendDverifyCode
     }, dispatch)
   }
 }
@@ -71,11 +50,11 @@ class LoginScene extends PureComponent {
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       verifyCode: '',
-      loginType: BY_SMS,
       doingSign: false,
       doingSignKey: '',
       authorization: false,
       show_auth_modal: true,
+      show_repetition_button: false,
     };
 
     const params = (this.props.route.params || {});
@@ -102,17 +81,23 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode = () => {
-    let {mobile} = this.state
+    let {mobile, canAskReqSmsCode, authorization} = this.state
+    if (!authorization) {
+      return this.setState({
+        show_auth_modal: true
+      })
+    }
+    if (canAskReqSmsCode) return;
     if (tool.length(mobile) > 10) {
       const {dispatch} = this.props;
-      dispatch(requestSmsCode(mobile, 0, (success) => {
-        const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
+      dispatch(sendDverifyCode(mobile, 0, 1, (success, msg) => {
         this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
           this.interval = setInterval(() => {
             this.setState({
+              show_repetition_button: true,
               reRequestAfterSeconds: this.getCountdown() - 1
-            },()=>{
+            }, () => {
               if (this.state.reRequestAfterSeconds <= 0) {
                 this.onCounterReReqEnd()
                 clearInterval(this.interval)
@@ -120,13 +105,11 @@ class LoginScene extends PureComponent {
             })
           }, 1000)
           this.setState({canAskReqSmsCode: true});
-          showSuccess(msg)
-        } else {
-          showError(msg)
         }
+        ToastShort(msg, 0)
       }));
     } else {
-      showError("请输入正确的手机号")
+      ToastShort("请输入正确的手机号", 0)
     }
   }
 
@@ -135,111 +118,82 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    let {loginType, authorization, mobile, verifyCode, password} = this.state;
-    if (!authorization) {
-      return this.setState({
-        show_auth_modal: true
-      })
-    }
-    if (!mobile) {
-      const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-      ToastShort(msg)
-      return false;
-    }
-    showModal('登录中');
-    switch (loginType) {
-      case BY_SMS:
-        if (!verifyCode) {
-          showError('请输入短信验证码')
-          return false;
-        }
-        this._signIn(mobile, verifyCode, "短信验证码");
-        break;
-      case BY_PASSWORD:
-        if (!password) {
-          showError('请输入登录密码')
-          return false;
-        }
-        this._signIn(mobile, password, "帐号和密码");
-        break;
-      default:
-        showError('登录类型错误')
-    }
+    tool.debounces(() => {
+      let {authorization, mobile, verifyCode} = this.state;
+      if (!authorization) {
+        return this.setState({
+          show_auth_modal: true
+        })
+      }
+      if (tool.length(mobile) < 10) {
+        return ToastShort("请输入正确的手机号", 0)
+      }
+      if (!verifyCode) {
+        return ToastShort("请填写验证码", 0)
+      }
+      this._signIn(mobile, verifyCode);
+    })
   }
 
-  _signIn = (mobile, password, name) => {
+  _signIn = (mobile, password) => {
+    showModal("正在登录...")
     const {dispatch} = this.props;
     dispatch(logout());
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
-    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
-      if (ok) {
-        this.queryConfig(uid)
-        if (uid) {
-          this.mixpanel.getDistinctId().then(res => {
-            if (res !== uid) {
-              mergeMixpanelId(res, uid);
-              this.mixpanel.identify(uid);
-            }
-          })
-        }
+    dispatch(signIn(mobile, password, this.props, (ok, msg, uid) => {
+      if (ok && uid) {
+        this.queryConfig()
+        this.mixpanel.getDistinctId().then(res => {
+          if (res !== uid) {
+            mergeMixpanelId(res, uid);
+            this.mixpanel.identify(uid);
+          }
+        })
       } else {
-        if (msg.indexOf("注册") !== -1) {
-          this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
+        if (msg === 401) { //未注册
+          return this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
         }
-        ToastShort(msg ? msg : "登录失败，请输入正确的" + name)
+        ToastShort(msg, 0)
       }
     }));
   }
 
-  queryConfig = (uid) => {
+  queryConfig = () => {
     let {accessToken, currStoreId} = this.props.global;
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
-        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          this.doneSelectStore(store_id, !binded);
-        }));
+        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
-        ToastShort(err_msg);
+        ToastShort(err_msg, 0);
       }
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false) => {
+  doneSelectStore = (storeId, show_bottom_tab = false) => {
     const {dispatch, navigation} = this.props;
-    const setCurrStoreIdCallback = (set_ok, msg) => {
-      if (set_ok) {
-        dispatch(setCurrentStore(storeId));
-        if (not_bind) {
-          navigation.navigate(Config.ROUTE_STORE_STATUS)
-          hideModal()
-          return;
-        }
-        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
-      } else {
-        showError(msg);
-      }
-    };
-    if (Platform.OS === 'ios') {
-      setCurrStoreIdCallback(true, '');
-    } else {
-      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    dispatch(setCurrentStore(storeId));
+
+    if (!show_bottom_tab) {
+      hideModal()
+      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
+
+    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+      initTab: Config.ROUTE_ORDERS,
+      initialRouteName: Config.ROUTE_ALERT
+    });
+
+    hideModal()
   }
 
   closeModal = () => {
     this.setState({
       show_auth_modal: false
     })
-    ToastShort("请手动勾选隐私政策")
   }
 
   onReadProtocol = () => {
@@ -249,222 +203,148 @@ class LoginScene extends PureComponent {
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 
+  setCheckd = () => {
+    let {authorization} = this.state;
+    if (!authorization) {
+      this.mixpanel.track("openApp_readandagree_click", {});
+    }
+    this.setState({authorization: !authorization})
+  }
+
+  cancelValue = () => {
+    this.setState({
+      mobile: ''
+    })
+  }
+
   render() {
+    let {
+      mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization, show_repetition_button
+    } = this.state;
     return (
-      <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
-        <ScrollView style={{zIndex: 999, flex: 1}}>
-          <View style={{alignItems: "center"}}>
-            <Image
-              style={{
-                height: pxToDp(134),
-                width: pxToDp(134),
-                borderRadius: pxToDp(20),
-                marginVertical: pxToDp(50),
-                marginHorizontal: 'auto'
-              }}
-              source={require('../../../img/Login/ic_launcher.png')}/>
-          </View>
-          <View>
+      <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
+        <Text style={{fontSize: 28, fontWeight: 'bold', color: colors.color333}}>
+          登录外送帮
+        </Text>
+        <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17, marginVertical: 4}}>
+          未注册手机号验证后自动创建外送帮账号
+        </Text>
+        <View style={{marginVertical: 16}}>
+          <View style={{backgroundColor: colors.f5, borderRadius: 4, height: 48}}>
             <TextInput
               underlineColorAndroid='transparent'
               placeholder="请输入手机号"
-              onChangeText={(mobile) => {
-                this.setState({mobile})
-              }}
-              value={this.state.mobile}
-              placeholderTextColor={'#cad0d9'}
+              onChangeText={(mobile) => this.setState({mobile})}
+              maxLength={11}
+              value={mobile}
+              placeholderTextColor={colors.color999}
+              keyboardType={'numeric'}
               style={{
-                borderWidth: pxToDp(1),
-                borderColor: colors.main_color,
-                borderRadius: pxToDp(52),
-                marginHorizontal: pxToDp(50),
-                paddingLeft: pxToDp(45),
-                height: pxToDp(90)
+                fontSize: 16,
+                flex: 1,
+                padding: 12,
               }}
             />
+            <If condition={tool.length(mobile) > 0}>
+              <Entypo onPress={this.cancelValue} name="circle-with-cross"
+                      style={{position: 'absolute', top: 15, right: 10, fontSize: 16, color: colors.color999}}/>
+            </If>
           </View>
-          <View style={{flex: 1}}>
-            <View style={{flexDirection: 'row'}}>
-              <TextInput
-                onChangeText={(verifyCode) => this.setState({verifyCode})}
-                value={this.state.verifyCode}
-                placeholderTextColor={'#cad0d9'}
-                underlineColorAndroid='transparent'
-                placeholder="请输入验证码"
-                style={{
-                  borderWidth: pxToDp(1),
-                  borderColor: colors.main_color,
-                  borderRadius: pxToDp(52),
-                  marginHorizontal: pxToDp(50),
-                  paddingLeft: pxToDp(40),
-                  width: pxToDp(370),
-                  marginTop: pxToDp(45),
-                  height: pxToDp(90),
-                  marginRight: pxToDp(20),
-                }}
-              />
-              {this.state.canAskReqSmsCode ?
-                <TouchableOpacity style={{
-                  alignSelf: 'center',
-                  height: pxToDp(90),
-                  width: pxToDp(230),
-                  borderWidth: pxToDp(1),
-                  borderRadius: pxToDp(45),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: pxToDp(40),
-                  borderColor: colors.fontBlack
-                }}>
-                  <Text style={{
-                    fontSize: pxToDp(colors.actionSecondSize),
-                    color: colors.fontBlack
-                  }}>{this.state.reRequestAfterSeconds}秒重新获取 </Text>
-                </TouchableOpacity>
-                : <TouchableOpacity style={{
-                  alignSelf: 'center',
-                  height: pxToDp(90),
-                  width: pxToDp(230),
-                  borderWidth: pxToDp(1),
-                  borderRadius: pxToDp(45),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: pxToDp(40),
-                  borderColor: colors.main_color
-                }} onPress={this.onRequestSmsCode}>
-                  <Text
-                    style={{
-                      fontSize: pxToDp(colors.actionSecondSize),
-                      color: colors.main_vice_color
-                    }}>获取验证码 </Text>
-                </TouchableOpacity>
-              }
-            </View>
-          </View>
-
-          <View style={{marginLeft: 15, marginRight: 15}}>
-            <TouchableOpacity style={{
-              height: pxToDp(90),
-              borderRadius: pxToDp(45),
-              marginTop: pxToDp(50),
-              marginHorizontal: pxToDp(20),
-              backgroundColor: "#59b26a",
-              justifyContent: 'center',
-              alignItems: 'center',
-              overflow: "hidden",
-              borderWidth: pxToDp(0)
-            }}
-                              activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
-                              onPress={this.onLogin}>
-              <Text
-                style={{
-                  color: 'white',
-                  textAlign: 'center',
-                  lineHeight: pxToDp(96),
-                  fontSize: pxToDp(30)
-                }}>登录</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{
-              height: pxToDp(90),
-              borderRadius: pxToDp(45),
-              marginTop: pxToDp(50),
-              marginHorizontal: pxToDp(20),
-              backgroundColor: '#E2ECF8',
-              borderColor: "#979797",
-              borderWidth: pxToDp(1),
-              overflow: "hidden",
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: colors.main_color
-            }}
-                              activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
-                              onPress={() => {
-                                this.mixpanel.track("openApp_signupstore_click", {});
-                                this.props.navigation.navigate('Register')
-                              }}>
-              <Text style={{
-                color: colors.main_color,
-                textAlign: 'center',
-                lineHeight: pxToDp(96),
-                fontSize: pxToDp(30)
-              }}>注册</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <ImageBackground source={require('../../../img/Login/login_bird.jpg')} style={{
-          resizeMode: "cover",
-          justifyContent: "center",
-          height: height * 0.40,
-          zIndex: 100,
-        }}>
-          <TouchableOpacity onPress={() => {
-            if (!this.state.authorization) {
-              this.mixpanel.track("openApp_readandagree_click", {});
-            }
-            this.setState({authorization: !this.state.authorization})
-          }} style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}>
-            <CheckBox
-              checkedColor={colors.main_color}
-              style={{margin: 0, padding: 0}}
-              checked={this.state.authorization}
-              onPress={() => {
-                if (!this.state.authorization) {
-                  this.mixpanel.track("openApp_readandagree_click", {});
-                }
-                this.setState({authorization: !this.state.authorization})
-              }}
-            />
-            <Text style={{color: colors.color333, marginRight: 3, fontSize: 16}}>我已阅读并同意
-            </Text>
-            <Text onPress={this.onReadProtocol} style={{color: colors.main_color, fontSize: 16}}>外送帮隐私政策 </Text>
-          </TouchableOpacity>
-
           <View style={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            backgroundColor: colors.f5,
+            borderRadius: 4,
+            height: 48,
+            marginTop: 16,
             flexDirection: 'row',
+            justifyContent: 'space-between'
           }}>
-            <Text style={{fontSize: 16}}>遇到问题，请</Text>
-            <Text style={{
-              fontSize: 16,
-              color: '#59b26a',
-              textDecorationColor: '#59b26a',
-              textDecorationLine: 'underline',
-              marginLeft: pxToDp(10)
-            }} onPress={() => {
-
-              if (!this.state.authorization) {
-                return this.setState({
-                  show_auth_modal: true
-                })
-              }
-
-              this.mixpanel.track("info_customerservice_click", {});
-              JumpMiniProgram("/pages/service/index", {place: 'login'});
-              // native.dialNumber('18910275329');
-            }}>联系客服</Text>
+            <TextInput
+              onChangeText={(verifyCode) => {
+                if (/^[A-Za-z0-9]*$/.test(verifyCode)) {
+                  this.setState({verifyCode})
+                }
+              }}
+              value={verifyCode}
+              placeholderTextColor={colors.color999}
+              underlineColorAndroid='transparent'
+              placeholder="请输入验证码"
+              style={{fontSize: 16, flex: 1, padding: 12}}
+            />
+            <TouchableOpacity style={{
+              padding: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }} onPress={this.onRequestSmsCode}>
+              <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
+                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
+              </Text>
+            </TouchableOpacity>
           </View>
-        </ImageBackground>
+        </View>
+        <TouchableOpacity onPress={this.setCheckd} style={{flexDirection: 'row', alignItems: 'center',}}>
+          <CheckBox
+            size={18}
+            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+            checkedColor={colors.main_color}
+            uncheckedColor={'#DDDDDD'}
+            containerStyle={{margin: 0, padding: 0}}
+            checked={authorization}
+            onPress={this.setCheckd}
+          />
+          <Text style={{color: colors.color999, fontSize: 12}}>
+            我已阅读并同意
+          </Text>
+          <Text onPress={this.onReadProtocol} style={{color: colors.main_color, fontSize: 12}}>《外送帮隐私政策》 </Text>
+          <If condition={!authorization}>
+            <TouchableOpacity onPress={this.setCheckd} style={{position: 'absolute', top: 20, left: 0}}>
+              <Entypo name={'triangle-up'} style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
+
+              <View style={{
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                borderRadius: 4,
+                height: 35,
+                width: 108,
+                position: 'absolute',
+                top: 17.4,
+                left: 3,
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}>请阅读并勾选协议</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
+        </TouchableOpacity>
+
+        <View style={{marginTop: authorization ? 30 : 70}}>
+          <Button title={'登 录'}
+                  onPress={this.onLogin}
+                  buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, length: 48}]}
+                  titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
+          />
+        </View>
+
+
         <BottomModal title={'提示'} actionText={'同意'} closeText={'取消'} onPress={this.closeModal}
                      visible={this.state.show_auth_modal} onPressClose={this.closeModal}
                      onClose={this.closeModal} btnStyle={{backgroundColor: colors.main_color}}>
 
           <View style={{marginVertical: 10, marginHorizontal: 6}}>
-            <Text style={{fontSize: 14, color: colors.color333}}> 1.请先阅读并同意 <Text
-              style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}> 隐私政策 </Text> </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: colors.color333,
-                marginVertical: 6
-              }}> 2.授权app收集外送帮用户信息以提供发单及修改商品等服务 </Text>
-            <Text style={{fontSize: 14, color: colors.color333}}> 3.请手动勾选隐私协议 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>
+              1.请先阅读并同意
+              <Text style={{fontSize: 16, color: colors.main_color}} onPress={this.onReadProtocol}>
+                隐私政策
+              </Text>
+            </Text>
+            <Text style={{fontSize: 14, color: colors.color333, marginVertical: 6}}>
+              2.授权app收集外送帮用户信息以提供发单及修改商品等服务
+            </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>
+              3.请手动勾选隐私协议
+            </Text>
           </View>
         </BottomModal>
+
       </View>
     )
   }

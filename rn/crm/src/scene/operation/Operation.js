@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   right_icon: {
     fontSize: pxToDp(40),
-    color: colors.title_color,
+    color: colors.color111,
     justifyContent: "center",
     alignItems: "center"
   }

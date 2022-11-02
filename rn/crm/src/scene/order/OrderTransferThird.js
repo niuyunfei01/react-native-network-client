@@ -19,6 +19,8 @@ import {TextArea} from "../../weui";
 import dayjs from "dayjs";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   return {
@@ -114,7 +116,6 @@ class OrderTransferThird extends Component {
     this.setState({
       isLoading: true
     })
-    showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
     HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       let deliverys = []
@@ -516,13 +517,17 @@ class OrderTransferThird extends Component {
       <View style={{flexGrow: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
 
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={this.state.isLoading}
-            onRefresh={() => this.fetchThirdWays()}
-            tintColor='gray'
-          />
-        } style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.fetchThirdWays()}
+              tintColor='gray'
+            />
+          } style={{flex: 1}}>
           {this.renderContent()}
           {!tool.length(this.state.logistics) > 0 && !this.state.isLoading ?
             <EmptyData containerStyle={{marginBottom: 40}} placeholder={'无可用配送方式'}/> : this.renderList()}
@@ -543,7 +548,7 @@ class OrderTransferThird extends Component {
                 this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
               }} style={{flexDirection: "row", alignItems: "center"}}>
                 <Entypo name='cog'
-                        style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
+                        style={{fontSize: 18, color: colors.b2, marginRight: 4}}/>
                 <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
@@ -573,7 +578,7 @@ class OrderTransferThird extends Component {
         <If condition={if_reship !== undefined && if_reship === 1 && is_merchant_ship === 1}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <FontAwesome5 name={'exclamation-circle'} size={14} style={{marginRight: 7, color: '#F32B2B'}}/>
-            <Text style={{color: colors.fontGray}}>{merchant_reship_tip}</Text>
+            <Text style={{color: colors.fontGray}}>{merchant_reship_tip} </Text>
           </View>
         </If>
       </View>
@@ -1046,7 +1051,7 @@ class OrderTransferThird extends Component {
                       })
                     }
                   }}>
-                  <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label}</Text>
+                  <Text style={item?.isChosed ? styles.dateTextActive : styles.dateText}>{item.label} </Text>
                   <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
                     {item?.isChosed ?
                       <View style={styles.datePickerIcon}>
@@ -1078,18 +1083,20 @@ class OrderTransferThird extends Component {
             })} style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
               <Text style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red, flex: 1}}>
-                ·美团众包及达达暂不支持填写备注
+                ·美团跑腿及达达暂不支持填写备注
               </Text>
               <Entypo name="circle-with-cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </TouchableOpacity>
             <TextArea
+              multiline={true}
+              numberOfLines={4}
               value={this.state.remark}
               onChange={(remark) => this.setState({remark})}
               showCounter={false}
               defaultValue={'请输入备注信息'}
               underlineColorAndroid="transparent" //取消安卓下划线
-              style={{borderWidth: 1, borderColor: colors.fontColor, marginTop: 12, height: 100}}
+              style={{borderWidth: 1, borderColor: colors.b2, marginTop: 12, height: 100}}
             >
             </TextArea>
 
@@ -1174,8 +1181,9 @@ class OrderTransferThird extends Component {
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
                 商品重量
               </Text>
-              <Entypo onPress={() => this.setState({showDeliveryModal: false})} name="circle-with-cross"
-                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+
+              <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
               <Text style={{color: colors.color999, fontSize: 12,}}>
@@ -1327,7 +1335,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color,
+    color: colors.color111,
   },
   modalCancel: {
     width: '100%',
@@ -1432,7 +1440,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   dateTextActive: {color: colors.main_color, fontWeight: "bold"},
-  dateText: {color: colors.title_color, fontWeight: "bold"},
+  dateText: {color: colors.color111, fontWeight: "bold"},
   datePickerHead: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1441,7 +1449,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.colorEEE,
     paddingBottom: 15
   },
-  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.title_color},
+  callTime: {fontWeight: "bold", fontSize: pxToDp(32), color: colors.color111},
   sureBtn: {fontSize: pxToDp(32), color: colors.main_color},
   dateMsg: {fontWeight: "bold", fontSize: pxToDp(22), color: '#DA0000', marginVertical: 10},
   datePickerItem: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 5},

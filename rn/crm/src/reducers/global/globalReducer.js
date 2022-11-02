@@ -10,12 +10,10 @@ const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
   SET_CURR_STORE,
-  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
   CHECK_VERSION_AT,
   BLE_STARTED,
   LOGOUT_SUCCESS,
-  UPDATE_CFG,
   UPDATE_CONFIG,
   HOST_UPDATED,
   UPDATE_CFG_ITEM,
@@ -23,10 +21,15 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_SHOW_EXT_STORE,
+  // SET_CALL_DELIVERY_LIST,
+  SET_DEFAULT_ORDER_INFO,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
-  SET_NO_LOGIN_INFO
+  SET_NO_LOGIN_INFO,
+  SET_GOODS_SG_CATEGORY,
+  SET_BLUETOOTH_DEVICE_LIST,
+  SET_SCANNING_BLUETOOTH_DEVICE,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -58,10 +61,31 @@ const initialState = {
   customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {
-    order_list_by: 'expectTime asc',
+    order_list_by: 'orderTime asc',
   },
+
+  show_bottom_tab: false,
+  only_one_store: false,
+  is_vendor_admin: false,
+  menu_list: {
+    delivery: 1,
+    myself: 1,
+    news: 0,
+    product: 0,
+    switch_store: 1,
+    work: 0
+  },
+  basic_categories: [],
+  bluetoothDeviceList: [],
   bleStarted: false,
   printer_id: '0',
+  isScanningBluetoothDevice: false,
+  autoBluetoothPrint: false,
+  accessToken: '',
+  refreshToken: '',
+  getTokenTs: 0,
+  call_delivery_list: [],
+  default_order_info: {},
 };
 
 /**
@@ -72,6 +96,33 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_AUTO_PRINT:
+      return {
+        ...state,
+        autoBluetoothPrint: action.payload
+      }
+    case SET_SCANNING_BLUETOOTH_DEVICE:
+      return {
+        ...state,
+        isScanningBluetoothDevice: action.payload
+      }
+
+    case SET_BLUETOOTH_DEVICE_LIST:
+      if (action.payload) {
+        return {
+          ...state,
+          bluetoothDeviceList: action.payload,
+        }
+      }
+      break
+    case SET_GOODS_SG_CATEGORY:
+      if (action.payload) {
+        return {
+          ...state,
+          basic_categories: action.payload
+        }
+      }
+      break
     case SET_NO_LOGIN_INFO:
       if (action.payload) {
         return {
@@ -80,7 +131,12 @@ export default function globalReducer(state = initialState, action) {
           accessToken: action.payload.accessToken,
           currStoreId: action.payload.currStoreId,
           host: action.payload.host,
-          printer_id: action.payload.printer_id
+          printer_id: action.payload.printer_id,
+          autoBluetoothPrint: action.payload.autoBluetoothPrint,
+          refreshToken: action.payload.refreshToken,
+          expireTs: action.payload.expireTs,
+          getTokenTs: action.payload.getTokenTs,
+          user_config: action.info
         }
       }
       break
@@ -107,6 +163,7 @@ export default function globalReducer(state = initialState, action) {
         accessToken: action.payload.access_token,
         refreshToken: action.payload.refresh_token,
         expireTs: action.payload.expires_in_ts,
+        getTokenTs: action.payload.getTokenTs
       };
 
     case CHECK_VERSION_AT:
@@ -150,6 +207,10 @@ export default function globalReducer(state = initialState, action) {
         show_expense_center: action.payload.show_expense_center || state.show_expense_center,
         is_record_request_monitor: action.payload.is_record_request_monitor || state.is_record_request_monitor,
         customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
+        menu_list: action.payload.menu_list || state.menu_list,
+        show_bottom_tab: Boolean(action.payload.show_bottom_tab),
+        is_vendor_admin: Boolean(action.payload.is_vendor_admin),
+        only_one_store: Boolean(action.payload.only_one_store),
       } : state;
 
     case HOST_UPDATED:
@@ -170,8 +231,11 @@ export default function globalReducer(state = initialState, action) {
     case SET_USER_CONFIG:
       return {...state, user_config: action.info}
 
-    case SET_SHOW_EXT_STORE:
-      return {...state, show_orderlist_ext_store: action.show}
+    // case SET_CALL_DELIVERY_LIST:
+    //   return {...state, call_delivery_list: action.list}
+
+    case SET_DEFAULT_ORDER_INFO:
+      return {...state, default_order_info: action.info}
 
     case SET_SHOW_FLOAT_SERVICE_ICON:
       return {...state, show_float_service_icon: action.show}

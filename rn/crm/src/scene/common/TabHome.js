@@ -2,16 +2,20 @@ import React from 'react'
 import {connect} from "react-redux";
 import {View} from "react-native";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import Cts from "../../pubilc/common/Cts";
 import colors from "../../pubilc/styles/colors";
-import {Badge} from 'react-native-elements'
-import Icon from "react-native-vector-icons/Entypo";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import store from "../../reducers/store/index"
-import tool from "../../pubilc/util/tool";
-
 import OrderListScene from '../order/OrderListScene'
 import PropTypes from "prop-types";
+import {
+  bottom_tab_control,
+  bottom_tab_control_check,
+  bottom_tab_goods,
+  bottom_tab_goods_check,
+  bottom_tab_message,
+  bottom_tab_message_check,
+  bottom_tab_workbench,
+  bottom_tab_workbench_check
+} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -20,17 +24,7 @@ function mapStateToProps(state) {
 
 const Tab = createBottomTabNavigator();
 
-const tabBarOptions = {
-  activeTintColor: colors.main_color,
-  inactiveTintColor: colors.color666,
-  style: {backgroundColor: colors.white},
-  animationEnabled: false,
-  lazy: true,
-  labelStyle: {fontSize: 15}
-}
-
 class TabHome extends React.Component {
-
   static propTypes = {
     route: PropTypes.object,
     remind: PropTypes.object,
@@ -38,88 +32,37 @@ class TabHome extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      showFlag: false
-    }
+    this.state = {}
   }
-
-  componentDidMount() {
-    this.unSubscribe = store.subscribe(() => {
-      this.setState({
-        showFlag: store.getState().payload
-      })
-    })
-  }
-
-  componentWillUnmount() {
-    this.unSubscribe()
-  }
-
 
   render() {
-    let isBlx = false;
     let remind = this.props.remind?.remindNum;
     let {route} = this.props
-    let {co_type} = tool.vendor(this.props.global) !== undefined ? tool.vendor(this.props.global) : global.noLoginInfo.co_type;
-    let storeVendorId = Number(this.props?.global?.vendor_id !== undefined ? this.props?.global?.vendor_id : global.noLoginInfo.vendor_id || 0)
-
-    let enabledGoodMgr = Number(this.props.global?.enabled_good_mgr !== undefined ? this.props.global.enabled_good_mgr : global.noLoginInfo.enabledGoodMgr)
-    if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
-      isBlx = true;
-    }
-
     const initialRouteName = route.params?.initialRouteName ?? 'Login'
     const initTab = initialRouteName === "Tab" && (route.params?.initTab || "Orders") || initialRouteName
-    let {showFlag} = this.state
+    let {show_bottom_tab, menu_list} = this.props.global;
+    let {news, product, work} = menu_list;
     return (
       <Tab.Navigator
         initialRouteName={initTab}
-        tabBarOptions={tabBarOptions}>
-        <If condition={co_type !== 'peisong'}>
-          <Tab.Screen
-            name="Home"
-            getComponent={() => require("../notice/NoticeList").default}
-            options={
-              {
-                tabBarBadge:remind > 99 ? '99+' : remind,
-                tabBarLabel: "提醒",
-                tabBarIcon: ({focused}) => (
-                  <View style={{position: "relative"}}>
-                    <FontAwesome5 name={'bell'} size={22}
-                                  color={focused ? colors.main_color : colors.colorCCC}
-                    />
-                  </View>
-                )
-              }
-            }
-          />
-        </If>
-        <If condition={this.props.global?.store_info?.fn_stall === '1'}>
+        tabBarOptions={{
+          activeTintColor: colors.main_color,
+          inactiveTintColor: colors.color666,
+          style: {backgroundColor: colors.white, height: show_bottom_tab ? 49 : 0},
+          animationEnabled: false,
+          lazy: true,
+          labelStyle: {textAlign: 'center', fontSize: 12, opacity: show_bottom_tab ? 1 : 0}
+        }}>
+        <If condition={Number(work) === 1}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
-                        tabBarLabel: '控制台',
+                        tabBarLabel: '工作台',
                         tabBarIcon: ({focused}) => (
-                          <Icon name={'grid'} size={26} color={focused ? colors.main_color : colors.colorCCC}/>)
+                          focused ? <SvgXml xml={bottom_tab_workbench_check()} width={24} height={24}/> :
+                            <SvgXml xml={bottom_tab_workbench()} width={24} height={24}/>
+                        )
                       }}/>
-        </If>
-        <If condition={co_type === 'peisong'}>
-          <Tab.Screen
-            name="CreateOrder"
-            getComponent={() => require("../order/OrderSettingPack").default}
-            options={
-              {
-                tabBarLabel: "创建",
-                tabBarIcon: ({focused}) => (
-                  <View style={{position: "relative"}}>
-                    <Icon name={"circle-with-plus"} size={26}
-                          style={{color: focused ? colors.main_color : colors.colorCCC}}/>
-
-                  </View>
-                )
-              }
-            }
-          />
         </If>
 
         <Tab.Screen
@@ -127,15 +70,18 @@ class TabHome extends React.Component {
           component={OrderListScene}
           options={
             {
-              tabBarLabel: "订单",
+              tabBarLabel: "配送",
               tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'file-alt'} size={22} color={focused ? colors.main_color : colors.colorCCC}/>
+                show_bottom_tab ?
+                  focused ? <SvgXml xml={bottom_tab_control_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_control()} width={24} height={24}/> : <View/>
               ),
 
             }
           }
         />
-        <If condition={enabledGoodMgr}>
+
+        <If condition={Number(product) === 1}>
           <Tab.Screen
             name="Goods"
             getComponent={() => require("../product/Goods/StoreGoodsList").default}
@@ -143,50 +89,30 @@ class TabHome extends React.Component {
               {
                 tabBarLabel: "商品",
                 tabBarIcon: ({focused}) => (
-                  <Icon name={"shopping-bag"}
-                        style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
+                  focused ? <SvgXml xml={bottom_tab_goods_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_goods()} width={24} height={24}/>
                 ),
               }
             }
           />
         </If>
-        <If condition={isBlx}>
+
+        <If condition={Number(news) === 1}>
           <Tab.Screen
-            name="Operation"
-            getComponent={() => require("../operation/Operation").default}
-            options={{
-              tabBarLabel: "运营",
-              tabBarIcon: ({focused}) => (
-                <View style={{position: "relative"}}>
-                  <FontAwesome5 name={'cloudsmith'} size={22}
-                                color={focused ? colors.main_color : colors.colorCCC}
-                  />
-                  <If condition={showFlag}>
-                    <Badge
-                      value={'点我'}
-                      status="error"
-                      containerStyle={{position: 'absolute', top: -5, right: -30}}
-                    />
-                  </If>
-                </View>
-              )
+            name="Home"
+            getComponent={() => require("../notice/NoticeList").default}
+            options={
+              {
+                tabBarBadge: remind > 99 ? '99+' : remind,
+                tabBarLabel: "提醒",
+                tabBarIcon: ({focused}) => (
+                  focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :
+                    <SvgXml xml={bottom_tab_message()} width={24} height={24}/>
+                )
+              }
             }
-            }/>
+          />
         </If>
-        <Tab.Screen
-          name="Mine"
-          getComponent={() => require("../home/Mine/MineScene").default}
-          options={
-            {
-              tabBarLabel: "我的",
-              tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'user-cog'} size={22}
-                              color={focused ? colors.main_color : colors.colorCCC}
-                />
-              )
-            }
-          }
-        />
       </Tab.Navigator>
     )
   }

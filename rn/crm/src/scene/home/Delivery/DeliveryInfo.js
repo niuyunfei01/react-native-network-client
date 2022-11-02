@@ -414,7 +414,11 @@ class DeliveryInfo extends PureComponent {
   render() {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flexGrow: 1}}>
           <If condition={this.state.apply_status === 0}>
             <CellsTitle style={styles.cell_title}>{this.state.platform_name}</CellsTitle>
             <Cells style={[styles.cell_box]}>

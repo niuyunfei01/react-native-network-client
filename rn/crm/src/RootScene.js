@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
-import {LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
+import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo, setUserCfg, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
@@ -20,13 +20,9 @@ global.currentRouteName = ''
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#40455A'
   },
   statusBar: {
     height: StatusBar.currentHeight,
-    ...Platform.select({
-      android: {backgroundColor: '#40455A'}
-    })
   }
 });
 
@@ -80,6 +76,7 @@ class RootScene extends PureComponent {
           rehydrated: true,
         });
       }
+      store.dispatch(setUserCfg(noLoginInfo?.user_config));
       SplashScreen.hide();
     }).catch(() => {
       SplashScreen.hide();
@@ -120,10 +117,10 @@ class RootScene extends PureComponent {
 
       if (!initialRouteName) {
         if (orderId) {
-          initialRouteName = Config.ROUTE_ORDER;
+          initialRouteName = Config.ROUTE_ORDER_NEW;
           initialRouteParams = {orderId};
         } else {
-          initialRouteName = "Tab";
+          initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
         }
       }
     }
@@ -138,7 +135,7 @@ class RootScene extends PureComponent {
         <ErrorBoundary>
           <SafeAreaView style={styles.container}>
             <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'light-content'}/>
+              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
             </View>
             <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
           </SafeAreaView>

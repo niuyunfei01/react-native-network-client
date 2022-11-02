@@ -1,16 +1,12 @@
 'use strict';
-import AppConfig from '../common/config.js';
-import FetchEx from '../util/fetchEx';
+import HttpUtils from "../util/http";
+import type {ICheckLoginParams, ICheckSendMobileCodeParams} from "../../reducers/data.d";
 
-export function serviceSignIn(deviceId, mobile, password) {
-
-  let formData = {
-    "grant_type": AppConfig.GRANT_TYP_PASSWORD,
-    "username": mobile,
-    "password": password,
-    "client_id": AppConfig.GRANT_CLIENT_ID,
-    "device_uuid": deviceId
-  };
-
-  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm('oauth/token', formData))
+export async function sendMobileCode(params: ICheckSendMobileCodeParams[]) {
+  return HttpUtils.get('/v4/wsb_user/getMobileCode', params)
 }
+
+export async function Login(params: ICheckLoginParams[]) {
+  return HttpUtils.get('/v4/wsb_user/login', params, false, false, false)
+}
+

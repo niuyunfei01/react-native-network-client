@@ -114,15 +114,15 @@ class ItemRow extends PureComponent {
         <Text
           style={[styles.editStatus, Styles.editStatusDeduct]}>退{numeral(-editNum * item.price).format('0.00')} </Text>
       </View>) : (showEditAdded && <View style={{alignItems: 'flex-end', flex: 1}}>
-        <Text style={[styles.editStatus, Styles.editStatusAdd]}>已加{editNum}件</Text>
+        <Text style={[styles.editStatus, Styles.warn_color]}>已加{editNum}件</Text>
         <Text
-          style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(editNum * item.normal_price / 100).format('0.00')} </Text>
+          style={[styles.editStatus, Styles.warn_color]}>收{numeral(editNum * item.normal_price / 100).format('0.00')} </Text>
       </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end', flex: 1}}>
-        <Text style={[styles.editStatus, Styles.editStatusAdd]}>加货{item.num} </Text>
+        <Text style={[styles.editStatus, Styles.warn_color]}>加货{item.num} </Text>
         <Text
-          style={[styles.editStatus, Styles.editStatusAdd]}>收{numeral(item.num * item.price).format('0.00')} </Text>
+          style={[styles.editStatus, Styles.warn_color]}>收{numeral(item.num * item.price).format('0.00')} </Text>
       </View>}
 
       {isPromotion &&
@@ -185,7 +185,7 @@ const Styles = StyleSheet.create({
   fnPrice: {color: '#f9b5b2', marginLeft: 30},
   editNum: {alignItems: 'flex-end', flex: 1},
   editStatusDeduct: {backgroundColor: colors.editStatusDeduct, opacity: 0.7},
-  editStatusAdd: {backgroundColor: colors.editStatusAdd, opacity: 0.7},
+  warn_color: {backgroundColor: colors.warn_color, opacity: 0.7},
   isPromotion: {alignSelf: 'flex-end', flex: 1, color: colors.color999},
   isEdtingOn: {alignSelf: 'flex-end', fontSize: pxToEm(26), color: '#f44140'},
   isEdting: {

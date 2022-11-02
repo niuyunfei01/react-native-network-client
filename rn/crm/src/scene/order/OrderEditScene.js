@@ -360,7 +360,11 @@ class OrderEditScene extends Component {
 
   render() {
     return (
-      <ScrollView style={[styles.container, {flex: 1}]}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={[styles.container, {flex: 1}]}>
         <Dialog
           onRequestClose={() => {
             if (this._errorHintsCallback) this._errorHintsCallback();
@@ -464,6 +468,8 @@ class OrderEditScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={60}
                 placeholder=""
                 onChange={v => {

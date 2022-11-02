@@ -90,22 +90,22 @@ class MsgVoiceScene extends PureComponent {
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back}}>
+        } style={{backgroundColor: colors.f2}}>
 
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Flex>
                 {!this.state.notificationEnabled &&
-                  <View
-                    style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                  <View style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: colors.main_color,
-                    margin: 5
-                  }}></View>}
+                <View
+                  style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                <View style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: colors.main_color,
+                  margin: 5
+                }}></View>}
                 <Text
                   style={[styles.cell_body_text]}>系统通知权限设置</Text>
               </Flex>
@@ -139,8 +139,8 @@ class MsgVoiceScene extends PureComponent {
                                 }}>
 
                 {!this.state.notificationEnabled &&
-                  <Text style={[styles.status_err]}>去开启</Text> ||
-                  <Text style={[styles.body_status]}>已开启</Text>}
+                <Text style={[styles.status_err]}>去开启</Text> ||
+                <Text style={[styles.body_status]}>已开启</Text>}
 
               </TouchableOpacity>
             </CellFooter>
@@ -150,15 +150,15 @@ class MsgVoiceScene extends PureComponent {
             <CellBody>
               <Flex>
                 {!this.state.enable_notify &&
-                  <View
-                    style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                  <View style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: colors.main_color,
-                    margin: 5
-                  }}></View>}
+                <View
+                  style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                <View style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: colors.main_color,
+                  margin: 5
+                }}></View>}
                 <Text
                   style={[styles.cell_body_text]}>语音播报设置</Text>
               </Flex>
@@ -172,8 +172,8 @@ class MsgVoiceScene extends PureComponent {
                                 }}>
 
                 {!this.state.enable_notify &&
-                  <Text style={[styles.status_err]}>去设置</Text> ||
-                  <Text style={[styles.body_status]}>正常</Text>}
+                <Text style={[styles.status_err]}>去设置</Text> ||
+                <Text style={[styles.body_status]}>正常</Text>}
               </TouchableOpacity>
             </CellFooter>
           </Cell>
@@ -181,15 +181,15 @@ class MsgVoiceScene extends PureComponent {
             <CellBody>
               <Flex>
                 {!this.state.Volume &&
-                  <View
-                    style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                  <View style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: colors.main_color,
-                    margin: 5
-                  }}></View>}
+                <View
+                  style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                <View style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: colors.main_color,
+                  margin: 5
+                }}></View>}
                 <Text
                   style={[styles.cell_body_text]}>系统音量设置</Text>
               </Flex>
@@ -203,8 +203,8 @@ class MsgVoiceScene extends PureComponent {
                                 }}>
 
                 {!this.state.Volume &&
-                  <Text style={[styles.status_err]}>去开启</Text> ||
-                  <Text style={[styles.body_status]}>正常</Text>}
+                <Text style={[styles.status_err]}>去开启</Text> ||
+                <Text style={[styles.body_status]}>正常</Text>}
               </TouchableOpacity>
             </CellFooter>
           </Cell>
@@ -212,15 +212,15 @@ class MsgVoiceScene extends PureComponent {
             <CellBody>
               <Flex>
                 {!this.state.isRun &&
-                  <View
-                    style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                  <View style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: colors.main_color,
-                    margin: 5
-                  }}></View>}
+                <View
+                  style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                <View style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: colors.main_color,
+                  margin: 5
+                }}></View>}
                 <Text
                   style={[styles.cell_body_text]}>外送帮后台运行</Text>
               </Flex>
@@ -254,8 +254,8 @@ class MsgVoiceScene extends PureComponent {
                                   }
                                 }}>
                 {!this.state.isRun &&
-                  <Text style={[styles.status_err]}>去设置</Text> ||
-                  <Text style={[styles.body_status]}>开启</Text>}
+                <Text style={[styles.status_err]}>去设置</Text> ||
+                <Text style={[styles.body_status]}>开启</Text>}
               </TouchableOpacity>
             </CellFooter>
           </Cell>

@@ -207,17 +207,21 @@ class SeetingDelivery extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
-        <ScrollView style={styles.container}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => this.onHeaderRefresh()}
-                        tintColor='gray'
-                      />
-                    }
-                    automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.container}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          }
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
 
           {this.state.showBind ?

@@ -1,6 +1,7 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
+  Dimensions,
   Image,
   InteractionManager,
   PixelRatio,
@@ -11,7 +12,7 @@ import {
   View
 } from 'react-native'
 import {connect} from "react-redux";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import {Dialog} from "../../../weui";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
@@ -23,16 +24,18 @@ import Icon from "react-native-vector-icons/Entypo";
 import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
-import * as tool from "../../../pubilc/util/tool";
+import tool from "../../../pubilc/util/tool";
 import {Button} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {SvgXml} from "react-native-svg";
 import {
+  empty_data,
   platformLogoEleme,
   platformLogoJD,
   platformLogoMeiTuan,
   platformLogoTaoXianDa,
-  platformLogoWechat, platformLogoWSB
+  platformLogoWechat,
+  platformLogoWSB
 } from "../../../svg/svg";
 
 function mapStateToProps(state) {
@@ -46,6 +49,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+const width = Dimensions.get("window").width;
 
 const timeOptions = [
   {label: '30分钟', value: 30, key: 30},
@@ -62,28 +66,35 @@ const timeOptions = [
 ]
 
 class StoreStatusScene extends PureComponent {
+  buttons = [{
+    type: 'default',
+    label: '取消',
+    sty: {
+      borderColor: 'gray',
+      borderWidth: pxToDp(1),
+    },
+    onPress: () => this.setState({dialogVisible: false})
+  }, {
+    type: 'primary',
+    label: '允许',
+    sty: {
+      backgroundColor: colors.b2,
+      borderColor: 'gray',
+      borderWidth: pxToDp(1),
+    },
+    textsty: {
+      color: colors.white,
+    },
+    onPress: () => this.setState({dialogVisible: false}, () => {
+      this.setAutoTaskOrder()
+    })
+  }]
+
   constructor(props) {
     super(props)
-    const {navigation} = this.props
 
-    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
-    let {currStoreId} = this.props.global
-    navigation.setOptions({
-      headerRight: () => {
-        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
-          return <TouchableOpacity style={{flexDirection: 'row'}}
-                                   onPress={() => {
-                                     this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
-                                   }}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
-              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
-            </View>
-          </TouchableOpacity>
-        }
-      }
-    })
+    let {is_service_mgr} = tool.vendor(this.props.global);
+
 
     this.state = {
       all_close: false,
@@ -110,6 +121,23 @@ class StoreStatusScene extends PureComponent {
 
   componentDidMount() {
     const {navigation, global} = this.props
+    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
+    navigation.setOptions({
+      headerRight: () => {
+        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
+          return <TouchableOpacity style={{flexDirection: 'row'}}
+                                   onPress={() => {
+                                     this.onPress(Config.PLATFORM_BIND)
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
+                                   }}>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
+              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
+            </View>
+          </TouchableOpacity>
+        }
+      }
+    })
     this.focus = navigation.addListener('focus', () => {
       this.fetchData()
     })
@@ -159,7 +187,6 @@ class StoreStatusScene extends PureComponent {
     });
   }
 
-
   openStore() {
     showModal('请求中...')
     const {accessToken, currStoreId} = this.props.global
@@ -174,7 +201,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   showAlert() {
-    Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团众包”配送；\n' +
+    Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团跑腿”配送；\n' +
       '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
       '•兼容模式不支持自动接单\t\t\t', [
       {
@@ -190,7 +217,11 @@ class StoreStatusScene extends PureComponent {
     const {currStoreId, vendor_id} = this.props.global
 
     return (
-      <ScrollView style={styles.bodyContainer}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.bodyContainer}>
         {
           business_status && business_status.map((store, index) => {
             let suspend_confirm_order = store.suspend_confirm_order === '0'
@@ -254,7 +285,7 @@ class StoreStatusScene extends PureComponent {
                       position: "relative"
                     }}>
                       <Text style={styles.wm_store_name}>
-                        {store.name && tool.length(store.name) >= 13 ? store.name.substring(0, 13) + '...' : store.name}
+                        {tool.jbbsubstr(store?.name, 13)}
                       </Text>
                       <Text
                         style={[!store.open ? styles.close_text : styles.open_text, {
@@ -326,28 +357,16 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
-
   renderNoBody() {
     return (
-      <View style={{flexDirection: "column", alignItems: "center"}}>
-        <Text style={{
-          marginTop: '20%',
-          marginBottom: '5%',
-          backgroundColor: '#f5f5f9',
-          textAlignVertical: "center",
-          textAlign: "center",
-          fontWeight: 'bold',
-          fontSize: 25
-        }}>
-          暂时未绑定外卖店铺
-        </Text>
-
+      <View style={styles.noOrderContent}>
+        <SvgXml xml={empty_data()}/>
         <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
-          <Button
-            title={'去绑定'}
-            onPress={() => this.onPress(Config.PLATFORM_BIND)}
-            buttonStyle={{backgroundColor: '#f5f5f9', marginTop: 30, width: "95%"}}
-            titleStyle={{color: colors.fontBlack, textAlign: 'center'}}
+          <Text style={styles.noOrderDesc}>暂无绑定外卖店铺</Text>
+          <Button title={'去绑定'}
+                  onPress={() => this.onPress(Config.PLATFORM_BIND)}
+                  buttonStyle={styles.noOrderBtn}
+                  titleStyle={styles.noOrderBtnTitle}
           />
         </If>
       </View>
@@ -430,32 +449,8 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
-  buttons = [{
-    type: 'default',
-    label: '取消',
-    sty: {
-      borderColor: 'gray',
-      borderWidth: pxToDp(1),
-    },
-    onPress: () => this.setState({dialogVisible: false})
-  }, {
-    type: 'primary',
-    label: '允许',
-    sty: {
-      backgroundColor: colors.fontColor,
-      borderColor: 'gray',
-      borderWidth: pxToDp(1),
-    },
-    textsty: {
-      color: colors.white,
-    },
-    onPress: () => this.setState({dialogVisible: false}, () => {
-      this.setAutoTaskOrder()
-    })
-  }]
-
   render() {
-    return (<View style={{flex: 1}}>
+    return (<View style={{flex: 1, backgroundColor: colors.f5}}>
         <View style={{flex: 1}}>
           <If condition={!this.state.show_body}>
             {this.renderNoBody()}
@@ -508,7 +503,7 @@ class StoreStatusScene extends PureComponent {
             <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团跑腿”配送 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>
@@ -639,4 +634,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center"
   },
+  noOrderContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50
+  },
+  noOrderDesc: {
+    fontSize: 15,
+    marginTop: 9,
+    marginBottom: 20,
+    color: colors.color999
+  },
+  noOrderBtn: {
+    width: 180,
+    borderRadius: 20,
+    backgroundColor: colors.main_color,
+    paddingVertical: 10,
+    marginTop: 20
+  },
+  noOrderBtnTitle: {
+    color: colors.white,
+    fontSize: 16
+  }
 })

@@ -132,6 +132,9 @@ class MaterialDetailUpdate extends React.Component {
   render() {
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
         style={{flex: 1}}
       >

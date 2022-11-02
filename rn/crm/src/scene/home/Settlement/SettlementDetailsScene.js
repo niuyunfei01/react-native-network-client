@@ -86,7 +86,7 @@ class SettlementDetailsScene extends React.Component {
   }
 
   to_order = (id) => {
-    this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})
+    this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: id})
   };
 
   renderHeader() {
@@ -95,7 +95,7 @@ class SettlementDetailsScene extends React.Component {
       <View style={styles.header}>
         <Text style={styles.headerDate}>时间：{date} </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)} </Text>
           <FontAwesome5 name={icon}
                         style={{
                           fontSize: icon === 'weixin' ? 22 : 25,
@@ -122,11 +122,15 @@ class SettlementDetailsScene extends React.Component {
     const {date, totalPrice, icon, status} = this.state
     return (
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
           <View style={styles.header}>
             <Text style={styles.headerDate}>时间：{date} </Text>
             <View style={styles.amountRow}>
-              <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+              <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)} </Text>
               <If condition={icon}>
                 <FontAwesome5 name={icon}
                               style={{

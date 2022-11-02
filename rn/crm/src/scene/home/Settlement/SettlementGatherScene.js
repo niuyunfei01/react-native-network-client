@@ -246,7 +246,11 @@ class SettlementGatherScene extends PureComponent {
             <Text style={title.comm}>总价 </Text>
           </View>
         </View>
-        <ScrollView style={{paddingBottom: pxToDp(20)}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{paddingBottom: pxToDp(20)}}>
 
           {
             this.renderList()

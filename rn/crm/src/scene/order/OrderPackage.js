@@ -75,7 +75,11 @@ class OrderPackage extends BaseComponent {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView contentContainerStyle={styles.container} refreshControl={refreshControl}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.container} refreshControl={refreshControl}>
           {this.state.packages.map(item => (
             <View style={styles.packageContainer} key={item.id}>
               <View style={styles.row}>

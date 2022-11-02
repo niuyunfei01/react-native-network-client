@@ -248,7 +248,11 @@ class NoticeList extends React.PureComponent {
     }
     return (
       <View style={styles.typeTab}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          horizontal={true} showsHorizontalScrollIndicator={false}>
           <For index="i" each='tab' of={typeLabels}>
             <TouchableOpacity
               key={i}
@@ -347,7 +351,7 @@ class NoticeList extends React.PureComponent {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
   },
   orderListContent: {flex: 1},
   statusTab: {flexDirection: 'row', justifyContent: 'center', backgroundColor: colors.white},
@@ -374,7 +378,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 210
   },
-  noOrderDesc: {fontSize: 18, color: colors.fontColor},
+  noOrderDesc: {fontSize: 18, color: colors.b2},
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NoticeList)

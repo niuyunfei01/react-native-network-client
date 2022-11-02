@@ -160,6 +160,15 @@ class OrderInfo extends Component {
     route: PropTypes.object,
     device: PropTypes.object,
   }
+  buttons = [
+    {
+      text: '确定',
+      onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+    },
+    {
+      text: '取消'
+    }
+  ]
 
   constructor(props) {
     super(props);
@@ -603,16 +612,6 @@ class OrderInfo extends Component {
     }
 
   }
-
-  buttons = [
-    {
-      text: '确定',
-      onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-    },
-    {
-      text: '取消'
-    }
-  ]
 
   _doSunMiPint = () => {
     const {order} = this.state
@@ -1397,7 +1396,7 @@ class OrderInfo extends Component {
               <If condition={totalMoneyEdit !== 0}>
                 <>
                   <Text
-                    style={totalMoneyEdit > 0 ? Styles.editStatusAdd : Styles.editStatusDeduct}>
+                    style={totalMoneyEdit > 0 ? Styles.warn_color : Styles.editStatusDeduct}>
                     {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
                   </Text>
                   <Text style={Styles.totalGoodsPrice}>
@@ -1675,8 +1674,9 @@ class OrderInfo extends Component {
   }
 
   canViewPosition = (info) => {
+    let {order_id} = this.state
     this.setState({showDeliveryModal: false}, () => {
-      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id})
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info.ship_id, order_id: order_id})
     })
     this.mixpanel.track('配送调度页_查看位置')
   }
@@ -1729,7 +1729,7 @@ class OrderInfo extends Component {
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
                   <Entypo name={"help-with-circle"}
                           style={Styles.addTipHelpIcon}/>
-                  <Text style={Styles.addTipReason}>{this.state.respReason}</Text>
+                  <Text style={Styles.addTipReason}>{this.state.respReason} </Text>
                 </View>
               </If>
             </View>
@@ -1767,7 +1767,11 @@ class OrderInfo extends Component {
     const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
 
     return noOrder ?
-      <ScrollView contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={Styles.contentContainer} refreshControl={this.refreshControl()}>
         <View>
           <FloatServiceIcon fromComponent={'订单详情'}/>
           <Text style={Styles.textAlignCenter}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>
@@ -1888,7 +1892,7 @@ const Styles = StyleSheet.create({
   },
   amountBtn: {
     borderWidth: 1,
-    borderColor: colors.title_color,
+    borderColor: colors.color111,
     width: "30%", textAlign: 'center',
     paddingVertical: pxToDp(5)
   },
@@ -1997,7 +2001,7 @@ const Styles = StyleSheet.create({
     flex: 1
   },
   deliveryInfo: {
-    borderBottomColor: colors.fontColor,
+    borderBottomColor: colors.b2,
     borderBottomWidth: 0,
     paddingBottom: 0,
     marginTop: pxToDp(20),
@@ -2005,7 +2009,7 @@ const Styles = StyleSheet.create({
     alignItems: "center"
   },
   deliveryInfoOn: {
-    borderBottomColor: colors.fontColor,
+    borderBottomColor: colors.b2,
     borderBottomWidth: 1,
     paddingBottom: 20,
     marginTop: pxToDp(20),
@@ -2022,7 +2026,7 @@ const Styles = StyleSheet.create({
   },
   driverInfo: {
     fontSize: 12,
-    color: colors.fontColor,
+    color: colors.b2,
     marginTop: pxToDp(3)
   },
   driverPhone: {
@@ -2039,13 +2043,13 @@ const Styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: pxToDp(1),
     width: pxToDp(150),
-    borderColor: colors.fontColor,
+    borderColor: colors.b2,
     borderRadius: pxToDp(10),
     padding: pxToDp(15),
     marginRight: pxToDp(15)
   },
   deliveryInfoBtnTextGray: {
-    color: colors.fontColor,
+    color: colors.b2,
     fontSize: 12,
     fontWeight: 'bold'
   },
@@ -2150,9 +2154,9 @@ const Styles = StyleSheet.create({
     width: pxToDp(310),
   },
   goodsButtonRefund: {
-    backgroundColor: colors.fontColor,
+    backgroundColor: colors.b2,
     borderWidth: pxToDp(1),
-    borderColor: colors.fontColor,
+    borderColor: colors.b2,
     borderRadius: pxToDp(10),
     padding: pxToDp(12),
     marginLeft: 0,
@@ -2196,8 +2200,8 @@ const Styles = StyleSheet.create({
     fontSize: pxToDp(26),
     color: colors.color333
   },
-  editStatusAdd: {
-    backgroundColor: colors.editStatusAdd,
+  warn_color: {
+    backgroundColor: colors.warn_color,
     color: colors.white,
     fontSize: pxToDp(22),
     borderRadius: pxToDp(5),
@@ -2227,7 +2231,7 @@ const Styles = StyleSheet.create({
     fontSize: pxToDp(26),
     color: colors.color777,
   },
-  borderLine: {borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)},
+  borderLine: {borderTopColor: colors.b2, borderTopWidth: pxToDp(1)},
   logHeader: {
     marginBottom: pxToDp(100),
     borderRadius: pxToDp(20),
@@ -2307,7 +2311,7 @@ const Styles = StyleSheet.create({
     borderTopRightRadius: pxToDp(30),
   },
   deliveryModalTitle: {color: colors.main_color, marginTop: pxToDp(20), marginLeft: pxToDp(20)},
-  deliveryModalIcon: {fontSize: 25, color: colors.fontColor},
+  deliveryModalIcon: {fontSize: 25, color: colors.b2},
   deliveryModalContent: {padding: pxToDp(20)},
   deliveryModalContentInfo: {
     padding: pxToDp(20),

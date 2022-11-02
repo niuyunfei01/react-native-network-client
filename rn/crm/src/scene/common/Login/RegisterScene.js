@@ -123,11 +123,15 @@ class RegisterScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{
-        flex: 1,
-        padding: 12,
-        backgroundColor: colors.background,
-      }}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
+          flex: 1,
+          padding: 12,
+          backgroundColor: colors.f3,
+        }}>
         <View style={{
           paddingTop: 30,
           flex: 1,
@@ -216,7 +220,7 @@ class RegisterScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
             </View>
             {this.state.canAskReqSmsCode ?
-              <Button buttonStyle={{backgroundColor: colors.fontColor, marginLeft: 6}}
+              <Button buttonStyle={{backgroundColor: colors.b2, marginLeft: 6}}
                       titleStyle={{fontSize: 14, color: colors.white}}
                       title={this.state.reRequestAfterSeconds + "秒重新获取"}/>
               : <Button buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}

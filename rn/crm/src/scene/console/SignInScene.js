@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   currentDate: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21,
     marginRight: 4
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   selectMonthText: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: 16,
     fontWeight: 'bold',
     padding: 5,
@@ -235,7 +235,7 @@ class SignInScene extends PureComponent {
 
         </View>
         <View style={styles.allowOrderWrap}>
-          <Text>{shippingAcceptStatus === 2 ? '开启接单' : '停止接单'}</Text>
+          <Text>{shippingAcceptStatus === 2 ? '开启接单' : '停止接单'} </Text>
           <Switch value={shippingAcceptStatus === 2}
                   onValueChange={() => this.allowOrderOrStopOrder(shippingAcceptStatus)}/>
         </View>

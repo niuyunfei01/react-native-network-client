@@ -399,7 +399,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认置为无效？',
       '订货单已无效',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, trashSupplyOrder)},
       ],
       {cancelable: false}
@@ -411,7 +411,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认收货？',
       '订货单已经收货',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, receivedSupplyOrder)},
       ],
       {cancelable: false}
@@ -423,7 +423,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认审核？',
       '订货单已经审核',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, reviewSupplyOrder)},
       ],
       {cancelable: false}
@@ -435,7 +435,7 @@ class InvoicingOrderGoodsScene extends Component {
       '确认结算？',
       '订货单已经结算',
       [
-        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '取消', style: 'cancel'},
         {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, balanceSupplyOrder)},
       ],
       {cancelable: false}
@@ -803,13 +803,17 @@ class InvoicingOrderGoodsScene extends Component {
   render() {
     return (
       <View>
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.reloadData()}
-            tintColor='gray'
-          />
-        }>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.reloadData()}
+              tintColor='gray'
+            />
+          }>
           {this.tab()}
           {this.renderItems()}
         </ScrollView>
@@ -1072,7 +1076,7 @@ const list = {
     backgroundColor: colors.white,
   },
   item_header: {
-    borderColor: colors.main_back,
+    borderColor: colors.f2,
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     justifyContent: 'space-between',
@@ -1141,9 +1145,9 @@ const list = {
     textAlign: 'center',
     textAlignVertical: 'center',
     borderRadius: pxToDp(5),
-    color: colors.editStatusAdd,
+    color: colors.warn_color,
     borderWidth: 0.5,
-    borderColor: colors.editStatusAdd,
+    borderColor: colors.warn_color,
     fontSize: 13,
   },
   good_item_field: {

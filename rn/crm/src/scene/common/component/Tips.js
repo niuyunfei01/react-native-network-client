@@ -33,12 +33,11 @@ class Tips extends Component {
 
   onCallThirdShips() {
     this.props.onItemClick();
-    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: this.props.orderId,
-      storeId: this.props.storeId,
-      selectedWay: [],
+    this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: this.props.orderId,
+      store_id: this.props.storeId,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -54,63 +53,48 @@ class Tips extends Component {
         <JbbModal visible={this.state.modalTip} onClose={() => this.props.onItemClick()} modal_type={'bottom'}
                   modalStyle={{padding: 0}}
         >
-          <View style={{
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center"
-          }}>
-            <TouchableOpacity
-              style={{width: '15%'}}
-              onPress={() => this.props.onItemClick()}>
-            </TouchableOpacity>
+          <>
+            <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
+              <TouchableOpacity style={{width: '15%'}} onPress={() => this.props.onItemClick()}/>
+              <Text style={[{textAlign: 'center', color: colors.color111, fontWeight: "bold", flex: 1, fontSize: 14}]}>
+                长时间没有骑手接单怎么办
+              </Text>
+              <TouchableOpacity style={[{flexDirection: "row", justifyContent: "flex-end", width: '15%'}]}
+                                onPress={() => this.props.onItemClick()}>
+                <Entypo name="circle-with-cross"
+                        style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cell_body}>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
+              </View>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
+              </View>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>加小费 </Text>
+              </View>
 
-            <Text style={[{
-              textAlign: 'center',
-              color: colors.title_color,
-              fontWeight: "bold",
-              flex: 1,
-              fontSize: 14
-            }]}>长时间没有骑手接单怎么办 </Text>
-            <TouchableOpacity
-              style={[{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                width: '15%'
-              }]}
-              onPress={() => this.props.onItemClick()}>
-              <Entypo name="circle-with-cross"
-                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cell_body}>
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
-            </View>
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
-            </View>
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>加小费 </Text>
-            </View>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>您开通的配送较少 </Text>
+              </View>
 
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>您开通的配送较少 </Text>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>请开通美团飞速达、顺丰（不需审核立即开通) </Text>
+              </View>
+              <View style={styles.Item}>
+                <View style={styles.circle}></View>
+                <Text style={styles.txt}>我自己送 </Text>
+              </View>
             </View>
-
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>请开通美团飞速达、顺丰（不需审核立即开通) </Text>
-            </View>
-            <View style={styles.Item}>
-              <View style={styles.circle}></View>
-              <Text style={styles.txt}>我自己送 </Text>
-            </View>
-          </View>
-          {this.renderBtn()}
+            {this.renderBtn()}
+          </>
         </JbbModal>
       </View>
 

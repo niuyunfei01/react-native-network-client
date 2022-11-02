@@ -51,7 +51,10 @@ export default class SelectDialog extends Component {
                 this.props.positionStyle]}> {this.props.titles} </Text>
             </View>
             <View style={[styles.flexRow, styles.flex1]}>
-              <ScrollView style={[styles.flex1]}>
+              <ScrollView
+                automaticallyAdjustContentInsets={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false} style={[styles.flex1]}>
                 {datas.map((item, i) => this.createList(item, i))}
               </ScrollView>
             </View>

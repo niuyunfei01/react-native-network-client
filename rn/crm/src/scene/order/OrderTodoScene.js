@@ -122,7 +122,11 @@ class OrderTodoScene extends Component {
       return {label: reason.label, value: idx}
     });
 
-    return <ScrollView style={[styles.container, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {
       }}
@@ -151,6 +155,8 @@ class OrderTodoScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={60}
                 placeholder="输入需要给处理人的其他信息"
                 onChange={(v) => {

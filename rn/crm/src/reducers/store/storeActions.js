@@ -17,8 +17,6 @@ const {
 } = require('../../pubilc/common/constants').default
 
 
-
-
 export function getContactRequest(data) {
   return {
     type: GET_CONTACT_REQUEST,

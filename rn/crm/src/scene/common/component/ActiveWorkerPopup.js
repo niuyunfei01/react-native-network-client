@@ -202,7 +202,10 @@ class ActiveWorkerPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
-          {tool.length(this.state.workerList) > 0 ? <ScrollView>
+          {tool.length(this.state.workerList) > 0 ? <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}>
               <List>
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>

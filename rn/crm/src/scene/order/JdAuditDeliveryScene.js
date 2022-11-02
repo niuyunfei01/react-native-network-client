@@ -95,7 +95,11 @@ class JdAuditDeliveryScene extends Component {
   render() {
     let {delivery_urge, reply_content, remind} = this.state;
 
-    return <ScrollView style={[styles.container, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, {flex: 1}]}>
       <Dialog
         onRequestClose={() => {
         }}
@@ -131,6 +135,9 @@ class JdAuditDeliveryScene extends Component {
             <Cell>
               <CellBody>
                 <TextArea
+
+                  multiline={true}
+                  numberOfLines={4}
                   maxLength={20}
                   placeholder="请输入拒绝理由"
                   onChange={(v) => {

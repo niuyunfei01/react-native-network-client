@@ -1,9 +1,9 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {setPrinterName} from '../../../reducers/global/globalActions';
+import {setAutoPrint, setPrinterName} from '../../../reducers/global/globalActions';
 
 import Config from "../../../pubilc/common/config";
 import native from "../../../pubilc/util/native";
@@ -72,10 +72,11 @@ class PrinterSetting extends PureComponent {
   }
 
   componentDidMount() {
-    const {navigation} = this.props
+    const {navigation, global} = this.props
     this.focus = navigation.addListener('focus', () => {
       this.check_printer_connected()
     })
+    const {autoBluetoothPrint} = global
     native.getAutoBluePrint((auto, msg) => {
       this.setState({auto_blue_print: auto})
     }).then()
@@ -87,7 +88,8 @@ class PrinterSetting extends PureComponent {
     this.focus()
   }
 
-  get_print_settings(callback = () => {}) {
+  get_print_settings(callback = () => {
+  }) {
     const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
@@ -156,18 +158,22 @@ class PrinterSetting extends PureComponent {
   }
 
   render() {
-    const {printer_id, printer_name} = this.props.global
-    const {printer_status, printer_status_color} = this.state
+    const {dispatch, global} = this.props
+    const {printer_id, printer_name, autoBluetoothPrint} = global
+    const {printer_status, printer_status_color, isRefreshing, printerConnected} = this.state
     return (
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={this.state.isRefreshing}
+            refreshing={isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
         }
-        style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+        style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
         <View style={{
           backgroundColor: colors.white,
           borderRadius: 8,
@@ -181,12 +187,7 @@ class PrinterSetting extends PureComponent {
             </Text>
           </View>
           <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_CLOUD_PRINTER)}
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              paddingHorizontal: 8,
-                              height: pxToDp(90),
-                            }}>
+                            style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: 45}}>
             <Text style={{fontSize: 14, color: colors.color333}}>
               {printer_name ? printer_name : '暂无打印机'}
             </Text>
@@ -202,62 +203,47 @@ class PrinterSetting extends PureComponent {
           </TouchableOpacity>
         </View>
 
-        <If condition={Platform.OS === 'android'}>
-          <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
-            <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
-              <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold',}}>
-                蓝牙打印机
-              </Text>
-            </View>
-
-            <TouchableOpacity onPress={() => {
-              let auto_blue_print = !this.state.auto_blue_print
-              this.setState({auto_blue_print});
-              native.setAutoBluePrint(auto_blue_print).then()
-            }}
-                              style={{
-                                borderBottomWidth: 1,
-                                borderColor: colors.colorCCC,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{fontSize: 14, color: colors.color333, flex: 1,}}>自动打印 </Text>
-              <Switch color={colors.main_color} style={{fontSize: 16}} value={this.state.auto_blue_print}
-                      onChange={(val) => {
-                        let auto_blue_print = !this.state.auto_blue_print
-                        this.setState({auto_blue_print});
-                        native.setAutoBluePrint(auto_blue_print).then()
-                      }}/>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_PRINTER_CONNECT)}
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>
-                {printer_id !== '0' && this.state.printerName !== undefined ? "打印机: " + this.state.printerName : '暂无打印机'}
-              </Text>
-              <Text style={[{
-                fontSize: 14,
-                color: colors.color999,
-                textAlign: "right",
-              }, printer_id !== '0' ? {color: this.state.printerConnected ? colors.main_color : colors.warn_color} : {}]}>
-                {printer_id !== '0' ? this.state.printerConnected ? '已连接' : '已断开' : "去添加"}
-              </Text>
-              <If condition={this.state.printerConnected}>
-                <Text style={{fontSize: 14, color: colors.color999, textAlign: "right"}}>
-                  信号: {this.state.printerRssi}
-                </Text>
-              </If>
-              <Entypo name="chevron-thin-right" size={18} color={colors.color999}/>
-            </TouchableOpacity>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
+          <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
+            <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold',}}>
+              蓝牙打印机
+            </Text>
           </View>
-        </If>
+
+          <TouchableOpacity onPress={() => dispatch(setAutoPrint(!autoBluetoothPrint))}
+                            style={{
+                              borderBottomWidth: 1,
+                              borderColor: colors.colorCCC,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              paddingHorizontal: 8,
+                              height: pxToDp(90),
+                            }}>
+            <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>自动打印 </Text>
+            <Switch color={colors.main_color} style={{fontSize: 16}} value={autoBluetoothPrint}
+                    onChange={() => dispatch(setAutoPrint(!autoBluetoothPrint))}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_PRINTER_CONNECT)}
+                            style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, height: 45}}>
+            <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>
+              {printer_id !== '0' && this.state.printerName ? "打印机: " + this.state.printerName : '暂无打印机'}
+            </Text>
+            <Text style={[{
+              fontSize: 14,
+              color: colors.color999,
+              textAlign: "right",
+            }, printer_id !== '0' ? {color: printerConnected ? colors.main_color : colors.warn_color} : {}]}>
+              {printer_id !== '0' ? printerConnected ? '已连接' : '已断开' : "去添加"}
+            </Text>
+            <If condition={printerConnected}>
+              <Text style={{fontSize: 14, color: colors.color999, textAlign: "right"}}>
+                信号: {this.state.printerRssi}
+              </Text>
+            </If>
+            <Entypo name="chevron-thin-right" size={18} color={colors.color999}/>
+          </TouchableOpacity>
+        </View>
 
         <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, padding: 10, paddingBottom: 4}}>
           <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
@@ -338,8 +324,7 @@ class PrinterSetting extends PureComponent {
           </TouchableOpacity>
         </View>
 
-        <View
-          style={{backgroundColor: colors.white, borderRadius: 8, padding: 10, paddingBottom: 4, marginBottom: 100}}>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, padding: 10, paddingBottom: 4, marginBottom: 50}}>
           <View style={{borderBottomWidth: 1, paddingBottom: 2, borderColor: colors.colorCCC}}>
             <Text style={{color: colors.color333, padding: 10, paddingLeft: 8, fontSize: 15, fontWeight: 'bold'}}>
               打印配置

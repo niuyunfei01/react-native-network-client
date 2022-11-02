@@ -106,7 +106,10 @@ class HistoryNoticeScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={Styles.scrollStyle}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false} style={Styles.scrollStyle}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchHistoryAdvicesList.bind(this)}/>
         {this.renderHistoryAdvicesList()}
         <If condition={!this.state.isLastPage}>
@@ -137,7 +140,7 @@ class HistoryNoticeScene extends PureComponent {
       <For each='info' index="i" of={historyAdviceList}>
         <TouchableOpacity onPress={() => this.toDetail(info)} style={Styles.advicesListContainer} key={i}>
           <View style={Styles.advicesListTitle}>
-            <Text style={Styles.advicesListTitleText}>{info.title}</Text>
+            <Text style={Styles.advicesListTitleText}>{info.title} </Text>
             <View style={Styles.flex1}/>
             <Entypo name={"chevron-thin-right"} style={Styles.advicesListTitleIcon}/>
           </View>
@@ -174,7 +177,7 @@ const Styles = StyleSheet.create({
   scrollStyle: {
     flex: 1,
     padding: 10,
-    backgroundColor: colors.background
+    backgroundColor: colors.f3
   },
   advicesListContainer: {
     backgroundColor: colors.white,

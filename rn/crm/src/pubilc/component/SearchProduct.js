@@ -229,7 +229,10 @@ class SearchProduct extends Component {
           {/*分类*/}
           <If condition={this.state.showCategory}>
             <View style={styles.categoryBox}>
-              <ScrollView>
+              <ScrollView
+                automaticallyAdjustContentInsets={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}>
                 {this.renderCategories()}
               </ScrollView>
             </View>

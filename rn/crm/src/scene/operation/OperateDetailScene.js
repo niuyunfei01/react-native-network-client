@@ -138,9 +138,6 @@ class OperateDetailScene extends PureComponent {
         isLoading: false
       });
       hideModal()
-    }, res => {
-
-    }).catch(error => {
     })
 
   }
@@ -266,7 +263,6 @@ class OperateDetailScene extends PureComponent {
       total_balanced,
       balance_money
     } = this.state;
-    console.log('income', this.state.income)
     return (
       <View style={{flex: 1}}>
         <Header text={"今日运营收益"} money={toFixed(sum)}/>
@@ -274,7 +270,11 @@ class OperateDetailScene extends PureComponent {
           <Header text={"运营收益结转"} money={toFixed(balance_money)}/>
         </If>
         <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
-        <ScrollView style={{paddingBottom: pxToDp(50)}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{paddingBottom: pxToDp(50)}}>
           <View style={content.in_box}>
             {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
             <CellAccess
@@ -362,7 +362,11 @@ class OperateDetailScene extends PureComponent {
             }
           ]}
         >
-          <ScrollView style={{height: pxToDp(500)}}>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{height: pxToDp(500)}}>
             <Text style={{color: colors.color333}}>项目(不超过15个汉字) </Text>
             <Input
               underlineColorAndroid="transparent"
@@ -432,7 +436,7 @@ const
     left: {
       fontSize: pxToDp(30),
       fontWeight: "900",
-      color: colors.title_color
+      color: colors.color111
     },
     right: {
       fontSize: pxToDp(30),
@@ -441,11 +445,11 @@ const
     },
     text: {
       fontSize: pxToDp(30),
-      color: colors.title_color
+      color: colors.color111
     },
     money: {
       fontSize: pxToDp(36),
-      color: colors.title_color
+      color: colors.color111
     },
     cancel_item: {
       position: "relative"

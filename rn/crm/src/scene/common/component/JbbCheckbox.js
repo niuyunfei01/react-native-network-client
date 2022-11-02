@@ -39,7 +39,7 @@ export default class JbbCheckbox extends React.Component {
           w={18}
           bw={1 / PixelRatio.get()}
           bgc={this.state.checked ? colors.theme : colors.white}
-          bc={this.state.checked ? colors.theme : colors.gray}
+          bc={this.state.checked ? colors.theme : colors.colorCCC}
           mgr={20}
         />
       </TouchableOpacity>

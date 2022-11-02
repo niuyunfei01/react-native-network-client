@@ -5,6 +5,8 @@ import {
   Dimensions,
   FlatList,
   InteractionManager,
+  NativeEventEmitter,
+  NativeModules,
   Platform,
   StatusBar,
   StyleSheet,
@@ -14,47 +16,45 @@ import {
 } from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../pubilc/util/pxToDp';
+import {Button} from "react-native-elements";
+import {SvgXml} from "react-native-svg";
+import DeviceInfo from "react-native-device-info";
+import PropTypes from "prop-types";
+import dayjs from "dayjs";
+import {downloadApk} from "rn-app-upgrade";
+import {AMapSdk} from "react-native-amap3d";
+import ModalDropdown from "react-native-modal-dropdown";
+import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {setBleStarted, setCheckVersionAt, setExtStore, setUserCfg} from '../../reducers/global/globalActions'
+import {getConfig, setAccessToken, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
+import {setDeviceInfo} from "../../reducers/device/deviceActions";
+
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
-import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
-import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import tool from "../../pubilc/util/tool";
 import native from "../../pubilc/util/native";
-import JPush from "jpush-react-native";
-import Dialog from "../common/component/Dialog";
+import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
-import ModalDropdown from "react-native-modal-dropdown";
-import SearchExtStore from "../common/component/SearchExtStore";
-import Entypo from 'react-native-vector-icons/Entypo';
-import {showError, ToastLong} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {Badge, Button} from "react-native-elements";
-import FloatServiceIcon from "../common/component/FloatServiceIcon";
+import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
+import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
+import RemindModal from "../../pubilc/component/remindModal";
+import store from "../../pubilc/util/configureStore";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
-import RemindModal from "../../pubilc/component/remindModal";
-import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
-import Swiper from 'react-native-swiper'
-import dayjs from "dayjs";
 import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
-import {AMapSdk} from "react-native-amap3d";
-import FastImage from "react-native-fast-image";
-import Scanner from "../../pubilc/component/Scanner";
 import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
 import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
-import BleManager from "react-native-ble-manager";
-import {setDeviceInfo} from "../../reducers/device/deviceActions";
-import store from "../../pubilc/util/configureStore";
-import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
-import DeviceInfo from "react-native-device-info";
-import {downloadApk} from "rn-app-upgrade";
-import {setRecordFlag} from "../../reducers/store/storeActions";
-import PropTypes from "prop-types";
-import {SafeAreaView} from 'react-native-safe-area-context';
+import JbbModal from "../../pubilc/component/JbbModal";
+import OrderItem from "../../pubilc/component/OrderItem";
+import GoodsListModal from "../../pubilc/component/GoodsListModal";
+import AddTipModal from "../../pubilc/component/AddTipModal";
+import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
+import AlertModal from "../../pubilc/component/AlertModal";
 
 const {width} = Dimensions.get("window");
 
@@ -74,8 +74,9 @@ function mapDispatchToProps(dispatch) {
 const initState = {
   isLoading: false,
   categoryLabels: [
-    {tabname: '待打包', num: 0, status: 1},
-    {tabname: '待配送', num: 0, status: 2},
+    {tabname: '新订单', num: 0, status: 9},
+    {tabname: '待接单', num: 0, status: 10},
+    {tabname: '待取货', num: 0, status: 2},
     {tabname: '配送中', num: 0, status: 3},
     {tabname: '异常', num: 0, status: 8},
   ],
@@ -87,39 +88,25 @@ const initState = {
     maxPastDays: 100,
     isAdd: true,
   },
-  sortData: [
-    {"label": '送达时间正序', 'value': 'expectTime asc'},
-    {"label": '下单时间倒序', 'value': 'orderTime desc'},
-    {"label": '下单时间正序', 'value': 'orderTime asc'}
+  sort_list: [
+    {"label": '最新来单', 'value': 'orderTime desc'},
+    {"label": '最早来单', 'value': 'orderTime asc'},
+    {"label": '送达时间', 'value': 'expectTime desc'},
   ],
-  opRemind: {},
-  storeId: 0,
   ListData: [],
-  orderStatus: 1,
-  sort: "expectTime asc",
+  orderStatus: 9,
   showSortModal: false,
-  show_voice_pop: false,
-  show_inform_pop: false,
-  show_hint: false,
-  hint_msg: 1,
-  showTabs: true,
-  show_button: false,
-  is_service_mgr: false,
-  allow_merchants_store_bind: true,
-  img: '',
-  showImgType: 1,
-  show_img: true,
-  activityUrl: '',
-  activity: [],
-  allow_edit_ship_rule: false,
-  ext_store_list: [],
-  ext_store_id: 0,
+  show_bind_button: false,
   orderNum: {},
-  searchStoreVisible: false,
   isCanLoadMore: false,
-  ext_store_name: '所有外卖店铺',
-  isadditional: '',
   scanBoolean: false,
+  order_id: 0,
+  show_goods_list: false,
+  add_tip_id: 0,
+  show_add_tip_modal: false,
+  show_delivery_modal: false,
+  show_cancel_delivery_modal: false,
+  show_finish_delivery_modal: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -131,12 +118,11 @@ const timeObj = {
 }
 
 class OrderListScene extends Component {
-  state = initState;
-
   static propTypes = {
     dispatch: PropTypes.func,
     device: PropTypes.object,
   }
+  state = initState;
 
   constructor(props) {
     super(props);
@@ -147,53 +133,8 @@ class OrderListScene extends Component {
       this.mixpanel.identify(currentUser);
     }
 
-    this.mixpanel.track("orderpage_view", {})
-    this.getActivity();
+    this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
-  }
-
-  openAndroidNotification = () => {
-    if (Platform.OS !== 'ios') {
-      JPush.isNotificationEnabled((enabled) => {
-        this.setState({show_voice_pop: !enabled})
-        if (this.state.show_voice_pop) {
-          Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
-            {
-              text: '忽略', style: 'cancel', onPress: () => {
-                this.setState({show_hint: true, hint_msg: 1})
-              }
-            },
-            {
-              text: '去设置', onPress: () => {
-                native.toOpenNotifySettings().then()
-                // this.onPress(Config.ROUTE_SETTING);
-              }
-            },
-          ])
-        }
-      })
-      native.getDisableSoundNotify((disabled) => {
-        this.setState({show_inform_pop: disabled})
-
-        if (this.state.show_inform_pop && !this.state.show_voice_pop) {
-          Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
-            {
-              text: '忽略', style: 'cancel', onPress: () => {
-                this.setState({show_hint: true, hint_msg: 2})
-              }
-            },
-            {
-              text: '去设置', onPress: () => {
-                this.onPress(Config.ROUTE_SETTING);
-              }
-            },
-          ])
-        }
-      }).then()
-
-      native.xunfeiIdentily().then()
-
-    }
   }
 
   calcAppStartTime = () => {
@@ -214,20 +155,54 @@ class OrderListScene extends Component {
     }).then()
   }
 
+  printByBluetoothIOS = () => {
+    const {global} = this.props
+    let {accessToken} = global;
+    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+    this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+      if (obj.order_type !== 'new_order') {
+        sendDeviceStatus(accessToken, {...obj, btConnected: '收到极光推送，不是新订单不需要打印'})
+        return
+      }
+      await handlePrintOrder(this.props, obj)
+    })
+  }
+
+
+  printByBluetoothAndroid = () => {
+    this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+      await handlePrintOrder(this.props, obj)
+
+    })
+  }
+
+  printByBluetooth = () => {
+    switch (Platform.OS) {
+      case "ios":
+        this.printByBluetoothIOS()
+        break
+      case "android":
+        this.printByBluetoothAndroid()
+        break
+    }
+  }
+
   componentWillUnmount() {
     this.focus()
     this.unSubscribe()
-    if (this.ptListener != null) {
-      this.ptListener.remove();
-    }
-    this.ptListener = null;
+    this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
+    this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
+    unInitBlueTooth()
   }
+
 
   componentDidMount() {
     initJPush()
     this.whiteNoLoginInfo()
+    this.getVendor()
     const {global, navigation, device} = this.props
     if (Platform.OS === 'android') {
+      native.xunfeiIdentily().then()
       this.calcAppStartTime()
     }
     timeObj.method[0].endTime = getTime()
@@ -235,72 +210,10 @@ class OrderListScene extends Component {
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken} = global;
-    if (this.ptListener) {
-      this.ptListener.remove()
-    }
+    const {currStoreId, currentUser, accessToken, lastCheckVersion = 0} = global;
 
-    native.getAutoBluePrint(() => {
-      if (!this.state.bleStarted) {
-        BleManager.start({showAlert: false}).then();
-        this.setState({bleStarted: true})
-        store.dispatch(setBleStarted(true));
-      }
-    }).then()
+    initBlueTooth(global).then(() => this.printByBluetooth())
 
-
-    let {lastCheckVersion = 0, printer_id, bleStarted} = global;
-    //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      if (printer_id) {
-        if (!bleStarted) {
-          BleManager.start({showAlert: false}).then();
-          store.dispatch(setBleStarted(true));
-        }
-        setTimeout(() => {
-          const clb = (msg, error) => {
-            // noinspection JSIgnoredPromiseFromCall
-            sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
-          };
-          BleManager.retrieveServices(printer_id).then((peripheral) => {
-            print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
-          }).catch((error) => {
-            //蓝牙尚未启动时，会导致App崩溃
-            if (!bleStarted) {
-              sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
-              return;
-            }
-            //重新连接
-            BleManager.connect(printer_id).then(() => {
-              BleManager.retrieveServices(printer_id).then((peripheral) => {
-                print_order_to_bt(peripheral, clb, obj.wm_id, false, 1);
-              })
-            }).catch((error2) => {
-              // noinspection JSIgnoredPromiseFromCall
-              sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
-              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [{
-                text: '确定', onPress: () => {
-                  this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-                }
-              }, {'text': '取消'}]);
-            });
-          });
-        }, 300);
-      } else {
-        // noinspection JSIgnoredPromiseFromCall
-        sendDeviceStatus(accessToken, {...obj, btConnected: '未连接'})
-        Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
-          text: '确定', onPress: () => {
-            this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-          }
-        }, {'text': '取消'}]);
-      }
-    })
-
-    //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
-      sendDeviceStatus(accessToken, obj)
-    })
     doJPushSetAlias(currentUser);
 
     const currentTs = dayjs(new Date()).unix();
@@ -323,12 +236,11 @@ class OrderListScene extends Component {
     timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
 
-    this.openAndroidNotification();
-    this.fetchShowRecordFlag();
     this.focus = navigation.addListener('focus', () => {
-      this.getVendor()
       this.onRefresh()
     })
+
+
     AMapSdk.init(
       Platform.select({
         android: "1d669aafc6970cb991f9baf252bcdb66",
@@ -337,21 +249,12 @@ class OrderListScene extends Component {
     );
   }
 
-
-  fetchShowRecordFlag() {
-    const {accessToken, currentUser} = this.props.global;
-    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      this.props.dispatch(setRecordFlag(res.ok))
-    })
-  }
-
-
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(() => {
       this.handleNoLoginInfo(store.getState().global)
     })
   }
+
   handleNoLoginInfo = (reduxGlobal) => {
     const {co_type} = tool.vendor(reduxGlobal)
     if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
@@ -368,7 +271,8 @@ class OrderListScene extends Component {
       co_type === global.noLoginInfo.co_type &&
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
-      reduxGlobal?.printer_id === global.noLoginInfo.printer_id
+      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
+      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
 
     if (flag) {
       return
@@ -381,10 +285,30 @@ class OrderListScene extends Component {
       co_type: co_type,
       enabledGoodMgr: reduxGlobal.enabled_good_mgr,
       currVendorId: reduxGlobal.vendor_id,
-      printer_id: reduxGlobal.printer_id || '0'
+      printer_id: reduxGlobal.printer_id || '0',
+      show_bottom_tab: reduxGlobal.show_bottom_tab,
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
+      refreshToken: reduxGlobal.refreshToken,
+      expireTs: reduxGlobal.expireTs,
+      getTokenTs: reduxGlobal.getTokenTs,
+      user_config: reduxGlobal.user_config,
+      // call_delivery_list: reduxGlobal.call_delivery_list,
+      //default_order_info: reduxGlobal.default_order_info,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
+    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
+      this.refreshAccessToken(reduxGlobal.refreshToken)
+  }
+
+  refreshAccessToken = (refreshToken) => {
+    const url = `/v4/WsbUser/refreshToken`
+    const params = {refresh_token: refreshToken}
+    const {dispatch} = this.props
+    HttpUtils.post(url, params).then(res => {
+      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
+    })
   }
 
   checkVersion = () => {
@@ -426,128 +350,41 @@ class OrderListScene extends Component {
     }
   }
 
-  getActivity = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `api/get_activity_info?access_token=${accessToken}`
-    let data = {
-      storeId: currStoreId,
-      pos: 1
-    }
-    HttpUtils.post.bind(this.props)(api, data, true).then((res) => {
-      const {obj} = res
-      timeObj.method.push({
-        interfaceName: api,
-        startTime: res.startTime,
-        endTime: res.endTime,
-        executeTime: res.endTime - res.startTime,
-        executeStatus: res.executeStatus,
-        methodName: 'getActivity'
-      })
-      if (tool.length(obj) > 0) {
-        this.setState({
-          img: obj.banner,
-          showImgType: obj.can_close,
-          activity: obj.list ?? [obj]
-        })
-        this.mixpanel.track("act_user_ref_ad_view", {
-          store_id: currStoreId,
-          list: obj.list
-        });
-      } else {
-        this.setState({
-          show_img: false
-        })
-      }
-    }).catch(error => {
-      timeObj.method.push({
-        interfaceName: api,
-        startTime: error.startTime,
-        endTime: error.endTime,
-        executeTime: error.endTime - error.startTime,
-        executeStatus: error.executeStatus,
-        methodName: 'getActivity'
-      })
-    })
-  }
-
-  closeActivity = (info) => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `api/close_user_refer_ad?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then()
-    this.mixpanel.track("close_user_refer_ad", {
-      img_name: info.name,
-      pos: info.pos_name,
-      store_id: currStoreId,
-    });
-  }
-
   getVendor = () => {
-    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
-    this.setState({
-      is_service_mgr: is_service_mgr,
-      allow_merchants_store_bind: allow_merchants_store_bind === '1',
-    })
-    this.getstore()
-    this.clearStoreCache()
-  }
-
-  getstore = () => {
-
-    const {dispatch} = this.props
     const {accessToken, currStoreId} = this.props.global;
     if (currStoreId > 0) {
-      const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+      let api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
-        if (tool.length(res.business_status) > 0) {
-          let all_store = {
-            id: "0",
-            name: "A所有外卖店铺",
-            poi_name: "A所有外卖店铺",
-          }
-          res.business_status.push(all_store)
-          dispatch(setExtStore(res.business_status));
-          this.setState({
-            show_button: false,
-            ext_store_list: res.business_status,
-            allow_edit_ship_rule: res.allow_edit_ship_rule
-          })
-        } else {
-          this.setState({
-            show_button: true,
-            allow_edit_ship_rule: res.allow_edit_ship_rule
-          })
+        this.setState({
+          show_bind_button: tool.length(res.business_status) <= 0,
+        })
+      })
+      api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(res => {
+        if (res.sum < 0) {
+          Alert.alert('提醒', '余额不足请充值', [
+            {
+              text: '取消'
+            },
+            {
+              text: '去充值',
+              onPress: () => {
+                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
+                  onBack: () => {
+                    Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
+                      {
+                        text: '确定'
+                      }
+                    ])
+                  }
+                });
+              }
+            }
+          ])
         }
-
       })
     }
-  }
 
-  clearStoreCache = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then(res => {
-      if (res.sum < 0) {
-        Alert.alert('提醒', '余额不足请充值', [
-          {
-            text: '取消'
-          },
-          {
-            text: '去充值',
-            onPress: () => {
-              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
-                onBack: () => {
-                  Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
-                    {
-                      text: '确定'
-                    }
-                  ])
-                }
-              });
-            }
-          }
-        ])
-      }
-    })
   }
 
   onRefresh = (status) => {
@@ -559,7 +396,6 @@ class OrderListScene extends Component {
         this.setState({isLoading: true})
       return;
     }
-    const {vendor_info} = this.props.global
     this.setState({
         query: {...query, page: 1, isAdd: true, offset: 0}
       },
@@ -569,15 +405,12 @@ class OrderListScene extends Component {
 
   // 新订单1  待取货  106   配送中 1
   fetorderNum = () => {
-    let {currStoreId, accessToken, show_orderlist_ext_store} = this.props.global;
+    let {currStoreId, accessToken} = this.props.global;
     let params = {
       search: `store:${currStoreId}`,
     }
 
-    if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
-      params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
-    }
-    const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
+    const url = `/v4/wsb_order/order_counts?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params, true).then(res => {
       const {obj} = res
       timeObj.method.push({
@@ -590,7 +423,6 @@ class OrderListScene extends Component {
       })
       this.setState({
         orderNum: obj.totals,
-        isadditional: obj?.delvery_reship_count !== undefined && Number(obj.delvery_reship_count) === 1
       })
     }).catch(error => {
       timeObj.method.push({
@@ -606,14 +438,15 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType, setList = 1) => {
-    if (this.state.isLoading || !this.state.query.isAdd) {
+    let {isLoading, query, orderStatus} = this.state;
+    if (isLoading || !query.isAdd) {
       return null;
     }
     this.fetorderNum();
     let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
-    let {currStoreId, accessToken, show_orderlist_ext_store, user_config} = this.props.global;
+    let {currStoreId, accessToken, user_config} = this.props.global;
     let search = `store:${currStoreId}`;
-    let initQueryType = queryType || this.state.orderStatus;
+    let initQueryType = queryType || orderStatus;
     const order_by = user_config && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
 
     this.setState({
@@ -624,36 +457,18 @@ class OrderListScene extends Component {
     let params = {
       status: initQueryType,
       vendor_id: vendor_id,
-      offset: this.state.query.offset,
-      limit: this.state.query.limit,
+      offset: query.offset,
+      limit: query.limit,
       max_past_day: 100,
       search: search,
       use_v2: 1,
-      is_right_once: this.state.orderStatus === 7 ? 7 : 1, //预订单类型
+      is_right_once: 1, //预订单类型
       order_by: order_by
     }
-    if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
-      params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
-    }
+
     if (vendor_id && accessToken) {
-      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-          for (let i in res.tabs) {
-            res.tabs[i].num = 0;
-          }
-          this.setState({
-            orderStatus: parseInt(res.tabs[0].status),
-            categoryLabels: res.tabs,
-            showTabs: true,
-            isLoading: false,
-          })
-          this.onRefresh()
-          return
-        }
-        // this.setState({
-        //   categoryLabels: res.tabs,
-        // })
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -665,7 +480,6 @@ class OrderListScene extends Component {
           ListData: setList === 1 ? res.orders : ListData.concat(res.orders),
           isLoading: false,
           query: query,
-          categoryLabels: res.tabs,
         })
       }, (res) => {
         showError(res.reason);
@@ -681,110 +495,26 @@ class OrderListScene extends Component {
     });
   }
 
-  searchExtStoreOnClose = () => {
-    this.setState({
-      searchStoreVisible: false,
-      ext_store_name: '所有外卖店铺',
-      ext_store_id: 0
-    })
-  }
-
-  searchExtStoreOnSelect = (item) => {
-    if (item.id === "0") {
-      item.name = '所有外卖店铺'
-    }
-    this.setState({
-      query: {
-        ...this.state.query,
-        page: 1,
-        isAdd: true,
-        offset: 0
-      },
-      searchStoreVisible: false,
-      ext_store_id: item.id,
-      ext_store_name: item.name,
-      isLoading: false,
-    }, () => {
-      this.fetchOrders()
-    })
-  }
-
   bind_platform = () => {
     this.mixpanel.track("orderpage_authorizestore_click", {});
     this.onPress(Config.PLATFORM_BIND)
   }
 
-  openNotifySetting = () => {
-    if (this.state.hint_msg === 1) {
-      native.toOpenNotifySettings().then()
-    }
-    if (this.state.hint_msg === 2) {
-      this.onPress(Config.ROUTE_SETTING);
-    }
-  }
-
-  inProcessOrder = () => {
-    this.setState({
-      showTabs: true,
-      ListData: [],
-      orderStatus: this.state.categoryLabels[0].status
-    }, () => {
-      this.onRefresh(this.state.categoryLabels[0].status)
-      this.mixpanel.track('处理中订单')
-    })
-  }
-
-  reserveOrder = () => {
-    this.setState({
-      showTabs: false,
-      orderStatus: 7,
-      ListData: [],
-    }, () => {
-      this.onRefresh(7)
-      this.mixpanel.track('预订单')
-    })
-  }
-
-  allOrders = () => {
-    this.mixpanel.track('全部的订单')
-    const {navigation} = this.props
-    navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
-  }
-
-
   onSelect = (e) => {
-    if (e === 0) {
-      this.mixpanel.track('新建订单')
+    let {showSortModal} = this.state;
+    if (e === 1) {
+      this.mixpanel.track('V4订单列表_手动下单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
-    } else if (e === 1) {
-      this.setState({showSortModal: !this.state.showSortModal})
+    } else if (e === 0) {
+      this.mixpanel.track('V4订单列表_订单排序')
+      this.setState({showSortModal: !showSortModal})
     } else {
-
       this.mixpanel.track('订单列表扫描')
       this.setState({
         scanBoolean: true,
       })
     }
   }
-
-
-  showImage = (info) => {
-    this.setState({
-      show_img: false
-    }, () => this.closeActivity(info))
-  }
-
-
-  onPressActivity = (info) => {
-    const {currStoreId, accessToken} = this.props.global;
-    this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
-    this.mixpanel.track("act_user_ref_ad_click", {
-      img_name: info.name,
-      pos: info.pos_name,
-      store_id: currStoreId,
-    });
-  }
-
 
   onScanSuccess = (code) => {
     if (code) {
@@ -793,7 +523,7 @@ class OrderListScene extends Component {
       const api = `/v1/new_api/orders/barcode_decode/${code}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then((res) => {
         if (res.order_id && Number(res.order_id) > 0) {
-          this.onPress(Config.ROUTE_ORDER, {orderId: res.order_id})
+          this.onPress(Config.ROUTE_ORDER_NEW, {orderId: res.order_id})
         }
       })
     }
@@ -803,121 +533,341 @@ class OrderListScene extends Component {
     ToastLong('编码不合法，请重新扫描')
   }
 
+  openAddTipModal = (order_id) => {
+    this.setState({
+      add_tip_id: order_id,
+      show_add_tip_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
+
+  openCancelDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_cancel_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
+  openFinishDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_finish_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
   render() {
-    const {show_orderlist_ext_store, currStoreId, accessToken} = this.props.global;
+    const {currStoreId, accessToken} = this.props.global;
+    let {dispatch} = this.props;
     const {
-      showSortModal,
-      ext_store_list,
-      searchStoreVisible,
-      ext_store_name,
-      showTabs,
-      show_hint,
       ListData,
-      hint_msg,
-      scanBoolean
+      order_id,
+      show_goods_list,
+      show_delivery_modal,
+      show_add_tip_modal,
+      show_cancel_delivery_modal,
+      add_tip_id,
+      orderStatus,
     } = this.state
 
     return (
-      <SafeAreaView style={styles.flex1}>
-        <FloatServiceIcon fromComponent={'订单列表'}/>
-        {this.renderTabsHead()}
-        <If condition={tool.length(ext_store_list) > 0 && show_orderlist_ext_store}>
-          <View style={styles.extStore}>
-            <Text onPress={() => this.setState({searchStoreVisible: true})} style={styles.extStoreLabel}>
-              {ext_store_name}
-            </Text>
-            <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-          </View>
-        </If>
-        <SearchExtStore visible={searchStoreVisible}
-                        data={ext_store_list}
-                        onClose={() => this.searchExtStoreOnClose()}
-                        onSelect={item => this.searchExtStoreOnSelect(item)}/>
-        {showTabs ? this.renderStatusTabs() : this.renderContent(ListData)}
-        <If condition={show_hint}>
-          <TouchableOpacity style={styles.cell_row}>
-            <Text style={styles.cell_body_text}>
-              {hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}
-            </Text>
-            <Text style={styles.button_status} onPress={this.openNotifySetting}>去查看</Text>
-          </TouchableOpacity>
-        </If>
-        <HotUpdateComponent/>
-        <RemindModal onPress={this.onPress} accessToken={accessToken} currStoreId={currStoreId}/>
-        <Dialog visible={showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {this.showSortSelect()}
-        </Dialog>
+      <View style={styles.flex1}>
 
-        <Scanner visible={scanBoolean} title="返回"
-                 onClose={() => this.setState({scanBoolean: false})}
-                 onScanSuccess={code => this.onScanSuccess(code)}
-                 onScanFail={code => this.onScanFail(code)}/>
-      </SafeAreaView>
+        {/*<FloatServiceIcon fromComponent={'订单列表'}/>*/}
+        {this.renderHead()}
+        {this.renderStatusTabs()}
+        {this.renderContent(ListData)}
+        {this.renderSortModal()}
+        {this.renderFinishDeliveryModal()}
+        <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
+        <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
+                     currStoreId={currStoreId}/>
+        <GoodsListModal
+          setState={this.setState.bind(this)}
+          onPress={this.onPress.bind(this)}
+          accessToken={accessToken}
+          order_id={order_id}
+          currStoreId={currStoreId}
+          show_goods_list={show_goods_list}/>
+
+        <DeliveryStatusModal
+          order_id={order_id}
+          order_status={orderStatus}
+          store_id={currStoreId}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          openAddTipModal={this.openAddTipModal.bind(this)}
+          openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+          openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
+          accessToken={accessToken}
+          show_modal={show_delivery_modal}
+          onClose={this.closeModal}
+        />
+
+        <CancelDeliveryModal
+          order_id={order_id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
+        />
+
+        <AddTipModal
+          setState={this.setState.bind(this)}
+          accessToken={accessToken}
+          id={add_tip_id}
+          orders_add_tip={true}
+          dispatch={dispatch}
+          show_add_tip_modal={show_add_tip_modal}/>
+
+        {/*<Scanner visible={scanBoolean} title="返回"*/}
+        {/*         onClose={() => this.setState({scanBoolean: false})}*/}
+        {/*         onScanSuccess={code => this.onScanSuccess(code)}*/}
+        {/*         onScanFail={code => this.onScanFail(code)}/>*/}
+      </View>
     );
   }
 
-  renderTabsHead = () => {
-    return (
-      <View style={styles.tabsHeader}>
-        <View style={styles.tabsHeader1}>
-          <Text onPress={this.inProcessOrder}
-                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 处理中 </Text>
-          <Text onPress={this.reserveOrder}
-                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : styles.tabsHeader3}> 预订单 </Text>
-          <Text onPress={this.allOrders} style={styles.tabsHeader3}> 全部订单 </Text>
-        </View>
+  closeModal = () => {
+    this.setState({
+      order_id: 0,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      showSortModal: false,
+      show_finish_delivery_modal: false,
+    })
+  }
 
-        <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)} style={styles.tabsHeaderRight}>
-          <View style={styles.flex1}/>
-          <Entypo name={"magnifying-glass"} style={styles.glassIcon}/>
+  toSetOrderComplete = () => {
+    this.closeModal();
+    let {accessToken} = this.props.global;
+    let {order_id} = this.state;
+    const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('订单已送达')
+      this.fetchOrders()
+    }).catch(() => {
+      ToastShort('“配送完成失败，请稍后重试”')
+    })
+  }
+
+
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
+  }
+
+  setOrderBy = (order_by) => {
+    if (order_by === 'orderTime desc') {
+      this.mixpanel.track('V4订单列表_最新来单')
+    } else if (order_by === 'orderTime asc') {
+      this.mixpanel.track('V4订单列表_最早来单')
+    } else {
+      this.mixpanel.track('V4订单列表_送达时间')
+    }
+    let {user_config} = this.props.global
+    let {dispatch} = this.props
+    user_config.order_list_by = order_by
+    dispatch(setUserCfg(user_config));
+  }
+
+  renderSortModal = () => {
+    let {user_config} = this.props.global;
+    let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
+    let {showSortModal, sort_list} = this.state;
+    return (
+      <JbbModal visible={showSortModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'bottom'}>
+        <View style={{marginBottom: 20}}>
+          <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+              订单排序
+            </Text>
+
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+
+          </View>
+          <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              justifyContent: "space-around",
+              flexWrap: "wrap"
+            }}>
+              <For index='index' each='info' of={sort_list}>
+                <TouchableOpacity key={index} style={{
+                  borderWidth: 0.5,
+                  borderColor: info.value === sort ? colors.main_color : colors.colorDDD,
+                  backgroundColor: info.value === sort ? '#DFFAE2' : colors.white,
+                  width: width * 0.25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 4,
+                  paddingVertical: 14,
+                  marginVertical: 5
+                }} onPress={() => this.setOrderBy(info.value)}>
+                  <Text key={index}
+                        style={{
+                          fontSize: 14,
+                          color: info.value === sort ? colors.main_color : colors.color333,
+                          fontWeight: info.value === sort ? 'bold' : '400'
+                        }}
+                        onPress={() => this.setOrderBy(info.value)}>
+                    {info.label}
+                  </Text>
+                </TouchableOpacity>
+              </For>
+            </View>
+            <Button title={'确 定'}
+                    onPress={() => {
+                      this.onRefresh()
+                      this.closeModal()
+                    }}
+                    buttonStyle={[{backgroundColor: colors.main_color, borderRadius: 24, height: 48}]}
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+          </View>
+        </View>
+      </JbbModal>
+    )
+  }
+
+  onCanChangeStore = (item) => {
+    showModal("切换店铺中...")
+    tool.debounces(() => {
+      const {dispatch, global, navigation} = this.props;
+      const {accessToken} = global;
+      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
+        if (ok) {
+          // tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          //   initTab: Config.ROUTE_ORDERS,
+          //   initialRouteName: Config.ROUTE_ALERT
+          // });
+          this.onRefresh()
+          hideModal()
+        } else {
+          ToastLong(msg);
+          hideModal()
+        }
+      }));
+    })
+  }
+
+  renderHead = () => {
+    let {store_info, only_one_store} = this.props.global;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 44,
+        width: width,
+        backgroundColor: colors.white,
+      }}>
+        <SvgXml style={{height: 44, marginRight: 16, marginLeft: 12}} onPress={() => {
+          this.mixpanel.track('V4订单列表_我的')
+          this.onPress(Config.ROUTE_MINE_NEW)
+        }}
+                xml={menu_left()}/>
+
+        <TouchableOpacity onPress={() => {
+          if (only_one_store) {
+            return;
+          }
+          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
+        }}
+                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+          <If condition={!only_one_store}>
+            <SvgXml xml={this_down()}/>
+          </If>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            this.mixpanel.track('V4订单列表_搜索')
+            this.onPress(Config.ROUTE_ORDER_SEARCH)
+          }}
+          style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+          <SvgXml xml={search_icon()}/>
+        </TouchableOpacity>
+
         <ModalDropdown
           dropdownStyle={styles.modalDropDown}
           dropdownTextStyle={styles.modalDropDownText}
-          dropdownTextHighlightStyle={{color: '#fff'}}
-          options={['新 建', '排 序', '扫 描']}
+          dropdownTextHighlightStyle={{color: colors.color333}}
+          style={{paddingRight: 12}}
+          options={['订单排序', '手动下单']}
           defaultValue={''}
           onSelect={(e) => this.onSelect(e)}
         >
-          <View style={styles.modalDropDownIcon}>
-            <Entypo name={"menu"} style={styles.modalDropDownIconMenu}/>
+          <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color333}}/>
           </View>
         </ModalDropdown>
+
       </View>
     )
   }
 
   renderStatusTabs = () => {
-    const tab_width = 1 / tool.length(this.state.categoryLabels);
-    if (!tool.length(this.state.categoryLabels) > 0) {
+    let {orderStatus, orderNum, categoryLabels} = this.state;
+    const tab_width = 1 / tool.length(categoryLabels);
+    if (!tool.length(categoryLabels) > 0) {
       return;
     }
     return (
-      <View style={styles.flex1}>
-        <View style={styles.statusTab}>
-          <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity
-              key={i}
-              style={{width: tab_width * width, alignItems: "center"}}
-              onPress={() => this.onRefresh(tab.status)}>
-              <View style={styles.statusTabItem}>
-                <Text style={[styles.f14c33, {fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"}]}>
-                  {tab.tabname}
-                </Text>
-                <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
-                  <Badge
-                    status="error"
-                    value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                    containerStyle={styles.statusTabBadge}/>
-                </If>
-              </View>
-              <If condition={this.state.orderStatus === tab.status}>
-                <View style={styles.statusTabRight}/>
-              </If>
-            </TouchableOpacity>
-          </For>
-        </View>
-        {this.renderContent(this.state.ListData)}
+      <View style={styles.statusTab}>
+        <For index="i" each='tab' of={categoryLabels}>
+          <TouchableOpacity
+            key={i}
+            style={{width: tab_width * width, alignItems: "center"}}
+            onPress={() => this.onRefresh(tab.status)}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              paddingTop: 10,
+            }}>
+              <Text style={[styles.f14c33, {
+                fontWeight: orderStatus === tab.status ? "bold" : "normal",
+                color: orderStatus === tab.status ? colors.main_color : colors.color333
+              }]}>
+                {orderNum[tab.status] > 0 ? orderNum[tab.status] > 999 ? '999+' : orderNum[tab.status] : '-'}
+              </Text>
+            </View>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              paddingBottom: 10,
+            }}>
+              <Text style={[styles.f14c33, {
+                fontWeight: orderStatus === tab.status ? "bold" : "normal",
+                color: orderStatus === tab.status ? colors.main_color : colors.color333
+              }]}>
+                {tab.tabname}
+              </Text>
+            </View>
+            <If condition={orderStatus === tab.status}>
+              <View style={styles.statusTabRight}/>
+            </If>
+          </TouchableOpacity>
+        </For>
       </View>
     )
   }
@@ -941,10 +891,23 @@ class OrderListScene extends Component {
       this.setState({scrollLocking: false});
     }
   }
+  _shouldItemUpdate = (prev, next) => {
+    return prev.item !== next.item;
+  }
+  _getItemLayout = (data, index) => {
+    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+  }
+  _keyExtractor = (item) => {
+    return item.id.toString();
+  }
+
+
   renderContent = (orders) => {
+    let {isLoading} = this.state;
     return (
       <View style={styles.orderListContent}>
         <FlatList
+          contentContainerStyle={{flexGrow: 1}}
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
@@ -955,12 +918,10 @@ class OrderListScene extends Component {
           onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
-          refreshing={this.state.isLoading}
+          refreshing={isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
-          ListFooterComponent={this.renderBottomImg()}
-          ListHeaderComponent={this.renderTopImg()}
           ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
@@ -974,103 +935,40 @@ class OrderListScene extends Component {
     }
   }
 
-  _shouldItemUpdate = (prev, next) => {
-    return prev.item !== next.item;
-  }
-
-  _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
-
-  _keyExtractor = (item) => {
-    return item.id.toString();
-  }
-
-  setOrderBy = (order_by) => {
-    let {user_config} = this.props.global
-    let {dispatch} = this.props
-    user_config.order_list_by = order_by
-    dispatch(setUserCfg(user_config));
-    this.setState({
-      showSortModal: false,
-      sort: order_by
-    }, () => {
-      this.onRefresh(this.state.orderStatus)
-    })
-  }
-
-  onChange = (event, sortItem) => {
-    if (event.target.checked) {
-      this.setOrderBy(sortItem.value)
-    }
-  }
-  showSortSelect = () => {
-    let {user_config} = this.props.global;
-    let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
-    return (
-      <View style={{marginTop: 12}}>
-        <For index="index" each="sortItem" of={this.state.sortData}>
-          <RadioItem key={index} style={styles.sortSelect}
-                     checked={sort === sortItem.value}
-                     onChange={event => this.onChange(event, sortItem)}>
-            <Text style={{color: colors.fontBlack}}>{sortItem.label} </Text>
-          </RadioItem>
-        </For>
-      </View>
-    )
-  }
-
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {orderStatus, allow_edit_ship_rule} = this.state;
-    let {vendor_id, vendor_info} = this.props.global
+    let {orderStatus} = this.state;
+    let {accessToken} = this.props.global
     return (
-      <OrderListItem showBtn={'1' === vendor_info.wsb_store_account}
-                     key={index}
-                     fetchData={() => this.onRefresh(orderStatus)}
-                     item={item}
-                     accessToken={this.props.global.accessToken}
-                     onRefresh={this.onRefresh}
-                     navigation={this.props.navigation}
-                     vendorId={vendor_id || '0'}
-                     allow_edit_ship_rule={allow_edit_ship_rule}
-                     setState={this.setState.bind(this)}
-                     orderStatus={orderStatus}
-                     onPress={this.onPress}/>
+      <OrderItem showBtn={item?.show_button_list}
+                 key={index}
+                 fetchData={() => this.onRefresh()}
+                 item={item}
+                 accessToken={accessToken}
+                 navigation={this.props.navigation}
+                 setState={this.setState.bind(this)}
+                 openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+                 openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
+                 orderStatus={orderStatus}
+      />
     );
   }
 
-  renderSwiper = () => {
-    let {activity} = this.state
-    return (
-      <Swiper style={styles.wrapper}
-              showsButtons={false}
-              height={100}
-              horizontal={true}
-              paginationStyle={{bottom: 10}}
-              autoplay={true}
-              autoplayTimeout={4}
-              loop={true}
-      >
-        <For index='i' each='info' of={activity}>
-          <View style={styles.slide1} key={i}>
-            <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.topImgBottom}>
-              <FastImage style={styles.image} source={{uri: info.banner}} resizeMode={FastImage.resizeMode.contain}/>
-            </TouchableOpacity>
-            <Entypo onPress={() => this.showImage(info)} name='cross' size={25} style={styles.topImgIcon}/>
-          </View>
-        </For>
-      </Swiper>
-    )
-  }
-
   renderNoOrder = () => {
+    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
+    let {show_bind_button} = this.state;
     return (
       <View style={styles.noOrderContent}>
-        <Text style={styles.noOrderDesc}>暂无订单</Text>
-        <If condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-          <Button title={'去授权外卖店铺'}
+        <SvgXml xml={empty_data()}/>
+        <If condition={!show_bind_button}>
+          <Text style={styles.noOrderDesc}>暂无订单</Text>
+        </If>
+
+        <If condition={show_bind_button && (allow_merchants_store_bind || is_service_mgr)}>
+
+          <Text style={styles.noOrderDesc}>暂无绑定外卖店铺</Text>
+          <Button title={'去绑定'}
                   onPress={() => this.bind_platform()}
                   buttonStyle={styles.noOrderBtn}
                   titleStyle={styles.noOrderBtnTitle}
@@ -1080,336 +978,65 @@ class OrderListScene extends Component {
     )
   }
 
-  renderTopImg = () => {
-    const {showImgType, show_img, isadditional, orderStatus} = this.state
-    return (
-      <>
-        <If condition={isadditional && orderStatus !== 7}>
-          <TouchableOpacity
-            onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})}
-            style={styles.topImg}>
-            <Text style={styles.topImgDesc}>存在补送的订单</Text>
-            <Button onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})}
-                    title={'查看'}
-                    buttonStyle={styles.topImgBtn}
-                    titleStyle={styles.topImgTitle}>
-            </Button>
-          </TouchableOpacity>
-        </If>
-        <If condition={showImgType === 1 && show_img}>
-          {this.renderSwiper()}
-        </If>
-
-      </>
-    )
-  }
-
-  renderBottomImg = () => {
-    let {activity, showImgType, show_img} = this.state
-    return (
-      <If condition={showImgType === 0 && show_img}>
-        <Swiper style={styles.wrapper}
-                showsButtons={false}
-                height={100}
-                horizontal={true}
-                paginationStyle={{bottom: 10}}
-                autoplay={true}
-                autoplayTimeout={4}
-                loop={true}
-        >
-          <For index='i' each='info' of={activity}>
-            <View style={styles.slide1} key={i}>
-              <TouchableOpacity onPress={() => this.onPressActivity(info)} style={styles.bottomImg}>
-                <FastImage style={styles.image} source={{uri: info.banner}} resizeMode={FastImage.resizeMode.contain}/>
-              </TouchableOpacity>
-            </View>
-          </For>
-        </Swiper>
-      </If>
-    )
-  }
-
 }
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
-  extStore: {
-    flexDirection: 'row',
-    lineHeight: 30,
-    paddingLeft: '2%',
-    paddingTop: 10,
-    paddingBottom: 6,
-    backgroundColor: colors.white
-  },
-  extStoreLabel: {fontSize: pxToDp(30), marginTop: pxToDp(3)},
-  glassIcon: {fontSize: 24, color: colors.color666},
-  center: {alignItems: 'center', justifyContent: 'center'},
-  modalWrap: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.25)'
-  },
-  modalContentWrap: {
-    width: '80%',
-    backgroundColor: colors.colorEEE,
-    borderRadius: 8,
-  },
-  modalTitleText: {fontSize: 12, fontWeight: 'bold', paddingTop: 8, paddingBottom: 8, marginLeft: 20, lineHeight: 25},
-  modalImgStyle: {width: 51.2, height: 51.2, marginTop: 12, borderRadius: 8},
-  modalContentText: {paddingTop: 12, paddingBottom: 16, marginLeft: 20, marginRight: 20, lineHeight: 25},
-  modalBtnWrap: {
-    backgroundColor: colors.main_color,
-    marginLeft: 20,
-    marginRight: 20,
-    borderRadius: 8
-  },
-  closeNewVersionModal: {fontSize: 20, textAlign: 'right'},
-  modalBtnText: {color: colors.white, fontSize: 20, padding: 12, textAlign: 'center'},
-  cell_row: {
-    marginLeft: 0,
-    paddingLeft: pxToDp(20),
-    backgroundColor: "#F2DDE0",
-    height: pxToDp(70),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  cell_body_text: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color333,
-  },
-  button_status: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    padding: pxToDp(7),
-    backgroundColor: colors.warn_color,
-    borderRadius: pxToDp(3),
-    color: colors.white,
-    marginRight: 10
-  },
-  printer_status_ok: {
-    color: colors.main_color,
-  },
-  printer_status_error: {
-    color: '#f44040',
-  },
-  searchBarPrefix: {
-    flexDirection: 'row',
-    width: pxToDp(140),
-    flex: 1,
-    position: 'relative',
-    alignItems: 'center'
-  },
-  label_box: {
-    backgroundColor: colors.white,
-    paddingHorizontal: pxToDp(20),
-    paddingVertical: pxToDp(10),
-  },
-  alert_msg: {
-    paddingHorizontal: pxToDp(5),
-    paddingVertical: pxToDp(10),
-    fontSize: pxToDp(28),
-    color: colors.color999,
-  },
-  label_view: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  label_style: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    borderWidth: pxToDp(1),
-    borderColor: colors.color999,
-    margin: pxToDp(10),
-    borderRadius: 13,
-    paddingVertical: pxToDp(8),
-    paddingHorizontal: pxToDp(20),
-  },
-  container: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.fontGray,
-  },
-  goToNew: {
-    margin: pxToDp(10),
-    marginLeft: pxToDp(30),
-    marginRight: pxToDp(30),
-    fontSize: pxToDp(32),
-    color: colors.white
-  },
-  tabsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    flexWrap: "nowrap",
-    backgroundColor: colors.white,
-    paddingVertical: 8,
-    width: width
-  },
-  tabsHeader1: {
-    backgroundColor: colors.f7,
-    width: 0.75 * width,
-    padding: pxToDp(8),
-    paddingLeft: pxToDp(0),
-    borderRadius: pxToDp(15),
-    flexDirection: 'row',
-    marginLeft: 10,
-  },
-  tabsHeader2: {
-    width: 0.24 * width,
-
-    paddingVertical: pxToDp(10),
-
-    borderRadius: pxToDp(18),
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: "center",
-    marginLeft: pxToDp(10),
-    color: colors.main_color,
-    backgroundColor: colors.white
-  },
-  tabsHeader3: {
-    width: 0.24 * width,
-
-    fontWeight: 'bold',
-    paddingVertical: pxToDp(10),
-
-    borderRadius: pxToDp(18),
-    fontSize: 16,
-    textAlign: "center",
-    marginLeft: pxToDp(10),
-    color: colors.title_color,
-  },
-  tabsHeaderRight: {width: 0.15 * width, flexDirection: 'row'},
   modalDropDown: {
-    marginRight: 10,
-    width: 70,
-    height: 120,
-    backgroundColor: '#5f6660',
+    width: 128,
+    height: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderColor: colors.colorDDD,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.1,
+    elevation: 5,
+    shadowRadius: 12,
+    borderRadius: 10,
+    borderWidth: 0.5,
     marginTop: -StatusBar.currentHeight,
   },
   modalDropDownText: {
     textAlignVertical: 'center',
     textAlign: 'center',
+    lineHeight: 20,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#fff',
-    height: 40,
-    backgroundColor: '#5f6660',
-    borderRadius: 2,
-    borderColor: '#5f6660',
-    borderWidth: 1,
+    color: colors.color333,
   },
-  modalDropDownIcon: {marginRight: 16, marginLeft: 18},
-  modalDropDownIconMenu: {fontSize: 24, color: colors.color666},
-  statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 40},
-  statusTabItem: {
-    borderColor: colors.main_color,
-    // borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
-    height: 38,
-    justifyContent: 'center',
-  },
+  statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 56},
   f14c33: {
     color: colors.color333,
     fontSize: 14
   },
-  statusTabBadge: {position: 'absolute', top: 1, right: -15},
-  statusTabRight: {height: 2, width: 24, backgroundColor: colors.main_color},
-  orderListContent: {flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)},
+  statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
+  orderListContent: {flex: 1, backgroundColor: colors.f5,},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
-  sortModal: {
-    width: 0,
-    height: 0,
-    borderRightWidth: 10,
-    borderRightColor: 'transparent',
-    borderLeftWidth: 10,
-    borderLeftColor: 'transparent',
-    borderBottomWidth: 10,
-    borderBottomColor: 'rgba(0,0,0,0.75)',
-    position: "absolute",
-    top: 37,
-    left: 350,
-  },
-  sortModalSelect: {
-    width: '30%',
-    position: 'absolute',
-    right: '3%',
-    top: '6%',
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    borderRadius: pxToDp(10)
-  },
-  image: {
-    width: width,
-    height: 70,
-    borderRadius: 10
-  },
-  right_btn: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(8),
-    marginLeft: pxToDp(10),
-  },
   noOrderContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    height: 210
+    marginTop: 80,
   },
-  noOrderDesc: {fontSize: 18, color: colors.fontColor},
+  noOrderDesc: {
+    fontSize: 15,
+    marginTop: 9,
+    marginBottom: 20,
+    color: colors.color999
+  },
   noOrderBtn: {
-    width: width - 20,
-    borderRadius: pxToDp(10),
+    width: 180,
+    borderRadius: 20,
     backgroundColor: colors.main_color,
-    marginTop: pxToDp(30)
+    paddingVertical: 10,
+    marginTop: 20
   },
   noOrderBtnTitle: {
     color: colors.white,
     fontSize: 16
   },
-  topImg: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    backgroundColor: '#EEDEE0',
-    height: 40
-  },
-  topImgDesc: {color: colors.color666, fontSize: 12, paddingLeft: 13, flex: 1},
-  topImgBtn: {
-    backgroundColor: colors.red,
-    borderRadius: 6,
-    marginRight: 13,
-    paddingVertical: 3,
-    paddingHorizontal: 4,
-  },
-  topImgTitle: {
-    fontSize: 12,
-    color: colors.white,
-  },
-  topImgBottom: {paddingBottom: pxToDp(20), paddingLeft: '3%', paddingRight: '3%'},
-  topImgIcon: {
-    position: 'absolute',
-    color: colors.white,
-    right: 12,
-    top: -1,
-  },
-  bottomImg: {
-    paddingLeft: '3%', paddingRight: '3%', paddingBottom: pxToDp(20)
-  },
-  wrapper: {
-    marginVertical: 10
-  },
-  slide1: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)

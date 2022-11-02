@@ -1,12 +1,15 @@
+#import <React/RCTEventEmitter.h>
+#import "IOSToReactNativeEventEmitter.h"
+#import "Constants.h"
 #import <NewRelic/NewRelic.h>
 #import "AppDelegate.h"
+#import "RNSplashScreen.h"  // 添加这一句
 // 引入 JPush 功能所需头文件
 #import <RCTJPushModule.h>
 #import "IFlyMSC/IFlyMSC.h"
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import "Definition.h"
 #import "TTSConfig.h"
-
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -41,15 +44,15 @@ static void InitializeFlipper(UIApplication *application) {
 {
 
   //Set log level
-  [IFlySetting setLogFile:LVL_ALL];
-
-  //Set whether to output log messages in Xcode console
-  [IFlySetting showLogcat:YES];
-
-  //Set the local storage path of SDK
-  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-  NSString *cachePath = [paths objectAtIndex:0];
-  [IFlySetting setLogFilePath:cachePath];
+//  [IFlySetting setLogFile:LVL_ALL];
+//
+//  //Set whether to output log messages in Xcode console
+//  [IFlySetting showLogcat:YES];
+//
+//  //Set the local storage path of SDK
+//  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+//  NSString *cachePath = [paths objectAtIndex:0];
+//  [IFlySetting setLogFilePath:cachePath];
 
   NSString *initString = [[NSString alloc] initWithFormat:@"appid=%@",APPID_VALUE];
   [IFlySpeechUtility createUtility:initString];
@@ -101,6 +104,7 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  [RNSplashScreen show];  // 添加这一句，这一句一定要在最后
   return YES;
 }
 
@@ -141,6 +145,24 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   // iOS 10 以下 Required
   NSLog(@"iOS 7 APNS");
   [JPUSHService handleRemoteNotification:userInfo];
+
+  NSString *order_id=[userInfo objectForKey:@"order_id"];
+  //NSString *speak_word=[userInfo objectForKey:@"speak_word" ];
+  NSString *store_id=[userInfo objectForKey:@"store_id"];
+  NSString *order_type=[userInfo objectForKey:@"type"];
+  NSDictionary *dict=@{
+    @"wm_id":order_id,
+    @"store_id":store_id,
+    @"order_type":order_type
+  };
+
+  [IOSToReactNativeEventEmitter emitEventWithName:NotifyName andPayload:dict];
+
+//
+//  NSString *speakWord = [userInfo objectForKey:@"speak_word"];
+//  if(speak_word != nil) {
+//    [self.iFlySpeechSynthesizer startSpeaking:speak_word];
+//  }
   [[NSNotificationCenter defaultCenter] postNotificationName:J_APNS_NOTIFICATION_ARRIVED_EVENT object:userInfo];
   completionHandler(UIBackgroundFetchResultNewData);
 }
@@ -149,21 +171,21 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 - (void)jpushNotificationCenter:(UNUserNotificationCenter *)center  willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(NSInteger))completionHandler {
 
   NSDictionary * userInfo = notification.request.content.userInfo;
-  UNNotificationRequest *request = notification.request; // 收到推送的请求
-  UNNotificationContent *content = request.content; // 收到推送的消息内容
+  //UNNotificationRequest *request = notification.request; // 收到推送的请求
+  //UNNotificationContent *content = request.content; // 收到推送的消息内容
 
-  NSNumber *badge = content.badge;  // 推送消息的角标
-  NSString *body = content.body;    // 推送消息体
-  UNNotificationSound *sound = content.sound;  // 推送消息的声音
-  NSString *subtitle = content.subtitle;  // 推送消息的副标题
-  NSString *title = content.title;  // 推送消息的标题
+//  NSNumber *badge = content.badge;  // 推送消息的角标
+//  NSString *body = content.body;    // 推送消息体
+//  UNNotificationSound *sound = content.sound;  // 推送消息的声音
+//  NSString *subtitle = content.subtitle;  // 推送消息的副标题
+//  NSString *title = content.title;  // 推送消息的标题
 
   NSString *speakWord = [userInfo objectForKey:@"speak_word"];
   if(speakWord != nil) {
     [self.iFlySpeechSynthesizer startSpeaking:speakWord];
   }
 
-  NSLog(@"iOS10 前台收到通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
+//  NSLog(@"iOS10 前台收到通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
 
   if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
     // Apns
@@ -189,14 +211,14 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 - (void)jpushNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler: (void (^)(void))completionHandler {
   NSDictionary * userInfo = response.notification.request.content.userInfo;
 
-  UNNotificationRequest *request = response.notification.request; // 收到推送的请求
-  UNNotificationContent *content = request.content; // 收到推送的消息内容
-
-  NSNumber *badge = content.badge;  // 推送消息的角标
-  NSString *body = content.body;    // 推送消息体
-  UNNotificationSound *sound = content.sound;  // 推送消息的声音
-  NSString *subtitle = content.subtitle;  // 推送消息的副标题
-  NSString *title = content.title;  // 推送消息的标题
+//  UNNotificationRequest *request = response.notification.request; // 收到推送的请求
+//  UNNotificationContent *content = request.content; // 收到推送的消息内容
+//
+//  NSNumber *badge = content.badge;  // 推送消息的角标
+//  NSString *body = content.body;    // 推送消息体
+//  UNNotificationSound *sound = content.sound;  // 推送消息的声音
+//  NSString *subtitle = content.subtitle;  // 推送消息的副标题
+//  NSString *title = content.title;  // 推送消息的标题
 
   if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
     // Apns
@@ -212,7 +234,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     }
 
     // 判断为本地通知
-    NSLog(@"iOS10 收到远程通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
+//    NSLog(@"iOS10 收到远程通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
   }
   else {
     // 本地通知
@@ -222,7 +244,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [[NSNotificationCenter defaultCenter] postNotificationName:J_LOCAL_NOTIFICATION_OPENED_EVENT object:userInfo];
 
     // 判断为本地通知
-    NSLog(@"iOS10 收到本地通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
+//    NSLog(@"iOS10 收到本地通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
   }
   // 系统要求执行这个方法
   completionHandler();

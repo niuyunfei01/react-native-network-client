@@ -51,7 +51,18 @@ class AutomaticPackagingScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    this.getSetting(props.global)
+
+  }
+
+  componentDidMount() {
+    const {navigation, global} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getSetting(global)
+    })
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   getSetting = (global) => {
@@ -92,7 +103,10 @@ class AutomaticPackagingScene extends PureComponent {
     const {packageStatus} = this.state
     return (
       <>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
           <View style={Styles.rowWrap}>
             <Text style={styles.description}>
               自动打包

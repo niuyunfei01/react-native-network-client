@@ -10,8 +10,6 @@ import {
   logout,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
-
-import native from "../../../pubilc/util/native";
 import stringEx from "../../../pubilc/util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from '../../../pubilc/util/pxToDp';
@@ -23,7 +21,7 @@ import tool from "../../../pubilc/util/tool";
 import {mergeMixpanelId, MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {Button} from "react-native-elements";
@@ -198,7 +196,7 @@ class ApplyScene extends PureComponent {
       this.setState({doingApply: false})
       if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");
-        this.queryConfig(res?.user?.user_id, res?.user?.token?.access_token, res?.OfflineStore?.id)
+        this.queryConfig(res?.user?.token?.access_token, res?.OfflineStore?.id)
         this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
         this.mixpanel.getDistinctId().then(mixpanel_id => {
           if (mixpanel_id !== res.user.user_id) {
@@ -213,50 +211,36 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (uid, accessToken, currStoreId) => {
+  queryConfig = (accessToken, currStoreId) => {
     const {dispatch} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let store_id = cfg?.store_id || currStoreId;
-        dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: store_id}, (binded) => {
-          this.doneSelectStore(store_id, !binded);
-        }));
+        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
         ToastShort(err_msg);
       }
     }));
   }
 
-  doneSelectStore = (storeId, not_bind = false) => {
+  doneSelectStore = (storeId, show_bottom_tab = true) => {
     const {dispatch, navigation} = this.props;
-    const setCurrStoreIdCallback = (set_ok, msg) => {
-      if (set_ok) {
-        dispatch(setCurrentStore(storeId));
-        if (not_bind) {
-          navigation.navigate(Config.ROUTE_STORE_STATUS)
-          hideModal()
-          return;
-        }
-        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
-      } else {
-        showError(msg);
-      }
-    };
-    if (Platform.OS === 'ios') {
-      setCurrStoreIdCallback(true, '');
-    } else {
-      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    dispatch(setCurrentStore(storeId));
+    if (show_bottom_tab) {
+      hideModal()
+      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
     }
+    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+      initTab: Config.ROUTE_ORDERS,
+      initialRouteName: Config.ROUTE_ALERT
+    });
+    hideModal()
   }
 
   setAddress(res) {
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, tool.length(res.location));
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    let lat = res.location.split(",")[1];
+    let Lng = res.location.split(",")[0];
+
     let states = {
       location_long: Lng,
       location_lat: lat,
@@ -274,10 +258,13 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (
-      <ScrollView style={{
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false} style={{
         flex: 1,
         padding: 12,
-        backgroundColor: colors.background,
+        backgroundColor: colors.f3,
       }}>
         <View style={{
           paddingTop: 30,
@@ -490,7 +477,7 @@ class ApplyScene extends PureComponent {
             </View>
             <View style={{
               width: "68%",
-              borderColor: colors.fontColor,
+              borderColor: colors.b2,
               borderBottomWidth: pxToDp(2),
               padding: 6,
             }}>
@@ -545,10 +532,12 @@ class ApplyScene extends PureComponent {
               textDecorationColor: '#59b26a',
               textDecorationLine: 'underline',
               marginLeft: pxToDp(10)
-            }} onPress={() => {
+            }} onPress={async () => {
               this.mixpanel.track("info_customerservice_click", {});
-              JumpMiniProgram("/pages/service/index", {place: 'apply'});
-            }}>联系客服</Text>
+              await JumpMiniProgram("/pages/service/index", {place: 'apply'});
+            }}>
+              联系客服
+            </Text>
           </View>
 
         </View>

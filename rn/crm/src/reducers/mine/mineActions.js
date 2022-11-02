@@ -76,8 +76,8 @@ export function fetchWorkers(_v_id, token, callback) {
       })
       .catch(error => {
         dispatch(receiveWorker(_v_id, {}));
-        ToastLong(error.message);
-        callback && callback({ok: false, desc: error.message});
+        ToastLong(error?.desc);
+        callback && callback({ok: false, desc: error?.desc});
       });
   };
 }

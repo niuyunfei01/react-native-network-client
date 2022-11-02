@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Switch, Text, TextInput, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -8,6 +8,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const styles = StyleSheet.create({
   notificationWrap: {
@@ -28,9 +29,6 @@ const styles = StyleSheet.create({
   },
   rowDescriptionText: {
     fontSize: 15,
-    fontWeight: '400',
-    color: colors.color333,
-    lineHeight: 21
   },
   showTimeText: {
     fontSize: 12,
@@ -263,12 +261,13 @@ class BadReviewReminderScene extends PureComponent {
     const {showDatePicker, selectTimeType} = this.state
     return (
       <>
-        <ScrollView>
+        <KeyboardAwareScrollView enableOnAndroid={false}>
+
           {this.renderNotificationSwitch()}
           {this.renderNotificationTime()}
           {this.renderContactDetails()}
 
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <View style={Styles.saveZoneWrap}>
           <TouchableOpacity style={Styles.saveWrap} onPress={this.saveSetting}>
             <Text style={Styles.saveText}>

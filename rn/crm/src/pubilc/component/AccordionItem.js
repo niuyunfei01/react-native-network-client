@@ -76,7 +76,7 @@ const accordionStyles = StyleSheet.create({
     marginRight: 0,
   },
   title: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: pxToDp(30),
     fontWeight: 'bold'
   },

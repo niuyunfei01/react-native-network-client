@@ -40,13 +40,13 @@ class OperateProfitScene extends PureComponent {
       items: {},
       unbalanced: 0
     };
-    showModal('加载中')
-    this.getProfitHome = this.getProfitHome.bind(this);
+
   }
 
-  getProfitHome() {
+  getProfitHome = () => {
     const {dispatch} = this.props;
     let {currStoreId, accessToken} = this.props.global;
+    showModal('加载中')
     dispatch(
       fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
         if (ok) {
@@ -54,7 +54,6 @@ class OperateProfitScene extends PureComponent {
             unbalanced: obj.unbalanced,
             items: obj.items
           });
-        } else {
         }
         hideModal()
         this.setState({query: false});
@@ -88,9 +87,7 @@ class OperateProfitScene extends PureComponent {
                   return (
                     <Cell
                       style={content.cell}
-                      onPress={() => {
-                        this.toOperateDetail(day, total_balanced);
-                      }}
+                      onPress={() => this.toOperateDetail(day, total_balanced)}
                       key={key}
                       customStyle={content.cust}>
                       <CellHeader style={content.header}>
@@ -115,17 +112,12 @@ class OperateProfitScene extends PureComponent {
                             +{toFixed(sum_today)}
                           </Text>
                         ) : (
-                          <Text
-                            style={[
-                              content.text_right,
-                              content.take_in,
-                              {color: "#fe0000"}
-                            ]}>
+                          <Text style={[content.text_right, content.take_in, {color: "#fe0000"}]}>
                             {toFixed(sum_today)}
                           </Text>
                         )}
                       </CellBody>
-                      <CellFooter style={[content.text_right, content.foot, content.date]}>
+                      <CellFooter style={[content.text_right, content.date]}>
                         {toFixed(total_balanced)}
                         <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
                       </CellFooter>
@@ -183,7 +175,7 @@ const content = StyleSheet.create({
   },
   item_time: {
     fontSize: pxToDp(28),
-    color: colors.fontColor
+    color: colors.b2
   },
   cell: {
     height: pxToDp(125),

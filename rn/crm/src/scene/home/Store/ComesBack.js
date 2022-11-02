@@ -59,15 +59,19 @@ class ComesBack extends PureComponent {
   render() {
     let {msg, isRefreshing} = this.state
     return (
-      <View style={{flex: 1, backgroundColor: colors.background}}>
+      <View style={{flex: 1, backgroundColor: colors.f3}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={() => this.fetchData()}
-            tintColor="gray"
-          />
-        }>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={() => this.fetchData()}
+              tintColor="gray"
+            />
+          }>
           <View
             style={{flexDirection: 'row', backgroundColor: colors.white, paddingHorizontal: 18, paddingVertical: 9}}>
             <FontAwesome

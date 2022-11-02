@@ -1,6 +1,8 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_AUTO_PRINT: null,
+  SET_SCANNING_BLUETOOTH_DEVICE: null,
   SET_NO_LOGIN_INFO: null,
   SET_DEVICE_INFO: null,
   SET_PLATFORM: null,
@@ -25,9 +27,12 @@ export default keyMirror({
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
   SET_USER_CONFIG: null,
-  SET_SHOW_EXT_STORE: null,
   SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
+
+  SET_GOODS_SG_CATEGORY: null,
+
+  SET_BLUETOOTH_DEVICE_LIST: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -116,4 +121,6 @@ export default keyMirror({
   ACTIVITY_GOODS_LIST: null,
   GET_MANAGE_SELECT: null,
   ACTIVITY_MANAGER_REFRESH: null,
+  // SET_CALL_DELIVERY_LIST: null,
+  SET_DEFAULT_ORDER_INFO: null,
 })

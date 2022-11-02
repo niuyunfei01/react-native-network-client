@@ -139,7 +139,7 @@ export function fetchVendorTags(_v_id, token, callback) {
 }
 
 export function productSave(data, token, callback) {
-  let url = `api/product_save_new.json?access_token=${token}`;
+  let url = `api/product_save_new_v4.json?access_token=${token}`;
   return jsonWithTpl2(
     url,
     data,

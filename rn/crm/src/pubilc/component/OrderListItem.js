@@ -75,7 +75,7 @@ class OrderListItem extends React.PureComponent {
     order: PropType.object,
     onItemClick: PropTypes.func,
     setState: PropType.func,
-    comesBackBtn: PropType.number,
+    comesBackBtn: PropType.bool,
   };
   state = {
     modalTip: false,
@@ -127,7 +127,7 @@ class OrderListItem extends React.PureComponent {
           ToastShort('暂无数据')
         }
       }).catch((obj) => {
-        ToastShort(`操作失败：${obj.reason}`)
+        ToastShort(`操作失败：${obj?.reason}`)
       })
       this.setState({
         order_id: item.id,
@@ -202,10 +202,10 @@ class OrderListItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
       }).catch(e => {
-        ToastShort('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 600)
   }
@@ -223,13 +223,12 @@ class OrderListItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
-    this.onPress(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: order_id,
-      storeId: store_id,
-      selectedWay: [],
+    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -311,8 +310,8 @@ class OrderListItem extends React.PureComponent {
 
   loseDelivery = (val) => {
     this.mixpanel.track('订单列表页_忽略配送')
-    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-      text: '继续忽略配送',
+    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+      text: '忽略',
       onPress: () => {
         this.onOverlookDelivery(val)
       }
@@ -371,8 +370,9 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
+    let {order_id} = this.state
     this.setState({showDeliveryModal: false}, () => {
-      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val})
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val, order_id: order_id})
     })
     this.mixpanel.track('查看位置')
   }
@@ -583,14 +583,14 @@ class OrderListItem extends React.PureComponent {
         <If condition={item.show_store_name}>
           <View style={styles.orderInfoContent}>
             <Text style={styles.orderInfoStoreName}>店铺名称 </Text>
-            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name}</Text>
+            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name} </Text>
           </View>
         </If>
 
         <If condition={item.orderTimeInList}>
           <View style={styles.orderTimeList}>
             <Text style={styles.orderTimeLabel}>下单时间 </Text>
-            <Text style={styles.orderTimeValue}>{item.orderTimeInList}</Text>
+            <Text style={styles.orderTimeValue}>{item.orderTimeInList} </Text>
           </View>
         </If>
 
@@ -627,7 +627,7 @@ class OrderListItem extends React.PureComponent {
 
   touchOrderInfoDetail = (item) => {
     this.mixpanel.track('点击详情')
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
   }
 
   touchShipDetail = (item) => {
@@ -660,9 +660,13 @@ class OrderListItem extends React.PureComponent {
   renderButton = () => {
     let {item} = this.props;
     let obj_num = 0
-    tool.objectMap(item?.btn_list, (item, idx) => {
-      obj_num += item
-    })
+    if (this.props.comesBackBtn) {
+      obj_num = 1
+    } else {
+      tool.objectMap(item?.btn_list, (item, idx) => {
+        obj_num += item
+      })
+    }
     let btn_width = 0.90 / Number(obj_num)
     return (
       <View
@@ -806,7 +810,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   routeOrder = (item) => {
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
     this.mixpanel.track('订单详情页')
   }
 
@@ -894,7 +898,7 @@ class OrderListItem extends React.PureComponent {
                 <For index='index' each='info' of={tipList}>
                   <Text key={index} style={styles.amountBtn} onPress={() => {
                     this.onChangeAccount(info.value)
-                  }}>{info.label}</Text>
+                  }}>{info.label} </Text>
                 </For>
               </View>
               <View style={styles.addTipInputBox}>
@@ -912,7 +916,7 @@ class OrderListItem extends React.PureComponent {
                 <View style={styles.addTipIcon}>
                   <Entypo name={"help-with-circle"}
                           style={styles.addTipHelpIcon}/>
-                  <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                  <Text style={styles.addTipReason}>{this.state.respReason} </Text>
                 </View>
               </If>
             </View>
@@ -945,7 +949,7 @@ class OrderListItem extends React.PureComponent {
                 }} style={styles.deliveryModalTitle}>呼叫配送规则</Text>
                 <View style={{flex: 1}}/>
                 <TouchableOpacity onPress={() => this.closeDeliveryModal()}>
-                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>
+                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.b2}}/>
                 </TouchableOpacity>
               </View>
 
@@ -1513,7 +1517,7 @@ const styles = StyleSheet.create({
   },
   amountBtn: {
     borderWidth: 1,
-    borderColor: colors.title_color,
+    borderColor: colors.color111,
     width: width * 0.2, textAlign: 'center',
     paddingVertical: pxToDp(10),
     marginVertical: pxToDp(5)

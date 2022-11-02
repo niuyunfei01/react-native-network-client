@@ -1,45 +1,40 @@
 import React, {Component} from 'react';
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import {saveOrderDelayShip,} from '../../reducers/order/orderActions'
+import {Alert, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import Cts from '../../pubilc/common/Cts'
 import {ActionSheet} from "../../weui";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
-import {CheckBox} from 'react-native-elements'
 import {showError, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
-import DateTimePicker from "react-native-modal-datetime-picker";
-import dayjs from "dayjs";
 import Config from '../../pubilc/common/config'
 import tool from '../../pubilc/util/tool'
 import native from '../../pubilc/util/native'
-import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../pubilc/component/BottomModal";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
+import BleManager from "react-native-ble-manager";
+import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
+import {printInCloud} from "../../reducers/order/orderActions";
 
-const MENU_EDIT_BASIC = 1;
-const MENU_EDIT_EXPECT_TIME = 2;
-const MENU_EDIT_STORE = 3;
-const MENU_FEEDBACK = 4;
-const MENU_SET_INVALID = 5; // 置为无效
-const MENU_ADD_TODO = 6;
-const MENU_PROVIDING = 8;
-const MENU_SEND_MONEY = 9;
-const MENU_RECEIVE_QR = 10;
-const MENU_ORDER_SCAN = 11;
-const MENU_ORDER_SCAN_READY = 12;
-const MENU_ORDER_CANCEL_TO_ENTRY = 13;
-const MENU_REDEEM_GOOD_COUPON = 14;
-const MENU_CANCEL_ORDER = 15; // 取消订单
-const MENU_SET_COMPLETE = 16; // 置为完成
-const MENU_CALL_STAFF = 17; // 联系员工
+const width = Dimensions.get("window").width;
 
+// 订单操作常量
+const MENU_PRINT_AGAIN = 1;               // 再次打印
+const MENU_COMPLAINT_RIDER = 2;           // 投诉骑手
+const MENU_CANCEL_ORDER = 3;              // 取消订单
+const MENU_EDIT_BASIC = 4;                // 修改订单
+const MENU_EDIT_STORE = 5;                // 修改门店
+const MENU_SEND_MONEY = 6;                // 发红包
+const MENU_CALL_STAFF = 7;               // 联系门店
+const MENU_SET_INVALID = 8;               // 置为无效
+const MENU_SET_COMPLETE = 9;             // 置为完成
+const MENU_ORDER_SCAN = 10;               // 订单过机
+const MENU_ORDER_SCAN_READY = 11;         // 扫码出库
+const MENU_ORDER_CANCEL_TO_ENTRY = 12;    // 退单入库
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -49,13 +44,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
 function mapStateToProps(state) {
   return {
     global: state.global,
   }
 }
-
 
 class OrderOperation extends Component {
   constructor(props) {
@@ -65,8 +58,6 @@ class OrderOperation extends Component {
     this.state = {
       actionSheet: props.route.params.actionSheet,
       checked: true,
-      isEndVisible: false,//修改配送时间弹窗
-      visibleReceiveQr: false,//收款码
       showCallStore: false,//修改门店
       show_no_rider_tips: false,
       isShowInput: false,
@@ -125,31 +116,6 @@ class OrderOperation extends Component {
     }, {text: '再想想'}])
   }
 
-  onSaveDelayShip(date) {
-    let expect_time = tool.fullDate(date);
-    const {order} = this.state;
-    if (dayjs(expect_time).unix() <= dayjs().unix()) {
-      ToastLong('不能小于当前时间')
-      return null;
-    }
-    let send_data = {
-      wm_id: order.id,
-      expect_time: expect_time,
-    };
-    const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-    InteractionManager.runAfterInteractions(() => {
-      dispatch(saveOrderDelayShip(send_data, accessToken, (resp) => {
-        if (resp.ok) {
-          ToastShort('操作成功');
-          this.setState({
-            isEndVisible: false
-          })
-        }
-      }));
-    });
-  }
-
   _contacts2menus() {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.state.store_contacts || []).map((contact, idx) => {
@@ -164,15 +130,15 @@ class OrderOperation extends Component {
     });
   }
 
-  _onToProvide() {
-    const {order, navigation} = this.state;
-    if (order.store_id <= 0) {
-      ToastLong("所属门店未知，请先设置好订单所属门店！");
-      return false;
-    }
-    const path = `stores/orders_go_to_buy/${order.id}.html?access_token=${global.accessToken}`;
-    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
-  }
+  // _onToProvide() {
+  //   const {order, navigation} = this.state;
+  //   if (order.store_id <= 0) {
+  //     ToastLong("所属门店未知，请先设置好订单所属门店！");
+  //     return false;
+  //   }
+  //   const path = `stores/orders_go_to_buy/${order.id}.html?access_token=${global.accessToken}`;
+  //   navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
+  // }
 
   _onShowStoreCall() {
     const {dispatch, global} = this.props;
@@ -193,13 +159,14 @@ class OrderOperation extends Component {
       '确认是否取消订单', '取消订单后无法撤回，是否继续？',
       [
         {
-          text: '确认', onPress: () => {
-            HttpUtils.get(url).then(res => {
+          text: '确认',
+          onPress: () => {
+            HttpUtils.get(url).then(() => {
               showSuccess('订单取消成功即将返回!')
               setTimeout(() => {
                 this.props.navigation.goBack();
               }, 1000);
-            }).catch((error) => {
+            }).catch(() => {
               this.setState({
                 showDeliveryModal: false,
                 showErrorModal: true,
@@ -209,30 +176,45 @@ class OrderOperation extends Component {
           }
         },
         {
-          "text": '返回', onPress: () => {
-            this.setState({
-              showDeliveryModal: true
-            })
-          }
+          text: '返回', onPress: () => this.setState({showDeliveryModal: true})
         }
       ]
     )
   }
 
+
   touchItem = (actionSheet, idx) => {
     actionSheet[idx].checked = true;
     switch (actionSheet[idx].key) {
-      case 3:
-        this.mixpanel.track('点击修改门店')
+      case 1:
+        this.mixpanel.track('订单操作_再次打印')
         break
-      case 15:
-        this.mixpanel.track('点击取消订单')
+      case 2:
+        this.mixpanel.track('订单操作_投诉骑手')
+        break
+      case 3:
+        this.mixpanel.track('订单操作_取消订单')
         this.setState({
           showDeliveryModal: true
         })
         break
-      case 16:
-        this.mixpanel.track('点击置为完成')
+      case 4:
+        this.mixpanel.track('订单操作_修改订单')
+        break
+      case 5:
+        this.mixpanel.track('订单操作_修改门店')
+        break
+      case 9:
+        this.mixpanel.track('订单操作_置为完成')
+        break
+      case 10:
+        this.mixpanel.track('订单操作_订单过机')
+        break
+      case 11:
+        this.mixpanel.track('订单操作_扫码入库')
+        break
+      case 12:
+        this.mixpanel.track('订单操作_退单入库')
         break
     }
     this.setState({
@@ -244,27 +226,33 @@ class OrderOperation extends Component {
 
   onMenuOptionSelected(option) {
     const {navigation, global} = this.props;
-    const {accessToken} = global;
+    // const {accessToken} = global;
     const {order} = this.state
-    const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id
-      : "#!/feedback/order/" + order.id;
-    const path = `vm?access_token=${accessToken}${vm_path}`;
-    const url = Config.serverUrl(path, Config.https);
+    // const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id
+    //   : "#!/feedback/order/" + order.id;
+    // const path = `vm?access_token=${accessToken}${vm_path}`;
+    // const url = Config.serverUrl(path, Config.https);
     switch (option?.key) {
+      case MENU_PRINT_AGAIN:
+        Alert.alert('提醒', '当前订单已打印，是否继续打印？', [
+          {
+            text: '确定',
+            onPress: () => this.onPrint(order?.printer_sn),
+          },
+          {
+            text: '取消'
+          }
+        ])
+        break
+      case MENU_COMPLAINT_RIDER:
+        navigation.navigate(Config.ROUTE_COMPLAIN, {id: order?.ship_id})
+        break
       case MENU_EDIT_BASIC:
         navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
-        break
-      case MENU_EDIT_EXPECT_TIME://修改配送时间
-        this.setState({
-          isEndVisible: true,
-        });
         break
       case MENU_EDIT_STORE:
         GlobalUtil.setOrderFresh(1)
         navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order});
-        break
-      case MENU_FEEDBACK:
-        navigation.navigate(Config.ROUTE_WEB, {url});
         break
       case MENU_SET_INVALID:
         navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
@@ -273,15 +261,6 @@ class OrderOperation extends Component {
       case MENU_CANCEL_ORDER:
         GlobalUtil.setOrderFresh(1)
         this.cancel_order()
-        break
-      case MENU_ADD_TODO:
-        navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
-        break
-      case MENU_PROVIDING:
-        this._onToProvide();
-        break
-      case MENU_RECEIVE_QR:
-        this.setState({visibleReceiveQr: true})
         break
       case MENU_SEND_MONEY:
         navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.id, storeId: order.store_id})
@@ -295,26 +274,84 @@ class OrderOperation extends Component {
       case MENU_ORDER_CANCEL_TO_ENTRY:
         navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.id})
         break
-      case MENU_REDEEM_GOOD_COUPON:
-        navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
-          type: 'select',
-          storeId: order.store_id,
-          orderId: order.id,
-          coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
-          to_u_id: order.user_id,
-          to_u_name: order.userName,
-          to_u_mobile: order.mobile,
-        })
-        break
       case MENU_SET_COMPLETE:
         this.toSetOrderComplete()
         break
       case MENU_CALL_STAFF:
         this._onShowStoreCall()
         break
+      // case MENU_REDEEM_GOOD_COUPON:
+      //   navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
+      //     type: 'select',
+      //     storeId: order.store_id,
+      //     orderId: order.id,
+      //     coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
+      //     to_u_id: order.user_id,
+      //     to_u_name: order.userName,
+      //     to_u_mobile: order.mobile,
+      //   })
+      //   break
       default:
         ToastLong('未知的操作');
         break
+    }
+  }
+
+  onPrint = (printer_sn) => {
+    if (printer_sn) {
+      this.setState({showPrinterChooser: true})
+    } else {
+      this._doBluetoothPrint()
+    }
+  }
+
+  _hidePrinterChooser = () => {
+    this.setState({showPrinterChooser: false})
+  }
+
+  printAction = [
+    {
+      type: 'default',
+      label: '取消',
+      onPress: this._hidePrinterChooser
+    }
+  ]
+
+  _doBluetoothPrint = () => {
+    this._hidePrinterChooser()
+    let {order} = this.state;
+    const {printer_id, accessToken} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        const clb = (msg,) => {
+          if (msg === 'ok') {
+            ToastShort("已发送给蓝牙打印机！");
+          }
+          this._hidePrinterChooser();
+        };
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          print_order_to_bt(accessToken, peripheral, clb, order.id, order);
+        }).catch(() => {
+          BleManager.connect(printer_id).then(() => {
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(accessToken, peripheral, clb, order.id, order);
+            })
+          }).catch(() => {
+            Alert.alert('提示', '打印机已断开连接', this.buttons);
+            this._hidePrinterChooser();
+          });
+        });
+      }, 300);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机', [
+        {
+          text: '确定',
+          onPress: () => this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        },
+        {
+          text: '取消'
+        }
+      ]);
     }
   }
 
@@ -324,7 +361,7 @@ class OrderOperation extends Component {
     })
   }
 
-  openMiniprogarm = () => {
+  openMiniprogarm = async () => {
     let {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global;
     let data = {
       v: vendor_id,
@@ -333,49 +370,12 @@ class OrderOperation extends Component {
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'
     }
-    JumpMiniProgram("/pages/service/index", data);
-  }
-
-  render() {
-    const {
-      actionSheet,
-    } = this.state
-    return (
-      <View>
-        {this.renderModal()}
-        <ScrollView
-          overScrollMode="always"
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}>
-          {
-            actionSheet && actionSheet.map((item, idx) => {
-              item.checked = false
-              return (
-                <CheckBox
-                  key={idx}
-                  left
-                  title={item.label}
-                  checkedIcon='dot-circle-o'
-                  uncheckedIcon='circle-o'
-                  checked={item.checked || false}
-                  checkedColor={colors.main_color}
-                  onPress={() => this.touchItem(actionSheet, idx)}
-                />
-              )
-            })
-          }
-          <View style={{width: '100%', height: pxToDp(200)}}/>
-        </ScrollView>
-
-      </View>
-    );
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   renderModal = () => {
     const {
       showCallStore,
-      order,
       showDeliveryModal,
       showErrorModal,
       errMsg,
@@ -476,34 +476,91 @@ class OrderOperation extends Component {
             }
           ]}
         />
-
-        <ReceiveMoney
-          formVisible={this.state.visibleReceiveQr}
-          onCloseForm={() => this.setState({visibleReceiveQr: false})}
-          order={order}
-        />
-        <DateTimePicker
-          cancelTextIOS={'取消'}
-          confirmTextIOS={'修改'}
-          customHeaderIOS={() => {
-            return (<View/>)
-          }}
-          date={new Date()}
-          mode='datetime'
-          isVisible={this.state.isEndVisible}
-          onConfirm={(date) => {
-            this.onSaveDelayShip(date)
-          }}
-          onCancel={() => {
-            this.setState({
-              isEndVisible: false,
-            });
-          }}
-        />
       </View>
     )
   }
 
+  _cloudPrinterSN = () => {
+    const {order} = this.state
+    const printerName = order.printer_sn || '未知';
+    return `云打印(${printerName})`;
+  }
+
+  // 云打印
+  _doCloudPrint = () => {
+    const {dispatch, global} = this.props;
+    let {order} = this.state;
+    this._hidePrinterChooser()
+    dispatch(printInCloud(global.accessToken, order.id, (ok, msg) => {
+      if (ok) {
+        ToastShort("已发送到打印机");
+      } else {
+        ToastLong('打印失败：' + msg)
+      }
+      this._hidePrinterChooser();
+    }))
+  }
+
+  // 商米打印
+  _doSunMiPint = () => {
+    const {order} = this.state
+    native.printSmPrinter(order).then();
+    this._hidePrinterChooser();
+  }
+
+  render() {
+    const {
+      actionSheet,
+      showPrinterChooser
+    } = this.state
+    const menus = [
+      {
+        type: 'default',
+        label: this._cloudPrinterSN(),
+        onPress: this._doCloudPrint
+      },
+      {
+        type: 'default',
+        label: '蓝牙打印',
+        onPress: this._doBluetoothPrint
+      },
+      {
+        type: 'default',
+        label: '商米打印',
+        onPress: this._doSunMiPint
+      }
+    ]
+    return (
+      <View>
+        {this.renderModal()}
+        <ScrollView
+          overScrollMode="always"
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.Content}>
+            <For index='index' of={actionSheet} each='info'>
+              <TouchableOpacity key={index} style={[styles.checkItem, {
+                borderTopWidth: index === 0 ? 0 : 0.5,
+                borderTopColor: colors.e5
+              }]} onPress={() => this.touchItem(actionSheet, index)}>
+                <Text style={styles.checkItemLabel}>
+                  {info?.label}
+                </Text>
+              </TouchableOpacity>
+            </For>
+            <ActionSheet
+              visible={showPrinterChooser}
+              onRequestClose={this._hidePrinterChooser}
+              menus={menus}
+              actions={this.printAction}
+            />
+          </View>
+        </ScrollView>
+
+      </View>
+    );
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderOperation)
@@ -534,6 +591,21 @@ const styles = StyleSheet.create({
     width: '90%',
     left: '5%',
     height: pxToDp(100),
+  },
+  Content: {
+    width: width * 0.92,
+    marginLeft: width * 0.04,
+    backgroundColor: colors.white,
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 6
+  },
+  checkItem: {
+    flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 13
+  },
+  checkItemLabel: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: colors.color333
   }
-
 });

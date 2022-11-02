@@ -8,7 +8,7 @@
 'use strict';
 
 import Config from '../../pubilc/common/config'
-import {serviceSignIn} from '../../pubilc/services/account'
+import {Login, sendMobileCode} from '../../pubilc/services/account'
 import native from "../../pubilc/util/native";
 import {getWithTpl} from '../../pubilc/util/common'
 import {
@@ -23,9 +23,9 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
-import Cts from "../../pubilc/common/Cts";
 import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
+import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -46,27 +46,67 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_SHOW_EXT_STORE,
+  // SET_CALL_DELIVERY_LIST,
+  SET_DEFAULT_ORDER_INFO,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
-  SET_NO_LOGIN_INFO
+  SET_NO_LOGIN_INFO,
+  SET_GOODS_SG_CATEGORY,
+  SET_BLUETOOTH_DEVICE_LIST,
+  SET_SCANNING_BLUETOOTH_DEVICE,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
 }
 
-export function setAccessToken(oauthToken) {
+export const setAutoPrint = (autoBluetoothPrint) => {
+  return {
+    type: SET_AUTO_PRINT,
+    payload: autoBluetoothPrint
+  }
+}
+export const setIsScanningBlueTooth = (status) => {
+  return {
+    type: SET_SCANNING_BLUETOOTH_DEVICE,
+    payload: status
+  }
+}
+
+export const setBlueToothDeviceList = (bluetoothDeviceList) => {
+  return {
+    type: SET_BLUETOOTH_DEVICE_LIST,
+    payload: bluetoothDeviceList
+  }
+}
+
+export const setSGCategory = (basic_categories) => {
+  return {
+    type: SET_GOODS_SG_CATEGORY,
+    payload: basic_categories
+  }
+}
+
+export function setAccessToken(obj) {
   return {
     type: SESSION_TOKEN_SUCCESS,
-    payload: oauthToken
+    payload: {
+      access_token: obj.access_token,
+      refresh_token: obj.refresh_token,
+      expires_in_ts: obj.expires_in_ts,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
 export function setNoLoginInfo(info) {
   return {
     type: SET_NO_LOGIN_INFO,
-    payload: info
+    payload: {
+      ...info,
+      getTokenTs: dayjs().valueOf()
+    }
   }
 }
 
@@ -119,12 +159,20 @@ export function setPrinterName(printerInfo) {
   }
 }
 
-export function setOrderListExtStore(show) {
+// export function setCallDeliveryList(list) {
+//   return {
+//     type: SET_CALL_DELIVERY_LIST,
+//     list: list
+//   }
+// }
+
+export function setDefaultOrderInfo(info) {
   return {
-    type: SET_SHOW_EXT_STORE,
-    show: show
+    type: SET_DEFAULT_ORDER_INFO,
+    info: info
   }
 }
+
 
 export function setFloatSerciceIcon(show) {
   return {
@@ -243,31 +291,30 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export function doAuthLogin(access_token, expire, props, callback) {
-  HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
-    if (user.id) {
-      callback(true, "ok", user)
-    } else {
-      callback(false, "账号不存在")
-    }
-  }, (res) => {
-    if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "账号错误，请检查账号是否正确")
-    } else {
-      callback(false, "获取不到账户相关信息");
-    }
-  })
+export function sendDverifyCode(mobile, type, is_agree, callback) {
+  return dispatch => {
+    return sendMobileCode({
+      mobile,
+      type,
+      is_agree,
+      device_uuid: getDeviceUUID(),
+    })
+      .then(() => {
+        callback(true, '发送成功')
+      }).catch((error) => {
+        callback(false, '发送失败' + error?.desc)
+      })
+  }
 }
+
 
 export function signIn(mobile, password, props, callback) {
   return dispatch => {
-    return serviceSignIn(getDeviceUUID(), mobile, password)
-      .then(response => response.json())
+    return Login({mobile, password, device_uuid: getDeviceUUID()})
       .then(json => {
         const {access_token, refresh_token, expires_in: expires_in_ts} = json;
-
         if (access_token) {
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+          dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
 
           const authCallback = (ok, msg, profile) => {
@@ -279,25 +326,31 @@ export function signIn(mobile, password, props, callback) {
             }
           };
           doAuthLogin(access_token, expire, props, authCallback)
+
         } else {
+          if (Number(json.error_code) === 401)
+            return callback(false, Number(json.error_code))
           //fixme: 需要给出明确提示
-          callback(false, "登录失败，请检查验证码是否正确")
+          callback(false, "验证码错误")
         }
-      }).catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
+      }).catch(() => callback(false, '网络错误，请检查您的网络连接'))
   }
 }
 
-export function requestSmsCode(mobile, type, callback) {
-  return dispatch => {
-    const url = `check/blx_app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
-    return getWithTpl(url, (json => {
-      callback(json.success, json.reason)
-    }), (error) => {
-      callback(false, '网络错误，请检查您的网络连接')
-    });
-  }
+export function doAuthLogin(access_token, expire, props, callback) {
+  HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
+    if (user.id) {
+      callback(true, "ok", user)
+    } else {
+      callback(false, "账号不存在")
+    }
+  }, (res) => {
+    if (Number(res.desc) === 10001) {
+      callback(false, "账号错误，请检查账号是否正确")
+    } else {
+      callback(false, "获取不到账户相关信息");
+    }
+  })
 }
 
 export function checkPhone(params, callback) {

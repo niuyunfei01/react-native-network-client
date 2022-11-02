@@ -257,7 +257,11 @@ class Refund extends Component {
         </BottomModal>
 
         {this.state.isShowHeaderType && this.renderHeaderTab()}
-        <ScrollView style={{backgroundColor: '#EEEEEE', height: '100%'}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: '#EEEEEE', height: '100%'}}>
           {this.state.headerType === 1 ? this.renderRefund() : this.renderSpread()}
         </ScrollView>
         {this.rendenBtn()}
@@ -379,12 +383,12 @@ class Refund extends Component {
                   <Yuan
                     icon={"md-remove"}
                     size={25}
-                    ic={element.num <= 0 ? colors.gray : colors.color333}
+                    ic={element.num <= 0 ? colors.colorCCC : colors.color333}
                     w={25}
                     bw={1 / PixelRatio.get()}
                     mgr={5}
                     bgc={colors.white}
-                    bc={colors.gray}
+                    bc={colors.colorCCC}
                     onPress={() => {
                       if (element.num <= 0) return;
                       element.num = element.num - 1;
@@ -410,7 +414,7 @@ class Refund extends Component {
                     size={25}
                     ic={
                       element.num >= element.origin_num
-                        ? colors.gray
+                        ? colors.colorCCC
                         : colors.color333
                     }
                     w={25}
@@ -431,7 +435,7 @@ class Refund extends Component {
                     bw={1 / PixelRatio.get()}
                     mgl={5}
                     bgc={colors.white}
-                    bc={colors.gray}
+                    bc={colors.colorCCC}
                   />
                 </View>
               </View>
@@ -501,7 +505,7 @@ class Refund extends Component {
                 paddingHorizontal: pxToDp(10)
               }}>
                 <View style={{flexDirection: 'row', alignItems: "center"}}>
-                  <Text style={{fontSize: pxToDp(22), color: colors.title_color}}>请输入实际拣重：</Text>
+                  <Text style={{fontSize: pxToDp(22), color: colors.color111}}>请输入实际拣重：</Text>
                   <Input
                     onChangeText={(weight) => {
                       if (weight > element.weight) {
@@ -529,7 +533,7 @@ class Refund extends Component {
                     }}
                   />
                   <Text
-                    style={{fontSize: pxToDp(22), color: colors.title_color, marginLeft: pxToDp(10)}}>g</Text>
+                    style={{fontSize: pxToDp(22), color: colors.color111, marginLeft: pxToDp(10)}}>g</Text>
                 </View>
                 <If condition={element.refund_prices > 0}>
                   <View style={{flexDirection: 'row', alignItems: "center"}}>
@@ -563,7 +567,7 @@ class Refund extends Component {
             <Text style={{fontSize: pxToDp(24), color: '#AAAAAA'}}>退差价规则</Text>
           </TouchableOpacity>
           <If condition={this.getSpreadPriceSum() > 0}>
-            <Text style={{fontSize: pxToDp(22), color: colors.title_color, marginRight: pxToDp(10)}}>共退差价<Text
+            <Text style={{fontSize: pxToDp(22), color: colors.color111, marginRight: pxToDp(10)}}>共退差价<Text
               style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()} </Text></Text>
           </If>
         </View>
@@ -660,7 +664,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color
+    color: colors.color111
   },
   h203e: {
     color: colors.fontBlack,

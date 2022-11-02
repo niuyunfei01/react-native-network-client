@@ -57,7 +57,7 @@ class ServiceChargeInfo extends PureComponent {
   }
   onItemClicked = (item) => {
     if (item.wm_id) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
+      this.props.navigation.navigate(Config.ROUTE_ORDER_NEW, {orderId: item.wm_id});
     }
   }
   onServiceDesc = () => {
@@ -67,7 +67,11 @@ class ServiceChargeInfo extends PureComponent {
   render() {
     const {records} = this.state;
     return (
-      <ScrollView style={{flex: 1, backgroundColor: colors.background}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, backgroundColor: colors.f3}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
                 return (
@@ -92,7 +96,7 @@ class ServiceChargeInfo extends PureComponent {
                   </TouchableOpacity>)
               }}
         >
-          <View style={{paddingVertical: 12, paddingHorizontal: 10, backgroundColor: colors.background}}>
+          <View style={{paddingVertical: 12, paddingHorizontal: 10, backgroundColor: colors.f3}}>
             {records.map((item, idx) => {
               return <List.Item arrow="horizontal"
                                 key={idx}
@@ -133,7 +137,7 @@ class ServiceChargeInfo extends PureComponent {
                     color: colors.color333,
                     fontSize: 14,
                     fontWeight: "bold"
-                  }}>{this.state.date_labels[item.wm_id]}</Text>
+                  }}>{this.state.date_labels[item.wm_id]} </Text>
                   <Text style={{
                     color: colors.color333,
                     fontSize: 14,

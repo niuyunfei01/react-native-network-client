@@ -349,7 +349,7 @@ class GoodsPriceDetails extends PureComponent {
     }
     let {status} = goodsDetail;
     if (status == Cts.STORE_PROD_ON_SALE) {
-      return (<Text style={{color: colors.editStatusAdd}}>{this.getPlatPrice(wm_goods, key)} </Text>)
+      return (<Text style={{color: colors.warn_color}}>{this.getPlatPrice(wm_goods, key)} </Text>)
     } else {
       return (<Text style={{color: colors.fontGray}}>{this.getPlatPrice(wm_goods, key)} </Text>)
     }
@@ -399,7 +399,7 @@ class GoodsPriceDetails extends PureComponent {
                     width: pxToDp(45),
                     position: 'absolute',
                     right: pxToDp(15),
-                    backgroundColor: colors.gray,
+                    backgroundColor: colors.colorCCC,
                     borderRadius: pxToDp(22),
                     flexDirection: "row",
                     justifyContent: "center",
@@ -500,18 +500,22 @@ class GoodsPriceDetails extends PureComponent {
             this.renderNav()
           }
         </View>
-        <ScrollView style={{marginTop: pxToDp(7)}}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.query}
-                        onRefresh={() => {
-                          this.setState({query: true});
-                          showModal("加载中")
-                          this.getListStoresGoods();
-                        }}
-                        tintColor='gray'
-                      />
-                    }
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{marginTop: pxToDp(7)}}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.query}
+              onRefresh={() => {
+                this.setState({query: true});
+                showModal("加载中")
+                this.getListStoresGoods();
+              }}
+              tintColor='gray'
+            />
+          }
         >
           {
             this.renderList()
@@ -651,7 +655,7 @@ class GoodsPriceDetails extends PureComponent {
                       style={{
                         marginLeft: pxToDp(10),
                         fontSize: pxToDp(50),
-                        color: setUpperLimit <= 100 ? colors.gray : colors.fontBlue
+                        color: setUpperLimit <= 100 ? colors.colorCCC : colors.fontBlue
                       }}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setUpperLimit}% </Text>
@@ -677,7 +681,7 @@ class GoodsPriceDetails extends PureComponent {
                       style={{
                         marginLeft: pxToDp(10),
                         fontSize: pxToDp(50),
-                        color: setLowerLimit < 1 ? colors.gray : colors.fontBlue
+                        color: setLowerLimit < 1 ? colors.colorCCC : colors.fontBlue
                       }}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setLowerLimit}%</Text>
@@ -687,7 +691,7 @@ class GoodsPriceDetails extends PureComponent {
               <Entypo name={"circle-with-plus"} style={{
                 marginLeft: pxToDp(10),
                 fontSize: pxToDp(50),
-                color: setLowerLimit >= 100 ? colors.gray : colors.fontBlue
+                color: setLowerLimit >= 100 ? colors.colorCCC : colors.fontBlue
               }}/>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{

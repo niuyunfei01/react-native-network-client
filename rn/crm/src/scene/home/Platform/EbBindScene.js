@@ -110,7 +110,7 @@ class EbBindScene extends PureComponent {
               refreshing={this.state.isRefreshing}
               tintColor='gray'
             />
-          } style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+          } style={{backgroundColor: colors.f2, flexGrow: 1}}>
 
           <View style={styles.headerBox}>
             <View style={{flexDirection: "row", flex: 1}}>
@@ -137,7 +137,7 @@ class EbBindScene extends PureComponent {
                 defaultKey={-999}
               >
                 <View style={styles.body_text}>
-                  <Text style={styles.selectLabelLine}>{this.state.applicationTypeLabel || '点击选择应用类型'}</Text>
+                  <Text style={styles.selectLabelLine}>{this.state.applicationTypeLabel || '点击选择应用类型'} </Text>
                   <Entypo name="chevron-right" style={styles.right_icon}/>
                 </View>
               </ModalSelector>
@@ -175,7 +175,7 @@ class EbBindScene extends PureComponent {
                 }}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.b2,
                 }}
                 titleStyle={{
                   color: colors.white,
