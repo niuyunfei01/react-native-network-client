@@ -1,19 +1,18 @@
 import React, {Component} from "react";
-import {Dimensions, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Dimensions, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {cloneDeep} from "lodash";
-import {Line} from "../../common/component/All";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import {getWithTpl} from "../../../pubilc/util/common";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global};
+  const {global} = state;
+  return {global: global};
 }
 
-const {height} = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 
 class SelectCity extends Component {
   constructor(props) {
@@ -30,7 +29,7 @@ class SelectCity extends Component {
     for (let i = 0; i < index; i++) {
       start += tool.length(this.state.cityList[i].cityList);
     }
-    this.scrollView.scrollTo({y: 41 * start});
+    this.scrollView.scrollTo({y: 47 * start});
   };
 
   onSuccess = (data) => {
@@ -91,16 +90,17 @@ class SelectCity extends Component {
       <View style={styles.contentWrap}>
         {/*定位当前城市*/}
         <View style={styles.headerWrap}>
-          <View style={[styles.searchWrap, styles.n2grey9]}>
-            <TextInput style={[{width: "90%", textAlign: "center", padding: 0}, styles.n2grey9]}
-                       placeholder="请输入城市名字"
-                       value={this.state.searchValue}
-                       autoCapitalize="none"
-                       ref={textInput => this.textInput = textInput}
-                       underlineColorAndroid="transparent"
-                       placeholderTextColor={colors.color999}
-                       onChangeText={text => this.onChangeText(text)}
-            />
+          <Text style={styles.n1}>当前定位城市 </Text>
+          <View style={{
+            backgroundColor: colors.f5,
+            height: 28,
+            borderRadius: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 4,
+          }}>
+            <Text style={styles.n1}> 北京 </Text>
           </View>
         </View>
         <ScrollView
@@ -113,23 +113,33 @@ class SelectCity extends Component {
           <View style={{width: height * 19 / 20}}>
             {this.state.cityList.map((item, index) => {
               return (
-                <View key={index}>
+                <View key={index} style={{flex: 1}}>
                   <If condition={tool.length(item.cityList)}>
-                    <Text style={[styles.cityKeyText, styles.n2grey6]}>
+                    <Text style={[styles.cityKeyText]}>
                       {item.key}
                     </Text>
                   </If>
 
-                  {item.cityList.map((element, id) => {
-                    return (
-                      <TouchableOpacity key={id} onPress={() => this.selectCity(element)}>
-                        <Text style={[{paddingVertical: 10, paddingLeft: 18}, styles.n1]} allowFontScaling={false}>
-                          {element.city}
-                        </Text>
-                        <Line c={colors.gray_f8}/>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  <View style={{
+                    paddingHorizontal: 20,
+                  }}>
+                    {item.cityList.map((element, id) => {
+                      return (
+                        <TouchableOpacity key={id} style={{
+                          width: width - 40,
+                          borderBottomWidth: 0.5,
+                          paddingVertical: 14,
+                          borderBottomColor: colors.e5,
+                        }}
+                                          onPress={() => this.selectCity(element)}>
+                          <Text style={styles.n1}
+                                allowFontScaling={false}>
+                            {element.city}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
               );
             })}
@@ -140,10 +150,11 @@ class SelectCity extends Component {
         <View style={styles.quicklyPosition}>
           {allCityList.map((item, index) => {
             return (
-              <TouchableOpacity key={index} onPress={() => this.goTo(index)}>
-                <Text style={styles.quicklyPositionText}>
-                  {item.key}
-                </Text>
+              <TouchableOpacity
+                key={index}
+                onPress={() => this.goTo(index)}
+              >
+                <Text style={styles.quicklyPositionText}> {item.key} </Text>
               </TouchableOpacity>
             );
           })}
@@ -158,10 +169,15 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: colors.white
   },
   cityKeyText: {
-    paddingLeft: 18, paddingVertical: 5, backgroundColor: colors.f2
+    paddingLeft: 20,
+    paddingVertical: 6,
+    backgroundColor: colors.f5,
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   quicklyPositionText: {
-    textAlign: "center", fontSize: 10, lineHeight: 21
+    textAlign: "center", fontSize: 12, lineHeight: 21, fontWeight: 'bold', color: colors.color666
   },
   quicklyPosition: {
     width: height / 20,
@@ -180,14 +196,16 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   headerWrap: {
-    backgroundColor: colors.gray_f8,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    justifyContent: "center",
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    justifyContent: 'space-between',
     alignItems: "center"
   },
   contentWrap: {
     flex: 1,
+    backgroundColor: colors.f5
   },
   n2grey9: {
     color: colors.color999,
