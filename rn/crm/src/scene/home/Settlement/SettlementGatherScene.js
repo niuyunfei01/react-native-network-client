@@ -58,11 +58,10 @@ class SettlementGatherScene extends PureComponent {
   }
 
   getDateilsList() {
-    let store_id = this.props.global.currStoreId;
-    let date = this.state.date
-    let token = this.props.global.accessToken;
-    const {dispatch} = this.props;
-    dispatch(get_supply_items(store_id, date, 'month', token, async (resp) => {
+    let {date} = this.state
+    const {dispatch, global} = this.props;
+    let {currStoreId, accessToken} = global;
+    dispatch(get_supply_items(currStoreId, date, 'month', accessToken, async (resp) => {
       if (resp.ok) {
         this.setState({
           list: resp.obj.goods_list,
@@ -98,13 +97,13 @@ class SettlementGatherScene extends PureComponent {
   }
 
   renderHeader() {
-    let {dateList, date} = this.state;
+    let {date, dates, total_price, order_num} = this.state;
     const datePicker = (
       <DatePicker
         rootNativeProps={{'data-xx': 'yy'}}
         minDate={new Date(2015, 8, 15, 10, 30, 0)}
         maxDate={new Date()}
-        defaultDate={this.state.dates}
+        defaultDate={dates}
         mode="month"
         locale={zh_CN}
       />
@@ -120,13 +119,11 @@ class SettlementGatherScene extends PureComponent {
             title={'选择日期'}
             okText={'确认'}
             dismissText={'取消'}
-            date={this.state.dates}
+            date={dates}
             onChange={this.onChange}
-            onDismiss={() => {
-            }}
           >
             <Text style={header.time}>
-              {this.state.date} &nbsp;&nbsp;&nbsp;
+              {date} &nbsp;&nbsp;&nbsp;
               <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
             </Text>
           </PopPicker>
@@ -134,10 +131,10 @@ class SettlementGatherScene extends PureComponent {
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
-            <Text style={header.money}>订单数量 : {this.state.order_num}  </Text>
+            <Text style={header.money}>订单数量 : {order_num}  </Text>
           </View>
           <View style={header.text_box}>
-            <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}  </Text>
+            <Text style={header.money}>金额 : {tool.toFixed(total_price)}  </Text>
           </View>
         </View>
       </View>
@@ -162,29 +159,23 @@ class SettlementGatherScene extends PureComponent {
             }}>
               <TouchableOpacity
                 onPress={() => {
-                  this.state.list[key].down = !item.down;
+                  list[key].down = !item.down;
                   this.forceUpdate()
                 }}
                 style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
               >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{
-                    fontSize: pxToDp(32),
-                    color: colors.main_color,
-                    fontWeight: '900',
-                    marginRight: pxToDp(10)
-                  }}>{key}  </Text>
-                  <Text style={{
-                    color: colors.color666,
-                    fontSize: pxToDp(28),
-                    fontWeight: '100',
-                    marginLeft: pxToDp(20)
-                  }}>共{tool.toFixed(this.arraySum(item))}  </Text>
+                  <Text style={{fontSize: pxToDp(32), color: colors.main_color, fontWeight: '900', marginRight: pxToDp(10)}}>
+                    {key}
+                  </Text>
+                  <Text style={{color: colors.color666, fontSize: pxToDp(28), fontWeight: '100', marginLeft: pxToDp(20)}}>
+                    共{tool.toFixed(this.arraySum(item))}
+                  </Text>
 
                 </View>
                 {
-                  item.down ? <Entypo name={"chevron-thin-up"}
-                                      style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
+                  item.down ?
+                    <Entypo name={"chevron-thin-up"} style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
                     <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}}/>
                 }
               </TouchableOpacity>
@@ -225,10 +216,10 @@ class SettlementGatherScene extends PureComponent {
     } else {
       return (
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-          <FontAwesome5 name={'file-signature'} size={52}
-                        color={colors.color999}
-          />
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录 </Text>
+          <FontAwesome5 name={'file-signature'} size={52} color={colors.color999}/>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>
+            没有相关记录
+          </Text>
         </View>
       )
     }
@@ -338,3 +329,4 @@ const title = StyleSheet.create({
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementGatherScene)
+
