@@ -1,5 +1,5 @@
 import React from "react";
-import {Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, Alert} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {LineView, Styles} from "../../home/GoodsIncrementService/GoodsIncrementServiceStyle";
 import colors from "../../../pubilc/styles/colors";
@@ -99,6 +99,11 @@ class AddMissingPictureScene extends React.PureComponent {
     showImgMenus: false,
     productInfo: {}
   }
+  actions = [
+    {
+      label: '取消', onPress: () => this.setState({showImgMenus: false})
+    }
+  ]
 
   getProductInfo = () => {
     const {vendor_id, currStoreId, accessToken} = this.props.global
@@ -210,12 +215,6 @@ class AddMissingPictureScene extends React.PureComponent {
     }
   ]
 
-  actions = [
-    {
-      label: '取消', onPress: () => this.setState({showImgMenus: false})
-    }
-  ]
-
   renderActionSheet = () => {
     const {showImgMenus} = this.state
     return (
@@ -308,8 +307,7 @@ class AddMissingPictureScene extends React.PureComponent {
       if (ok) {
         showSuccess('添加主图成功')
         this.props.navigation.goBack()
-      }
-      else showError(reason)
+      } else showError(reason)
     }));
   }
   renderSaveInfo = () => {

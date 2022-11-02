@@ -2,13 +2,46 @@ import Cts from "../common/Cts";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 
+export const SFCategory = [
+  {value: '1', label: '快餐'},
+  {value: '2', label: '送药'},
+  {value: '3', label: '百货'},
+  {value: '4', label: '脏衣服收'},
+  {value: '5', label: '干净衣服派'},
+  {value: '6', label: '生鲜'},
+  {value: '7', label: '保单'},
+  {value: '8', label: '高端饮品'},
+  {value: '9', label: '现场勘验'},
+  {value: '10', label: '快递'},
+  {value: '12', label: '文件'},
+  {value: '13', label: '蛋糕'},
+  {value: '14', label: '鲜花'},
+  {value: '15', label: '电子数码'},
+  {value: '16', label: '服装鞋帽'},
+  {value: '17', label: '汽车配件'},
+  {value: '18', label: '珠宝'},
+  {value: '20', label: '披萨'},
+  {value: '21', label: '中餐'},
+  {value: '22', label: '水产'},
+  {value: '27', label: '专人直送'},
+  {value: '32', label: '中端饮品'},
+  {value: '33', label: '便利店'},
+  {value: '34', label: '面包糕点'},
+  {value: '35', label: '火锅'},
+  {value: '36', label: '证照'},
+  {value: '40', label: '烧烤小龙虾'},
+  {value: '41', label: '外部落地配'},
+  {value: '47', label: '烟酒行'},
+  {value: '48', label: '成人用品'},
+  {value: '99', label: '其他'}];
+
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
   if (typeof keys === "undefined" || length(keys) === 0) {
     return [];
   }
 
-  return keys.map(key => fn(obj[key], key));
+  return keys.map((key, index) => fn(obj[key], key, index));
 }
 
 /**
@@ -128,7 +161,7 @@ export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
   }
-  switch (typeof obj){
+  switch (typeof obj) {
     case "boolean":
       return Number(obj)
     case "number":
@@ -145,7 +178,7 @@ export function length(obj) {
 
 }
 
- const pickImageOptions = (cropping) => {
+const pickImageOptions = (cropping, allowMultiplePic = false) => {
   return {
     width: 800,
     height: 800,
@@ -153,9 +186,11 @@ export function length(obj) {
     cropperCircleOverlay: false,
     includeExif: true,
     cropperChooseText: '选择图片',
-    cropperCancelText: '取消'
+    cropperCancelText: '取消',
+    multiple: allowMultiplePic
   };
 }
+
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
@@ -264,7 +299,7 @@ export function intOf(val) {
 }
 
 function parameterByName(name, url) {
-  name = name.replace(/[\[\]]/g, "\\$&");
+  name = name.replace(/[[\]]/g, "\\$&");
   let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
     results = regex.exec(url);
   if (!results) return null;
@@ -462,6 +497,32 @@ function throttle(fn, wait) {
   }
 }
 
+function getCenterLonLat(oneLon, oneLat, twoLon, twoLat) {
+  //oneLon：第一个点的经度；oneLat：第一个点的纬度；twoLon：第二个点的经度；twoLat：第二个点的纬度；
+  let aLon = 0, aLat = 0;
+  let bLon = Number(oneLon) - Number(twoLon);
+  let bLat = Number(oneLat) - Number(twoLat);
+  //Math.abs()绝对值
+  if (bLon > 0) {
+    aLon = Number(oneLon) - Math.abs(bLon) / 2;
+  } else {
+    aLon = Number(twoLon) - Math.abs(bLon) / 2;
+  }
+  if (bLat > 0) {
+    aLat = Number(oneLat) - Math.abs(bLat) / 2;
+  } else {
+    aLat = Number(twoLat) - Math.abs(bLat) / 2;
+  }
+  return {aLon, aLat};
+}
+
+function jbbsubstr(str = '', height = 0, start = 0, default_str = '') {
+  if (typeof str !== 'string' && typeof str !== 'number') {
+    return default_str;
+  }
+  let str_height = height > 0 ? height : height * -1;
+  return length(str || default_str) > str_height ? height > 0 ? str.substring(start, height - 1) + '...' : '...' + str.substr(height) : (str || default_str)
+}
 
 export default {
   objectMap,
@@ -494,5 +555,7 @@ export default {
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle
+  throttle,
+  getCenterLonLat,
+  jbbsubstr
 };

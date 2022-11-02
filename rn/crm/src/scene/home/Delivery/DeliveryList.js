@@ -103,7 +103,7 @@ class DeliveryList extends PureComponent {
           }
         }}
       >
-        <Text style={headerRightStyles.text}>{show_type === 1 ? `禁用` : `解绑`}</Text>
+        <Text style={headerRightStyles.text}>{show_type === 1 ? `禁用` : `解绑`} </Text>
       </TouchableOpacity>
     )
   }
@@ -443,7 +443,6 @@ class DeliveryList extends PureComponent {
         this.setState({
           show_modal: true,
           modal_msg: desc,
-          show_disable_all: false,
           multipleSelection: []
         })
       } else {
@@ -544,7 +543,7 @@ class DeliveryList extends PureComponent {
           <View style={styles.ml6}>
             <If condition={info?.id === undefined}>
               <View style={styles.info_undefined}>
-                <FontAwesome5 name={'circle'} color={colors.fontColor} size={22}/>
+                <FontAwesome5 name={'circle'} color={colors.b2} size={22}/>
               </View>
             </If>
 
@@ -606,7 +605,9 @@ class DeliveryList extends PureComponent {
                 let menu = [...this.state.wsbDeliveryList]
                 menu[idx].checked = !menu[idx].checked;
                 this.setState({
-                  wsbDeliveryList: menu
+                  wsbDeliveryList: menu,
+                  disable_id: info?.v2_type,
+                  delivery_way_state: info?.is_forbidden
                 })
                 if (menu[idx].checked) {
                   multipleSelection.push(info?.v2_type)
@@ -660,7 +661,11 @@ class DeliveryList extends PureComponent {
   renderListDisable = () => {
     let {show_disable_all, multipleSelection, wsbDeliveryList} = this.state
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.container}>
         <For index="idx" each="info" of={wsbDeliveryList}>
           <TouchableOpacity
             key={idx}
@@ -718,7 +723,11 @@ class DeliveryList extends PureComponent {
     list = list.concat(this.state.master_delivery_unbind_list)
     list = list.concat(this.state.master_delivery_bind_list)
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.container}>
         <For index="idx" each="info" of={list}>
           <TouchableOpacity
             key={idx}
@@ -836,7 +845,7 @@ class DeliveryList extends PureComponent {
             />
             {this.state.count_down > 0 ?
               <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`} </Text>
               </TouchableOpacity> :
               <TouchableOpacity onPress={() => {
                 showSuccess('验证码发送成功！')
@@ -885,7 +894,7 @@ class DeliveryList extends PureComponent {
             />
             {this.state.count_down > 0 ?
               <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`} </Text>
               </TouchableOpacity> :
               <TouchableOpacity onPress={() => {
                 showSuccess('验证码发送成功！')
@@ -953,7 +962,7 @@ class DeliveryList extends PureComponent {
                 onPress={() => this.unBindBtn()}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: this.state.unbind_id !== 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: this.state.unbind_id !== 0 ? colors.main_color : colors.b2,
                 }}
                 titleStyle={styles.bottomBtnTitle}
         />
@@ -969,7 +978,7 @@ class DeliveryList extends PureComponent {
                 onPress={() => this.unDisableBtn('禁用')}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
-                  backgroundColor: multipleSelection.length > 0 ? colors.main_color : colors.fontColor,
+                  backgroundColor: multipleSelection.length > 0 ? colors.main_color : colors.b2,
                 }}
                 titleStyle={styles.bottomBtnTitle}
         />
@@ -1085,7 +1094,7 @@ const styles = StyleSheet.create({
   cell_box: {
     margin: 0,
     padding: 10,
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
     flexDirection: "column",
     justifyContent: "space-evenly"
   },
@@ -1110,7 +1119,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color,
+    color: colors.color111,
   },
 
   img: {
@@ -1131,7 +1140,7 @@ const styles = StyleSheet.create({
     color: colors.f7,
   },
   ml6: {marginLeft: 6},
-  info_undefined: {backgroundColor: colors.fontColor, borderRadius: 11},
+  info_undefined: {backgroundColor: colors.b2, borderRadius: 11},
   itemBox: {flexDirection: 'column', paddingBottom: 5, flex: 1},
   itemBtn: {
     flexDirection: "row",

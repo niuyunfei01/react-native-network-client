@@ -206,9 +206,13 @@ class StockCheck extends BaseComponent {
 
     return (
       <View style={{flex: 1}}>
-        <ScrollView refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
-        }>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
+          }>
           {this.renderInfo()}
           <View style={cellStyles.cellTitle}>
             <Text style={cellStyles.cellsTitle}>商品库存</Text>

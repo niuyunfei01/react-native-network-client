@@ -59,7 +59,7 @@ class ReceiptScene extends PureComponent {
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
-        } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
+        } style={{backgroundColor: colors.f2, margin: pxToDp(30)}}>
         <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
       </ScrollView>
     );

@@ -25,6 +25,7 @@ import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
 // import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -375,7 +376,11 @@ class MaterialList extends React.Component {
     const {filterStatus, filterSupplyPriceHigh} = this.state
     return (
       <View style={{flex: 1, backgroundColor: '#fff'}}>
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.drawerItem}>
             <Text style={styles.drawerItemLabel}>状态 </Text>
             {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
@@ -538,6 +543,7 @@ class MaterialList extends React.Component {
       drawer: {
         shadowColor: '#000000',
         shadowOpacity: 0.8,
+        elevation: 10,
         shadowRadius: 3,
         borderLeftWidth: 1,
         borderLeftColor: colors.theme

@@ -30,6 +30,8 @@ const screenOptions = ({
 })
 
 export const AppNavigator = (props) => {
+
+
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
@@ -63,15 +65,31 @@ export const AppNavigator = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
-                      getComponent={() => require("../../scene/order/OrderInfo").default}
+        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
+        <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
+                      getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_OPERATION_LOG} options={{headerTitle: '操作日志'}}
+                      getComponent={() => require("../../scene/order/OrderOperationLog").default}
+                      initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderListScene").default}
+                      initialParams={initialRouteParams}/>
+
+        {/*<Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}*/}
+        {/*              getComponent={() => require("../../scene/home/Mine/MineScene").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
+
+        <Stack.Screen name={Config.ROUTE_MINE_NEW} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Mine/Mine").default}
+                      initialParams={initialRouteParams}/>
+
         <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Home" getComponent={() => require("../../scene/notice/NoticeList").default}
-                      options={{headerShown: false}}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
         <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
@@ -82,7 +100,7 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryInfo").default}/>
-        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '美团配送App授权说明'}}
+        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '美团跑腿帮送授权说明'}}
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
@@ -161,6 +179,11 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}
                       getComponent={() => require("../../scene/order/OrderTransferThird").default}
         />
+
+        <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderCallDelivery").default}
+        />
+
 
         <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
                       getComponent={() => require("../../scene/order/OrderAinSend").default}
@@ -277,6 +300,9 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
+                      getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
+        />
         <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} options={{headerTitle: '批量改价'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsBatchPriceScene').default}
                       initialParams={initialRouteParams}/>
@@ -336,6 +362,8 @@ export const AppNavigator = (props) => {
                       initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} options={{headerTitle: '商品搜索'}}
                       getComponent={() => require('../../scene/product/Goods/StoreGoodsSearch').default}/>
+        <Stack.Screen name={Config.ROUTE_SEARCH_AND_CREATE_GOODS} options={{headerTitle: '搜索新建商品'}}
+                      getComponent={() => require('../../scene/product/Goods/SearchAndCreateGoodsScene').default}/>
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '账户清单'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedExpense').default}
         />
@@ -359,8 +387,10 @@ export const AppNavigator = (props) => {
                       getComponent={() => require('../../scene/home/SeparatedExpense/FreezeList').default}
         />
 
-        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
+        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '我的钱包'}}
                       getComponent={() => require('../../scene/home/SeparatedExpense/SeparatedAccountFill').default}/>
+        <Stack.Screen name={Config.ROUTE_TRIPARTITE_RECHARGE} options={{headerTitle: '三方充值'}}
+                      getComponent={() => require('../../scene/home/SeparatedExpense/TripartiteRecharge').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}}
                       getComponent={() => require('../../scene/home/Store/SelectCity').default}/>
         <Stack.Screen name={Config.ROUTE_SELECT_QUALIFICATION} options={{headerTitle: '提交资质'}}
@@ -404,7 +434,7 @@ export const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       getComponent={() => require('../../scene/product/Inventory/Detail').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
+        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerShown: false}}
                       getComponent={() => require('../component/SearchShop').default}
         />
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
@@ -471,11 +501,20 @@ export const AppNavigator = (props) => {
 
 
         <Stack.Screen name={Config.RIDER_TRSJECTORY}
-                      options={{headerTitle: '骑手轨迹'}}
+                      options={{headerTitle: '地图'}}
                       getComponent={() => require('../../scene/order/RiderTrajectory').default}/>
         <Stack.Screen name={Config.ROUTE_ADD_MISSING_PICTURE}
-                      options={{headerTitle:'添加图片'}}
-                      getComponent={()=>require('../../scene/product/Goods/AddMissingPictureScene').default}/>
+                      options={{headerTitle: '添加图片'}}
+                      getComponent={() => require('../../scene/product/Goods/AddMissingPictureScene').default}/>
+        <Stack.Screen name={Config.ROUTE_PER_IDENTIFY}
+                      options={{headerTitle: '账号管理'}}
+                      getComponent={() => require('../../scene/home/Setting/AccountManagement').default}/>
+        <Stack.Screen name={Config.ROUTE_ADD_ACCOUNT}
+                      options={{headerTitle: '添加员工'}}
+                      getComponent={() => require('../../scene/home/Setting/AddAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_EDIT_ACCOUNT}
+                      options={{headerTitle: '编辑账号'}}
+                      getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

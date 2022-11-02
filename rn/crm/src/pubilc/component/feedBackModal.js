@@ -2,11 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
-import {Button} from "react-native-elements";
+import {Button, CheckBox} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../util/http";
 import pxToDp from "../util/pxToDp";
-import { CheckBox } from 'react-native-elements';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {TextArea} from "../../weui";
 
@@ -48,10 +47,7 @@ class FeedBackModal extends React.Component {
       is_legible: checked,
       feedback: suggest
     }
-    HttpUtils.post.bind(this.props)(url, params).then(res => {
-      console.log(res)
-    }, () => {
-    })
+    HttpUtils.post.bind(this.props)(url, params).then()
   }
 
   closeRemindModal = () => {
@@ -74,7 +70,7 @@ class FeedBackModal extends React.Component {
     })
   }
 
-  render =  () => {
+  render = () => {
     let {showAdvicesVisible, checked, suggest} = this.state
     return <Modal hardwareAccelerated={true}
                   onRequestClose={() => this.closeRemindModal()}
@@ -88,7 +84,7 @@ class FeedBackModal extends React.Component {
             <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
             <Text style={styles.modalContentTitleText}>反馈信息 </Text>
             <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
-              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
+              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.b2}}/>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
@@ -98,13 +94,16 @@ class FeedBackModal extends React.Component {
               <For each="info" of={options} index="key">
                 <TouchableOpacity style={styles.TouchBox} onPress={() => this.setItem(info.key)}>
                   <Text>{info.label} </Text>
-                  <CheckBox center type={'material'} size={16} checkedIcon={'dot-circle-o'} checkedColor={colors.main_color}
+                  <CheckBox center type={'material'} size={16} checkedIcon={'dot-circle-o'}
+                            checkedColor={colors.main_color}
                             uncheckedIcon={'circle-o'} checked={checked === info.key}
                             onPress={() => this.setItem(info.key)}/>
                 </TouchableOpacity>
               </For>
               <If condition={checked === 1}>
                 <TextArea
+                  multiline={true}
+                  numberOfLines={4}
                   maxLength={60}
                   style={styles.suggestInput}
                   placeholder=" 请输入修改建议"
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     fontSize: 35,
-    color: colors.fontColor
+    color: colors.b2
   },
   modalBtnWrap: {
     backgroundColor: colors.main_color,

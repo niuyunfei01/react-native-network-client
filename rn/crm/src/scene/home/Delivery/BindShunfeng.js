@@ -82,7 +82,7 @@ class BindShunfeng extends PureComponent {
     });
   }
 
-  find = () => {
+  find = async () => {
     try {
       const {currVendorId} = tool.vendor(this.props.global)
       const data = {
@@ -92,7 +92,7 @@ class BindShunfeng extends PureComponent {
         m: this.props.global.currentUserProfile.mobilephone,
         place: 'mine'
       }
-      JumpMiniProgram("/pages/service/index", data);
+     await JumpMiniProgram("/pages/service/index", data);
     } catch (e) {
       showError('打开小程序失败')
     }

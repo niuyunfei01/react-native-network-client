@@ -6,7 +6,7 @@ import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import tool from "../../../pubilc/util/tool";
-import {Button, Switch, CheckBox} from "react-native-elements";
+import {Button, CheckBox, Switch} from "react-native-elements";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 
@@ -113,7 +113,7 @@ class SettingDeliveryInfo extends PureComponent {
       return;
     }
 
-    if(Number(order_require_minutes) <= 0){
+    if (Number(order_require_minutes) <= 0) {
       ToastLong("需要配置预订单自动呼叫骑手时间");
       this.setState({isRefreshing: false});
       return;

@@ -125,7 +125,11 @@ class SettlementScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.background}}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{flex: 1, padding: 10, backgroundColor: colors.f3}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.getSupplyList.bind(this)}/>
         <If condition={this.state.show_pay_info}>
           {this.renderPayList()}
@@ -290,7 +294,7 @@ class SettlementScene extends PureComponent {
                   <Text style={{
                     color: ite.status_label === "待打款" ? colors.warn_color : colors.color999,
                     fontSize: 14
-                  }}>{ite.status_label}</Text>
+                  }}>{ite.status_label} </Text>
                   <View style={{flex: 1}}></View>
                   <Text style={{color: colors.color333, fontSize: 18, fontWeight: 'bold'}}>
                     {tool.toFixed(ite.bill_price)}

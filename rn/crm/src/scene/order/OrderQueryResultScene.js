@@ -62,7 +62,7 @@ class OrderQueryResultScene extends PureComponent {
     const {navigation, route} = props
     let title = '全部订单'
     let type = 'done'
-    if (route.params.additional !== undefined && route.params.additional) {
+    if (route?.params?.additional !== undefined && route?.params?.additional) {
       title = '补送单'
       type = 'additional'
     }
@@ -196,7 +196,6 @@ class OrderQueryResultScene extends PureComponent {
     if (this.state.isLoading) {
       return null;
     }
-    showModal("加载中...")
     this.setState({isLoading: true})
     const {accessToken, currStoreId} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
@@ -250,7 +249,6 @@ class OrderQueryResultScene extends PureComponent {
     if (isLoading) {
       return
     }
-    showModal("加载中...")
     this.setState({isLoading: true})
 
     let params = {
@@ -317,7 +315,7 @@ class OrderQueryResultScene extends PureComponent {
       const api = `/v1/new_api/orders/barcode_decode/${code}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then((res) => {
         if (res.order_id && Number(res.order_id) > 0) {
-          this.onPress(Config.ROUTE_ORDER, {orderId: res.order_id})
+          this.onPress(Config.ROUTE_ORDER_NEW, {orderId: res.order_id})
         }
       })
     }
@@ -477,7 +475,7 @@ class OrderQueryResultScene extends PureComponent {
   renderContent() {
     const {orders, isCanLoadMore, isLoading} = this.state
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <FlatList
           data={orders}
           renderItem={this.renderItem}
@@ -505,7 +503,7 @@ class OrderQueryResultScene extends PureComponent {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
         <If condition={!this.state.isLoading}>
-          <Text style={{fontSize: 18, color: colors.fontColor}}>
+          <Text style={{fontSize: 18, color: colors.b2}}>
             未搜索到订单
           </Text>
         </If>

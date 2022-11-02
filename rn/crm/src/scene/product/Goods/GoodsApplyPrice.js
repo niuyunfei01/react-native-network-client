@@ -180,7 +180,11 @@ class GoodsApplyPrice extends Component {
     let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{marginBottom: pxToDp(114), flex: 1}}>
           <GoodsItem
             wmText={'当前外卖价'}
             name={this.state.product.name}

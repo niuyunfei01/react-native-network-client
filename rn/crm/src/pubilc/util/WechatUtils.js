@@ -4,8 +4,10 @@ import * as wechat from 'react-native-wechat-lib'
 import Config from "../common/config";
 import tool from "./tool";
 import {getReadableVersion} from "react-native-device-info/src/index";
+import {ToastShort} from "./ToastUtils";
 
-wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
+let regStatus = false
+wechat.registerApp(Config.APP_ID, Config.universalLink).then(() => regStatus = true);
 
 function shareWechatImage(imageUrl, scene) {
   return new Promise((resolve, reject) => {
@@ -18,19 +20,24 @@ function shareWechatImage(imageUrl, scene) {
 
 }
 
-function JumpMiniProgram(path = "/pages/service/index", data = {}) {
+async function JumpMiniProgram(path = "/pages/service/index", data = {}) {
+  if (!regStatus) {
+    ToastShort('请重新打开外送帮重试')
+    return
+  }
+  const isInstalled = await wechat.isWXAppInstalled()
+  if (!isInstalled) {
+    ToastShort('请先安装微信')
+    return
+  }
   let str = '?ver=' + getReadableVersion() + '&';
   if (tool.length(data) > 0) {
     let paramsArray = [];
     Object.keys(data).forEach(key => paramsArray.push(key + '=' + data[key]))
     str += paramsArray.join('&')
   }
-  wechat.launchMiniProgram({
-    userName: Config.Program_id,
-    path: path + str
-  }, (res) => {
-  }).then(() => {
-  });
+  await wechat.launchMiniProgram({userName: Config.Program_id, path: path + str})
+
 }
 
 function wechatLogin() {

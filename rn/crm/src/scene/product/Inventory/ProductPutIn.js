@@ -129,7 +129,11 @@ class ProductPutIn extends React.Component {
 
   renderBody() {
     return (
-      <ScrollView>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         {this.renderInfo()}
         {this.renderForm()}
       </ScrollView>

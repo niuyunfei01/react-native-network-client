@@ -1,12 +1,21 @@
 import React from "react";
-import {FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {LineView, ShortLineView, Styles} from "../home/GoodsIncrementService/GoodsIncrementServiceStyle";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../pubilc/styles/colors";
 import CommonModal from "../../pubilc/component/goods/CommonModal";
 import {Checkbox} from "@ant-design/react-native";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import InputBoard from "../../pubilc/component/InputBoard";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
@@ -128,7 +137,8 @@ const styles = StyleSheet.create({
     fontSize: 12, fontWeight: '400', color: colors.red, lineHeight: 17, marginLeft: 23, marginTop: 11
   },
   checkBoxWrap: {flexDirection: 'row', alignItems: 'center'},
-  pageWrap: {marginBottom: 12}
+  pageWrap: {marginBottom: 12},
+  modalBottom: {paddingBottom: 24}
 })
 
 class NewRetailPriceScene extends React.PureComponent {
@@ -373,7 +383,7 @@ class NewRetailPriceScene extends React.PureComponent {
   renderSelectSpec = () => {
     const {skus} = this.state
     return (
-      <>
+      <View style={styles.modalBottom}>
         <View style={styles.baseRowCenterWrap}>
           <View style={styles.closeModal}/>
           <Text style={styles.modalHeaderText}>
@@ -387,7 +397,7 @@ class NewRetailPriceScene extends React.PureComponent {
                   keyExtractor={(item, index) => `${index}`}
                   initialNumToRender={5}
         />
-      </>
+      </View>
     )
   }
 
@@ -454,7 +464,7 @@ class NewRetailPriceScene extends React.PureComponent {
       editAlonePrice
     } = this.state
     return (
-      <InputBoard>
+      <View style={styles.modalBottom}>
         <View style={styles.baseRowCenterWrap}>
           <Text onPress={this.closeModal} style={styles.cancelBtn}>
             取消
@@ -560,7 +570,7 @@ class NewRetailPriceScene extends React.PureComponent {
           </View>
 
         </If>
-      </InputBoard>
+      </View>
     )
   }
 
@@ -571,7 +581,7 @@ class NewRetailPriceScene extends React.PureComponent {
     const {modalVisible, openModalFrom} = this.state
     return (
       <CommonModal visible={modalVisible} position={'flex-end'}>
-        <View style={styles.modalWrap}>
+        <KeyboardAvoidingView style={styles.modalWrap} behavior={Platform.select({android: 'height', ios: 'padding'})}>
           <If condition={openModalFrom === 'spec'}>
             {this.renderSelectSpec()}
           </If>
@@ -579,7 +589,7 @@ class NewRetailPriceScene extends React.PureComponent {
             condition={openModalFrom === 'cost_price' || openModalFrom === 'unified_pricing' || openModalFrom === 'separatelyPriced'}>
             {this.renderPrice()}
           </If>
-        </View>
+        </KeyboardAvoidingView>
       </CommonModal>
     )
   }
@@ -587,7 +597,11 @@ class NewRetailPriceScene extends React.PureComponent {
   render() {
     return (
       <>
-        <ScrollView style={styles.pageWrap}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.pageWrap}>
           {this.getHeader()}
           {this.getPlatformPrice()}
           {this.getSinglePrice()}

@@ -47,7 +47,7 @@ class VersionScene extends PureComponent {
 
   setVersion = () => {
     showModal('获取版本信息中')
-    let { accessToken } = this.props.global;
+    let {accessToken} = this.props.global;
     const api = `/api/check_version?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       hideModal()
@@ -79,7 +79,7 @@ class VersionScene extends PureComponent {
         curr_version_name: version_name,
         isRefreshing: false
       })
-    }).catch(() => {})
+    })
   }
 
   render() {
@@ -99,10 +99,10 @@ class VersionScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}>
+        style={{backgroundColor: colors.f2}}>
         {is_newest_version ? (
           <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
-            <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version})    </Text>
+            <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version}) </Text>
             <Text style={styles.newest_version}>已是最新版本</Text>
           </View>
         ) : (

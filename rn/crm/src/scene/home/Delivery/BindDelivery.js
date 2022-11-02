@@ -11,6 +11,7 @@ import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import {Button, Input} from "react-native-elements";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import Entypo from "react-native-vector-icons/Entypo";
+import {SFCategory} from "../../../pubilc/util/tool";
 
 const mapStateToProps = state => {
   let {global} = state
@@ -22,38 +23,7 @@ const mapDispatchToProps = dispatch => {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
-const data = [
-  {value: '1', label: '快餐'},
-  {value: '2', label: '送药'},
-  {value: '3', label: '百货'},
-  {value: '4', label: '脏衣服收'},
-  {value: '5', label: '干净衣服派'},
-  {value: '6', label: '生鲜'},
-  {value: '7', label: '保单'},
-  {value: '8', label: '高端饮品'},
-  {value: '9', label: '现场勘验'},
-  {value: '10', label: '快递'},
-  {value: '12', label: '文件'},
-  {value: '13', label: '蛋糕'},
-  {value: '14', label: '鲜花'},
-  {value: '15', label: '电子数码'},
-  {value: '16', label: '服装鞋帽'},
-  {value: '17', label: '汽车配件'},
-  {value: '18', label: '珠宝'},
-  {value: '20', label: '披萨'},
-  {value: '21', label: '中餐'},
-  {value: '22', label: '水产'},
-  {value: '27', label: '专人直送'},
-  {value: '32', label: '中端饮品'},
-  {value: '33', label: '便利店'},
-  {value: '34', label: '面包糕点'},
-  {value: '35', label: '火锅'},
-  {value: '36', label: '证照'},
-  {value: '40', label: '烧烤小龙虾'},
-  {value: '41', label: '外部落地配'},
-  {value: '47', label: '烟酒行'},
-  {value: '48', label: '成人用品'},
-  {value: '99', label: '其他'}];
+
 
 class BindDelivery extends PureComponent {
 
@@ -67,7 +37,7 @@ class BindDelivery extends PureComponent {
       app_key: '',
       app_secret: '',
       shop_id: '',
-      storename : store_info?.name
+      storename: store_info?.name
     }
 
     this.onChange = value => {
@@ -102,13 +72,17 @@ class BindDelivery extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={{
-        marginBottom: pxToDp(22),
-        backgroundColor: colors.white
-      }}
-                  automaticallyAdjustContentInsets={false}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
+          marginBottom: pxToDp(22),
+          backgroundColor: colors.white
+        }}
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <Text style={{fontSize: 16, color: colors.color333, padding: 10}}>{this.state.storename} </Text>
         <Text style={{
@@ -121,7 +95,7 @@ class BindDelivery extends PureComponent {
         <View style={{
           padding: 10,
           flexDirection: "row",
-          borderColor: colors.fontColor,
+          borderColor: colors.b2,
           borderWidth: pxToDp(1),
           // justifyContent: 'center',
           alignItems: 'center',
@@ -144,7 +118,7 @@ class BindDelivery extends PureComponent {
         <View style={{
           flexDirection: "row",
           padding: 10,
-          borderColor: colors.fontColor,
+          borderColor: colors.b2,
           borderWidth: pxToDp(1),
           alignItems: 'center',
         }}>
@@ -158,7 +132,7 @@ class BindDelivery extends PureComponent {
 
               this.setState({value});
             }}
-            data={data}
+            data={SFCategory}
             skin="customer"
             defaultKey={-999}
           >

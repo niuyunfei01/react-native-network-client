@@ -1,5 +1,5 @@
 import React from "react";
-import {Text, StyleSheet, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Text} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {Styles} from "./GoodsIncrementServiceStyle";
 
@@ -13,7 +13,11 @@ export default class MemberAgreementScene extends React.PureComponent {
 
   render() {
     return (
-      <ScrollView style={Styles.zoneWrap}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={Styles.zoneWrap}>
         <Text style={[styles.content]}>
           <Text style={styles.bold}>
             &emsp;&emsp;外送帮会员服务由北京家帮帮科技有限公司（以下亦称“家帮帮”）提供。《外送帮会员服务协议》由您和家帮帮进行缔结，对双方具有同等
@@ -45,7 +49,7 @@ export default class MemberAgreementScene extends React.PureComponent {
           &emsp;&emsp;4.特别提醒您，使用外送帮会员权益需要满足一定软件版本、设备及/或操作系统要求，因此，家帮帮建议您及时升级应用程序或操作系统
           版本、或更换使用设备以顺利的享受会员权益。{`\n`}
           &emsp;&emsp;5.外送帮会员服务所有权及相关知识产权归家帮帮所有或经过授权使用，您仅拥有本协议项下拥有本协议项下外送帮会员服务的使用权。{`\n`}
-          <Text style={styles.bold}>&emsp;&emsp;三、服务期限{`\n`}</Text>
+          <Text style={styles.bold}>&emsp;&emsp;三、服务期限{`\n`} </Text>
           &emsp;&emsp;1.会员服务的服务期限以支付相应会员费用对应的服务期限为准，您可以通过登录外送帮会员中心查询。
           <Text style={styles.bold}>
             特别提醒您，该期限不因您未使用相应服务而延长。当会员服务期限到期后，外送帮会员服务软件将停止继续向您提供会员服务；但如您在服务期限到期
@@ -88,7 +92,7 @@ export default class MemberAgreementScene extends React.PureComponent {
           &emsp;&emsp;如果您有任何需要投诉或申诉的内容，请在APP在线联系客服办理，我们会立即处理您的情况，如需核实，我们会在7个工作日内将处理结果或意见反馈到您。{`\n`}
           <Text style={styles.bold}>
             &emsp;&emsp;八、其他{`\n`}
-         </Text>
+          </Text>
           &emsp;&emsp;1.本协议的生效、履行、解释及争议的解决均适用中华人民共和国法律。{`\n`}
           &emsp;&emsp;2.如就本协议的签订、履行等发生任何争议的，双方应尽量友好协商解决；协商不成时，任何一方均可向家帮帮住所地的人民法院提起诉讼。{`\n`}
           &emsp;&emsp;3.如本协议因与中华人民共和国现行法律相抵触而导致部分无效的，不影响本协议其他条款的效力。{`\n`}

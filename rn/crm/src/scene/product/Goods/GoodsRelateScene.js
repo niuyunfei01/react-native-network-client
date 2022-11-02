@@ -187,17 +187,21 @@ class GoodsRelatedScene extends PureComponent {
         <View style={{height: pxToDp(70), justifyContent: 'center', paddingHorizontal: pxToDp(30)}}>
           <Text style={{color: colors.color333}}>关联店铺</Text>
         </View>
-        <ScrollView style={{backgroundColor: '#fff', flex: 1}}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => {
-                          this.setState({isRefreshing: true});
-                          this.getStoresList()
-                        }}
-                        tintColor='gray'
-                      />
-                    }>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: '#fff', flex: 1}}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => {
+                this.setState({isRefreshing: true});
+                this.getStoresList()
+              }}
+              tintColor='gray'
+            />
+          }>
           {
             tool.length(this.state.storesList) > 0 ? this.state.storesList.map((item, index) => {
               return (

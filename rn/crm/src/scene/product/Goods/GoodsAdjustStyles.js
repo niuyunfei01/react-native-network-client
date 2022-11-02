@@ -18,22 +18,22 @@ export default {
     flexDirection: "row",
   },
   tabs: {
-    height: pxToDp(64),
+    alignItems: 'center',
+    justifyContent: 'center',
     flexDirection: 'row',
-    overflow: 'hidden',
+
     borderRadius: pxToDp(5),
     backgroundColor: colors.main_color,
     borderBottomWidth: 0.5,
-    borderColor: colors.color999
   },
   tabItem: {
-    height: pxToDp(62),
+    paddingVertical: 6,
     width: pxToDp(180),
     fontSize: pxToDp(30),
     color: colors.main_color,
     backgroundColor: colors.white,
     textAlign: 'center',
-    textAlignVertical: 'center',
+
     borderWidth: 0.5,
     borderColor: colors.main_color,
   },

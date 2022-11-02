@@ -46,13 +46,17 @@ class ServiceChargeDesc extends PureComponent {
   render() {
     const {list} = this.state;
     return (
-      <ScrollView style={{
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        flex: 1,
-        backgroundColor: colors.background,
-        borderRadius: 4
-      }}>
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
+          paddingVertical: 12,
+          paddingHorizontal: 10,
+          flex: 1,
+          backgroundColor: colors.f3,
+          borderRadius: 4
+        }}>
         <View style={{
           padding: 12,
           backgroundColor: colors.white,

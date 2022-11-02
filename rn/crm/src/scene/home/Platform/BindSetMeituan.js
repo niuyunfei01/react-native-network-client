@@ -35,7 +35,11 @@ class BindSetMeituan extends PureComponent {
           urls={[{url: this.state.showImg}]}
           onClickModal={() => this.onToggleFullScreen()}
         />
-        <ScrollView style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}>
           <View style={{
             backgroundColor: colors.white,
             borderRadius: 8,
@@ -46,7 +50,7 @@ class BindSetMeituan extends PureComponent {
             <View style={{
               borderBottomWidth: pxToDp(1),
               paddingBottom: 2,
-              borderColor: colors.fontColor
+              borderColor: colors.b2
             }}>
               <Text style={{
                 color: colors.color333,
@@ -85,7 +89,7 @@ class BindSetMeituan extends PureComponent {
             <View style={{
               borderBottomWidth: pxToDp(1),
               paddingBottom: 2,
-              borderColor: colors.fontColor
+              borderColor: colors.b2
             }}>
               <Text style={{
                 color: colors.color333,
@@ -120,7 +124,7 @@ class BindSetMeituan extends PureComponent {
             <View style={{
               borderBottomWidth: this.state.showBindDesc ? pxToDp(1) : 0,
               paddingBottom: this.state.showBindDesc ? 2 : 0,
-              borderColor: colors.fontColor
+              borderColor: colors.b2
             }}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={{
@@ -131,7 +135,7 @@ class BindSetMeituan extends PureComponent {
                 }}>如何在外送帮绑定美团店铺 </Text>
                 <View style={{flexGrow: 1}}></View>
                 <Entypo name={this.state.showBindDesc ? "chevron-thin-up" : "chevron-thin-right"}
-                        style={{fontSize: pxToDp(40), color: colors.fontColor, marginRight: 6}}></Entypo>
+                        style={{fontSize: pxToDp(40), color: colors.b2, marginRight: 6}}></Entypo>
               </View>
             </View>
             <If condition={this.state.showBindDesc}>
@@ -227,7 +231,7 @@ class BindSetMeituan extends PureComponent {
             <View style={{
               borderBottomWidth: this.state.showUnBindDesc ? pxToDp(1) : 0,
               paddingBottom: this.state.showUnBindDesc ? 2 : 0,
-              borderColor: colors.fontColor
+              borderColor: colors.b2
             }}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={{
@@ -238,7 +242,7 @@ class BindSetMeituan extends PureComponent {
                 }}>如何在外送帮解除美团店铺绑定 </Text>
                 <View style={{flexGrow: 1}}></View>
                 <Entypo name={this.state.showUnBindDesc ? "chevron-thin-up" : "chevron-thin-right"}
-                        style={{fontSize: pxToDp(40), color: colors.fontColor, marginRight: 6}}></Entypo>
+                        style={{fontSize: pxToDp(40), color: colors.b2, marginRight: 6}}></Entypo>
               </View>
             </View>
 

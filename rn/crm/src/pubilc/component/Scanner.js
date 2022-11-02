@@ -14,9 +14,24 @@ import {
 } from 'react-native'
 import PropType from 'prop-types'
 import tool from "../util/tool";
+import Sound from 'react-native-sound';
 
-const Sound = require('react-native-sound');
 Sound.setCategory('Playback');
+const barCodeTypes = [
+  RNCamera.Constants.BarCodeType.aztec,
+  RNCamera.Constants.BarCodeType.code128,
+  RNCamera.Constants.BarCodeType.code39,
+  RNCamera.Constants.BarCodeType.code39mod43,
+  RNCamera.Constants.BarCodeType.code93,
+  RNCamera.Constants.BarCodeType.ean13,
+  RNCamera.Constants.BarCodeType.ean8,
+  RNCamera.Constants.BarCodeType.pdf417,
+  RNCamera.Constants.BarCodeType.upc_e,
+  RNCamera.Constants.BarCodeType.interleaved2of5,
+  RNCamera.Constants.BarCodeType.itf14,
+  RNCamera.Constants.BarCodeType.datamatrix,
+]
+const googleVisionBarcodeType = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX
 
 class Scanner extends React.Component {
   static propTypes = {
@@ -99,50 +114,27 @@ class Scanner extends React.Component {
   render() {
     return (
 
-      <Modal
-        visible={this.props.visible}
-        onRequestClose={this.props.onClose}
-      >
+      <Modal visible={this.props.visible} onRequestClose={this.props.onClose}>
         <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
           <View style={styles.container}>
             <View style={styles.header}>
               <TouchableOpacity onPress={() => this.props.onClose()}>
-                <View style={{flexDirection: 'row'}}>
-                  {/*<Icon name={'left'} size="md"/>*/}
-                  <Text style={styles.title}>{this.props.title} </Text>
-                </View>
+                <Text style={styles.title}>{this.props.title} </Text>
               </TouchableOpacity>
             </View>
             <RNCamera
-              ref={ref => {
-                this.camera = ref;
-              }}
+              ref={ref => this.camera = ref}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              flashMode={RNCamera.Constants.FlashMode.on}
-              barCodeTypes={[
-                RNCamera.Constants.BarCodeType.aztec,
-                RNCamera.Constants.BarCodeType.code128,
-                RNCamera.Constants.BarCodeType.code39,
-                RNCamera.Constants.BarCodeType.code39mod43,
-                RNCamera.Constants.BarCodeType.code93,
-                RNCamera.Constants.BarCodeType.ean13,
-                RNCamera.Constants.BarCodeType.ean8,
-                RNCamera.Constants.BarCodeType.pdf417,
-                RNCamera.Constants.BarCodeType.upc_e,
-                RNCamera.Constants.BarCodeType.interleaved2of5,
-                RNCamera.Constants.BarCodeType.itf14,
-                RNCamera.Constants.BarCodeType.datamatrix,
-              ]}
+              flashMode={RNCamera.Constants.FlashMode.auto}
+              barCodeTypes={barCodeTypes}
               onBarCodeRead={this.onBarCodeRead}
-              googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
+              googleVisionBarcodeType={googleVisionBarcodeType}
               captureAudio={false}
             >
               <View style={styles.rectangleContainer}>
                 <View style={styles.rectangle}/>
-                <Animated.View style={[
-                  styles.border,
-                  {transform: [{translateY: this.state.moveAnim}]}]}/>
+                <Animated.View style={[styles.border, {transform: [{translateY: this.state.moveAnim}]}]}/>
                 <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描 </Text>
               </View>
             </RNCamera>

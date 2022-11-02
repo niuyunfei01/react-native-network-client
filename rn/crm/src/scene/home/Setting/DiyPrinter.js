@@ -42,7 +42,6 @@ class DiyPrinter extends PureComponent {
       show_goods_code: false,
       show_shelves_code: false,
       upc: false,
-      invoice_serial_set: 0,
     }
     this.get_printer_custom_cfg()
   }
@@ -60,7 +59,6 @@ class DiyPrinter extends PureComponent {
         show_goods_code: res.show_goods_code,
         upc: res.upc !== undefined ? res.upc : false,
         show_shelves_code: res.show_shelves_code !== undefined ? res.show_shelves_code : false,
-        invoice_serial_set: res.invoice_serial_set ? Number(res.invoice_serial_set) : 0,
         isRefreshing: false
       })
     })
@@ -96,7 +94,6 @@ class DiyPrinter extends PureComponent {
         show_product_discounts,
         show_distribution_distance,
         show_goods_code,
-        invoice_serial_set,
         upc,
         show_shelves_code
       } = this.state;
@@ -107,13 +104,12 @@ class DiyPrinter extends PureComponent {
         show_product_discounts: show_product_discounts,
         show_distribution_distance: show_distribution_distance,
         show_goods_code: show_goods_code,
-        invoice_serial_set: invoice_serial_set,
         store_id: currStoreId,
         upc: upc,
         show_shelves_code: show_shelves_code,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
-      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+      HttpUtils.post.bind(this.props)(api, fromData).then(() => {
         ToastLong('操作成功')
         this.setState({
           isRefreshing: false
@@ -129,13 +125,16 @@ class DiyPrinter extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={this.state.isRefreshing}
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+          } style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
 
           <View style={{
             backgroundColor: colors.white,
@@ -331,11 +330,16 @@ class DiyPrinter extends PureComponent {
                                 paddingHorizontal: 8,
                                 height: pxToDp(90),
                               }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>显示货号（暂仅显示美团货号） </Text>
+              <View style={{flex: 1,}}>
+                <Text style={{
+                  fontSize: 14,
+                  color: colors.color333,
+                }}>显示货号 </Text>
+                <Text style={{
+                  fontSize: 10,
+                  color: colors.color999,
+                }}>暂仅显示美团货号</Text>
+              </View>
               <Switch color={colors.main_color} style={{
                 fontSize: 16,
               }} onChange={() => {
@@ -397,7 +401,7 @@ class DiyPrinter extends PureComponent {
                 <Text style={{
                   fontSize: 10,
                   color: colors.color999,
-                }}>开启后显示外送帮货架码，关闭后显示美团货架码</Text>
+                }}>开启后显示外送帮货架码</Text>
               </View>
               <Switch color={colors.main_color} style={{
                 fontSize: 16,
@@ -451,77 +455,6 @@ class DiyPrinter extends PureComponent {
             </TouchableOpacity>
           </View>
 
-          <View style={{
-            backgroundColor: colors.white,
-            borderRadius: 8,
-            marginBottom: 10,
-            padding: 10,
-            paddingBottom: 4,
-          }}>
-            <View style={{
-              borderBottomWidth: 1,
-              paddingBottom: 2,
-              borderColor: colors.colorEEE
-            }}>
-              <Text style={{
-                color: colors.color333,
-                padding: 10,
-                paddingLeft: 8,
-                fontSize: 15,
-                fontWeight: 'bold',
-              }}>小票 </Text>
-            </View>
-
-            <TouchableOpacity onPress={() => {
-              this.setState({
-                invoice_serial_set: 0
-              })
-            }}
-                              style={{
-                                borderBottomWidth: 1,
-                                borderColor: colors.colorEEE,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>使用平台店名与平台单号 </Text>
-              <If condition={this.state.invoice_serial_set === 0}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
-              </If>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => {
-              this.setState({
-                invoice_serial_set: 1
-              })
-            }}
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{
-                fontSize: 14,
-                color: colors.color333,
-                flex: 1,
-              }}>使用商家名称与总单号 </Text>
-              <If condition={this.state.invoice_serial_set === 1}>
-                <Entypo name={'check'} style={{
-                  fontSize: 22,
-                  color: colors.main_color,
-                }}/>
-              </If>
-            </TouchableOpacity>
-          </View>
 
           <View style={{
             backgroundColor: colors.white,

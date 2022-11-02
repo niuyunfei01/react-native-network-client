@@ -12,7 +12,11 @@ const styles = StyleSheet.create({
 })
 
 const Article = (props) =>
-  <ScrollView style={[styles.article, props.style]}>
+  <ScrollView
+    automaticallyAdjustContentInsets={false}
+    showsHorizontalScrollIndicator={false}
+    showsVerticalScrollIndicator={false}
+    style={[styles.article, props.style]}>
     {props.children}
   </ScrollView>
 

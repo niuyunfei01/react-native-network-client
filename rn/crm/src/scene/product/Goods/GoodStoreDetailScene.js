@@ -208,14 +208,14 @@ class GoodStoreDetailScene extends PureComponent {
 
   getStoreProdWithProd = () => {
     this.getproduct()
+    const {product_id, store_id} = this.state
     const {accessToken} = this.props.global;
-    const storeId = this.state.store_id || 0;
-    const pid = this.state.product_id || 0;
+    global.product_id = product_id
     const {params} = this.props.route
-    const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
+    const url = `/api_products/get_prod_with_store_detail/${store_id}/${product_id}?access_token=${accessToken}`;
     //showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      const product = pid === 0 ? params.item : data.p
+      const product = product_id === 0 ? params.item : data.p
       const spec = {...product, ...data.sp}
       const retail_price_enabled = data.vendor?.retail_price_enabled ? data.vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
@@ -242,7 +242,7 @@ class GoodStoreDetailScene extends PureComponent {
       selectedSpecArray.sort((a, b) => {
         return a.label > b.label ? 1 : -1
       })
-      if (pid === 0) {
+      if (product_id === 0) {
         this.setState({
           ext_stores: data.ext_stores,
           product: params.item,
@@ -334,7 +334,11 @@ class GoodStoreDetailScene extends PureComponent {
 
     return (
       <View style={styles.page}>
-        <ScrollView refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          refreshControl={this.refreshControl()} style={styles.scrollViewWrap}>
           {
             product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)
           }
@@ -813,9 +817,9 @@ const full_styles = StyleSheet.create({
 const styles = StyleSheet.create({
   page: {flex: 1, flexDirection: "column"},
   normalText: {color: colors.color333, fontSize: 12},
-  iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray},
+  iconOffSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.colorCCC},
   iconSaleStyle: {fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange},
-  scrollViewWrap: {backgroundColor: colors.main_back, flexDirection: 'column'},
+  scrollViewWrap: {backgroundColor: colors.f2, flexDirection: 'column'},
   stallWrap: {margin: 10, backgroundColor: colors.white, borderRadius: 8},
   stallTopWrap: {borderBottomWidth: 1, borderBottomColor: colors.colorEEE, borderStyle: 'solid'},
   stallTopText: {
@@ -823,7 +827,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingBottom: 12,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21
   },
@@ -968,7 +972,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     height: pxToDp(70),
-    backgroundColor: colors.main_back,
+    backgroundColor: colors.f2,
   },
   goods_desc: {
     fontSize: pxToDp(30),
@@ -1137,7 +1141,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10
   },
-  tabText: {color: colors.title_color, fontWeight: "bold"},
+  tabText: {color: colors.color111, fontWeight: "bold"},
   tabTextActivity: {color: colors.main_color, fontWeight: "bold"},
 });
 

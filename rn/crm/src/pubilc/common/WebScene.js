@@ -220,7 +220,7 @@ class WebScene extends PureComponent {
       stop = true;
     } else if (url.indexOf("/stores/view_order") >= 0) {
       if (navState && !navState.loading) {
-        navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
+        navigation.navigate(Config.ROUTE_ORDERS, {orderId: tool.parameterByName('wm_id', url)});
       }
       stop = true;
     } else if (url.indexOf("/users/login/crm/") >= 0
@@ -247,7 +247,7 @@ class WebScene extends PureComponent {
   componentDidMount() {
     this.navigationOptions(this.props)
     InteractionManager.runAfterInteractions(() => {
-      ToastShort('加载中')
+      // ToastShort('加载中')
       let {url, action} = this.props.route.params;
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.route.params;
@@ -256,9 +256,9 @@ class WebScene extends PureComponent {
       }
       let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
       this.setState(state)
+      //BackHandler.addEventListener('hardwareBackPress', this.backHandler);
+      this.props.navigation.setParams({backHandler: this.backHandler, refresh: this.onRefresh});
     });
-    //BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-    this.props.navigation.setParams({backHandler: this.backHandler, refresh: this.onRefresh});
 
   }
 

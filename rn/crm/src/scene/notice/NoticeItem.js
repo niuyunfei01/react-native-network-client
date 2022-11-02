@@ -106,7 +106,7 @@ class NoticeItem extends PureComponent {
     return (
       <TouchableOpacity onPress={() => {
         if (item.order_id > 0) {
-          onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
+          onPress(Config.ROUTE_ORDER_NEW, {orderId: item.order_id})
         } else if (parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS) {
           let params = {
             task_id: item.id,
@@ -219,7 +219,7 @@ class NoticeItem extends PureComponent {
           <View style={styles.bodyItemRow}>
             {/*<Text style={styles.itrmLabel}>店铺名称: </Text>*/}
             <Text style={{fontSize: 14, color: colors.color333, width: width * 0.85, fontWeight: "bold"}}>
-              {task_info}{task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}</Text>
+              {task_info}{task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id} </Text>
           </View>
         </If>
       </View>

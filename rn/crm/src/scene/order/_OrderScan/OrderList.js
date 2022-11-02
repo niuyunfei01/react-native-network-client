@@ -96,7 +96,7 @@ class OrderList extends BaseComponent {
 
           {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
           {/*  <View style={styles.mask}>*/}
-          {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
+          {/*    <Text style={{color: colors.warn_color, fontWeight: 'bold'}}>拣货完成！</Text>*/}
           {/*  </View>*/}
           {/*</If>*/}
         </View>
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.color333
   },
   itemTitle: {
-    color: colors.title_color,
+    color: colors.color111,
     fontSize: pxToDp(30),
     fontWeight: 'bold'
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(20)
   },
   itemTitleScanTip: {
-    color: colors.editStatusAdd,
+    color: colors.warn_color,
     fontSize: pxToDp(24),
     marginLeft: pxToDp(20)
   },

@@ -89,12 +89,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     params.putInt("wm_id", notify.getOrder_id());
                     params.putString("msg_id", msgId);
                     params.putBoolean("acceptNotifyNew", GlobalCtx.app().acceptNotifyNew());
-                    if (SettingUtility.getAutoPrintSetting()) {
-                        GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
-                        //OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
-                    } else {
-                        GlobalCtx.app().sendRNEvent(reactContext, "listenNewNotPrint", params);
-                    }
+                    GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
                 }
 
                 GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();

@@ -83,7 +83,6 @@ class StoreClose extends PureComponent {
         refundReasonStopBusiness: res.reason_list['STOP_TO_BUSINESS'],
         refundReasonCloseFifteen: res.reason_list['CLOSE_FIFTY_DAY']
       })
-    }).catch(() => {
     })
   }
 
@@ -130,7 +129,6 @@ class StoreClose extends PureComponent {
       setTimeout(() => {
         navigation.goBack();
       }, 1000)
-    }).catch(() => {
     })
 
   }
@@ -154,7 +152,6 @@ class StoreClose extends PureComponent {
         }
       }])
       this.fetchData()
-    }).catch(() => {
     })
   }
 
@@ -172,17 +169,21 @@ class StoreClose extends PureComponent {
     const navigation = this.props.navigation
     return (<View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-        <ScrollView style={[styles.container]}
-                    refreshControl={
-                      <RefreshControl
-                        refreshing={this.state.isRefreshing}
-                        onRefresh={() => this.fetchData()}
-                        tintColor='gray'
-                      />
-                    }
-                    automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.container]}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.fetchData()}
+              tintColor='gray'
+            />
+          }
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
           <For index="index" each="element" of={timeOptions}>
             <Cells style={{
@@ -289,7 +290,6 @@ class StoreClose extends PureComponent {
                       setTimeout(() => {
                         navigation.goBack();
                       }, 1000)
-                    }).catch(() => {
                     })
                   }
                 }, {text: '取消'}])
@@ -408,7 +408,6 @@ class StoreClose extends PureComponent {
                       setTimeout(() => {
                         navigation.goBack();
                       }, 1000)
-                    }).catch(() => {
                     })
                   }
                 }, {text: '取消'}])
@@ -610,7 +609,7 @@ class StoreClose extends PureComponent {
                       selectTextOnFocus={true}
                       autoCapitalize="none"
                       underlineColorAndroid="transparent"
-                      placeholderTextColor={colors.gray}
+                      placeholderTextColor={colors.colorCCC}
                       multiline={true}
                       onChangeText={text => {
                         this.setState({
@@ -665,6 +664,7 @@ class StoreClose extends PureComponent {
           backgroundColor: colors.white,
           shadowOffset: {width: -4, height: -4},
           shadowOpacity: 0.75,
+          elevation: 10,
           shadowRadius: 4
         }}>
           <Button title={'确定'}

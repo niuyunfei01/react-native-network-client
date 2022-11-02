@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.colorEEE
   },
-  itemLeftText: {fontSize: 15, fontWeight: '500', color: colors.color333, lineHeight: 21},
+  itemLeftText: {fontSize: 15, fontWeight: 'bold', color: colors.color333, lineHeight: 21},
   itemRightWrap: {flexDirection: 'row'},
   itemRightText: {fontSize: 14, fontWeight: '400', color: '#EE2626', lineHeight: 20},
   itemRightIcon: {color: colors.colorCCC, marginLeft: 9, alignSelf: 'center'},
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     textAlign: 'center',
     color: colors.color333,
-    fontWeight: "500",
+    fontWeight: 'bold',
     lineHeight: 25,
     fontSize: 18,
     paddingBottom: 25
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingBottom: 4
   },
-  selectContent:{
+  selectContent: {
     width: '70%',
     justifyContent: 'center',
     borderRadius: 4,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.colorEEE,
     borderBottomWidth: 1,
   },
-  modifySettlementTopLeftText: {fontSize: 15, fontWeight: '500', color: colors.color333, lineHeight: 21},
+  modifySettlementTopLeftText: {fontSize: 15, fontWeight: 'bold', color: colors.color333, lineHeight: 21},
   modifySettlementRightText: {fontSize: 16, fontWeight: '600', color: '#EE2626', lineHeight: 22},
 
   extraViewWrap: {backgroundColor: colors.white, paddingLeft: 18, paddingRight: 18},
@@ -524,7 +524,11 @@ class StallDetailScene extends PureComponent {
                 操作人员：{item.username}
               </Text>
             </View>
-            <ScrollView style={styles.remarkContentWrap}>
+            <ScrollView
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              style={styles.remarkContentWrap}>
               <Text style={styles.remarkText}>
                 备注信息：{item.deduct_desc}
               </Text>

@@ -7,8 +7,15 @@ import HttpUtils from "../util/http";
 import {connect} from "react-redux";
 import GlobalUtil from "../util/GlobalUtil";
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
+import PropTypes from "prop-types";
 
 class ErrorBoundary extends React.Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    device: PropTypes.object,
+    children: PropTypes.object,
+  }
+
   constructor(props) {
     super(props)
     this.state = {hasError: false, error: '', errorInfo: ''}
@@ -62,25 +69,22 @@ class ErrorBoundary extends React.Component {
     const {currStoreId, currentUser} = this.props.global
     const url = '/util/crm_error_report/1'
     const params = {
-      APP_VERSION_CODE: device.deviceInfo.appVersion,
+      APP_VERSION_CODE: device?.deviceInfo?.appVersion,
       CUSTOM_DATA: {
         'CURR-STORE': currStoreId,
         'UID': currentUser
       },
-      BRAND: device.deviceInfo.brand,
-      PHONE_MODEL: device.deviceInfo.device,
+      BRAND: device?.deviceInfo?.brand,
+      PHONE_MODEL: device?.deviceInfo?.device,
       STACK_TRACE: {
         error: `${error}`,
         errorInfo: `${errorInfo}`,
         currentRouteName: global.currentRouteName
       }
     };
-
-    HttpUtils.post(url, params).then(res => {
-
-    }).catch(error => {
-
-    })
+    if (`${error}`.indexOf('product_id') !== -1)
+      params.STACK_TRACE.product_id = global.product_id
+    HttpUtils.post(url, params).then()
   }
 
 
@@ -106,7 +110,6 @@ class ErrorBoundary extends React.Component {
       // 你可以自定义降级后的 UI 并渲染
       return this.getErrorPage()
     }
-
     return this.props.children
   }
 }

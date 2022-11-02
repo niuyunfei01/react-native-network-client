@@ -40,7 +40,6 @@ import Entypo from "react-native-vector-icons/Entypo"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import {Button, Image} from "react-native-elements";
 import BottomModal from "./BottomModal";
-import {Input} from "../../weui";
 import {MixpanelInstance} from "../util/analytics";
 
 let width = Dimensions.get("window").width;
@@ -53,12 +52,10 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const tipListTop = [
+const tipList = [
   {label: '1元', value: 1},
   {label: '2元', value: 2},
-  {label: '3元', value: 3}
-]
-const tipListBottom = [
+  {label: '3元', value: 3},
   {label: '4元', value: 4},
   {label: '5元', value: 5},
   {label: '10元', value: 10}
@@ -78,7 +75,7 @@ class OrderListItem extends React.PureComponent {
     order: PropType.object,
     onItemClick: PropTypes.func,
     setState: PropType.func,
-    comesBackBtn: PropType.number,
+    comesBackBtn: PropType.bool,
   };
   state = {
     modalTip: false,
@@ -130,7 +127,7 @@ class OrderListItem extends React.PureComponent {
           ToastShort('暂无数据')
         }
       }).catch((obj) => {
-        ToastShort(`操作失败：${obj.reason}`)
+        ToastShort(`操作失败：${obj?.reason}`)
       })
       this.setState({
         order_id: item.id,
@@ -173,30 +170,28 @@ class OrderListItem extends React.PureComponent {
   upAddTip = () => {
     let {addMoneyNum, shipId, addOrdersTip} = this.state;
     const {dispatch, accessToken, item} = this.props;
-    if (addMoneyNum > 0) {
-      if (addOrdersTip) {
-        dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
-          this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
-          if (tool.length(resp?.obj?.error_msg) > 0) {
-            ToastShort(resp?.obj?.error_msg)
-          } else {
-            ToastShort('操作成功')
-          }
-        }));
-        return;
-      }
-      dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
-        if (resp.ok) {
-          this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
-          ToastShort('操作成功')
-        } else {
-          this.setState({respReason: resp.desc, ok: resp.ok})
-        }
-        await this.setState({addMoneyNum: ''});
-      }));
-    } else {
-      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
+    if (Number(addMoneyNum) < 1) {
+      return this.setState({addMoneyNum: 1, respReason: '加小费的金额必须大于1元', ok: false});
     }
+    if (addOrdersTip) {
+      return dispatch(addTipMoneys(item?.id, addMoneyNum, accessToken, (resp) => {
+        this.setState({addMoneyNum: '', addTipModal: false, addOrdersTip: false})
+        if (tool.length(resp?.obj?.error_msg) > 0) {
+          ToastShort(resp?.obj?.error_msg)
+        } else {
+          ToastShort('操作成功')
+        }
+      }));
+    }
+    dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
+      if (resp.ok) {
+        this.setState({addTipModal: false, addOrdersTip: false, respReason: '加小费成功'})
+        ToastShort('操作成功')
+      } else {
+        this.setState({respReason: resp.desc, ok: resp.ok})
+      }
+      await this.setState({addMoneyNum: ''});
+    }));
   }
 
   onOverlookDelivery = (order_id) => {
@@ -207,10 +202,10 @@ class OrderListItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
       }).catch(e => {
-        ToastShort('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 600)
   }
@@ -228,13 +223,12 @@ class OrderListItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
-    this.onPress(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: order_id,
-      storeId: store_id,
-      selectedWay: [],
+    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -316,8 +310,8 @@ class OrderListItem extends React.PureComponent {
 
   loseDelivery = (val) => {
     this.mixpanel.track('订单列表页_忽略配送')
-    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-      text: '继续忽略配送',
+    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+      text: '忽略',
       onPress: () => {
         this.onOverlookDelivery(val)
       }
@@ -376,8 +370,9 @@ class OrderListItem extends React.PureComponent {
   }
 
   catLocation = (val) => {
+    let {order_id} = this.state
     this.setState({showDeliveryModal: false}, () => {
-      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val})
+      this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: val, order_id: order_id})
     })
     this.mixpanel.track('查看位置')
   }
@@ -588,14 +583,14 @@ class OrderListItem extends React.PureComponent {
         <If condition={item.show_store_name}>
           <View style={styles.orderInfoContent}>
             <Text style={styles.orderInfoStoreName}>店铺名称 </Text>
-            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name}</Text>
+            <Text style={styles.orderInfoStoreNameText}>{item.show_store_name} </Text>
           </View>
         </If>
 
         <If condition={item.orderTimeInList}>
           <View style={styles.orderTimeList}>
             <Text style={styles.orderTimeLabel}>下单时间 </Text>
-            <Text style={styles.orderTimeValue}>{item.orderTimeInList}</Text>
+            <Text style={styles.orderTimeValue}>{item.orderTimeInList} </Text>
           </View>
         </If>
 
@@ -632,7 +627,7 @@ class OrderListItem extends React.PureComponent {
 
   touchOrderInfoDetail = (item) => {
     this.mixpanel.track('点击详情')
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
   }
 
   touchShipDetail = (item) => {
@@ -664,6 +659,15 @@ class OrderListItem extends React.PureComponent {
 
   renderButton = () => {
     let {item} = this.props;
+    let obj_num = 0
+    if (this.props.comesBackBtn) {
+      obj_num = 1
+    } else {
+      tool.objectMap(item?.btn_list, (item, idx) => {
+        obj_num += item
+      })
+    }
+    let btn_width = 0.90 / Number(obj_num)
     return (
       <View
         style={[styles.btnContent, item?.btn_list && item?.btn_list?.switch_batch_add_tips ? {flexWrap: "wrap"} : {}]}>
@@ -673,7 +677,7 @@ class OrderListItem extends React.PureComponent {
                   onPress={() => this.loseDelivery(item.id)}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.colorCCC,
-                    width: width * 0.27
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.colorCCC, fontSize: 16}}
           />
@@ -687,7 +691,7 @@ class OrderListItem extends React.PureComponent {
                   }}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.color666,
-                    width: width * 0.27
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
           />
@@ -698,12 +702,25 @@ class OrderListItem extends React.PureComponent {
                   onPress={() => this.myselfSend(item)}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.main_color,
-                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
-
+        <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
+          <Button title={'加小费'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.addOrdersTip()
+                    this.mixpanel.track('订单列表页_加小费')
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    borderColor: colors.main_color,
+                    width: width * btn_width
+                  }]}
+                  titleStyle={{color: colors.main_color, fontSize: 16}}
+          />
+        </If>
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
           <Button title={'呼叫配送'}
                   onPress={() => {
@@ -711,7 +728,7 @@ class OrderListItem extends React.PureComponent {
                     this.mixpanel.track('订单列表页_呼叫配送')
                   }}
                   buttonStyle={[styles.callDeliveryBtn, {
-                    width: (item?.btn_list?.btn_ignore_delivery || item?.btn_list?.switch_batch_add_tips) ? width * 0.27 : width * 0.40
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
@@ -720,7 +737,7 @@ class OrderListItem extends React.PureComponent {
           <Button title={'联系骑手'}
                   onPress={() => this.dialNumber(item.ship_worker_mobile)}
                   buttonStyle={[styles.callDeliveryBtn, {
-                    width: width * 0.40
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
@@ -741,7 +758,7 @@ class OrderListItem extends React.PureComponent {
                   }}
                   buttonStyle={[styles.modalBtn, {
                     borderColor: colors.main_color,
-                    width: width * 0.40
+                    width: width * btn_width
                   }]}
                   titleStyle={{color: colors.main_color, fontSize: 16}}
           />
@@ -754,7 +771,7 @@ class OrderListItem extends React.PureComponent {
                     this.onAinSend(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
-                    width: width * 0.86,
+                    width: width * btn_width,
                     borderColor: colors.main_color,
                     backgroundColor: colors.main_color
                   }]}
@@ -768,26 +785,11 @@ class OrderListItem extends React.PureComponent {
                     this.toSetOrderComplete(item.id)
                   }}
                   buttonStyle={[styles.modalBtn, {
-                    width: width * 0.86,
+                    width: width * btn_width,
                     borderColor: colors.main_color,
                     backgroundColor: colors.main_color
                   }]}
                   titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </If>
-        <If condition={item?.btn_list && item?.btn_list?.switch_batch_add_tips}>
-          <Button title={'加小费'}
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-                    this.addOrdersTip()
-                    this.mixpanel.track('订单列表页_加小费')
-                  }}
-                  buttonStyle={[styles.modalBtn, {
-                    borderColor: colors.main_color,
-                    width: width * 0.86,
-                    marginTop: 10
-                  }]}
-                  titleStyle={{color: colors.main_color, fontSize: 16}}
           />
         </If>
       </View>
@@ -808,7 +810,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   routeOrder = (item) => {
-    this.onPress(Config.ROUTE_ORDER, {orderId: item.id})
+    this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
     this.mixpanel.track('订单详情页')
   }
 
@@ -872,78 +874,55 @@ class OrderListItem extends React.PureComponent {
   }
 
   renderAddTipModal = () => {
-    let {is_merchant_add_tip} = this.state
+    let {is_merchant_add_tip, addTipModal} = this.state
     return (
-      <Modal
-        visible={this.state.addTipModal}
-        onRequestClose={() => this.closeAddTipModal()}
-        animationType={'slide'}
-        transparent={true}
-      >
-        <View style={styles.modalBackground}>
+      <View>
+        <BottomModal
+          visible={addTipModal}
+          modal_type={'center'}
+          onPress={() => this.upAddTip()}
+          onPressClose={() => this.closeAddTipModal()}
+          title={'加小费'}
+          actionText={'确定'}
+          closeText={'取消'}
+          onClose={() => this.closeAddTipModal()}>
           <View style={[styles.container]}>
-            <TouchableOpacity onPress={() => this.closeAddTipModal()} style={styles.addTipRightIcon}>
-              <Entypo name={"circle-with-cross"}
-                      style={styles.addTipRightIconStyle}/>
-            </TouchableOpacity>
-            <Text style={styles.addTipTitleText}>加小费</Text>
             <Text style={styles.addTipTitleDesc}>多次添加以累计金额为主，最低一元</Text>
             <If condition={is_merchant_add_tip === 1}>
               <Text style={styles.addTipTitleTextRemind}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
             </If>
             <View style={[styles.container1]}>
               <Text style={styles.f26}>金额</Text>
-              <View style={styles.tipSelect}>
-                <For index='i' each='info' of={tipListTop}>
-                  <Text key={i} style={styles.amountBtn} onPress={() => {
+              <View
+                style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", flexWrap: "wrap"}}>
+                <For index='index' each='info' of={tipList}>
+                  <Text key={index} style={styles.amountBtn} onPress={() => {
                     this.onChangeAccount(info.value)
-                  }}>
-                    {info.label}
-                  </Text>
-                </For>
-              </View>
-              <View style={styles.tipSelect}>
-                <For index='i' each='info' of={tipListBottom}>
-                  <Text key={i} style={styles.amountBtn} onPress={() => {
-                    this.onChangeAccount(info.value)
-                  }}>{info.label}</Text>
+                  }}>{info.label} </Text>
                 </For>
               </View>
               <View style={styles.addTipInputBox}>
-                <Input
-                  style={styles.addTipInput}
-                  placeholder={'请输入其他金额'}
-                  defaultValue={`${this.state.addMoneyNum}`}
-                  keyboardType='numeric'
-                  onChangeText={(value) =>
-                    this.onChangeAccount(value)
-                  }
-                />
-                <Text style={styles.addTipInputRight}>元</Text>
+                <TextInput placeholder={"请输入其他金额"}
+                           onChangeText={(value) => {
+                             this.onChangeAccount(value)
+                           }}
+                           value={`${this.state.addMoneyNum}`}
+                           placeholderTextColor={'#ccc'}
+                           style={styles.addTipTextInput}
+                           underlineColorAndroid="transparent"/>
+                <Text style={{fontSize: pxToDp(26)}}>元</Text>
               </View>
               <If condition={!this.state.ok || this.state.addMoneyNum === 0}>
                 <View style={styles.addTipIcon}>
                   <Entypo name={"help-with-circle"}
                           style={styles.addTipHelpIcon}/>
-                  <Text style={styles.addTipReason}>{this.state.respReason}</Text>
+                  <Text style={styles.addTipReason}>{this.state.respReason} </Text>
                 </View>
               </If>
             </View>
-            <View style={styles.btn1}>
-              <View style={styles.flex1}>
-                <TouchableOpacity style={styles.marginH10} onPress={() => this.closeAddTipModal()}>
-                  <Text style={styles.btnText2}>取消</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.flex1}>
-                <TouchableOpacity style={styles.marginH10} onPress={() => this.upAddTip()}>
-                  <Text style={styles.btnText}>确定</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
           </View>
-        </View>
-      </Modal>
+        </BottomModal>
+      </View>
     )
   }
 
@@ -970,7 +949,7 @@ class OrderListItem extends React.PureComponent {
                 }} style={styles.deliveryModalTitle}>呼叫配送规则</Text>
                 <View style={{flex: 1}}/>
                 <TouchableOpacity onPress={() => this.closeDeliveryModal()}>
-                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>
+                  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.b2}}/>
                 </TouchableOpacity>
               </View>
 
@@ -1304,6 +1283,17 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10),
     marginVertical: 20,
   },
+  addTipTextInput: {
+    color: colors.color333,
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: '#999',
+    fontSize: 16,
+    height: pxToDp(75),
+    width: width * 0.6,
+    borderWidth: pxToDp(1),
+    borderRadius: pxToDp(10),
+    marginVertical: 20,
+  },
   addTipText: {fontWeight: "bold", fontSize: pxToDp(32)},
   addTipDesc: {
     fontSize: pxToDp(26),
@@ -1331,20 +1321,7 @@ const styles = StyleSheet.create({
     color: '#F32B2B',
     marginVertical: pxToDp(10)
   },
-  addTipInputBox: {alignItems: "center", marginTop: pxToDp(30)},
-  addTipInput: {
-    fontSize: pxToDp(24),
-    borderWidth: pxToDp(1),
-    paddingLeft: pxToDp(15),
-    width: "100%",
-    height: "40%"
-  },
-  addTipInputRight: {
-    fontSize: pxToDp(26),
-    position: "absolute",
-    top: "25%",
-    right: "5%"
-  },
+  addTipInputBox: {flexDirection: "row", justifyContent: "space-around", alignItems: "center"},
   addTipIcon: {flexDirection: "row", alignItems: "center", justifyContent: "flex-start"},
   addTipHelpIcon: {
     fontSize: pxToDp(35),
@@ -1525,15 +1502,12 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   container: {
-    width: '90%',
-    maxHeight: '70%',
     backgroundColor: '#fff',
     borderRadius: pxToDp(10),
     padding: pxToDp(20),
     alignItems: 'center'
   },
   container1: {
-    width: '95%',
     maxHeight: '70%',
     backgroundColor: '#fff',
     padding: pxToDp(20),
@@ -1543,9 +1517,10 @@ const styles = StyleSheet.create({
   },
   amountBtn: {
     borderWidth: 1,
-    borderColor: colors.title_color,
-    width: "30%", textAlign: 'center',
-    paddingVertical: pxToDp(5)
+    borderColor: colors.color111,
+    width: width * 0.2, textAlign: 'center',
+    paddingVertical: pxToDp(10),
+    marginVertical: pxToDp(5)
   },
   between: {
     flexDirection: "row",

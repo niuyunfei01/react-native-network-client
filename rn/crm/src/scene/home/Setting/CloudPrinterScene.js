@@ -242,7 +242,7 @@ class CloudPrinterScene extends PureComponent {
               tintColor='gray'
             />
           }
-          style={{backgroundColor: colors.main_back, flexGrow: 1}}
+          style={{backgroundColor: colors.f2, flexGrow: 1}}
         >
           <View style={{marginTop: 4}}>
             <Cells style={[styles.cell_box]}>
@@ -425,12 +425,12 @@ class CloudPrinterScene extends PureComponent {
   }
   renderRrinter = () => {
 
-    let {printer,cloud_printer_list} = this.state;
+    let {printer, cloud_printer_list} = this.state;
 
     return <List style={{marginTop: 12}}>
       {
-        cloud_printer_list&&cloud_printer_list.map((cloud_printer,index)=>{
-          return(
+        cloud_printer_list && cloud_printer_list.map((cloud_printer, index) => {
+          return (
             <RadioItem key={index} style={{fontSize: 12, fontWeight: 'bold'}}
                        checked={printer === cloud_printer.printer}
                        onChange={event => {

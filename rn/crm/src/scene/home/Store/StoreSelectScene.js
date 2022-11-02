@@ -9,9 +9,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import SearchStoreItem from "../../../pubilc/component/SearchStoreItem";
 import Loadmore from 'react-native-loadmore'
 import tool from "../../../pubilc/util/tool";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
-const rowHeight = 40
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -45,9 +43,7 @@ class StoreSelect extends PureComponent {
       access_token: global?.accessToken
     };
     this.clearHandle = this.clearHandle.bind(this)
-    this.handleFocus = this.handleFocus.bind(this)
     this.onCancel = this.onCancel.bind(this)
-    this.focus = this.focus.bind(this)
   }
 
   UNSAFE_componentWillMount() {
@@ -77,19 +73,10 @@ class StoreSelect extends PureComponent {
     this.setState({focus: true})
   }
 
-  focus() {
-    this.refs.searchInput.focus()
-  }
-
-  blur() {
-    this.refs.searchInput.blur()
-  }
 
   fetchData = (options = {}) => {
-    ToastShort('加载中')
     const {page, page_size, access_token} = this.state
     const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
-
     let params = {
       keywords: this.state.searchKeywords,
       page: options.page ? options.page : page,
@@ -132,7 +119,7 @@ class StoreSelect extends PureComponent {
           <SearchStoreItem key={index} onPress={() => {
             this.props.navigation.goBack()
             this.props.route.params.onBack(item)
-          }} item={item} rowHeight={rowHeight}/>
+          }} item={item} rowHeight={50}/>
         )
       }
     })
@@ -141,7 +128,7 @@ class StoreSelect extends PureComponent {
   listEmptyComponent = () => {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', height: 210}}>
-        <Text style={{fontSize: 18, color: colors.fontColor}}>
+        <Text style={{fontSize: 18, color: colors.b2}}>
           未搜索到门店
         </Text>
       </View>
@@ -156,6 +143,7 @@ class StoreSelect extends PureComponent {
           <View style={styles.searchInner}>
             <Entypo name="magnifying-glass" size={12} style={{color: colors.color999, marginRight: 10}}/>
             <TextInput
+              autoFocus={true}
               returnKeyType="search"
               eturnKeyLabel="搜索"
               value={searchKeywords}
@@ -185,18 +173,18 @@ class StoreSelect extends PureComponent {
             </If>
           </View>
         </View>
-        <If condition={focus}>
-          <Text style={styles.searchCancel} onPress={this.onCancel}>
-            {lang.cancel}
-          </Text>
-        </If>
+        {/*<If condition={focus}>*/}
+        {/*  <Text style={styles.searchCancel} onPress={this.onCancel}>*/}
+        {/*    {lang.cancel}*/}
+        {/*  </Text>*/}
+        {/*</If>*/}
       </View>
     )
   }
 
   renderContent = () => {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, paddingTop: 10}}>
         <Loadmore
           keyboardShouldPersistTaps="never"
           renderList={this.renderList()}

@@ -1,11 +1,11 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, Image, ImageBackground, Pressable, StyleSheet, Text, TextInput, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {ActionSheet} from "../../../weui";
 import ImagePicker from "react-native-image-crop-picker";
 import {showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
-import tool from "../../../pubilc/util/tool";
+import tool, {SFCategory} from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
@@ -14,41 +14,9 @@ import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {imageKey} from "../../../pubilc/util/md5";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
-
-const DATA = [
-  {value: 1, label: '快餐'},
-  {value: 2, label: '送药'},
-  {value: 3, label: '百货'},
-  {value: 4, label: '脏衣服收'},
-  {value: 5, label: '干净衣服派'},
-  {value: 6, label: '生鲜'},
-  {value: 7, label: '保单'},
-  {value: 8, label: '高端饮品'},
-  {value: 9, label: '现场勘验'},
-  {value: 10, label: '快递'},
-  {value: 12, label: '文件'},
-  {value: 13, label: '蛋糕'},
-  {value: 14, label: '鲜花'},
-  {value: 15, label: '电子数码'},
-  {value: 16, label: '服装鞋帽'},
-  {value: 17, label: '汽车配件'},
-  {value: 18, label: '珠宝'},
-  {value: 20, label: '披萨'},
-  {value: 21, label: '中餐'},
-  {value: 22, label: '水产'},
-  {value: 27, label: '专人直送'},
-  {value: 32, label: '中端饮品'},
-  {value: 33, label: '便利店'},
-  {value: 34, label: '面包糕点'},
-  {value: 35, label: '火锅'},
-  {value: 36, label: '证照'},
-  {value: 40, label: '烧烤小龙虾'},
-  {value: 41, label: '外部落地配'},
-  {value: 47, label: '烟酒行'},
-  {value: 48, label: '成人用品'},
-  {value: 99, label: '其他'}];
 
 class RegisterShunfeng extends PureComponent {
 
@@ -200,7 +168,7 @@ class RegisterShunfeng extends PureComponent {
             </Text>
             <ModalSelector
               onChange={value => this.onChange(value)}
-              data={DATA}
+              data={SFCategory}
               skin="customer"
               defaultKey={-999}
             >
@@ -424,7 +392,7 @@ class RegisterShunfeng extends PureComponent {
     )
   }
 
-  find = () => {
+  find =async () => {
     try {
       const {currVendorId} = tool.vendor(this.props.global)
       const data = {
@@ -434,7 +402,7 @@ class RegisterShunfeng extends PureComponent {
         m: this.props.global.currentUserProfile.mobilephone,
         place: 'mine'
       }
-      JumpMiniProgram("/pages/service/index", data);
+     await JumpMiniProgram("/pages/service/index", data);
     } catch (e) {
       showError('打开小程序失败')
     }
@@ -445,11 +413,11 @@ class RegisterShunfeng extends PureComponent {
     const {store, subject, success} = this.state
     return (
       <SafeAreaView style={styles.content}>
-        <ScrollView>
+        <KeyboardAwareScrollView>
           {
             success ? this.renderSuccess() : this.notSubmit(store, subject)
           }
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     );
   }
@@ -479,7 +447,7 @@ const styles = StyleSheet.create({
   titleStyle: {
     color: '#333333',
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     lineHeight: 21
   },
   textStyle: {

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!--设置状态栏透明开始-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!--设置状态栏透明结束-->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 
     <style name="Theme.Styled" parent="@style/Theme.AppCompat.Light">
         <item name="actionBarItemBackground">@drawable/selectable_background</item>
@@ -19,7 +26,6 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@drawable/launcher_</item>
     </style>
 
     <!-- Base application theme. -->

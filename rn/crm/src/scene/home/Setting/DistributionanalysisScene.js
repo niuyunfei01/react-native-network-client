@@ -1,5 +1,7 @@
 import React, {PureComponent} from 'react'
 import {
+  Appearance,
+  InteractionManager,
   PixelRatio,
   Platform,
   ScrollView,
@@ -12,16 +14,20 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showError, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Dialog from "../../common/component/Dialog";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Cts from "../../../pubilc/common/Cts";
+import Entypo from "react-native-vector-icons/Entypo";
+import Config from "../../../pubilc/common/config";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
+const {width} = Dimensions.get("window")
 const Distribution_Analysis = 'distribution_analysis';
 const Profit_AndLoss_Analysis = 0;
 const timeOptions = [
@@ -30,6 +36,7 @@ const timeOptions = [
   {label: '本月', value: 2},
   {label: '自定义', value: 3},
 ]
+const tableTitle = ['配送方式', '配送费', '总发单量', '平均成本', '平均距离']
 const styleLine = {
   borderTopColor: colors.colorDDD,
   borderTopWidth: 1 / PixelRatio.get() * 2,
@@ -49,7 +56,6 @@ class DistributionAnalysisScene extends PureComponent {
       currStoreId: currStoreId,
       accessToken: accessToken,
       DistributionAnalysisData: [],
-      tableTitle: ['配送方式', '配送费', '总发单量', '平均成本', '平均距离'],
       total_delivery: '',
       total_fee: '',
       dateStatus: 0,
@@ -64,17 +70,26 @@ class DistributionAnalysisScene extends PureComponent {
       analysis_by: Distribution_Analysis,
       analysis_done: Profit_AndLoss_Analysis,
       showHeader: true,
-      cardStatus: 0,
       profitAndLoss: [],
       startTimeSaveValue: new Date(),
       endTimeSaveValue: new Date(),
+      params: {
+        start_time: '',
+        end_time: ''
+      }
     }
     this.getDistributionAnalysisData = this.getDistributionAnalysisData.bind(this);
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.initializeTime()
+  }
+
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
   }
 
   initializeTime = () => {
@@ -100,18 +115,24 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  getProfitAndLossAnalysisData(startTime, endTime) {
+  getProfitAndLossAnalysisData = (startTime, endTime) => {
+    this.setParamsTime(startTime, endTime)
     const {currStoreId, accessToken} = this.state;
-    ToastShort("查询中");
+    showModal("查询中");
     const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
+      hideModal()
       this.setState({
         profitAndLoss: res?.data,
         startTimeSaveValue: startTime,
         endTimeSaveValue: endTime
       })
     }).catch((reason => {
+      hideModal()
       showError(reason?.desc)
+      this.setState({
+        headerType: 1
+      })
     }))
   }
 
@@ -133,12 +154,13 @@ class DistributionAnalysisScene extends PureComponent {
       return
     }
     let startTime
+    let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 2) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime = new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -149,11 +171,11 @@ class DistributionAnalysisScene extends PureComponent {
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
-      dateStatus: type,
+      dateStatus: type
     })
   }
 
-  p(s) {
+  p = (s) => {
     return s < 10 ? '0' + s : s
   }
 
@@ -166,12 +188,13 @@ class DistributionAnalysisScene extends PureComponent {
       return
     }
     let startTime
+    let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 2) * 86400000).setHours(0, 0, 0, 0) / 1000)
+        startTime =  new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -186,40 +209,100 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  onRequestClose() {
+  onRequestClose = () => {
     this.setState({
       showLeftDateModal: false,
       showRightDateModal: false,
     })
   }
 
-  renderDistributionAnalysis() {
-    const {DistributionAnalysisData, tableTitle, total_delivery, total_fee, filterPlatform, dateStatus} = this.state
+  setParamsTime = (startTime, endTime) => {
+    this.setState({
+      params: {
+        start_time: startTime,
+        end_time: endTime
+      }
+    })
+  }
+
+  navigateToProfitDetail = (item) => {
+    let {params} = this.state;
+    this.onPress(Config.ROUTE_PROFITANDLOSS, {
+      info: params
+    })
+  }
+
+  downProfitInfo = (i) => {
+    let profit_list = [...this.state.profitAndLoss]
+    profit_list[i].default_show = !profit_list[i].default_show
+    this.setState({profitAndLoss: profit_list})
+  }
+
+  renderHeaderTab = () => {
+    let {showHeader} = this.state
+    if (showHeader) {
+      return (
+        <View style={styles.headerTab}>
+          <Text onPress={() => {
+            this.setState({
+              headerType: 1,
+              dateStatus: 0
+            }, () => {
+              this.setLeftDateStatus(0)
+            })
+          }}
+                style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
+          <Text
+            onPress={() => {
+              this.setState({
+                headerType: 2,
+                dateStatus: 0
+              }, () => {
+                this.setRightDateStatus(0)
+              })
+            }}
+            style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>
+        </View>
+      )
+    } else {
+      return null
+    }
+  }
+
+  renderDistributionAnalysis = () => {
+    const {DistributionAnalysisData, total_delivery, total_fee, filterPlatform, dateStatus} = this.state
     let Array = []
     for (let i in DistributionAnalysisData) {
       Array.push(DistributionAnalysisData[i])
     }
     if (this.state.analysis_by === Distribution_Analysis && this.state.headerType === 1)
       return (
-        <ScrollView style={Styles.scrollContainer}>
+        <View>
           <View style={[styles.cell_box_header, {marginBottom: 10, paddingVertical: 10}]}>
             <For index='i' each='info' of={Cts.PLAT_ARRAY}>
               <TouchableOpacity
                 key={i}
                 style={[filterPlatform === info.id ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, filterPlatform === info.id ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
                 onPress={() => this.setFilterPlatform(info.id)}>
-                <Text style={{fontSize: 12, color: filterPlatform === info.id ? colors.white : colors.fontBlack}}>{info.label}</Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: filterPlatform === info.id ? colors.white : colors.fontBlack
+                }}>{info.label} </Text>
               </TouchableOpacity>
             </For>
           </View>
-          <View style={[styles.cell_box_header]}>
+          <View style={[styles.cell_box_header, {paddingVertical: 10}]}>
             <For index='i' each='info' of={timeOptions}>
-              <View key={i} style={styles.cell_box_info}>
-                <Text style={dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1}
-                  onPress={() => {
-                    this.setLeftDateStatus(info.value)
-                  }}> {info.label} </Text>
-              </View>
+              <TouchableOpacity
+                key={i}
+                style={[dateStatus === info.value ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
+                onPress={() => this.setLeftDateStatus(info.value)}
+              >
+                <Text style={{
+                  fontSize: 12,
+                  color: dateStatus === info.value ? colors.white : colors.fontBlack
+                }}> {info.label} </Text>
+              </TouchableOpacity>
             </For>
           </View>
 
@@ -266,39 +349,48 @@ class DistributionAnalysisScene extends PureComponent {
           <Dialog visible={this.state.showLeftDateModal} onRequestClose={() => this.onRequestClose()}>
             {this.showDatePicker()}
           </Dialog>
-        </ScrollView>
+        </View>
       )
   }
 
-  renderProfitAndLossAnalysis() {
-    const {cardStatus, profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
+  renderProfitAndLossAnalysis = () => {
+    const {profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
     if (headerType !== 1) {
       return (
-        <ScrollView style={Styles.scrollContainer}>
-          <View style={[styles.cell_box_header]}>
+        <View>
+          <View style={[styles.cell_box_header, {paddingVertical: 10}]}>
             <For index='i' each='info' of={timeOptions}>
-              <View key={i} style={styles.cell_box_info}>
-                <Text style={dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1}
-                  onPress={() => {
-                    this.setRightDateStatus(info.value)
-                  }}> {info.label} </Text>
-              </View>
+              <TouchableOpacity
+                key={i}
+                style={[dateStatus === info.value ? Styles.cell_rowTitleChecked : Styles.cell_rowTitleNoChecked, dateStatus === info.value ? styles.cell_rowTitleText_today : styles.cell_rowTitleText_today1]}
+                onPress={() => this.setRightDateStatus(info.value)}
+              >
+                <Text style={{
+                  fontSize: 12,
+                  color: dateStatus === info.value ? colors.white : colors.fontBlack
+                }}> {info.label} </Text>
+              </TouchableOpacity>
             </For>
           </View>
           <For of={profitAndLoss} each='item' index='idx'>
-            <View style={styles.profitBox} key={idx}>
-              <View style={styles.cell_box_info}>
-                <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name} </Text>
-                <View style={cardStatus == 0 ? {flexDirection: "row", justifyContent: "space-between"} : {flexDirection: "column", alignItems: "center"}}>
-                  <Text style={[styles.cell_rowTitleTextR2]}>毛利额/毛利率</Text>
-                  <Text style={[cardStatus == 0 ? {fontSize: pxToDp(28)} : {fontSize: pxToDp(38), fontWeight: "bold"}, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
-                    ¥{item.good_profit}/{item.good_profit_ratio}%
-                  </Text>
-                </View>
+            <View style={styles.profitItemBox} key={idx}>
+              <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name} </Text>
+              <View style={item?.default ? {
+                flexDirection: "row",
+                justifyContent: "space-between"
+              } : {flexDirection: "column", alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleTextR2]}>毛利额/毛利率</Text>
+                <Text style={[item?.default ? {fontSize: pxToDp(28)} : {
+                  fontSize: pxToDp(38),
+                  fontWeight: "bold"
+                }, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
+                  ¥{item.good_profit}/{item.good_profit_ratio}%
+                </Text>
+              </View>
 
-                {cardStatus == 1 &&
+              <If condition={item?.default_show == 1}>
                 <View>
-                  <View style={[styles.cardContent, {marginVertical: pxToDp(5)}]}>
+                  <View style={[styles.cardContent]}>
                     <Text style={[styles.cell_rowTitleTextR4]}>订单总数 </Text>
                     <Text style={styles.cell_rowText}>{item.num_of_orders}单</Text>
                   </View>
@@ -318,64 +410,51 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
-                  <View style={styles.cardContent}>
+                  <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
                     <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
-                    <Text style={styles.catInfo} onPress={() => {
-                      this.setState({
-                        headerType: 1
-                      })
-                    }}>去查看 </Text>
-                  </View>
+                    <View style={styles.cardContent}>
+                      <Text style={{color: colors.main_color}}>查看 </Text>
+                      <Entypo name="chevron-thin-right" style={styles.iconShow}/>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-                }
-
-                <View style={[cardStatus == 1 && styleLine, styles.cardContent]}>
-                  <Text style={[styles.cell_rowTitleTextR3]}>盈亏明细</Text>
-                  {cardStatus == 0 ? <Text style={styles.catBtn} onPress={() => this.setState({cardStatus: 1})}>展开</Text> : <Text style={styles.catBtn} onPress={() => this.setState({cardStatus: 0})}>关闭</Text>}
+              </If>
+              <TouchableOpacity
+                style={[styles.cardContent, {borderBottomWidth: 1, borderBottomColor: colors.e5, borderStyle: "solid"}]}
+                onPress={() => this.navigateToProfitDetail(item)}>
+                <Text style={[styles.cell_rowTitleTextR3]}>盈亏明细 </Text>
+                <View style={styles.cardContent}>
+                  <Text style={{color: colors.main_color}}>查看 </Text>
+                  <Entypo name="chevron-thin-right" style={styles.iconShow}/>
                 </View>
-              </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10
+                }}
+                onPress={() => this.downProfitInfo(idx)}
+              >
+                <View/>
+                <View style={styles.cardContent}>
+                  <Text style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`} </Text>
+                  {item?.default_show ?
+                    <Entypo name='chevron-thin-up' style={styles.iconShow}/> :
+                    <Entypo name='chevron-thin-down' style={styles.iconShow}/>
+                  }
+                </View>
+              </TouchableOpacity>
             </View>
           </For>
           <Dialog visible={showRightDateModal} onRequestClose={() => this.onRequestClose()}>
             {this.showDatePicker()}
           </Dialog>
-        </ScrollView>
-      )
-    }
-  }
-
-  renderHeaderTab() {
-    let {showHeader} = this.state
-    if (showHeader) {
-      return (
-        <View style={styles.headerTab}>
-          <Text onPress={() => {
-              this.setState({
-                headerType: 1,
-                dateStatus: 0
-              }, () => {
-                this.setLeftDateStatus(0)
-              })
-            }}
-            style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 2,
-                dateStatus: 0
-              }, () => {
-                this.setRightDateStatus(0)
-              })
-            }}
-            style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>
         </View>
       )
-    } else {
-      return null
     }
   }
 
-  showDatePicker() {
+  showDatePicker = () => {
+    const colorScheme = Appearance.getColorScheme();
     return <View>
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
         let self = this
@@ -401,6 +480,9 @@ class DistributionAnalysisScene extends PureComponent {
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'
+        backdropStyleIOS={
+          {backdrop: colorScheme === 'dark' ? colors.back_color : colors.white}
+        }
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
           let d = new Date(value)
@@ -410,7 +492,7 @@ class DistributionAnalysisScene extends PureComponent {
             timeJs = Math.round(new Date(new Date(value).setHours(0, 0, 0, 0)).getTime() / 1000)
             this.setState({startNewDateValue: timeJs, showDateModal: false, startTime: resDate})
           } else if (this.state.timeType === 'end') {
-            timeJs = Math.round(new Date(value).getTime() / 1000)
+            timeJs = Math.floor(new Date(new Date(value).setHours(11, 59, 59, 999)).getTime() / 1000)
             this.setState({endNewDateValue: timeJs, showDateModal: false, endTime: resDate})
           }
         }
@@ -431,7 +513,7 @@ class DistributionAnalysisScene extends PureComponent {
     </View>
   }
 
-  onConfirm() {
+  onConfirm = () => {
     this.setState({
       showLeftDateModal: false,
       showRightDateModal: false
@@ -444,12 +526,18 @@ class DistributionAnalysisScene extends PureComponent {
     }
   }
 
-  render() {
+  render = () => {
     return (
       <View style={{flex: 1}}>
         {this.renderHeaderTab()}
-        {this.renderDistributionAnalysis()}
-        {this.renderProfitAndLossAnalysis()}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={Styles.scrollContainer}>
+          {this.renderDistributionAnalysis()}
+          {this.renderProfitAndLossAnalysis()}
+        </ScrollView>
       </View>
     );
   }
@@ -475,9 +563,9 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10),
     backgroundColor: colors.white,
     flexDirection: "row",
-    justifyContent: "space-evenly"
+    justifyContent: "space-around"
   },
-  cell_box_info: {flexDirection: "column", marginVertical: pxToDp(20), padding: 10},
+  cell_box_info: {flexDirection: "column", padding: 10},
   cell_box1: {
     marginHorizontal: 10,
     borderRadius: pxToDp(10),
@@ -507,34 +595,34 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleText: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   cell_rowTitleTextR1: {
-    fontSize: pxToDp(40),
+    fontSize: 20,
     color: colors.main_color,
     marginVertical: pxToDp(10),
-    fontWeight: "bold"
+    fontWeight: 'bold'
   },
   cell_rowTitleTextR2: {
     fontSize: pxToDp(30),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10),
     fontWeight: "bold"
   },
   cell_rowTitleTextR3: {
     fontSize: pxToDp(30),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(20)
   },
   cell_rowTitleTextR4: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   cell_rowText: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     marginVertical: pxToDp(10)
   },
   catInfo: {
@@ -559,7 +647,7 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleText_today1: {
     fontSize: pxToDp(26),
-    color: colors.title_color,
+    color: colors.color111,
     paddingVertical: pxToDp(25),
     paddingHorizontal: pxToDp(15)
   },
@@ -637,7 +725,7 @@ const styles = StyleSheet.create({
   },
   check_staus: {
     backgroundColor: colors.white,
-    color: colors.title_color
+    color: colors.color111
   },
   profitBox: {
     marginVertical: 15,
@@ -645,7 +733,20 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(10),
     backgroundColor: colors.white
   },
-  cardContent: {flexDirection: "row", justifyContent: "space-between"}
+  cardContent: {flexDirection: "row", justifyContent: "space-between", alignItems: "center"},
+  iconShow: {
+    fontSize: 14,
+    color: colors.main_color,
+    fontWeight: '400'
+  },
+  profitItemBox: {
+    width: width * 0.94,
+    marginLeft: width * 0.03,
+    borderRadius: 6,
+    marginTop: 10,
+    backgroundColor: colors.white,
+    padding: 10
+  }
 });
 
 const Styles = StyleSheet.create({
@@ -661,7 +762,7 @@ const Styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: pxToDp(20)
   },
-  scrollContainer: {backgroundColor: colors.main_back}
+  scrollContainer: {backgroundColor: colors.f2}
 })
 
 export default connect(mapStateToProps)(DistributionAnalysisScene)

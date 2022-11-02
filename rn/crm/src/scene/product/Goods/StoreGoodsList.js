@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
@@ -9,12 +9,16 @@ import colors from "../../../pubilc/styles/colors";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
 import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
-import Dialog from "../../common/component/Dialog";
-import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import Entypo from "react-native-vector-icons/Entypo";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import PropTypes from "prop-types";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Scanner from "../../../pubilc/component/Scanner";
+import {addGoods, scan, search} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
+import * as globalActions from "../../../reducers/global/globalActions";
+import {setSGCategory} from "../../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -23,7 +27,14 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
+    ...bindActionCreators(
+      {
+        setSGCategory,
+        ...globalActions
+      },
+      dispatch
+    )
   };
 }
 
@@ -40,11 +51,14 @@ class StoreGoodsList extends Component {
       goods: [],
       page: 1,
       statusList: [
-        {label: '全部商品', value: 'all'},
-        {label: '下架商品', value: 'out_of_stock'},
-        {label: '最近上新', value: 'new_arrivals'},
-        {label: '上架商品', value: 'in_stock'},
+        {label: '全部 0', value: 'all'},
+        {label: '上架 0', value: 'in_stock'},
+        {label: '下架 0', value: 'out_of_stock'},
+        {label: '最近上新 0', value: 'new_arrivals'},
+
       ],
+      showStatusList: [],
+      showMoreGoodsStatus: false,
       pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
       categories: [],
       isLoading: false,
@@ -52,36 +66,42 @@ class StoreGoodsList extends Component {
       isLastPage: false,
       isCanLoadMore: false,
       selectedTagId: '',
+      isSelectedCategory: '',
       selectedChildTagId: '',
       fnProviding: false,
       modalType: '',
       selectedStatus: '',
       selectedProduct: {},
       shouldShowNotificationBar: false,
-      showstatusModal: false,
-      inventory_Dialog: false,
       storeName: '',
       storeCity: '',
       storeVendor: '',
       all_amount: 0,
       all_count: 0,
       inventorySummary: {},
-      selectStatusItem: '',
-      onStrict: false
+      onStrict: false,
+      showScan: false,
+      showScanType: 'add',//add-扫码新建，search-扫码搜索
     }
   }
 
   componentDidMount() {
     const {global, navigation} = this.props
     const {accessToken, store_id, store_info} = global;
-    this.setState({
-      fnPriceControlled: store_info?.fn_price_controlled,
-      fnProviding: Number(store_info?.strict_providing) > 0,
-      init: true
-    })
+    this.setState({fnProviding: Number(store_info?.strict_providing) > 0})
     this.fetchUnreadPriceAdjustment(store_id, accessToken)
-    this.restart()
+    this.getSGCategory()
     this.focus = navigation.addListener('focus', () => this.restart());
+  }
+
+  getSGCategory() {
+    const {dispatch} = this.props
+    const {accessToken} = this.props.global;
+    let {vendor_id} = this.state;
+    const url = `/data_dictionary/get_app_sg_tags/${vendor_id}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then((obj) => {
+      dispatch(setSGCategory(obj))
+    }).catch()
   }
 
   componentWillUnmount() {
@@ -104,27 +124,34 @@ class StoreGoodsList extends Component {
       let newStatusList
       if (res.strict_providing === '1') {
         newStatusList = [
-          {label: '全部商品 - ' + res.all, value: 'all'},
-          {label: '总部供货 - ' + res.common_provided, value: 'common_provided'},
-          {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
-          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '售罄商品 - ' + (res.in_stock_but_nil ?? '0'), value: 'in_stock_but_nil'},
-          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
+          {label: '全部 ' + res.all, value: 'all'},
+          {label: '上架 ' + res.in_stock, value: 'in_stock'},
+          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '售罄 ' + (res.in_stock_but_nil ?? '0'), value: 'in_stock_but_nil'},
+          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+          {label: '总部供货 ' + res.common_provided, value: 'common_provided'},
+          {label: '门店自采 ' + res.self_provided, value: 'self_provided'},
         ]
       } else {
         newStatusList = [
-          {label: '全部商品 - ' + res.all, value: 'all'},
-          {label: '上架商品 - ' + res.in_stock, value: 'in_stock'},
-          {label: '下架商品 - ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'}
+          {label: '全部 ' + res.all, value: 'all'},
+          {label: '上架 ' + res.in_stock, value: 'in_stock'},
+          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'}
         ]
       }
-      if ((114 === vendor_id || 163 === vendor_id) && res.no_img)
-        newStatusList.push({label: '缺失图片 - ' + (res.no_img ?? '0'), value: 'no_img'})
+      if (114 === vendor_id && res.no_img)
+        newStatusList = [
+          {label: '全部 ' + res.all, value: 'all'},
+          {label: '缺失图片 ' + (res.no_img ?? '0'), value: 'no_img'},
+          {label: '上架 ' + res.in_stock, value: 'in_stock'},
+          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+        ]
       this.setState({
-        statusList: [...newStatusList],
-        selectedStatus: {...newStatusList[0]},
+        statusList: newStatusList,
+        showStatusList: newStatusList.length > 4 ? newStatusList.slice(0, 4) : newStatusList,
+        selectedStatus: newStatusList[0],
         all_amount: res.all_amount,
         all_count: res.all_count,
         inventorySummary: res,
@@ -141,10 +168,18 @@ class StoreGoodsList extends Component {
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
     const selectedStatus = this.state.selectedStatus.value
-    HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}/${selectedStatus}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
+    const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus}?access_token=${accessToken}`
+    const params = {
+      hideAreaHot: hideAreaHot,
+      is_get_all: 1
+    }
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+
       this.setState({
         categories: res,
-        selectedTagId: res[0] ? res[0].id : null,
+        selectedTagId: res[0] ? res[0].id : '',
+        isSelectedCategory: res[0] ? res[0].id : '',
+        selectedChildTagId: res[0] && res[0].children && res[0].children.length > 0 ? res[0].children && res[0].children[0].id : ''
       }, () => {
         this.search();
       })
@@ -157,25 +192,14 @@ class StoreGoodsList extends Component {
     const url = `/api/is_existed_unread_price_adjustments/${storeId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
       if (res) {
-        this.setState({
-          shouldShowNotificationBar: true
-        })
+        this.setState({shouldShowNotificationBar: true})
       }
     })
   }
 
-
   search = (setList = 1, isRefreshItem = false) => {
-
     const {
-      isLoading,
-      selectedStatus,
-      selectedChildTagId,
-      selectedTagId,
-      page,
-      pageNum,
-      selectedProduct,
-      goods
+      isLoading, selectedStatus, selectedChildTagId, selectedTagId, page, pageNum, selectedProduct, goods
     } = this.state
     if (isLoading) {
       return;
@@ -209,7 +233,12 @@ class StoreGoodsList extends Component {
         return
       }
       const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
-      this.setState({goods: goodList, isLastPage: res.isLastPage, isLoading: false})
+
+      this.setState({
+        goods: goodList,
+        isLastPage: res.isLastPage,
+        isLoading: false
+      })
     }, (res) => {
       ToastLong(res.reason)
       this.setState({isLoading: false})
@@ -254,25 +283,6 @@ class StoreGoodsList extends Component {
 
   }
 
-  onSelectCategory(category) {
-    this.setState({
-      selectedTagId: category.id,
-      selectedChildTagId: '',
-      page: 1
-    }, () => {
-      this.search()
-    })
-  }
-
-  onSelectChildCategory(childCategory) {
-    this.setState({
-      selectedChildTagId: childCategory.id,
-      page: 1
-    }, () => {
-      this.search()
-    })
-  }
-
   onOpenModal(modalType, product) {
     this.setState({
       modalType: modalType,
@@ -294,16 +304,63 @@ class StoreGoodsList extends Component {
     })
   }
 
+  selectCategory = (category, selectedTagId, isSelectedCategory) => {
+    if (category.id === isSelectedCategory) {
+      this.setState({
+        selectedTagId: selectedTagId,
+        isSelectedCategory: '0000',
+        selectedChildTagId: '',
+        page: 1
+      }, () => this.search())
+      return
+    }
+    if (category.children.length > 0) {
+      this.selectCategoryChildren(category, category.children[0])
+      return;
+    }
+    this.setState({
+      selectedTagId: category.id,
+      isSelectedCategory: category.id,
+      selectedChildTagId: '',
+      page: 1
+    }, () => this.search())
+  }
+
+  selectCategoryChildren = (category, categoryChildren) => {
+    this.setState({
+      selectedTagId: category.id,
+      isSelectedCategory: category.id,
+      selectedChildTagId: categoryChildren.id,
+      page: 1
+    }, () => this.search())
+  }
 
   renderCategories() {
-    const {categories, selectedTagId} = this.state
+    const {categories, selectedTagId, isSelectedCategory, selectedChildTagId} = this.state
     return (
-      <For each="item" of={categories} index="i">
-        <TouchableOpacity key={i} onPress={() => this.onSelectCategory(item)}>
-          <View style={[selectedTagId === item.id ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={selectedTagId === item.id ? styles.activeCategoriesText : styles.n2grey6}>{item.name} </Text>
-          </View>
+      <For each="items" of={categories} index="i">
+        <TouchableOpacity key={i}
+                          onPress={() => this.selectCategory(items, selectedTagId, isSelectedCategory)}
+                          style={[isSelectedCategory === items.id ? styles.categoryItemActive : styles.categoryItem]}>
+          <Text style={isSelectedCategory === items.id ? styles.activeCategoriesText : styles.categoriesText}>
+            {items.name}
+          </Text>
+          <If condition={items.children.length > 0}>
+            <AntDesign name={isSelectedCategory === items.id ? 'up' : 'down'} color={colors.color999} size={14}
+                       style={{paddingVertical: 7}}/>
+          </If>
         </TouchableOpacity>
+        <If condition={isSelectedCategory === items.id && items.children.length > 0}>
+          <For index='index' of={items.children} each='item'>
+            <TouchableOpacity key={index} onPress={() => this.selectCategoryChildren(items, item)}
+                              style={selectedChildTagId === item.id ? styles.selectCategoryChildrenWrap : styles.cateChildrenWrap}>
+              <Text
+                style={selectedChildTagId === item.id ? styles.selectCategoryChildrenText : styles.categoryChildrenText}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          </For>
+        </If>
       </For>
     )
   }
@@ -312,6 +369,7 @@ class StoreGoodsList extends Component {
     this.setState({
       page: 1,
       selectedTagId: '',
+      isSelectedCategory: '',
       selectedChildTagId: '',
     }, () => {
       const {accessToken, currStoreId} = this.props.global;
@@ -348,52 +406,68 @@ class StoreGoodsList extends Component {
     }
   }
 
+  getNotification = () => {
+    const {shouldShowNotificationBar} = this.state
+    if (shouldShowNotificationBar)
+      return (
+        <View style={styles.notificationBar}>
+          <Text style={[styles.n2grey6, {paddingHorizontal: 10, paddingVertical: 6}]}>
+            您申请的调价商品有更新，请及时查看
+          </Text>
+          <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
+            <Text style={styles.readNotificationText}>查看</Text>
+          </TouchableOpacity>
+        </View>
+      )
+  }
+
+  getScanView = () => {
+    const {showScan} = this.state
+    return (
+      <Scanner onClose={() => this.setScanStatus(false, '')}
+               visible={showScan}
+               title="退出扫码"
+               onScanSuccess={code => this.onScanSuccess(code)}
+               onScanFail={code => this.onScanFail(code)}/>
+    )
+  }
+
   render() {
 
-    const {accessToken, store_info, currStoreId, vendor_id} = this.props.global;
-    let {all_amount, all_count, inventorySummary, selectStatusItem, selectedProduct, goods, isLoading} = this.state;
+    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    let {selectedProduct, goods, isLoading} = this.state;
     const {sp} = selectedProduct;
     return (
-      <>
-        {this.renderHeader()}
+      <View style={styles.page}>
+        {this.getHeader()}
+        {this.renderGoodsStatus()}
         <View style={styles.container}>
-          <If condition={this.state.shouldShowNotificationBar}>
-            <View style={styles.notificationBar}>
-              <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
-              <TouchableOpacity onPress={this.readNotification} style={styles.readNotification}>
-                <Text style={{color: 'white'}}>查看</Text>
-              </TouchableOpacity>
-            </View>
-          </If>
+          {this.getNotification()}
           <View style={{flex: 14, flexDirection: 'row'}}>
             <View style={styles.categoryBox}>
               <ScrollView>
                 {this.renderCategories()}
               </ScrollView>
             </View>
+            <FlatList
+              data={goods}
+              legacyImplementation={false}
+              directionalLockEnabled={true}
+              onEndReachedThreshold={0.1}
+              onEndReached={this.onEndReached}
+              onMomentumScrollBegin={this.onMomentumScrollBegin}
+              onTouchMove={(e) => this.onTouchMove(e)}
+              renderItem={this.renderItem}
+              onRefresh={this.onRefresh}
+              refreshing={isLoading}
+              keyExtractor={this._keyExtractor}
+              shouldItemUpdate={this._shouldItemUpdate}
+              getItemLayout={this._getItemLayout}
+              initialNumToRender={5}
+            />
 
-            <View style={{flex: 1,}}>
-              <View style={{marginBottom: 4, marginLeft: 1}}>
-                {this.renderChildrenCategories()}
-              </View>
-              <FlatList
-                data={goods}
-                legacyImplementation={false}
-                directionalLockEnabled={true}
-                onEndReachedThreshold={0.5}
-                onEndReached={this.onEndReached}
-                onMomentumScrollBegin={this.onMomentumScrollBegin}
-                onTouchMove={(e) => this.onTouchMove(e)}
-                renderItem={this.renderItem}
-                onRefresh={this.onRefresh}
-                refreshing={isLoading}
-                keyExtractor={this._keyExtractor}
-                shouldItemUpdate={this._shouldItemUpdate}
-                getItemLayout={this._getItemLayout}
-                initialNumToRender={5}
-              />
-            </View>
           </View>
+          {this.getBottomButton()}
           <If condition={sp}>
             <GoodItemEditBottom key={sp.id} pid={Number(selectedProduct.id)}
                                 modalType={this.state.modalType}
@@ -414,117 +488,26 @@ class StoreGoodsList extends Component {
                                 storePro={selectedProduct}
                                 beforePrice={Number(sp.supply_price)}/>
           </If>
-          <Modal
-            visible={this.state.inventory_Dialog}
-            onRequestClose={this.closeCountModal}
-            animationType={'fade'}
-            transparent={true}
-          >
-            <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
-              <View style={{
-                width: '80%',
-                maxHeight: '70%',
-                backgroundColor: '#fff',
-                borderRadius: pxToDp(10),
-                padding: pxToDp(20),
-                alignItems: 'center'
-              }}>
-                <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>
-                  {store_info?.name}
-                </Text>
-                <View style={{
-                  flexDirection: "column",
-                  marginVertical: pxToDp(30)
-                }}>
-                  <View style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginVertical: pxToDp(15)
-                  }}>
-                    <If condition={selectStatusItem === 'all' || selectStatusItem === ''}>
-                      <Text style={styles.modalCountText}>店铺库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{all_count}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'common_provided'}>
-                      <Text style={styles.modalCountText}>总部供货库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['common_provided_count']}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'in_stock'}>
-                      <Text style={styles.modalCountText}>在售商品库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['in_stock_count']}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'new_arrivals'}>
-                      <Text style={styles.modalCountText}>最近上新库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['new_arrivals_count']}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'off_stock'}>
-                      <Text style={styles.modalCountText}>下架商品库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['off_stock_count']}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'out_of_stock'}>
-                      <Text style={styles.modalCountText}>售罄商品库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['out_of_stock_count']}件</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'self_provided'}>
-                      <Text style={styles.modalCountText}>门店自采库存汇总：</Text>
-                      <Text style={styles.modalCountText}>{inventorySummary['self_provided_count']}件</Text>
-                    </If>
-                  </View>
-                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                    <If condition={selectStatusItem === 'all' || selectStatusItem === ''}>
-                      <Text style={styles.modalCountText}>店铺库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{all_amount}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'common_provided'}>
-                      <Text style={styles.modalCountText}>总部供货库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['common_provided_amount']}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'in_stock'}>
-                      <Text style={styles.modalCountText}>在售商品库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['in_stock_amount']}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'new_arrivals'}>
-                      <Text style={styles.modalCountText}>最近上新库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['new_arrivals_amount']}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'off_stock'}>
-                      <Text style={styles.modalCountText}>下架商品库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['off_stock_amount']}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'out_of_stock'}>
-                      <Text style={styles.modalCountText}>售罄商品库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['out_of_stock_amount']}</Text>
-                    </If>
-                    <If condition={selectStatusItem === 'self_provided'}>
-                      <Text style={styles.modalCountText}>门店自采库存总价：</Text>
-                      <Text style={styles.modalCountText}>¥{inventorySummary['self_provided_amount']}</Text>
-                    </If>
-                  </View>
-                </View>
-                <TouchableOpacity style={styles.modalDetermineWrap} onPress={this.closeCountModal}>
-                  <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}>
-                    确 定
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-
         </View>
-        <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
-          {this.showstatusSelect()}
-        </Dialog>
-      </>
+        {this.getScanView()}
+      </View>
     )
   }
 
-  closeCountModal = () => {
-    this.setState({inventory_Dialog: false})
+  onScanSuccess = (code) => {
+    const {showScanType} = this.state
+    if (showScanType === 'search') {
+      // this.setState({searchKeywords: code});
+      this.jumpToSearchGoodsList(code)
+      return
+    }
+    this.jumpToGoodsEdit(code)
   }
-
-  openCountModal = () => {
-    this.setState({inventory_Dialog: true})
+  setScanStatus = (value, showScanType) => {
+    this.setState({showScan: value, showScanType: showScanType})
+  }
+  onScanFail = () => {
+    Alert.alert('错误提示', '商品编码不合法', [{text: '确定', onPress: () => this.setScanStatus(false, '')}]);
   }
   _keyExtractor = (item) => {
     return item.id.toString();
@@ -538,124 +521,133 @@ class StoreGoodsList extends Component {
     return {length: pxToDp(242), offset: pxToDp(242) * index, index}
   }
 
+  selectGoodsStatus = (item, index) => {
+    const {statusList} = this.state
+    if (index > 3) {
 
-  renderHeader() {
-    let {navigation} = this.props;
-    let {onStrict} = this.state
-    return (
-      <View style={{
-        flexDirection: 'row',
-        height: 40,
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderBottomColor: colors.fontGray,
-        borderBottomWidth: pxToDp(1)
-      }}>
-        <TouchableOpacity
-          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
-          onPress={() => {
-            this.setState({
-              showstatusModal: true
-            })
-          }}>
-          <Text style={{color: colors.color333}}>{this.state.selectedStatus.label}  </Text>
-          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
-        </TouchableOpacity>
-
-        <View style={{flex: 1}}></View>
-        <If condition={onStrict}>
-          <TouchableOpacity style={styles.stockWrap} onPress={this.openCountModal}>
-            <Text style={styles.stockText}> 库 </Text>
-          </TouchableOpacity>
-        </If>
-        <TouchableOpacity
-          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
-          onPress={() => {
-            this.mixpanel.track('商品页面_上新')
-            navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
-          }}>
-          <Text style={{color: colors.color333}}>上新 </Text>
-          <Entypo name='circle-with-plus' size={18}/>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
-          onPress={() => {
-            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate})
-          }}>
-          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5, color: colors.color333}}/>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  onChangeRadioItem = (event, item) => {
-    if (event.target.checked) {
-      this.setState({
-        showstatusModal: false,
-        selectedStatus: item,
-        selectStatusItem: item.value
-      }, () => this.onSelectStatus(item.value))
-    }
-  }
-
-  showstatusSelect() {
-    let {selectedStatus, statusList} = this.state;
-    return (
-      <View style={{marginTop: 2}}>
-        <For each="item" of={statusList} index="i">
-          <RadioItem key={i} style={{backgroundColor: colors.white}}
-                     checked={selectedStatus.value === item.value}
-                     onChange={event => this.onChangeRadioItem(event, item)}>
-            <Text style={{fontSize: 18, color: colors.fontBlack,}}>
-              {item.label}
-            </Text>
-          </RadioItem>
-        </For>
-      </View>
-    )
-  }
-
-  renderChildCategory(childCategory) {
-    const isActive = this.state.selectedChildTagId === childCategory.id
-    let itemStyle = [styles.categoryItem, isActive && {
-      backgroundColor: '#fff',
-      borderBottomWidth: pxToDp(5),
-      borderBottomColor: colors.main_color,
-    }];
-    return (
-      <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
-                        style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2}]}>
-        <Text style={styles.n2grey6}>{childCategory.name} </Text>
-      </TouchableOpacity>
-    )
-  }
-
-  renderChildrenCategories() {
-    if (!this.state.selectedTagId) {
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(3)})
+      this.onSelectStatus()
       return
     }
-    const selectedCategory = this.state.categories.find(category => `${category.id}` === `${this.state.selectedTagId}`)
-    if (selectedCategory.children.length) {
-      {/* TODO 需要定制子分类的样式*/
-      }
-      return (
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={true}>
-          {selectedCategory.children.map(childCategory => {
-            return this.renderChildCategory(childCategory)
-          })}
-        </ScrollView>
-      )
+    if (index <= 3) {
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(0, 4)})
+      this.onSelectStatus()
+      return;
     }
+    this.setState({selectedStatus: item})
+    this.onSelectStatus()
   }
 
+  renderGoodsStatus = () => {
+    const {statusList, showStatusList, selectedStatus, showMoreGoodsStatus} = this.state
+    return (
+      <>
+        <View style={styles.headerGoodsStatusWrap}>
+          {
+            showStatusList.map((item, index) => {
+              const isSelect = selectedStatus.value === item.value
+              return (
+                <View key={index} style={isSelect ? styles.selectGoodsStatusWrap : styles.goodsStatusWrap}>
+                  <Text onPress={() => this.selectGoodsStatus(item)}
+                        style={isSelect ? styles.selectGoodsStatusText : styles.goodsStatusText}>
+                    {item.label}
+                  </Text>
+                </View>
+              )
+            })}
+          <If condition={statusList.length > 4}>
+            <AntDesign name={showMoreGoodsStatus ? 'up' : 'down'}
+                       size={16}
+                       color={colors.color999}
+                       style={{marginRight: 10}}
+                       onPress={() => this.setState({showMoreGoodsStatus: !showMoreGoodsStatus})}/>
+          </If>
+        </View>
+        <If condition={showMoreGoodsStatus}>
+          <View style={styles.showMoreGoodsStatusZone}>
+            {
+              statusList.map((item, index) => {
+                const isSelect = selectedStatus.value === item.value
+                return (
+                  <TouchableOpacity key={index}
+                                    style={isSelect ? styles.selectShowMoreGoodsStatusWrap : styles.showMoreGoodsStatusWrap}
+                                    onPress={() => this.selectGoodsStatus(item, index)}>
+                    <Text style={isSelect ? styles.selectShowMoreGoodsStatusText : styles.showMoreGoodsStatusText}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })
+            }
+          </View>
+        </If>
+      </>
+    )
+  }
 
-  opBar = (onSale, onStrict, item) => {
+  jumpToGoodsEdit = (upcCode = '') => {
+    let {navigation} = this.props;
+    this.mixpanel.track('商品页面_上新')
+    navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add', upcCode: upcCode})
+  }
+
+  jumpToSearchGoodsList = (value) => {
+    let {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {searchKeywords: value})
+  }
+
+  jumpToSearchAndCreateGoods = () => {
+    let {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_SEARCH_AND_CREATE_GOODS)
+  }
+  getBottomButton = () => {
+    return (
+      <View style={styles.bottomButtonWrap}>
+        <TouchableOpacity style={styles.bottomButton} onPress={() => this.jumpToSearchAndCreateGoods()}>
+          <SvgXml xml={search()}/>
+          <Text style={styles.bottomButtonText}>
+            搜索新建
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.jumpToGoodsEdit('')} style={styles.bottomButton}>
+          <SvgXml xml={addGoods()}/>
+          <Text style={styles.bottomButtonText}>
+            手动新建
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomButton}
+                          onPress={() => this.setScanStatus(true, 'add')}>
+          <SvgXml xml={scan()}/>
+          <Text style={styles.bottomButtonText}>
+            扫码新建
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  getHeader() {
+    let {searchKeywords} = this.state
+    return (
+      <View style={styles.HeaderWrap}>
+        <View style={styles.HeaderInputWrap}>
+          <AntDesign name={'search1'} size={18} style={{marginLeft: 10}}/>
+          <TextInput value={searchKeywords}
+                     style={{flex: 1, padding: 8, marginLeft: 13}}
+                     onFocus={() => this.jumpToSearchGoodsList(searchKeywords)}
+                     placeholderTextColor={colors.color999}
+                     placeholder={'请输入商品名称、SKU或UPC'}/>
+          <SvgXml xml={scan()} onPress={() => this.setScanStatus(true, 'search')} style={{marginRight: 10}}/>
+        </View>
+      </View>
+    )
+  }
+
+  opBar = (onSale, onStrict, item, price_type) => {
+
     if ('' === item.coverimg) {
       return (
-        <View style={[styles.row_center, styles.btnWrap]}>
+        <View style={[styles.row_center]}>
           <TouchableOpacity style={[styles.toOnlineBtn]}
                             onPress={() => this.gotoAddMissingPicture(item)}>
             <Text style={styles.goodsOperationBtn}>编辑</Text>
@@ -663,28 +655,27 @@ class StoreGoodsList extends Component {
         </View>
       )
     }
+
     return (
-      <View style={[styles.row_center, styles.btnWrap]}>
+      <View style={[styles.row_center]}>
         <If condition={onSale}>
-          <TouchableOpacity style={[styles.toOnlineBtn]}
-                            onPress={() => this.onOpenModal('off_sale', item)}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', item)}>
             <Text style={styles.goodsOperationBtn}>下架 </Text>
           </TouchableOpacity>
         </If>
         <If condition={!onSale}>
-          <TouchableOpacity style={[styles.toOnlineBtn]}
-                            onPress={() => this.onOpenModal('on_sale', item)}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', item)}>
             <Text style={styles.goodsOperationBtn}>上架 </Text>
           </TouchableOpacity>
         </If>
         <If condition={onStrict}>
-          <If condition={item?.price_type === 1}>
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+          <If condition={price_type}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
               <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
             </TouchableOpacity>
           </If>
-          <If condition={item?.price_type === 0 || item?.price_type === undefined}>
+          <If condition={!price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
               <Text style={styles.goodsOperationBtn}>报价/库存 </Text>
@@ -692,15 +683,14 @@ class StoreGoodsList extends Component {
           </If>
         </If>
         <If condition={!onStrict}>
-          <If condition={item?.price_type === 1}>
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+          <If condition={price_type}>
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
               <Text style={styles.goodsOperationBtn}>价格 </Text>
             </TouchableOpacity>
           </If>
-          <If condition={item?.price_type === 0}>
-            <TouchableOpacity style={[styles.toOnlineBtn]}
-                              onPress={() => this.onOpenModal('set_price', item)}>
+          <If condition={!price_type}>
+            <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('set_price', item)}>
               <Text style={styles.goodsOperationBtn}>报价 </Text>
             </TouchableOpacity>
           </If>
@@ -719,14 +709,15 @@ class StoreGoodsList extends Component {
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
   renderItem = (order) => {
+    const {price_type} = this.props.global.vendor_info
     let {item} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={item.id}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    price_type={item.price_type || 0}
-                    opBar={this.opBar(onSale, onStrict, item)}
+                    price_type={price_type}
+                    opBar={this.opBar(onSale, onStrict, item, price_type)}
       />
     );
   }
@@ -735,6 +726,73 @@ class StoreGoodsList extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
 
 const styles = StyleSheet.create({
+  showMoreGoodsStatusZone: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
+  selectShowMoreGoodsStatusWrap: {
+    backgroundColor: colors.main_color,
+    borderRadius: 2,
+    width: 101,
+    marginLeft: 10,
+    marginBottom: 6
+  },
+  showMoreGoodsStatusWrap: {
+    backgroundColor: colors.colorEEE,
+    borderRadius: 2,
+    width: 101,
+    marginLeft: 10,
+    marginBottom: 6
+  },
+  selectShowMoreGoodsStatusText: {color: colors.white, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
+  showMoreGoodsStatusText: {color: colors.color333, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
+  selectCategoryChildrenWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderTopColor: colors.main_color,
+    borderBottomColor: colors.main_color,
+    borderTopWidth: 1,
+    borderBottomWidth: 1
+  },
+  cateChildrenWrap: {
+    backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center'
+  },
+  selectCategoryChildrenText: {fontSize: 14, color: colors.main_color, paddingVertical: 7},
+  categoryChildrenText: {fontSize: 14, color: colors.color666, paddingVertical: 7},
+  bottomButtonWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    height: 48,
+    borderTopColor: colors.colorEEE,
+    borderTopWidth: 1
+  },
+  bottomButton: {alignItems: 'center', justifyContent: 'center'},
+  bottomButtonText: {fontSize: 10, paddingTop: 7},
+  HeaderWrap: {
+    flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, marginTop: 10
+  },
+  HeaderInputWrap: {
+    flex: 9, flexDirection: 'row', alignItems: 'center', borderRadius: 17, backgroundColor: '#f7f7f7'
+  },
+  page: {flex: 1, backgroundColor: colors.white},
+  headerGoodsStatusWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    paddingLeft: 10,
+    paddingVertical: 8,
+
+  },
+  selectGoodsStatusWrap: {marginRight: 10, borderBottomColor: colors.main_color, borderBottomWidth: 2},
+  goodsStatusWrap: {marginRight: 10, color: colors.color999},
+  selectGoodsStatusText: {color: colors.color333, paddingVertical: 6},
+  goodsStatusText: {color: colors.color999, paddingVertical: 6},
+  headerWrap: {
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.1,
+    elevation: 5,
+    shadowRadius: 8,
+  },
   stockWrap: {
     flexDirection: 'row',
     justifyContent: "center",
@@ -772,22 +830,24 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    backgroundColor: '#EEDEE0',
-    height: pxToDp(150)
+    backgroundColor: 'rgba(238,38,38,0.09)',
+    justifyContent: 'space-between'
   },
   categoryItem: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    height: pxToDp(70)
+    flexDirection: 'row',
+    paddingRight: 8,
+    flexWrap: 'wrap',
   },
   categoryItemActive: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderLeftWidth: pxToDp(10),
-    borderLeftColor: colors.main_color,
-    height: pxToDp(70)
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    paddingRight: 8,
+    flexWrap: 'wrap',
+
   },
   noFoundBtnRow: {
     width: '100%',
@@ -809,41 +869,43 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   toOnlineBtn: {
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.colorDDD,
+    borderWidth: 1,
+    borderColor: colors.colorCCC,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
+    marginRight: 4,
+    borderRadius: 2,
     flex: 1
   },
-  btnWrap: {
-    flex: 1,
-    backgroundColor:
-    colors.white,
-    borderTopWidth: pxToDp(1),
-    borderColor: colors.colorDDD
-  },
   activeCategoriesText: {
+    flex: 1,
     fontSize: 14,
-    fontWeight: 'bold',
     color: colors.color333,
-    lineHeight: 20
+    paddingVertical: 7,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
+  categoriesText: {flex: 1, fontSize: 12, color: colors.color666, textAlign: 'center', paddingVertical: 7,},
   n2grey6: {
     color: colors.color666,
     fontSize: 12
   },
   row_center: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginRight: 9,
+    marginLeft: 4
   },
   readNotification: {
-    marginRight: 10,
-    marginBottom: 8,
-    flex: 2,
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    backgroundColor: '#E26A6E',
+    marginVertical: 6,
+    marginHorizontal: 10,
+    backgroundColor: '#EE2626',
+    borderRadius: 2
+  },
+  readNotificationText: {
+    color: colors.white, paddingHorizontal: 8, paddingVertical: 1, fontSize: 12
   }
 })

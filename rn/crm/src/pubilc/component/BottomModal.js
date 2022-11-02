@@ -1,14 +1,56 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ScrollView, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native'
+import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
 import pxToDp from "../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import {Button} from "react-native-elements";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {cross_icon} from "../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
-const width = Dimensions.get("window").width;
-const height = Dimensions.get("window").height;
+const {width, height} = Dimensions.get("window")
+const styles = StyleSheet.create({
+  modalWrap: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.25)'
+  },
+  contentWrap: {
+    backgroundColor: colors.white, borderRadius: pxToDp(30), width: '88%', maxHeight: height * 0.8
+  },
+  keyboardWrap: {
+    flexDirection: "row",
+    padding: 10,
+    paddingBottom: 0,
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
+  title: {
+    color: colors.color333,
+    fontWeight: "bold",
+    flex: 1,
+    fontSize: 16
+  },
+  closeWrap: {
+    flexDirection: "row", justifyContent: "flex-end", width: '20%'
+  },
+  btnWrap: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 10
+  },
+  closeBtn: {
+    backgroundColor: colors.white,
+    width: width * 0.40,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.color666,
+  }
+})
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -20,6 +62,7 @@ class BottomModal extends React.Component {
     closeText: PropTypes.string,
     visible: PropTypes.bool,
     btnStyle: PropTypes.object,
+    children: PropTypes.object,
     btnTitleStyle: PropTypes.object,
     closeBtnStyle: PropTypes.object,
     closeBtnTitleStyle: PropTypes.object,
@@ -29,93 +72,55 @@ class BottomModal extends React.Component {
     visible: true
   }
 
-  render(): React.ReactNode {
-    return <Modal hardwareAccelerated={true}
-                  onRequestClose={this.props.onClose}
-                  maskClosable transparent={true}
-                  visible={this.props.visible}>
+  render() {
+    const {
+      onClose, visible, children, btnBottomStyle, closeText, closeBtnStyle, closeBtnTitleStyle, onPressClose, btnStyle,
+      btnTitleStyle, actionText, onPress
+    } = this.props
+    return (
+      <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}>
+        <TouchableOpacity style={styles.modalWrap} onPress={onClose}>
+          <TouchableHighlight style={styles.contentWrap}>
+            <KeyboardAwareScrollView style={{paddingBottom: 3}} enableOnAndroid={false}>
+              <View style={styles.keyboardWrap}>
+                <Text style={styles.title}>
+                  {this.props.title}
+                </Text>
+                <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
+                  <SvgXml xml={cross_icon()} width={18} height={18}/>
+                </TouchableOpacity>
+              </View>
+              <View style={{paddingHorizontal: 10}}>
+                {children}
+              </View>
 
-      <TouchableOpacity onPress={this.props.onClose} style={{
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.25)'
-      }}>
-        <TouchableHighlight style={{
-          backgroundColor: colors.white,
-          // padding: 10,
-          borderRadius: pxToDp(30),
-          width: '88%',
-          maxHeight: height * 0.8
-        }}>
+              <View style={{height: 10}}/>
+              <View style={[styles.btnWrap, btnBottomStyle]}>
+                <If condition={closeText}>
+                  <Button buttonStyle={[styles.closeBtn, closeBtnStyle]}
+                          titleStyle={[{color: colors.color666}, closeBtnTitleStyle]}
+                          title={closeText}
+                          onPress={() => {
+                            if (onPressClose) {
+                              onPressClose()
+                            } else {
+                              onClose()
+                            }
+                          }}/>
+                </If>
 
-          <ScrollView style={{paddingBottom: 3,}}>
-            <View style={{
-              flexDirection: "row",
-              padding: 10,
-              paddingBottom: 0,
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}>
-              <TouchableOpacity
-                style={{width: '20%'}}
-                onPress={this.props.onClose}>
-              </TouchableOpacity>
-
-              <Text style={[{
-                textAlign: 'center',
-                color: colors.title_color,
-                fontWeight: "bold",
-                flex: 1,
-                fontSize: pxToDp(34)
-              }]}>{this.props.title} </Text>
-
-              <TouchableOpacity
-                style={[{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  width: '20%'
-                }]}
-                onPress={this.props.onClose}>
-                <Entypo name="circle-with-cross"
-                        style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
-              </TouchableOpacity>
-            </View>
-            <View style={{paddingHorizontal: 10}}>
-              {this.props.children}
-            </View>
-
-            <View style={{height: 10}}/>
-            <View style={[{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingBottom: 10,
-            }, this.props.btnBottomStyle]}>
-              <If condition={this.props.closeText}>
                 <Button buttonStyle={[{
-                  backgroundColor: colors.white,
-                  width: width * 0.40,
-                  marginRight: 10,
-                  borderWidth: 1,
-                  borderColor: colors.color666,
-                }, this.props.closeBtnStyle]}
-                        titleStyle={[{color: colors.color666,}, this.props.closeBtnTitleStyle]}
-                        title={this.props.closeText}
-                        onPress={this.props.onPressClose}/>
-              </If>
-
-              <Button buttonStyle={[{
-                backgroundColor: colors.warn_color,
-                width: this.props.closeText !== undefined ? width * 0.40 : width * 0.82,
-              }, this.props.btnStyle]}
-                      titleStyle={[{color: colors.white}, this.props.btnTitleStyle]} title={this.props.actionText}
-                      onPress={this.props.onPress}/>
-            </View>
-          </ScrollView>
-        </TouchableHighlight>
-      </TouchableOpacity>
-    </Modal>
+                  backgroundColor: colors.warn_color,
+                  width: closeText !== undefined ? width * 0.40 : width * 0.82
+                }, btnStyle]}
+                        titleStyle={[{color: colors.white}, btnTitleStyle]} title={actionText}
+                        onPress={onPress}/>
+              </View>
+            </KeyboardAwareScrollView>
+          </TouchableHighlight>
+        </TouchableOpacity>
+      </Modal>
+    )
   }
 }
 

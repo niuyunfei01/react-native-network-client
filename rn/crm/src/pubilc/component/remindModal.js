@@ -8,8 +8,11 @@ import HttpUtils from "../util/http";
 import Config from "../common/config";
 import pxToDp from "../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import GlobalUtil from "../util/GlobalUtil";
 
 const width = Dimensions.get("window").width;
+
+const {HOST_UPDATED} = require("../../pubilc/common/constants").default;
 
 const initState = {
   scrollViewIsBottom: false,
@@ -21,7 +24,12 @@ const initState = {
 class RemindModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
-    onPress: PropTypes.func
+    currStoreId: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
+    onPress: PropTypes.func,
+    dispatch: PropTypes.func,
   }
   state = initState
 
@@ -39,6 +47,18 @@ class RemindModal extends React.Component {
         showAdvicesVisible: true
       })
     }, () => {
+    })
+
+    let api = 'v4/wsbServerConfig/getServer?access_token=' + accessToken
+    let data = {
+      store_id: currStoreId,
+    }
+    HttpUtils.post.bind(this.props)(api, data).then(res => {
+      if (res?.host && res?.host !== GlobalUtil.getHostPort()) {
+        const {dispatch} = this.props;
+        dispatch({type: HOST_UPDATED, host: res?.host});
+        GlobalUtil.setHostPort(res?.host)
+      }
     })
   }
 
@@ -61,8 +81,7 @@ class RemindModal extends React.Component {
     const api = `/v1/new_api/advice/recordAdvice/${id}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken
-    }).then((res) => {
-    })
+    }).then()
   }
 
   toAdvicesDetail = (val) => {
@@ -105,7 +124,7 @@ class RemindModal extends React.Component {
             <TouchableOpacity style={{width: '10%'}} onPress={() => this.closeRemindModal()}/>
             <Text style={styles.modalContentTitleText}>{this.state.advicesInfoArray.title} </Text>
             <TouchableOpacity style={styles.modalContentIcon} onPress={() => this.closeRemindModal()}>
-              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.fontColor}}/>
+              <Entypo name="cross" style={{backgroundColor: "#fff", fontSize: 35, color: colors.b2}}/>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalContainer} automaticallyAdjustContentInsets={false}
@@ -198,14 +217,14 @@ const styles = StyleSheet.create({
   modalContentIcon: {flexDirection: "row", justifyContent: "flex-end", width: '10%'},
   modalContentTitleText: {
     textAlign: 'center',
-    color: colors.title_color,
+    color: colors.color111,
     fontWeight: "bold",
     flex: 1,
     fontSize: pxToDp(28)
   },
   closeIcon: {
     fontSize: 35,
-    color: colors.fontColor
+    color: colors.b2
   },
   modalBtnWrap: {
     backgroundColor: colors.main_color,

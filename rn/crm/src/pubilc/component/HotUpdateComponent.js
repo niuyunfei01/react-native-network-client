@@ -13,6 +13,7 @@ import {SvgXml} from "react-native-svg";
 import {hotUpdateHeader} from "../../svg/svg";
 import tool from "../util/tool";
 import DeviceInfo from "react-native-device-info";
+import PropTypes from "prop-types";
 
 const styles = StyleSheet.create({
   modalWrap: {
@@ -146,6 +147,13 @@ const Progress = (downloadFileProgress = 0) => {
 
 export default class HotUpdateComponent extends PureComponent {
 
+  static propTypes = {
+    currStoreId: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ]),
+    accessToken: PropTypes.string,
+  }
   state = {
     showNewVersionVisible: false,
     newVersionInfo: {},
@@ -165,8 +173,16 @@ export default class HotUpdateComponent extends PureComponent {
 
   getNewVersionInfo = () => {
     const url = '/v1/new_api/Version/getBundleUrl'
+    let {accessToken, currStoreId} = this.props;
     const version = Cts.BUNDLE_VERSION;
-    const params = {platform: platform, version: version, version_code: DeviceInfo.getBuildNumber()}
+    const params = {
+      store_id: currStoreId,
+      accessToken: accessToken,
+      platform: platform,
+      version: version,
+      hot_update_num: version,
+      version_code: DeviceInfo.getBuildNumber()
+    }
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       if (parseInt(res.android) > version)
         this.setState({newVersionInfo: res, showNewVersionVisible: true})

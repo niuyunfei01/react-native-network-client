@@ -287,12 +287,16 @@ class OrderScan extends BaseComponent {
     return currentOrder && tool.length(Object.keys(currentOrder)) ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
-          <ScrollView refreshControl={
-            <RefreshControl
-              refreshing={this.state.isLoading}
-              onRefresh={() => this.fetchOrder(currentOrder.id)}
-            />
-          }>
+          <ScrollView
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.isLoading}
+                onRefresh={() => this.fetchOrder(currentOrder.id)}
+              />
+            }>
             {this.renderOrderInfo(this.state.currentOrder)}
             <OrderList
               scanCount={this.state.scanCount}

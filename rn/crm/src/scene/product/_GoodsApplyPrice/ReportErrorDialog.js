@@ -62,7 +62,10 @@ class ReportErrorDialog extends React.Component {
         onClickCancel={() => this.onClickCancel()}
         onClickConfirm={() => this.onClickConfirm()}
       >
-        <ScrollView>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}>
           <GoodsBaseItem
             image={this.props.productImg}
             name={this.props.productName}
@@ -83,6 +86,8 @@ class ReportErrorDialog extends React.Component {
             <Cell customStyle={{borderTopWidth: 0}}>
               <CellBody>
                 <TextArea
+                  multiline={true}
+                  numberOfLines={4}
                   value={this.state.remark}
                   onChange={(remark) => self.setState({remark: remark})}
                   showCounter={false}

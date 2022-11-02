@@ -114,7 +114,11 @@ class OrderSetPackDone extends Component {
     const packOpts = workers ? workers.map((worker, idx) => {
       return {label: `${worker.nickname}`, value: worker.id}
     }) : [];
-    return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {
       }}

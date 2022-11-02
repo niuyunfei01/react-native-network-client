@@ -116,13 +116,16 @@ class DiyPrinterItem extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={this.state.isRefreshing}
               onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
-          } style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
+          } style={{flex: 1, backgroundColor: colors.f2, marginHorizontal: 10}}>
 
           <If condition={this.state.type === 'font'}>
             <View>

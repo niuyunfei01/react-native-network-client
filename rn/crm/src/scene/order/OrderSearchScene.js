@@ -1,6 +1,15 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {FlatList, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  InteractionManager,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -42,7 +51,7 @@ class OrderSearchScene extends PureComponent {
     super(props);
 
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
-    const term = props.route.params?.term
+    const {term} = props.route.params || {}
     this.state = {
       keyword: term && tool.length(term) > 12 && term.substring(9, 13) || '',
       isRefreshing: false,
@@ -51,6 +60,7 @@ class OrderSearchScene extends PureComponent {
       orderList: [],
       end: false,
       isLoading: false,
+      isCanLoadMore: false,
       query: {
         page: 1,
         limit: 10,
@@ -62,7 +72,7 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentDidMount() {
-    const term = this.props.route.params?.term
+    const {term} = this.props.route.params || {}
     if (term && tool.length(term) > 0) {
       contentFromOrderList = true
       this.queryOrderInfo(true)
@@ -167,26 +177,31 @@ class OrderSearchScene extends PureComponent {
     this.filterType = value
     contentFromOrderList = false
     this.queryOrderInfo(true)
+    Keyboard.dismiss()
   }
 
   onEndReached = () => {
-    const {query, end} = this.state
+    const {query, end, isLoading, isCanLoadMore} = this.state
+    if (!isCanLoadMore)
+      return;
     if (end) {
       showError('没有更多数据了')
+      this.setState({isCanLoadMore: false})
       return
     }
+    if (isLoading)
+      return;
     query.page += 1
-    this.setState({query: query}, () => this.queryOrderInfo(false))
+    this.setState({query: query, isLoading: true, isCanLoadMore: false}, () => this.queryOrderInfo(false))
   }
 
   queryOrderInfo = (isChangeType) => {
     const {accessToken} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
-    const {query, keyword, isLoading} = this.state
-    const term = this.props.route.params?.term
-    if (isLoading)
-      return
-    this.setState({isLoading: true})
+    const {query, keyword} = this.state
+
+    const {term = ''} = this.props.route.params || {}
+
     showModal('加载中...')
     const params = {
       vendor_id: currVendorId,
@@ -213,10 +228,14 @@ class OrderSearchScene extends PureComponent {
     })
   }
 
+  onScrollBeginDrag = () => {
+    this.setState({isCanLoadMore: true})
+  }
+
   render() {
-    const {keyword, prefix, orderList, isLoading} = this.state
+    const {keyword, prefix, orderList} = this.state
     const {global, navigation, route} = this.props
-    const term = route.params?.term
+    const {term} = route.params || {}
     return (
       <>
         <View style={styles.searchWarp}>
@@ -270,11 +289,12 @@ class OrderSearchScene extends PureComponent {
                   renderItem={(item) => this.renderItem(item, global, navigation)}
                   initialNumToRender={2}
                   onRefresh={this.onRefresh}
+                  refreshing={false}
                   onEndReachedThreshold={0.1}
+                  onScrollBeginDrag={this.onScrollBeginDrag}
                   onEndReached={this.onEndReached}
-                  refreshing={isLoading}
-                  removeClippedSubviews={true}
                   keyExtractor={(item, index) => `${index}`}
+
         />
       </>
     );

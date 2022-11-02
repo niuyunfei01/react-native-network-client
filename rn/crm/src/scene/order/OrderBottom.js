@@ -45,23 +45,22 @@ class OrderBottom extends PureComponent {
     tool.debounces(() => {
       const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.token}`
       HttpUtils.get.bind(self.props.navigation)(api).then(() => {
-        showSuccess('操作成功')
+        showSuccess('配送已完成')
         this.props.fetchData();
         GlobalUtil.setOrderFresh(1)
       }).catch(e => {
-        showError('操作失败' + e.desc)
+        ToastShort('忽略配送失败' + e.desc)
       })
     }, 1000)
   }
 
   onCallThirdShips(order_id, store_id, if_reship) {
-    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
-      orderId: order_id,
-      storeId: store_id,
-      selectedWay: [],
+    this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count >= 0) {
+        if (res && res?.count >= 0) {
           this.props.fetchData()
 
           GlobalUtil.setOrderFresh(1)
@@ -128,6 +127,7 @@ class OrderBottom extends PureComponent {
         shadowColor: '#000',
         shadowOffset: {width: -4, height: -4},
         shadowOpacity: 0.75,
+        elevation: 10,
         shadowRadius: 4,
       }}>
         <If condition={btn_list && btn_list.btn_pack_green}>
@@ -170,8 +170,8 @@ class OrderBottom extends PureComponent {
           <Button title={'忽略配送'}
                   onPress={() => {
                     this.mixpanel.track('订单详情页_忽略配送')
-                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                      text: '继续忽略配送',
+                    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+                      text: '忽略',
                       onPress: () => {
                         this.onOverlookDelivery(order.id)
                       }
@@ -179,7 +179,7 @@ class OrderBottom extends PureComponent {
                   }}
                   buttonStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontColor,
+                    backgroundColor: colors.b2,
                   }}
 
                   titleStyle={{
@@ -195,7 +195,7 @@ class OrderBottom extends PureComponent {
                   }}
                   buttonStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontColor,
+                    backgroundColor: colors.b2,
                   }}
                   titleStyle={{
                     color: colors.white,
@@ -204,8 +204,8 @@ class OrderBottom extends PureComponent {
           />
           <Button title={'忽略配送'}
                   onPress={() => {
-                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                      text: '继续忽略配送',
+                    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
+                      text: '忽略',
                       onPress: () => {
                         this.onOverlookDelivery(order.id)
                       }

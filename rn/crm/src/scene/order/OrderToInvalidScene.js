@@ -107,7 +107,11 @@ class OrderToInvalidScene extends Component {
       return {label: reason.label, value: idx}
     });
 
-    return <ScrollView style={[styles.container, {flex: 1}]}>
+    return <ScrollView
+      automaticallyAdjustContentInsets={false}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {
       }}
@@ -136,6 +140,8 @@ class OrderToInvalidScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
+                multiline={true}
+                numberOfLines={4}
                 maxLength={20}
                 placeholder="请输入自定义内容"
                 onChange={(v) => {

@@ -5,24 +5,29 @@ import {ActivityIndicator, StyleSheet} from 'react-native'
 import {Icon} from "../../weui/Icon";
 import tool from "./tool";
 
-export function ToastShort(content) {
+export function ToastShort(content, position = WToast.position.BOTTOM, icon = undefined) {
   WModal.hide()
-  WToast.show({data: content, duration: WToast.duration.SHORT})
+  WToast.show({
+    data: content,
+    duration: WToast.duration.SHORT,
+    position: position,
+    icon: icon
+  })
 }
 
-export function ToastLong(content) {
+export function ToastLong(content, position = WToast.position.BOTTOM) {
   WModal.hide()
-  WToast.show({data: content, duration: WToast.duration.LONG})
+  WToast.show({data: content, duration: WToast.duration.LONG, position: position})
 }
 
-export function showModal(content, icon = 'loading', timeOut = 6000) {
+export function showModal(content, icon = 'loading', timeOut = 6000, positon = WModal.position.CENTER) {
 
   WModal.hide()
   const modalOpts = {
     data: content,
     textColor: '#fff',
     backgroundColor: '#444444',
-    position: WModal.position.CENTER,
+    position: positon,
     icon: icon === 'loading' ? <ActivityIndicator color='#fff' size={'large'}/> :
       <Icon name={icon} style={[styles.toastIcon]}/>
   }

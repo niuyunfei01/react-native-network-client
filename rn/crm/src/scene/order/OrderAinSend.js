@@ -73,7 +73,11 @@ class OrderAinSend extends Component {
   render() {
     return (
       <View style={{flexGrow: 1}}>
-        <ScrollView style={{flex: 1, padding: pxToDp(20)}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{flex: 1, padding: pxToDp(20)}}>
           <View style={{backgroundColor: colors.white, borderRadius: pxToDp(15)}}>
             <View style={styles.header}>
               <Text style={{fontSize: 15, fontWeight: 'bold'}}>配送人员</Text>

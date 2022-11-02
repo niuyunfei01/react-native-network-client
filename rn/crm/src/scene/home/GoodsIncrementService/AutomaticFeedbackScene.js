@@ -1,20 +1,22 @@
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {LineView, Styles} from "./GoodsIncrementServiceStyle";
 import Config from "../../../pubilc/common/config";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import {SvgXml} from "react-native-svg";
+import {close} from "../../../svg/svg";
 
 const styles = StyleSheet.create({
   rowHeaderText: {
     padding: 12,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 21
   },
@@ -38,7 +40,36 @@ const styles = StyleSheet.create({
     paddingBottom: 13,
   },
   row: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  switchStyle: {marginRight: 14}
+  switchStyle: {marginRight: 14},
+  storeWrap: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    paddingHorizontal: 12,
+    maxHeight: '70%'
+  },
+  listItemText: {
+    fontSize: 16,
+    lineHeight: 22,
+    height: 48,
+    paddingVertical: 13,
+    textAlign: 'center'
+  },
+  selectedListItemText: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.main_color,
+    height: 48,
+    paddingVertical: 13,
+    textAlign: 'center'
+  },
+  headerWrap: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  }
 })
 const REPLAY_LIST = [
   {
@@ -66,8 +97,8 @@ class AutomaticFeedbackScene extends PureComponent {
     this.state = {
       storeList: [],
       selectStore: {
-        label: '',
-        value: '',
+        name: '',
+        id: '',
         status: {
           score_1: 'off',
           score_3: 'off',
@@ -76,8 +107,20 @@ class AutomaticFeedbackScene extends PureComponent {
         }
       },
       settings: {},
+      visible: false
     }
-    this.getSetting()
+
+  }
+
+  componentDidMount() {
+    this.focus = this.props.navigation.addListener('focus', () => {
+      this.getSetting()
+    })
+
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   getStoreList = () => {
@@ -87,18 +130,22 @@ class AutomaticFeedbackScene extends PureComponent {
 
     const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
-      list.map(item => {
-        item.value = item.id
-        item.label = item.name
-      })
-      let _selectStore = tool.length(list) > 0 ? list[0] : selectStore
-      Object.keys(settings).map(key => {
-        if (_selectStore.value === key)
-          _selectStore = {..._selectStore, status: settings[key].status};
-      })
+
+      const lists = [{id: '0', name: '全部', platform: '0', store: currStoreId}].concat(list)
+      if (!selectStore.id) {
+        let _selectStore = tool.length(lists) > 0 ? lists[0] : selectStore
+        Object.keys(settings).map(key => {
+          if (_selectStore.id === key)
+            _selectStore = {..._selectStore, status: settings[key].status};
+        })
+        this.setState({
+          storeList: lists,
+          selectStore: _selectStore
+        })
+        return
+      }
       this.setState({
-        storeList: list,
-        selectStore: _selectStore
+        storeList: lists
       })
     }).catch(error => showError(error.reason))
   }
@@ -118,39 +165,37 @@ class AutomaticFeedbackScene extends PureComponent {
   onChange = (item) => {
     let {selectStore, settings} = this.state
     Object.keys(settings).map(key => {
-      if (item.value === key) {
+      if (item.id === key) {
         this.setState({
           selectStore: {
             ...selectStore,
             status: settings[key].status,
-            label: item.label,
-            name: item.label,
-            value: item.value,
-            id: item.value,
-          }
+            name: item.name,
+            id: item.id,
+          },
+
         })
       }
     })
-
+    this.setState({visible: false})
   }
   renderHeader = () => {
-    const {storeList, selectStore} = this.state
+    const {selectStore} = this.state
     return (
       <View style={Styles.zoneWrap}>
         <Text style={styles.rowHeaderText}>
           外卖店
         </Text>
         <LineView/>
-        <ModalSelector skin="customer" data={storeList} onChange={item => this.onChange(item)}>
-          <View style={styles.row}>
-            <Text style={styles.rowContentText}>
-              {selectStore.label}
-            </Text>
-            <Text style={styles.rowContentRightText}>
-              {'切换门店 >'}
-            </Text>
-          </View>
-        </ModalSelector>
+        <TouchableOpacity style={styles.row} onPress={() => this.setState({visible: true})}>
+          <Text style={styles.rowContentText}>
+            {selectStore.name}
+          </Text>
+          <Text style={styles.rowContentRightText}>
+            {'切换门店 >'}
+          </Text>
+        </TouchableOpacity>
+
       </View>
     )
   }
@@ -159,13 +204,14 @@ class AutomaticFeedbackScene extends PureComponent {
     const {global} = this.props
     const {currStoreId, accessToken} = global
     const {selectStore, settings} = this.state
-    let tpl_content = ''
+    let tpl_content = '', tpl_type = 0
     Object.keys(settings).map(key => {
       if (key === selectStore.id) {
         const storeInfo = settings[key]
         Object.keys(storeInfo?.tpl).map(tplKey => {
           if (tplKey === `${item.id}`) {
             tpl_content = storeInfo.tpl[tplKey].tpl_content
+            tpl_type = storeInfo.tpl[tplKey].tpl_type
           }
         })
       }
@@ -173,9 +219,10 @@ class AutomaticFeedbackScene extends PureComponent {
     this.props.navigation.navigate(Config.ROUTE_TEMPLATE_SETTINGS, {
       store: {
         store_id: currStoreId,
-        ext_store_id: selectStore.value,
+        ext_store_id: selectStore.id,
         tpl_level: `${item.id}`,
         tpl_content: tpl_content,
+        tpl_type: Number(tpl_type),
         title: item.title,
         accessToken: accessToken
       }
@@ -270,7 +317,7 @@ class AutomaticFeedbackScene extends PureComponent {
     const api = `/v1/new_api/added/auto_reply?access_token=${accessToken}`
     const params = {
       store_id: currStoreId,
-      ext_store_id: selectStore.value,
+      ext_store_id: selectStore.id,
       score_5: selectStore.status.score_5,
       score_4: selectStore.status.score_4,
       score_3: selectStore.status.score_3,
@@ -278,10 +325,28 @@ class AutomaticFeedbackScene extends PureComponent {
     }
     HttpUtils.post(api, params).then(() => {
       showSuccess('保存成功')
+      this.getSetting()
     }).catch(error => showError('保存失败，原因：' + error.reason))
   }
 
+  renderItem = ({item}) => {
+    const {selectStore} = this.state
+    return (
+      <TouchableOpacity onPress={() => this.onChange(item)}>
+        <Text style={selectStore.id === item.id ? styles.selectedListItemText : styles.listItemText}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
+  getItemLayout = (data, index) => ({
+    length: 48, offset: 48 * index, index
+  })
+
   render() {
+    const {storeList, visible} = this.state
+
     return (
       <>
         <ScrollView>
@@ -295,6 +360,23 @@ class AutomaticFeedbackScene extends PureComponent {
             </Text>
           </TouchableOpacity>
         </View>
+        <CommonModal visible={visible} position={'flex-end'} onRequestClose={() => this.setState({visible: false})}>
+          <View style={styles.storeWrap}>
+            <View style={styles.headerWrap}>
+              <View/>
+              <Text style={styles.headerTitle}>
+                请选择外卖门店
+              </Text>
+              <SvgXml xml={close(18, 18)} onPress={() => this.setState({visible: false})}/>
+            </View>
+            <FlatList data={storeList}
+                      initialNumToRender={10}
+                      ItemSeparatorComponent={LineView}
+                      getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                      keyExtractor={item => item.id}
+                      renderItem={this.renderItem}/>
+          </View>
+        </CommonModal>
       </>
     )
   }
