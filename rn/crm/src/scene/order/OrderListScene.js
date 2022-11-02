@@ -756,10 +756,11 @@ class OrderListScene extends Component {
       const {accessToken} = global;
       dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
         if (ok) {
-          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-            initTab: Config.ROUTE_ORDERS,
-            initialRouteName: Config.ROUTE_ALERT
-          });
+          // tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          //   initTab: Config.ROUTE_ORDERS,
+          //   initialRouteName: Config.ROUTE_ALERT
+          // });
+          this.onRefresh()
           hideModal()
         } else {
           ToastLong(msg);
