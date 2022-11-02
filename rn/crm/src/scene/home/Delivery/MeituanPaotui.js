@@ -69,14 +69,14 @@ class MeituanPaotui extends PureComponent {
             paddingVertical: 10,
             paddingHorizontal: 16
           }}>
-            <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>什么是美团配送App</Text>
+            <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>什么是美团跑腿帮送</Text>
             <View style={{flexDirection: 'row', marginTop: 12}}>
               <Text style={{
                 fontSize: 12,
                 fontWeight: "bold",
                 width: "76%",
                 color: colors.color333,
-              }}>&emsp;美团配送App可支持其非美团外卖商家的用户使用美团配送的运力，不仅可接入美团的订单，还可接入其他多个平台的订单，并支持添加多个发货地址。</Text>
+              }}>&emsp;美团跑腿帮送可支持其非美团外卖商家的用户使用美团配送的运力，不仅可接入美团的订单，还可接入其他多个平台的订单，并支持添加多个发货地址。</Text>
               <TouchableOpacity
                 style={{marginLeft: 10}}
                 onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/meituanpaotui/1.png')}>
@@ -118,7 +118,7 @@ class MeituanPaotui extends PureComponent {
                 <View style={{marginLeft: 6}}>
                   <Text style={{color: colors.color333, fontSize: 12,}}>（2）美团个人账号：适用于</Text>
                   <Text style={{color: colors.color333, fontSize: 12,}}>· 非美团外卖商家但有美团个人账号的用户。</Text>
-                  <Text style={{color: colors.color333, fontSize: 12,}}>· 非美团外卖商家且无美团配送App账号的用户。</Text>
+                  <Text style={{color: colors.color333, fontSize: 12,}}>· 非美团外卖商家且无美团跑腿帮送账号的用户。</Text>
                   <TouchableOpacity
                     style={{marginVertical: 16}}
                     onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/meituanpaotui/3.png')}>

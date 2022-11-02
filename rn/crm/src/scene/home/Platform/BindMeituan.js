@@ -272,7 +272,7 @@ class BindMeituan extends PureComponent {
             <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团跑腿”配送 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>

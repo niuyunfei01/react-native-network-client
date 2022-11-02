@@ -201,7 +201,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   showAlert() {
-    Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团众包”配送；\n' +
+    Alert.alert('提示', '•兼容模式支持在外送帮呼叫 “美团跑腿”配送；\n' +
       '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
       '•兼容模式不支持自动接单\t\t\t', [
       {
@@ -503,7 +503,7 @@ class StoreStatusScene extends PureComponent {
             <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
-              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团众包”配送 </Text>
+              <Text style={{color: colors.color333, fontSize: 14}}>收银模式支持在外送帮呼叫 “美团跑腿”配送 </Text>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 4}}>

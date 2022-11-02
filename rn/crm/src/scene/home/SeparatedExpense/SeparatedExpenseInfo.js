@@ -118,7 +118,7 @@ class SeparatedExpenseInfo extends PureComponent {
                   }}>
                     <Text style={{paddingLeft: '5%', width: '93%', fontSize: pxToDp(20),}}>
                       <Icon name="question-circle" style={{fontSize: pxToEm(30), color: "red"}}/>
-                      &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看
+                      &nbsp;&nbsp;美团跑腿在平台扣费，外送帮不收费，只做扣费记录，方便查看
                     </Text>
                   </View>
                 </If>
