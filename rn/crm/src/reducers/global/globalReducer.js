@@ -21,7 +21,7 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_CALL_DELIVERY_LIST,
+  // SET_CALL_DELIVERY_LIST,
   SET_DEFAULT_ORDER_INFO,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
@@ -135,7 +135,8 @@ export default function globalReducer(state = initialState, action) {
           autoBluetoothPrint: action.payload.autoBluetoothPrint,
           refreshToken: action.payload.refreshToken,
           expireTs: action.payload.expireTs,
-          getTokenTs: action.payload.getTokenTs
+          getTokenTs: action.payload.getTokenTs,
+          user_config: action.info
         }
       }
       break
@@ -230,8 +231,8 @@ export default function globalReducer(state = initialState, action) {
     case SET_USER_CONFIG:
       return {...state, user_config: action.info}
 
-    case SET_CALL_DELIVERY_LIST:
-      return {...state, call_delivery_list: action.list}
+    // case SET_CALL_DELIVERY_LIST:
+    //   return {...state, call_delivery_list: action.list}
 
     case SET_DEFAULT_ORDER_INFO:
       return {...state, default_order_info: action.info}

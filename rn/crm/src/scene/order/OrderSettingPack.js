@@ -141,6 +141,7 @@ class OrderSettingScene extends Component {
   }
 
   selectStore = (store_info) => {
+    this.cancelData()
     this.setState({
       store_id: store_info?.id,
       store_name: store_info?.name,
@@ -150,24 +151,25 @@ class OrderSettingScene extends Component {
   }
 
   componentDidMount() {
-    this.getClipboardText()
+    // this.getClipboardText()
   }
 
-  getClipboardText = () => {
-    Clipboard.getString().then(res => {
-      if (tool.length(res) > 0) {
-        Alert.alert('"外送帮"想从粘贴板粘贴', '你允许这样做吗？', [{
-          text: '允许', onPress: () => {
-            this.setState({
-              smartText: res,
-            }, () => {
-              this.intelligentIdentification()
-            })
-          }
-        }, {'text': '不允许'}]);
-      }
-    });
-  }
+  // getClipboardText = () => {
+  //   Clipboard.getString().then(res => {
+  //     if (tool.length(res) > 0) {
+  //       Alert.alert('"外送帮"想从粘贴板粘贴', '你允许这样做吗？', [{
+  //         text: '允许', onPress: () => {
+  //           this.setState({
+  //             smartText: res,
+  //           }, () => {
+  //             this.intelligentIdentification()
+  //           })
+  //         }
+  //       }, {'text': '不允许'}]);
+  //     }
+  //   });
+  // }
+
   onPress = (route, params = {}) => {
     this.props.navigation.navigate(route, params);
   }
@@ -422,7 +424,7 @@ class OrderSettingScene extends Component {
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}> {tool.jbbsubstr(store_address, -18)}</Text>
+                  }}> {tool.jbbsubstr(store_address, -18)} </Text>
                 </View>
               </View>
               <If condition={!only_one_store}>
@@ -522,6 +524,7 @@ class OrderSettingScene extends Component {
                      underlineColorAndroid="transparent"
                      style={{height: 50, flex: 1}}
                      placeholderTextColor={'#999'}
+                     maxLength={10}
                      value={name}
                      onChangeText={value => {
                        this.setState({name: value});

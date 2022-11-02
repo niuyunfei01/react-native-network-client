@@ -21,9 +21,9 @@ class AddAccount extends PureComponent {
     super(props);
     this.state = {
       workerRoles: [],
-      storeList: [
-        {label: '所有门店', value: 0}
-      ],
+      // storeList: [
+        // {label: '所有门店', value: 0}
+      // ],
       roleStoreList: [],
       worker_role_grade: '',
       worker_role_grade_value: 0,
@@ -54,7 +54,7 @@ class AddAccount extends PureComponent {
         })
       })
       this.setState({
-        storeList: this.state.storeList.concat(stores),
+        // storeList: this.state.storeList.concat(stores),
         workerRoles: res?.roles,
         roleStoreList: stores
       })
@@ -134,7 +134,7 @@ class AddAccount extends PureComponent {
       worker_store_id_belong,
       worker_name,
       worker_account,
-      storeList,
+      // storeList,
       roleStoreList
     } = this.state
     return (
@@ -175,7 +175,7 @@ class AddAccount extends PureComponent {
                     worker_store_id_belong_value: option.value
                   })
                 }}
-                data={this.state.worker_role_grade_value === 1 ? roleStoreList : storeList}
+                data={roleStoreList}
                 skin="customer"
                 defaultKey={-999}
               >

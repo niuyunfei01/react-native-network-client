@@ -95,7 +95,7 @@ class SettlementDetailsScene extends React.Component {
       <View style={styles.header}>
         <Text style={styles.headerDate}>时间：{date} </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)} </Text>
           <FontAwesome5 name={icon}
                         style={{
                           fontSize: icon === 'weixin' ? 22 : 25,
@@ -130,7 +130,7 @@ class SettlementDetailsScene extends React.Component {
           <View style={styles.header}>
             <Text style={styles.headerDate}>时间：{date} </Text>
             <View style={styles.amountRow}>
-              <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+              <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)} </Text>
               <If condition={icon}>
                 <FontAwesome5 name={icon}
                               style={{

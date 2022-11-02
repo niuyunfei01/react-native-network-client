@@ -121,6 +121,6 @@ export default keyMirror({
   ACTIVITY_GOODS_LIST: null,
   GET_MANAGE_SELECT: null,
   ACTIVITY_MANAGER_REFRESH: null,
-  SET_CALL_DELIVERY_LIST: null,
+  // SET_CALL_DELIVERY_LIST: null,
   SET_DEFAULT_ORDER_INFO: null,
 })

@@ -66,7 +66,7 @@ class AddTipModal extends React.Component {
     let {add_money} = this.state;
 
     if (Number(add_money) < 1) {
-      return this.setState({add_money: 1, respReason: '加小费的金额必须大于1元', ok: false});
+      return this.setState({add_money: 1, respReason: '加小费的金额必须大于等于1元', ok: false});
     }
 
     if (set_add_tip_money) { //修改上级页面加小费金额
@@ -150,7 +150,7 @@ class AddTipModal extends React.Component {
               <For index='index' each='info' of={tip_list}>
 
                 <TouchableOpacity onPress={() => {
-                  this.setState({add_money: Number(info.value)})
+                  this.setState({add_money: Number(info.value), input_add_money: ''})
                 }} key={index} style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
@@ -171,13 +171,17 @@ class AddTipModal extends React.Component {
               </For>
               <TextInput
                 onChangeText={(input_add_money) => {
-                  this.setState({input_add_money: Number(input_add_money), add_money: Number(input_add_money)})
+                  if (/^([0]|[1-9][0-9]*)$/.test(input_add_money)) {
+                    this.setState({input_add_money: Number(input_add_money), add_money: Number(input_add_money)})
+                  } else {
+                    this.setState({input_add_money: '', add_money: ''})
+                  }
                 }}
                 defaultValue={`${input_add_money}`}
                 value={`${input_add_money}`}
                 placeholderTextColor={colors.color999}
                 underlineColorAndroid='transparent'
-                maxLength={6}
+                maxLength={2}
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
@@ -209,7 +213,7 @@ class AddTipModal extends React.Component {
                   color: colors.warn_red,
                   fontSize: 14,
                   fontWeight: 'bold'
-                }}>{respReason}</Text>
+                }}>{respReason} </Text>
               </View>
             </If>
 

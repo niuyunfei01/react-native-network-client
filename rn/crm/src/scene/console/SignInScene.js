@@ -235,7 +235,7 @@ class SignInScene extends PureComponent {
 
         </View>
         <View style={styles.allowOrderWrap}>
-          <Text>{shippingAcceptStatus === 2 ? '开启接单' : '停止接单'}</Text>
+          <Text>{shippingAcceptStatus === 2 ? '开启接单' : '停止接单'} </Text>
           <Switch value={shippingAcceptStatus === 2}
                   onValueChange={() => this.allowOrderOrStopOrder(shippingAcceptStatus)}/>
         </View>

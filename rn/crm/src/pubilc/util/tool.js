@@ -178,7 +178,7 @@ export function length(obj) {
 
 }
 
-const pickImageOptions = (cropping) => {
+const pickImageOptions = (cropping, allowMultiplePic = false) => {
   return {
     width: 800,
     height: 800,
@@ -186,7 +186,8 @@ const pickImageOptions = (cropping) => {
     cropperCircleOverlay: false,
     includeExif: true,
     cropperChooseText: '选择图片',
-    cropperCancelText: '取消'
+    cropperCancelText: '取消',
+    multiple: allowMultiplePic
   };
 }
 

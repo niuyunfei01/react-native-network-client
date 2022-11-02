@@ -51,7 +51,7 @@ import {showError} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout} from "../../../reducers/global/globalActions";
+import {logout, setUserCfg} from "../../../reducers/global/globalActions";
 
 const width = Dimensions.get("window").width;
 
@@ -86,6 +86,41 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
+const menu_list = [
+  {
+    title: "常用",
+    items: [
+      {name: "全部订单", type: "Router", path: "OrderSearchResult", icon: "order_search", badge: {}},
+      {name: "经营数据", type: "Router", path: "DistributionAnalysis", icon: "operator_data", badge: {}},
+      {
+        name: "配送回传",
+        type: "Router",
+        path: "ComesBack",
+        icon: "delivery_sync",
+        badge: {label: "达标", color: "white", bg_color: "#26B942"}
+      },
+      {name: "三方充值", type: "Router", path: "TripartiteRecharge", icon: "third_recharge", badge: {}}
+    ]
+  },
+  {
+    title: "配送设置",
+    items: [
+      {name: "外卖门店", type: "Router", path: "StoreStatus", icon: "ext_store", badge: {}},
+      {name: "配送管理", type: "Router", path: "DeliveryList", icon: "deliveries", badge: {}},
+      {name: "门店管理", type: "Router", path: "Store", icon: "stores", badge: {}},
+      {name: "打印设置", type: "Router", path: "PrinterSetting", icon: "printer", badge: {}}
+    ]
+  },
+  {
+    title: "其他",
+    items: [
+      {name: "通知设置", type: "Router", path: "PushSetting", icon: "push", badge: {}},
+      {name: "系统设置", type: "Router", path: "Setting", icon: "setting", badge: {}},
+      {name: "帮助中心", type: "Router", path: "Help", icon: "help", badge: {}},
+      {name: "系统公告", type: "Router", path: "HistoryNoticeScene", icon: "history_notice", badge: {}}]
+  }
+]
+
 class Mine extends PureComponent {
 
   static propTypes = {}
@@ -99,7 +134,6 @@ class Mine extends PureComponent {
       currVersion,
       co_type
     } = tool.vendor(this.props.global);
-    let json_str = '[{"title":"常用","items":[{"name":"全部订单","type":"Router","path":"OrderSearchResult","icon":"order_search","badge":{}},{"name":"经营数据","type":"Router","path":"DistributionAnalysis","icon":"operator_data","badge":{}},{"name":"配送回传","type":"Router","path":"ComesBack","icon":"delivery_sync","badge":{"label":"达标","color":"white","bg_color":"#26B942"}},{"name":"三方充值","type":"Router","path":"TripartiteRecharge","icon":"third_recharge","badge":{}}]},{"title":"配送设置","items":[{"name":"外卖门店","type":"Router","path":"StoreStatus","icon":"ext_store","badge":{}},{"name":"配送管理","type":"Router","path":"DeliveryList","icon":"deliveries","badge":{}},{"name":"门店管理","type":"Router","path":"Store","icon":"stores","badge":{}},{"name":"打印设置","type":"Router","path":"PrinterSetting","icon":"printer","badge":{}}]},{"title":"其他","items":[{"name":"通知设置","type":"Router","path":"PushSetting","icon":"push","badge":{}},{"name":"系统设置","type":"Router","path":"Setting","icon":"setting","badge":{}},{"name":"帮助中心","type":"Router","path":"Help","icon":"help","badge":{}},{"name":"系统公告","type":"Router","path":"HistoryNoticeScene","icon":"history_notice","badge":{}}]}]'
     this.state = {
       isRefreshing: false,
       currStoreId: currStoreId,
@@ -119,7 +153,7 @@ class Mine extends PureComponent {
         disabled_recharge: false,
         disabled_view_bill: false
       },
-      menu_list: JSON.parse(json_str),
+      menu_list: menu_list,
       activity: [],
       img: ''
     }
@@ -237,7 +271,7 @@ class Mine extends PureComponent {
   }
 
   // 联系客服
-  JumpToServices = () => {
+  JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
     let {currStoreId} = this.state;
     let data = {
@@ -248,7 +282,7 @@ class Mine extends PureComponent {
       place: 'cancelOrder'
     }
     this.mixpanel.track('我的_联系客服')
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   jumpToAccountFill = (flag) => {
@@ -312,6 +346,7 @@ class Mine extends PureComponent {
   }
 
   logOutAccount = () => {
+    const {dispatch, navigation, global} = this.props;
     Alert.alert('提醒', `确定要退出吗？`, [
       {
         text: '取消',
@@ -321,7 +356,6 @@ class Mine extends PureComponent {
         text: '确定',
         style: 'default',
         onPress: () => {
-          const {dispatch, navigation, global} = this.props;
           this.mixpanel.reset();
           const noLoginInfo = {
             accessToken: '',
@@ -331,9 +365,18 @@ class Mine extends PureComponent {
             co_type: '',
             enabledGoodMgr: '',
             currVendorId: '',
-            printer_id: global.printer_id || '0'
+            refreshToken: '',
+            expireTs: 0,
+            printer_id: '0',
+            user_config: {
+              order_list_by: 'orderTime asc'
+            }
           }
           setNoLoginInfo(JSON.stringify(noLoginInfo))
+
+          let {user_config = {}} = global
+          user_config.order_list_by = 'orderTime asc'
+          dispatch(setUserCfg(user_config))
           dispatch(logout(() => {
             tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
           }));

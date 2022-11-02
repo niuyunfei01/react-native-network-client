@@ -301,7 +301,7 @@ class newRefundScene extends Component {
             flexDirection: 'row',
             justifyContent: 'space-between'
           }}>
-            <Text>退款方式：{refund_desc}</Text>
+            <Text>退款方式：{refund_desc} </Text>
             <FontAwesome5 solid={false} onPress={() => {
             }} name={!show_good_list ? 'chevron-down' : 'chevron-up'}
                           style={{fontSize: 14, color: colors.color666}}/>
@@ -333,7 +333,7 @@ class newRefundScene extends Component {
                 <View
                   style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, justifyContent: "space-between"}}>
                   <Text style={{fontSize: 14, color: colors.color333}}>退货金额： </Text>
-                  <Text style={{fontSize: 14, color: colors.color333}}>¥ {total_refund_price}</Text>
+                  <Text style={{fontSize: 14, color: colors.color333}}>¥ {total_refund_price} </Text>
                 </View>
               </If>
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
@@ -355,7 +355,7 @@ class newRefundScene extends Component {
                 Clipboard.setString(refund_delivery_code)
                 ToastShort('已复制到剪切板')
               }} style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 8}}>
-                <Text style={{fontSize: 14, color: colors.color333}}>物流单号： {refund_delivery_code}</Text>
+                <Text style={{fontSize: 14, color: colors.color333}}>物流单号： {refund_delivery_code} </Text>
                 <Text style={{fontSize: 14, color: colors.main_color}}>复制 </Text>
               </TouchableOpacity>
             </If>

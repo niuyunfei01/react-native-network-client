@@ -31,12 +31,12 @@ import tool from "../util/tool";
 import colors from "../styles/colors";
 import GlobalUtil from "../util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo"
-import {Button, Image} from "react-native-elements";
+import {Button} from "react-native-elements";
 import BottomModal from "./BottomModal";
 import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {call, locationIcon} from "../../svg/svg";
-import AlertModal from "./AlertModal";
+import FastImage from "react-native-fast-image";
 
 let width = Dimensions.get("window").width;
 
@@ -202,7 +202,7 @@ class OrderItem extends React.PureComponent {
   routeOrder = () => {
     let {item} = this.props;
     this.onPress(Config.ROUTE_ORDER_NEW, {orderId: item.id})
-    this.mixpanel.track('订单详情页')
+    this.mixpanel.track('V4订单详情页')
   }
 
   render() {
@@ -272,7 +272,7 @@ class OrderItem extends React.PureComponent {
         backgroundColor: colors.f9
       }}>
 
-        <If condition={item.is_right_once}>
+        <If condition={!item.is_right_once}>
           <View style={{
             position: 'absolute',
             left: 0,
@@ -283,7 +283,8 @@ class OrderItem extends React.PureComponent {
           </View>
         </If>
 
-        <Image source={{uri: item.platformIcon}}
+        <FastImage source={{uri: item.platformIcon}}
+                   resizeMode={FastImage.resizeMode.contain}
                style={styles.platformIcon}/>
         <View style={{flex: 1, marginLeft: 10}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -570,7 +571,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_confirm_arrived}>
-          <Button title={'配送完成'}
+          <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_完成配送')
                     this.props.openFinishDeliveryModal(item?.id);

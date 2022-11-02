@@ -107,14 +107,19 @@ class OrderInfoNew extends PureComponent {
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-    let {default_order_info} = this.props.global
     this.state = {
       isRefreshing: false,
       loadingImg: true,
       orderId: order_id,
       is_service_mgr: is_service_mgr,
       isFetching: false,
-      order: default_order_info,
+      order: {
+        ship_id: '',
+        fn_scan_items: '',
+        fn_scan_ready: '',
+        cancel_to_entry: '',
+        orderStatus: ''
+      },
       actionSheet: [],
       isShowMap: false,
       logistics: [],
@@ -190,8 +195,7 @@ class OrderInfoNew extends PureComponent {
     const as = [
       {key: MENU_PRINT_AGAIN, label: '再次打印'},
       {key: MENU_EDIT_BASIC, label: '修改订单'},
-      {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_CALL_STAFF, label: '联系门店'},
+      {key: MENU_EDIT_STORE, label: '修改门店'}
     ];
     const {is_service_mgr} = this.state
     if (order && order?.ship_id > 0) {
@@ -200,6 +204,7 @@ class OrderInfoNew extends PureComponent {
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
+      as.push({key: MENU_CALL_STAFF, label: '联系门店'})
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
@@ -519,7 +524,7 @@ class OrderInfoNew extends PureComponent {
 
   deliveryModalFlag = () => {
     let {order} = this.state;
-    if (order?.orderStatus != Cts.ORDER_STATUS_TO_READY) {
+    if (!order?.not_call_delivery) {
       this.mixpanel.track('订单详情页_>')
       this.setState({show_delivery_modal: true})
     }
@@ -793,8 +798,8 @@ class OrderInfoNew extends PureComponent {
             <View style={styles.orderInfoHeaderFlag}/>
           </If>
           <View style={styles.orderInfoHeaderStatus}>
-            <Text style={styles.orderStatusDesc}>{delivery_status}</Text>
-            <If condition={order?.orderStatus !== Cts.ORDER_STATUS_TO_READY}>
+            <Text style={styles.orderStatusDesc}>{delivery_status} </Text>
+            <If condition={!order?.not_call_delivery}>
               <Entypo name="chevron-thin-right" style={styles.orderStatusRightIcon}/>
             </If>
           </View>
@@ -935,11 +940,21 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoCard = () => {
-    let {order, is_service_mgr} = this.state;
+    let {order} = this.state;
     const {currStoreId} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
+          <If condition={!order?.is_right_once}>
+            <View style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+            }}>
+              <View style={styles.ItemHeader}/>
+              <Text style={styles.ItemHeaderTitle}>预 </Text>
+            </View>
+          </If>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
                        resizeMode={FastImage.resizeMode.contain}/>
@@ -963,7 +978,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>收件信息 </Text>
           <View style={styles.cardTitleInfo}>
             <View style={styles.cardTitleInfoLeft}>
-              <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile}</Text>
+              <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile} </Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
             <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
@@ -1001,9 +1016,7 @@ class OrderInfoNew extends PureComponent {
                       {info?.product_name}
                     </Text>
                     <If condition={info?.product_id > 0}>
-                      <Text style={styles.productItemId}>(#{info?.product_id}
-                        <If condition={info?.tag_code}>[{info?.tag_code}]</If>)
-                      </Text>
+                      <Text style={styles.productItemId}>#{info?.product_id} </Text>
                     </If>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
@@ -1644,7 +1657,24 @@ const styles = StyleSheet.create({
   QrDesc: {fontSize: 17, fontWeight: 'bold', color: colors.color333},
   QrClose: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
-  QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20}
+  QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
+  ItemHeader: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 25,
+    borderTopColor: "#FF8309",
+    borderTopLeftRadius: 6,
+    borderRightWidth: 31,
+    borderRightColor: 'transparent',
+  },
+  ItemHeaderTitle: {
+    color: colors.white,
+    fontSize: 11,
+    fontWeight: 'bold',
+    position: 'absolute',
+    top: 1,
+    left: 4,
+  }
 });
 
 const headerRightStyles = StyleSheet.create({

@@ -34,7 +34,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {setCallDeliveryList} from "../../reducers/global/globalActions";
+// import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
 
@@ -65,7 +65,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
-    let {call_delivery_list} = this.props.global
+    // let {call_delivery_list} = this.props.global
     this.state = {
       isLoading: false,
       order_id: order_id,
@@ -73,7 +73,7 @@ class OrderCallDelivery extends Component {
       if_reship: if_reship,
       address_id: address_id,
       store_est: [],
-      est: call_delivery_list,
+      est: [],
       exist_waiting_delivery: [],
       maxPrice: 0,
       minPrice: 0,
@@ -85,8 +85,8 @@ class OrderCallDelivery extends Component {
       weight_step: 1,
       logisticFeeMap: [],
       dateArray: [],
-      wm_platform: '美团',
-      wm_platform_day_id: '1',
+      wm_platform: '',
+      wm_platform_day_id: '',
       order_expect_time: '',
       wm_address: '',
       wm_user_name: '',
@@ -185,7 +185,7 @@ class OrderCallDelivery extends Component {
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
       let store_est = obj?.store_est || [];
       let est = obj?.est || [];
-      this.props.dispatch(setCallDeliveryList(est))
+      // this.props.dispatch(setCallDeliveryList(est))
       if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
         let check = false
         for (let i in logistic_fee_map) {
@@ -346,7 +346,7 @@ class OrderCallDelivery extends Component {
         weight,
         expect_time,
         order_money,
-        order_tips: add_tips,
+        add_tips,
         remark
       }
       const api = `/v4/wsb_delivery/call_delivery?access_token=${accessToken}`;
@@ -814,7 +814,7 @@ class OrderCallDelivery extends Component {
 
           <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
             <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
-              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee}</Text>元
+              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
             </Text>
             <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
               <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
@@ -886,15 +886,18 @@ class OrderCallDelivery extends Component {
           }}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
-        <View style={{flex: 1,}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
-            <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
+        <If condition={wm_platform && wm_platform_day_id && order_expect_time}>
+          <View style={{flex: 1}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
+              <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
+            </View>
+            <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
+              <Text
+                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{order_expect_time} </Text>
+            </View>
           </View>
-          <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-            <Text style={{fontSize: 12, color: '#FF8309'}}>预计送达时间{order_expect_time} </Text>
-          </View>
-        </View>
+        </If>
         <View style={{width: 36}}/>
       </View>
     )
@@ -935,7 +938,7 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{weight}KG</Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{weight}KG </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -954,7 +957,7 @@ class OrderCallDelivery extends Component {
               fontSize: 11,
               color: colors.color333,
               marginTop: 5
-            }}>{is_right_once === 0 ? mealTime : '立即送达'}</Text>
+            }}>{is_right_once === 0 ? mealTime : '立即送达'} </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -969,7 +972,8 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>{order_money}元</Text>
+            <Text
+              style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{order_money}元 </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -984,7 +988,7 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={add_tip()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
               {add_tips > 0 ? '加' + add_tips + '元' : '加小费'}
             </Text>
           </TouchableOpacity>
@@ -999,7 +1003,7 @@ class OrderCallDelivery extends Component {
                               alignItems: 'center'
                             }}>
             <SvgXml style={{marginTop: 5}} xml={remarkIcon()}/>
-            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
               {tool.length(remark) > 0 ? '已' : ''}备注
             </Text>
           </TouchableOpacity>
@@ -1353,7 +1357,7 @@ class OrderCallDelivery extends Component {
   }
 
   renderRemarkModal = () => {
-    let {show_remark_modal, remark_input_value} = this.state;
+    let {show_remark_modal, remark_input_value, remark} = this.state;
     return (
       <JbbModal visible={show_remark_modal} onClose={this.closeModal}
                 modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
@@ -1374,11 +1378,11 @@ class OrderCallDelivery extends Component {
             <TextArea
               multiline={true}
               numberOfLines={4}
-              maxLength={30}
-              value={remark_input_value}
+              maxLength={40}
+              value={remark_input_value ? remark_input_value : remark}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}
-              placeholder={'请在此填写备注信息，最多不超过30个字符'}
+              placeholder={'请在此填写备注信息，最多不超过40个字符'}
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent" //取消安卓下划线
               style={{

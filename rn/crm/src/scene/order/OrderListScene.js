@@ -272,7 +272,7 @@ class OrderListScene extends Component {
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
       reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.user_config === global.noLoginInfo.user_config
+      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
 
     if (flag) {
       return
@@ -292,8 +292,8 @@ class OrderListScene extends Component {
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
       user_config: reduxGlobal.user_config,
-      call_delivery_list: reduxGlobal.call_delivery_list,
-      default_order_info: reduxGlobal.default_order_info,
+      // call_delivery_list: reduxGlobal.call_delivery_list,
+      //default_order_info: reduxGlobal.default_order_info,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
@@ -756,10 +756,11 @@ class OrderListScene extends Component {
       const {accessToken} = global;
       dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
         if (ok) {
-          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-            initTab: Config.ROUTE_ORDERS,
-            initialRouteName: Config.ROUTE_ALERT
-          });
+          // tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          //   initTab: Config.ROUTE_ORDERS,
+          //   initialRouteName: Config.ROUTE_ALERT
+          // });
+          this.onRefresh()
           hideModal()
         } else {
           ToastLong(msg);
@@ -792,9 +793,7 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{fontSize: 15, color: colors.color333}}>
-            {tool.jbbsubstr(store_info?.name, 8)}
-          </Text>
+          <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={this_down()}/>
           </If>

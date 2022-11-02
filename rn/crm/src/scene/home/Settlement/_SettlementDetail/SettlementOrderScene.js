@@ -155,8 +155,8 @@ class SettlementOrderScene extends PureComponent {
           return (
             <View key={index} style={styles.dropdownRow}>
               <View style={styles.dropdownRowItem}>
-                <Text style={{color: colors.color333}}>{ite.title}</Text>
-                <Text style={{color: colors.color333}}>承担{ite.bearFee}元</Text>
+                <Text style={{color: colors.color333}}>{ite.title} </Text>
+                <Text style={{color: colors.color333}}>承担{ite.bearFee}元 </Text>
               </View>
             </View>
           )

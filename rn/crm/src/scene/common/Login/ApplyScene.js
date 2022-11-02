@@ -532,10 +532,12 @@ class ApplyScene extends PureComponent {
               textDecorationColor: '#59b26a',
               textDecorationLine: 'underline',
               marginLeft: pxToDp(10)
-            }} onPress={() => {
+            }} onPress={async () => {
               this.mixpanel.track("info_customerservice_click", {});
-              JumpMiniProgram("/pages/service/index", {place: 'apply'});
-            }}>联系客服</Text>
+              await JumpMiniProgram("/pages/service/index", {place: 'apply'});
+            }}>
+              联系客服
+            </Text>
           </View>
 
         </View>

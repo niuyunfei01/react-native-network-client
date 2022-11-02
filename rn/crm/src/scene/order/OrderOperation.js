@@ -361,7 +361,7 @@ class OrderOperation extends Component {
     })
   }
 
-  openMiniprogarm = () => {
+  openMiniprogarm = async () => {
     let {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global;
     let data = {
       v: vendor_id,
@@ -370,7 +370,7 @@ class OrderOperation extends Component {
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'
     }
-    JumpMiniProgram("/pages/service/index", data);
+    await JumpMiniProgram("/pages/service/index", data);
   }
 
   renderModal = () => {

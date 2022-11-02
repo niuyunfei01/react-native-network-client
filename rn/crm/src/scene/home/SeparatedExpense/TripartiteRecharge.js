@@ -1,13 +1,5 @@
 import React, {PureComponent} from 'react'
-import ReactNative, {
-  Dimensions,
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import ReactNative, {ImageBackground, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -17,18 +9,17 @@ import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
 import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
-import {Button} from "react-native-elements";
+import {Button, Image} from "react-native-elements";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
-import tool from "../../../pubilc/util/tool";
 
 const {StyleSheet} = ReactNative
-const width = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
-  const {global, device} = state;
-  return {global: global, device: device}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -39,28 +30,18 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const THIRD_PARTY_ACCOUNT = 1;
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
-class TripartiteRecharge extends PureComponent {
+class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
     this.state = {
       isRefreshing: false,
+      freeze_show: false,
+      freeze_msg: "",
       prompt_msg: '外送帮仅支持充值，如需查看充值记录和账单明细，请登录配送商家版查看',
       thirdAccountList: [],
       pay_url: '',
       dadaAccountModal: false,
-      dadaAccountNum: 0,
+      dadaAccountNum: 0
     }
   }
 
@@ -69,15 +50,13 @@ class TripartiteRecharge extends PureComponent {
   }
 
   onPress(route, params = {}, callback = {}) {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params, callback);
-    });
+    this.props.navigation.navigate(route, params, callback);
   }
 
   onRefresh = () => {
     this.fetchThirdDeliveryList()
   }
+
 
   // 获取三方配送充值列表
   fetchThirdDeliveryList = () => {
@@ -114,12 +93,8 @@ class TripartiteRecharge extends PureComponent {
         } else {
           this.setState({
             pay_url: res.pay_url,
-            switch_type: THIRD_PARTY_ACCOUNT
           }, () => {
-            ToastLong('即将前往充值...')
-            setTimeout(() => {
-              this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
-            }, 100)
+            this.onPress(Config.ROUTE_WEB, {url: this.state.pay_url})
           })
         }
       })
@@ -143,7 +118,6 @@ class TripartiteRecharge extends PureComponent {
       } else {
         this.setState({
           pay_url: res.pay_url,
-          switch_type: THIRD_PARTY_ACCOUNT
         }, () => {
           ToastLong('即将前往充值...')
           setTimeout(() => {
@@ -167,43 +141,66 @@ class TripartiteRecharge extends PureComponent {
   }
 
   render() {
-    let {thirdAccountList} = this.state;
+    const {isRefreshing} = this.state;
     return (
       <View style={Styles.containerContent}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-        <ScrollView
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={Styles.containerContent} refreshControl={
-          <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
+        <ScrollView style={Styles.containerContent} refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => this.onRefresh()}
                           tintColor='gray'/>
         }>
 
-          {this.renderTHIRDHeader()}
-          {tool.length(thirdAccountList) > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
+          {this.renderTHIRDContainer()}
           {this.renderAccountModal()}
+
         </ScrollView>
       </View>
     )
   }
 
-  renderTHIRDContentItem = () => {
+  renderTHIRDContainer = () => {
+    const {thirdAccountList, prompt_msg} = this.state
     return (
-      <View></View>
-    )
-  }
-
-  renderTHIRDHeader = () => {
-    const {prompt_msg} = this.state
-    return (
-      <View style={Styles.THIRDHeader}>
-        <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
-        <Text style={Styles.THIRDHeaderText}>{prompt_msg}</Text>
+      <View>
+        <View style={Styles.THIRDHeader}>
+          <FontAwesome5 name={'exclamation-circle'} style={Styles.THORDHeaderIcon} size={18}/>
+          <Text style={Styles.THIRDHeaderText}>{prompt_msg} </Text>
+        </View>
+        {thirdAccountList.length > 0 ? this.renderTHIRDContentItem() : this.renderNOTHIRDList()}
       </View>
     )
   }
 
+  renderTHIRDContentItem = () => {
+    const {thirdAccountList} = this.state
+    return (
+      <View style={Styles.THIRDContainerList}>
+        <For index='i' each='info' of={thirdAccountList}>
+          <LinearGradient style={Styles.THIRDContainerItemLinear}
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 1}}
+                          colors={info.background_color}>
+            <View style={Styles.THIRDContainerItemBody}>
+              <View style={Styles.THIRDContainerItemBody}>
+                <Image source={{uri: info.img}}
+                       style={Styles.THIRDContainerItemIcon}/>
+                <Text style={Styles.THIRDContainerItemName}>{info.name} </Text>
+              </View>
+              <Button buttonStyle={Styles.THIRDContainerBtn}
+                      titleStyle={{color: info.btn_title_color, fontSize: pxToDp(25), fontWeight: "bold"}}
+                      title={'立即充值'}
+                      onPress={() => {
+                        this.toPay(info)
+                      }}/>
+            </View>
+            <View style={Styles.THIRDContainerItemBody}>
+              <Text style={Styles.currentBanlance}>当前余额： ￥ {info.current_balance} </Text>
+              <ImageBackground source={{uri: info.background_img}} style={Styles.THIRDContainerItemIconBg}/>
+            </View>
+          </LinearGradient>
+        </For>
+      </View>
+    )
+  }
 
   renderNOTHIRDList = () => {
     return (
@@ -220,6 +217,7 @@ class TripartiteRecharge extends PureComponent {
       </View>
     )
   }
+
 
   renderAccountModal = () => {
     let {dadaAccountModal, dadaAccountNum} = this.state;
@@ -239,13 +237,13 @@ class TripartiteRecharge extends PureComponent {
           </InputItem>
           <View style={Styles.modalBtnStyle}>
             <Button buttonStyle={Styles.modalBtnText}
-                    titleStyle={{fontSize: 15, color: 'white'}}
+                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
                     title={'取消'}
                     onPress={() => {
                       this.closeAccountModal()
                     }}/>
             <Button buttonStyle={Styles.modalBtnText1}
-                    titleStyle={{fontSize: 15, color: 'white'}}
+                    titleStyle={{fontSize: pxToDp(30), color: 'white'}}
                     title={'确定'}
                     onPress={() => {
                       this.closeAccountModal()
@@ -260,6 +258,165 @@ class TripartiteRecharge extends PureComponent {
 }
 
 const Styles = StyleSheet.create({
+  flexRowStyle: {flexDirection: 'row', justifyContent: "space-between", alignItems: 'center', marginBottom: 20},
+  modalTitle: {fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333},
+  flex1: {flex: 1},
+  flex3: {flex: 3},
+  fontBold: {fontWeight: "bold"},
+  color333: {color: colors.color333},
+  containerContent: {flex: 1, backgroundColor: '#f5f5f9'},
+  containerHeader: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#EEDEE0',
+    height: 40
+  },
+  containerHeaderText: {
+    color: colors.color666,
+    fontSize: 12,
+    paddingLeft: 13,
+    flex: 1
+  },
+  containerHeaderBtn: {
+    backgroundColor: colors.red,
+    borderRadius: 6,
+    marginRight: 13,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+  },
+  containerHeaderBtnText: {
+    fontSize: 12,
+    color: colors.white,
+  },
+  expensesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
+    backgroundColor: colors.white,
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#ccc',
+    paddingVertical: pxToDp(25),
+    paddingHorizontal: pxToDp(30),
+    zIndex: 999,
+  },
+  selectMonthLabel: {flex: 1, color: colors.color333, fontWeight: "bold"},
+  selectMonthText: {
+    color: colors.title_color,
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  selectMonthIcon: {fontSize: 14, marginLeft: 10},
+  recordsContent: {
+    paddingVertical: pxToDp(25),
+    paddingHorizontal: pxToDp(30),
+    flex: 1,
+    alignItems: "center",
+    flexDirection: 'column',
+    backgroundColor: 'white',
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#ccc',
+  },
+  recordsBody: {alignItems: "center", flexDirection: 'row'},
+  recordsItemTime: {fontSize: 16, color: colors.color333, fontWeight: 'bold'},
+  recordsItemBalanced: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    width: "30%",
+    textAlign: 'right',
+  },
+  recordsItemIcon: {fontSize: 14, marginLeft: 10},
+  recordsItemDesc: {flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10},
+  recordsItemDescTextLeft: {fontSize: 14, color: colors.color999, flex: 1},
+  recordsItemDescTextRight: {fontSize: 14, color: colors.color999},
+  recordsContainer2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#ccc',
+    paddingTop: pxToDp(20),
+    paddingBottom: pxToDp(20),
+    paddingLeft: pxToDp(40),
+    backgroundColor: colors.white
+  },
+  recordsCreated2: {color: '#999', marginTop: pxToDp(8)},
+  recordsFee2: {
+    textAlign: 'right',
+    marginRight: pxToDp(40),
+    fontWeight: 'bold',
+  },
+  WSBHeader: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: '#28A077',
+    margin: pxToDp(20),
+    paddingVertical: pxToDp(50),
+    borderRadius: pxToDp(8)
+  },
+  WSBHeaderTitle: {
+    width: '100%',
+    marginLeft: pxToDp(100),
+    textAlign: 'left',
+    color: 'white'
+  },
+  WSBHeaderBalanceNum: {
+    marginVertical: pxToDp(30),
+    fontSize: pxToDp(120),
+    fontWeight: "bold",
+    textAlign: 'center',
+    color: 'white'
+  },
+  WSBCZBtn: {
+    backgroundColor: 'white',
+    width: 140,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: "center",
+  },
+  WSBCZText: {
+    color: colors.main_color,
+    textAlign: 'center',
+    paddingVertical: pxToDp(10),
+  },
+  WSBSZBtn: {
+    justifyContent: 'center',
+    alignItems: "center",
+    marginTop: pxToDp(10),
+  },
+  WSBSZText: {
+    color: '#f7f7f7',
+    textAlign: 'center',
+    paddingVertical: pxToDp(10),
+    textDecorationLine: 'underline',
+  },
+  WSBType: {
+    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    height: 40,
+    marginBottom: 5,
+  },
+  WSBTypeBtn: {width: '50%', alignItems: "center"},
+  headerType: {
+    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    height: 40,
+  },
+  switchTypeLeft: {
+    borderColor: colors.main_color,
+    borderBottomWidth: 3,
+    height: 40,
+    justifyContent: 'center'
+  },
+  switchTypeRight: {
+    borderColor: colors.main_color,
+    borderBottomWidth: 0,
+    height: 40,
+    justifyContent: 'center'
+  },
   THIRDHeader: {
     display: "flex",
     flexDirection: "row",
@@ -289,7 +446,7 @@ const Styles = StyleSheet.create({
   THIRDContainerNOList: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    flex: 1
   },
   THIRDContainerItemBody: {
     display: "flex",
@@ -331,12 +488,14 @@ const Styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     color: '#999999',
-    marginTop: '20%'
+    marginTop: '30%',
+    marginLeft: '20%'
   },
   NoTHIRDListBtn: {
-    width: width * 0.92,
+    width: "96%",
     height: pxToDp(70),
     marginTop: '20%',
+    marginLeft: '2%',
     backgroundColor: '#59B26A',
     borderRadius: pxToDp(10)
   },
@@ -374,4 +533,4 @@ const Styles = StyleSheet.create({
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(TripartiteRecharge);
+export default connect(mapStateToProps, mapDispatchToProps)(SeparatedExpense);

@@ -105,7 +105,7 @@ class SeparatedExpenseInfo extends PureComponent {
                                   </Text>
                                 </View>}>
               <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
-                <Text style={{color: colors.color333, fontWeight: "bold"}}>{item.date}</Text>
+                <Text style={{color: colors.color333, fontWeight: "bold"}}>{item.date} </Text>
                 <Text style={{
                   color: colors.color333,
                   marginLeft: 10,

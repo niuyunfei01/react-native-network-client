@@ -86,6 +86,7 @@ class CancelDeliveryModal extends React.Component {
       })
       hideModal()
     }).catch(() => {
+      this.closeModal()
       hideModal()
     })
   }

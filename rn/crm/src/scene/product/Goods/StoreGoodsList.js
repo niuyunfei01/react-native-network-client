@@ -66,6 +66,7 @@ class StoreGoodsList extends Component {
       isLastPage: false,
       isCanLoadMore: false,
       selectedTagId: '',
+      isSelectedCategory: '',
       selectedChildTagId: '',
       fnProviding: false,
       modalType: '',
@@ -177,6 +178,7 @@ class StoreGoodsList extends Component {
       this.setState({
         categories: res,
         selectedTagId: res[0] ? res[0].id : '',
+        isSelectedCategory: res[0] ? res[0].id : '',
         selectedChildTagId: res[0] && res[0].children && res[0].children.length > 0 ? res[0].children && res[0].children[0].id : ''
       }, () => {
         this.search();
@@ -302,42 +304,53 @@ class StoreGoodsList extends Component {
     })
   }
 
-  selectCategory = (category, selectedTagId) => {
-    if (category.id === selectedTagId) {
-      this.setState({selectedTagId: selectedTagId, selectedChildTagId: '', page: 1}, () => this.search())
+  selectCategory = (category, selectedTagId, isSelectedCategory) => {
+    if (category.id === isSelectedCategory) {
+      this.setState({
+        selectedTagId: selectedTagId,
+        isSelectedCategory: '0000',
+        selectedChildTagId: '',
+        page: 1
+      }, () => this.search())
       return
     }
     if (category.children.length > 0) {
       this.selectCategoryChildren(category, category.children[0])
       return;
     }
-    this.setState({selectedTagId: category.id, selectedChildTagId: '', page: 1}, () => this.search())
+    this.setState({
+      selectedTagId: category.id,
+      isSelectedCategory: category.id,
+      selectedChildTagId: '',
+      page: 1
+    }, () => this.search())
   }
 
   selectCategoryChildren = (category, categoryChildren) => {
     this.setState({
       selectedTagId: category.id,
+      isSelectedCategory: category.id,
       selectedChildTagId: categoryChildren.id,
       page: 1
     }, () => this.search())
   }
 
   renderCategories() {
-    const {categories, selectedTagId, selectedChildTagId} = this.state
+    const {categories, selectedTagId, isSelectedCategory, selectedChildTagId} = this.state
     return (
       <For each="items" of={categories} index="i">
         <TouchableOpacity key={i}
-                          onPress={() => this.selectCategory(items, selectedTagId)}
-                          style={[selectedTagId === items.id ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={selectedTagId === items.id ? styles.activeCategoriesText : styles.categoriesText}>
+                          onPress={() => this.selectCategory(items, selectedTagId, isSelectedCategory)}
+                          style={[isSelectedCategory === items.id ? styles.categoryItemActive : styles.categoryItem]}>
+          <Text style={isSelectedCategory === items.id ? styles.activeCategoriesText : styles.categoriesText}>
             {items.name}
           </Text>
           <If condition={items.children.length > 0}>
-            <AntDesign name={selectedTagId === items.id ? 'up' : 'down'} color={colors.color999} size={14}
+            <AntDesign name={isSelectedCategory === items.id ? 'up' : 'down'} color={colors.color999} size={14}
                        style={{paddingVertical: 7}}/>
           </If>
         </TouchableOpacity>
-        <If condition={selectedTagId === items.id && items.children.length > 0}>
+        <If condition={isSelectedCategory === items.id && items.children.length > 0}>
           <For index='index' of={items.children} each='item'>
             <TouchableOpacity key={index} onPress={() => this.selectCategoryChildren(items, item)}
                               style={selectedChildTagId === item.id ? styles.selectCategoryChildrenWrap : styles.cateChildrenWrap}>
@@ -356,6 +369,7 @@ class StoreGoodsList extends Component {
     this.setState({
       page: 1,
       selectedTagId: '',
+      isSelectedCategory: '',
       selectedChildTagId: '',
     }, () => {
       const {accessToken, currStoreId} = this.props.global;

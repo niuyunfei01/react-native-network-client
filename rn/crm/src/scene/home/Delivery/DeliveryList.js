@@ -103,7 +103,7 @@ class DeliveryList extends PureComponent {
           }
         }}
       >
-        <Text style={headerRightStyles.text}>{show_type === 1 ? `禁用` : `解绑`}</Text>
+        <Text style={headerRightStyles.text}>{show_type === 1 ? `禁用` : `解绑`} </Text>
       </TouchableOpacity>
     )
   }
@@ -845,7 +845,7 @@ class DeliveryList extends PureComponent {
             />
             {this.state.count_down > 0 ?
               <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`} </Text>
               </TouchableOpacity> :
               <TouchableOpacity onPress={() => {
                 showSuccess('验证码发送成功！')
@@ -894,7 +894,7 @@ class DeliveryList extends PureComponent {
             />
             {this.state.count_down > 0 ?
               <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</Text>
+                <Text style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`} </Text>
               </TouchableOpacity> :
               <TouchableOpacity onPress={() => {
                 showSuccess('验证码发送成功！')

@@ -1038,7 +1038,7 @@ class StoreInfo extends Component {
           <View>
             <If condition={this.state.open_time_conf}>
               <For of={this.state.open_time_conf} index="idx" each="item">
-                <Text style={{fontSize: 14}} key={idx}>{item.start_time} —— {item.end_time}</Text>
+                <Text style={{fontSize: 14}} key={idx}>{item.start_time} —— {item.end_time} </Text>
               </For>
             </If>
 

@@ -294,7 +294,7 @@ class SettlementScene extends PureComponent {
                   <Text style={{
                     color: ite.status_label === "待打款" ? colors.warn_color : colors.color999,
                     fontSize: 14
-                  }}>{ite.status_label}</Text>
+                  }}>{ite.status_label} </Text>
                   <View style={{flex: 1}}></View>
                   <Text style={{color: colors.color333, fontSize: 18, fontWeight: 'bold'}}>
                     {tool.toFixed(ite.bill_price)}

@@ -137,7 +137,7 @@ class EbBindScene extends PureComponent {
                 defaultKey={-999}
               >
                 <View style={styles.body_text}>
-                  <Text style={styles.selectLabelLine}>{this.state.applicationTypeLabel || '点击选择应用类型'}</Text>
+                  <Text style={styles.selectLabelLine}>{this.state.applicationTypeLabel || '点击选择应用类型'} </Text>
                   <Entypo name="chevron-right" style={styles.right_icon}/>
                 </View>
               </ModalSelector>

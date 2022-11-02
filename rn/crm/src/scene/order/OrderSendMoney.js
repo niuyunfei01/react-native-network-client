@@ -108,11 +108,11 @@ class OrderSendMoney extends PureComponent {
             <Text style={[{padding: 10}, styles.fontN1]}>收款信息</Text>
             <View style={styles.infoContent}>
               <Text style={styles.fontN1}>收款人 </Text>
-              <Text style={{color: colors.color999, fontSize: 13}}>{storeOwnerName ? storeOwnerName : `未设置`}</Text>
+              <Text style={{color: colors.color999, fontSize: 13}}>{storeOwnerName ? storeOwnerName : `未设置`} </Text>
             </View>
             <View style={{flexDirection: "row", justifyContent: "space-between", padding: 10}}>
               <Text style={styles.fontN1}>店铺名称 </Text>
-              <Text style={{color: colors.color999, fontSize: 13}}>{storeVendor}-{storeCity}-{storeName}</Text>
+              <Text style={{color: colors.color999, fontSize: 13}}>{storeVendor}-{storeCity}-{storeName} </Text>
             </View>
           </View>
           <WhiteSpace/>
@@ -167,7 +167,7 @@ class OrderSendMoney extends PureComponent {
                 }}>
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Text style={{color: colors.color999, fontSize: 12}}>共</Text>
-                    <Text style={{color: colors.main_color, fontSize: 18, marginHorizontal: 2}}>{logListLength}</Text>
+                    <Text style={{color: colors.main_color, fontSize: 18, marginHorizontal: 2}}>{logListLength} </Text>
                     <Text style={{color: colors.color999, fontSize: 12}}>笔补偿</Text>
                   </View>
                   <Text style={{color: colors.color999, fontSize: 12}}>最近一次补偿在{latelyTime}</Text>
@@ -182,12 +182,12 @@ class OrderSendMoney extends PureComponent {
                       color: colors.color333,
                       fontSize: 16,
                       padding: 10
-                    }}>{(element.created).trim().split(" ")[0]}</Text>
+                    }}>{(element.created).trim().split(" ")[0]} </Text>
                     <Text style={{
                       color: colors.color333,
                       fontSize: 16,
                       padding: 10
-                    }}>补偿金额{parseFloat(element.total_fee / 100).toFixed(2)}元</Text>
+                    }}>补偿金额{parseFloat(element.total_fee / 100).toFixed(2)}元 </Text>
                   </View>
                   <View style={{
                     flexDirection: "row",
@@ -197,8 +197,8 @@ class OrderSendMoney extends PureComponent {
                     paddingBottom: 5
                   }}>
                     <Text
-                      style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.nickname}</Text>
-                    <Text style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.remark}</Text>
+                      style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.nickname} </Text>
+                    <Text style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.remark} </Text>
                   </View>
                 </View>
               </For>

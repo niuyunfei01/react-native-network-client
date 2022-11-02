@@ -65,9 +65,9 @@ export const AppNavigator = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
-                      getComponent={() => require("../../scene/order/OrderInfo").default}
-                      initialParams={initialRouteParams}/>
+        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -78,9 +78,9 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/order/OrderListScene").default}
                       initialParams={initialRouteParams}/>
 
-        <Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}
-                      getComponent={() => require("../../scene/home/Mine/MineScene").default}
-                      initialParams={initialRouteParams}/>
+        {/*<Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}*/}
+        {/*              getComponent={() => require("../../scene/home/Mine/MineScene").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
 
         <Stack.Screen name={Config.ROUTE_MINE_NEW} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Mine/Mine").default}
@@ -100,7 +100,7 @@ export const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryInfo").default}/>
-        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '美团配送App授权说明'}}
+        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '美团跑腿帮送授权说明'}}
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
