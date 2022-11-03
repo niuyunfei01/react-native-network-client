@@ -251,7 +251,7 @@ class GoodsEditScene extends PureComponent {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           let {upload_files, newImageKey, selectPicType, selectPreviewPic} = this.state;
           const uri = res + newImageKey
-          const img = {id: 0, url: uri, name: newImageKey, path: uri}
+          const img = {id: newImageKey, url: uri, name: newImageKey, path: uri, isNewPic: true}
           if (selectPicType) {
             upload_files.push(img);
           } else {
@@ -733,6 +733,11 @@ class GoodsEditScene extends PureComponent {
       if (this.state.uploading) {
         return false;
       }
+      upload_files.map(item => {
+        const {isNewPic = false} = item
+        if (isNewPic)
+          item.id = 0
+      })
       dispatch(productSave(formData, accessToken, save_done));
     }
   };
