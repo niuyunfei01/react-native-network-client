@@ -107,6 +107,7 @@ const initState = {
   show_delivery_modal: false,
   show_cancel_delivery_modal: false,
   show_finish_delivery_modal: false,
+  uninit: false,
 };
 const timeObj = {
   deviceInfo: {},
@@ -188,6 +189,9 @@ class OrderListScene extends Component {
   }
 
   componentWillUnmount() {
+    if (!this.state.uninit) {
+      return;
+    }
     this.focus()
     this.unSubscribe()
     this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
@@ -195,8 +199,14 @@ class OrderListScene extends Component {
     unInitBlueTooth()
   }
 
-
   componentDidMount() {
+
+    tool.debounces(() => {
+      this.setState({
+        uninit: true
+      })
+    }, 2000)
+
     initJPush()
     this.whiteNoLoginInfo()
     this.getVendor()
@@ -756,11 +766,10 @@ class OrderListScene extends Component {
       const {accessToken} = global;
       dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
         if (ok) {
-          // tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          //   initTab: Config.ROUTE_ORDERS,
-          //   initialRouteName: Config.ROUTE_ALERT
-          // });
-          this.onRefresh()
+          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+            initTab: Config.ROUTE_ORDERS,
+            initialRouteName: Config.ROUTE_ALERT
+          });
           hideModal()
         } else {
           ToastLong(msg);
