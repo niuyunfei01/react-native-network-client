@@ -2,10 +2,12 @@ import React, {Component} from "react";
 import {Dimensions, PanResponder, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {cloneDeep} from "lodash";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
-import {getWithTpl} from "../../../pubilc/util/common";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
+import Entypo from "react-native-vector-icons/Entypo";
+import PropTypes from "prop-types";
+import HttpUtils from "../../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -15,6 +17,11 @@ function mapStateToProps(state) {
 const {width, height} = Dimensions.get('window')
 
 class SelectCity extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -29,29 +36,24 @@ class SelectCity extends Component {
   goTo = index => {
     let start = 0;
     for (let i = 0; i < index; i++) {
-      start += tool.length(this.state.cityList[i].cityList);
+      start += tool.length(this.state.cityList[i]?.cityList);
     }
     this.scrollView.scrollTo({y: 47 * start});
   };
-
-  onSuccess = (data) => {
-    if (data.ok) {
-      this.setState({cityList: data.obj, allCityList: data.obj, loading: false})
-    }
-  }
-
-  onError = () => {
-    this.setState({loading: false})
-    ToastLong("获取城市列表错误！")
-  }
 
   initCityList() {
     if (this.state.loading) {
       return;
     }
     this.setState({loading: true})
-    ToastLong("获取城市列表中..")
-    getWithTpl("DataDictionary/get_crm_city_list", (data) => this.onSuccess(data), () => this.onError())
+    ToastShort("获取城市列表中..")
+    const api = `DataDictionary/get_crm_city_list`;
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({cityList: res, allCityList: res, loading: false})
+    }, () => {
+      this.setState({loading: false})
+      ToastShort("获取城市列表错误！")
+    })
   }
 
   componentDidMount() {
@@ -79,7 +81,8 @@ class SelectCity extends Component {
         if (this.state.check_right === index) {
           return true;
         }
-        this.checkRight(index)
+        this.checkRight()
+        this.goTo(index)
         this.setState({
           check_right: index,
         })
@@ -122,17 +125,17 @@ class SelectCity extends Component {
     this.props.navigation.goBack();
   }
 
-  checkRight = (index) => {
+  checkRight = () => {
     tool.debounces(() => {
       this.setState({
         check_right: -1,
       })
-      this.goTo(index)
     }, 1000)
   }
 
   render() {
     let {allCityList, check_right} = this.state;
+    let {city = '北京'} = this.props.route.params;
     return (
       <View style={styles.contentWrap}>
         {/*定位当前城市*/}
@@ -147,7 +150,12 @@ class SelectCity extends Component {
             alignItems: 'center',
             padding: 4,
           }}>
-            <Text style={styles.n1}> 北京 </Text>
+            <Entypo name={'location-pin'} style={{
+              fontSize: 15,
+              color: colors.color666,
+              textAlignVertical: "center"
+            }}/>
+            <Text style={styles.n1}> {city} </Text>
           </View>
         </View>
         <ScrollView
@@ -207,7 +215,7 @@ class SelectCity extends Component {
                     check_rights: index,
                   })
                 }}
-                onPressOut={() => this.checkRight(index)}
+                onPressOut={() => this.checkRight()}
               >
                 <If condition={check_right === index}>
                   <View style={{

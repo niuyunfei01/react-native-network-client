@@ -37,6 +37,7 @@ import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {call, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
+import AlertModal from "./AlertModal";
 
 let width = Dimensions.get("window").width;
 
@@ -61,6 +62,7 @@ class OrderItem extends React.PureComponent {
   };
   state = {
     verification_modal: false,
+    show_close_delivery_modal: false,
     pickupCode: '',
   }
 
@@ -156,19 +158,10 @@ class OrderItem extends React.PureComponent {
     ToastLong('已复制到剪切板')
   }
 
-  closeDelivery = (val) => {
-    this.mixpanel.track('订单列表页_忽略配送')
-    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
-      text: '忽略',
-      onPress: () => {
-        this.onOverlookDelivery(val)
-      }
-    }])
-  }
-
   closeModal = () => {
     this.setState({
       verification_modal: false,
+      show_close_delivery_modal: false,
     })
   }
 
@@ -224,6 +217,7 @@ class OrderItem extends React.PureComponent {
             </If>
           </View>
           {this.renderPickModal()}
+          {this.renderCloseDeliveryModal()}
         </View>
 
       </TouchableWithoutFeedback>
@@ -285,7 +279,7 @@ class OrderItem extends React.PureComponent {
 
         <FastImage source={{uri: item.platformIcon}}
                    resizeMode={FastImage.resizeMode.contain}
-               style={styles.platformIcon}/>
+                   style={styles.platformIcon}/>
         <View style={{flex: 1, marginLeft: 10}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{
@@ -443,6 +437,25 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+
+  renderCloseDeliveryModal = () => {
+    let {item} = this.props;
+    let {show_close_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_close_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.onOverlookDelivery(item?.id)}
+          title={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'忽略'}
+          closeText={'暂不'}/>
+      </View>
+    )
+  }
+
+
   renderButton = () => {
     let {item, comesBackBtn} = this.props;
     let obj_num = 0
@@ -467,7 +480,12 @@ class OrderItem extends React.PureComponent {
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
-                  onPress={() => this.closeDelivery(item.id)}
+                  onPress={() => {
+                    this.mixpanel.track('订单列表页_忽略配送')
+                    this.setState({
+                      show_close_delivery_modal: true
+                    })
+                  }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
