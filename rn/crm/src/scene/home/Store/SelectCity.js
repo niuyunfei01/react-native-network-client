@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Dimensions, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Dimensions, PanResponder, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {cloneDeep} from "lodash";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -20,7 +20,9 @@ class SelectCity extends Component {
     this.state = {
       cityList: [],
       allCityList: [],
-      loading: false
+      loading: false,
+      check_right: -1,
+      check_rights: -1,
     };
   }
 
@@ -56,6 +58,42 @@ class SelectCity extends Component {
     this.initCityList()
   }
 
+  UNSAFE_componentWillMount() {
+
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        return true;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderGrant: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderMove: (evt, gestureState) => {
+
+        if (Math.abs(gestureState.dy) < 3) {
+          return;
+        }
+        let index = this.state.check_rights + Math.round(gestureState.dy / 18);
+        if (this.state.check_right === index) {
+          return true;
+        }
+        this.checkRight(index)
+        this.setState({
+          check_right: index,
+        })
+        return true;
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        return true;
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        return true;
+      },
+    });
+  }
+
   onChangeText = (text) => {
     let {allCityList} = this.state;
     if (text) {
@@ -84,8 +122,17 @@ class SelectCity extends Component {
     this.props.navigation.goBack();
   }
 
+  checkRight = (index) => {
+    tool.debounces(() => {
+      this.setState({
+        check_right: -1,
+      })
+      this.goTo(index)
+    }, 1000)
+  }
+
   render() {
-    let {allCityList} = this.state;
+    let {allCityList, check_right} = this.state;
     return (
       <View style={styles.contentWrap}>
         {/*定位当前城市*/}
@@ -147,13 +194,36 @@ class SelectCity extends Component {
         </ScrollView>
 
         {/*英文字母*/}
-        <View style={styles.quicklyPosition}>
+        <View style={styles.quicklyPosition} {...this._panResponder.panHandlers}>
           {allCityList.map((item, index) => {
             return (
               <TouchableOpacity
                 key={index}
                 onPress={() => this.goTo(index)}
+                onPressIn={() => {
+                  this.goTo(index)
+                  this.setState({
+                    check_right: index,
+                    check_rights: index,
+                  })
+                }}
+                onPressOut={() => this.checkRight(index)}
               >
+                <If condition={check_right === index}>
+                  <View style={{
+                    width: 40,
+                    height: 40,
+                    backgroundColor: 'rgba(2,2,2,0.5)',
+                    borderRadius: 4,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: "absolute",
+                    right: 50,
+                  }}>
+                    <Text style={{fontSize: 28, fontWeight: 'bold', color: colors.white}}> {item.key} </Text>
+                  </View>
+                </If>
                 <Text style={styles.quicklyPositionText}> {item.key} </Text>
               </TouchableOpacity>
             );
