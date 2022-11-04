@@ -143,7 +143,7 @@ export const initBlueTooth = async (reduxGlobal) => {
       const options = Platform.select({
         android: {},
         ios: {
-          showAlert: !!reduxGlobal.printer_id,
+          showAlert: '0' !== reduxGlobal.printer_id,
           restoreIdentifierKey: 'com.waisongbang.app.bt.restoreIdentifierKey',
           queueIdentifierKey: 'com.waisongbang.app.bt.queueIdentifierKey'
         }
