@@ -596,6 +596,7 @@ class OrderCallDelivery extends Component {
           title={'期望送达时间'}
           modal
           open={show_date_modal}
+          textColor={colors.color666}
           date={new Date()}
           minimumDate={new Date()}
           onConfirm={(date) => {
