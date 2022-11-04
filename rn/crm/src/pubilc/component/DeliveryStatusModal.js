@@ -371,7 +371,7 @@ class deliveryStatusModal extends React.Component {
                 style={[styles.platform, log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
               <View style={styles.descInfo}>
                 <If condition={tool.length(log?.log_desc) > 0}>
-                  <Text style={styles.desc}>{tool.jbbsubstr(log?.log_desc, 20)} </Text>
+                  <Text style={styles.desc}>{tool.jbbsubstr(log?.log_desc, 24)} </Text>
                 </If>
                 <If condition={tool.length(log?.log_right_btn) > 0}>
                   <Text onPress={() => {
