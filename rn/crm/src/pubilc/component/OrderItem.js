@@ -93,11 +93,6 @@ class OrderItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship = 0) => {
-    if (if_reship === 0) {
-      this.mixpanel.track('V4订单列表_下配送单')
-    } else {
-      this.mixpanel.track('V4订单列表_追加配送')
-    }
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
@@ -533,7 +528,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
-                    this.mixpanel.track('订单列表页_呼叫配送')
+                    this.mixpanel.track('V4订单列表_下配送单')
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
@@ -546,7 +541,8 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery_again}>
           <Button title={'追加配送'}
                   onPress={() => {
-                    this.onCallThirdShips(item.id, item.store_id, 1)
+                    this.mixpanel.track('V4订单列表_追加配送')
+                    this.onCallThirdShips(item.id, item.store_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
