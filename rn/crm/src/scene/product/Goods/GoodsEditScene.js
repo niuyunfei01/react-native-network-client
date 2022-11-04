@@ -1778,16 +1778,26 @@ class GoodsEditScene extends PureComponent {
                          onPress={() => this.setState({searchPicVisible: false, searchPicText: '', picList: []})}
                          color={colors.colorCCC}/>
             </View>
-            <View style={styles.searchModalInputWrap}>
-              <AntDesign name={'search1'} style={{paddingLeft: 11, paddingVertical: 6}}/>
-              <TextInput value={searchPicText}
-                         onChangeText={value => this.setSearchPicText(value)}
-                         placeholder={'请输入图片名称'}
-                         placeholderTextColor={colors.colorCCC}
-                         style={{flex: 1, padding: 6}}/>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={styles.searchModalInputWrap}>
+                <AntDesign name={'search1'} style={{paddingLeft: 11, paddingVertical: 6}}/>
+                <TextInput value={searchPicText}
+                           onChangeText={value => this.setSearchPicText(value)}
+                           placeholder={'请输入图片名称'}
+                           returnKeyType={'search'}
+                           onSubmitEditing={() => this.searchPicList(searchPicText)}
+                           placeholderTextColor={colors.colorCCC}
+                           style={styles.searchModalInput}/>
+                <If condition={searchPicText}>
+                  <AntDesign name={'close'} style={styles.searchModalClearText}
+                             onPress={() => this.setSearchPicText('')}/>
+                </If>
+              </View>
+
               <If condition={searchPicText}>
-                <AntDesign name={'close'} style={styles.searchModalClearText}
-                           onPress={() => this.setSearchPicText('')}/>
+                <Text style={styles.searchPicFromLib} onPress={() => this.searchPicList(searchPicText)}>
+                  搜索
+                </Text>
               </If>
             </View>
             <FlatList data={picList}
@@ -1846,7 +1856,7 @@ class GoodsEditScene extends PureComponent {
   }
   setSearchPicText = (value) => {
     this.setState({searchPicText: value})
-    this.searchPicList(value)
+
   }
 
   searchPicList = (searchPicText) => {
@@ -2175,6 +2185,7 @@ const ITEM_HEIGHT = 36
 const PIC_SIZE_WRAP = 112
 
 const styles = StyleSheet.create({
+  searchPicFromLib: {fontSize: 16, padding: 8, color: colors.color333},
   noResultText: {color: colors.colorEEE, fontSize: 16, textAlign: 'center'},
   searchModalWrap: {
     width: '100%',
@@ -2193,13 +2204,16 @@ const styles = StyleSheet.create({
   },
   searchModalHeaderText: {fontSize: 15, fontWeight: 'bold', lineHeight: 21, padding: 12},
   searchModalInputWrap: {
+    flex: 1,
     borderRadius: 17,
     backgroundColor: '#F7F7F7',
-    marginHorizontal: 10,
+    marginLeft: 10,
+    marginRight: 8,
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 8
   },
+  searchModalInput: {flex: 1, padding: 6},
   searchModalClearText: {paddingRight: 8, paddingVertical: 6, color: colors.color999},
   searchModalImageWrap: {
     height: PIC_SIZE_WRAP,

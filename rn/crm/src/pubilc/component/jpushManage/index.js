@@ -4,12 +4,6 @@ import native from "../../util/native";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
 
-export const initJPush = () => {
-  JPush.setLoggerEnable(false)
-  JPush.init()
-
-}
-
 export const doJPushSetAlias = (currentUser) => {
   if (currentUser) {
     const alias = `uid_${currentUser}`;
@@ -63,7 +57,6 @@ export const sendDeviceStatus = (accessToken, data) => {
       data.Appversion = DeviceInfo.getBuildNumber()
       data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
       data.disable_sound_notify = settings.disabledSoundNotify;
-      data.auto_print = settings.autoPrint;
       data.Volume = settings.currentSoundVolume > 0
       data.isRun = settings.isRunInBg;
       data.isRinger = settings.isRinger

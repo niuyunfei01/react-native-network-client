@@ -40,6 +40,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import AlertModal from "../../pubilc/component/AlertModal";
+import {doJPushSetAlias} from "../../pubilc/component/jpushManage";
 
 const {width} = Dimensions.get("window");
 
@@ -153,7 +154,8 @@ class OrderListScene extends Component {
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
-
+    //防止退出登录，重新登录不推送的问题
+    doJPushSetAlias(currentUser)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

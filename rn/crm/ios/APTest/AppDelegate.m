@@ -1,6 +1,4 @@
 #import <React/RCTEventEmitter.h>
-#import "IOSToReactNativeEventEmitter.h"
-#import "Constants.h"
 #import <NewRelic/NewRelic.h>
 #import "AppDelegate.h"
 #import "RNSplashScreen.h"  // 添加这一句
@@ -145,18 +143,6 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   // iOS 10 以下 Required
   NSLog(@"iOS 7 APNS");
   [JPUSHService handleRemoteNotification:userInfo];
-
-  NSString *order_id=[userInfo objectForKey:@"order_id"];
-  //NSString *speak_word=[userInfo objectForKey:@"speak_word" ];
-  NSString *store_id=[userInfo objectForKey:@"store_id"];
-  NSString *order_type=[userInfo objectForKey:@"type"];
-  NSDictionary *dict=@{
-    @"wm_id":order_id,
-    @"store_id":store_id,
-    @"order_type":order_type
-  };
-
-  [IOSToReactNativeEventEmitter emitEventWithName:NotifyName andPayload:dict];
 
 //
 //  NSString *speakWord = [userInfo objectForKey:@"speak_word"];
