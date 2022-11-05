@@ -101,6 +101,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderListScene").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_ORDER_ALL} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderAllScene").default}
+                      initialParams={initialRouteParams}/>
 
         {/*<Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}*/}
         {/*              getComponent={() => require("../../scene/home/Mine/MineScene").default}*/}
@@ -224,6 +227,8 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderSurcharge").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderSearchScene").default}/>
+        <Stack.Screen name={Config.ROUTE_SEARCH_ORDER} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/SearchOrder").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN} options={{headerTitle: '订单过机'}}
                       getComponent={() => require("../../scene/order/OrderScan").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} options={{headerTitle: '扫码打包完成'}}

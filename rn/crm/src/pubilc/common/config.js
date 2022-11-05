@@ -70,6 +70,7 @@ const C = {
   ROUTE_OPERATION_LOG: 'OrderOperationLog',
   ROUTE_ALERT: 'Tab', //home for reminds
   ROUTE_ORDERS: 'Orders',
+  ROUTE_ORDER_ALL: 'OrderAll',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
@@ -140,6 +141,7 @@ const C = {
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
+  ROUTE_SEARCH_ORDER: 'SearchOrder',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
   ROUTE_ORDER_PEND_PAYMENT: 'OrderPendingPayment',

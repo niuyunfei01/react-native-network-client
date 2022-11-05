@@ -2,15 +2,16 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {FlatList, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
 import {ToastLong} from "../util/ToastUtils";
-import {SearchBar} from 'react-native-elements';
 import {MapType, MapView, Marker} from "react-native-amap3d";
 import Entypo from "react-native-vector-icons/Entypo";
 import PropTypes from "prop-types";
+import {SvgXml} from "react-native-svg";
+import {cross_circle_icon, empty_order, this_down} from "../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -33,10 +34,9 @@ class SearchShop extends Component {
   constructor(props) {
     super(props);
     const {center, cityName, keywords, placeholderText, show_select_city} = this.props.route.params;
-
     let map = {};
     let isMap = false;
-    let show_seach_msg = false;
+    let show_seach_msg = true;
     let is_default = false
     let cityNames = "北京市"
 
@@ -69,23 +69,12 @@ class SearchShop extends Component {
       is_default: is_default,
       cityname: cityNames,
       shopmsg: map,
-      placeholderText: placeholderText !== undefined ? placeholderText : '请在此输入地址',
+      placeholderText: placeholderText !== undefined ? placeholderText : '请搜索门店位置信息',
     }
 
     if (tool.length(center) <= 0 && keywords) {
       this.search()
     }
-  }
-
-  onCancel = () => { //点击取消
-    this.setState({searchKeywords: '', shops: []});
-  }
-
-  onChange = (searchKeywords) => {
-    let show_seach_msg = tool.length(searchKeywords) <= 0
-    this.setState({searchKeywords, show_seach_msg}, () => {
-      this.search()
-    });
   }
 
   search = (isMap = false) => {   //submit 事件 (点击键盘的 enter)
@@ -115,7 +104,7 @@ class SearchShop extends Component {
           }
         });
       } else {
-        ToastLong("请输入内容")
+        ToastLong("请输入门店位置信息")
       }
     }, 1000)
   }
@@ -153,8 +142,6 @@ class SearchShop extends Component {
             })
           }
         });
-      } else {
-        ToastLong("请输入内容")
       }
     }, 1000)
   }
@@ -184,25 +171,33 @@ class SearchShop extends Component {
     )
   }
 
+  onCancel = () => { //点击取消
+    this.setState({searchKeywords: '', shops: []});
+  }
+
+  onChange = (searchKeywords) => {
+    let show_seach_msg = tool.length(searchKeywords) <= 0
+    this.setState({searchKeywords, show_seach_msg}, () => {
+      this.search()
+    });
+  }
+
   render() {
     let {shops, ret_list, isMap} = this.state;
     return (
       <View style={{
         flex: 1,
       }}>
-
         {this.renderHeader()}
         <If condition={!isMap}>
           <View style={{paddingHorizontal: 12, paddingVertical: 10}}>
             {this.renderList(shops)}
           </View>
         </If>
-
         <If condition={isMap}>
           {this.renderMap()}
           {this.renderList(ret_list)}
         </If>
-
       </View>
     )
   }
@@ -210,61 +205,69 @@ class SearchShop extends Component {
   renderHeader = () => {
     let {show_select_city, show_seach_msg, cityname, searchKeywords, placeholderText} = this.state
     return (
-      <View style={{backgroundColor: colors.white, marginBottom: show_seach_msg ? 30 : 0,}}>
+      <View style={{
+        backgroundColor: colors.white,
+        marginBottom: show_seach_msg ? 30 : 0,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        flexDirection: "row",
+        alignItems: "center",
+      }}>
         <View style={{
           flexDirection: "row",
           alignItems: "center",
-          paddingBottom: 10,
-          paddingLeft: show_select_city ? 0 : 10
+          backgroundColor: colors.f5,
+          height: 32,
+          borderRadius: 16,
+          flex: 1,
+          paddingLeft: show_select_city ? 0 : 10,
         }}>
           <If condition={show_select_city}>
             <TouchableOpacity
-              style={{width: 60, flexDirection: 'row', justifyContent: 'center'}}
+              style={{
+                width: 66,
+                borderRightWidth: 1,
+                borderRightColor: colors.colorDDD,
+                flexDirection: 'row',
+                justifyContent: 'center'
+              }}
               onPress={() => this.goSelectCity()}
             >
               <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-                <Entypo name={'location-pin'} style={styles.map_icon}/>
                 {tool.jbbsubstr(cityname, 4)}
               </Text>
+              <SvgXml xml={this_down()}/>
             </TouchableOpacity>
           </If>
-          <SearchBar
-            inputStyle={{fontSize: 14, color: colors.color333}}
-            leftIconContainerStyle={{
-              width: 20,
-              height: 20
-            }}
-            cancelIcon={true}
-            clearIcon={true}
-            inputContainerStyle={{
-              backgroundColor: colors.f5,
-              height: 32,
-              borderRadius: 16,
-              borderWidth: 0
-            }}
-            containerStyle={{
-              flex: 1,
-              padding: 0,
-              margin: 0,
-              height: 31,
-              borderRadius: 16
-            }}
-            lightTheme={true}
+          <TextInput
+            underlineColorAndroid='transparent'
             placeholder={placeholderText}
             onChangeText={(v) => this.onChange(v)}
-            onCancel={this.onCancel}
+            maxLength={11}
             value={searchKeywords}
+            placeholderTextColor={colors.color999}
+            style={{
+              paddingLeft: 10,
+              fontSize: 14,
+              color: colors.color333,
+              flex: 1,
+            }}
           />
-          <Text onPress={() => this.props.navigation.goBack()}
-                style={{textAlign: 'center', width: 56, fontSize: 14, color: colors.color333}}>取消</Text>
-
+          <If condition={tool.length(searchKeywords) > 0}>
+            <SvgXml onPress={() => {
+              this.setState({searchKeywords: '', show_seach_msg: true});
+            }} xml={cross_circle_icon()}
+                    style={{position: 'absolute', top: 6, right: 10, color: colors.color999}}/>
+          </If>
         </View>
+
+        <Text onPress={() => this.props.navigation.goBack()}
+              style={{textAlign: 'right', width: 40, fontSize: 14, color: colors.color333}}>取消</Text>
 
         <If condition={show_seach_msg}>
           <TouchableOpacity style={{position: 'absolute', top: 20, left: show_select_city ? 56 : 6}}>
             <Entypo name={'triangle-up'}
                     style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
-
             <View style={{
               backgroundColor: 'rgba(0,0,0,0.7)',
               borderRadius: 4,
@@ -279,12 +282,12 @@ class SearchShop extends Component {
               <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}> 请输入准确的地址信息进行搜索，如小区，大厦等 </Text>
             </View>
           </TouchableOpacity>
-
         </If>
       </View>
     )
   }
-  onClickItrm = (item) => {
+
+  onClickItem = (item) => {
     let {isMap, is_default} = this.state;
     InteractionManager.runAfterInteractions(() => {
       if (isMap) {
@@ -301,41 +304,60 @@ class SearchShop extends Component {
     })
   }
 
+  onEndReached = () => {
+    if (this.state.isCanLoadMore) {
+      this.setState({isCanLoadMore: false}, () => this.listmore())
+    }
+  }
+  onMomentumScrollBegin = () => {
+    this.setState({isCanLoadMore: true})
+  }
+  _shouldItemUpdate = (prev, next) => {
+    return prev.item !== next.item;
+  }
+  _getItemLayout = (data, index) => {
+    return {length: 80, offset: 80 * index, index}
+  }
+  _keyExtractor = (item) => {
+    return item?.id.toString();
+  }
+
+  listmore = () => {
+    if (this.state.query.isAdd) {
+      this.search(this.state.orderStatus, 0);
+    }
+  }
+
+  onRefresh = () => {
+    this.search()
+    console.log(111)
+  }
+
   renderList(list) {
-    let {loading, searchKeywords} = this.state;
+    let {loading} = this.state;
     return (
       <View style={{
         borderRadius: 8,
         paddingHorizontal: 12,
         backgroundColor: colors.white,
         flexDirection: "column",
-        flexGrow: 1,
+        flex: 1,
       }}>
         <FlatList
           data={list}
-          ListEmptyComponent={() => {
-            return (
-              <View style={{
-                paddingVertical: 9,
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                marginTop: '30%',
-                marginBottom: '60%',
-                flex: 1
-              }}>
-                <If condition={loading}>
-                  <Text style={{color: colors.color666}}>搜索中 </Text>
-                </If>
-                <If condition={searchKeywords && !loading}>
-                  <Text style={{color: colors.color666}}>没有找到" {searchKeywords} " 这个地址 </Text>
-                </If>
-                <If condition={!searchKeywords && !loading}>
-                  <Text style={{color: colors.color666}}>请输入关键词 </Text>
-                </If>
-              </View>
-            )
-          }}
+          contentContainerStyle={{flex: 1}}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onEndReachedThreshold={0.3}
+          onEndReached={this.onEndReached}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          onRefresh={this.onRefresh}
+          refreshing={loading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={this.renderNoData()}
+          initialNumToRender={5}
           renderItem={({item, index}) => {
             return (
               <TouchableOpacity key={index}
@@ -346,18 +368,13 @@ class SearchShop extends Component {
                                   borderBottomWidth: 0.5,
                                   backgroundColor: 'white',
                                 }}
-                                onPress={() => this.onClickItrm(item)}>
-                <View>
-                  <Text style={{
-                    color: colors.color333,
-                    fontSize: 16
-                  }}> {item?.name}  </Text>
-                  <Text
-                    style={{
-                      color: colors.color666,
-                      fontSize: 12
-                    }}> {tool.jbbsubstr(item?.address, 18)} </Text>
-                </View>
+                                onPress={() => this.onClickItem(item)}>
+                <Text style={{color: colors.color333, fontSize: 16}}> {item?.name}  </Text>
+                <Text style={{
+                  color: colors.color666,
+                  fontSize: 12,
+                  marginTop: 4
+                }}> {tool.jbbsubstr(item?.address, 25)} </Text>
               </TouchableOpacity>
             )
           }}
@@ -391,7 +408,7 @@ class SearchShop extends Component {
               aLon,
               aLat
             } = tool.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
-            if (aLon, aLat) {
+            if (aLon && aLat) {
               this.setLatLng(aLat, aLon)
             }
           }}
@@ -429,14 +446,35 @@ class SearchShop extends Component {
   }
 
 
+  renderNoData = () => {
+    let {keyword, loading} = this.state;
+    return (
+      <View style={styles.noOrderContent}>
+        <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
+
+        <If condition={tool.length(keyword) > 0 && !loading}>
+          <Text style={styles.noOrderDesc}> 找不到该地址 </Text>
+          <Text style={styles.noOrderDesc}> 很抱歉，暂未找到您搜索的地址： </Text>
+          <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
+        </If>
+
+        <If condition={tool.length(keyword) <= 0 && !loading}>
+          <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
+          <Text style={styles.noOrderDesc}> 订单号、流水号、手机号及尾号后4位； </Text>
+        </If>
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
-  map_icon: {
-    fontSize: 15,
-    color: colors.color666,
-    textAlignVertical: "center"
+  noOrderContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    paddingTop: 86,
   },
-})
+  noOrderDesc: {flex: 1, fontSize: 15, color: colors.color999, lineHeight: 21},
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);
