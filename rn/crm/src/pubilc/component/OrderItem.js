@@ -484,7 +484,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -500,7 +500,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -516,7 +516,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -535,7 +535,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}

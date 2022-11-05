@@ -1,5 +1,15 @@
 import React, {Component} from "react";
-import {Alert, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Appearance,
+  InteractionManager,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Clipboard from '@react-native-community/clipboard';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -1450,6 +1460,8 @@ class StoreInfo extends Component {
     return <View style={{marginTop: 12}}>
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         customHeaderIOS={() => {
           return (

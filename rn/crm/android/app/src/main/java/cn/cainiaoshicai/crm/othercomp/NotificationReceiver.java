@@ -89,7 +89,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     params.putInt("wm_id", notify.getOrder_id());
                     params.putString("msg_id", msgId);
                     params.putBoolean("acceptNotifyNew", GlobalCtx.app().acceptNotifyNew());
-                    GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
+                    //GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
                 }
 
                 GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();

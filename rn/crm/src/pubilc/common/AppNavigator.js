@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Alert, DeviceEventEmitter, Dimensions, NativeEventEmitter, NativeModules, Platform} from "react-native";
+import {Alert, Dimensions, Platform} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
@@ -16,7 +16,7 @@ import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
 import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
-import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../component/jpushManage";
+import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
 import GlobalUtil from "../util/GlobalUtil";
@@ -24,6 +24,7 @@ import {setDeviceInfo} from "../../reducers/device/deviceActions";
 import {AMapSdk} from "react-native-amap3d";
 import DeviceInfo from "react-native-device-info";
 import {downloadApk} from "rn-app-upgrade";
+import JPush from "jpush-react-native";
 
 let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
@@ -622,22 +623,68 @@ class AppNavigator extends PureComponent {
       dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
     })
   }
+  initJPush = () => {
+
+    JPush.setLoggerEnable(false)
+    JPush.init()
+    JPush.addConnectEventListener(({connectEnable}) => {
+      //console.log("connectEnable:" + connectEnable)
+      if (connectEnable)
+        doJPushSetAlias(currentUser);
+    })
+
+    // JPush.getRegistrationID(({registerID}) => {
+    //     console.log("registerID:" + JSON.stringify(registerID))
+    //   }
+    // )
+    const {accessToken, autoBluetoothPrint, currentUser, currStoreId} = this.props.global
+    //tag alias事件回调
+    JPush.addTagAliasListener(({code}) => {
+      //console.log("tagAliasListener:" + code)
+      if (code) {
+        doJPushSetAlias(currentUser)
+      }
+    });
+    //通知回调
+
+    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
+      // console.log("notificationListener,extras:" + JSON.stringify(extras))
+      // console.log("notificationListener,notificationEventType:" + notificationEventType)
+      const {type, order_id} = extras
+      if ('notificationArrived' === notificationEventType) {
+        if (type !== 'new_order') {
+          sendDeviceStatus(accessToken, {
+            msgId: messageID,
+            listener_stores: currStoreId,
+            orderId: order_id,
+            btConnected: '收到极光推送，不是新订单不需要打印',
+            auto_print: autoBluetoothPrint
+          })
+          return
+        }
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: currStoreId})
+      }
+      if ('notificationOpened' === notificationEventType) {
+        JPush.setBadge({appBadge: 0, badge: 0})
+      }
+    });
+  }
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
       const {global} = store.getState()
       this.handleNoLoginInfo(global)
-      const {currentUser, accessToken, lastCheckVersion = 0} = global;
+      const {accessToken, lastCheckVersion = 0} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
-        initJPush()
+        this.initJPush()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
           await this.calcAppStartTime()
         }
-        initBlueTooth(global).then(() => this.printByBluetooth())
-        doJPushSetAlias(currentUser);
+        await initBlueTooth(global)
+
         const currentTs = dayjs().valueOf()
         if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
           store.dispatch(setCheckVersionAt(currentTs))
@@ -662,8 +709,8 @@ class AppNavigator extends PureComponent {
 
   componentWillUnmount() {
     this.unSubscribe()
-    this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
-    this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
+    //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
+    //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
   }
 
@@ -686,37 +733,41 @@ class AppNavigator extends PureComponent {
     })
   }
 
-  printByBluetoothIOS = () => {
-    const {global} = this.props
-    let {accessToken} = global;
-    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-    this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-      if (obj.order_type !== 'new_order') {
-        sendDeviceStatus(accessToken, {...obj, btConnected: '收到极光推送，不是新订单不需要打印'})
-        return
-      }
-      await handlePrintOrder(this.props, obj)
-    })
-  }
+  // printByBluetoothIOS = () => {
+  //   const {global} = this.props
+  //   let {accessToken, autoBluetoothPrint} = global;
+  //   //const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+  //   // this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+  //   //   if (obj.order_type !== 'new_order') {
+  //   //     sendDeviceStatus(accessToken, {
+  //   //       ...obj,
+  //   //       btConnected: '收到极光推送，不是新订单不需要打印',
+  //   //       auto_print: autoBluetoothPrint
+  //   //     })
+  //   //     return
+  //   //   }
+  //   //   await handlePrintOrder(this.props, obj)
+  //   // })
+  // }
 
 
-  printByBluetoothAndroid = () => {
-    this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-      await handlePrintOrder(this.props, obj)
+  // printByBluetoothAndroid = () => {
+  //   this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+  //     await handlePrintOrder(this.props, obj)
+  //
+  //   })
+  // }
 
-    })
-  }
-
-  printByBluetooth = () => {
-    switch (Platform.OS) {
-      case "ios":
-        this.printByBluetoothIOS()
-        break
-      case "android":
-        this.printByBluetoothAndroid()
-        break
-    }
-  }
+  // printByBluetooth = () => {
+  //   switch (Platform.OS) {
+  //     case "ios":
+  //       this.printByBluetoothIOS()
+  //       break
+  //     case "android":
+  //       this.printByBluetoothAndroid()
+  //       break
+  //   }
+  // }
 
 
   render() {

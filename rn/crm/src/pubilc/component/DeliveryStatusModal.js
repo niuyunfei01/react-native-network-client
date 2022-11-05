@@ -6,7 +6,7 @@ import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
@@ -20,9 +20,7 @@ const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
   copyText: {
     fontSize: 12,
-    fontWeight: '400',
     color: colors.main_color,
-    padding: 10
   },
   QrTitle: {
     flexDirection: 'row',
@@ -119,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     color: colors.color666,
-    marginTop: 6
+    marginTop: 4
   },
   deliveryStatusBtnWhite: {
     height: 42,
@@ -203,7 +201,7 @@ class deliveryStatusModal extends React.Component {
 
   getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
-    const params = {access_token: accessToken, order_id: order_id,order_status: order_status}
+    const params = {access_token: accessToken, order_id: order_id, order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         delivery_list: res?.do_list,
@@ -218,7 +216,7 @@ class deliveryStatusModal extends React.Component {
     }, () => {
       hideModal()
       this.closeModal()
-    }).catch(()=>{
+    }).catch(() => {
       hideModal()
       this.closeModal()
     })
@@ -373,7 +371,7 @@ class deliveryStatusModal extends React.Component {
                 style={[styles.platform, log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
               <View style={styles.descInfo}>
                 <If condition={tool.length(log?.log_desc) > 0}>
-                  <Text style={styles.desc}>{log?.log_desc} </Text>
+                  <Text style={styles.desc}>{tool.jbbsubstr(log?.log_desc, 24)} </Text>
                 </If>
                 <If condition={tool.length(log?.log_right_btn) > 0}>
                   <Text onPress={() => {
@@ -381,7 +379,7 @@ class deliveryStatusModal extends React.Component {
                   }} style={styles.copyText}>{log?.log_right_btn} </Text>
                 </If>
               </View>
-              <Text style={[styles.platform, {marginTop: 6}]}>{log?.log_call_time} </Text>
+              <Text style={[styles.platform, {marginTop: 4}]}>{log?.log_call_time} </Text>
             </View>
           </View>
         </View>
