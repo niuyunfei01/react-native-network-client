@@ -113,7 +113,7 @@ class OrderSettingScene extends Component {
     }
     const params = {
       center: center,
-      cityName: city,
+      city_name: city,
       show_select_city: false,
       keywords: address,
       onBack: (res) => {
@@ -225,7 +225,7 @@ class OrderSettingScene extends Component {
         mobile: res.phone,
       })
       const params = {
-        cityName: city,
+        city_name: city,
         show_select_city: false,
         keywords: res.address,
         onBack: (res) => {

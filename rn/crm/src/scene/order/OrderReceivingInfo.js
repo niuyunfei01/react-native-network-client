@@ -120,6 +120,7 @@ class OrderReceivingInfo extends Component {
     const params = {
       center: center,
       keywords: address,
+      show_select_city: false,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
@@ -230,7 +231,7 @@ class OrderReceivingInfo extends Component {
         mobile: res.phone,
       })
       const params = {
-        show_select_city: true,
+        show_select_city: false,
         keywords: res.address,
         onBack: (res) => {
           this.setAddress.bind(this)(res)

@@ -6,7 +6,7 @@ import {FlatList, Image, InteractionManager, StyleSheet, Text, TextInput, Toucha
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
-import {ToastLong} from "../util/ToastUtils";
+import {ToastLong, ToastShort} from "../util/ToastUtils";
 import {MapType, MapView, Marker} from "react-native-amap3d";
 import Entypo from "react-native-vector-icons/Entypo";
 import PropTypes from "prop-types";
@@ -33,43 +33,55 @@ class SearchShop extends Component {
 
   constructor(props) {
     super(props);
-    const {center, cityName, keywords, placeholderText, show_select_city} = this.props.route.params;
+    let {
+      center,
+      keywords,
+      city_name,
+      placeholder_text = '请搜索门店位置信息',
+      show_select_city = true
+    } = this.props.route.params;
     let map = {};
+
     let isMap = false;
     let show_seach_msg = true;
-    let is_default = false
-    let cityNames = "北京市"
+    let local_city = '北京';
 
-    if (tool.length(tool.store(this.props.global)) > 0) {
-      let citymsg = tool.store(this.props.global);
-      cityNames = citymsg.city
-      map.location = citymsg.loc_lng + "," + citymsg.loc_lat;
+    let {store_info = {}} = this.props.global;
+    if (tool.length(store_info) > 0) {
+      local_city = store_info?.city
+      map.location = store_info?.loc_lng + "," + store_info?.loc_lat;
     }
-    if (cityName !== undefined && tool.length(cityName) > 0)
-      cityNames = cityName;
 
     if (keywords) {
       map.address = keywords
       show_seach_msg = false
     }
 
+    if (show_select_city && tool.length(city_name) > 0) {
+      local_city = city_name;
+    }
+
     if (tool.length(center) > 0) {
       map.location = center
-      isMap = is_default = true;
+      isMap = true;
     }
 
     this.state = {
       loading: false,
-      show_select_city: show_select_city !== undefined ? show_select_city : true,
+      show_select_city: show_select_city,
       show_seach_msg: show_seach_msg,
       shops: [],
       ret_list: [],
-      searchKeywords: keywords,
+      keyword: keywords,
       isMap: isMap, //控制显示搜索还是展示地图
-      is_default: is_default,
-      cityname: cityNames,
-      shopmsg: map,
-      placeholderText: placeholderText !== undefined ? placeholderText : '请搜索门店位置信息',
+      is_default: isMap,
+      city_name: local_city,
+      location: map,
+      placeholderText: placeholder_text,
+      isCanLoadMore: false,
+      is_add: true,
+      page: 1,
+      pagesize: 10
     }
 
     if (tool.length(center) <= 0 && keywords) {
@@ -78,15 +90,15 @@ class SearchShop extends Component {
   }
 
   search = (isMap = false) => {   //submit 事件 (点击键盘的 enter)
-    let {searchKeywords, cityname} = this.state;
+    let {keyword, city_name} = this.state;
     this.setState({loading: true})
     tool.debounces(() => {
-      if (searchKeywords) {
+      if (keyword) {
         let header = 'https://restapi.amap.com/v3/assistant/inputtips?parameters?'
         const params = {
-          keywords: searchKeywords,
+          keywords: keyword,
           key: '85e66c49898d2118cc7805f484243909',
-          city: cityname,
+          city: city_name,
           citylimit: true
         }
         Object.keys(params).forEach(key => {
@@ -110,35 +122,37 @@ class SearchShop extends Component {
   }
 
   searchLngLat = () => {   //submit 事件 (点击键盘的 enter)
-    let {shopmsg, searchKeywords, cityname} = this.state;
+    let {location, keyword, city_name} = this.state;
     this.setState({loading: true})
     tool.debounces(() => {
-      if (shopmsg?.location) {
+      if (location?.location) {
         let header = 'https://restapi.amap.com/v5/place/around?'
         const params = {
-          region: cityname,
-          location: shopmsg?.location,
-          keywords: searchKeywords,
+          region: city_name,
+          location: location?.location,
+          keywords: keyword,
           radius: 100,
           key: '85e66c49898d2118cc7805f484243909',
           types: '120100|120200|120202|120203|120300|120301|120302|120303|120304|120201|190108|190400|190403|991401|150500|060100|100100|150501|991000|991001|991001|010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000|160000|170000|180000|190000|200000|',
         }
+
         Object.keys(params).forEach(key => {
             header += '&' + key + '=' + params[key]
           }
         )
+
         fetch(header).then(response => response.json()).then(data => {
           if (data.status === "1" && tool.length(data?.pois) > 0) {
             this.setState({
               ret_list: data?.pois,
               loading: false,
-              searchKeywords: ''
+              keyword: ''
             })
           } else {
             this.search(true)
             this.setState({
               loading: false,
-              searchKeywords: ''
+              keyword: ''
             })
           }
         });
@@ -148,11 +162,11 @@ class SearchShop extends Component {
 
 
   setLatLng = (latitude, longitude) => {
-    let {shopmsg} = this.state;
-    shopmsg.location = longitude + ',' + latitude
+    let {location} = this.state;
+    location.location = longitude + ',' + latitude
     this.setState({
       is_default: false,
-      shopmsg
+      location
     }, () => {
       this.searchLngLat()
     })
@@ -162,9 +176,10 @@ class SearchShop extends Component {
     this.props.navigation.navigate(
       Config.ROUTE_SELECT_CITY_LIST,
       {
+        city: this.state.city_name,
         callback: (selectCity) => {
           this.setState({
-            cityname: selectCity.name,
+            city_name: selectCity.name,
           })
         }
       }
@@ -172,12 +187,12 @@ class SearchShop extends Component {
   }
 
   onCancel = () => { //点击取消
-    this.setState({searchKeywords: '', shops: []});
+    this.setState({keyword: '', shops: []});
   }
 
-  onChange = (searchKeywords) => {
-    let show_seach_msg = tool.length(searchKeywords) <= 0
-    this.setState({searchKeywords, show_seach_msg}, () => {
+  onChange = (keyword) => {
+    let show_seach_msg = tool.length(keyword) <= 0
+    this.setState({keyword, show_seach_msg}, () => {
       this.search()
     });
   }
@@ -190,7 +205,7 @@ class SearchShop extends Component {
       }}>
         {this.renderHeader()}
         <If condition={!isMap}>
-          <View style={{paddingHorizontal: 12, paddingVertical: 10}}>
+          <View style={{paddingHorizontal: 12, paddingVertical: 10, flex: 1,}}>
             {this.renderList(shops)}
           </View>
         </If>
@@ -203,7 +218,7 @@ class SearchShop extends Component {
   }
 
   renderHeader = () => {
-    let {show_select_city, show_seach_msg, cityname, searchKeywords, placeholderText} = this.state
+    let {show_select_city, show_seach_msg, city_name, keyword, placeholderText} = this.state
     return (
       <View style={{
         backgroundColor: colors.white,
@@ -234,7 +249,7 @@ class SearchShop extends Component {
               onPress={() => this.goSelectCity()}
             >
               <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-                {tool.jbbsubstr(cityname, 4)}
+                {tool.jbbsubstr(city_name, 3)}
               </Text>
               <SvgXml xml={this_down()}/>
             </TouchableOpacity>
@@ -244,7 +259,7 @@ class SearchShop extends Component {
             placeholder={placeholderText}
             onChangeText={(v) => this.onChange(v)}
             maxLength={11}
-            value={searchKeywords}
+            value={keyword}
             placeholderTextColor={colors.color999}
             style={{
               paddingLeft: 10,
@@ -253,9 +268,9 @@ class SearchShop extends Component {
               flex: 1,
             }}
           />
-          <If condition={tool.length(searchKeywords) > 0}>
+          <If condition={tool.length(keyword) > 0}>
             <SvgXml onPress={() => {
-              this.setState({searchKeywords: '', show_seach_msg: true});
+              this.setState({keyword: '', show_seach_msg: true});
             }} xml={cross_circle_icon()}
                     style={{position: 'absolute', top: 6, right: 10, color: colors.color999}}/>
           </If>
@@ -298,17 +313,25 @@ class SearchShop extends Component {
       } else {
         this.setState({
           isMap: true,
-          shopmsg: item
+          location: item
         })
       }
     })
   }
 
   onEndReached = () => {
-    if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+    let {isCanLoadMore, is_add} = this.state;
+    if (isCanLoadMore) {
+      this.setState({isCanLoadMore: false}, () => {
+        if (is_add) {
+          this.search();
+        } else {
+          ToastShort('已经到底部了')
+        }
+      })
     }
   }
+
   onMomentumScrollBegin = () => {
     this.setState({isCanLoadMore: true})
   }
@@ -322,15 +345,8 @@ class SearchShop extends Component {
     return item?.id.toString();
   }
 
-  listmore = () => {
-    if (this.state.query.isAdd) {
-      this.search(this.state.orderStatus, 0);
-    }
-  }
-
   onRefresh = () => {
     this.search()
-    console.log(111)
   }
 
   renderList(list) {
@@ -345,52 +361,52 @@ class SearchShop extends Component {
       }}>
         <FlatList
           data={list}
-          contentContainerStyle={{flex: 1}}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          refreshing={loading}
+          initialNumToRender={5}
           onEndReachedThreshold={0.3}
+          onRefresh={this.onRefresh}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          onRefresh={this.onRefresh}
-          refreshing={loading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoData()}
-          initialNumToRender={5}
-          renderItem={({item, index}) => {
-            return (
-              <TouchableOpacity key={index}
-                                style={{
-                                  paddingVertical: 20,
-                                  borderColor:
-                                  colors.e5,
-                                  borderBottomWidth: 0.5,
-                                  backgroundColor: 'white',
-                                }}
-                                onPress={() => this.onClickItem(item)}>
-                <Text style={{color: colors.color333, fontSize: 16}}> {item?.name}  </Text>
-                <Text style={{
-                  color: colors.color666,
-                  fontSize: 12,
-                  marginTop: 4
-                }}> {tool.jbbsubstr(item?.address, 25)} </Text>
-              </TouchableOpacity>
-            )
-          }}
+          renderItem={({item, index}) => this.renderItem(item, index)}
         />
       </View>
     )
   }
 
+  renderItem = (item, index) => {
+    return (
+      <TouchableOpacity key={index}
+                        style={{
+                          paddingVertical: 20,
+                          borderColor: colors.e5,
+                          borderBottomWidth: 0.5,
+                          backgroundColor: 'white',
+                        }}
+                        onPress={() => this.onClickItem(item)}>
+        <Text style={{color: colors.color333, fontSize: 16}}> {item?.name}  </Text>
+        <Text style={{
+          color: colors.color999,
+          fontSize: 12,
+          marginTop: 4
+        }}> {tool.jbbsubstr(item?.address, 25)} </Text>
+      </TouchableOpacity>
+    )
+  }
+
   renderMap() {
-    let {shopmsg} = this.state;
-    let lat = shopmsg.location.split(",")[1];
-    let lng = shopmsg.location.split(",")[0];
+    let {location} = this.state;
+    let lat = location.location.split(",")[1];
+    let lng = location.location.split(",")[0];
     if (!lat || !lng) {
       return null
     }
-    let address = shopmsg?.name ? shopmsg?.name : shopmsg?.address;
+    let address = location?.name ? location?.name : location?.address;
     return (
       <View style={{height: 300}}>
         <MapView
@@ -454,13 +470,12 @@ class SearchShop extends Component {
 
         <If condition={tool.length(keyword) > 0 && !loading}>
           <Text style={styles.noOrderDesc}> 找不到该地址 </Text>
-          <Text style={styles.noOrderDesc}> 很抱歉，暂未找到您搜索的地址： </Text>
+          <Text style={styles.noOrderDesc}> 很抱歉，暂未找到您搜索的地址 </Text>
           <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
         </If>
 
         <If condition={tool.length(keyword) <= 0 && !loading}>
-          <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
-          <Text style={styles.noOrderDesc}> 订单号、流水号、手机号及尾号后4位； </Text>
+          <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
         </If>
       </View>
     )
@@ -473,6 +488,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingTop: 86,
+    paddingBottom: 286,
   },
   noOrderDesc: {flex: 1, fontSize: 15, color: colors.color999, lineHeight: 21},
 });

@@ -697,35 +697,30 @@ class OrderListScene extends Component {
     )
   }
 
-  onTouchStart = (e) => {
-    this.pageX = e.nativeEvent.pageX;
-    this.pageY = e.nativeEvent.pageY;
-  }
   onEndReached = () => {
-    if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+    let {isCanLoadMore, query} = this.state;
+    if (isCanLoadMore) {
+      this.setState({isCanLoadMore: false}, () => {
+        if (query?.isAdd) {
+          this.fetchOrders(this.state.orderStatus, 0);
+        } else {
+          ToastShort('已经到底部了')
+        }
+      })
     }
   }
   onMomentumScrollBegin = () => {
     this.setState({isCanLoadMore: true})
   }
-  onTouchMove = (e) => {
-    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-      this.setState({scrollLocking: true});
-    } else {
-      this.setState({scrollLocking: false});
-    }
-  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
   _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+    return {length: 125, offset: 125 * index, index}
   }
   _keyExtractor = (item) => {
     return item.id.toString();
   }
-
 
   renderContent = (orders) => {
     let {isLoading} = this.state;
@@ -736,14 +731,12 @@ class OrderListScene extends Component {
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
-          onTouchStart={(e) => this.onTouchStart(e)}
+          refreshing={isLoading}
           onEndReachedThreshold={0.3}
-          onEndReached={this.onEndReached}
-          onMomentumScrollBegin={this.onMomentumScrollBegin}
-          onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
-          refreshing={isLoading}
+          onEndReached={this.onEndReached}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
@@ -752,12 +745,6 @@ class OrderListScene extends Component {
         />
       </View>
     );
-  }
-
-  listmore = () => {
-    if (this.state.query.isAdd) {
-      this.fetchOrders(this.state.orderStatus, 0);
-    }
   }
 
 
