@@ -1103,7 +1103,7 @@ class OrderCallDelivery extends Component {
                     worker_delivery_id: 0
                   })
                   this.closeModal()
-                }} xml={cross_icon()} width={18} height={18}/>
+                }} xml={cross_icon()}/>
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}
@@ -1177,7 +1177,7 @@ class OrderCallDelivery extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品重量
             </Text>
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -1269,7 +1269,7 @@ class OrderCallDelivery extends Component {
               物品价值
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -1372,7 +1372,7 @@ class OrderCallDelivery extends Component {
               备注
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

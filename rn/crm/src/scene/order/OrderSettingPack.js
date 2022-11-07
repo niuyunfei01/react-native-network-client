@@ -746,7 +746,7 @@ class OrderSettingScene extends Component {
               物品重量
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -823,7 +823,7 @@ class OrderSettingScene extends Component {
               物品价值
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -921,7 +921,7 @@ class OrderSettingScene extends Component {
               使用复制的收件信息？
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
           </View>
 
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -997,7 +997,7 @@ class OrderSettingScene extends Component {
               备注
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} />
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea

@@ -461,7 +461,7 @@ class OrderReceivingInfo extends Component {
               使用复制的收件信息？
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
 

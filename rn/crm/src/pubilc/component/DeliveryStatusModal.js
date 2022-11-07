@@ -190,13 +190,12 @@ class deliveryStatusModal extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {accessToken, order_id, show_modal, order_status} = nextProps;
-    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
+    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal || this.state.show_modal) {
       return null;
     }
-    showModal('请求中...')
-    tool.debounces(() => {
-      this.getInfo(accessToken, order_id, order_status)
-    })
+    this.state.show_modal = true
+    this.getInfo(accessToken, order_id, order_status)
+
   }
 
   getInfo = (accessToken, order_id, order_status) => {
@@ -211,13 +210,10 @@ class deliveryStatusModal extends React.Component {
         btn_list: res?.btn_list,
         driver_phone: res?.driver_phone,
         complaint_rider_delivery_id: res?.complaint_rider_delivery_id,
-        show_modal: true
-      }, hideModal)
+      })
     }, () => {
-      hideModal()
       this.closeModal()
     }).catch(() => {
-      hideModal()
       this.closeModal()
     })
   }
@@ -226,6 +222,10 @@ class deliveryStatusModal extends React.Component {
     this.setState({
       show_modal: false,
       delivery_list: [],
+      order_platform_desc: '',
+      platform_dayId: '',
+      expect_time_desc: '',
+      driver_phone: '',
     }, () => {
       this.props.onClose();
     })
@@ -277,6 +277,9 @@ class deliveryStatusModal extends React.Component {
 
   render = () => {
     let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc} = this.state;
+    if (!show_modal) {
+      return null;
+    }
     return (
 
       <Modal hardwareAccelerated={true}
@@ -308,7 +311,7 @@ class deliveryStatusModal extends React.Component {
                     <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}

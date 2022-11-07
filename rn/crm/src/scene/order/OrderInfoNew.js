@@ -1255,7 +1255,7 @@ class OrderInfoNew extends PureComponent {
           <View style={styles.QrTitle}>
             <Text style={styles.QrDesc}>查看取货码</Text>
 
-            <SvgXml onPress={this.closeQrCodeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeQrCodeModal} xml={cross_icon()}/>
 
           </View>
           <View style={styles.QrImg}>

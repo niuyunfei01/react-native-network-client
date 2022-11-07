@@ -224,7 +224,7 @@ class OrderItem extends React.PureComponent {
     return (
       <BottomModal
         visible={verification_modal}
-        modal_type={'bottom'}
+        onClose={this.closeModal}
         onPress={this.goVeriFicationToShop}
         title={'自提订单核销'}
         actionText={'确定'}
@@ -233,7 +233,7 @@ class OrderItem extends React.PureComponent {
           borderRadius: 24,
           length: 48,
         }}
-        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
+        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
         onPressClose={() => this.closeModal()}>
         <TextInput placeholder={"请输入核销码"}
                    onChangeText={(pickupCode) => {
@@ -241,7 +241,15 @@ class OrderItem extends React.PureComponent {
                    }}
                    value={pickupCode}
                    placeholderTextColor={colors.color999}
-                   style={styles.veriFicationInput}
+                   style={{
+                     color: colors.color333,
+                     borderBottomWidth: 0.5,
+                     borderBottomColor: colors.color999,
+                     fontSize: 16,
+                     height: 45,
+                     borderRadius: 5,
+                     marginVertical: 20,
+                   }}
                    underlineColorAndroid="transparent"/>
       </BottomModal>
     )
@@ -320,7 +328,14 @@ class OrderItem extends React.PureComponent {
 
   renderVerificationBtn = () => {
     return (
-      <View style={styles.btnContent}>
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderTopWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
         <Button title={'门店核销'}
                 onPress={() => {
                   this.mixpanel.track('V4订单列表_到店核销')
@@ -328,7 +343,10 @@ class OrderItem extends React.PureComponent {
                     verification_modal: true,
                   })
                 }}
-                buttonStyle={styles.veriFicationBtn}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.main_color,
+                  width: width * 0.8,
+                }]}
                 titleStyle={{color: colors.white, fontSize: 16}}
         />
       </View>
