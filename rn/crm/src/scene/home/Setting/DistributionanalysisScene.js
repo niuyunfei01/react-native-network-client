@@ -21,6 +21,8 @@ import Cts from "../../../pubilc/common/Cts";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import {question} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -238,6 +240,10 @@ class DistributionAnalysisScene extends PureComponent {
     this.setState({profitAndLoss: profit_list})
   }
 
+  promptingMessage = () => {
+
+  }
+
   renderHeaderTab = () => {
     let {showHeader} = this.state
     if (showHeader) {
@@ -384,7 +390,7 @@ class DistributionAnalysisScene extends PureComponent {
                   fontSize: pxToDp(38),
                   fontWeight: "bold"
                 }, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
-                  ¥{item.good_profit}/{item.good_profit_ratio}%
+                  ¥{item.good_profit} / {item.good_profit_ratio}%
                 </Text>
               </View>
 
@@ -399,8 +405,15 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.ratio} </Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
-                    <Text style={styles.cell_rowText}>{item.sum_of_total_income_from_platform}元</Text>
+                    <View style={styles.cardLabelContent}>
+                      <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
+                      <SvgXml onPress={this.promptingMessage} xml={question()} width={18} height={18}/>
+                    </View>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => {}}>
+                      <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
+                      <Text style={{color: colors.main_color}}>查看 </Text>
+                      <Entypo name="chevron-thin-right" style={styles.iconShow}/>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.cardContent}>
                     <Text style={[styles.cell_rowTitleTextR4]}>客单价 </Text>
@@ -410,13 +423,16 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
-                  <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
-                    <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
-                    <View style={styles.cardContent}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardLabelContent}>
+                      <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
+                      <SvgXml onPress={this.promptingMessage} xml={question()} width={18} height={18}/>
+                    </View>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
                       <Text style={{color: colors.main_color}}>查看 </Text>
                       <Entypo name="chevron-thin-right" style={styles.iconShow}/>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </If>
               <TouchableOpacity
@@ -598,15 +614,15 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleTextR1: {
     fontSize: 20,
-    color: colors.main_color,
+    color: colors.color333,
     marginVertical: pxToDp(10),
     fontWeight: 'bold'
   },
   cell_rowTitleTextR2: {
-    fontSize: pxToDp(30),
-    color: colors.color111,
+    fontSize: 13,
+    color: colors.color666,
     marginVertical: pxToDp(10),
-    fontWeight: "bold"
+    fontWeight: "normal"
   },
   cell_rowTitleTextR3: {
     fontSize: pxToDp(30),
@@ -732,6 +748,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
   cardContent: {flexDirection: "row", justifyContent: "space-between", alignItems: "center"},
+  cardLabelContent: {flexDirection: "row", justifyContent: "flex-start", alignItems: "center"},
   iconShow: {
     fontSize: 14,
     color: colors.main_color,
@@ -743,7 +760,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 10,
     backgroundColor: colors.white,
-    padding: 10
+    paddingHorizontal: 10,
+    paddingTop: 10
   }
 });
 
