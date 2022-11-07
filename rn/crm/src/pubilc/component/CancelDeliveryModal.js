@@ -29,6 +29,7 @@ class CancelDeliveryModal extends React.Component {
   }
 
   state = {
+    loading: false,
     show_modal: false,
     title: '',
     actionText: '',
@@ -39,16 +40,15 @@ class CancelDeliveryModal extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {order_id, show_modal} = nextProps;
-    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
+    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal || this.state.loading) {
       return null;
     }
-    showModal('请求中...')
-    tool.debounces(() => {
-      this.getInfo()
-    })
+    this.state.loading = true;
+    this.getInfo()
   }
 
   getInfo = () => {
+    showModal('请求中...')
     let {order_id, accessToken} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
     HttpUtils.get.bind(this.props)(api, {
@@ -139,6 +139,7 @@ class CancelDeliveryModal extends React.Component {
   closeModal = () => {
     this.setState({
       show_modal: false,
+      loading: false,
       title: '',
       actionText: '',
       closeText: '',

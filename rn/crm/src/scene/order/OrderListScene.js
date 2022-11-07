@@ -185,30 +185,6 @@ class OrderListScene extends Component {
           show_bind_button: tool.length(res.business_status) <= 0,
         })
       })
-      api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(api).then(res => {
-        if (res.sum < 0) {
-          Alert.alert('提醒', '余额不足请充值', [
-            {
-              text: '取消'
-            },
-            {
-              text: '去充值',
-              onPress: () => {
-                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-                  onBack: () => {
-                    Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
-                      {
-                        text: '确定'
-                      }
-                    ])
-                  }
-                });
-              }
-            }
-          ])
-        }
-      })
     }
 
   }
@@ -527,7 +503,7 @@ class OrderListScene extends Component {
               订单排序
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

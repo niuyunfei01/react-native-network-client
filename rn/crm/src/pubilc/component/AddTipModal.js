@@ -8,7 +8,7 @@ import JbbModal from "./JbbModal";
 import {ToastShort} from "../util/ToastUtils";
 import {addTipMoneyNew, addTipMoneys} from "../../reducers/order/orderActions";
 import {Button} from "react-native-elements";
-import {check_icon, cross_circle_icon, cross_icon} from "../../svg/svg";
+import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
 
 const {width} = Dimensions.get("window");
@@ -50,14 +50,12 @@ class AddTipModal extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {id, show_add_tip_modal, add_money} = nextProps;
 
-    if (tool.length(id) <= 0 || Number(id) <= 0 || !show_add_tip_modal) {
+    if (tool.length(id) <= 0 || Number(id) <= 0 || !show_add_tip_modal || this.state.show_modal) {
       return null;
     }
-    tool.debounces(() => {
-      this.setState({
-        show_modal: true,
-        add_money: add_money || 0,
-      })
+    this.setState({
+      show_modal: true,
+      add_money: add_money || 0,
     })
   }
 
@@ -118,6 +116,9 @@ class AddTipModal extends React.Component {
 
   render(): React.ReactNode {
     let {show_modal, add_money, input_add_money, respReason} = this.state;
+    if (!show_modal) {
+      return null;
+    }
     return (
       <JbbModal visible={show_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -132,9 +133,9 @@ class AddTipModal extends React.Component {
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333, lineHeight: 30}}>
               加小费
-              <Text style={{fontWeight: 'normal',fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
+              <Text style={{fontWeight: 'normal', fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
             </Text>
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
 
           </View>

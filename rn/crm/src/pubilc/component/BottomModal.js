@@ -86,7 +86,7 @@ class BottomModal extends React.Component {
                   {this.props.title}
                 </Text>
                 <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
-                  <SvgXml xml={cross_icon()} width={18} height={18}/>
+                  <SvgXml xml={cross_icon()}/>
                 </TouchableOpacity>
               </View>
               <View style={{paddingHorizontal: 10}}>
