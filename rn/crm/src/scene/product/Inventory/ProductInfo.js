@@ -390,7 +390,7 @@ class ProductInfo extends React.Component {
       }
     ]
     return (
-      <View>
+      <View style={{marginBottom: 100,}}>
         <View style={styles.item_body}>
           <View style={[styles.item_head, {flexDirection: "row", justifyContent: "space-between"}]}>
             <Text style={styles.item_title}>库管信息 </Text>
@@ -524,8 +524,8 @@ class ProductInfo extends React.Component {
             cancelText={'取消'}
             data={this.state.skuFreshDegrees}
           >
-            <TouchableOpacity onPress={() => this.setState({refProdPrompt: true})}
-                              style={[styles.itemRow, {justifyContent: "space-between"}]}>
+            <TouchableOpacity
+              style={[styles.itemRow, {justifyContent: "space-between"}]}>
               <Text style={styles.item_title}>温区: </Text>
               <View style={styles.itemRow}>
                 <Text style={styles.row_right}>{productInfo?.sku?.fresh_degree_label} </Text>
@@ -564,13 +564,17 @@ class ProductInfo extends React.Component {
           </If>
           <If condition={!_.isEmpty(this.state.referred_by)}>
             <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
-              <View style={[styles.itemRow, {justifyContent: "space-between"}]}>
+              <TouchableOpacity onPress={() => this.setState({refProdPrompt: true})}
+                                style={[styles.itemRow, {
+                                  justifyContent: "space-between",
+                                  backgroundColor: colors.white,
+                                }]}>
                 <Text style={styles.item_title}>关联库存商品: </Text>
                 <View style={styles.itemRow}>
                   <Text style={styles.row_right}>{productInfo?.refer_prod_name} </Text>
                   <Text style={styles.row_right}>左滑取消关联</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </Swipeout>
           </If>
         </View>
