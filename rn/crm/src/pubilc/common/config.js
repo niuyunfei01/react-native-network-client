@@ -125,6 +125,8 @@ const C = {
   ROUTE_Member_Agreement: 'ROUTE_Member_Agreement',//会员协议
 
   ROUTE_STORE: 'Store',
+  ROUTE_STORE_LIST: 'StoreList',
+  ROUTE_SAVE_STORE: 'SaveStore',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
   ROUTE_STORE_RULE: 'StoreRule',

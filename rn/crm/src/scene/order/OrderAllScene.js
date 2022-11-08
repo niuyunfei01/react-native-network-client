@@ -21,7 +21,6 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import AlertModal from "../../pubilc/component/AlertModal";
-import TopModal from "../../pubilc/component/TopModal";
 import DatePicker from "react-native-date-picker";
 import dayjs from "dayjs";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";

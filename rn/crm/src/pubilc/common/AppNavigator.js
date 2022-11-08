@@ -258,6 +258,10 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/StoreList").default}/>
+        <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/SaveStore").default}/>
 
         <Stack.Screen name={Config.ROUTE_STORE_ADD} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreInfo").default}

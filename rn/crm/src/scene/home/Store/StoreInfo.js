@@ -961,6 +961,7 @@ class StoreInfo extends Component {
             }
             const params = {
               center: center,
+              show_select_city: false,
               keywords: this.state.dada_address,
               onBack: (res) => {
                 this.setAddress.bind(this)(res)
