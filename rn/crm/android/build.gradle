@@ -46,7 +46,8 @@ allprojects {
     project.configurations.all {
         resolutionStrategy {
             force 'com.google.zxing:core:3.3.3'
-
+            force 'com.facebook.react:react-native:0.63.4'
+            force 'androidx.tracing:tracing:1.0.0'
             eachDependency { details ->
                 if (details.requested.group == 'com.android.support') {
                     if (!requested.name.startsWith("multidex")) {
