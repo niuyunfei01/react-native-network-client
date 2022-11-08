@@ -1772,10 +1772,12 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  resetPicList = () => {
+  closePicList = () => {
     this.setState({searchPicVisible: false, searchPicText: '', picList: [], isSearchPicList: false})
   }
-
+  resetPicList = () => {
+    this.setState({searchPicText: '', picList: [], isSearchPicList: false})
+  }
   renderSearchPic = () => {
     const {searchPicVisible, picList, searchPicText} = this.state
     if (searchPicVisible)
@@ -1790,7 +1792,7 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'close'}
                          size={16}
                          style={{padding: 12}}
-                         onPress={this.resetPicList}
+                         onPress={this.closePicList}
                          color={colors.colorCCC}/>
             </View>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -1881,7 +1883,6 @@ class GoodsEditScene extends PureComponent {
   }
 
   searchPicList = (searchPicText) => {
-    console.log('searchPicList')
     showModal('加载中', 'loading', 6000, 1)
     const {vendor_id, accessToken} = this.props.global
     const {page, pageSize, picList} = this.state
