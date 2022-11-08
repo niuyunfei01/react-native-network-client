@@ -80,7 +80,7 @@ class Detail extends BaseComponent {
   }
 
   fetchData = (val) => {
-    showModal('加载中')
+
     const {productId, storeId} = this.props.route.params
     let {dateHtp, date_type} = this.state
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
@@ -110,6 +110,7 @@ class Detail extends BaseComponent {
       })
     }).catch(() => {
       hideModal()
+      this.setState({isLoading: false})
     })
   }
 
