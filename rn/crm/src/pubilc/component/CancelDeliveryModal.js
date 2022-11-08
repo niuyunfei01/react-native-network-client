@@ -39,17 +39,16 @@ class CancelDeliveryModal extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {order_id, show_modal} = nextProps;
+    const {order_id = 0, show_modal, accessToken = ''} = nextProps;
     if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal || this.state.loading) {
       return null;
     }
     this.state.loading = true;
-    this.getInfo()
+    this.getInfo(order_id, accessToken)
   }
 
-  getInfo = () => {
+  getInfo = (order_id, accessToken) => {
     showModal('请求中...')
-    let {order_id, accessToken} = this.props;
     const api = `/v4/wsb_delivery/preCancelDelivery`;
     HttpUtils.get.bind(this.props)(api, {
       order_id: order_id,
