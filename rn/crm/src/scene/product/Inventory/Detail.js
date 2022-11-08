@@ -95,7 +95,7 @@ class Detail extends BaseComponent {
       date_type: date_type
     }
     HttpUtils.get.bind(this.props)(uri, params).then(res => {
-      hideModal()
+
       const lists = (this.state.page === 1 ? [] : this.state.lists).concat(res.lists)
       const skus_arr = []
       skus_arr.push({id: '0', label: '全部规格'})
@@ -109,7 +109,7 @@ class Detail extends BaseComponent {
         rulesArray: skus_arr
       })
     }).catch(() => {
-      hideModal()
+
       this.setState({isLoading: false})
     })
   }
