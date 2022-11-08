@@ -67,7 +67,7 @@ dependencies {
     implementation(name: 'HiPushSdk-6.0.4.200', ext: 'aar')
     implementation(name: 'HiPushSdkCommon-6.0.4.200', ext: 'aar')
 
-    implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
+    implementation "com.facebook.react:react-native:0.63.4"
 
     implementation "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
 
