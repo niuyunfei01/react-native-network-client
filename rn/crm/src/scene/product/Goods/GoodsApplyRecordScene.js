@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import FastImage from "react-native-fast-image";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -9,9 +9,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import Cts from "../../../pubilc/common/Cts";
 import Config from "../../../pubilc/common/config";
 
-import {Dialog} from "../../../weui";
 import * as tool from "../../../pubilc/util/tool";
-import {Button1} from "../../common/component/All";
 //请求
 import {getWithTpl} from "../../../pubilc/util/common";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -19,6 +17,7 @@ import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -39,19 +38,13 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
-  buttons = [
-    {
-      type: "default",
-      label: "确定",
-      onPress: () => this.setState({dialog: false})
-    }
-  ]
+
 
   constructor(props) {
     super(props);
     const {is_service_mgr = false} = tool.vendor(this.props.global)
     this.state = {
-      audit_status: Cts.AUDIT_STATUS_WAIT,
+      auditStatus: Cts.AUDIT_STATUS_WAIT,
       list: [],
       query: true,
       pullLoading: false,
@@ -59,19 +52,16 @@ class GoodsApplyRecordScene extends Component {
       curr_page: 1,
       refresh: false,
       onSendingConfirm: true,
-      dialog: false,
       selectedItem: {},
       shouldShowModal: false,
       setPrice: '',
       isKf: is_service_mgr
     };
-    this.tab = this.tab.bind(this);
-    this.getApplyList = this.getApplyList.bind(this);
 
-    showModal('加载中')
+
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.initData()
   }
 
@@ -84,10 +74,10 @@ class GoodsApplyRecordScene extends Component {
     this.setState({viewStoreId: storeId, refresh: true}, () => this.getApplyList(1));
   }
 
-  tab(num) {
-    if (num != this.state.audit_status) {
+  tab = (num) => {
+    if (num !== this.state.auditStatus) {
       showModal('加载中')
-      this.setState({query: true, audit_status: num, list: [], refresh: true}, () => {
+      this.setState({query: true, auditStatus: num, list: [], refresh: true}, () => {
         this.getApplyList(1);
       });
     }
@@ -101,36 +91,23 @@ class GoodsApplyRecordScene extends Component {
     })
   }
 
-  tips(msg) {
-    this.setState({dialog: true, errMsg: msg});
-  }
-
-  getApplyList(page) {
-    let pullLoading = this.state.pullLoading;
+  getApplyList = (page) => {
+    let {pullLoading, auditStatus, viewStoreId, list, refresh} = this.state;
     if (pullLoading) {
       return false;
     }
     showModal('加载中')
-    let store_id = this.state.viewStoreId;
-    let audit_status = this.state.audit_status;
-    let token = this.props.global.accessToken;
+    let {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(
-      fetchApplyRocordList(store_id, audit_status, page, token, async resp => {
+      fetchApplyRocordList(viewStoreId, auditStatus, page, accessToken, async resp => {
         if (resp.ok) {
-          let {total_page, audit_list} = resp.obj;
-          let arrList;
-          if (this.state.refresh) {
-            arrList = audit_list;
-          } else {
-            arrList = this.state.list.concat(audit_list);
-          }
+          let {total_page, audit_list = []} = resp.obj;
           this.setState({
-            list: arrList,
+            list: refresh ? audit_list : list.concat(audit_list),
             total_page: total_page,
             curr_page: page
           });
-        } else {
         }
         hideModal()
         this.setState({pullLoading: false, refresh: false, query: false});
@@ -145,7 +122,7 @@ class GoodsApplyRecordScene extends Component {
           <Text style={[styles.title_text, {flex: 1}]}>图片</Text>
           <Text style={[styles.title_text, {flex: 3}]}>商品名称</Text>
           <Text style={[styles.title_text, {flex: 1}]}>原价</Text>
-          <Text style={[styles.title_text, {flex: 1}]}>调整价</Text>
+          <Text style={[styles.title_text, {flex: 1}]}>调价</Text>
         </View>
       );
     } else {
@@ -174,7 +151,7 @@ class GoodsApplyRecordScene extends Component {
           ToastLong("成功通过!");
           this.setState({
               query: true,
-              audit_status: Cts.AUDIT_STATUS_WAIT,
+              auditStatus: Cts.AUDIT_STATUS_WAIT,
               list: []
             },
             () => {
@@ -201,7 +178,7 @@ class GoodsApplyRecordScene extends Component {
           showModal('加载中')
           this.setState({
               query: true,
-              audit_status: Cts.AUDIT_STATUS_WAIT,
+              auditStatus: Cts.AUDIT_STATUS_WAIT,
               list: []
             },
             () => {
@@ -218,69 +195,60 @@ class GoodsApplyRecordScene extends Component {
     );
   }
 
-  renderItem = (item) => {
+  renderItem = ({item}) => {
     const {
       audit_status, auto_reject_time, product_id, store_id, apply_price, cover_img, product_name, created, before_price,
       audit_desc, remark, lower, upper, id
-    } = item.item
+    } = item
+    const {auditStatus, isKf} = this.state
     return (
       <View style={styles.listItemWrap}>
-        <TouchableOpacity onPress={() => this.jumpToGoodDetail(store_id, audit_status, product_id, apply_price)}>
-          <View>
-            <View style={[styles.item, {flexDirection: 'row',}]}>
-              <View style={[styles.center, styles.image, {flex: 1}]}>
-                <Image
-                  style={{height: pxToDp(90), width: pxToDp(90)}}
-                  source={{uri: cover_img}}
-                />
-              </View>
-              <View style={[styles.goods_name, {flex: 3}]}>
-                <View style={styles.name_text}>
-                  <Text numberOfLines={2}>{product_name} </Text>
-                </View>
-                <Text style={styles.name_time}>
-                  #{product_id} {tool.orderExpectTime(created)}
-                </Text>
-              </View>
-              <View style={[styles.center, styles.original_price, {flex: 1}]}>
-                <Text style={styles.price_text}>
-                  {(before_price / 100).toFixed(2)}
-                </Text>
-              </View>
-              <View style={[styles.center, {flex: 1}]}>
-                <Text style={styles.price_text}>
-                  {(apply_price / 100).toFixed(2)}
-                </Text>
-              </View>
-            </View>
+        <TouchableOpacity style={[styles.item, {flexDirection: 'row',}]}
+                          onPress={() => this.jumpToGoodDetail(store_id, audit_status, product_id, apply_price)}>
+          <FastImage style={{height: 56, width: 56, borderRadius: 5, flex: 1}}
+                     source={{uri: cover_img}}
+                     resizeMode={FastImage.resizeMode.contain}
+          />
+          <View style={{flex: 3}}>
+            <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
+              {/*<Text style={styles.shan}>闪</Text> <Text style={styles.huo}>活</Text> */}{product_name}
+            </Text>
+            <Text style={styles.name_time}>
+              #{product_id} {tool.orderExpectTime(created)}
+            </Text>
+          </View>
+          <View style={[styles.center, {flex: 1}]}>
+            <Text style={styles.price_text}>
+              {(before_price / 100).toFixed(2)}
+            </Text>
+          </View>
+          <View style={[styles.center, {flex: 1, flexDirection: 'row', alignItems: 'center'}]}>
+            <Text style={styles.price_text}>
+              {(apply_price / 100).toFixed(2)}
+            </Text>
+            {
+              parseFloat(apply_price / 100) >= parseFloat(before_price / 100) ?
+                <AntDesign name={'arrowup'} color={'#FF0000'}/> :
+                <AntDesign name={'arrowdown'} color={'#26B942'}/>
+            }
           </View>
         </TouchableOpacity>
-        <If condition={this.state.audit_status === Cts.AUDIT_STATUS_FAILED}>
-          <View>
-            <View style={{flexDirection: "row", flex: 1}}>
-              <View style={{marginLeft: 15}}>
-                <Text style={{color: colors.color666, fontSize: 12}}>理由：<Text
-                  style={{color: 'red'}}>{audit_desc === 'other' ? remark : audit_desc} </Text></Text>
-              </View>
-            </View>
-            <View style={{flexDirection: "row", margin: 5}}>
-              <View style={{flex: 4}}></View>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  alignContent: 'center',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: 5,
-                  backgroundColor: '#72AF73'
-                }}
-                onPress={() => this.openPriceAdjustmentModal(item.item)}>
-                <Text style={{color: 'white'}}>重新报价</Text>
-              </TouchableOpacity>
-            </View>
+        <If condition={auditStatus === Cts.AUDIT_STATUS_FAILED}>
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+            <Text style={{marginLeft: 15, color: colors.color999, fontSize: 12, width: '62%'}}>理由：
+              <Text style={{color: '#FF8309'}}>
+                {audit_desc === 'other' ? remark : audit_desc}
+              </Text>
+            </Text>
+            <TouchableOpacity style={{backgroundColor: '#E4FFE7', borderRadius: 15, marginRight: 12}}
+                              onPress={() => this.openPriceAdjustmentModal(item)}>
+              <Text style={{color: '#26B942', fontSize: 14, paddingVertical: 5, paddingHorizontal: 14}}>
+                重新报价
+              </Text>
+            </TouchableOpacity>
           </View>
         </If>
-        <If condition={this.state.isKf && this.state.audit_status === Cts.AUDIT_STATUS_WAIT}>
+        <If condition={isKf && auditStatus === Cts.AUDIT_STATUS_WAIT}>
           <View style={styles.statusWaitWrap}>
             <View style={{width: pxToDp(90), justifyContent: "center", alignItems: "center"}}>
               <Text style={[{backgroundColor: auto_reject_time ? "mediumseagreen" : "#fff"}, styles.controlStatus]}>
@@ -295,8 +263,18 @@ class GoodsApplyRecordScene extends Component {
             <If condition={lower <= 0}>
               <Text style={{width: pxToDp(240)}}>无参考价</Text>
             </If>
-            <Button1 t="通过" w={pxToDp(110)} h={pxToDp(60)} onPress={() => this.approvedPrice(id)} mgt={0}/>
-            <Button1 t="拒绝" w={pxToDp(110)} h={pxToDp(60)} mgt={0} onPress={() => this.refusePrice(id)}/>
+            <TouchableOpacity style={{backgroundColor: '#E4FFE7', borderRadius: 15}}
+                              onPress={() => this.approvedPrice(id)}>
+              <Text style={{color: '#26B942', fontSize: 14, paddingVertical: 5, paddingHorizontal: 20}}>
+                通过
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{backgroundColor: '#FFE4E0', borderRadius: 15}}
+                              onPress={() => this.refusePrice(id)}>
+              <Text style={{color: '#FF2200', fontSize: 14, paddingVertical: 5, paddingHorizontal: 20}}>
+                拒绝
+              </Text>
+            </TouchableOpacity>
           </View>
         </If>
       </View>
@@ -310,11 +288,9 @@ class GoodsApplyRecordScene extends Component {
         style={{flex: 1}}
         data={this.state.list}
         renderItem={this.renderItem}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.2}
+        initialNumToRender={9}
         onEndReached={this.onEndReached}
-        ListFooterComponent={() => {
-          return <View/>;
-        }}
         ListEmptyComponent={this.renderEmpty()}
         refreshing={false}
         onRefresh={this.onRefresh}
@@ -353,24 +329,27 @@ class GoodsApplyRecordScene extends Component {
   }
 
   render() {
-    const {audit_status, dialog, shouldShowModal, selectedItem, errMsg} = this.state
+    const {auditStatus, shouldShowModal, selectedItem} = this.state
     return (
       <View style={{flex: 1}}>
         <View style={styles.tab}>
-          <TouchableOpacity onPress={() => this.tab(Cts.AUDIT_STATUS_WAIT)}>
-            <Text style={audit_status === Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
+          <TouchableOpacity style={auditStatus === Cts.AUDIT_STATUS_WAIT ? styles.activeWrap : {}}
+                            onPress={() => this.tab(Cts.AUDIT_STATUS_WAIT)}>
+            <Text style={auditStatus === Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
               审核中
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => this.tab(Cts.AUDIT_STATUS_PASSED)}>
-            <Text style={audit_status === Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
+          <TouchableOpacity style={auditStatus === Cts.AUDIT_STATUS_PASSED ? styles.activeWrap : {}}
+                            onPress={() => this.tab(Cts.AUDIT_STATUS_PASSED)}>
+            <Text style={auditStatus === Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
               已审核
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => this.tab(Cts.AUDIT_STATUS_FAILED)}>
-            <Text style={audit_status === Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
+          <TouchableOpacity style={auditStatus === Cts.AUDIT_STATUS_FAILED ? styles.activeWrap : {}}
+                            onPress={() => this.tab(Cts.AUDIT_STATUS_FAILED)}>
+            <Text style={auditStatus === Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
               未通过
             </Text>
           </TouchableOpacity>
@@ -390,9 +369,6 @@ class GoodsApplyRecordScene extends Component {
                               onClose={this.onClose}
                               applyingPrice={Number(selectedItem.apply_price)} spId={0}/>
         </If>
-        <Dialog visible={dialog} buttons={this.buttons}>
-          <Text>{errMsg} </Text>
-        </Dialog>
       </View>
     );
   }
@@ -434,57 +410,48 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
   listItemWrap: {
-    borderBottomWidth: pxToDp(1),
-    borderBottomColor: '#e0e0e0',
+    paddingLeft: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e5e5e5',
     backgroundColor: colors.white
   },
   tab: {
-    paddingHorizontal: pxToDp(30),
     backgroundColor: colors.white,
-    height: pxToDp(90),
     flexDirection: "row",
     justifyContent: "space-around"
   },
   fontStyle: {
-    fontSize: pxToDp(28),
-    marginTop: pxToDp(20),
-    color: '#b2b2b2'
+    fontSize: 14,
+    paddingVertical: 10,
+    color: colors.color666
   },
+  activeWrap: {borderBottomColor: '#26B942', borderBottomWidth: 2},
   active: {
     color: '#58C587',
-    fontSize: pxToDp(28),
-    marginTop: pxToDp(20),
-    borderBottomWidth: pxToDp(3),
-    borderBottomColor: '#58C587',
-    paddingBottom: pxToDp(20)
+    fontSize: 14,
+    fontWeight: '500',
+    paddingVertical: 10
   },
   title: {
-    height: pxToDp(55),
-    paddingHorizontal: pxToDp(30),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderBottomWidth: pxToDp(1),
-    borderBottomColor: '#e0e0e0'
   },
   title_text: {
-    fontSize: pxToDp(24),
-    width: pxToDp(90),
+    paddingVertical: 8,
+    fontSize: 12,
+    color: colors.color999,
     textAlign: "center"
   },
   item: {
-    paddingHorizontal: pxToDp(30),
-    // height: pxToDp(140),
-    paddingVertical: pxToDp(15),
     flexDirection: "row",
     justifyContent: "space-between",
-
     alignItems: "center"
   },
   center: {
     justifyContent: "center",
     alignItems: "center",
-    height: pxToDp(100)
   },
   image: {
     width: pxToDp(90),
@@ -492,25 +459,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center"
   },
-  goods_name: {
-    width: pxToDp(240),
-    height: pxToDp(100)
-  },
-  original_price: {},
-  price: {
-    width: pxToDp(120)
-  },
+
   price_text: {
-    color: "#ff0000",
-    fontSize: pxToDp(30)
+    fontWeight: '500',
+    color: colors.color333,
+    fontSize: 13
   },
+  shan: {fontSize: 11, color: colors.color333, backgroundColor: '#FFD225', borderRadius: 2, padding: 2},
+  huo: {fontSize: 11, color: colors.white, backgroundColor: '#FF8309', borderRadius: 2, padding: 2},
   name_text: {
-    width: "100%",
-    minHeight: pxToDp(70)
+    height: 36,
+    fontSize: 13,
+    color: '#1A1614',
   },
   name_time: {
-    fontSize: pxToDp(18),
-    color: '#b2b2b2'
+    fontSize: 11,
+    color: colors.color999
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsApplyRecordScene)

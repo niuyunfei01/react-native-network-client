@@ -30,7 +30,8 @@ interface GridViewProps extends ScrollViewProps {
     renderItem: (item: any, index?: number) => JSX.Element
     renderLockedItem?: (item: any, index?: number) => JSX.Element
     locked?: (item: any, index?: number) => boolean
-    onBeginDragging?: () => void
+    onBeginDragging?: (item: any, index?: number) => void
+    onEndDragging?: (item: any, index?: number) => void
     onPressCell?: (item: any, index?: number) => void
     onReleaseCell?: (data: any[]) => void
     onEndAddAnimation?: (item: any) => void
@@ -87,12 +88,14 @@ const GridView = memo((props: GridViewProps) => {
         renderLockedItem,
         locked,
         onBeginDragging,
+        onEndDragging,
         onPressCell,
         onReleaseCell,
         onEndAddAnimation,
         onEndDeleteAnimation,
         ...rest
     } = props
+
     const numColumns = rest.numColumns || 1
     const top = rest.containerMargin?.top || 0
     const bottom = rest.containerMargin?.bottom || 0
@@ -320,7 +323,7 @@ const GridView = memo((props: GridViewProps) => {
             self.startPoint = position
             self.startPointOffset = 0
             setSelectedItem(self.items[index])
-            onBeginDragging && onBeginDragging()
+            onEndDragging && onEndDragging(item, index)
         },
         [onBeginDragging]
     )
@@ -462,6 +465,7 @@ const GridView = memo((props: GridViewProps) => {
         },
         [selectedItem, renderLockedItem, renderItem]
     )
+    onUpdateGrid()
     return (
         <ScrollView
             {...rest}
@@ -484,6 +488,7 @@ const GridView = memo((props: GridViewProps) => {
  * @param j
  */
 const swap = (array: any[], i: number, j: number) =>
-    array.splice(j, 1, array.splice(i, 1, array[j])[0])
+    [array[i], array[j]] = [array[j], array[i]]
+// array.splice(j, 1, array.splice(i, 1, array[j])[0])
 
 export default GridView

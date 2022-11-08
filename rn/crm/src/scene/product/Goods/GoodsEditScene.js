@@ -104,6 +104,7 @@ class GoodsEditScene extends PureComponent {
       searchPicVisible: false,
       selectPicType: true,//true-添加图片 false-替换图片
       picList: [],
+      isSearchPicList: false,
       searchPicText: '',
       page: 1,
       pageSize: 12,
@@ -1118,44 +1119,45 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'right'} style={styles.rightEmptyView} color={colors.colorCCC} size={16}/>
             </TouchableOpacity>
             <LineView/>
-          </If>
-          <View style={styles.baseRowCenterWrap}>
-            <Text style={styles.leftText}>
-              商品分类
-              <Text style={styles.leftFlag}>
-                *
+            <View style={styles.baseRowCenterWrap}>
+              <Text style={styles.leftText}>
+                商品分类
+                <Text style={styles.leftFlag}>
+                  *
+                </Text>
               </Text>
-            </Text>
-            {/*<TouchableOpacity style={styles.textInputStyle}*/}
-            {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
-            {/*  <Text style={styles.selectTipText}>*/}
-            {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
-            {/*  </Text>*/}
+              {/*<TouchableOpacity style={styles.textInputStyle}*/}
+              {/*                  onPress={() => this.setSelectHeaderText('商品分类', false)}>*/}
+              {/*  <Text style={styles.selectTipText}>*/}
+              {/*    {store_categories_obj.name_path ?? '请选择分类'}*/}
+              {/*  </Text>*/}
 
-            {/*</TouchableOpacity>*/}
-            {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
-            <View style={styles.textInputStyle}>
-              <SectionedMultiSelect
-                items={store_tags || []}
-                IconRenderer={MaterialIcons}
-                uniqueKey="id"
-                subKey="children"
-                selectText="请选择分类"
-                showDropDowns={true}
-                readOnlyHeadings={true}
-                onSelectedItemsChange={this.onSelectedItemsChange}
-                selectChildren={true}
-                highlightChildren={true}
-                selectedItems={store_categories}
-                selectedText={"个已选中"}
-                searchPlaceholderText='搜索门店分类'
-                confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
+              {/*</TouchableOpacity>*/}
+              {/*<MaterialIcons name={'chevron-right'} style={styles.rightEmptyView} color={colors.colorCCC} size={26}/>*/}
+              <View style={styles.textInputStyle}>
+                <SectionedMultiSelect
+                  items={store_tags || []}
+                  IconRenderer={MaterialIcons}
+                  uniqueKey="id"
+                  subKey="children"
+                  selectText="请选择分类"
+                  showDropDowns={true}
+                  readOnlyHeadings={true}
+                  onSelectedItemsChange={this.onSelectedItemsChange}
+                  selectChildren={true}
+                  highlightChildren={true}
+                  selectedItems={store_categories}
+                  selectedText={"个已选中"}
+                  searchPlaceholderText='搜索门店分类'
+                  confirmText={tool.length(store_categories) > 0 ? '确定' : '关闭'}
 
-                colors={{primary: colors.main_color}}
-              />
+                  colors={{primary: colors.main_color}}
+                />
+              </View>
             </View>
-          </View>
-          <LineView/>
+            <LineView/>
+          </If>
+
           <If condition={allow_multi_spec === 1 && 'add' === type && allow_switch_multi}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
@@ -1707,12 +1709,13 @@ class GoodsEditScene extends PureComponent {
                       renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
                       locked={item => '' === item}
                       onReleaseCell={this.onReleaseCell}
+                      onEndDragging={(item, index) => this.onEndDragging(item, index)}
                       onPressCell={(item, index) => this.onPressCell(item, index)}
                       keyExtractor={(item) => item.id}
                       delayLongPress={100}
                       renderItem={(item, index) => this.renderModalItem(item, index)}/>
             <View style={styles.modifyPicBtnWrap}>
-              <If condition={selectPreviewPic.index !== 0}>
+              <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
                 <TouchableOpacity onPress={this.setMainPic}
                                   style={[{backgroundColor: colors.main_color}, styles.modifyPicBtn]}>
                   <Text style={styles.modifyPicBtnText}>
@@ -1720,7 +1723,7 @@ class GoodsEditScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
               </If>
-              <If condition={!vendor_has && !store_has}>
+              <If condition={!vendor_has && !store_has && upload_files.length > 0}>
                 <TouchableOpacity style={[{backgroundColor: colors.colorCCC}, styles.modifyPicBtn]}
                                   onPress={() => this.setState({showImgMenus: true, selectPicType: false})}>
                   <Text style={styles.modifyPicBtnText}>
@@ -1750,6 +1753,13 @@ class GoodsEditScene extends PureComponent {
       )
   }
 
+  onEndDragging = (item, index) => {
+    if (item)
+      this.setState({
+        selectPreviewPic: {url: item.url, index: index, key: item.id}
+      })
+  }
+
   onPressCell = (item, index) => {
     this.setState({selectPreviewPic: {url: item.url, index: index, key: item.id}})
   }
@@ -1761,6 +1771,11 @@ class GoodsEditScene extends PureComponent {
       this.setState({upload_files: list_img1})
     }
   }
+
+  resetPicList = () => {
+    this.setState({searchPicVisible: false, searchPicText: '', picList: [], isSearchPicList: false})
+  }
+
   renderSearchPic = () => {
     const {searchPicVisible, picList, searchPicText} = this.state
     if (searchPicVisible)
@@ -1775,7 +1790,7 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'close'}
                          size={16}
                          style={{padding: 12}}
-                         onPress={() => this.setState({searchPicVisible: false, searchPicText: '', picList: []})}
+                         onPress={this.resetPicList}
                          color={colors.colorCCC}/>
             </View>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -1819,8 +1834,8 @@ class GoodsEditScene extends PureComponent {
   }
 
   ListEmptyComponent = () => {
-    const {searchPicText, picList} = this.state
-    if (searchPicText && picList.length === 0)
+    const {searchPicText, picList, isSearchPicList} = this.state
+    if (searchPicText && isSearchPicList && picList.length === 0)
       return (
         <Text style={styles.noResultText}>
           无匹配结果，请重新输入关键字
@@ -1856,10 +1871,17 @@ class GoodsEditScene extends PureComponent {
   }
   setSearchPicText = (value) => {
     this.setState({searchPicText: value})
-
+    if (!value) {
+      this.resetPicList()
+      return
+    }
+    tool.debounces(() => {
+      Keyboard.dismiss()
+    }, 200)
   }
 
   searchPicList = (searchPicText) => {
+    console.log('searchPicList')
     showModal('加载中', 'loading', 6000, 1)
     const {vendor_id, accessToken} = this.props.global
     const {page, pageSize, picList} = this.state
@@ -1889,11 +1911,11 @@ class GoodsEditScene extends PureComponent {
         showError('返回的结果有问题', 1)
         this.setState({isLoadingPic: false})
       }
-      Keyboard.dismiss()
     }).catch(() => {
       showError('返回的结果有问题', 1)
       this.setState({isLoadingPic: false})
     })
+    Keyboard.dismiss()
   }
 
   modifyPic = (item) => {
