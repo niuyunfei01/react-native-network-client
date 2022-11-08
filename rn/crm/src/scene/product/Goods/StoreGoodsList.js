@@ -436,7 +436,7 @@ class StoreGoodsList extends Component {
     const {isLastPage} = this.state
     if (isLastPage)
       return (
-        <Text style={{color: colors.color999, fontSize: 12, textAlign: 'center', paddingVertical: 8}}>
+        <Text style={{color: colors.color999, fontSize: 14, textAlign: 'center', paddingVertical: 8}}>
           已经到底了~
         </Text>
       )
