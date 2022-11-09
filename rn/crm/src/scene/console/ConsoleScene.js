@@ -7,18 +7,6 @@ import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
 import {format} from "../../pubilc/util/TimeUtil";
 
-const BUTTON_LIST = [
-  {
-    title: '拣货任务',
-    iconName: 'list-alt',
-    routeName: config.ROUTE_CONSOLE_STOCKING_TASKS
-  },
-  {
-    title: '员工打卡',
-    iconName: 'check-square',
-    routeName: Config.ROUTE_CONSOLE_SIGN_IN
-  }
-]
 
 class ConsoleScene extends PureComponent {
 
@@ -26,28 +14,37 @@ class ConsoleScene extends PureComponent {
     sigInInfo: {
       sign_status: 0,
       records: []
-    }
+    },
+    BUTTON_LIST: []
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   componentDidMount() {
-    this.handleSignInIcon()
+    this.focus = this.props.navigation.addListener('focus', () => this.handleSignInIcon())
     this.getLogList(format(new Date()))
   }
 
   handleSignInIcon = () => {
-    const {global} = this.props
-    let show_sign_center = global?.show_sign_center;
-    const signInIndex = BUTTON_LIST.findIndex(item => item.title === '员工打卡')
-    if (show_sign_center && signInIndex === -1) {
+    const BUTTON_LIST = []
+    const {store_info = {}} = this.props.global
+    const {fn_allot_order = '0', fn_stall = '0'} = store_info
+    if (fn_allot_order === '1')
       BUTTON_LIST.push({
         title: '员工打卡',
         iconName: 'check-square',
         routeName: Config.ROUTE_CONSOLE_SIGN_IN
       })
-      return
-    }
-    if (show_sign_center === false && signInIndex !== -1)
-      BUTTON_LIST.splice(signInIndex, 1)
+    if (fn_stall === '1')
+      BUTTON_LIST.push({
+        title: '拣货任务',
+        iconName: 'list-alt',
+        routeName: config.ROUTE_CONSOLE_STOCKING_TASKS
+      })
+
+    this.setState({BUTTON_LIST: BUTTON_LIST})
   }
 
   getLogList = (start_day) => {
@@ -69,6 +66,7 @@ class ConsoleScene extends PureComponent {
   }
 
   render() {
+    const {BUTTON_LIST} = this.state
     return (
       <View style={styles.page}>
         <View style={styles.card}>
@@ -77,7 +75,7 @@ class ConsoleScene extends PureComponent {
           </Text>
           <View style={styles.buttonArrayWrap}>
             {
-              BUTTON_LIST.map((button, index) => {
+              BUTTON_LIST && BUTTON_LIST.map((button, index) => {
                 return (
                   <TouchableOpacity style={styles.buttonStyle}
                                     onPress={() => this.onPress(button.routeName)}
