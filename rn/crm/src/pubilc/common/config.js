@@ -162,6 +162,7 @@ const C = {
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
+  ROUTE_SETTLEMENT_PLATFORM: 'SettlementPlatform',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',
