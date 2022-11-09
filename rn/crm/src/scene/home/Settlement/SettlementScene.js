@@ -234,6 +234,8 @@ class SettlementScene extends PureComponent {
           </Text>
         </View>
         <FlatList data={list}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}

@@ -295,6 +295,8 @@ class StockingTasks extends PureComponent {
   renderList = (isLoading, stockList) => {
     return (
       <FlatList data={stockList}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 style={{marginBottom: 10}}
                 onEndReachedThreshold={0.1}
                 onEndReached={this.onEndReached}

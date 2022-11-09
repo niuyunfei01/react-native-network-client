@@ -127,6 +127,8 @@ class SearchOrder extends PureComponent {
       <>
         {this.renderHeader()}
         <FlatList data={orderList}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={(item) => this.renderItem(item)}
                   initialNumToRender={2}
                   onRefresh={this.onRefresh}

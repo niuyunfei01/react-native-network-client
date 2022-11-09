@@ -131,6 +131,8 @@ class StoreList extends PureComponent {
           data={store_list}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           refreshing={loading}
           initialNumToRender={5}
           onEndReachedThreshold={0.3}

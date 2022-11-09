@@ -393,6 +393,8 @@ class NewRetailPriceScene extends React.PureComponent {
         </View>
         <LineView/>
         <FlatList data={skus}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   keyExtractor={(item, index) => `${index}`}
                   initialNumToRender={5}

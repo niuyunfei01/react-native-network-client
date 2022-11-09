@@ -675,6 +675,8 @@ class StallDetailScene extends PureComponent {
 
     return (
       <FlatList data={stallInfo[selectType]}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 ItemSeparatorComponent={this.ItemSeparatorComponent}
                 renderItem={(item) => this.renderItem(item)}
                 keyExtractor={(item, index) => `${index}`}

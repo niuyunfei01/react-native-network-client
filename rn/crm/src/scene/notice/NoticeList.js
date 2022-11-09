@@ -299,6 +299,8 @@ class NoticeList extends React.PureComponent {
           data={list}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onTouchStart={(e) => {
             this.pageX = e.nativeEvent.pageX;
             this.pageY = e.nativeEvent.pageY;

@@ -286,6 +286,8 @@ class OrderSearchScene extends PureComponent {
           </Text>
         </If>
         <FlatList data={orderList}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={(item) => this.renderItem(item, global, navigation)}
                   initialNumToRender={2}
                   onRefresh={this.onRefresh}

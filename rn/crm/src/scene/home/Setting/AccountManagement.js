@@ -136,6 +136,8 @@ class PermissionToIdentify extends PureComponent {
     return (
       <FlatList
         data={workerList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         renderItem={this.renderWorkerItem}
         onRefresh={this.onRefresh}
         onEndReachedThreshold={0.1}

@@ -361,6 +361,8 @@ class SearchShop extends Component {
       }}>
         <FlatList
           data={list}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           legacyImplementation={false}
           directionalLockEnabled={true}
           refreshing={loading}

@@ -593,6 +593,8 @@ class OrderAllScene extends Component {
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onTouchStart={(e) => this.onTouchStart(e)}
           onEndReachedThreshold={0.3}
           onEndReached={this.onEndReached}

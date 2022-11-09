@@ -310,6 +310,8 @@ class StoreGoodsSearch extends Component {
     if (goods.length > 0)
       return (
         <FlatList data={goods}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderRow}
                   getItemLayout={this._getItemLayout}
                   initialNumToRender={10}

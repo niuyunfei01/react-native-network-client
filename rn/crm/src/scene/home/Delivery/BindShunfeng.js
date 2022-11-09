@@ -161,7 +161,9 @@ class BindShunfeng extends PureComponent {
         <Text style={styles.title}>
           {CONTENT.title}
         </Text>
-        <FlatList data={res.bind_way}
+        <FlatList data={res?.bind_way || []}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   keyExtractor={(item) => item.way}
                   initialNumToRender={3}

@@ -158,6 +158,8 @@ class Detail extends BaseComponent {
     let {isLoading, lists} = this.state
     return (
       <FlatList data={lists}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 style={{marginBottom: 10}}
                 onEndReachedThreshold={0.1}
                 onEndReached={this.onEndReached}

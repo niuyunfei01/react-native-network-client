@@ -342,6 +342,8 @@ class SignInScene extends PureComponent {
           </Text>
         </View>
         <FlatList data={sigInInfo.records}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   initialNumToRender={5}
                   style={styles.flex1}
