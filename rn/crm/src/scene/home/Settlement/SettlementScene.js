@@ -49,7 +49,7 @@ class SettlementScene extends PureComponent {
     super(props);
     let date = new Date();
     this.state = {
-      list: {},
+      list: [],
       orderNum: 0,
       totalPrice: 0,
       status: 0,
