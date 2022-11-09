@@ -1182,7 +1182,7 @@ class OrderTransferThird extends Component {
                 商品重量
               </Text>
 
-              <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+              <SvgXml onPress={this.closeModal} xml={cross_icon()} />
 
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

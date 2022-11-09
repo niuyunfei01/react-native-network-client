@@ -108,7 +108,6 @@
 		<string>audio</string>
 		<string>bluetooth-central</string>
 		<string>fetch</string>
-		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

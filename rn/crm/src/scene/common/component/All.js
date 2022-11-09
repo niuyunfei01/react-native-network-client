@@ -363,9 +363,8 @@ class NavigationItem1 extends PureComponent {
   render() {
 
     const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, ...others} = this.props;
-    let _icon = this.props.icon &&
-      <Image style={[styles.icon, iconStyle]} source={icon}/>
-
+    let _icon = this.props.icon ? this.props.icon : null;
+    // <Image style={[styles.icon, iconStyle]} source={icon}/>
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title} </Text>
     return (

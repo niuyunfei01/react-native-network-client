@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {Alert, Dimensions, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Dimensions, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -17,7 +17,6 @@ import {MixpanelInstance} from "../../pubilc/util/analytics";
 import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
-import Clipboard from '@react-native-community/clipboard'
 import DatePicker from 'react-native-date-picker'
 import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
@@ -385,6 +384,7 @@ class OrderSettingScene extends Component {
               cancelText={'取消'}
               title={'期望送达时间'}
               modal
+              textColor={colors.color666}
               open={showDateModal}
               date={new Date()}
               minimumDate={new Date()}
@@ -746,7 +746,7 @@ class OrderSettingScene extends Component {
               物品重量
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -823,7 +823,7 @@ class OrderSettingScene extends Component {
               物品价值
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -921,7 +921,7 @@ class OrderSettingScene extends Component {
               使用复制的收件信息？
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
           </View>
 
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -997,7 +997,7 @@ class OrderSettingScene extends Component {
               备注
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()} />
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea

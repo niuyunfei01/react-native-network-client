@@ -64,7 +64,7 @@ class SearchProduct extends Component {
 
   renderHeader() {
     return (
-      <View style={{height: 45, borderBottomColor: '#eee', borderBottomWidth: 1}}>
+      <View style={{height: 45, borderBottomColor: '#eee', borderBottomWidth: 1, marginTop: 40}}>
         <SearchInputNavigation
           onSearch={(text) => this.searchWithKeyword(text)}
           onBack={() => this.props.onCancel && this.props.onCancel()}
@@ -98,7 +98,7 @@ class SearchProduct extends Component {
       name: this.state.text ? this.state.text : '',
       storeId: storeId
     }
-    HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
       let goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)

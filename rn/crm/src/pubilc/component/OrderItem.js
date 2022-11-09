@@ -93,11 +93,6 @@ class OrderItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship = 0) => {
-    if (if_reship === 0) {
-      this.mixpanel.track('V4订单列表_下配送单')
-    } else {
-      this.mixpanel.track('V4订单列表_追加配送')
-    }
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
@@ -235,7 +230,7 @@ class OrderItem extends React.PureComponent {
     return (
       <BottomModal
         visible={verification_modal}
-        modal_type={'bottom'}
+        onClose={this.closeModal}
         onPress={this.goVeriFicationToShop}
         title={'自提订单核销'}
         actionText={'确定'}
@@ -244,7 +239,7 @@ class OrderItem extends React.PureComponent {
           borderRadius: 24,
           length: 48,
         }}
-        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}
+        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
         onPressClose={() => this.closeModal()}>
         <TextInput placeholder={"请输入核销码"}
                    onChangeText={(pickupCode) => {
@@ -252,7 +247,15 @@ class OrderItem extends React.PureComponent {
                    }}
                    value={pickupCode}
                    placeholderTextColor={colors.color999}
-                   style={styles.veriFicationInput}
+                   style={{
+                     color: colors.color333,
+                     borderBottomWidth: 0.5,
+                     borderBottomColor: colors.color999,
+                     fontSize: 16,
+                     height: 45,
+                     borderRadius: 5,
+                     marginVertical: 20,
+                   }}
                    underlineColorAndroid="transparent"/>
       </BottomModal>
     )
@@ -285,7 +288,7 @@ class OrderItem extends React.PureComponent {
 
         <FastImage source={{uri: item.platformIcon}}
                    resizeMode={FastImage.resizeMode.contain}
-               style={styles.platformIcon}/>
+                   style={styles.platformIcon}/>
         <View style={{flex: 1, marginLeft: 10}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{
@@ -331,7 +334,14 @@ class OrderItem extends React.PureComponent {
 
   renderVerificationBtn = () => {
     return (
-      <View style={styles.btnContent}>
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderTopWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
         <Button title={'门店核销'}
                 onPress={() => {
                   this.mixpanel.track('V4订单列表_到店核销')
@@ -339,7 +349,10 @@ class OrderItem extends React.PureComponent {
                     verification_modal: true,
                   })
                 }}
-                buttonStyle={styles.veriFicationBtn}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.main_color,
+                  width: width * 0.8,
+                }]}
                 titleStyle={{color: colors.white, fontSize: 16}}
         />
       </View>
@@ -471,7 +484,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -487,7 +500,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -503,7 +516,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -522,7 +535,7 @@ class OrderItem extends React.PureComponent {
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
-                    borderWidth: 0.2,
+                    borderWidth: 0.5,
                     width: width * btn_width,
                   }]}
                   titleStyle={{color: colors.color666, fontSize: 16}}
@@ -533,7 +546,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
-                    this.mixpanel.track('订单列表页_呼叫配送')
+                    this.mixpanel.track('V4订单列表_下配送单')
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
@@ -546,7 +559,8 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery_again}>
           <Button title={'追加配送'}
                   onPress={() => {
-                    this.onCallThirdShips(item.id, item.store_id, 1)
+                    this.mixpanel.track('V4订单列表_追加配送')
+                    this.onCallThirdShips(item.id, item.store_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,

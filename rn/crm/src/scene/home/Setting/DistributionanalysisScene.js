@@ -194,7 +194,7 @@ class DistributionAnalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime =  new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
+        startTime = new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
@@ -454,7 +454,6 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   showDatePicker = () => {
-    const colorScheme = Appearance.getColorScheme();
     return <View>
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
         let self = this
@@ -477,12 +476,11 @@ class DistributionAnalysisScene extends PureComponent {
       </TouchableOpacity>
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'
-        backdropStyleIOS={
-          {backdrop: colorScheme === 'dark' ? colors.back_color : colors.white}
-        }
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
           let d = new Date(value)

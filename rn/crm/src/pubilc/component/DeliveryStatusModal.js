@@ -6,7 +6,7 @@ import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
@@ -20,9 +20,7 @@ const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
   copyText: {
     fontSize: 12,
-    fontWeight: '400',
     color: colors.main_color,
-    padding: 10
   },
   QrTitle: {
     flexDirection: 'row',
@@ -119,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     color: colors.color666,
-    marginTop: 6
+    marginTop: 4
   },
   deliveryStatusBtnWhite: {
     height: 42,
@@ -192,18 +190,17 @@ class deliveryStatusModal extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {accessToken, order_id, show_modal, order_status} = nextProps;
-    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal) {
+    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal || this.state.show_modal) {
       return null;
     }
-    showModal('请求中...')
-    tool.debounces(() => {
-      this.getInfo(accessToken, order_id, order_status)
-    })
+    this.state.show_modal = true
+    this.getInfo(accessToken, order_id, order_status)
+
   }
 
   getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
-    const params = {access_token: accessToken, order_id: order_id,order_status: order_status}
+    const params = {access_token: accessToken, order_id: order_id, order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         delivery_list: res?.do_list,
@@ -213,13 +210,10 @@ class deliveryStatusModal extends React.Component {
         btn_list: res?.btn_list,
         driver_phone: res?.driver_phone,
         complaint_rider_delivery_id: res?.complaint_rider_delivery_id,
-        show_modal: true
-      }, hideModal)
+      })
     }, () => {
-      hideModal()
       this.closeModal()
-    }).catch(()=>{
-      hideModal()
+    }).catch(() => {
       this.closeModal()
     })
   }
@@ -228,6 +222,10 @@ class deliveryStatusModal extends React.Component {
     this.setState({
       show_modal: false,
       delivery_list: [],
+      order_platform_desc: '',
+      platform_dayId: '',
+      expect_time_desc: '',
+      driver_phone: '',
     }, () => {
       this.props.onClose();
     })
@@ -279,6 +277,9 @@ class deliveryStatusModal extends React.Component {
 
   render = () => {
     let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc} = this.state;
+    if (!show_modal) {
+      return null;
+    }
     return (
 
       <Modal hardwareAccelerated={true}
@@ -310,7 +311,7 @@ class deliveryStatusModal extends React.Component {
                     <Text style={styles.expectTime}>{expect_time_desc} </Text>
                   </View>
                 </View>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}
@@ -373,7 +374,7 @@ class deliveryStatusModal extends React.Component {
                 style={[styles.platform, log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
               <View style={styles.descInfo}>
                 <If condition={tool.length(log?.log_desc) > 0}>
-                  <Text style={styles.desc}>{log?.log_desc} </Text>
+                  <Text style={styles.desc}>{tool.jbbsubstr(log?.log_desc, 24)} </Text>
                 </If>
                 <If condition={tool.length(log?.log_right_btn) > 0}>
                   <Text onPress={() => {
@@ -381,7 +382,7 @@ class deliveryStatusModal extends React.Component {
                   }} style={styles.copyText}>{log?.log_right_btn} </Text>
                 </If>
               </View>
-              <Text style={[styles.platform, {marginTop: 6}]}>{log?.log_call_time} </Text>
+              <Text style={[styles.platform, {marginTop: 4}]}>{log?.log_call_time} </Text>
             </View>
           </View>
         </View>
