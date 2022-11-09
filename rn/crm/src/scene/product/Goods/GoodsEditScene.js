@@ -1119,6 +1119,9 @@ class GoodsEditScene extends PureComponent {
               <AntDesign name={'right'} style={styles.rightEmptyView} color={colors.colorCCC} size={16}/>
             </TouchableOpacity>
             <LineView/>
+
+          </If>
+          <If condition={!vendor_has && !store_has}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品分类
@@ -1157,7 +1160,6 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-
           <If condition={allow_multi_spec === 1 && 'add' === type && allow_switch_multi}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
