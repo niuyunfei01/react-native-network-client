@@ -13,40 +13,41 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderActions";
+import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
-import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker} from "react-native-amap3d/lib/src/index";
 import tool from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
-import {Button} from "react-native-elements";
-import pxToDp from "../../pubilc/util/pxToDp";
-import native from "../../pubilc/util/native";
-import numeral from "numeral";
-import Clipboard from "@react-native-community/clipboard";
+import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
 import Config from "../../pubilc/common/config";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
-import PropTypes from "prop-types";
-import BleManager from "react-native-ble-manager";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderActions";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Tips from "../common/component/Tips";
+import {call, cross_icon} from "../../svg/svg";
+
+import numeral from "numeral";
+import {SvgXml} from "react-native-svg";
+import FastImage from "react-native-fast-image";
+import {Button} from "react-native-elements";
+import native from "../../pubilc/util/native";
+import QRCode from "react-native-qrcode-svg";
+import Clipboard from "@react-native-community/clipboard";
+import BleManager from "react-native-ble-manager";
 import OrderReminds from "../../pubilc/component/OrderReminds";
 import {ActionSheet} from "../../weui";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import {markTaskDone} from "../../reducers/remind/remindActions";
+
 import JbbModal from "../../pubilc/component/JbbModal";
-import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
-import FastImage from "react-native-fast-image";
-import {SvgXml} from "react-native-svg";
-import {call, cross_icon} from "../../svg/svg";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import PropTypes from "prop-types";
 
 const {width, height} = Dimensions.get("window")
 
@@ -102,7 +103,6 @@ class OrderInfoNew extends PureComponent {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.mixpanel = MixpanelInstance;
-
     this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
@@ -133,7 +133,6 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       showQrcode: false,
       show_delivery_modal: false,
-
       toastContext: '',
       add_tip_id: 0,
       show_add_tip_modal: false,
@@ -141,7 +140,6 @@ class OrderInfoNew extends PureComponent {
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false
     }
-    this.map_height = 290
   }
 
   componentDidMount = () => {
@@ -250,10 +248,13 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
-  fetchOrder = () => {
-    showModal('加载中')
+  fetchOrder = (show_loading = 0) => {
+    if (show_loading !== 1) {
+      showModal('加载中')
+    }
     let {orderId, isFetching} = this.state
     if (!orderId || isFetching) {
+      hideModal()
       return false;
     }
     this.setState({
@@ -261,6 +262,7 @@ class OrderInfoNew extends PureComponent {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    this.fetchShipData()
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       hideModal()
@@ -284,17 +286,16 @@ class OrderInfoNew extends PureComponent {
           this.setState({reminds: data})
         }
       }));
-      this.fetchShipData()
       this.logOrderViewed();
       this.fetchThirdWays()
     }, ((res) => {
       hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
-      ToastLong('操作失败：' + res.reason)
+      ToastShort('操作失败：' + res.reason)
       this.setState({isFetching: false})
     })).catch((e) => {
       hideModal()
-      ToastLong('操作失败：' + e.desc)
+      ToastShort('操作失败：' + e.desc)
       this.setState({isFetching: false})
     })
   }
@@ -325,7 +326,7 @@ class OrderInfoNew extends PureComponent {
         this.handleTimeObj(url, res.executeStatus, res.startTime, res.endTime, 'logOrderViewed', res.endTime - res.startTime)
       }).catch((res) => {
         this.handleTimeObj(url, res.executeStatus, res.startTime, res.endTime, 'logOrderViewed', res.endTime - res.startTime)
-        ToastLong("记录订单访问次数错误！");
+        ToastShort("记录订单访问次数错误！");
       })
     }
   }
@@ -369,7 +370,7 @@ class OrderInfoNew extends PureComponent {
 
   copyToClipboard = (val) => {
     Clipboard.setString(val)
-    ToastLong('复制成功')
+    ToastShort('复制成功')
   }
 
   onPrint = (printer_sn) => {
@@ -395,7 +396,7 @@ class OrderInfoNew extends PureComponent {
       if (ok) {
         ToastShort("已发送到打印机");
       } else {
-        ToastLong('打印失败：' + msg)
+        ToastShort('打印失败：' + msg)
       }
       this._hidePrinterChooser();
     }))
@@ -464,6 +465,7 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
+      showQrcode: false,
     })
   }
 
@@ -491,21 +493,18 @@ class OrderInfoNew extends PureComponent {
         this.setState({onSubmitting: true});
         showModal('处理中')
         dispatch(markTaskDone(accessToken, remind.id, Cts.TASK_STATUS_DONE, (ok, msg,) => {
-          const state = {onSubmitting: false};
           hideModal()
+          this.setState({onSubmitting: false});
+          ToastShort(ok ? '已处理' : msg);
           if (ok) {
-            showSuccess('已处理');
             setTimeout(() => {
               remind.status = Cts.TASK_STATUS_DONE;
             }, 2000);
-          } else {
-            ToastLong(msg)
           }
-          this.setState(state);
         }));
         break
       default:
-        ToastLong('暂不支持该处理类型')
+        ToastShort('暂不支持该处理类型')
         break
     }
   }
@@ -516,11 +515,6 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
-  closeQrCodeModal = () => {
-    this.setState({
-      showQrcode: false
-    })
-  }
 
   deliveryModalFlag = () => {
     let {order} = this.state;
@@ -530,9 +524,6 @@ class OrderInfoNew extends PureComponent {
     }
   }
 
-  closeDeliveryModal = () => {
-    this.setState({show_delivery_modal: false})
-  }
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
@@ -551,7 +542,7 @@ class OrderInfoNew extends PureComponent {
 
   callSelfAgain = () => {
     let {order} = this.state
-    this.setState({show_delivery_modal: false})
+    this.closeModal()
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
@@ -562,8 +553,11 @@ class OrderInfoNew extends PureComponent {
       text: '确定', onPress: () => {
         const api = `/api/batch_cancel_third_ship/${id}?access_token=${accessToken}`;
         HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          ToastShort(res.desc);
+          GlobalUtil.setOrderFresh(1)
+          ToastShort(res?.desc);
           this.fetchOrder()
+        }, (e) => {
+          ToastShort(e?.desc)
         }).catch(() => {
           ToastShort("此订单已有骑手接单，取消失败")
         })
@@ -576,11 +570,16 @@ class OrderInfoNew extends PureComponent {
     let {order} = this.state;
     const api = `/api/complete_order/${order?.id}?access_token=${accessToken}`
     HttpUtils.get(api).then(() => {
-      ToastLong('配送已完成')
+      ToastShort('配送已完成')
+      GlobalUtil.setOrderFresh(1)
       this.closeModal();
-      this.fetchOrder()
-    }).catch(() => {
-      showError('配送完成失败，请稍后重试')
+      this.fetchOrder(1);
+    }, (e) => {
+      this.closeModal();
+      ToastShort(e?.desc)
+    }).catch((e) => {
+      this.closeModal();
+      ToastShort(e?.desc)
     })
   }
 
@@ -620,7 +619,7 @@ class OrderInfoNew extends PureComponent {
     } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
 
     return (
-      <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
+      <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: 290}}>
         <MapView
           zoomGesturesEnabled={true}
           scrollGesturesEnabled={true}
@@ -1250,12 +1249,12 @@ class OrderInfoNew extends PureComponent {
   renderQrCode = () => {
     let {showQrcode, order} = this.state;
     return (
-      <JbbModal visible={showQrcode} onClose={this.closeQrCodeModal} modal_type={'center'}>
+      <JbbModal visible={showQrcode} onClose={this.closeModal} modal_type={'center'}>
         <View style={styles.QrBox}>
           <View style={styles.QrTitle}>
             <Text style={styles.QrDesc}>查看取货码</Text>
 
-            <SvgXml onPress={this.closeQrCodeModal} xml={cross_icon()}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={styles.QrImg}>
@@ -1289,7 +1288,7 @@ class OrderInfoNew extends PureComponent {
         openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
         accessToken={accessToken}
         show_modal={show_delivery_modal}
-        onClose={this.closeDeliveryModal}
+        onClose={this.closeModal}
       />
     )
   }
@@ -1330,7 +1329,7 @@ class OrderInfoNew extends PureComponent {
     }
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder.bind(this)}/>
 
         <If condition={loadingImg}>
           {this.renderNoInfo()}
@@ -1533,13 +1532,13 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: 11
   },
-  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: pxToDp(5)},
+  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: 2.5},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
     padding: 12,
-    paddingRight: pxToDp(12)
+    paddingRight: 6
   },
   cardTitle: {
     fontSize: 14,
@@ -1566,7 +1565,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.color666,
     fontWeight: '400',
-    marginBottom: pxToDp(10)
+    marginBottom: 5
   },
   cardTitleAddress: {
     fontSize: 12,
@@ -1578,7 +1577,7 @@ const styles = StyleSheet.create({
   },
   cuttingLine: {
     backgroundColor: colors.e5,
-    height: pxToDp(0.5),
+    height: 0.2,
     width: width * 0.86,
     marginLeft: width * 0.03
   },
@@ -1588,7 +1587,7 @@ const styles = StyleSheet.create({
     width: width * 0.86,
     marginVertical: 10
   },
-  productInfo: {flexDirection: "row", marginVertical: pxToDp(15)},
+  productInfo: {flexDirection: "row", marginVertical: 7.5},
   productImage: {
     width: 60,
     height: 60,
@@ -1598,7 +1597,7 @@ const styles = StyleSheet.create({
   remarkValue: {fontSize: 12, fontWeight: '400', color: colors.color333},
   productItem: {
     flexDirection: "column",
-    marginLeft: pxToDp(10)
+    marginLeft: 5
   },
   productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614', width: width * 0.7},
   productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
@@ -1619,7 +1618,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#FF8309',
     textAlign: 'center',
-    marginRight: pxToDp(10)
+    marginRight: 5
   },
   priceWai: {
     width: 15,
@@ -1631,7 +1630,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#26B942',
     textAlign: "center",
-    marginRight: pxToDp(10)
+    marginRight: 5
   },
   price: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
   productNum: {fontWeight: '400', fontSize: 12, color: colors.color666},
@@ -1639,7 +1638,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: pxToDp(10)
+    marginVertical: 5
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
@@ -1655,7 +1654,7 @@ const styles = StyleSheet.create({
   QrBox: {marginBottom: 20, padding: 12, flexDirection: "column"},
   QrTitle: {flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 20},
   QrDesc: {fontSize: 17, fontWeight: 'bold', color: colors.color333},
-  QrClose: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
+  QrClose: {backgroundColor: "#fff", fontSize: 22, color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
   QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
   ItemHeader: {
