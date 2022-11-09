@@ -15,4 +15,7 @@ mv android/app/src/main/assets/index.android.bundle.hbc android/app/src/main/ass
 
 rm -rf android/app/src/main/assets/index.android.bundle.hbc.map
 
+npx react-native bundle --platform ios --dev false --entry-file index.ios.js \
+	--bundle-output ios/main.jsbundle \
+	--assets-dest ios
 cd ..;
