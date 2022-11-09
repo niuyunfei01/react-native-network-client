@@ -90,7 +90,7 @@ class Detail extends BaseComponent {
       storeId,
       page: val ? 1 : this.state.page,
       date: dateHtp,
-      sku_id: val ? val.id : '',
+      sku_id: val ? val.id : 0,
       pageSize: 20,
       date_type: date_type
     }
@@ -115,11 +115,21 @@ class Detail extends BaseComponent {
   }
 
   onRefresh = () => {
-    this.setState({page: 1}, () => this.fetchData())
+    this.setState({
+      page: 1,
+      rules: {
+        sku_id: 0,
+        sku_name: '全部规格'
+      }
+    }, () => this.fetchData())
   }
 
   onConfirmDate = (date) => {
-    this.setState({dateHtp: dayjs(date).format('YYYY-MM'), date: date}, () => {
+    this.setState({
+      dateHtp: dayjs(date).format('YYYY-MM'),
+      date: date,
+      start_day: dayjs(date).format('YYYY-MM')
+      }, () => {
       this.navigationOptions()
       this.setState({page: 1}, () => this.fetchData())
     })
@@ -140,7 +150,14 @@ class Detail extends BaseComponent {
     return (
       <View style={Styles.selectHeader}>
         <View style={Styles.selectHeaderContent}>
-          <ModalSelector onChange={value => this.fetchData(value)}
+          <ModalSelector onChange={value => {
+            this.setState({
+              rules: {
+                sku_id: value.id,
+                sku_name: value.label
+              }
+            }, () => this.fetchData(value))
+          }}
                          data={rulesArray}
                          skin="customer"
                          defaultKey={-999}>

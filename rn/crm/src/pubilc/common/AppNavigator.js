@@ -215,7 +215,7 @@ const Page = (props) => {
 
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../../scene/order/OrderEditStoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} options={{headerTitle: '撤回呼叫'}}
+        <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} options={{headerTitle: '取消配送'}}
                       getComponent={() => require("../../scene/order/OrderCancelShip").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} options={{headerTitle: '发红包'}}
