@@ -34,6 +34,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 // import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
@@ -332,8 +333,13 @@ class OrderCallDelivery extends Component {
     if (isLoading) {
       return ToastShort("请刷新页面重试")
     }
+
+    GlobalUtil.setOrderFresh(1)
     if (worker_delivery_id > 0) {
       return this.onWorkerDelivery();
+    }
+    if (tool.length(logistic_fee_map) <= 0) {
+      return ToastShort("请选择配送方式")
     }
     tool.debounces(() => {
       let params = {

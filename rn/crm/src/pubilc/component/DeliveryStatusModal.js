@@ -6,7 +6,7 @@ import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
-import {hideModal, showModal, ToastLong, ToastShort} from "../util/ToastUtils";
+import {ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import Config from "../common/config";
 import Clipboard from "@react-native-community/clipboard";
@@ -410,6 +410,7 @@ class deliveryStatusModal extends React.Component {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_取消配送')
+                    this.closeModal()
                     this.props.openCancelDeliveryModal(order_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
@@ -506,6 +507,7 @@ class deliveryStatusModal extends React.Component {
           <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_完成配送')
+                    this.closeModal();
                     this.props.openFinishDeliveryModal(order_id)
                   }}
                   buttonStyle={[styles.modalBtn, {
