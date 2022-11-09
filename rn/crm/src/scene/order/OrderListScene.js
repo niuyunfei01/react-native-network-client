@@ -1,13 +1,9 @@
 import React, {Component} from 'react'
 import {
   Alert,
-  DeviceEventEmitter,
   Dimensions,
   FlatList,
   InteractionManager,
-  NativeEventEmitter,
-  NativeModules,
-  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -18,22 +14,16 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import DeviceInfo from "react-native-device-info";
 import PropTypes from "prop-types";
-import dayjs from "dayjs";
-import {downloadApk} from "rn-app-upgrade";
-import {AMapSdk} from "react-native-amap3d";
 import ModalDropdown from "react-native-modal-dropdown";
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getConfig, setAccessToken, setCheckVersionAt, setUserCfg} from '../../reducers/global/globalActions'
-import {setDeviceInfo} from "../../reducers/device/deviceActions";
+import {getConfig, setUserCfg} from '../../reducers/global/globalActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
-import native from "../../pubilc/util/native";
 import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -41,20 +31,16 @@ import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
-import store from "../../pubilc/util/configureStore";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../pubilc/util/TimeUtil";
-import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
-import {setNoLoginInfo} from "../../pubilc/common/noLoginInfo";
-import {doJPushSetAlias, initJPush, sendDeviceStatus} from "../../pubilc/component/jpushManage";
 import JbbModal from "../../pubilc/component/JbbModal";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../../pubilc/util/ble/handleBlueTooth";
 import AlertModal from "../../pubilc/component/AlertModal";
+import {doJPushSetAlias} from "../../pubilc/component/jpushManage";
 
 const {width} = Dimensions.get("window");
 
@@ -106,7 +92,7 @@ const initState = {
   show_add_tip_modal: false,
   show_delivery_modal: false,
   show_cancel_delivery_modal: false,
-  show_finish_delivery_modal: false,
+  show_finish_delivery_modal: false
 };
 const timeObj = {
   deviceInfo: {},
@@ -137,94 +123,23 @@ class OrderListScene extends Component {
     GlobalUtil.setOrderFresh(1)
   }
 
-  calcAppStartTime = () => {
-    native.getStartAppTime((flag, startAppTime) => {
-      if (flag) {
-        const startAppEndTime = dayjs().valueOf()
-        const duration = startAppEndTime - parseInt(startAppTime)
-        if (global.isLoginToOrderList)
-          return
-        const {currStoreId, currentUser} = this.props.global
-
-        nrRecordMetric("start_app_end_time", {
-          startAppTimeDuration: duration,
-          store_id: currStoreId,
-          user_id: currentUser
-        })
-      }
-    }).then()
-  }
-
-  printByBluetoothIOS = () => {
-    const {global} = this.props
-    let {accessToken} = global;
-    const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-    this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-      if (obj.order_type !== 'new_order') {
-        sendDeviceStatus(accessToken, {...obj, btConnected: '收到极光推送，不是新订单不需要打印'})
-        return
-      }
-      await handlePrintOrder(this.props, obj)
-    })
-  }
-
-
-  printByBluetoothAndroid = () => {
-    this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-      await handlePrintOrder(this.props, obj)
-
-    })
-  }
-
-  printByBluetooth = () => {
-    switch (Platform.OS) {
-      case "ios":
-        this.printByBluetoothIOS()
-        break
-      case "android":
-        this.printByBluetoothAndroid()
-        break
-    }
-  }
 
   componentWillUnmount() {
+
     this.focus()
-    this.unSubscribe()
-    this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
-    this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
-    unInitBlueTooth()
   }
 
-
   componentDidMount() {
-    initJPush()
-    this.whiteNoLoginInfo()
+
     this.getVendor()
     const {global, navigation, device} = this.props
-    if (Platform.OS === 'android') {
-      native.xunfeiIdentily().then()
-      this.calcAppStartTime()
-    }
+
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken, lastCheckVersion = 0} = global;
-
-    initBlueTooth(global).then(() => this.printByBluetooth())
-
-    doJPushSetAlias(currentUser);
-
-    const currentTs = dayjs(new Date()).unix();
-    if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
-      store.dispatch(setCheckVersionAt(currentTs))
-      this.checkVersion();
-    }
-
-    GlobalUtil.getDeviceInfo().then(deviceInfo => {
-      store.dispatch(setDeviceInfo(deviceInfo))
-    })
+    const {currStoreId, currentUser, accessToken} = global;
 
 
     const {deviceInfo} = device
@@ -239,97 +154,8 @@ class OrderListScene extends Component {
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
-
-
-    AMapSdk.init(
-      Platform.select({
-        android: "1d669aafc6970cb991f9baf252bcdb66",
-        ios: "48148de470831f4155abda953888a487",
-      })
-    );
-  }
-
-  whiteNoLoginInfo = () => {
-    this.unSubscribe = store.subscribe(() => {
-      this.handleNoLoginInfo(store.getState().global)
-    })
-  }
-
-  handleNoLoginInfo = (reduxGlobal) => {
-    const {co_type} = tool.vendor(reduxGlobal)
-    if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
-      return;
-    }
-    if (reduxGlobal.store_id === 0)
-      return;
-    if (reduxGlobal.vendor_id === 0)
-      return;
-    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
-      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
-      reduxGlobal.store_id === global.noLoginInfo.store_id &&
-      reduxGlobal.host === global.noLoginInfo.host &&
-      co_type === global.noLoginInfo.co_type &&
-      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
-      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
-      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
-
-    if (flag) {
-      return
-    }
-    const noLoginInfo = {
-      accessToken: reduxGlobal.accessToken,
-      currentUser: reduxGlobal.currentUser,
-      currStoreId: reduxGlobal.store_id,
-      host: reduxGlobal.host || Config.defaultHost,
-      co_type: co_type,
-      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
-      currVendorId: reduxGlobal.vendor_id,
-      printer_id: reduxGlobal.printer_id || '0',
-      show_bottom_tab: reduxGlobal.show_bottom_tab,
-      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
-      refreshToken: reduxGlobal.refreshToken,
-      expireTs: reduxGlobal.expireTs,
-      getTokenTs: reduxGlobal.getTokenTs,
-      user_config: reduxGlobal.user_config,
-      // call_delivery_list: reduxGlobal.call_delivery_list,
-      //default_order_info: reduxGlobal.default_order_info,
-    }
-    global.noLoginInfo = noLoginInfo
-    setNoLoginInfo(JSON.stringify(noLoginInfo))
-    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
-      this.refreshAccessToken(reduxGlobal.refreshToken)
-  }
-
-  refreshAccessToken = (refreshToken) => {
-    const url = `/v4/WsbUser/refreshToken`
-    const params = {refresh_token: refreshToken}
-    const {dispatch} = this.props
-    HttpUtils.post(url, params).then(res => {
-      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
-      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
-    })
-  }
-
-  checkVersion = () => {
-    HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
-      if (res.yes) {
-        Alert.alert('新版本提示', res.desc, [
-          {text: '稍等再说', style: 'cancel'},
-          {
-            text: '现在更新',
-            style: 'default',
-            onPress: () => {
-              downloadApk({
-                interval: 250, // listen to upload progress event, emit every 666ms
-                apkUrl: res.download_url,
-                downloadInstall: true
-              }).then();
-            }
-          },
-        ])
-      }
-    })
+    //防止退出登录，重新登录不推送的问题
+    doJPushSetAlias(currentUser)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -358,30 +184,6 @@ class OrderListScene extends Component {
         this.setState({
           show_bind_button: tool.length(res.business_status) <= 0,
         })
-      })
-      api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(api).then(res => {
-        if (res.sum < 0) {
-          Alert.alert('提醒', '余额不足请充值', [
-            {
-              text: '取消'
-            },
-            {
-              text: '去充值',
-              onPress: () => {
-                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-                  onBack: () => {
-                    Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
-                      {
-                        text: '确定'
-                      }
-                    ])
-                  }
-                });
-              }
-            }
-          ])
-        }
       })
     }
 
@@ -701,7 +503,7 @@ class OrderListScene extends Component {
               订单排序
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -756,11 +558,10 @@ class OrderListScene extends Component {
       const {accessToken} = global;
       dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
         if (ok) {
-          // tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          //   initTab: Config.ROUTE_ORDERS,
-          //   initialRouteName: Config.ROUTE_ALERT
-          // });
-          this.onRefresh()
+          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+            initTab: Config.ROUTE_ORDERS,
+            initialRouteName: Config.ROUTE_ALERT
+          });
           hideModal()
         } else {
           ToastLong(msg);

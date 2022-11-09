@@ -1,5 +1,14 @@
 import React, {PureComponent} from 'react'
-import {FlatList, InteractionManager, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Appearance,
+  FlatList,
+  InteractionManager,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../pubilc/util/pxToDp';
@@ -10,7 +19,7 @@ import colors from "../../pubilc/styles/colors";
 import tool from "../../pubilc/util/tool";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
-import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import {SearchBar} from "../../weui";
@@ -352,6 +361,8 @@ class OrderQueryResultScene extends PureComponent {
         <View style={styles.rowWrap}>
           <DateTimePicker
             cancelTextIOS={'取消'}
+            headerTextIOS={'选择日期'}
+            isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
             confirmTextIOS={'确定'}
             customHeaderIOS={() => {
               return (<View/>)

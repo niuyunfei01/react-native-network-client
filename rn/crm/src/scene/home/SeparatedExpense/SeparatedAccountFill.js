@@ -223,7 +223,7 @@ class SeparatedAccountFill extends PureComponent {
 
   onReadProtocol = () => {
     const {navigation} = this.props;
-    navigation.navigate(Config.ROUTE_WEB, {url: "https://preview.waisongbang.com/RechargeTerm.html"});
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://www.waisongbang.com/RechargeTerm.html"});
   }
 
   render() {

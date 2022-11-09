@@ -1,13 +1,30 @@
-import React, {useRef} from "react";
+import React, {useRef, PureComponent} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Dimensions} from "react-native";
-//import LoginScene from "../../scene/common/Login/LoginScene";
+import {Alert, Dimensions, Platform} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../reducers/global/globalActions";
+import store from "../util/configureStore";
+import tool from "../util/tool";
+import {setNoLoginInfo} from "./noLoginInfo";
+import dayjs from "dayjs";
+import HttpUtils from "../util/http";
+import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
+import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
+import {nrRecordMetric} from "../util/NewRelicRN";
+import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
+import GlobalUtil from "../util/GlobalUtil";
+import {setDeviceInfo} from "../../reducers/device/deviceActions";
+import {AMapSdk} from "react-native-amap3d";
+import DeviceInfo from "react-native-device-info";
+import {downloadApk} from "rn-app-upgrade";
+import JPush from "jpush-react-native";
 
 let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
@@ -29,17 +46,26 @@ const screenOptions = ({
   showIcon: true
 })
 
-export const AppNavigator = (props) => {
+function mapStateToProps(state) {
+  const {global, device} = state;
+  return {global: global, device: device}
+}
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      ...globalActions
+    }, dispatch)
+  }
+}
 
+const Page = (props) => {
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
   return (
     <NavigationContainer ref={navigationRef}
-                         onReady={() =>
-                           (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
-                         }
+                         onReady={() => routeNameRef.current = navigationRef.current.getCurrentRoute().name}
                          onStateChange={async () => {
                            const previousRouteName = routeNameRef.current;
                            const currentRouteName = navigationRef.current.getCurrentRoute().name;
@@ -52,9 +78,7 @@ export const AppNavigator = (props) => {
                            // Save the current route name for later comparison
                            routeNameRef.current = currentRouteName;
                          }}>
-      <Stack.Navigator
-        initialRouteName={initialRouteName}
-        screenOptions={screenOptions}>
+      <Stack.Navigator initialRouteName={initialRouteName} screenOptions={screenOptions}>
         <Stack.Screen name="Tab"
                       options={{headerShown: false}}
                       initialParams={initialRouteParams}
@@ -519,6 +543,241 @@ export const AppNavigator = (props) => {
     </NavigationContainer>
   );
 }
+let notInit = true
+
+class AppNavigator extends PureComponent {
+
+  checkVersion = () => {
+    HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+      if (res.yes) {
+        Alert.alert('新版本提示', res.desc, [
+          {text: '稍等再说', style: 'cancel'},
+          {
+            text: '现在更新',
+            style: 'default',
+            onPress: async () => {
+              await downloadApk({
+                interval: 250, // listen to upload progress event, emit every 666ms
+                apkUrl: res.download_url,
+                downloadInstall: true
+              })
+            }
+          },
+        ])
+      }
+    })
+  }
+
+  handleNoLoginInfo = (reduxGlobal) => {
+    const {co_type} = tool.vendor(reduxGlobal)
+    if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+      return;
+    }
+    if (reduxGlobal.store_id === 0)
+      return;
+    if (reduxGlobal.vendor_id === 0)
+      return;
+    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
+      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
+      reduxGlobal.store_id === global.noLoginInfo.store_id &&
+      reduxGlobal.host === global.noLoginInfo.host &&
+      co_type === global.noLoginInfo.co_type &&
+      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
+      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
+      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
+      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
+
+    if (flag) {
+      return
+    }
+    const noLoginInfo = {
+      accessToken: reduxGlobal.accessToken,
+      currentUser: reduxGlobal.currentUser,
+      currStoreId: reduxGlobal.store_id,
+      host: reduxGlobal.host || Config.defaultHost,
+      co_type: co_type,
+      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
+      currVendorId: reduxGlobal.vendor_id,
+      printer_id: reduxGlobal.printer_id || '0',
+      show_bottom_tab: reduxGlobal.show_bottom_tab,
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
+      refreshToken: reduxGlobal.refreshToken,
+      expireTs: reduxGlobal.expireTs,
+      getTokenTs: reduxGlobal.getTokenTs,
+      user_config: reduxGlobal.user_config,
+      // call_delivery_list: reduxGlobal.call_delivery_list,
+      //default_order_info: reduxGlobal.default_order_info,
+    }
+    global.noLoginInfo = noLoginInfo
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
+    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
+      this.refreshAccessToken(reduxGlobal.refreshToken)
+  }
+
+  refreshAccessToken = (refreshToken) => {
+    const url = `/v4/WsbUser/refreshToken`
+    const params = {refresh_token: refreshToken}
+    const {dispatch} = this.props
+    HttpUtils.post(url, params).then(res => {
+      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
+    })
+  }
+  initJPush = () => {
+
+    JPush.setLoggerEnable(false)
+    JPush.init()
+    JPush.addConnectEventListener(({connectEnable}) => {
+      //console.log("connectEnable:" + connectEnable)
+      if (connectEnable)
+        doJPushSetAlias(currentUser);
+    })
+
+    // JPush.getRegistrationID(({registerID}) => {
+    //     console.log("registerID:" + JSON.stringify(registerID))
+    //   }
+    // )
+    const {accessToken, autoBluetoothPrint, currentUser, currStoreId} = this.props.global
+    //tag alias事件回调
+    JPush.addTagAliasListener(({code}) => {
+      //console.log("tagAliasListener:" + code)
+      if (code) {
+        doJPushSetAlias(currentUser)
+      }
+    });
+    //通知回调
+
+    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
+      // console.log("notificationListener,extras:" + JSON.stringify(extras))
+      // console.log("notificationListener,notificationEventType:" + notificationEventType)
+      const {type, order_id} = extras
+      if ('notificationArrived' === notificationEventType) {
+        if (type !== 'new_order') {
+          sendDeviceStatus(accessToken, {
+            msgId: messageID,
+            listener_stores: currStoreId,
+            orderId: order_id,
+            btConnected: '收到极光推送，不是新订单不需要打印',
+            auto_print: autoBluetoothPrint
+          })
+          return
+        }
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: currStoreId})
+      }
+      if ('notificationOpened' === notificationEventType) {
+        JPush.setBadge({appBadge: 0, badge: 0})
+      }
+    });
+  }
+
+  whiteNoLoginInfo = () => {
+    this.unSubscribe = store.subscribe(async () => {
+      const {global} = store.getState()
+      this.handleNoLoginInfo(global)
+      const {accessToken, lastCheckVersion = 0} = global;
+      //如果登录了，才可以进行后续的初始化，并且只初始化一次
+      if (accessToken && notInit) {
+        notInit = false
+        this.initJPush()
+        if (Platform.OS === 'android') {
+          await native.xunfeiIdentily()
+          await this.calcAppStartTime()
+        }
+        await initBlueTooth(global)
+
+        const currentTs = dayjs().valueOf()
+        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+          store.dispatch(setCheckVersionAt(currentTs))
+          this.checkVersion();
+        }
+
+        GlobalUtil.getDeviceInfo().then(deviceInfo => store.dispatch(setDeviceInfo(deviceInfo)))
+
+        AMapSdk.init(
+          Platform.select({
+            android: "1d669aafc6970cb991f9baf252bcdb66",
+            ios: "48148de470831f4155abda953888a487",
+          })
+        );
+      }
+    })
+  }
+
+  componentDidMount() {
+    this.whiteNoLoginInfo()
+  }
+
+  componentWillUnmount() {
+    this.unSubscribe()
+    //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
+    //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
+    unInitBlueTooth()
+  }
 
 
-export default AppNavigator;
+  calcAppStartTime = async () => {
+    await native.getStartAppTime((flag, startAppTime) => {
+      if (flag) {
+        const startAppEndTime = dayjs().valueOf()
+        const duration = startAppEndTime - parseInt(startAppTime)
+        if (global.isLoginToOrderList)
+          return
+        const {currStoreId, currentUser} = this.props.global
+
+        nrRecordMetric("start_app_end_time", {
+          startAppTimeDuration: duration,
+          store_id: currStoreId,
+          user_id: currentUser
+        })
+      }
+    })
+  }
+
+  // printByBluetoothIOS = () => {
+  //   const {global} = this.props
+  //   let {accessToken, autoBluetoothPrint} = global;
+  //   //const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
+  //   // this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+  //   //   if (obj.order_type !== 'new_order') {
+  //   //     sendDeviceStatus(accessToken, {
+  //   //       ...obj,
+  //   //       btConnected: '收到极光推送，不是新订单不需要打印',
+  //   //       auto_print: autoBluetoothPrint
+  //   //     })
+  //   //     return
+  //   //   }
+  //   //   await handlePrintOrder(this.props, obj)
+  //   // })
+  // }
+
+
+  // printByBluetoothAndroid = () => {
+  //   this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
+  //     await handlePrintOrder(this.props, obj)
+  //
+  //   })
+  // }
+
+  // printByBluetooth = () => {
+  //   switch (Platform.OS) {
+  //     case "ios":
+  //       this.printByBluetoothIOS()
+  //       break
+  //     case "android":
+  //       this.printByBluetoothAndroid()
+  //       break
+  //   }
+  // }
+
+
+  render() {
+    const {initialRouteName, initialRouteParams} = this.props;
+    return (
+      <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+    );
+  }
+
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppNavigator);

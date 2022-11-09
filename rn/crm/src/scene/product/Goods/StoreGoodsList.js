@@ -59,7 +59,7 @@ class StoreGoodsList extends Component {
       ],
       showStatusList: [],
       showMoreGoodsStatus: false,
-      pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
+      pageNum: 20,
       categories: [],
       isLoading: false,
       loadingCategory: true,
@@ -225,18 +225,19 @@ class StoreGoodsList extends Component {
       params.pid = selectedProduct.id
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
+      const {lists = [], isLastPage = false} = res
       if (isRefreshItem) {
         const index = goods.findIndex(item => item.id === selectedProduct.id)
-        if (Array.isArray(res.lists) && res.lists.length > 0)
-          goods[index] = res.lists[0]
-        this.setState({goods: goods, isLastPage: res.isLastPage, isLoading: false})
+        if (Array.isArray(lists) && lists.length > 0)
+          goods[index] = lists[0]
+        this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
         return
       }
-      const goodList = setList === 1 ? res.lists : goods.concat(res.lists)
+      const goodList = setList === 1 ? lists : goods.concat(lists)
 
       this.setState({
         goods: goodList,
-        isLastPage: res.isLastPage,
+        isLastPage: isLastPage,
         isLoading: false
       })
     }, (res) => {
@@ -273,7 +274,7 @@ class StoreGoodsList extends Component {
   onLoadMore = () => {
     let {page, isLastPage} = this.state
     if (isLastPage) {
-      ToastShort("暂无更多数据")
+      // ToastShort("暂无更多数据")
       return;
     }
 
@@ -431,6 +432,15 @@ class StoreGoodsList extends Component {
                onScanFail={code => this.onScanFail(code)}/>
     )
   }
+  listFooterComponent = () => {
+    const {isLastPage} = this.state
+    if (isLastPage)
+      return (
+        <Text style={{color: colors.color999, fontSize: 14, textAlign: 'center', paddingVertical: 8}}>
+          已经到底了~
+        </Text>
+      )
+  }
 
   render() {
 
@@ -451,19 +461,21 @@ class StoreGoodsList extends Component {
             </View>
             <FlatList
               data={goods}
+              style={{flex: 1}}
               legacyImplementation={false}
               directionalLockEnabled={true}
-              onEndReachedThreshold={0.1}
+              onEndReachedThreshold={0.5}
               onEndReached={this.onEndReached}
               onMomentumScrollBegin={this.onMomentumScrollBegin}
               onTouchMove={(e) => this.onTouchMove(e)}
               renderItem={this.renderItem}
               onRefresh={this.onRefresh}
-              refreshing={isLoading}
+              refreshing={false}
               keyExtractor={this._keyExtractor}
               shouldItemUpdate={this._shouldItemUpdate}
               getItemLayout={this._getItemLayout}
               initialNumToRender={5}
+              ListFooterComponent={this.listFooterComponent()}
             />
 
           </View>
@@ -763,17 +775,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     height: 48,
     borderTopColor: colors.colorEEE,
-    borderTopWidth: 1
+    borderTopWidth: 1,
+    backgroundColor: colors.white
   },
   bottomButton: {alignItems: 'center', justifyContent: 'center'},
   bottomButtonText: {fontSize: 10, paddingTop: 7},
   HeaderWrap: {
-    flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, marginTop: 10
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, backgroundColor: colors.white
   },
   HeaderInputWrap: {
     flex: 9, flexDirection: 'row', alignItems: 'center', borderRadius: 17, backgroundColor: '#f7f7f7'
   },
-  page: {flex: 1, backgroundColor: colors.white},
+  page: {flex: 1},
   headerGoodsStatusWrap: {
     flexDirection: 'row',
     alignItems: 'center',

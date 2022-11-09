@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
 import pxToDp from "../util/pxToDp";
-import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import {Button} from "react-native-elements";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -81,13 +80,13 @@ class BottomModal extends React.Component {
       <Modal hardwareAccelerated={true} onRequestClose={onClose} transparent={true} visible={visible}>
         <TouchableOpacity style={styles.modalWrap} onPress={onClose}>
           <TouchableHighlight style={styles.contentWrap}>
-            <KeyboardAwareScrollView style={{paddingBottom: 3}} enableOnAndroid={false}>
+            <KeyboardAwareScrollView style={{paddingBottom: 3}} scrollEnabled={false} enableOnAndroid={false}>
               <View style={styles.keyboardWrap}>
                 <Text style={styles.title}>
                   {this.props.title}
                 </Text>
                 <TouchableOpacity style={styles.closeWrap} onPress={onClose}>
-                  <SvgXml xml={cross_icon()} width={18} height={18}/>
+                  <SvgXml xml={cross_icon()}/>
                 </TouchableOpacity>
               </View>
               <View style={{paddingHorizontal: 10}}>

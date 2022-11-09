@@ -4,7 +4,7 @@ import {Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity
 import colors from "../styles/colors";
 import HttpUtils from "../util/http";
 import tool from "../util/tool";
-import {hideModal, showModal, ToastShort} from "../util/ToastUtils";
+import {ToastShort} from "../util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import numeral from "numeral";
 import Config from "../common/config";
@@ -35,18 +35,16 @@ class GoodsListModal extends React.Component {
     is_fn_price_controlled: false,
     is_fn_show_wm_price: false,
     is_fn_total_price: false,
-    count: false,
+    count: '',
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {accessToken, order_id, show_goods_list} = nextProps;
-    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_goods_list) {
+    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_goods_list || this.state.show_goods_list_modal) {
       return null;
     }
-    showModal('请求中...')
-    tool.debounces(() => {
-      this.getOrderGoodsList(accessToken, order_id)
-    }, 300)
+    this.state.show_goods_list_modal = true
+    this.getOrderGoodsList(accessToken, order_id)
   }
 
   getOrderGoodsList = (accessToken, order_id) => {
@@ -63,10 +61,8 @@ class GoodsListModal extends React.Component {
         is_fn_price_controlled: res?.is_fn_price_controlled,
         is_fn_total_price: res?.is_fn_total_price,
         count: res?.count,
-        show_goods_list_modal: true
-      }, hideModal)
+      })
     }, () => {
-      hideModal()
       this.closeModal()
     })
   }
@@ -75,6 +71,7 @@ class GoodsListModal extends React.Component {
     this.setState({
       show_goods_list_modal: false,
       goods_list: [],
+      count: '',
     }, () => {
       this.props.setState({
         show_goods_list: false,
@@ -86,8 +83,15 @@ class GoodsListModal extends React.Component {
 
   render(): React.ReactNode {
     let {currStoreId, onPress} = this.props;
-    let {show_goods_list_modal, goods_list, count, is_fn_show_wm_price, is_fn_price_controlled, is_fn_total_price} = this.state;
-    if (tool.length(goods_list) <= 0) {
+    let {
+      show_goods_list_modal,
+      goods_list,
+      count,
+      is_fn_show_wm_price,
+      is_fn_price_controlled,
+      is_fn_total_price
+    } = this.state;
+    if (!show_goods_list_modal) {
       return null
     }
     return (
@@ -117,7 +121,7 @@ class GoodsListModal extends React.Component {
                 <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
                   商品{count}件
                 </Text>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}
@@ -125,7 +129,7 @@ class GoodsListModal extends React.Component {
                           showsVerticalScrollIndicator={false}
                           style={{paddingHorizontal: 12, maxHeight: 380}}>
                 <For index='idx' of={goods_list} each='item'>
-                  <TouchableOpacity onPress={() => {
+                  <TouchableOpacity key={idx} onPress={() => {
                     this.closeModal()
                     onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: currStoreId, item: item})
                   }} style={Styles.ItemRowContent}>

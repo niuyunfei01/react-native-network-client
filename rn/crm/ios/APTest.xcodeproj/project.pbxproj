@@ -38,8 +38,6 @@
 		847849FF28FF149F00D79AAC /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 847849FE28FF149F00D79AAC /* NotificationService.m */; };
 		84784A0328FF149F00D79AAC /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 847849FB28FF149F00D79AAC /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B93872286C231A00333FE1 /* RNZipArchive.m */; };
-		84BE76992907F47600438E15 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BE76952907F47600438E15 /* Constants.m */; };
-		84BE769A2907F47600438E15 /* IOSToReactNativeEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BE76962907F47600438E15 /* IOSToReactNativeEventEmitter.m */; };
 		A9549240A330F6111EE1CBF2 /* libPods-APTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08916304050819E6F1D127FB /* libPods-APTest.a */; };
 		AB8074FF287C1896004356ED /* RNViewShot.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8074FE287C1896004356ED /* RNViewShot.m */; };
 		DA8234071066F77621636834 /* libPods-APTest-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2ACAD9FCC75DEC6DBAE153DF /* libPods-APTest-tvOS.a */; };
@@ -152,10 +150,6 @@
 		84784A0028FF149F00D79AAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84B93871286C22D700333FE1 /* RNZipArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZipArchive.h; sourceTree = "<group>"; };
 		84B93872286C231A00333FE1 /* RNZipArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZipArchive.m; sourceTree = "<group>"; };
-		84BE76952907F47600438E15 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
-		84BE76962907F47600438E15 /* IOSToReactNativeEventEmitter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IOSToReactNativeEventEmitter.m; sourceTree = "<group>"; };
-		84BE76972907F47600438E15 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		84BE76982907F47600438E15 /* IOSToReactNativeEventEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSToReactNativeEventEmitter.h; sourceTree = "<group>"; };
 		892CBBA6154F7BC6B9A25BAF /* Pods-APTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest.release.xcconfig"; path = "Target Support Files/Pods-APTest/Pods-APTest.release.xcconfig"; sourceTree = "<group>"; };
 		9B9654B569CF25601207FB81 /* Pods-APTest-tvOS.ad-hoc.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-tvOS.ad-hoc.xcconfig"; path = "Target Support Files/Pods-APTest-tvOS/Pods-APTest-tvOS.ad-hoc.xcconfig"; sourceTree = "<group>"; };
 		A74CE7648676B9CB7D56A580 /* Pods-APTest-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-APTest-tvOSTests/Pods-APTest-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -254,10 +248,6 @@
 		13B07FAE1A68108700A75B9A /* APTest */ = {
 			isa = PBXGroup;
 			children = (
-				84BE76972907F47600438E15 /* Constants.h */,
-				84BE76952907F47600438E15 /* Constants.m */,
-				84BE76982907F47600438E15 /* IOSToReactNativeEventEmitter.h */,
-				84BE76962907F47600438E15 /* IOSToReactNativeEventEmitter.m */,
 				088E512827A0F72A003A173E /* Definition.h */,
 				088E512927A0FB08003A173E /* TTSConfig.h */,
 				088E512A27A0FB08003A173E /* TTSConfig.m */,
@@ -991,9 +981,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				08C1456026FCBA980031A0BC /* NewRelicModule.m in Sources */,
 				088E512B27A0FB08003A173E /* TTSConfig.m in Sources */,
-				84BE76992907F47600438E15 /* Constants.m in Sources */,
 				8452B372286C6561003F2D3D /* Restart.m in Sources */,
-				84BE769A2907F47600438E15 /* IOSToReactNativeEventEmitter.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				08DE057726F4C847004A9ACD /* RCTActivityStarterModule.m in Sources */,
 				84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */,
@@ -1180,7 +1168,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.20.1;
+				MARKETING_VERSION = 4.0.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1293,7 +1281,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.20.1;
+				MARKETING_VERSION = 4.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1330,7 +1318,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.20.1;
+				MARKETING_VERSION = 4.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
