@@ -21,8 +21,8 @@ import Cts from "../../../pubilc/common/Cts";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import {question} from "../../../svg/svg";
-import {SvgXml} from "react-native-svg";
+import JbbModal from "../../../pubilc/component/JbbModal";
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -78,7 +78,12 @@ class DistributionAnalysisScene extends PureComponent {
       params: {
         start_time: '',
         end_time: ''
-      }
+      },
+      promptVisible: false,
+      plat_income_txt: '',
+      ship_fee_txt: '',
+      promptTitle: '',
+      promptStatus: ''
     }
     this.getDistributionAnalysisData = this.getDistributionAnalysisData.bind(this);
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
@@ -121,13 +126,16 @@ class DistributionAnalysisScene extends PureComponent {
     this.setParamsTime(startTime, endTime)
     const {currStoreId, accessToken} = this.state;
     showModal("查询中");
-    const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    // const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/profit_data/${currStoreId}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       hideModal()
       this.setState({
         profitAndLoss: res?.data,
         startTimeSaveValue: startTime,
-        endTimeSaveValue: endTime
+        endTimeSaveValue: endTime,
+        plat_income_txt: res?.plat_income_txt,
+        ship_fee_txt: res?.ship_fee_txt
       })
     }).catch((reason => {
       hideModal()
@@ -227,10 +235,16 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  navigateToProfitDetail = (item) => {
+  navigateToProfitDetail = () => {
     let {params} = this.state;
     this.onPress(Config.ROUTE_PROFITANDLOSS, {
       info: params
+    })
+  }
+
+  navigateToPlatformDetail = (item) => {
+    this.onPress(Config.ROUTE_SETTLEMENT_PLATFORM, {
+      info: item
     })
   }
 
@@ -240,8 +254,12 @@ class DistributionAnalysisScene extends PureComponent {
     this.setState({profitAndLoss: profit_list})
   }
 
-  promptingMessage = () => {
-
+  promptingMessage = (flag = blur(), title = '', status = '') => {
+    this.setState({
+      promptVisible: flag,
+      promptTitle: title,
+      promptStatus: status
+    })
   }
 
   renderHeaderTab = () => {
@@ -402,14 +420,15 @@ class DistributionAnalysisScene extends PureComponent {
                   </View>
                   <View style={styles.cardContent}>
                     <Text style={[styles.cell_rowTitleTextR4]}>亏损单占比 </Text>
-                    <Text style={styles.cell_rowText}>{item.ratio} </Text>
+                    <Text style={styles.cell_rowText}>{item.loss_ratio} </Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <View style={styles.cardLabelContent}>
+                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
-                      <SvgXml onPress={this.promptingMessage} xml={question()} width={18} height={18}/>
-                    </View>
-                    <TouchableOpacity style={styles.cardContent} onPress={() => {}}>
+                      <Entypo name="help-with-circle"
+                              style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item)}>
                       <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
                       <Text style={{color: colors.main_color}}>查看 </Text>
                       <Entypo name="chevron-thin-right" style={styles.iconShow}/>
@@ -424,10 +443,11 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <View style={styles.cardLabelContent}>
+                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
-                      <SvgXml onPress={this.promptingMessage} xml={question()} width={18} height={18}/>
-                    </View>
+                      <Entypo name="help-with-circle"
+                              style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
                       <Text style={{color: colors.main_color}}>查看 </Text>
                       <Entypo name="chevron-thin-right" style={styles.iconShow}/>
@@ -540,6 +560,28 @@ class DistributionAnalysisScene extends PureComponent {
     }
   }
 
+  renderPromptingMessage = () => {
+    let {promptVisible, plat_income_txt, ship_fee_txt, promptStatus, promptTitle} = this.state;
+    return (
+      <JbbModal visible={promptVisible} onClose={() => this.promptingMessage(false)} modal_type={'center'}>
+        <View style={{flexDirection: "column", padding: pxToDp(20)}}>
+          <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>{promptTitle} </Text>
+          </View>
+          <Text style={{color: colors.color333, fontSize: 15, marginVertical: 15}}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
+          <Button title={'知道了'}
+                  onPress={() => this.promptingMessage(false)}
+                  containerStyle={{flex: 1}}
+                  buttonStyle={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: 24
+                  }}
+                  titleStyle={{color: colors.white, fontSize: 16, fontWeight: "bold"}}/>
+        </View>
+      </JbbModal>
+    )
+  }
+
   render = () => {
     return (
       <View style={{flex: 1}}>
@@ -551,6 +593,7 @@ class DistributionAnalysisScene extends PureComponent {
           style={Styles.scrollContainer}>
           {this.renderDistributionAnalysis()}
           {this.renderProfitAndLossAnalysis()}
+          {this.renderPromptingMessage()}
         </ScrollView>
       </View>
     );

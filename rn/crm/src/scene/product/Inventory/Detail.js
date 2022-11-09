@@ -119,7 +119,7 @@ class Detail extends BaseComponent {
   }
 
   onConfirmDate = (date) => {
-    this.setState({dateHtp: dayjs(date).format('YYYY-MM'), date: date}, () => {
+    this.setState({dateHtp: dayjs(date).format('YYYY-MM'), date: date, start_day: dayjs(date).format('YYYY-MM')}, () => {
       this.navigationOptions()
       this.setState({page: 1}, () => this.fetchData())
     })
