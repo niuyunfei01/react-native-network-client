@@ -13,7 +13,7 @@ import {Button} from "react-native-elements";
 import Config from "../../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
 import {SvgXml} from "react-native-svg";
-import {back, class_icon, id_icon, local_icon} from "../../../svg/svg";
+import {back} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -44,20 +44,20 @@ class StoreList extends PureComponent {
     this.state = {
       loading: false,
       storeList: [],
-      is_store_admin_or_owner: true,
       is_add: true,
-      is_can_load_more: false
+      is_can_load_more: false,
+      page: 1,
+      page_size: 10,
+      is_store_admin_or_owner: false,
     };
-
-    this.fetchData = this.fetchData.bind(this);
   }
 
   componentDidMount() {
     this.fetchData();
   }
 
-  fetchData() {
-    let {loading} = this.state;
+  fetchData(set_list = 0) {
+    let {loading, page, page_size, store_list} = this.state;
     if (loading) {
       return;
     }
@@ -65,10 +65,17 @@ class StoreList extends PureComponent {
 
     const {accessToken} = this.props.global;
     const api = `/v4/wsb_store/listOfStore?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
+    let params = {
+      page,
+      page_size
+    };
+
+    HttpUtils.get.bind(this.props)(api, params).then((res) => {
       this.setState({
         loading: false,
-        store_list: res?.lists,
+        is_add: tool.length(res?.lists) >= page_size,
+        page: page++,
+        store_list: set_list === 0 ? res?.lists : store_list.concat(res?.lists),
         is_store_admin_or_owner: res?.is_store_admin_or_owner,
       })
     })
@@ -124,7 +131,7 @@ class StoreList extends PureComponent {
     return (
       <View style={{
         paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingBottom: 10,
         flexGrow: 1,
       }}>
         <FlatList
@@ -135,7 +142,7 @@ class StoreList extends PureComponent {
           showsHorizontalScrollIndicator={false}
           refreshing={loading}
           initialNumToRender={5}
-          onEndReachedThreshold={0.3}
+          onEndReachedThreshold={0.5}
           onRefresh={this.onRefresh}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
@@ -150,11 +157,11 @@ class StoreList extends PureComponent {
   }
 
   onEndReached = () => {
-    let {isCanLoadMore, is_add} = this.state;
-    if (isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => {
+    let {is_can_load_more, is_add} = this.state;
+    if (is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => {
         if (is_add) {
-          this.fetchData();
+          this.fetchData(1);
         } else {
           ToastShort('已经到底部了')
         }
@@ -176,7 +183,12 @@ class StoreList extends PureComponent {
   }
 
   onRefresh = () => {
-    this.fetchData()
+    this.setState({
+      page: 1,
+      is_add: true,
+    }, () => {
+      this.fetchData()
+    })
   }
 
   renderItem = (item, index) => {
@@ -184,12 +196,12 @@ class StoreList extends PureComponent {
       <TouchableOpacity key={index}
                         style={{
                           padding: 12,
-                          marginBottom: 10,
+                          marginTop: 10,
                           backgroundColor: 'white',
                           borderRadius: 6,
                         }}
                         onPress={() => {
-                          this.onPress(Config.ROUTE_STORE_ADD)
+                          this.onPress(Config.ROUTE_SAVE_STORE, {type: 'edit', store_id: item?.id})
                         }}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <Text
@@ -197,17 +209,17 @@ class StoreList extends PureComponent {
           <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-          <SvgXml xml={local_icon()}/>
+          {/*<SvgXml xml={local_icon()}/>*/}
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.dada_address, 20)} </Text>
         </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
-          <SvgXml xml={id_icon()}/>
+          {/*<SvgXml xml={id_icon()}/>*/}
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.id, 20)} </Text>
         </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 12}}>
-          <SvgXml xml={class_icon()}/>
+          {/*<SvgXml xml={class_icon()}/>*/}
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.category_desc, 20)} </Text>
         </View>
         <TouchableOpacity onPress={() => {
@@ -218,7 +230,7 @@ class StoreList extends PureComponent {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingVertical: 12
+          paddingVertical: 12,
         }}>
           <View style={{
             flexDirection: 'row',

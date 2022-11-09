@@ -49,6 +49,7 @@ class AlertModal extends PureComponent {
                     color: colors.color333,
                     fontWeight: 'bold',
                     marginVertical: 10,
+                    lineHeight: 22
                   }}>{this.props.title} </Text>
               </View>
 
@@ -63,7 +64,11 @@ class AlertModal extends PureComponent {
                 </View>
               </If>
 
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: tool.length(this.props.desc) > 0 ? 0 : 20
+              }}>
                 <If condition={tool.length(this.props.closeText) > 0}>
                   <Button title={this.props.closeText}
                           onPress={this.props.onPressClose}
