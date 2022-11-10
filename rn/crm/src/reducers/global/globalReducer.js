@@ -136,7 +136,7 @@ export default function globalReducer(state = initialState, action) {
           refreshToken: action.payload.refreshToken,
           expireTs: action.payload.expireTs,
           getTokenTs: action.payload.getTokenTs,
-          user_config: action.info
+          user_config: action.payload.user_config
         }
       }
       break
