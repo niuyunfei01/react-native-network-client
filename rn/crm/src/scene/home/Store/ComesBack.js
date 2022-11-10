@@ -101,17 +101,19 @@ class ComesBack extends PureComponent {
           });
           this.mixpanel.track('配送回传页_查看详情')
         }} style={{
-          backgroundColor: colors.white, borderRadius: 8,
+          backgroundColor: colors.white,
+          borderRadius: 8,
           paddingVertical: 9,
           paddingHorizontal: 6,
           flexDirection: 'row',
           marginTop: 12,
           justifyContent: 'space-between',
           alignItems: 'center',
+          flex: 1
         }}>
           <View style={{
             flexDirection: 'row',
-            flex: 1
+            flex: 1,
           }}>
             <Image style={{
               width: 60,
