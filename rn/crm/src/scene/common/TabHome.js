@@ -58,7 +58,7 @@ class TabHome extends React.Component {
       <Tab.Navigator
         initialRouteName={initTab}
         tabBarOptions={this.tabBarOptions()}>
-        <If condition={Number(work) === 1}>
+        <If condition={Number(work) === 1 && show_bottom_tab}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
@@ -86,7 +86,7 @@ class TabHome extends React.Component {
           }
         />
 
-        <If condition={Number(product) === 1}>
+        <If condition={Number(product) === 1 && show_bottom_tab}>
           <Tab.Screen
             name="Goods"
             getComponent={() => require("../product/Goods/StoreGoodsList").default}
@@ -102,7 +102,7 @@ class TabHome extends React.Component {
           />
         </If>
 
-        <If condition={Number(news) === 1}>
+        <If condition={Number(news) === 1 && show_bottom_tab}>
           <Tab.Screen
             name="Home"
             getComponent={() => require("../notice/NoticeList").default}
