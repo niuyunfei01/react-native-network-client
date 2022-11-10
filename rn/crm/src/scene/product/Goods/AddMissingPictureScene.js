@@ -108,7 +108,7 @@ class AddMissingPictureScene extends React.PureComponent {
   getProductInfo = () => {
     const {vendor_id, currStoreId, accessToken} = this.props.global
     const {goodsInfo} = this.props.route.params
-    const url = `/api/get_product_detail/${goodsInfo.id}/${vendor_id}/${currStoreId}?access_token=${accessToken}`
+    const url = `/api/get_product_detail/${goodsInfo?.id}/${vendor_id}/${currStoreId}?access_token=${accessToken}`
 
     HttpUtils.get.bind(this.props)(url).then(res => {
       this.setState({productInfo: res})
@@ -236,7 +236,7 @@ class AddMissingPictureScene extends React.PureComponent {
             tool.objectMap(list_img, (img_data, img_id) => {
               return (
                 <View key={img_id} style={styles.hasImageList}>
-                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_data["url"])}}/>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_data?.url)}}/>
                   <TouchableOpacity style={styles.deleteUploadImageIcon}
                                     onPress={() => this.deleteUploadImage(img_id)}>
                     <MaterialIcons name={"clear"} size={pxToDp(40)} style={{backgroundColor: colors.white}}
