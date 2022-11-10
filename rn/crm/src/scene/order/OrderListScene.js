@@ -590,8 +590,8 @@ class OrderListScene extends Component {
           if (only_one_store) {
             return;
           }
-          // this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-          this.onPress(Config.ROUTE_STORE_LIST)
+          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
+          // this.onPress(Config.ROUTE_STORE_LIST)
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>

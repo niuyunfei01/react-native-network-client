@@ -9,6 +9,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -110,13 +111,14 @@ class ComesBack extends PureComponent {
         }}>
           <View style={{
             flexDirection: 'row',
+            flex: 1
           }}>
             <Image style={{
               width: 60,
               height: 60,
             }} source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/meituan.png'}}/>
             <View style={{marginLeft: 15, marginTop: 4}}>
-              <Text style={{fontSize: 14, color: colors.color333}}>{item.ext_store_name} </Text>
+              <Text style={{fontSize: 14, color: colors.color333}}>{tool.jbbsubstr(item.ext_store_name, 12)} </Text>
               <Text style={{fontSize: 14, color: colors.color333, marginTop: 17}}>
                 <Text style={{fontSize: 12, color: colors.color333}}>今日回传： </Text>
                 <Text style={{fontSize: 14, color: item.today_sync_color}}>{item.today_sync_rate}% </Text>
