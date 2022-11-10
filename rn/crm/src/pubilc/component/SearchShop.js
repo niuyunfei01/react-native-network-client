@@ -57,7 +57,7 @@ class SearchShop extends Component {
       show_seach_msg = false
     }
 
-    if (show_select_city && tool.length(city_name) > 0) {
+    if (tool.length(city_name) > 0) {
       local_city = city_name;
     }
 

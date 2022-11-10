@@ -2496,4 +2496,84 @@ export const class_icon = () => {
   )
 }
 
+export const empty_delivery_data = () => {
+  return (
+    `
+<svg width="121px" height="99px" viewBox="0 0 121 99" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>暂无配送</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D8D8D8" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="35.7436319%" y1="41.1505795%" x2="66.7975079%" y2="63.166686%" id="linearGradient-2">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#CCCCCC" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="35.7436319%" y1="41.1505795%" x2="66.7975079%" y2="63.166686%" id="linearGradient-3">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#CCCCCC" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.318170704%" y1="100%" x2="99.6818293%" y2="0%" id="linearGradient-4">
+            <stop stop-color="#F8F8F8" offset="0%"></stop>
+            <stop stop-color="#CECECE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#CBCBCB" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="66.1543523%" x2="50%" y2="-22.3537959%" id="linearGradient-6">
+            <stop stop-color="#DFDFDF" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="66.1543523%" x2="50%" y2="-22.3537959%" id="linearGradient-7">
+            <stop stop-color="#E8E8E8" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-8">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#CBCBCB" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-9">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-10">
+            <stop stop-color="#EEEEEE" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </linearGradient>
+        <radialGradient cx="50%" cy="66.1543523%" fx="50%" fy="66.1543523%" r="88.5081482%" gradientTransform="translate(0.500000,0.661544),rotate(-90.000000),scale(1.000000,1.742069),translate(-0.500000,-0.661544)" id="radialGradient-11">
+            <stop stop-color="#EDECEC" offset="0%"></stop>
+            <stop stop-color="#D1D1D1" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="发配送-无配送-审核中运力" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="手动发单-发配送" transform="translate(-125.000000, -232.000000)">
+            <g id="编组-2" transform="translate(125.000000, 232.241021)">
+                <ellipse id="椭圆形" fill="#E7E7E7" cx="62.5768806" cy="89.1566427" rx="54.8571429" ry="8.61111111"></ellipse>
+                <polygon id="Star-Copy-2" fill="#CCCCCC" transform="translate(99.081976, 31.570081) rotate(-45.000000) translate(-99.081976, -31.570081) " points="99.0834996 32.3288746 96.4046231 34.247434 98.3231825 31.5685575 96.393849 28.8819543 99.0804523 30.8112878 101.759329 28.8927284 99.8407694 31.5716049 101.770103 34.2582081"></polygon>
+                <polygon id="Star-Copy-4" fill="#CCCCCC" transform="translate(96.486726, 43.262728) rotate(-45.000000) translate(-96.486726, -43.262728) " points="96.4909767 45.3797973 93.4987497 46.250704 94.3696564 43.2584769 93.4867256 40.2627281 96.4824744 41.1456589 99.4747015 40.2747522 98.6037948 43.2669792 99.4867256 46.2627281"></polygon>
+                <path d="M3.70056853,9.70629635 L19.1898465,9.69571074 C20.200654,11.9268552 20.7046362,15.0713695 20.7017932,19.1292538 C20.6989501,23.187138 21.9113078,26.7369565 24.3388662,29.7787091 L8.84958819,29.7892948 C6.42245252,26.144182 5.21023699,22.3914694 5.2129416,18.5311567 C5.21564621,14.6708441 4.71152186,11.729224 3.70056853,9.70629635 Z" id="矩形" fill="url(#linearGradient-1)" transform="translate(14.019717, 19.742503) rotate(-31.000000) translate(-14.019717, -19.742503) "></path>
+                <rect id="矩形" fill="#D8D8D8" x="18.1483091" y="83.3391824" width="1.14285714" height="6.85714286"></rect>
+                <path d="M19.0703423,66.7677539 C16.829564,68.9597908 14.1041126,71.2600404 14.7010986,75.3448235 C13.0565013,77.4759299 10.5360474,85.3471802 18.7479531,84.9864714 C25.0948737,85.5688048 26.6135792,82.3549222 23.3040695,75.3448235 C22.97534,70.7914439 21.5640976,67.9324207 19.0703423,66.7677539 Z" id="路径-3" fill="url(#linearGradient-2)"></path>
+                <rect id="矩形" fill="#D8D8D8" x="103.434023" y="85.8153729" width="1" height="4.57142857"></rect>
+                <path d="M104.048712,74.7677539 C102.55486,76.2291118 100.737892,77.7626115 101.135883,80.4858003 C100.039485,81.9065379 98.3591822,87.1540381 103.833786,86.9135655 C108.065066,87.3017878 109.077537,85.1591994 106.871197,80.4858003 C106.652044,77.4502139 105.711216,75.5441984 104.048712,74.7677539 Z" id="路径-3" fill="url(#linearGradient-3)"></path>
+                <ellipse id="椭圆形" fill="url(#linearGradient-4)" transform="translate(110.064654, 59.882393) rotate(24.000000) translate(-110.064654, -59.882393) " cx="110.064654" cy="59.8823931" rx="7.53484289" ry="7.55893157"></ellipse>
+                <g id="编组" transform="translate(30.000000, 42.758979)">
+                    <polygon id="Fill-1" fill="url(#linearGradient-5)" points="3.38557135 41.1163819 24.7225099 51 24.7225099 10.247407 3.38557135 3.63688225"></polygon>
+                    <polygon id="Fill-3" fill="url(#linearGradient-6)" points="37.2831608 0 37.2831608 8.99588164 61.4383582 6.58910921"></polygon>
+                    <polygon id="Fill-5" fill="url(#linearGradient-7)" points="37.2831608 0 3.38557135 3.63688225 24.7225099 10.247407 37.2831608 8.99588164"></polygon>
+                    <polygon id="Fill-7" fill="url(#linearGradient-8)" points="24.7225099 10.247407 24.7225099 51 61.4383582 45.223856 61.4383582 6.58910921"></polygon>
+                    <polygon id="Fill-9" fill="url(#linearGradient-9)" points="24.7243587 10.2591214 27.471068 22.3513728 64 17.9206528 61.4145084 6.53804149"></polygon>
+                    <polygon id="Fill-11" fill="url(#linearGradient-10)" points="0 14.3195546 20.9876952 21.9874924 24.7069798 10.2520744 3.38492426 3.63889567"></polygon>
+                </g>
+                <path d="M59.9661092,50.0935126 C66.724787,41.0780147 68.9402873,36.1989864 66.6126099,35.4564276 C63.1210937,34.3425894 60.7969217,38.2642584 63.7047658,38.8299322 C66.6126099,39.3956061 70.7752991,39.3956061 73.9607849,35.4564276 C76.0844421,32.8303086 77.8844337,30.1998867 79.3607595,27.5651617" id="路径-6" stroke="#BCBCBC" stroke-dasharray="1"></path>
+                <path d="M93.781229,2.73636791 C93.4671464,2.53391179 93.0629293,2.53685676 92.7518302,2.74386771 L64.626177,21.4933886 C64.3358653,21.6860637 64.177141,22.0244662 64.214605,22.3708662 C64.249904,22.7171652 64.4750978,23.0149993 64.798681,23.1433465 L72.1338514,26.078584 L75.582994,32.1140547 C75.7479968,32.4029528 76.0537613,32.5827635 76.3864501,32.5865427 L76.3967629,32.5865427 C76.725833,32.5865427 77.0314651,32.4121722 77.200219,32.1309293 L79.1474517,28.8844498 L88.2367253,32.5190444 C88.4999966,32.6250264 88.7972537,32.6050031 89.0439315,32.4646708 C89.2914373,32.3259243 89.4611287,32.0821805 89.5089423,31.8018752 L94.1965512,3.67759386 C94.257501,3.30919449 94.0944496,2.93967826 93.781229,2.73636791 Z" id="形状" fill="url(#radialGradient-11)" transform="translate(79.209182, 17.586543) rotate(11.000000) translate(-79.209182, -17.586543) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    `
+  )
+}
 

@@ -553,11 +553,6 @@ class OrderAllScene extends Component {
     )
   }
 
-
-  onTouchStart = (e) => {
-    this.pageX = e.nativeEvent.pageX;
-    this.pageY = e.nativeEvent.pageY;
-  }
   onEndReached = () => {
     if (this.state.isCanLoadMore) {
       this.setState({isCanLoadMore: false}, () => this.listmore())
@@ -566,16 +561,10 @@ class OrderAllScene extends Component {
   onMomentumScrollBegin = () => {
     this.setState({isCanLoadMore: true})
   }
-  onTouchMove = (e) => {
-    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-      this.setState({scrollLocking: true});
-    } else {
-      this.setState({scrollLocking: false});
-    }
-  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
+
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
@@ -595,11 +584,9 @@ class OrderAllScene extends Component {
           directionalLockEnabled={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          onTouchStart={(e) => this.onTouchStart(e)}
           onEndReachedThreshold={0.3}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
           refreshing={isLoading}
@@ -642,7 +629,7 @@ class OrderAllScene extends Component {
     return (
       <View style={styles.noOrderContent}>
         <SvgXml xml={empty_data()}/>
-        <Text style={styles.noOrderDesc}>暂无订单</Text>
+        <Text style={styles.noOrderDesc}> 暂无订单 </Text>
       </View>
     )
   }

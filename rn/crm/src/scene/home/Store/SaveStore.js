@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {InteractionManager, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Dimensions, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {back} from "../../../svg/svg";
+import {back, cross_icon} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
@@ -17,6 +17,7 @@ import AlertModal from "../../../pubilc/component/AlertModal";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 
+const {width, height} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -55,18 +56,32 @@ class SaveStore extends PureComponent {
       lng: '',
       lat: '',
       street_block: '',
+      category_list: [],
       category_id: '',
+      category_id_input_vlue: '',
+      category_id_input_vlue_desc: '',
       category_desc: '',
       contact_name: '',
       contact_phone: '',
       city: '',
-      show_back_modal: false
+      show_back_modal: false,
+      show_category_modal: false
     };
+    this.fetchCategories()
     if (type !== 'add') {
       this.fetchData()
     }
   }
 
+  fetchCategories = () => {
+    const {accessToken} = this.props.global;
+    const api = `/v1/new_api/stores/sale_categories?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        category_list: res
+      })
+    })
+  }
   fetchData = () => {
     let {loading, store_id} = this.state;
     if (Number(store_id) <= 0) {
@@ -79,13 +94,16 @@ class SaveStore extends PureComponent {
     this.setState({loading: true});
     const {accessToken} = this.props.global;
     const api = `/v4/wsb_store/findStore?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {store_id}).then((res) => {
+    HttpUtils.get.bind(this.props)(api, {store_id_real: store_id}).then((res) => {
       this.setState({
         loading: false,
         store_name: res?.store_name,
         store_address: res?.store_address,
-        city: res?.city,
-        category_id: res?.category_id,
+        lat: res?.lat,
+        lng: res?.lng,
+        city: res?.store_city,
+        category_id: res?.sale_category,
+        category_id_input_vlue: Number(res?.sale_category),
         category_desc: res?.category_desc,
         contact_name: res?.contact_name,
         contact_phone: res?.contact_phone,
@@ -102,7 +120,8 @@ class SaveStore extends PureComponent {
 
   closeModal = () => {
     this.setState({
-      show_back_modal: false
+      show_back_modal: false,
+      show_category_modal: false,
     })
   }
 
@@ -160,7 +179,7 @@ class SaveStore extends PureComponent {
     }
     this.setState({loading: true});
     let params = {
-      store_id,
+      store_id_real: store_id,
       store_name,
       store_address,
       lng,
@@ -204,6 +223,7 @@ class SaveStore extends PureComponent {
         {this.renderBody()}
         {this.renderBtn()}
         {this.renderBackModal()}
+        {this.renderCategoriesModal()}
       </View>
     )
   }
@@ -270,6 +290,7 @@ class SaveStore extends PureComponent {
                        style={{flex: 1, textAlign: 'right', color: colors.color333}}
                        placeholderTextColor={'#999'}
                        value={store_name}
+                       maxLength={20}
                        multiline={true}
                        numberOfLines={2}
                        onChangeText={store_name => {
@@ -321,6 +342,9 @@ class SaveStore extends PureComponent {
           </View>
 
           <TouchableOpacity onPress={() => {
+            this.setState({
+              show_category_modal: true
+            })
           }} style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -424,6 +448,120 @@ class SaveStore extends PureComponent {
           actionText={'确定'}
           closeText={'暂不'}/>
       </View>
+    )
+  }
+
+  renderCategoriesModal = () => {
+    let {category_list, show_category_modal, category_id_input_vlue, category_id_input_vlue_desc} = this.state;
+    if (tool.length(category_list) <= 0) {
+      ToastShort('正在请求品类，请稍后再试');
+      return this.closeModal();
+    }
+    return (
+      <Modal hardwareAccelerated={true}
+             onRequestClose={this.closeModal}
+             maskClosable transparent={true}
+             animationType="fade"
+             visible={show_category_modal}>
+        <View style={[{
+          backgroundColor: 'rgba(0,0,0,0.25)',
+          flex: 1
+        }]}>
+          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
+          <View style={[{
+            backgroundColor: colors.white,
+            maxHeight: height * 0.7,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+          }]}>
+            <View>
+              <View style={{
+                flexDirection: 'row',
+                padding: 12,
+                paddingBottom: 5,
+                justifyContent: 'space-between',
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
+                  经营品类
+                </Text>
+                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+              </View>
+
+              <ScrollView
+                automaticallyAdjustContentInsets={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                style={{
+                  paddingHorizontal: 12,
+                  maxHeight: 380,
+                }}>
+                <View style={{
+
+                  flexDirection: 'row',
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+
+                  <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 10,
+                    flexWrap: "wrap"
+                  }}>
+                    <For index='index' of={category_list} each='info'>
+                      <TouchableOpacity onPress={() => {
+                        this.setState({
+                          category_id_input_vlue: Number(info?.id),
+                          category_id_input_vlue_desc: info?.name
+                        })
+                      }} key={index} style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: width * 0.28,
+                        height: 36,
+                        margin: 5,
+                        borderWidth: 0.5,
+                        borderRadius: 4,
+                        backgroundColor: Number(info?.id) === category_id_input_vlue ? '#DFFAE2' : colors.white,
+                        borderColor: Number(info?.id) === category_id_input_vlue ? colors.main_color : colors.colorDDD,
+                      }}>
+                        <Text style={{
+                          fontSize: 14,
+                          color: Number(info?.id) === category_id_input_vlue ? colors.main_color : colors.color333,
+                          fontWeight: Number(info?.id) === category_id_input_vlue ? 'bold' : 'normal',
+                        }}>{info?.name} </Text>
+                      </TouchableOpacity>
+                    </For>
+                  </View>
+                </View>
+              </ScrollView>
+              <View style={{
+                padding: 20
+              }}>
+                <Button title={'确 定'}
+                        onPress={() => {
+                          this.setState({
+                            show_category_modal: false,
+                            category_id: category_id_input_vlue,
+                            category_desc: category_id_input_vlue_desc,
+                          })
+                        }}
+                        buttonStyle={{
+                          backgroundColor: colors.main_color,
+                          width: width * 0.9,
+                          borderRadius: 20,
+                          height: 40,
+                          marginHorizontal: 3,
+                        }}
+                        titleStyle={{color: colors.white, fontSize: 16, fontWeight: 'bold'}}
+                />
+              </View>
+            </View>
+
+          </View>
+        </View>
+      </Modal>
     )
   }
 }

@@ -74,7 +74,7 @@ class StoreList extends PureComponent {
       this.setState({
         loading: false,
         is_add: tool.length(res?.lists) >= page_size,
-        page: page++,
+        page: page + 1,
         store_list: set_list === 0 ? res?.lists : store_list.concat(res?.lists),
         is_store_admin_or_owner: res?.is_store_admin_or_owner,
       })
@@ -237,11 +237,19 @@ class StoreList extends PureComponent {
             alignItems: 'center'
           }}>
             <Text style={{color: colors.color999, fontSize: 13}}> 已开通省钱配送 </Text>
-            <Text style={{color: colors.main_color, fontSize: 13}}> {1} </Text>
-            <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
-            <Text style={{color: colors.color999, fontSize: 13, marginLeft: 12}}> 自有账号 </Text>
-            <Text style={{color: colors.main_color, fontSize: 13}}> {1} </Text>
-            <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
+            <If condition={item?.count_of_wsb_delivery > 0}>
+              <Text style={{color: colors.main_color, fontSize: 13}}> {item?.count_of_wsb_delivery} </Text>
+              <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
+            </If>
+            <If condition={item?.count_of_wsb_delivery <= 0}>
+              <Text style={{color: colors.main_color, fontSize: 13}}> 暂无开通 </Text>
+            </If>
+            
+            <If condition={item?.count_of_store_delivery > 0}>
+              <Text style={{color: colors.color999, fontSize: 13, marginLeft: 12}}> 自有账号 </Text>
+              <Text style={{color: colors.main_color, fontSize: 13}}> {item?.count_of_store_delivery} </Text>
+              <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
+            </If>
           </View>
           <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
         </TouchableOpacity>
@@ -253,7 +261,9 @@ class StoreList extends PureComponent {
     return (
       <View style={{backgroundColor: colors.white, paddingHorizontal: 20, paddingVertical: 10, height: 62}}>
         <Button title={'添加门店'}
-                onPress={() => this.onPress(Config.ROUTE_ORDER_RECEIVING_INFO, {type: 'add'})}
+                onPress={() => {
+                  this.onPress(Config.ROUTE_SAVE_STORE)
+                }}
                 buttonStyle={[{
                   backgroundColor: colors.main_color,
                   borderRadius: 20,
