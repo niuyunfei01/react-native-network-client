@@ -194,7 +194,7 @@ class SaveStore extends PureComponent {
     validator.add(store_name, 'required', '请填写门店名称')
     // validator.add(lat, 'required', '请设置门店地址')
     validator.add(store_address, 'required', '请填写详细门牌号')
-    // validator.add(category_id, 'required', '请设置门店品类')
+    validator.add(category_id, 'required', '请设置门店品类')
     validator.add(contact_name, 'required', '请填写门店联系人')
     validator.add(contact_phone, 'required|equalLenth:11|isMobile', '请输入正确的手机号')
     const err_msg = validator.start();
@@ -293,8 +293,16 @@ class SaveStore extends PureComponent {
                        maxLength={20}
                        multiline={true}
                        numberOfLines={2}
+                       onFocus={() => {
+                         if (tool.length(store_name) <= 0) {
+                           ToastShort('请填写门店名称')
+                         }
+                       }}
                        onChangeText={store_name => {
-                         this.setState({store_name});
+                         // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
+                         //   this.setState({store_name});
+                         // }
+                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
                        }}
             />
           </View>
@@ -335,8 +343,9 @@ class SaveStore extends PureComponent {
                        value={street_block}
                        multiline={true}
                        numberOfLines={2}
+                       maxLength={20}
                        onChangeText={street_block => {
-                         this.setState({street_block});
+                         this.setState({street_block: tool.filteremoji(street_block)});
                        }}
             />
           </View>
@@ -381,7 +390,7 @@ class SaveStore extends PureComponent {
                        maxLength={10}
                        value={contact_name}
                        onChangeText={contact_name => {
-                         this.setState({contact_name});
+                         this.setState({contact_name: tool.filtrationInput(contact_name)});
                        }}
             />
           </View>
@@ -401,8 +410,8 @@ class SaveStore extends PureComponent {
                        keyboardType={'numeric'}
                        value={contact_phone}
                        onChangeText={value => {
-                         const newText = value.replace(/[^\d]+/, '');
-                         this.setState({contact_phone: newText});
+                         // const newText = value.replace(/[^\d]+/, '');
+                         this.setState({contact_phone: value.replace(/[^0-9]/g, "")});
                        }}
             />
           </View>
@@ -453,7 +462,7 @@ class SaveStore extends PureComponent {
 
   renderCategoriesModal = () => {
     let {category_list, show_category_modal, category_id_input_vlue, category_id_input_vlue_desc} = this.state;
-    if (tool.length(category_list) <= 0) {
+    if (show_category_modal && tool.length(category_list) <= 0) {
       ToastShort('正在请求品类，请稍后再试');
       return this.closeModal();
     }
