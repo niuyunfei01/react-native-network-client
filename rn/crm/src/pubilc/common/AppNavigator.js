@@ -585,7 +585,7 @@ class AppNavigator extends PureComponent {
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
       reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
+      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by
 
     if (flag) {
       return
@@ -604,9 +604,7 @@ class AppNavigator extends PureComponent {
       refreshToken: reduxGlobal.refreshToken,
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
-      user_config: reduxGlobal.user_config,
-      // call_delivery_list: reduxGlobal.call_delivery_list,
-      //default_order_info: reduxGlobal.default_order_info,
+      order_list_by: reduxGlobal.order_list_by,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
