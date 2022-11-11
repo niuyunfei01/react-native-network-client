@@ -50,7 +50,7 @@ const initState = {
     maxPastDays: 100,
     isAdd: true,
   },
-  ListData: [],
+  list: [],
   orderStatus: 9,
   search_date: new Date(),
   search_status: 0,
@@ -169,7 +169,7 @@ class OrderAllScene extends Component {
     if (vendor_id && accessToken) {
       const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        let {ListData, query} = this.state;
+        let {list, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
         }
@@ -177,7 +177,7 @@ class OrderAllScene extends Component {
         query.listType = initQueryType
         query.offset = Number(query.page - 1) * query.limit;
         this.setState({
-          ListData: setList === 1 ? res.orders : ListData.concat(res.orders),
+          list: setList === 1 ? res.orders : list.concat(res.orders),
           isLoading: false,
           query: query,
         })
@@ -286,7 +286,7 @@ class OrderAllScene extends Component {
     const {currStoreId, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
-      ListData,
+      list,
       order_id,
       show_goods_list,
       show_delivery_modal,
@@ -321,7 +321,7 @@ class OrderAllScene extends Component {
                         marTop={80}
         />
 
-        {this.renderContent(ListData)}
+        {this.renderContent(list)}
 
         <DatePicker
           confirmText={'确定'}
@@ -594,7 +594,8 @@ class OrderAllScene extends Component {
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
-          initialNumToRender={5}
+          ListFooterComponent={this.renderBottomView()}
+          initialNumToRender={3}
         />
       </View>
     );
@@ -630,6 +631,19 @@ class OrderAllScene extends Component {
       <View style={styles.noOrderContent}>
         <SvgXml xml={empty_data()}/>
         <Text style={styles.noOrderDesc}> 暂无订单 </Text>
+      </View>
+    )
+  }
+
+
+  renderBottomView = () => {
+    let {query, list} = this.state;
+    if (query?.isAdd || tool.length(list) < 3) {
+      return <View/>
+    }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
       </View>
     )
   }

@@ -390,16 +390,15 @@ class OrderItem extends React.PureComponent {
     }
     return (
       <View style={[styles.contentHeader, {paddingTop: 12}]}>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-start'}}>
           <Text
-            style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>备注：</Text>
+            style={{fontWeight: 'bold', fontSize: 14, color: '#FF8309'}}>备注：</Text>
           <Text style={{
-            fontSize: 12,
+            fontSize: 14,
             color: colors.color666,
-            marginTop: 4,
+            lineHeight: 20
           }}>{item?.remark} </Text>
         </View>
-        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </View>
     )
   }
@@ -492,7 +491,7 @@ class OrderItem extends React.PureComponent {
 
 
   renderButton = () => {
-    let {item, comesBackBtn} = this.props;
+    let {item, comesBackBtn, orderStatus} = this.props;
     let obj_num = 0
     if (comesBackBtn) {
       obj_num = 1
@@ -583,7 +582,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
-          <Button title={'下配送单'}
+          <Button title={orderStatus === 8 ? '重新下单' : '下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('V4订单列表_下配送单')

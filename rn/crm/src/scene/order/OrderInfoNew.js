@@ -1139,7 +1139,9 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用 </Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元 </Text>
           </View>
-          <View style={styles.cuttingLine1}/>
+          <If condition={tool.length(order.greeting) > 0 || tool.length(order?.giver_phone) > 0}>
+            <View style={styles.cuttingLine1}/>
+          </If>
           <If condition={tool.length(order.greeting) > 0}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语 </Text>
@@ -1183,6 +1185,10 @@ class OrderInfoNew extends PureComponent {
           <View style={styles.productItemRow}>
             <Text style={styles.remarkLabel}>预计送达时间 </Text>
             <Text style={styles.remarkValue}>{order?.expectTime} </Text>
+          </View>
+          <View style={styles.productItemRow}>
+            <Text style={styles.remarkLabel}>下单时间 </Text>
+            <Text style={styles.remarkValue}>{order?.orderTime} </Text>
           </View>
         </View>
       </View>

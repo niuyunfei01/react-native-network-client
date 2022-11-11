@@ -76,6 +76,7 @@ class SettingScene extends PureComponent {
       showDeleteModal: false,
       shouldShowModal: false,
       order_list_show_product: false,
+      show_remark_in_order_list: false,
       is_alone_pay_vendor: true,
       is_owner: false,
       bd_mobile: '',
@@ -138,6 +139,7 @@ class SettingScene extends PureComponent {
         hide_good_titles_to_shipper: Boolean(res.hide_good_titles_to_shipper),
         use_real_weight: Number(res?.use_real_weight) === 1,
         order_list_show_product: Number(res?.order_list_show_product) === 1,
+        show_remark_in_order_list: Number(res?.show_remark_in_order_list) === 1,
         is_alone_pay_vendor: Boolean(res?.is_alone_pay_vendor),
         is_owner: Boolean(res?.is_owner),
         bd_mobile: tool.length(res?.delivery_bd_info) > 0 ? res.delivery_bd_info.mobile : '',
@@ -375,7 +377,7 @@ class SettingScene extends PureComponent {
 
 
   renderOrderSetting = () => {
-    let {show_remark_to_rider} = this.state
+    let {show_remark_to_rider,show_remark_in_order_list} = this.state
     return (
       <View>
         <View style={styles.item_body}>
@@ -388,12 +390,27 @@ class SettingScene extends PureComponent {
             }}
                               style={styles.item_row}>
               <View style={{flex: 1}}>
-                <Text style={styles.row_label}>展示订单备注 </Text>
+                <Text style={styles.row_label}>对骑手展示订单备注 </Text>
                 <Text style={styles.row_label_desc}>开启后骑手端可见客户下单备注 </Text>
               </View>
               <Switch onValueChange={(val) => this.setConfig('show_remark_to_rider', val)}
                       color={colors.main_color}
                       value={show_remark_to_rider}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              let val = !show_remark_in_order_list
+              this.setConfig('show_remark_in_order_list', val)
+            }}
+                              style={styles.item_row}>
+              <View style={{flex: 1}}>
+                <Text style={styles.row_label}>展示订单备注 </Text>
+                <Text style={styles.row_label_desc}>开启后在订单列表展示客户备注 </Text>
+              </View>
+              <Switch onValueChange={(val) => this.setConfig('show_remark_in_order_list', val)}
+                      color={colors.main_color}
+                      value={show_remark_in_order_list}
               />
             </TouchableOpacity>
           </View>
@@ -446,7 +463,6 @@ class SettingScene extends PureComponent {
 
 
   renderGoods = () => {
-    let {dispatch} = this.props;
     let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, order_list_show_product} = this.state
     return (
       <View>

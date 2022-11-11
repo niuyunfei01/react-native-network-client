@@ -723,6 +723,7 @@ class OrderListScene extends Component {
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
+          ListFooterComponent={this.renderBottomView()}
           initialNumToRender={5}
         />
       </View>
@@ -735,6 +736,17 @@ class OrderListScene extends Component {
     }
   }
 
+  renderBottomView = () => {
+    let {query, ListData} = this.state;
+    if (query?.isAdd || tool.length(ListData) < 3) {
+      return <View/>
+    }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
+      </View>
+    )
+  }
 
   renderItem = (order) => {
     let {item, index} = order;
