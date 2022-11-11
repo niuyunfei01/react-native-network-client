@@ -368,15 +368,9 @@ class Mine extends PureComponent {
             refreshToken: '',
             expireTs: 0,
             printer_id: '0',
-            user_config: {
-              order_list_by: 'orderTime asc'
-            }
+            order_list_by: 'orderTime asc'
           }
           setNoLoginInfo(JSON.stringify(noLoginInfo))
-
-          let {user_config = {}} = global
-          user_config.order_list_by = 'orderTime asc'
-          dispatch(setUserCfg(user_config))
           dispatch(logout(() => {
             tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
           }));

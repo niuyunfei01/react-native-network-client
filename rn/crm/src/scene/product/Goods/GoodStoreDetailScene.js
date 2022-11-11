@@ -150,9 +150,9 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   handleAuthItem = (authName, value) => {
-    const stockIndex = MORE_ITEM.findIndex(item => item.label === '库存')
-    const stallIndex = MORE_ITEM.findIndex(item => item.label === '摊位关联')
-    const retail_price_enabledIndex = MORE_ITEM.findIndex(item => item.label === '零售价格')
+    const stockIndex = MORE_ITEM.findIndex(item => item?.label === '库存')
+    const stallIndex = MORE_ITEM.findIndex(item => item?.label === '摊位关联')
+    const retail_price_enabledIndex = MORE_ITEM.findIndex(item => item?.label === '零售价格')
     switch (authName) {
       case 'strict_providing':
         if (value === '0' && stockIndex !== -1)
@@ -223,7 +223,7 @@ class GoodStoreDetailScene extends PureComponent {
       if (spec?.sku_name !== undefined) {
         selectedSpecArray.push({
           value: spec.product_id,
-          label: spec.sku_name ? spec.sku_name : spec.name,
+          label: spec?.sku_name ? spec?.sku_name : spec?.name,
           stallName: spec.stall_name,
           price: spec.supply_price,
           goodsName: spec.name,
@@ -233,14 +233,14 @@ class GoodStoreDetailScene extends PureComponent {
         spec.skus.map(sku => {
           selectedSpecArray.push({
             value: sku.product_id,
-            label: sku.sku_name,
+            label: sku?.sku_name,
             stallName: sku.stall_name,
             price: sku.supply_price,
             goodsName: spec.name
           })
         })
       selectedSpecArray.sort((a, b) => {
-        return a.label > b.label ? 1 : -1
+        return a?.label > b?.label ? 1 : -1
       })
       if (product_id === 0) {
         this.setState({
@@ -436,7 +436,7 @@ class GoodStoreDetailScene extends PureComponent {
                              defaultKey={-999}
                              onChange={value => this.onChange(value, store_prod)}>
                 <Text style={styles.moreText}>
-                  {selectItem.label}
+                  {selectItem?.label}
                 </Text>
               </ModalSelector>
             </If>
@@ -507,7 +507,7 @@ class GoodStoreDetailScene extends PureComponent {
                   {info.stallName}
                 </Text>
                 <Text style={styles.stallBottomText}>
-                  {info.label}
+                  {info?.label}
                 </Text>
               </View>
             </If>
@@ -528,7 +528,7 @@ class GoodStoreDetailScene extends PureComponent {
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const stallArray = []
       res && res.map(item => {
-        stallArray.push({...item, value: item.id, label: item.name})
+        stallArray.push({...item, value: item.id, label: item?.name})
       })
 
       this.setState({stallArray: stallArray})
@@ -558,7 +558,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
   renderModalStall = () => {
     const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
-    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec.label
+    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec?.label
     return (
       <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
              onShow={this.onShowStall}>
@@ -581,7 +581,7 @@ class GoodStoreDetailScene extends PureComponent {
                 <ModalSelector data={stallArray} onChange={value => this.onChangeStall(value)} skin={'customer'}
                                defaultKey={-999}>
                   <Text>
-                    {selectStall.label}
+                    {selectStall?.label}
                   </Text>
                 </ModalSelector>
               </View>
@@ -595,7 +595,7 @@ class GoodStoreDetailScene extends PureComponent {
                   <ModalSelector data={selectedSpecArray} onChange={value => this.onChangeSpec(value)} skin={'customer'}
                                  defaultKey={-999}>
                     <Text>
-                      {selectedSpec.label}
+                      {selectedSpec?.label}
                     </Text>
                   </ModalSelector>
                 </View>

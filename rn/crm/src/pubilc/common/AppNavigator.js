@@ -215,7 +215,7 @@ const Page = (props) => {
 
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../../scene/order/OrderEditStoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} options={{headerTitle: '撤回呼叫'}}
+        <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} options={{headerTitle: '取消配送'}}
                       getComponent={() => require("../../scene/order/OrderCancelShip").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} options={{headerTitle: '发红包'}}
@@ -585,7 +585,7 @@ class AppNavigator extends PureComponent {
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
       reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.user_config?.order_list_by === global.noLoginInfo.user_config?.order_list_by
+      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by
 
     if (flag) {
       return
@@ -604,9 +604,7 @@ class AppNavigator extends PureComponent {
       refreshToken: reduxGlobal.refreshToken,
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
-      user_config: reduxGlobal.user_config,
-      // call_delivery_list: reduxGlobal.call_delivery_list,
-      //default_order_info: reduxGlobal.default_order_info,
+      order_list_by: reduxGlobal.order_list_by,
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))

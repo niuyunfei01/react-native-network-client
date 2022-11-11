@@ -3,7 +3,7 @@ import {jsonWithTpl, jsonWithTpl2} from "../../pubilc/util/common";
 import AppConfig from "../../pubilc/common/config.js";
 import FetchEx from "../../pubilc/util/fetchEx";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
-import md5 from "../../pubilc/util/md5";
+import {hex_md5} from "../../pubilc/util/md5";
 import HttpUtils from "../../pubilc/util/http";
 import dayjs from "dayjs";
 import tool from "../../pubilc/util/tool";
@@ -232,9 +232,9 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
     let fileInfo = name.split('.');
     if (tool.length(fileInfo) > 1) {
       let fileExt = fileInfo.pop();
-      name = md5.hex_md5(fileInfo[0]) + "." + fileExt;
+      name = hex_md5(fileInfo[0]) + "." + fileExt;
     } else {
-      name = md5.hex_md5(name);
+      name = hex_md5(name);
     }
     let photo = {
       uri: uri,

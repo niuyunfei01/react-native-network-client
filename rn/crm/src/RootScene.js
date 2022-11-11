@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getConfig, setNoLoginInfo, setUserCfg, setUserProfile} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo, setOrderListBy, setUserCfg, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
@@ -76,7 +76,7 @@ class RootScene extends PureComponent {
           rehydrated: true,
         });
       }
-      store.dispatch(setUserCfg(noLoginInfo?.user_config));
+      store.dispatch(setOrderListBy(noLoginInfo?.order_list_by));
       SplashScreen.hide();
     }).catch(() => {
       SplashScreen.hide();
