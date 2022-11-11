@@ -162,11 +162,13 @@ class OrderItem extends React.PureComponent {
 
   goVeriFicationToShop = () => {
     let {item} = this.props;
-    this.setState({verification_modal: false});
+    this.closeModal();
     let {pickupCode} = this.state
     const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(() => {
       ToastShort(`核销成功，订单已完成`)
+    }, (reason) => {
+      ToastShort(`操作失败：${reason?.reason}`)
     }).catch((reason) => {
       ToastShort(`操作失败：${reason?.reason}`)
     })
@@ -238,8 +240,9 @@ class OrderItem extends React.PureComponent {
         onPressClose={() => this.closeModal()}>
         <TextInput placeholder={"请输入核销码"}
                    onChangeText={(pickupCode) => {
-                     this.setState({pickupCode})
+                     this.setState({pickupCode: pickupCode.replace(/[^\a-\z\A-\Z0-9]/g, "")})
                    }}
+                   maxLength={7}
                    value={pickupCode}
                    placeholderTextColor={colors.color999}
                    style={{

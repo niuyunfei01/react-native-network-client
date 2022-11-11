@@ -1,5 +1,5 @@
 import DeviceInfo from 'react-native-device-info';
-import {ToastLong, ToastShort} from './ToastUtils';
+import {hideModal, ToastLong, ToastShort} from './ToastUtils';
 import native from './native'
 import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../common/config.js";
@@ -75,6 +75,7 @@ class HttpUtils {
           if (response.ok) {
             return response.json();
           } else {
+            hideModal()
             // reject({status: response.status})
           }
         })
@@ -96,6 +97,7 @@ class HttpUtils {
             resolve(response.obj)
             return;
           }
+          hideModal()
           if (showReason)
             this.error(response, props.navigation);
           if (getNetworkDelay) {
@@ -106,7 +108,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-
+          hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {
             const endTime = getTime();

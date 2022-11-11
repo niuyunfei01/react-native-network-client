@@ -35,6 +35,7 @@ class SearchOrder extends PureComponent {
       isSearching: false,
       prefix: [],
       orderList: [],
+      item_list: [],
       end: false,
       isLoading: false,
       isCanLoadMore: false,
@@ -110,9 +111,9 @@ class SearchOrder extends PureComponent {
       const orderList = isChangeType ? res.orders : this.state.orderList.concat(res.orders)
       const end = tool.length(res.orders) < query.limit
       this.setState({orderList: orderList, end: end, isLoading: false})
-    }, res => {
+    }, () => {
       this.setState({isLoading: false})
-    }).catch(error => {
+    }).catch(() => {
       this.setState({isLoading: false})
     })
   }
@@ -148,15 +149,7 @@ class SearchOrder extends PureComponent {
   }
 
   renderHeader = () => {
-    let {keyword, check_item = 1} = this.state
-    let list = [
-      {label: '全部全部', value: 0},
-      {label: '美团全部', value: 1},
-      {label: '饿了么', value: 2},
-      {label: '京东到家', value: 3},
-      {label: '自定义', value: 4},
-      {label: '京东到家', value: 4},
-    ];
+    let {keyword, check_item = 1, item_list} = this.state
     return (
       <View style={{backgroundColor: colors.white}}>
         <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
@@ -184,12 +177,28 @@ class SearchOrder extends PureComponent {
             lightTheme={'true'}
             placeholder="请输入关键词进行搜索"
             onChangeText={(keyword) => {
+              let arr = [];
+              if (/[\u4e00-\u9fa5]+?$/g.test(keyword)) {
+                arr = [
+                  {label: '骑手姓名', value: 0},
+                  {label: '商品名', value: 1},
+                  {label: '收件地址', value: 2},
+                ]
+              }
+              if (/[0-9]+?$/g.test(keyword)) {
+                arr = [
+                  {label: '订单号', value: 0},
+                  {label: '流水号', value: 1},
+                  {label: '手机号', value: 2},
+                  {label: '取货码', value: 2},
+                ]
+              }
               this.setState({
-                keyword
+                keyword,
+                check_item: '',
+                item_list: arr
               }, () => {
-                tool.debounces(() => {
-                  // this.fetchAddressBook()
-                })
+
               })
             }}
             onCancel={this.onCancel}
@@ -207,7 +216,7 @@ class SearchOrder extends PureComponent {
           justifyContent: "flex-start",
           flexWrap: "wrap"
         }}>
-          <For index='index' each='info' of={list}>
+          <For index='index' each='info' of={item_list}>
             <TouchableOpacity onPress={() => {
               console.log(info, '12')
             }} key={index} style={{
