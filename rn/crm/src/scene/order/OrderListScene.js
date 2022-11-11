@@ -17,7 +17,7 @@ import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
-import {getConfig, setUserCfg} from '../../reducers/global/globalActions'
+import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -245,10 +245,10 @@ class OrderListScene extends Component {
     }
     this.fetorderNum();
     let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
-    let {currStoreId, accessToken, user_config} = this.props.global;
+    let {currStoreId, accessToken, order_list_by = 'orderTime asc'} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = queryType || orderStatus;
-    const order_by = user_config && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
+    const order_by = order_list_by
 
     this.setState({
       orderStatus: initQueryType,
@@ -482,15 +482,12 @@ class OrderListScene extends Component {
     } else {
       this.mixpanel.track('V4订单列表_送达时间')
     }
-    let {user_config} = this.props.global
     let {dispatch} = this.props
-    user_config.order_list_by = order_by
-    dispatch(setUserCfg(user_config));
+    dispatch(setOrderListBy(order_by));
   }
 
   renderSortModal = () => {
-    let {user_config} = this.props.global;
-    let sort = user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
+    let {order_list_by = 'orderTime asc'} = this.props.global;
     let {showSortModal, sort_list} = this.state;
     return (
       <JbbModal visible={showSortModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
@@ -516,8 +513,8 @@ class OrderListScene extends Component {
               <For index='index' each='info' of={sort_list}>
                 <TouchableOpacity key={index} style={{
                   borderWidth: 0.5,
-                  borderColor: info.value === sort ? colors.main_color : colors.colorDDD,
-                  backgroundColor: info.value === sort ? '#DFFAE2' : colors.white,
+                  borderColor: info.value === order_list_by ? colors.main_color : colors.colorDDD,
+                  backgroundColor: info.value === order_list_by ? '#DFFAE2' : colors.white,
                   width: width * 0.25,
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -528,8 +525,8 @@ class OrderListScene extends Component {
                   <Text key={index}
                         style={{
                           fontSize: 14,
-                          color: info.value === sort ? colors.main_color : colors.color333,
-                          fontWeight: info.value === sort ? 'bold' : '400'
+                          color: info.value === order_list_by ? colors.main_color : colors.color333,
+                          fontWeight: info.value === order_list_by ? 'bold' : '400'
                         }}
                         onPress={() => this.setOrderBy(info.value)}>
                     {info.label}

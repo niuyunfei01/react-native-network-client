@@ -22,7 +22,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
 import {NavigationActions} from '@react-navigation/compat';
-import {logout, setUserCfg} from "../../../reducers/global/globalActions";
+import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
@@ -143,7 +143,6 @@ class UserScene extends PureComponent {
 
   _onLogout() {
     const {dispatch, navigation, global} = this.props;
-    let {user_config} = global
     this.mixpanel.reset();
     const noLoginInfo = {
       accessToken: '',
@@ -154,12 +153,8 @@ class UserScene extends PureComponent {
       enabledGoodMgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      user_config: {
-        order_list_by: 'orderTime asc'
-      }
+      order_list_by: 'orderTime asc'
     }
-    user_config.order_list_by = 'orderTime asc'
-    setUserCfg(user_config)
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {
