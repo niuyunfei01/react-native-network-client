@@ -201,6 +201,7 @@ class OrderItem extends React.PureComponent {
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
             {this.renderUser()}
+            {this.renderRemark()}
             {this.renderGoods()}
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
@@ -378,6 +379,27 @@ class OrderItem extends React.PureComponent {
         <TouchableOpacity style={{paddingHorizontal: 10}} onPress={() => this.touchMobile()}>
           <SvgXml xml={call()}/>
         </TouchableOpacity>
+      </View>
+    )
+  }
+
+  renderRemark = () => {
+    let {item} = this.props;
+    if (tool.length(item?.remark) <= 0) {
+      return null;
+    }
+    return (
+      <View style={[styles.contentHeader, {paddingTop: 12}]}>
+        <View style={{flex: 1}}>
+          <Text
+            style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>备注：</Text>
+          <Text style={{
+            fontSize: 12,
+            color: colors.color666,
+            marginTop: 4,
+          }}>{item?.remark} </Text>
+        </View>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </View>
     )
   }
