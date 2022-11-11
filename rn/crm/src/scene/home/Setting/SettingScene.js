@@ -14,7 +14,7 @@ import {
   View
 } from 'react-native';
 import * as globalActions from '../../../reducers/global/globalActions';
-import {logout, setUserCfg} from '../../../reducers/global/globalActions';
+import {logout} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
 import JPush from "jpush-react-native";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -233,13 +233,8 @@ class SettingScene extends PureComponent {
       enabledGoodMgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      user_config: {
-        order_list_by: 'orderTime asc'
-      }
+      order_list_by: 'orderTime asc'
     }
-    let {user_config = {}} = global
-    user_config.order_list_by = 'orderTime asc'
-    dispatch(setUserCfg(user_config))
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {

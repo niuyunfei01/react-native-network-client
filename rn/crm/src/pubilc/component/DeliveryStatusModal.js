@@ -410,8 +410,16 @@ class deliveryStatusModal extends React.Component {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_取消配送')
-                    this.closeModal()
-                    this.props.openCancelDeliveryModal(order_id)
+                    this.setState({
+                      show_modal: false,
+                      delivery_list: [],
+                      order_platform_desc: '',
+                      platform_dayId: '',
+                      expect_time_desc: '',
+                      driver_phone: '',
+                    }, () => {
+                      this.props.openCancelDeliveryModal(order_id)
+                    })
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -507,8 +515,16 @@ class deliveryStatusModal extends React.Component {
           <Button title={'完成配送'}
                   onPress={() => {
                     this.mixpanel.track('V4配送调度页_完成配送')
-                    this.closeModal();
-                    this.props.openFinishDeliveryModal(order_id)
+                    this.setState({
+                      show_modal: false,
+                      delivery_list: [],
+                      order_platform_desc: '',
+                      platform_dayId: '',
+                      expect_time_desc: '',
+                      driver_phone: '',
+                    }, () => {
+                      this.props.openFinishDeliveryModal(order_id)
+                    })
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,

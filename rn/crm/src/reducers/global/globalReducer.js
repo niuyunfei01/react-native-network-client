@@ -21,6 +21,7 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
+  SET_ORLDER_LIST_BY,
   // SET_CALL_DELIVERY_LIST,
   SET_DEFAULT_ORDER_INFO,
   SET_SHOW_FLOAT_SERVICE_ICON,
@@ -60,10 +61,8 @@ const initialState = {
   is_record_request_monitor: false,
   customer_service_auth: {},
   show_float_service_icon: true,
-  user_config: {
-    order_list_by: 'orderTime asc',
-  },
-
+  user_config: {},
+  order_list_by: 'orderTime asc',
   show_bottom_tab: false,
   only_one_store: false,
   is_vendor_admin: false,
@@ -84,8 +83,6 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,
-  call_delivery_list: [],
-  default_order_info: {},
 };
 
 /**
@@ -136,7 +133,7 @@ export default function globalReducer(state = initialState, action) {
           refreshToken: action.payload.refreshToken,
           expireTs: action.payload.expireTs,
           getTokenTs: action.payload.getTokenTs,
-          user_config: action.info
+          order_list_by: action.payload.order_list_by
         }
       }
       break
@@ -231,11 +228,8 @@ export default function globalReducer(state = initialState, action) {
     case SET_USER_CONFIG:
       return {...state, user_config: action.info}
 
-    // case SET_CALL_DELIVERY_LIST:
-    //   return {...state, call_delivery_list: action.list}
-
-    case SET_DEFAULT_ORDER_INFO:
-      return {...state, default_order_info: action.info}
+    case SET_ORLDER_LIST_BY:
+      return {...state, order_list_by: action.val}
 
     case SET_SHOW_FLOAT_SERVICE_ICON:
       return {...state, show_float_service_icon: action.show}

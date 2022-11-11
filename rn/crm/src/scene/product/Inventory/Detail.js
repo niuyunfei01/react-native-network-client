@@ -80,9 +80,8 @@ class Detail extends BaseComponent {
   }
 
   fetchData = (val) => {
-
     const {productId, storeId} = this.props.route.params
-    let {dateHtp, date_type} = this.state
+    let {dateHtp, date_type, rules} = this.state
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
     this.setState({isLoading: true})
     let params = {
@@ -90,7 +89,7 @@ class Detail extends BaseComponent {
       storeId,
       page: val ? 1 : this.state.page,
       date: dateHtp,
-      sku_id: val ? val.id : '',
+      sku_id: rules.sku_id ? rules.sku_id : 0,
       pageSize: 20,
       date_type: date_type
     }
@@ -115,11 +114,21 @@ class Detail extends BaseComponent {
   }
 
   onRefresh = () => {
-    this.setState({page: 1}, () => this.fetchData())
+    this.setState({
+      page: 1,
+      rules: {
+        sku_id: 0,
+        sku_name: '全部规格'
+      }
+    }, () => this.fetchData())
   }
 
   onConfirmDate = (date) => {
-    this.setState({dateHtp: dayjs(date).format('YYYY-MM'), date: date}, () => {
+    this.setState({
+      dateHtp: dayjs(date).format('YYYY-MM'),
+      date: date,
+      start_day: dayjs(date).format('YYYY-MM')
+      }, () => {
       this.navigationOptions()
       this.setState({page: 1}, () => this.fetchData())
     })
@@ -140,7 +149,14 @@ class Detail extends BaseComponent {
     return (
       <View style={Styles.selectHeader}>
         <View style={Styles.selectHeaderContent}>
-          <ModalSelector onChange={value => this.fetchData(value)}
+          <ModalSelector onChange={value => {
+            this.setState({
+              rules: {
+                sku_id: value.id,
+                sku_name: value.label
+              }
+            }, () => this.fetchData(value))
+          }}
                          data={rulesArray}
                          skin="customer"
                          defaultKey={-999}>
