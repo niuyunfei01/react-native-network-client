@@ -19,8 +19,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import tool from "../../../pubilc/util/tool";
 import {TextArea} from "../../../weui";
-import numeral from "numeral";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const width = Dimensions.get("window").width;
 
@@ -72,6 +71,7 @@ class SettlementPlatform extends PureComponent {
   }
 
   submit = () => {
+    showModal('修改中')
     const {currStoreId, accessToken} = this.props.global;
     let {date, remark_input_value, platformMoney} = this.state;
     const api = `/v1/new_api/analysis/update_plat_income/${currStoreId}`
@@ -82,7 +82,11 @@ class SettlementPlatform extends PureComponent {
       amount: platformMoney,
       remark: remark_input_value
     }).then(log_info => {
+      hideModal()
       ToastShort('操作成功')
+      this.get_log()
+    }).catch(error => {
+      hideModal()
     })
   }
 
@@ -116,6 +120,7 @@ class SettlementPlatform extends PureComponent {
         headerTextIOS={'选择日期'}
         isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
+        maximumDate={new Date()}
         date={new Date()}
         mode='date'
         isVisible={showModal}
@@ -146,8 +151,16 @@ class SettlementPlatform extends PureComponent {
               placeholderTextColor={colors.color999}
               value={platformMoney}
               keyboardType={'numeric'}
+              maxLength={9}
               placeholder={'请填写金额'}
-              onChangeText={text => this.setState({platformMoney: text})}
+              onChangeText={text => {
+                let reg = /^[1-9]+(\.{1}[0-9]+){0,1}$/
+                if (reg.test(text) || text === '' || /^[1-9]+\./.test(text)) {
+                  this.setState({
+                    platformMoney: text
+                  })
+                }
+              }}
             />
           </View>
           <Text style={{fontSize: 14, color: colors.color333}}>元 </Text>
@@ -177,7 +190,7 @@ class SettlementPlatform extends PureComponent {
         <If condition={logList.length > 0}>
           <For of={logList} each='info' index='index'>
             <View style={styles.logBox}>
-              <Text style={styles.logTitle}>平台结算金额 {numeral(info.plat_settle / 100).format('0.00')}元 </Text>
+              <Text style={styles.logTitle}>平台结算金额 {info?.settle_chg_txt}元 </Text>
               <Text style={styles.loger}>操作: {info.username} </Text>
             </View>
             <Text style={styles.logDesc}>修改时间: {info.create_at} </Text>

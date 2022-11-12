@@ -23,6 +23,7 @@ import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -83,7 +84,8 @@ class DistributionAnalysisScene extends PureComponent {
       plat_income_txt: '',
       ship_fee_txt: '',
       promptTitle: '',
-      promptStatus: ''
+      promptStatus: '',
+      allowChange: true
     }
     this.getDistributionAnalysisData = this.getDistributionAnalysisData.bind(this);
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
@@ -201,13 +203,16 @@ class DistributionAnalysisScene extends PureComponent {
     let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
+        this.setState({allowChange: true})
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
         startTime = new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
+        this.setState({allowChange: false})
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
+        this.setState({allowChange: false})
         break
       default:
         break
@@ -378,7 +383,7 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   renderProfitAndLossAnalysis = () => {
-    const {profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
+    const {profitAndLoss, headerType, dateStatus, showRightDateModal, allowChange} = this.state
     if (headerType !== 1) {
       return (
         <View>
@@ -430,8 +435,11 @@ class DistributionAnalysisScene extends PureComponent {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item)}>
                       <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
-                      <Text style={{color: colors.main_color}}>查看 </Text>
-                      <Entypo name="chevron-thin-right" style={styles.iconShow}/>
+                      {/*<If condition={allowChange && item?.show_update > 0}>*/}
+                      <If condition={allowChange}>
+                        <Text style={{color: colors.main_color}}>修改 </Text>
+                        <Entypo name="chevron-thin-right" style={styles.iconShow}/>
+                      </If>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.cardContent}>
@@ -553,6 +561,11 @@ class DistributionAnalysisScene extends PureComponent {
       showRightDateModal: false
     })
     let {startNewDateValue, endNewDateValue, analysis_by, headerType} = this.state
+    let endTime = tool.fullDay(Math.round(new Date().getTime()))
+    this.setState({
+      allowChange: tool.fullDay(startNewDateValue * 1000) === endTime
+    })
+
     if (analysis_by === Distribution_Analysis && headerType === 1) {
       this.getDistributionAnalysisData(startNewDateValue, endNewDateValue)
     } else {
