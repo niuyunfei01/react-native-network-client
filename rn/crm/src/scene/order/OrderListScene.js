@@ -27,7 +27,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
+import {cross_icon, empty_data, menu, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -587,8 +587,7 @@ class OrderListScene extends Component {
           if (only_one_store) {
             return;
           }
-          // this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-          this.onPress(Config.ROUTE_STORE_LIST)
+          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
@@ -616,7 +615,7 @@ class OrderListScene extends Component {
           onSelect={(e) => this.onSelect(e)}
         >
           <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color333}}/>
+            <SvgXml xml={menu()}/>
           </View>
         </ModalDropdown>
 

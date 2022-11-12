@@ -13,7 +13,7 @@ import {Button} from "react-native-elements";
 import Config from "../../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
 import {SvgXml} from "react-native-svg";
-import {back} from "../../../svg/svg";
+import {back, class_icon, id_icon, local_icon} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -209,17 +209,17 @@ class StoreList extends PureComponent {
           <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-          {/*<SvgXml xml={local_icon()}/>*/}
+          <SvgXml xml={local_icon()}/>
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.dada_address, 20)} </Text>
         </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
-          {/*<SvgXml xml={id_icon()}/>*/}
+          <SvgXml xml={id_icon()}/>
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.id, 20)} </Text>
         </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 12}}>
-          {/*<SvgXml xml={class_icon()}/>*/}
+          <SvgXml xml={class_icon()}/>
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.category_desc, 20)} </Text>
         </View>
         <TouchableOpacity onPress={() => {
@@ -244,7 +244,7 @@ class StoreList extends PureComponent {
             <If condition={item?.count_of_wsb_delivery <= 0}>
               <Text style={{color: colors.main_color, fontSize: 13}}> 暂无开通 </Text>
             </If>
-            
+
             <If condition={item?.count_of_store_delivery > 0}>
               <Text style={{color: colors.color999, fontSize: 13, marginLeft: 12}}> 自有账号 </Text>
               <Text style={{color: colors.main_color, fontSize: 13}}> {item?.count_of_store_delivery} </Text>
