@@ -284,11 +284,14 @@ class SearchShop extends Component {
       </View>
     )
   }
-  onClickItrm = (item) => {
+  onClickItem = (item) => {
     let {isMap, is_default} = this.state;
     InteractionManager.runAfterInteractions(() => {
       if (isMap) {
         if (!is_default) {
+          if(!item?.adname){
+            item.adname =  this.state.city
+          }
           this.props.route.params.onBack(item);
         }
         this.props.navigation.goBack();
@@ -346,7 +349,7 @@ class SearchShop extends Component {
                                   borderBottomWidth: 0.5,
                                   backgroundColor: 'white',
                                 }}
-                                onPress={() => this.onClickItrm(item)}>
+                                onPress={() => this.onClickItem(item)}>
                 <View>
                   <Text style={{
                     color: colors.color333,

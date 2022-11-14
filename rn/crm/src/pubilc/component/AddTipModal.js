@@ -224,10 +224,10 @@ class AddTipModal extends React.Component {
                     }}
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
-                      borderRadius: 24,
-                      length: 48,
+                      borderRadius: 21,
+                      length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
           </View>
         </View>
       </JbbModal>
