@@ -65,7 +65,8 @@ class SaveStore extends PureComponent {
       contact_phone: '',
       city: '',
       show_back_modal: false,
-      show_category_modal: false
+      show_category_modal: false,
+      show_placeholder: true,
     };
     this.fetchCategories()
     if (type !== 'add') {
@@ -192,8 +193,8 @@ class SaveStore extends PureComponent {
     }
     const validator = new Validator();
     validator.add(store_name, 'required', '请填写门店名称')
-    // validator.add(lat, 'required', '请设置门店地址')
-    validator.add(store_address, 'required', '请填写详细门牌号')
+    validator.add(lat, 'required', '请设置门店地址')
+    validator.add(store_address, 'required', '请设置门店地址')
     validator.add(category_id, 'required', '请设置门店品类')
     validator.add(contact_name, 'required', '请填写门店联系人')
     validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的手机号')
@@ -207,7 +208,10 @@ class SaveStore extends PureComponent {
     const {accessToken} = this.props.global;
     const api = `/v4/wsb_store/editOfStore?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, params).then((res) => {
-      console.log(res, 'res')
+      this.setState({
+        loading: false
+      })
+      ToastShort(res?.desc);
     }, (e) => {
       ToastShort(e?.desc);
     }).catch((e) => {
@@ -260,7 +264,15 @@ class SaveStore extends PureComponent {
   }
 
   renderBody = () => {
-    let {store_name, store_address, street_block, category_desc, contact_name, contact_phone} = this.state;
+    let {
+      store_name,
+      store_address,
+      street_block,
+      category_desc,
+      contact_name,
+      contact_phone,
+      show_placeholder
+    } = this.state;
     return (
       <ScrollView automaticallyAdjustContentInsets={false}
                   showsHorizontalScrollIndicator={false}
@@ -285,18 +297,23 @@ class SaveStore extends PureComponent {
             height: 56
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店名称 </Text>
-            <TextInput placeholder="请填写门店名称"
+            <TextInput placeholder={"请填写门店名称"}
                        underlineColorAndroid="transparent"
                        style={{flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={'#999'}
+                       placeholderTextColor={show_placeholder ? '#999' : colors.white}
                        value={store_name}
                        maxLength={20}
+                       onBlur={() => {
+                         this.setState({
+                           show_placeholder: true
+                         })
+                       }}
                        multiline={true}
                        numberOfLines={2}
                        onFocus={() => {
-                         if (tool.length(store_name) <= 0) {
-                           ToastShort('请填写门店名称')
-                         }
+                         this.setState({
+                           show_placeholder: false
+                         })
                        }}
                        onChangeText={store_name => {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
