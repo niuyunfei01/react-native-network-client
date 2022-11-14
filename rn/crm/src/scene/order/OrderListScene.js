@@ -15,7 +15,6 @@ import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
 import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
-import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
 import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
 
@@ -741,7 +740,7 @@ class OrderListScene extends Component {
       return <View/>
     }
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10}}>
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
         <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
       </View>
     )

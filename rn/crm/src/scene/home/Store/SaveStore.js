@@ -196,7 +196,7 @@ class SaveStore extends PureComponent {
     validator.add(store_address, 'required', '请填写详细门牌号')
     validator.add(category_id, 'required', '请设置门店品类')
     validator.add(contact_name, 'required', '请填写门店联系人')
-    validator.add(contact_phone, 'required|equalLenth:11|isMobile', '请输入正确的手机号')
+    validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的手机号')
     const err_msg = validator.start();
     if (err_msg) {
       this.setState({

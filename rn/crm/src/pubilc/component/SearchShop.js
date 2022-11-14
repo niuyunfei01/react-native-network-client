@@ -307,6 +307,9 @@ class SearchShop extends Component {
     InteractionManager.runAfterInteractions(() => {
       if (isMap) {
         if (!is_default) {
+          if(!item?.adname){
+            item.adname =  this.state.city
+          }
           this.props.route.params.onBack(item);
         }
         this.props.navigation.goBack();

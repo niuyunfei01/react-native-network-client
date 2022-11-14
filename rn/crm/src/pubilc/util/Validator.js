@@ -1,7 +1,6 @@
 const tool = require("./tool");
 const strategies = {
   required: function (value, errMsg) {
-    console.log(value, tool.length(value))
     if (tool.length(value) <= 0) {
       return errMsg;
     }
@@ -11,7 +10,7 @@ const strategies = {
       return errMsg;
     }
   },
-  equalLenth: function (value, length, errMsg) {
+  equalLength: function (value, length, errMsg) {
     if (tool.length(value) === length) {
       return errMsg;
     }

@@ -14,6 +14,9 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 999
   },
+  item_text_style: {
+    fontSize: 14,
+  }
 })
 
 class TopSelectModal extends React.Component {
@@ -23,8 +26,8 @@ class TopSelectModal extends React.Component {
       PropTypes.number,
       PropTypes.string
     ]),
-    label_field:PropTypes.string,
-    value_field:PropTypes.string,
+    label_field: PropTypes.string,
+    value_field: PropTypes.string,
     onPress: PropTypes.func,
     onClose: PropTypes.func,
     visible: PropTypes.bool,
@@ -79,7 +82,10 @@ class TopSelectModal extends React.Component {
                 }}>
                   <Text style={[
                     styles.item_text_style,
-                    {color: default_val === item?.[value_field] ? colors.main_color : colors.color666}
+                    {
+                      color: default_val === item?.[value_field] ? colors.main_color : colors.color666,
+                      fontWeight: default_val === item?.[value_field] ? 'bold' : 'normal',
+                    }
                   ]}> {item?.[label_field]} </Text>
                 </TouchableOpacity>
               </For>
