@@ -24,6 +24,7 @@ import AlertModal from "../../pubilc/component/AlertModal";
 import DatePicker from "react-native-date-picker";
 import dayjs from "dayjs";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
+import JbbModal from "../../pubilc/component/JbbModal";
 
 const {width} = Dimensions.get("window");
 
@@ -52,11 +53,14 @@ const initState = {
   },
   list: [],
   orderStatus: 9,
-  search_date: new Date(),
+  search_start_date: new Date(),
+  search_end_date: new Date(),
+  search_start_date_input_val: new Date(),
+  search_end_date_input_val: new Date(),
   search_status: 0,
   search_type: 0,
   search_platform: 0,
-  date_desc: dayjs(new Date()).format('MM-DD'),
+  date_desc: dayjs(new Date()).format('MM/DD'),
   status_desc: '状态',
   type_desc: '类型',
   platform_desc: '平台',
@@ -91,6 +95,8 @@ const initState = {
   show_select_store_modal: false,
   show_condition_modal: 0,
   show_date_modal: false,
+  show_date_select_modal: false,
+  show_date_type: 1,
 };
 
 class OrderAllScene extends Component {
@@ -123,19 +129,14 @@ class OrderAllScene extends Component {
   }
 
   onRefresh = (status) => {
-    // tool.debounces(() => {
     const {isLoading, query} = this.state
-    if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
-      GlobalUtil.setOrderFresh(1)
-      if (isLoading)
-        this.setState({isLoading: true})
-      return;
+    if (isLoading) {
+      return
     }
     this.setState({
         query: {...query, page: 1, isAdd: true, offset: 0},
       },
       () => this.fetchOrders(status))
-    // }, 500)
   }
 
   fetchOrders = (queryType, setList = 1) => {
@@ -246,13 +247,19 @@ class OrderAllScene extends Component {
 
 
   checkDatePicker = (date) => {
-    this.setState({
-      search_date: date,
-      date_desc: dayjs(date).format('MM-DD'),
-      show_date_modal: false,
+    let {show_date_type} = this.state;
+    let params = {
+      show_date_select_modal: false,
       is_right_once: 0,
-    })
+    }
+    if (show_date_type === 1) {
+      params.search_start_date_input_val = date;
+    } else {
+      params.search_end_date_input_val = date;
+    }
+    this.setState(params)
   };
+
   checkItem = (item) => {
     let {show_condition_modal} = this.state;
     let params = {};
@@ -294,8 +301,6 @@ class OrderAllScene extends Component {
       show_cancel_delivery_modal,
       show_select_store_modal,
       show_condition_modal,
-      show_date_modal,
-      search_date,
       add_tip_id,
       check_list,
       check_item
@@ -322,26 +327,7 @@ class OrderAllScene extends Component {
         />
 
         {this.renderContent(list)}
-
-        <DatePicker
-          confirmText={'确定'}
-          cancelText={'取消'}
-          title={'日期'}
-          modal
-          mode={'date'}
-          textColor={colors.color666}
-          open={show_date_modal}
-          date={search_date}
-          minimumDate={dayjs(new Date()).subtract(90, 'day').toDate()}
-          maximumDate={new Date()}
-          onConfirm={(date) => {
-            this.checkDatePicker(date)
-          }}
-          onCancel={() => {
-            this.closeModal()
-          }}
-        />
-
+        {this.renderDateModal(list)}
         {this.renderFinishDeliveryModal()}
         <GoodsListModal
           setState={this.setState.bind(this)}
@@ -350,6 +336,7 @@ class OrderAllScene extends Component {
           order_id={order_id}
           currStoreId={currStoreId}
           show_goods_list={show_goods_list}/>
+
         <DeliveryStatusModal
           order_id={order_id}
           order_status={0}
@@ -384,6 +371,89 @@ class OrderAllScene extends Component {
 
       </View>
     );
+  }
+
+  confirmDate = () => {
+    let {search_start_date_input_val, search_end_date_input_val,} = this.state;
+    let date_desc = ''
+    if (dayjs(search_start_date_input_val).format('YYYY-MM-DD') === dayjs(search_end_date_input_val).format('YYYY-MM-DD')) {
+      date_desc = dayjs(search_start_date_input_val).format('MM/DD');
+    } else {
+      date_desc = dayjs(search_start_date_input_val).format('MM/DD') + '-' + dayjs(search_end_date_input_val).format('MM/DD');
+    }
+
+    this.setState({
+      show_date_modal: false,
+      search_start_date_input_val: search_start_date_input_val,
+      show_date_select_modal: search_end_date_input_val,
+      date_desc,
+    })
+  }
+
+  renderDateModal = () => {
+    let {
+      show_date_modal,
+      search_start_date_input_val,
+      search_end_date_input_val,
+      show_date_select_modal,
+      show_date_type
+    } = this.state;
+    return (
+      <JbbModal visible={show_date_modal} onClose={this.closeModal} modal_type={'bottom'}
+                modalStyle={{padding: 0}}
+      >
+        <View style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: 50,
+          marginHorizontal: 20
+        }}>
+          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}> 选择日期 </Text>
+          <Text
+            style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}}
+            onPress={this.confirmDate}> 确定 </Text>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+          height: 70
+        }}>
+          <TouchableOpacity onPress={() => {
+            this.setState({show_date_select_modal: true, show_date_type: 1})
+          }}>
+            <Text> {dayjs(search_start_date_input_val).format('YYYY-MM-DD')} </Text>
+          </TouchableOpacity>
+          <Text>-</Text>
+          <TouchableOpacity onPress={() => this.setState({show_date_select_modal: true, show_date_type: 2})}>
+            <Text> {dayjs(search_end_date_input_val).format('YYYY-MM-DD')} </Text>
+          </TouchableOpacity>
+
+          <DatePicker
+            confirmText={'确定'}
+            cancelText={'取消'}
+            title={'选择日期'}
+            modal
+            mode={'date'}
+            textColor={colors.color666}
+            open={show_date_select_modal}
+            date={show_date_type === 1 ? search_start_date_input_val : search_end_date_input_val}
+            minimumDate={show_date_type === 1 ? dayjs(new Date()).subtract(90, 'day').toDate() : search_start_date_input_val}
+            maximumDate={new Date()}
+            onConfirm={(date) => {
+              this.checkDatePicker(date)
+            }}
+            onCancel={() => {
+              this.setState({
+                show_date_select_modal: false
+              })
+            }}
+          />
+        </View>
+      </JbbModal>
+    )
   }
 
   renderConditionTabs = () => {
