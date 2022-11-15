@@ -200,9 +200,10 @@ class AddTipModal extends React.Component {
               />
             </View>
             <If condition={tool.length(respReason) > 0}>
-
               <View style={{
-                flexDirection: "row", alignItems: "center",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 5,
               }}>
                 <Entypo name={"help-with-circle"}
                         style={{
@@ -213,7 +214,8 @@ class AddTipModal extends React.Component {
                 <Text style={{
                   color: colors.warn_red,
                   fontSize: 14,
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  width: width * 0.6
                 }}>{respReason} </Text>
               </View>
             </If>
