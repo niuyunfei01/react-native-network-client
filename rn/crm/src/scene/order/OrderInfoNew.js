@@ -466,6 +466,7 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
+      show_delivery_modal: false,
       showQrcode: false,
     })
   }
