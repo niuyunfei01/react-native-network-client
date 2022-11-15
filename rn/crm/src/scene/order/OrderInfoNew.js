@@ -138,7 +138,8 @@ class OrderInfoNew extends PureComponent {
       show_add_tip_modal: false,
       allowRefresh: true,
       show_finish_delivery_modal: false,
-      show_cancel_delivery_modal: false
+      show_cancel_delivery_modal: false,
+      orders_add_tip: true,
     }
   }
 
@@ -583,9 +584,10 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
-  openAddTipModal = (order_id) => {
+  openAddTipModal = (add_tip_id, orders_add_tip = true) => {
     this.setState({
-      add_tip_id: order_id,
+      add_tip_id: add_tip_id,
+      orders_add_tip: orders_add_tip,
       show_add_tip_modal: true,
       show_delivery_modal: false
     })
@@ -1322,7 +1324,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderAddTipModal = () => {
-    let {show_add_tip_modal, add_tip_id} = this.state;
+    let {show_add_tip_modal, add_tip_id, orders_add_tip} = this.state;
     const {global, dispatch} = this.props;
     const {accessToken} = global;
     return (
@@ -1330,7 +1332,7 @@ class OrderInfoNew extends PureComponent {
         setState={this.setState.bind(this)}
         accessToken={accessToken}
         id={add_tip_id}
-        orders_add_tip={true}
+        orders_add_tip={orders_add_tip}
         dispatch={dispatch}
         show_add_tip_modal={show_add_tip_modal}/>
     )
