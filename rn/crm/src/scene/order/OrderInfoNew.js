@@ -997,14 +997,14 @@ class OrderInfoNew extends PureComponent {
             <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
           </View>
         </View>
-        <View style={styles.cuttingLine}/>
+        <View style={styles.line}/>
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
             <Text style={styles.remarkLabel}>备注 </Text>
             <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>
-        <View style={styles.cuttingLine}/>
+        <View style={styles.line}/>
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -1070,7 +1070,7 @@ class OrderInfoNew extends PureComponent {
               </For>
             </If>
           </View>
-          <View style={styles.cuttingLine}/>
+          <View style={styles.line}/>
           <View style={[styles.orderCardContainer, {
             flexDirection: "column",
             borderBottomLeftRadius: 6,
@@ -1170,7 +1170,7 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用</Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-          <View style={styles.cuttingLine1}/>
+          <View style={styles.line}/>
           <If condition={tool.length(order.greeting) > 0}>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语</Text>
@@ -1557,8 +1557,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.1,
-    elevation: 5,
+    shadowOpacity: 0.05,
+    elevation: 2,
     shadowRadius: 12
   },
   orderCardHeader: {
@@ -1589,7 +1589,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
-    marginBottom: 10
   },
   logLabel: {
     fontSize: 14,
@@ -1620,17 +1619,10 @@ const styles = StyleSheet.create({
   cardTitlePhone: {
     fontSize: 16
   },
-  cuttingLine: {
-    backgroundColor: colors.e5,
-    height: 0.2,
-    width: width * 0.86,
-    marginLeft: width * 0.03
-  },
-  cuttingLine1: {
-    backgroundColor: colors.e5,
-    height: 0.5,
-    width: width * 0.86,
-    marginVertical: 10
+  line: {
+    borderBottomColor: colors.e5,
+    borderBottomWidth: 1,
+    marginHorizontal: 12
   },
   productInfo: {flexDirection: "row", marginVertical: 7.5},
   productImage: {
@@ -1645,12 +1637,12 @@ const styles = StyleSheet.create({
     marginLeft: 5
   },
   productItemName: {fontSize: 14, fontWeight: '400', color: '#1A1614', width: width * 0.7},
-  productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
+  productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 2},
   productItemPrice: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
     width: width * 0.7
   },
   priceBao: {

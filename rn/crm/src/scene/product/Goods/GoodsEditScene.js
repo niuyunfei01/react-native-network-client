@@ -1819,7 +1819,7 @@ class GoodsEditScene extends PureComponent {
                       getItemLayout={this._getItemLayout}
                       onRefresh={this.onRefresh}
                       refreshing={false}
-                      ListEmptyComponent={this.ListEmptyComponent}
+                      ListEmptyComponent={this.ListEmptyComponent()}
                       onEndReachedThreshold={0.2}
                       onEndReached={this.onLoadMore}
                       onScrollBeginDrag={this.onScrollBeginDrag}
@@ -1899,15 +1899,16 @@ class GoodsEditScene extends PureComponent {
           picList: Number(page) === 1 ? lists : picList.concat(lists),
           isLastPage: isLastPage,
           page: page,
+          isSearchPicList: true,
           isLoadingPic: false
         })
       else {
         showError('返回的结果有问题', 1)
-        this.setState({isLoadingPic: false})
+        this.setState({isSearchPicList: true, isLoadingPic: false})
       }
     }).catch(() => {
       showError('返回的结果有问题', 1)
-      this.setState({isLoadingPic: false})
+      this.setState({isSearchPicList: true, isLoadingPic: false})
     })
 
   }
