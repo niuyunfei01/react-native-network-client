@@ -215,14 +215,15 @@ class GoodStoreDetailScene extends PureComponent {
     const url = `/api_products/get_prod_with_store_detail/${store_id}/${product_id}?access_token=${accessToken}`;
     //showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      const product = product_id === 0 ? params.item : data.p
-      const spec = {...product, ...data.sp}
-      const retail_price_enabled = data.vendor?.retail_price_enabled ? data.vendor.retail_price_enabled : '0'
+      const {p = {}, sp = [], vendor = {}, ext_stores = []} = data
+      const product = product_id === 0 ? params.item : p
+      const spec = {...product, ...sp}
+      const retail_price_enabled = vendor?.retail_price_enabled ? vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
       const selectedSpecArray = []
-      if (spec?.sku_name !== undefined) {
+      if (spec?.sku_name) {
         selectedSpecArray.push({
-          value: spec.product_id,
+          value: spec?.product_id || '',
           label: spec?.sku_name ? spec?.sku_name : spec?.name,
           stallName: spec.stall_name,
           price: spec.supply_price,
@@ -232,7 +233,7 @@ class GoodStoreDetailScene extends PureComponent {
       if (tool.length(spec?.skus) > 0)
         spec.skus.map(sku => {
           selectedSpecArray.push({
-            value: sku.product_id,
+            value: sku?.product_id || '',
             label: sku?.sku_name,
             stallName: sku.stall_name,
             price: sku.supply_price,
@@ -244,21 +245,21 @@ class GoodStoreDetailScene extends PureComponent {
       })
       if (product_id === 0) {
         this.setState({
-          ext_stores: data.ext_stores,
+          ext_stores: ext_stores,
           product: params.item,
-          store_prod: data.sp,
+          store_prod: sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type || 0
+          price_type: vendor?.price_type || 0
         })
       } else {
         this.setState({
-          ext_stores: data.ext_stores,
-          product: data.p,
-          store_prod: data.sp,
+          ext_stores: ext_stores,
+          product: p,
+          store_prod: sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type || 0
+          price_type: vendor?.price_type || 0
         })
       }
 
