@@ -187,9 +187,7 @@ class SearchShop extends Component {
   render() {
     let {shops, ret_list, isMap} = this.state;
     return (
-      <View style={{
-        flex: 1,
-      }}>
+      <View style={{flex: 1}}>
 
         {this.renderHeader()}
         <If condition={!isMap}>
@@ -230,10 +228,7 @@ class SearchShop extends Component {
           </If>
           <SearchBar
             inputStyle={{fontSize: 14, color: colors.color333}}
-            leftIconContainerStyle={{
-              width: 20,
-              height: 20
-            }}
+            leftIconContainerStyle={{width: 20, height: 20}}
             cancelIcon={true}
             clearIcon={true}
             inputContainerStyle={{
@@ -276,7 +271,9 @@ class SearchShop extends Component {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}> 请输入准确的地址信息进行搜索，如小区，大厦等 </Text>
+              <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}>
+                请输入准确的地址信息进行搜索，如小区，大厦等
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -284,11 +281,14 @@ class SearchShop extends Component {
       </View>
     )
   }
-  onClickItrm = (item) => {
-    let {isMap, is_default} = this.state;
+  onClickItem = (item) => {
+    let {isMap, is_default, cityname} = this.state;
     InteractionManager.runAfterInteractions(() => {
       if (isMap) {
         if (!is_default) {
+          if (!item?.adname) {
+            item.adname = cityname
+          }
           this.props.route.params.onBack(item);
         }
         this.props.navigation.goBack();
@@ -346,17 +346,14 @@ class SearchShop extends Component {
                                   borderBottomWidth: 0.5,
                                   backgroundColor: 'white',
                                 }}
-                                onPress={() => this.onClickItrm(item)}>
+                                onPress={() => this.onClickItem(item)}>
                 <View>
-                  <Text style={{
-                    color: colors.color333,
-                    fontSize: 16
-                  }}> {item?.name}  </Text>
-                  <Text
-                    style={{
-                      color: colors.color666,
-                      fontSize: 12
-                    }}> {tool.jbbsubstr(item?.address, 18)} </Text>
+                  <Text style={{color: colors.color333, fontSize: 16}}>
+                    {item?.name}
+                  </Text>
+                  <Text style={{color: colors.color666, fontSize: 12}}>
+                    {tool.jbbsubstr(item?.address, 18)}
+                  </Text>
                 </View>
               </TouchableOpacity>
             )
@@ -367,7 +364,7 @@ class SearchShop extends Component {
   }
 
   renderMap() {
-    let {shopmsg} = this.state;
+    let {shopmsg = {}} = this.state;
     let lat = shopmsg.location.split(",")[1];
     let lng = shopmsg.location.split(",")[0];
     if (!lat || !lng) {
@@ -391,7 +388,7 @@ class SearchShop extends Component {
               aLon,
               aLat
             } = tool.getCenterLonLat(northeast?.longitude, northeast?.latitude, southwest?.longitude, southwest?.latitude)
-            if (aLon, aLat) {
+            if (aLon || aLat) {
               this.setLatLng(aLat, aLon)
             }
           }}
@@ -410,10 +407,9 @@ class SearchShop extends Component {
                 padding: 8,
                 borderRadius: 6,
               }}>
-                <Text style={{
-                  color: colors.color333,
-                  fontSize: 12,
-                }}>{tool.jbbsubstr(address, 5, 0, '标注点')} </Text>
+                <Text style={{color: colors.color333, fontSize: 12}}>
+                  {tool.jbbsubstr(address, 5, 0, '标注点')}
+                </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>

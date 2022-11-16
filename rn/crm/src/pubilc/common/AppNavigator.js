@@ -327,6 +327,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
                       getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT_PLATFORM} options={{headerTitle: '平台结算'}}
+                      getComponent={() => require('../../scene/home/Settlement/SettlementPlatform').default}
+        />
         <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} options={{headerTitle: '批量改价'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsBatchPriceScene').default}
                       initialParams={initialRouteParams}/>

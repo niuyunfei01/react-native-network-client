@@ -498,10 +498,10 @@ class StoreInfo extends Component {
         cityId: res.citycode
       }
     }
-    if (res.address) {
+    if (res?.address) {
       states.dada_address = res.address;
     }
-    if (res.adname) {
+    if (res?.adname) {
       states.district = res.adname
     }
     this.setState(states)
@@ -961,7 +961,7 @@ class StoreInfo extends Component {
             }
             const params = {
               center: center,
-              keywords: this.state.dada_address,
+              keywords: this.props.route.params.btn_type === 'add',
               onBack: (res) => {
                 this.setAddress.bind(this)(res)
               },

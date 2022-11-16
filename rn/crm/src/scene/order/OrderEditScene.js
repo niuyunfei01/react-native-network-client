@@ -144,7 +144,6 @@ class OrderEditScene extends Component {
     this.editFields.map(edit => init[edit.key] = edit.val(order));
 
     this.setState(init);
-    this.getUserTags();
   }
 
   getUserTagNames() {
@@ -154,40 +153,6 @@ class OrderEditScene extends Component {
     } else {
       return names.join(',')
     }
-  }
-
-  getUserTagIds() {
-    let ids = _.pluck(this.state.userTags, 'id');
-    if (_.isEmpty(ids)) {
-      return []
-    } else {
-      return ids
-    }
-  }
-
-  getUserTags() {
-    const self = this
-    const {accessToken} = this.props.global;
-    const {order} = this.props.route.params;
-    const url = `api/get_user_tags/${order.user_id}?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
-      let {ok, reason, obj} = resp;
-      if (ok) {
-        self.setState({userTags: obj})
-      }
-    })
-  }
-
-  saveUserTags(tags) {
-    let ids = _.pluck(tags, 'id')
-    if (_.isEmpty(ids)) {
-      ids = [];
-    }
-    const {dispatch, global} = this.props;
-    const token = global.accessToken;
-    const {order} = this.props.route.params;
-    dispatch(saveUserTag(token, order.user_id, ids, (ok, msg, respData) => {
-    }))
   }
 
   _storeLoc() {
@@ -354,9 +319,6 @@ class OrderEditScene extends Component {
     return tool.length(ts) === 0;
   }
 
-  showTagPopup(multi) {
-    this.setState({userTagPopupVisible: true, userTagPopupMulti: true})
-  }
 
   render() {
     return (
@@ -482,70 +444,6 @@ class OrderEditScene extends Component {
           </Cell>
         </Cells>
 
-        <CellsTitle style={CommonStyle.cellsTitle35}>发票</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>发票抬头</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder=""
-                value={this.state.taxInvoice}
-                onChangeText={this._onChangeTaxInvoice}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-              />
-            </CellBody>
-          </Cell>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>税 号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder="个人可不填"
-                value={this.state.taxId}
-                onChangeText={this._onChangeTaxId}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={CommonStyle.cellsTitle35}>标签</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>选择标签</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity onPress={() => this.showTagPopup()}>
-                <Text style={styles.body_text}>
-                  {this.getUserTagNames()}
-                </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <WhiteSpace/>
-
-        <UserTagPopup
-          multiple={this.state.userTagPopupMulti}
-          visible={this.state.userTagPopupVisible}
-          selectTagIds={this.getUserTagIds()}
-          onClickWorker={(tag) => {
-            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
-          }}
-          onComplete={(tags) => {
-            this.setState({userTags: tags})
-            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
-            this.saveUserTags(tags)
-          }}
-          onCancel={() => this.setState({userTagPopupMulti: false, userTagPopupVisible: false})}
-        />
       </ScrollView>
     );
   }

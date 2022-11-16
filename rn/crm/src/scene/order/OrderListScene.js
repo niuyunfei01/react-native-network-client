@@ -91,7 +91,8 @@ const initState = {
   show_add_tip_modal: false,
   show_delivery_modal: false,
   show_cancel_delivery_modal: false,
-  show_finish_delivery_modal: false
+  show_finish_delivery_modal: false,
+  orders_add_tip: true,
 };
 const timeObj = {
   deviceInfo: {},
@@ -334,9 +335,10 @@ class OrderListScene extends Component {
     ToastLong('编码不合法，请重新扫描')
   }
 
-  openAddTipModal = (order_id) => {
+  openAddTipModal = (add_tip_id, orders_add_tip = true) => {
     this.setState({
-      add_tip_id: order_id,
+      add_tip_id: add_tip_id,
+      orders_add_tip: orders_add_tip,
       show_add_tip_modal: true,
       show_delivery_modal: false
     })
@@ -371,6 +373,7 @@ class OrderListScene extends Component {
       show_cancel_delivery_modal,
       add_tip_id,
       orderStatus,
+      orders_add_tip,
     } = this.state
 
     return (
@@ -421,7 +424,7 @@ class OrderListScene extends Component {
           setState={this.setState.bind(this)}
           accessToken={accessToken}
           id={add_tip_id}
-          orders_add_tip={true}
+          orders_add_tip={orders_add_tip}
           dispatch={dispatch}
           show_add_tip_modal={show_add_tip_modal}/>
 
@@ -590,7 +593,11 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }}
                           style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+          <Text style={{
+            fontSize: 15,
+            color: colors.color333,
+            fontWeight: 'bold'
+          }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={this_down()}/>
           </If>

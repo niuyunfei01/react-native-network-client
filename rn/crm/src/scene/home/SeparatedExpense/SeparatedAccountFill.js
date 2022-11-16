@@ -14,6 +14,8 @@ import Alipay from '@uiw/react-native-alipay';
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import {Button, CheckBox} from "react-native-elements";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {SvgXml} from "react-native-svg";
+import {check_circle_icon, check_icon} from "../../../svg/svg";
 
 const timeObj = {
   deviceInfo: {},
@@ -53,7 +55,7 @@ class SeparatedAccountFill extends PureComponent {
       isCustomMoney: false,
       pay_by: PAY_ALI_APP,
       balance: 0,
-      authorization: false,
+      authorization: true,
       recharge_amount: [
         {label: '100元', value: '100'},
         {label: '300元', value: '300'},
@@ -242,6 +244,8 @@ class SeparatedAccountFill extends PureComponent {
         <TouchableOpacity onPress={this.setCheckd}
                           style={{flexDirection: 'row', alignItems: 'center'}}>
           <CheckBox
+            size={18}
+            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
             checkedColor={colors.main_color}
             uncheckedColor={'#DDDDDD'}
             containerStyle={{margin: 0, padding: 0}}
@@ -363,7 +367,7 @@ class SeparatedAccountFill extends PureComponent {
               <FontAwesome5 size={24} name={'weixin'} style={style.wechatIcon}/>
               <Text style={{flex: 1, fontSize: 12, fontWeight: 'bold', color: colors.color333}}>微信 </Text>
               {pay_by === PAY_WECHAT_APP ?
-                <FontAwesome5 size={20} name={'check-circle'} style={style.circle}/> :
+                <SvgXml xml={check_circle_icon()}/> :
                 <FontAwesome5 size={20} name={'circle'} style={style.circle}/>
               }
             </TouchableOpacity>
@@ -380,7 +384,7 @@ class SeparatedAccountFill extends PureComponent {
               <FontAwesome5 size={24} name={'alipay'} style={style.alipayIcon}/>
               <Text style={{flex: 1, fontSize: 12, fontWeight: 'bold', color: colors.color333}}>支付宝 </Text>
               {pay_by === PAY_ALI_APP ?
-                <FontAwesome5 size={20} name={'check-circle'} style={style.circle}/> :
+                <SvgXml xml={check_circle_icon()}/> :
                 <FontAwesome5 size={20} name={'circle'} style={style.circle}/>
               }
             </TouchableOpacity>
@@ -410,7 +414,7 @@ const style = StyleSheet.create({
   alipayIcon: {color: '#1777ff', margin: pxToDp(10)},
   wechatIcon: {color: '#00c250', margin: pxToDp(10)},
   circle: {
-    color: colors.main_color,
+    color: colors.colorDDD,
   },
 
 });
