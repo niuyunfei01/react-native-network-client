@@ -49,7 +49,6 @@ class AlertModal extends PureComponent {
                     color: colors.color333,
                     fontWeight: 'bold',
                     marginVertical: 10,
-                    lineHeight: 22
                   }}>{this.props.title} </Text>
               </View>
 
@@ -63,7 +62,6 @@ class AlertModal extends PureComponent {
                     }}>{this.props.desc} </Text>
                 </View>
               </If>
-
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',

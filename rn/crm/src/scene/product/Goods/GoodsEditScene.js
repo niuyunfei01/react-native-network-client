@@ -565,7 +565,7 @@ class GoodsEditScene extends PureComponent {
 
           if (threeArray) {
             for (let threeIndex = 0, threeLength = threeArray.length; threeIndex < threeLength; threeIndex++) {
-              if (id.toString() === threeArray[threeIndex].id) {
+              if (id == threeArray[threeIndex].id) {
 
                 this.setState({
                   basic_category_obj: threeArray[threeIndex],
@@ -1812,12 +1812,6 @@ class GoodsEditScene extends PureComponent {
                              onPress={() => this.setSearchPicText('')}/>
                 </If>
               </View>
-
-              <If condition={searchPicText}>
-                <Text style={styles.searchPicFromLib} onPress={() => this.searchPicList(searchPicText)}>
-                  搜索
-                </Text>
-              </If>
             </View>
             <FlatList data={picList}
                       showsVerticalScrollIndicator={false}
@@ -1827,7 +1821,7 @@ class GoodsEditScene extends PureComponent {
                       getItemLayout={this._getItemLayout}
                       onRefresh={this.onRefresh}
                       refreshing={false}
-                      ListEmptyComponent={this.ListEmptyComponent}
+                      ListEmptyComponent={this.ListEmptyComponent()}
                       onEndReachedThreshold={0.2}
                       onEndReached={this.onLoadMore}
                       onScrollBeginDrag={this.onScrollBeginDrag}
@@ -1879,14 +1873,11 @@ class GoodsEditScene extends PureComponent {
     this.setState({searchPicText: value})
     if (!value) {
       this.resetPicList()
-      return
     }
-    tool.debounces(() => {
-      Keyboard.dismiss()
-    }, 200)
   }
 
   searchPicList = (searchPicText) => {
+    Keyboard.dismiss()
     showModal('加载中', 'loading', 6000, 1)
     const {vendor_id, accessToken} = this.props.global
     const {page, pageSize, picList} = this.state
@@ -1910,17 +1901,18 @@ class GoodsEditScene extends PureComponent {
           picList: Number(page) === 1 ? lists : picList.concat(lists),
           isLastPage: isLastPage,
           page: page,
+          isSearchPicList: true,
           isLoadingPic: false
         })
       else {
         showError('返回的结果有问题', 1)
-        this.setState({isLoadingPic: false})
+        this.setState({isSearchPicList: true, isLoadingPic: false})
       }
     }).catch(() => {
       showError('返回的结果有问题', 1)
-      this.setState({isLoadingPic: false})
+      this.setState({isSearchPicList: true, isLoadingPic: false})
     })
-    Keyboard.dismiss()
+
   }
 
   modifyPic = (item) => {

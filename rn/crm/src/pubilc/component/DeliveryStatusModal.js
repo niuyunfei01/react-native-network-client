@@ -335,13 +335,47 @@ class deliveryStatusModal extends React.Component {
                         </If>
                       </View>
                     </View>
-                    {info?.default_show ?
-                      <Entypo name='chevron-thin-up' style={styles.IconShow}/> :
-                      <Entypo name='chevron-thin-down' style={styles.IconShow}/>
-                    }
+                    <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
+                            style={styles.IconShow}/>
                   </TouchableOpacity>
                   <If condition={info?.default_show}>
                     {this.renderDeliveryStatus(info)}
+
+                    <If condition={info?.do_btn_list?.add_tip}>
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        position: 'absolute',
+                        bottom: 1,
+                        right: 1
+                      }}>
+                        <Button title={'加小费'}
+                                onPress={() => {
+                                  this.mixpanel.track('V4配送调度页_加小费')
+                                  this.setState({
+                                    show_modal: false,
+                                    delivery_list: [],
+                                    order_platform_desc: '',
+                                    platform_dayId: '',
+                                    expect_time_desc: '',
+                                    driver_phone: '',
+                                  }, () => {
+                                    this.props.openAddTipModal(info?.id, false)
+                                  })
+                                }}
+                                buttonStyle={{
+                                  borderRadius: 20,
+                                  height: 32,
+                                  width: 80,
+                                  backgroundColor: colors.white,
+                                  borderColor: colors.colorCCC,
+                                  borderWidth: 0.5,
+                                }}
+                                titleStyle={{color: colors.color666, fontSize: 14}}
+                        />
+                      </View>
+                    </If>
+
                   </If>
                 </For>
               </ScrollView>
@@ -365,7 +399,7 @@ class deliveryStatusModal extends React.Component {
           <View style={{flexDirection: "row"}}>
             <View style={styles.flexC}>
               <View style={[styles.circle, {backgroundColor: log?.icon_color}]}/>
-              <If condition={index !== (tool.length(info?.log_list) - 1)}>
+              <If condition={index !== (tool.length(info?.log_list) - 1) || info?.do_btn_list?.add_tip}>
                 <View style={styles.line}/>
               </If>
             </View>

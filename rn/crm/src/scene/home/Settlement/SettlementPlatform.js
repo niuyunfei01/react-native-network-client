@@ -31,9 +31,10 @@ function mapStateToProps(state) {
 class SettlementPlatform extends PureComponent {
   constructor(props) {
     super(props);
+    const params = this.props.route.params?.date
     this.state = {
       showModal: false,
-      date: tool.fullDay(new Date().getTime()),
+      date: tool.fullDay(params.start_time * 1000),
       settlementInfo: this.props.route.params?.info || {},
       platformMoney: '',
       remark_input_value: '',
@@ -92,8 +93,7 @@ class SettlementPlatform extends PureComponent {
 
   closeModal = () => {
     this.setState({
-      showModal: false,
-      date: new Date()
+      showModal: false
     })
   }
 
@@ -113,7 +113,7 @@ class SettlementPlatform extends PureComponent {
   }
 
   renderDatePicker = () => {
-    let {showModal} = this.state;
+    let {showModal, date} = this.state;
     return (
       <DateTimePicker
         cancelTextIOS={'取消'}
@@ -121,7 +121,7 @@ class SettlementPlatform extends PureComponent {
         isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         maximumDate={new Date()}
-        date={new Date()}
+        date={new Date(date)}
         mode='date'
         isVisible={showModal}
         onConfirm={
@@ -154,8 +154,8 @@ class SettlementPlatform extends PureComponent {
               maxLength={9}
               placeholder={'请填写金额'}
               onChangeText={text => {
-                let reg = /^[1-9]+(\.{1}[0-9]+){0,1}$/
-                if (reg.test(text) || text === '' || /^[1-9]+\./.test(text)) {
+                let reg = /^[0-9]+(\.{1}[0-9]+){0,1}$/
+                if (reg.test(text) || text === '' || /^[0-9]+\./.test(text)) {
                   this.setState({
                     platformMoney: text
                   })

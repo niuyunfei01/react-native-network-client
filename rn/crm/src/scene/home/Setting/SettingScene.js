@@ -210,10 +210,12 @@ class SettingScene extends PureComponent {
   }
 
   cancel = () => {
-    const {accessToken, vendor_id, currentUser} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     this.closeModal()
-    const url = `/v1/new_api/User/close_account/${vendor_id}/${currentUser}/0.json?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(() => {
+    const url = `/v4/wsb_store/destroyStore?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url,{
+      store_id,
+    }).then(() => {
         ToastLong('注销成功,正在退出登录', 0)
         setTimeout(() => {
           this._onLogout()

@@ -2,7 +2,6 @@ import React, {PureComponent} from 'react'
 import {
   Appearance,
   InteractionManager,
-  PixelRatio,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,7 +13,7 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Dialog from "../../common/component/Dialog";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Cts from "../../../pubilc/common/Cts";
@@ -40,11 +39,6 @@ const timeOptions = [
   {label: '自定义', value: 3},
 ]
 const tableTitle = ['配送方式', '配送费', '总发单量', '平均成本', '平均距离']
-const styleLine = {
-  borderTopColor: colors.colorDDD,
-  borderTopWidth: 1 / PixelRatio.get() * 2,
-  borderStyle: "dotted"
-};
 
 class DistributionAnalysisScene extends PureComponent {
   constructor(props) {
@@ -125,13 +119,11 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   getProfitAndLossAnalysisData = (startTime, endTime) => {
+    ToastShort("查询中");
     this.setParamsTime(startTime, endTime)
     const {currStoreId, accessToken} = this.state;
-    showModal("查询中");
-    // const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     const api = `/v1/new_api/analysis/profit_data/${currStoreId}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      hideModal()
       this.setState({
         profitAndLoss: res?.data,
         startTimeSaveValue: startTime,
@@ -140,7 +132,6 @@ class DistributionAnalysisScene extends PureComponent {
         ship_fee_txt: res?.ship_fee_txt
       })
     }).catch((reason => {
-      hideModal()
       showError(reason?.desc)
       this.setState({
         headerType: 1
@@ -247,10 +238,14 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  navigateToPlatformDetail = (item) => {
-    this.onPress(Config.ROUTE_SETTLEMENT_PLATFORM, {
-      info: item
-    })
+  navigateToPlatformDetail = (item, allowChange) => {
+    let {params} = this.state;
+    if (item?.show_update > 0 && allowChange) {
+      this.onPress(Config.ROUTE_SETTLEMENT_PLATFORM, {
+        info: item,
+        date: params
+      })
+    }
   }
 
   downProfitInfo = (i) => {
@@ -433,10 +428,9 @@ class DistributionAnalysisScene extends PureComponent {
                       <Entypo name="help-with-circle"
                               style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item)}>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
                       <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
-                      {/*<If condition={allowChange && item?.show_update > 0}>*/}
-                      <If condition={allowChange}>
+                      <If condition={allowChange && item?.show_update > 0}>
                         <Text style={{color: colors.main_color}}>修改 </Text>
                         <Entypo name="chevron-thin-right" style={styles.iconShow}/>
                       </If>
@@ -561,9 +555,8 @@ class DistributionAnalysisScene extends PureComponent {
       showRightDateModal: false
     })
     let {startNewDateValue, endNewDateValue, analysis_by, headerType} = this.state
-    let endTime = tool.fullDay(Math.round(new Date().getTime()))
     this.setState({
-      allowChange: tool.fullDay(startNewDateValue * 1000) === endTime
+      allowChange: tool.fullDay(startNewDateValue * 1000) === tool.fullDay(endNewDateValue * 1000)
     })
 
     if (analysis_by === Distribution_Analysis && headerType === 1) {

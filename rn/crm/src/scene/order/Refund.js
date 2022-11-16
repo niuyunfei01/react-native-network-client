@@ -170,11 +170,7 @@ class Refund extends Component {
     let {showReasonText} = this.state
     let allRefundAccount = this.state.headerType === 1 ? this.state.allRefundAccount : this.getSpreadPriceSum();
     return (
-      <View
-        style={{
-          backgroundColor: "#FFF",
-          flex: 1,
-        }}>
+      <View style={{backgroundColor: "#FFF", flex: 1}}>
 
         <BottomModal
           title={'退款金额' + `(¥${allRefundAccount})`}
@@ -188,24 +184,8 @@ class Refund extends Component {
           })}
         >
           <For index="index" each='element' of={this.state.refundReason}>
-            <TouchableOpacity
-              onPress={() => {
-
-                this.setState({
-                  index: index,
-                  showReasonText: index === 3
-                });
-              }}
-            >
-              <View
-                style={[
-                  {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 15
-                  }
-                ]}
-              >
+            <TouchableOpacity key={index} onPress={() => this.setState({index: index, showReasonText: index === 3})}>
+              <View style={{flexDirection: "row", alignItems: "center", marginTop: 15}}>
                 <View style={{
                   borderRadius: 10,
                   width: 20,
@@ -220,11 +200,7 @@ class Refund extends Component {
                   }}/>
                 </View>
 
-                <Text style={[{
-                  color: colors.fontBlack,
-                  fontSize: 13,
-                  marginLeft: 10
-                }]}>
+                <Text style={[{color: colors.fontBlack, fontSize: 13, marginLeft: 10}]}>
                   {element}
                 </Text>
               </View>
@@ -276,21 +252,17 @@ class Refund extends Component {
         flexDirection: 'row',
         backgroundColor: colors.main_color
       }}>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 1,
-            })
-          }}
-          style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退款</Text>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 2,
-            })
-            this.fetchRefundGoodsList()
-          }}
-          style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退差价</Text>
+        <Text onPress={() => this.setState({headerType: 1})}
+              style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>
+          退款
+        </Text>
+        <Text onPress={() => {
+          this.setState({headerType: 2})
+          this.fetchRefundGoodsList()
+        }}
+              style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>
+          退差价
+        </Text>
       </View>
     )
   }
@@ -451,10 +423,7 @@ class Refund extends Component {
   renderSpread() {
     return (
       <View style={{flexDirection: "column"}}>
-        <View style={{
-          backgroundColor: "#EEEEEE",
-          marginTop: pxToDp(10),
-        }}>
+        <View style={{backgroundColor: "#EEEEEE", marginTop: pxToDp(10),}}>
           <For index="index" each='element' of={this.state.spreadList}>
             <View key={index} style={{
               margin: pxToDp(10),
@@ -532,15 +501,15 @@ class Refund extends Component {
                       textAlign: 'center'
                     }}
                   />
-                  <Text
-                    style={{fontSize: pxToDp(22), color: colors.color111, marginLeft: pxToDp(10)}}>g</Text>
+                  <Text style={{fontSize: pxToDp(22), color: colors.color111, marginLeft: pxToDp(10)}}>
+                    g
+                  </Text>
                 </View>
                 <If condition={element.refund_prices > 0}>
                   <View style={{flexDirection: 'row', alignItems: "center"}}>
-                    <Text style={{
-                      fontSize: pxToDp(28),
-                      color: 'red'
-                    }}>{` ¥ ${element.refund_prices}`} </Text>
+                    <Text style={{fontSize: pxToDp(28), color: 'red'}}>
+                      {` ¥ ${element.refund_prices}`}
+                    </Text>
                   </View>
                 </If>
               </View>
@@ -554,12 +523,8 @@ class Refund extends Component {
           justifyContent: "space-between",
           marginTop: pxToDp(20)
         }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              refundReasonRuleVisible: true
-            })
-          }
-          } style={{flexDirection: "row", justifyContent: "space-between", marginBottom: pxToDp(100)}}>
+          <TouchableOpacity onPress={() => this.setState({refundReasonRuleVisible: true})}
+                            style={{flexDirection: "row", justifyContent: "space-between", marginBottom: pxToDp(100)}}>
             <Image
               source={require("../../img/My/help.png")}
               style={{width: pxToDp(30), height: pxToDp(30), marginHorizontal: pxToDp(10)}}
