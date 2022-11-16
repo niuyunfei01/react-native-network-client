@@ -282,12 +282,12 @@ class SearchShop extends Component {
     )
   }
   onClickItem = (item) => {
-    let {isMap, is_default} = this.state;
+    let {isMap, is_default, cityname} = this.state;
     InteractionManager.runAfterInteractions(() => {
       if (isMap) {
         if (!is_default) {
           if (!item?.adname) {
-            item.adname = this.state.city
+            item.adname = cityname
           }
           this.props.route.params.onBack(item);
         }
