@@ -837,7 +837,7 @@ const headerRightStyles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 10,
     paddingVertical: 10,
-    backgroundColor: rgbaColor(255, 255, 255, 0)
+    backgroundColor: rgbaColor(255, 255, 255, 0.15)
   },
   text: {
     fontSize: 20,

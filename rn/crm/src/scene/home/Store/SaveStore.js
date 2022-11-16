@@ -46,7 +46,7 @@ class SaveStore extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {store_id = 0, type = 'add'} = this.props.route.params;
+    let {store_id = 0, type = 'add', mobile = '', verify_code = ''} = this.props.route.params;
     this.state = {
       loading: false,
       store_id,
@@ -62,14 +62,15 @@ class SaveStore extends PureComponent {
       category_id_input_vlue_desc: '',
       category_desc: '',
       contact_name: '',
-      contact_phone: '',
+      contact_phone: mobile,
+      verify_code: verify_code,
       city: '',
       show_back_modal: false,
       show_category_modal: false,
       show_placeholder: true,
     };
     this.fetchCategories()
-    if (type !== 'add') {
+    if (type === 'edit') {
       this.fetchData()
     }
   }
@@ -258,7 +259,7 @@ class SaveStore extends PureComponent {
           marginRight: 40,
           flex: 1,
           textAlign: 'center'
-        }}> {type === 'add' ? '创建门店' : '门店管理'} </Text>
+        }}> {type === 'edit' ? '门店管理' : '创建门店'} </Text>
       </View>
     )
   }
@@ -271,7 +272,8 @@ class SaveStore extends PureComponent {
       category_desc,
       contact_name,
       contact_phone,
-      show_placeholder
+      show_placeholder,
+      type
     } = this.state;
     return (
       <ScrollView automaticallyAdjustContentInsets={false}
@@ -425,6 +427,7 @@ class SaveStore extends PureComponent {
                        placeholderTextColor={'#999'}
                        maxLength={11}
                        keyboardType={'numeric'}
+                       editable={type !== 'register'}
                        value={contact_phone}
                        onChangeText={value => {
                          // const newText = value.replace(/[^\d]+/, '');
@@ -444,7 +447,7 @@ class SaveStore extends PureComponent {
     let {type} = this.state;
     return (
       <View style={{backgroundColor: colors.white, paddingHorizontal: 20, paddingVertical: 10, height: 62}}>
-        <Button title={type === 'add' ? '保存' : '保存并同步'}
+        <Button title={type === 'edit' ? '保存并同步' : '保 存'}
                 onPress={this.submit}
                 buttonStyle={[{
                   backgroundColor: colors.main_color,
