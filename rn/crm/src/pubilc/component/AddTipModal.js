@@ -77,7 +77,7 @@ class AddTipModal extends React.Component {
           this.setState({respReason: resp?.obj?.error_msg})
         } else {
           this.closeModal()
-          ToastShort("操作成功")
+          ToastShort("加小费成功")
         }
       }));
     }
