@@ -1060,9 +1060,8 @@ class OrderInfoNew extends PureComponent {
                           </If>
                         </If>
                       </View>
-                      <Text style={info?.num > 1 ? styles.manyProductNum : styles.productNum}>
-                        {`x ${info?.num}`}
-                      </Text>
+                      <Text
+                        style={info?.num > 1 ? styles.manyProductNum : styles.productNum}>{`x ${info?.num}`} </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
