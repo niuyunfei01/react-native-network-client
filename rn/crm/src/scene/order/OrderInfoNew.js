@@ -954,7 +954,6 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoCard = () => {
     let {order = {}} = this.state;
     const {currStoreId} = this.props.global;
-    const {is_service_mgr = false} = tool.vendor(this.props.global);
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
@@ -1106,7 +1105,7 @@ class OrderInfoNew extends PureComponent {
                 <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元</Text>
               </View>
             </If>
-            <If condition={is_service_mgr || !order.is_fn_price_controlled || order.is_fn_show_wm_price}>
+            <If condition={order?.shop_deliver_fee}>
               <View style={styles.productItemRow}>
                 <Text style={styles.remarkLabel}>顾客支付配送费</Text>
                 <Text style={styles.remarkValue}>
