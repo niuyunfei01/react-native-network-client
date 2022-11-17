@@ -896,7 +896,7 @@ const headerRightStyles = StyleSheet.create({
     justifyContent: "center"
   },
   rightText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     color: colors.white,
     marginLeft: 3
