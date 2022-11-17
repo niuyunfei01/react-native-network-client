@@ -572,6 +572,8 @@ class AppNavigator extends PureComponent {
   }
 
   handleNoLoginInfo = (reduxGlobal) => {
+    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
+      this.refreshAccessToken(reduxGlobal.refreshToken)
     const {co_type} = tool.vendor(reduxGlobal)
     if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
       return;
@@ -611,8 +613,7 @@ class AppNavigator extends PureComponent {
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
-    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
-      this.refreshAccessToken(reduxGlobal.refreshToken)
+
   }
 
   refreshAccessToken = (refreshToken) => {
