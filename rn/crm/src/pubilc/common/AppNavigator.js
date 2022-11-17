@@ -89,9 +89,6 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
-        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -117,8 +114,6 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
-                      getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
         <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
                       getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
@@ -203,18 +198,17 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} options={{headerTitle: '置为无效'}}
                       getComponent={() => require("../../scene/order/OrderToInvalidScene").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}
-                      getComponent={() => require("../../scene/order/OrderTransferThird").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderTransferThird").default}*/}
+        {/*/>*/}
 
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
 
-
-        <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
-                      getComponent={() => require("../../scene/order/OrderAinSend").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderAinSend").default}*/}
+        {/*/>*/}
 
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../../scene/order/OrderEditStoreScene").default}/>
@@ -581,8 +575,9 @@ class AppNavigator extends PureComponent {
   }
 
   handleNoLoginInfo = (reduxGlobal) => {
-    const {co_type} = tool.vendor(reduxGlobal)
-    if (co_type === undefined || reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+    if ((dayjs().valueOf() - reduxGlobal?.getTokenTs) / 1000 >= reduxGlobal?.expireTs * 0.9 && reduxGlobal?.refreshToken)
+      this.refreshAccessToken(reduxGlobal?.refreshToken)
+    if (reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
       return;
     }
     if (reduxGlobal.store_id === 0)
@@ -593,7 +588,6 @@ class AppNavigator extends PureComponent {
       reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
       reduxGlobal.store_id === global.noLoginInfo.store_id &&
       reduxGlobal.host === global.noLoginInfo.host &&
-      co_type === global.noLoginInfo.co_type &&
       reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
       reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
       reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
@@ -607,7 +601,6 @@ class AppNavigator extends PureComponent {
       currentUser: reduxGlobal.currentUser,
       currStoreId: reduxGlobal.store_id,
       host: reduxGlobal.host || Config.defaultHost,
-      co_type: co_type,
       enabledGoodMgr: reduxGlobal.enabled_good_mgr,
       currVendorId: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
@@ -620,8 +613,7 @@ class AppNavigator extends PureComponent {
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
-    if ((dayjs().valueOf() - reduxGlobal.getTokenTs) / 1000 >= reduxGlobal.expireTs * 0.9)
-      this.refreshAccessToken(reduxGlobal.refreshToken)
+
   }
 
   refreshAccessToken = (refreshToken) => {
