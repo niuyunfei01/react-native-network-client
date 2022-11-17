@@ -320,14 +320,7 @@ class Mine extends PureComponent {
 
 
   navigateToStoreManager = () => {
-    const {currentUser, vendor_info} = this.props.global;
-    const {is_mgr, currVendorId} = this.state
-    this.onPress(Config.ROUTE_STORE, {
-      currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: vendor_info?.brand_name,
-      is_mgr: is_mgr
-    });
+    this.onPress(Config.ROUTE_STORE_LIST);
   }
 
   navigateToWorker = () => {
@@ -400,7 +393,10 @@ class Mine extends PureComponent {
     if (info?.type === 'Router') {
       switch (info?.path) {
         case 'Store':
-          this.navigateToStoreManager()
+          this.onPress(Config.ROUTE_STORE_LIST);
+          break
+        case 'OrderSearchResult':
+          this.onPress(Config.ROUTE_ORDER_ALL);
           break
         case 'Worker':
           this.navigateToWorker()
@@ -896,7 +892,7 @@ const headerRightStyles = StyleSheet.create({
     justifyContent: "center"
   },
   rightText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     color: colors.white,
     marginLeft: 3

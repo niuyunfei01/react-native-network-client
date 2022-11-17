@@ -1,9 +1,26 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {Dimensions, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  Dimensions,
+  InteractionManager,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
+import {
+  doAuthLogin,
+  getConfig,
+  setAccessToken,
+  setCurrentStore,
+  setUserProfile
+} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
@@ -14,8 +31,11 @@ import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
 import AlertModal from "../../../pubilc/component/AlertModal";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
+import {AMapSdk} from "react-native-amap3d/lib/src/index";
+import geolocation from "@react-native-community/geolocation";
+import {mergeMixpanelId} from "../../../pubilc/util/analytics";
 
 const {width, height} = Dimensions.get("window");
 
@@ -72,11 +92,47 @@ class SaveStore extends PureComponent {
     this.fetchCategories()
     if (type === 'edit') {
       this.fetchData()
+    } else {
+      this.autoGetgeolocation()
     }
   }
 
+  autoGetgeolocation = () => {
+    AMapSdk.init(
+      Platform.select({
+        android: "1d669aafc6970cb991f9baf252bcdb66",
+        ios: "48148de470831f4155abda953888a487",
+      })
+    );
+    let that = this
+    geolocation.getCurrentPosition((pos) => {
+      let coords = pos.coords;
+      let location = coords.longitude + "," + coords.latitude;
+      let url = "https://restapi.amap.com/v3/geocode/regeo?parameters?";
+      const params = {
+        key: '85e66c49898d2118cc7805f484243909',
+        location: location,
+      }
+      Object.keys(params).forEach(key => {
+          url += '&' + key + '=' + params[key]
+        }
+      )
+      fetch(url).then(response => response.json()).then((data) => {
+        if (data.status === "1") {
+          that.setState({
+            city: data?.regeocode?.addressComponent?.city,
+            // store_address: data?.regeocode?.addressComponent?.township,
+            // street_block: data?.regeocode?.addressComponent?.streetNumber?.street,
+            location_long: coords.longitude,
+            location_lat: coords.latitude,
+          })
+        }
+      });
+    })
+  }
+
   fetchCategories = () => {
-    const {accessToken} = this.props.global;
+    const {accessToken = ''} = this.props.global;
     const api = `/v1/new_api/stores/sale_categories?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
@@ -84,6 +140,7 @@ class SaveStore extends PureComponent {
       })
     })
   }
+
   fetchData = () => {
     let {loading, store_id} = this.state;
     if (Number(store_id) <= 0) {
@@ -94,7 +151,7 @@ class SaveStore extends PureComponent {
       return;
     }
     this.setState({loading: true});
-    const {accessToken} = this.props.global;
+    const {accessToken = ''} = this.props.global;
     const api = `/v4/wsb_store/findStore?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {store_id_real: store_id}).then((res) => {
       this.setState({
@@ -119,14 +176,12 @@ class SaveStore extends PureComponent {
       _this.props.navigation.navigate(route, params);
     });
   }
-
   closeModal = () => {
     this.setState({
       show_back_modal: false,
       show_category_modal: false,
     })
   }
-
   setAddress = (res) => {
     let Lng = (res?.location).split(',')[0];
     let lat = (res?.location).split(',')[1];
@@ -144,7 +199,7 @@ class SaveStore extends PureComponent {
   }
 
   goSelectAddress = () => {
-    let {store_address, lng, lat, city} = this.state;
+    let {store_address, lng, lat, city, type} = this.state;
     let center = ""
     if (lng && lat) {
       center = lng + ',' + lat
@@ -152,7 +207,7 @@ class SaveStore extends PureComponent {
     const params = {
       center: center,
       city_name: city,
-      show_select_city: false,
+      show_select_city: type !== 'edit',
       keywords: store_address,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
@@ -173,13 +228,16 @@ class SaveStore extends PureComponent {
       category_id,
       category_desc,
       contact_name,
-      contact_phone
+      contact_phone,
+      verify_code,
+      type
     } = this.state;
 
     if (loading) {
       return;
     }
     this.setState({loading: true});
+    const {accessToken = '', vendor_id = ''} = this.props.global;
     let params = {
       store_id_real: store_id,
       store_name,
@@ -190,7 +248,10 @@ class SaveStore extends PureComponent {
       sale_category: category_id,
       category_desc,
       contact_name,
-      contact_phone
+      contact_phone,
+      mobile: contact_phone,
+      password: verify_code,
+      vendor_id
     }
     const validator = new Validator();
     validator.add(store_name, 'required', '请填写门店名称')
@@ -206,20 +267,65 @@ class SaveStore extends PureComponent {
       })
       return ToastShort(err_msg)
     }
-    const {accessToken} = this.props.global;
-    const api = `/v4/wsb_store/editOfStore?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, params).then((res) => {
+
+    let api = `/v4/wsb_store/createStore?access_token=${accessToken}`
+    if (type === 'edit') {
+      api = `/v4/wsb_store/editOfStore?access_token=${accessToken}`
+    }
+    HttpUtils.post.bind(this.props)(api, params).then((res) => {
+      if (type === 'register' && res?.user?.token && res?.user?.user_id) {
+        showModal("注册成功，正在登录...")
+        let {access_token, refresh_token, expires_in: expires_in_ts} = res.user.token;
+        this.props.dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
+        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+        const authCallback = (ok, msg, profile) => {
+          if (ok) {
+            this.props.dispatch(setUserProfile(profile));
+          }
+        };
+        doAuthLogin(access_token, expire, this.props, authCallback)
+        this.queryConfig(access_token, res?.OfflineStore?.id)
+        this.mixpanel.getDistinctId().then(res => {
+          if (res !== res?.user?.user_id) {
+            mergeMixpanelId(res, res?.user?.user_id);
+            this.mixpanel.identify(res?.user?.user_id);
+          }
+        })
+      }
       this.setState({
         loading: false
       })
       ToastShort(res?.desc);
+      this.props.navigation.goBack();
     }, (e) => {
       ToastShort(e?.desc);
+      this.setState({
+        loading: false
+      })
     }).catch((e) => {
       ToastShort(e?.desc);
+      this.setState({
+        loading: false
+      })
     })
-
   }
+
+  queryConfig = (accessToken, currStoreId) => {
+    const {dispatch, navigation} = this.props;
+    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if (ok) {
+        dispatch(setCurrentStore(cfg?.store_id || currStoreId));
+        tool.resetNavStack(navigation, cfg?.show_bottom_tab ? Config.ROUTE_ORDERS : Config.ROUTE_ALERT, cfg?.show_bottom_tab ? {} : {
+          initTab: Config.ROUTE_ORDERS,
+          initialRouteName: Config.ROUTE_ALERT
+        });
+        hideModal()
+      } else {
+        ToastShort(err_msg, 0);
+      }
+    }));
+  }
+
 
   render() {
     return (

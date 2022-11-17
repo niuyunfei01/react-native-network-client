@@ -122,11 +122,6 @@ class LoginScene extends PureComponent {
   onLogin = () => {
     tool.debounces(() => {
       let {authorization, mobile, verifyCode} = this.state;
-      return this.props.navigation.navigate(Config.ROUTE_SAVE_STORE, {
-        type: 'register',
-        mobile,
-        verify_code: verifyCode
-      })
       if (!authorization) {
         return this.setState({
           show_auth_modal: true

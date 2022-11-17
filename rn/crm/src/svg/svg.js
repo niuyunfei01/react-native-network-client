@@ -1238,7 +1238,7 @@ export const this_up = (width = 16, height = 16) => {
 }
 
 
-export const search_icon = () => {
+export const search_icon = (color='#333333') => {
   return (
     `
 <svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -1246,7 +1246,7 @@ export const search_icon = () => {
     <g id="我的-订单查询" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="图标/搜索栏/搜索备份">
             <rect id="Rectangle-3" x="0" y="0" width="32" height="32"></rect>
-            <g id="icon" transform="translate(7.000000, 7.000000)" stroke="#333333" stroke-width="1.71428571">
+            <g id="icon" transform="translate(7.000000, 7.000000)" stroke="${color}" stroke-width="1.71428571">
                 <line x1="13.8" y1="13.8" x2="16.6732308" y2="16.6755638" id="路径-2" stroke-linecap="round" stroke-linejoin="round"></line>
                 <circle id="Oval-2" cx="8.4" cy="8.4" r="7.54285714"></circle>
             </g>

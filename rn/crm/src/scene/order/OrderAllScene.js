@@ -10,9 +10,8 @@ import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
-import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
-import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {back, empty_data, search_icon, this_down, this_up} from "../../svg/svg";
 import OrderItem from "../../pubilc/component/OrderItem";
@@ -29,8 +28,8 @@ import JbbModal from "../../pubilc/component/JbbModal";
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
-  const {global, device} = state;
-  return {global: global, device: device}
+  const {global} = state;
+  return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -41,75 +40,70 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const initState = {
-  isLoading: false,
-  query: {
-    listType: null,
-    offset: 0,
-    page: 1,
-    limit: 10,
-    maxPastDays: 100,
-    isAdd: true,
-  },
-  list: [],
-  orderStatus: 9,
-  search_start_date: new Date(),
-  search_end_date: new Date(),
-  search_start_date_input_val: new Date(),
-  search_end_date_input_val: new Date(),
-  search_status: 0,
-  search_type: 0,
-  search_platform: 0,
-  date_desc: dayjs(new Date()).format('MM/DD'),
-  status_desc: '状态',
-  type_desc: '类型',
-  platform_desc: '平台',
-  status_list: [
-    {label: '全部', value: 0},
-    {label: '进行中', value: 1},
-    {label: '已完成', value: 2},
-    {label: '已取消', value: 3},
-  ],
-  type_list: [
-    {label: '全部', value: 0},
-    {label: '即时单', value: 1},
-    {label: '预约单', value: 2},
-  ],
-  platform_list: [
-    {label: '全部', value: 0},
-    {label: '美团', value: 1},
-    {label: '饿了么', value: 2},
-    {label: '京东到家', value: 3},
-    {label: '自定义', value: 4},
-  ],
-  check_list: [],
-  check_item: '',
-  order_id: 0,
-  add_tip_id: 0,
-  isCanLoadMore: false,
-  show_goods_list: false,
-  show_add_tip_modal: false,
-  show_delivery_modal: false,
-  show_cancel_delivery_modal: false,
-  show_finish_delivery_modal: false,
-  show_select_store_modal: false,
-  show_condition_modal: 0,
-  show_date_modal: false,
-  show_date_select_modal: false,
-  show_date_type: 1,
-};
-
 class OrderAllScene extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    device: PropTypes.object,
   }
-  state = initState;
 
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
     GlobalUtil.setOrderFresh(1)
+    let {store_id} = this.props.global;
+    this.state = {
+      store_id,
+      is_loading: false,
+      query: {
+        page_size: 10,
+        page: 1,
+        is_add: true,
+      },
+      list: [],
+      search_start_date: new Date(),
+      search_end_date: new Date(),
+      search_start_date_input_val: new Date(),
+      search_end_date_input_val: new Date(),
+      search_status: 0,
+      search_type: 0,
+      search_platform: 0,
+      date_desc: '今日',
+      status_desc: '状态',
+      type_desc: '类型',
+      platform_desc: '平台',
+      status_list: [
+        {label: '全部', value: 0},
+        {label: '进行中', value: 1},
+        {label: '已完成', value: 2},
+        {label: '已取消', value: 3},
+      ],
+      type_list: [
+        {label: '全部', value: 0},
+        {label: '即时单', value: 1},
+        {label: '预约单', value: 2},
+      ],
+      platform_list: [
+        {label: '全部', value: 0},
+        {label: '美团', value: 3},
+        {label: '饿了么', value: 4},
+        {label: '京东到家', value: 6},
+        {label: '自定义', value: -1},
+      ],
+      check_list: [],
+      check_item: '',
+      order_id: 0,
+      add_tip_id: 0,
+      is_can_load_more: false,
+      show_goods_list: false,
+      show_add_tip_modal: false,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
+      show_select_store_modal: false,
+      show_condition_modal: 0,
+      show_date_modal: false,
+      show_date_select_modal: false,
+      show_date_type: 1,
+    }
   }
 
 
@@ -128,65 +122,66 @@ class OrderAllScene extends Component {
     })
   }
 
-  onRefresh = (status) => {
-    const {isLoading, query} = this.state
-    if (isLoading) {
+  onRefresh = () => {
+    const {is_loading, query} = this.state
+    if (is_loading) {
       return
     }
     this.setState({
-        query: {...query, page: 1, isAdd: true, offset: 0},
+        query: {...query, page: 1, is_add: true, page_size: 10},
       },
-      () => this.fetchOrders(status))
+      () => this.fetchOrderList())
   }
 
-  fetchOrders = (queryType, setList = 1) => {
-    let {isLoading, query, orderStatus} = this.state;
-    if (isLoading || !query.isAdd) {
+  fetchOrderList = (setList = 1) => {
+    let {
+      is_loading,
+      query,
+      store_id,
+      search_start_date,
+      search_end_date,
+      search_type,
+      search_status,
+      search_platform
+    } = this.state;
+    if (is_loading || !query.is_add) {
       return null;
     }
-    let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
-    let {currStoreId, accessToken, user_config} = this.props.global;
-    let search = `store:${currStoreId}`;
-    let initQueryType = queryType || orderStatus;
-    const order_by = user_config && user_config?.order_list_by ? user_config?.order_list_by : 'expectTime asc';
-
     this.setState({
-      orderStatus: initQueryType,
-      isLoading: true,
+      is_loading: true,
     })
 
+    let {accessToken} = this.props.global;
     let params = {
-      status: initQueryType,
-      vendor_id: vendor_id,
-      offset: query.offset,
-      limit: query.limit,
-      max_past_day: 100,
-      search: search,
-      use_v2: 1,
-      is_right_once: 1, //预订单类型
-      order_by: order_by
+      search_store_id: store_id,
+      page: query.page,
+      page_size: query.page_size,
+      // start_time: dayjs(search_start_date).format('YYYY-MM-DD'),
+      // end_time: dayjs(search_end_date).format('YYYY-MM-DD'),
+      search_type,
+      search_status,
+      search_platform,
     }
 
-    if (vendor_id && accessToken) {
-      const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
-      HttpUtils.get.bind(this.props)(url, params).then(res => {
-        let {list, query} = this.state;
-        if (tool.length(res.orders) < query.limit) {
-          query.isAdd = false;
-        }
-        query.page++;
-        query.listType = initQueryType
-        query.offset = Number(query.page - 1) * query.limit;
-        this.setState({
-          list: setList === 1 ? res.orders : list.concat(res.orders),
-          isLoading: false,
-          query: query,
-        })
-      }, (res) => {
-        showError(res.reason);
-        this.setState({isLoading: false})
+    const url = `/v4/wsb_order/order_search?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+      let {list, query} = this.state;
+      if (tool.length(res.data) < query.page_size) {
+        query.is_add = false;
+      }
+      query.page++;
+      this.setState({
+        is_loading: false,
+        query: query,
+        list: setList === 1 ? res.data : list.concat(res.data),
       })
-    }
+    }, (res) => {
+      ToastLong(res.reason);
+      this.setState({is_loading: false})
+    }).catch((res) => {
+      ToastLong(res.reason);
+      this.setState({is_loading: false})
+    })
 
   }
 
@@ -239,7 +234,7 @@ class OrderAllScene extends Component {
     const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(() => {
       ToastLong('订单已送达')
-      this.fetchOrders()
+      this.fetchOrderList()
     }).catch(() => {
       ToastShort('“配送完成失败，请稍后重试”')
     })
@@ -286,7 +281,9 @@ class OrderAllScene extends Component {
         }
         break;
     }
-    this.setState(params)
+    this.setState(params, () => {
+      this.onRefresh()
+    })
   }
 
   render() {
@@ -327,7 +324,7 @@ class OrderAllScene extends Component {
         />
 
         {this.renderContent(list)}
-        {this.renderDateModal(list)}
+        {this.renderDateModal()}
         {this.renderFinishDeliveryModal()}
         <GoodsListModal
           setState={this.setState.bind(this)}
@@ -378,15 +375,19 @@ class OrderAllScene extends Component {
     let date_desc = ''
     if (dayjs(search_start_date_input_val).format('YYYY-MM-DD') === dayjs(search_end_date_input_val).format('YYYY-MM-DD')) {
       date_desc = dayjs(search_start_date_input_val).format('MM/DD');
+      if (dayjs(search_start_date_input_val).format('YYYY-MM-DD') === dayjs(new Date()).format('YYYY-MM-DD')) {
+        date_desc = '今日'
+      }
     } else {
       date_desc = dayjs(search_start_date_input_val).format('MM/DD') + '-' + dayjs(search_end_date_input_val).format('MM/DD');
     }
-
     this.setState({
       show_date_modal: false,
       search_start_date_input_val: search_start_date_input_val,
       show_date_select_modal: search_end_date_input_val,
       date_desc,
+    }, () => {
+      this.onRefresh()
     })
   }
 
@@ -402,55 +403,57 @@ class OrderAllScene extends Component {
       <JbbModal visible={show_date_modal} onClose={this.closeModal} modal_type={'bottom'}
                 modalStyle={{padding: 0}}
       >
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: 50,
-          marginHorizontal: 20
-        }}>
-          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}> 选择日期 </Text>
-          <Text
-            style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}}
-            onPress={this.confirmDate}> 确定 </Text>
-        </View>
-
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: 70
-        }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({show_date_select_modal: true, show_date_type: 1})
+        <View>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: 50,
+            marginHorizontal: 20
           }}>
-            <Text> {dayjs(search_start_date_input_val).format('YYYY-MM-DD')} </Text>
-          </TouchableOpacity>
-          <Text>-</Text>
-          <TouchableOpacity onPress={() => this.setState({show_date_select_modal: true, show_date_type: 2})}>
-            <Text> {dayjs(search_end_date_input_val).format('YYYY-MM-DD')} </Text>
-          </TouchableOpacity>
+            <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}> 选择日期 </Text>
+            <Text
+              style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}}
+              onPress={this.confirmDate}> 确定 </Text>
+          </View>
 
-          <DatePicker
-            confirmText={'确定'}
-            cancelText={'取消'}
-            title={'选择日期'}
-            modal
-            mode={'date'}
-            textColor={colors.color666}
-            open={show_date_select_modal}
-            date={show_date_type === 1 ? search_start_date_input_val : search_end_date_input_val}
-            minimumDate={show_date_type === 1 ? dayjs(new Date()).subtract(90, 'day').toDate() : search_start_date_input_val}
-            maximumDate={new Date()}
-            onConfirm={(date) => {
-              this.checkDatePicker(date)
-            }}
-            onCancel={() => {
-              this.setState({
-                show_date_select_modal: false
-              })
-            }}
-          />
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+            height: 70
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.setState({show_date_select_modal: true, show_date_type: 1})
+            }}>
+              <Text> {dayjs(search_start_date_input_val).format('YYYY-MM-DD')} </Text>
+            </TouchableOpacity>
+            <Text>-</Text>
+            <TouchableOpacity onPress={() => this.setState({show_date_select_modal: true, show_date_type: 2})}>
+              <Text> {dayjs(search_end_date_input_val).format('YYYY-MM-DD')} </Text>
+            </TouchableOpacity>
+
+            <DatePicker
+              confirmText={'确定'}
+              cancelText={'取消'}
+              title={'选择日期'}
+              modal
+              mode={'date'}
+              textColor={colors.color666}
+              open={show_date_select_modal}
+              date={show_date_type === 1 ? search_start_date_input_val : search_end_date_input_val}
+              minimumDate={show_date_type === 1 ? dayjs(new Date()).subtract(90, 'day').toDate() : search_start_date_input_val}
+              maximumDate={new Date()}
+              onConfirm={(date) => {
+                this.checkDatePicker(date)
+              }}
+              onCancel={() => {
+                this.setState({
+                  show_date_select_modal: false
+                })
+              }}
+            />
+          </View>
         </View>
       </JbbModal>
     )
@@ -597,7 +600,11 @@ class OrderAllScene extends Component {
           })
           return;
         }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{fontSize: 15, color: colors.color333}}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+          <Text style={{
+            fontSize: 15,
+            color: colors.color333,
+            fontWeight: 'bold'
+          }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={show_select_store_modal ? this_up() : this_down()}/>
           </If>
@@ -606,7 +613,7 @@ class OrderAllScene extends Component {
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
-            this.onPress(Config.ROUTE_ORDER_SEARCH)
+            this.onPress(Config.ROUTE_SEARCH_ORDER)
           }}
           style={{
             height: 44,
@@ -624,32 +631,32 @@ class OrderAllScene extends Component {
   }
 
   onEndReached = () => {
-    if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+    if (this.state.is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => this.onRefresh())
     }
   }
   onMomentumScrollBegin = () => {
-    this.setState({isCanLoadMore: true})
+    this.setState({is_can_load_more: true})
   }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
 
   _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+    return {length: 120, page_size: 120 * index, index}
   }
   _keyExtractor = (item) => {
     return item.id.toString();
   }
 
 
-  renderContent = (orders) => {
-    let {isLoading} = this.state;
+  renderContent = (list) => {
+    let {is_loading} = this.state;
     return (
       <View style={styles.orderListContent}>
         <FlatList
           contentContainerStyle={{flexGrow: 1}}
-          data={orders}
+          data={list}
           legacyImplementation={false}
           directionalLockEnabled={true}
           showsVerticalScrollIndicator={false}
@@ -659,10 +666,10 @@ class OrderAllScene extends Component {
           onMomentumScrollBegin={this.onMomentumScrollBegin}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
-          refreshing={isLoading}
+          refreshing={is_loading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
+          // getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
           ListFooterComponent={this.renderBottomView()}
           initialNumToRender={3}
@@ -672,8 +679,8 @@ class OrderAllScene extends Component {
   }
 
   listmore = () => {
-    if (this.state.query.isAdd) {
-      this.fetchOrders(this.state.orderStatus, 0);
+    if (this.state.query.is_add) {
+      this.fetchOrderList(this.state.orderStatus, 0);
     }
   }
 
@@ -708,7 +715,7 @@ class OrderAllScene extends Component {
 
   renderBottomView = () => {
     let {query, list} = this.state;
-    if (query?.isAdd || tool.length(list) < 3) {
+    if (query?.is_add || tool.length(list) < 3) {
       return <View/>
     }
     return (

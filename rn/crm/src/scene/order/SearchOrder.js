@@ -1,17 +1,21 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import HttpUtils from "../../pubilc/util/http";
-import OrderListItem from "../../pubilc/component/OrderListItem";
 import tool from "../../pubilc/util/tool";
 import colors from "../../pubilc/styles/colors";
-import {hideModal, showError} from "../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {SearchBar} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
 import {cross_circle_icon, empty_order, search_icon} from "../../svg/svg";
+import OrderItem from "../../pubilc/component/OrderItem";
+import GoodsListModal from "../../pubilc/component/GoodsListModal";
+import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
+import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import AddTipModal from "../../pubilc/component/AddTipModal";
+import AlertModal from "../../pubilc/component/AlertModal";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,125 +35,223 @@ class SearchOrder extends PureComponent {
     super(props);
     this.state = {
       keyword: '',
-      isRefreshing: false,
-      isSearching: false,
-      prefix: [],
-      orderList: [],
+      keyword_type: 0,
+      list: [],
       item_list: [],
       end: false,
-      isLoading: false,
-      isCanLoadMore: false,
+      is_loading: false,
+      is_can_load_more: false,
       query: {
+        page_size: 10,
         page: 1,
-        limit: 10,
-        max_past_day: 90
-      }
+        is_add: true,
+      },
+      order_id: 0,
+      add_tip_id: 0,
+      show_goods_list: false,
+      show_add_tip_modal: false,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
     };
   }
 
-  fetchOrderSearchPrefix() {
-    const {accessToken} = this.props.global
-    const api = `/api/order_search_prefix?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
-      this.setState({prefix: res})
-    })
-  }
-
   onRefresh = () => {
-    tool.debounces(() => {
-      const {query} = this.state
-      query.page = 1
-      this.setState({
-        end: false,
-        query: query,
-        orderList: []
-      }, () => this.FetchOrderList(false))
-    })
+    const {is_loading, query} = this.state
+    if (is_loading) {
+      return
+    }
+    this.setState({
+        query: {...query, page: 1, is_add: true, page_size: 10},
+      },
+      () => this.fetchOrderList())
   }
 
-  onPress(route, params) {
+  fetchOrderList = (setList = 1) => {
+    let {
+      is_loading,
+      query,
+      keyword,
+      keyword_type,
+    } = this.state;
+    if (is_loading || !query.is_add) {
+      return null;
+    }
+    this.setState({
+      is_loading: true,
+    })
+    let {accessToken} = this.props.global;
+    let params = {
+      search_store_id: 0,//所有门店
+      keyword: keyword,
+      keyword_type: keyword_type,
+      page: query.page,
+      page_size: query.page_size,
+    }
+    const url = `/v4/wsb_order/order_search?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+      let {list, query} = this.state;
+      if (tool.length(res.data) < query.page_size) {
+        query.is_add = false;
+      }
+      query.page++;
+      this.setState({
+        is_loading: false,
+        query: query,
+        list: setList === 1 ? res.data : list.concat(res.data),
+      })
+    }, (res) => {
+      ToastLong(res.reason);
+      this.setState({is_loading: false})
+    }).catch((res) => {
+      ToastLong(res.reason);
+      this.setState({is_loading: false})
+    })
+
+  }
+
+  onPress = (route, params) => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
   }
 
-  onEndReached = () => {
-    const {query, end, isLoading, isCanLoadMore} = this.state
-    if (!isCanLoadMore || isLoading)
-      return;
-    if (end) {
-      showError('没有更多数据了')
-      this.setState({isCanLoadMore: false})
-      return
-    }
-    query.page += 1
+  openAddTipModal = (order_id) => {
     this.setState({
-      query: query,
-      isLoading: true,
-      isCanLoadMore: false
-    }, () => {
-      this.FetchOrderList(false)
+      add_tip_id: order_id,
+      show_add_tip_modal: true,
+      show_delivery_modal: false
     })
   }
 
-  FetchOrderList = (isChangeType) => {
-    const {accessToken} = this.props.global;
-    const {currVendorId} = tool.vendor(this.props.global);
-    const {query, keyword} = this.state
+  openCancelDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_cancel_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
 
-    const params = {
-      vendor_id: currVendorId,
-      offset: (query.page - 1) * query.limit,
-      max_past_day: query.max_past_day,
-      limit: query.limit,
-      search: encodeURIComponent(`${keyword}`),
-      use_v2: 1
-    }
-    const url = `/api/orders.json?access_token=${accessToken}`;
-    HttpUtils.get(url, params).then(res => {
-      hideModal()
-      const orderList = isChangeType ? res.orders : this.state.orderList.concat(res.orders)
-      const end = tool.length(res.orders) < query.limit
-      this.setState({orderList: orderList, end: end, isLoading: false})
-    }, () => {
-      this.setState({isLoading: false})
+  openFinishDeliveryModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_finish_delivery_modal: true,
+      show_delivery_modal: false
+    })
+  }
+
+  closeModal = () => {
+    this.setState({
+      order_id: 0,
+      show_condition_modal: 0,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
+      show_select_store_modal: false,
+      show_date_modal: false,
+    })
+  }
+
+  toSetOrderComplete = () => {
+    this.closeModal();
+    let {accessToken} = this.props.global;
+    let {order_id} = this.state;
+    const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('订单已送达')
+      this.fetchOrderList()
     }).catch(() => {
-      this.setState({isLoading: false})
+      ToastShort('“配送完成失败，请稍后重试”')
     })
   }
 
-  onScrollBeginDrag = () => {
-    this.setState({isCanLoadMore: true})
-  }
-
-  render() {
-    const {orderList} = this.state
-    return (
-      <>
-        {this.renderHeader()}
-        <FlatList data={orderList}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={(item) => this.renderItem(item)}
-                  initialNumToRender={2}
-                  onRefresh={this.onRefresh}
-                  refreshing={false}
-                  onEndReachedThreshold={0.1}
-                  onScrollBeginDrag={this.onScrollBeginDrag}
-                  onEndReached={this.onEndReached}
-                  ListEmptyComponent={this.renderNoOrder()}
-                  keyExtractor={(item, index) => `${index}`}
-        />
-      </>
-    );
-  }
 
   onCancel = () => {
     this.setState({keyword: ''});
   }
+  onScrollBeginDrag = () => {
+    this.setState({is_can_load_more: true})
+  }
+
+  render() {
+    const {currStoreId, accessToken, dispatch} = this.props.global;
+    const {
+      is_loading,
+      list,
+      order_id,
+      show_goods_list,
+      show_delivery_modal,
+      show_add_tip_modal,
+      show_cancel_delivery_modal,
+      add_tip_id,
+    } = this.state
+    return (
+      <View style={{flex: 1}}>
+        {this.renderHeader()}
+        <FlatList
+          data={list}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          onEndReachedThreshold={0.3}
+          onEndReached={this.onEndReached}
+          onMomentumScrollBegin={this.onMomentumScrollBegin}
+          renderItem={this.renderItem}
+          onRefresh={this.onRefresh}
+          refreshing={is_loading}
+          shouldItemUpdate={this._shouldItemUpdate}
+          keyExtractor={(item, index) => `${index}`}
+          ListEmptyComponent={this.renderNoOrder()}
+          ListFooterComponent={this.renderBottomView()}
+          initialNumToRender={3}
+        />
+        {this.renderFinishDeliveryModal()}
+        <GoodsListModal
+          setState={this.setState.bind(this)}
+          onPress={this.onPress.bind(this)}
+          accessToken={accessToken}
+          order_id={order_id}
+          currStoreId={currStoreId}
+          show_goods_list={show_goods_list}/>
+        <DeliveryStatusModal
+          order_id={order_id}
+          order_status={0}
+          store_id={currStoreId}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          openAddTipModal={this.openAddTipModal.bind(this)}
+          openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+          openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
+          accessToken={accessToken}
+          show_modal={show_delivery_modal}
+          onClose={this.closeModal}
+        />
+
+        <CancelDeliveryModal
+          order_id={order_id}
+          ship_id={0}
+          accessToken={accessToken}
+          show_modal={show_cancel_delivery_modal}
+          fetchData={this.onRefresh.bind(this)}
+          onPress={this.onPress.bind(this)}
+          onClose={this.closeModal}
+        />
+
+        <AddTipModal
+          setState={this.setState.bind(this)}
+          accessToken={accessToken}
+          id={add_tip_id}
+          orders_add_tip={true}
+          dispatch={dispatch}
+          show_add_tip_modal={show_add_tip_modal}/>
+
+      </View>
+    );
+  }
 
   renderHeader = () => {
-    let {keyword, check_item = 1, item_list} = this.state
+    let {keyword, keyword_type = 1, item_list} = this.state
     return (
       <View style={{backgroundColor: colors.white}}>
         <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
@@ -159,7 +261,7 @@ class SearchOrder extends PureComponent {
               width: 20,
               height: 20
             }}
-            searchIcon={<SvgXml xml={search_icon()}/>}
+            searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
             clearIcon={<SvgXml xml={cross_circle_icon()}/>}
             inputContainerStyle={{
               backgroundColor: colors.f5,
@@ -180,25 +282,26 @@ class SearchOrder extends PureComponent {
               let arr = [];
               if (/[\u4e00-\u9fa5]+?$/g.test(keyword)) {
                 arr = [
-                  {label: '骑手姓名', value: 0},
-                  {label: '商品名', value: 1},
-                  {label: '收件地址', value: 2},
+                  {label: '骑手姓名', value: 1},
+                  {label: '商品名', value: 2},
+                  {label: '收件地址', value: 3},
                 ]
               }
               if (/[0-9]+?$/g.test(keyword)) {
                 arr = [
-                  {label: '订单号', value: 0},
-                  {label: '流水号', value: 1},
-                  {label: '手机号', value: 2},
-                  {label: '取货码', value: 2},
+                  {label: '订单号', value: 4},
+                  {label: '流水号', value: 5},
+                  {label: '手机号', value: 6},
+                  {label: '取货码', value: 7},
                 ]
               }
               this.setState({
                 keyword,
-                check_item: '',
                 item_list: arr
               }, () => {
-
+                tool.debounces(() => {
+                  this.fetchOrderList()
+                })
               })
             }}
             onCancel={this.onCancel}
@@ -218,7 +321,13 @@ class SearchOrder extends PureComponent {
         }}>
           <For index='index' each='info' of={item_list}>
             <TouchableOpacity onPress={() => {
-              console.log(info, '12')
+              this.setState({
+                keyword_type: Number(info.value) === keyword_type ? 0 : Number(info.value)
+              }, () => {
+                tool.debounces(() => {
+                  this.fetchOrderList()
+                })
+              })
             }} key={index} style={{
               flexDirection: 'row',
               justifyContent: 'center',
@@ -229,11 +338,11 @@ class SearchOrder extends PureComponent {
               marginTop: 6,
               marginHorizontal: 4,
               borderRadius: 15,
-              backgroundColor: Number(info.value) === check_item ? '#DFFAE2' : colors.f5,
+              backgroundColor: Number(info.value) === keyword_type ? '#DFFAE2' : colors.f5,
             }}>
               <Text style={{
                 fontSize: 13,
-                color: Number(info.value) === check_item ? colors.main_color : colors.color666,
+                color: Number(info.value) === keyword_type ? colors.main_color : colors.color666,
               }}> {info.label} </Text>
             </TouchableOpacity>
           </For>
@@ -243,38 +352,79 @@ class SearchOrder extends PureComponent {
   }
 
 
-  renderItem(order) {
-    const {item, index} = order;
-    const {global, navigation} = this.props
-    const {accessToken} = global
+  renderFinishDeliveryModal = () => {
+    let {show_finish_delivery_modal} = this.state;
     return (
-      <OrderListItem showBtn={false}
-                     item={item}
-                     index={index}
-                     accessToken={accessToken}
-                     key={index}
-                     onRefresh={() => this.onRefresh()}
-                     navigation={navigation}
-                     vendorId={global?.vendor_id}
-                     setState={this.setState.bind(this)}
-                     allow_edit_ship_rule={false}
-                     onPress={this.onPress.bind(this)}
+      <View>
+        <AlertModal
+          visible={show_finish_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toSetOrderComplete()}
+          title={'当前配送确认完成吗?'}
+          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
+          actionText={'确定'}
+          closeText={'再想想'}/>
+      </View>
+    )
+  }
+
+  onEndReached = () => {
+    if (this.state.is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => this.onRefresh())
+    }
+  }
+
+  onMomentumScrollBegin = () => {
+    this.setState({is_can_load_more: true})
+  }
+  _shouldItemUpdate = (prev, next) => {
+    return prev.item !== next.item;
+  }
+
+  renderBottomView = () => {
+    let {query, list} = this.state;
+    if (query?.is_add || tool.length(list) < 3) {
+      return <View/>
+    }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
+      </View>
+    )
+  }
+
+
+  renderItem = (order) => {
+    let {item, index} = order;
+    let {accessToken} = this.props.global
+    return (
+      <OrderItem showBtn={item?.show_button_list}
+                 key={index}
+                 fetchData={() => this.onRefresh()}
+                 item={item}
+                 accessToken={accessToken}
+                 navigation={this.props.navigation}
+                 setState={this.setState.bind(this)}
+                 openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
+                 openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
+                 orderStatus={0}
       />
     );
   }
 
   renderNoOrder = () => {
-    let {keyword, isLoading} = this.state;
+    let {keyword, is_loading} = this.state;
     return (
       <View style={styles.noOrderContent}>
         <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
 
-        <If condition={tool.length(keyword) > 0 && !isLoading}>
+        <If condition={tool.length(keyword) > 0 && !is_loading}>
           <Text style={styles.noOrderDesc}> 未查询到订单 </Text>
           <Text style={styles.noOrderDesc}> 目前只支持查询近90天内订单查询 </Text>
         </If>
 
-        <If condition={tool.length(keyword) <= 0 && !isLoading}>
+        <If condition={tool.length(keyword) <= 0 && !is_loading}>
           <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
           <Text style={styles.noOrderDesc}> 订单号、流水号、手机号及尾号后4位； </Text>
           <Text style={styles.noOrderDesc}> 骑手姓名、商品名、收件地址等 </Text>
