@@ -234,7 +234,6 @@ class SettingScene extends PureComponent {
       currentUser: 0,
       currStoreId: 0,
       host: '',
-      co_type: '',
       enabledGoodMgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
