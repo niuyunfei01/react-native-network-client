@@ -46,7 +46,6 @@ class RootScene extends PureComponent {
         currStoreId: 0,
         currVendorId: 0,
         host: Config.defaultHost,
-        co_type: '',
         enabledGoodMgr: 0
       },
       rehydrated: false,
