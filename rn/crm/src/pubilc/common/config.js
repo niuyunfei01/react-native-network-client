@@ -46,7 +46,7 @@ export function hostPort() {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: "preview.waisongbang.com",
+  defaultHost: "www.waisongbang.com",
   AppName: "Crm",
 
   DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
@@ -158,6 +158,7 @@ const C = {
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
+  ROUTE_SETTLEMENT_PLATFORM: 'SettlementPlatform',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',

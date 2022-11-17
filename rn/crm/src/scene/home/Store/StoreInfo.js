@@ -1,5 +1,15 @@
 import React, {Component} from "react";
-import {Alert, InteractionManager, Modal, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Appearance,
+  InteractionManager,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Clipboard from '@react-native-community/clipboard';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -488,10 +498,10 @@ class StoreInfo extends Component {
         cityId: res.citycode
       }
     }
-    if (res.address) {
+    if (res?.address) {
       states.dada_address = res.address;
     }
-    if (res.adname) {
+    if (res?.adname) {
       states.district = res.adname
     }
     this.setState(states)
@@ -951,7 +961,7 @@ class StoreInfo extends Component {
             }
             const params = {
               center: center,
-              keywords: this.state.dada_address,
+              keywords: this.props.route.params.btn_type === 'add',
               onBack: (res) => {
                 this.setAddress.bind(this)(res)
               },
@@ -1450,6 +1460,8 @@ class StoreInfo extends Component {
     return <View style={{marginTop: 12}}>
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         customHeaderIOS={() => {
           return (

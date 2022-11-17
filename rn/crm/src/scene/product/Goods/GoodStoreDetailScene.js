@@ -150,9 +150,9 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   handleAuthItem = (authName, value) => {
-    const stockIndex = MORE_ITEM.findIndex(item => item.label === '库存')
-    const stallIndex = MORE_ITEM.findIndex(item => item.label === '摊位关联')
-    const retail_price_enabledIndex = MORE_ITEM.findIndex(item => item.label === '零售价格')
+    const stockIndex = MORE_ITEM.findIndex(item => item?.label === '库存')
+    const stallIndex = MORE_ITEM.findIndex(item => item?.label === '摊位关联')
+    const retail_price_enabledIndex = MORE_ITEM.findIndex(item => item?.label === '零售价格')
     switch (authName) {
       case 'strict_providing':
         if (value === '0' && stockIndex !== -1)
@@ -215,15 +215,16 @@ class GoodStoreDetailScene extends PureComponent {
     const url = `/api_products/get_prod_with_store_detail/${store_id}/${product_id}?access_token=${accessToken}`;
     //showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      const product = product_id === 0 ? params.item : data.p
-      const spec = {...product, ...data.sp}
-      const retail_price_enabled = data.vendor?.retail_price_enabled ? data.vendor.retail_price_enabled : '0'
+      const {p = {}, sp = [], vendor = {}, ext_stores = []} = data
+      const product = product_id === 0 ? params.item : p
+      const spec = {...product, ...sp}
+      const retail_price_enabled = vendor?.retail_price_enabled ? vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
       const selectedSpecArray = []
-      if (spec?.sku_name !== undefined) {
+      if (spec?.sku_name) {
         selectedSpecArray.push({
-          value: spec.product_id,
-          label: spec.sku_name ? spec.sku_name : spec.name,
+          value: spec?.product_id || '',
+          label: spec?.sku_name ? spec?.sku_name : spec?.name,
           stallName: spec.stall_name,
           price: spec.supply_price,
           goodsName: spec.name,
@@ -232,33 +233,33 @@ class GoodStoreDetailScene extends PureComponent {
       if (tool.length(spec?.skus) > 0)
         spec.skus.map(sku => {
           selectedSpecArray.push({
-            value: sku.product_id,
-            label: sku.sku_name,
+            value: sku?.product_id || '',
+            label: sku?.sku_name,
             stallName: sku.stall_name,
             price: sku.supply_price,
             goodsName: spec.name
           })
         })
       selectedSpecArray.sort((a, b) => {
-        return a.label > b.label ? 1 : -1
+        return a?.label > b?.label ? 1 : -1
       })
       if (product_id === 0) {
         this.setState({
-          ext_stores: data.ext_stores,
+          ext_stores: ext_stores,
           product: params.item,
-          store_prod: data.sp,
+          store_prod: sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type || 0
+          price_type: vendor?.price_type || 0
         })
       } else {
         this.setState({
-          ext_stores: data.ext_stores,
-          product: data.p,
-          store_prod: data.sp,
+          ext_stores: ext_stores,
+          product: p,
+          store_prod: sp,
           isRefreshing: false,
           selectedSpecArray: selectedSpecArray,
-          price_type: data?.vendor?.price_type || 0
+          price_type: vendor?.price_type || 0
         })
       }
 
@@ -436,7 +437,7 @@ class GoodStoreDetailScene extends PureComponent {
                              defaultKey={-999}
                              onChange={value => this.onChange(value, store_prod)}>
                 <Text style={styles.moreText}>
-                  {selectItem.label}
+                  {selectItem?.label}
                 </Text>
               </ModalSelector>
             </If>
@@ -507,7 +508,7 @@ class GoodStoreDetailScene extends PureComponent {
                   {info.stallName}
                 </Text>
                 <Text style={styles.stallBottomText}>
-                  {info.label}
+                  {info?.label}
                 </Text>
               </View>
             </If>
@@ -528,7 +529,7 @@ class GoodStoreDetailScene extends PureComponent {
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const stallArray = []
       res && res.map(item => {
-        stallArray.push({...item, value: item.id, label: item.name})
+        stallArray.push({...item, value: item.id, label: item?.name})
       })
 
       this.setState({stallArray: stallArray})
@@ -558,7 +559,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
   renderModalStall = () => {
     const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
-    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec.label
+    const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec?.label
     return (
       <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
              onShow={this.onShowStall}>
@@ -581,7 +582,7 @@ class GoodStoreDetailScene extends PureComponent {
                 <ModalSelector data={stallArray} onChange={value => this.onChangeStall(value)} skin={'customer'}
                                defaultKey={-999}>
                   <Text>
-                    {selectStall.label}
+                    {selectStall?.label}
                   </Text>
                 </ModalSelector>
               </View>
@@ -595,7 +596,7 @@ class GoodStoreDetailScene extends PureComponent {
                   <ModalSelector data={selectedSpecArray} onChange={value => this.onChangeSpec(value)} skin={'customer'}
                                  defaultKey={-999}>
                     <Text>
-                      {selectedSpec.label}
+                      {selectedSpec?.label}
                     </Text>
                   </ModalSelector>
                 </View>

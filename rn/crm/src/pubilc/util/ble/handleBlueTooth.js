@@ -143,12 +143,13 @@ export const initBlueTooth = async (reduxGlobal) => {
       const options = Platform.select({
         android: {},
         ios: {
-          showAlert: !!reduxGlobal.printer_id,
+          showAlert: '0' !== reduxGlobal.printer_id,
           restoreIdentifierKey: 'com.waisongbang.app.bt.restoreIdentifierKey',
           queueIdentifierKey: 'com.waisongbang.app.bt.queueIdentifierKey'
         }
       })
-      initBleResult = await BleManager.start(options)
+      await BleManager.start(options)
+      initBleResult = true
       store.dispatch(setBleStarted(true));
     }
     if (!global)
@@ -238,29 +239,37 @@ export const retrieveConnected = async () => {
 export const handlePrintOrder = async (props, obj) => {
   let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = props.global;
   if (!autoBluetoothPrint) {
-    sendDeviceStatus(accessToken, obj)
+    sendDeviceStatus(accessToken, {...obj, auto_print: autoBluetoothPrint})
     return;
   }
   if (printer_id && autoBluetoothPrint) {
     const clb = (msg, error) => {
-      sendDeviceStatus(accessToken, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+      sendDeviceStatus(accessToken, {
+        ...obj,
+        btConnected: `打印结果:${msg}-${error || ''}`,
+        auto_print: autoBluetoothPrint
+      })
     };
 
     try {
       const peripheral = await BleManager.retrieveServices(printer_id)
-      print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+      print_order_to_bt(accessToken, peripheral, clb, obj.orderId, false, 1);
     } catch (error) {
       //蓝牙尚未启动时，会导致App崩溃
       if (!bleStarted) {
-        sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动'})
+        sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动', auto_print: autoBluetoothPrint})
         return;
       }
       try {
         await BleManager.connect(printer_id)
         const peripheral = await BleManager.retrieveServices(printer_id)
-        print_order_to_bt(accessToken, peripheral, clb, obj.wm_id, false, 1);
+        print_order_to_bt(accessToken, peripheral, clb, obj.orderId, false, 1);
       } catch (error2) {
-        sendDeviceStatus(accessToken, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+        sendDeviceStatus(accessToken, {
+          ...obj,
+          btConnected: `已断开:error1-${error} error2-${error2}`,
+          auto_print: autoBluetoothPrint
+        })
         Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
           {
             text: '确定',
@@ -272,6 +281,6 @@ export const handlePrintOrder = async (props, obj) => {
     }
     return
   }
-  sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印'})
+  sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印', auto_print: autoBluetoothPrint})
 }
 

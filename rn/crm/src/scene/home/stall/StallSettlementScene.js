@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Appearance, FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -178,6 +178,8 @@ class StallSettlementScene extends PureComponent {
       <>
         {this.renderHeader(f_total_settle_amount, total_order_num)}
         <DateTimePicker cancelTextIOS={'取消'}
+                        headerTextIOS={'选择日期'}
+                        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
                         confirmTextIOS={'确定'}
                         date={new Date(selectedDate)}
                         customHeaderIOS={this.emptyView}

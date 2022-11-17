@@ -14,7 +14,7 @@ import {
   View
 } from 'react-native';
 import * as globalActions from '../../../reducers/global/globalActions';
-import {logout, setUserCfg} from '../../../reducers/global/globalActions';
+import {logout} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
 import JPush from "jpush-react-native";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -208,17 +208,22 @@ class SettingScene extends PureComponent {
   }
 
   cancel = () => {
-    const {accessToken, vendor_id, currentUser} = this.props.global;
-    const url = `/v1/new_api/User/close_account/${vendor_id}/${currentUser}/0.json?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then(() => {
-        ToastLong('注销成功', 0)
+    const {accessToken, store_id} = this.props.global;
+    this.closeModal()
+    const url = `/v4/wsb_store/destroyStore?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url,{
+      store_id,
+    }).then(() => {
+        ToastLong('注销成功,正在退出登录', 0)
         setTimeout(() => {
           this._onLogout()
-        }, 2000)
+        }, 1000)
       }, (res) => {
         ToastLong(res?.reason, 0)
       }
-    );
+    ).catch((res) => {
+      ToastLong(res?.reason, 0)
+    });
   }
 
   _onLogout = () => {
@@ -229,17 +234,11 @@ class SettingScene extends PureComponent {
       currentUser: 0,
       currStoreId: 0,
       host: '',
-      co_type: '',
       enabledGoodMgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      user_config: {
-        order_list_by: 'orderTime asc'
-      }
+      order_list_by: 'orderTime asc'
     }
-    let {user_config = {}} = global
-    user_config.order_list_by = 'orderTime asc'
-    dispatch(setUserCfg(user_config))
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
     dispatch(logout(() => {

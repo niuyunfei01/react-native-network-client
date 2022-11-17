@@ -89,23 +89,27 @@ class SettlementOrderScene extends PureComponent {
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>退款:{refundNum}笔</Text>
-          <Text
-            style={{color: colors.color333}}>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)} </Text>
+          <Text style={{color: colors.color333}}>
+            {refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)}
+          </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
-          <Text
-            style={{color: colors.color333}}>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
+          <Text style={{color: colors.color333}}>
+            {otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)}
+          </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>补送:{merchant_reship_num}笔</Text>
-          <Text
-            style={{color: colors.color333}}>{merchant_reship_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_reship_amount, '', true)} </Text>
+          <Text style={{color: colors.color333}}>
+            {merchant_reship_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_reship_amount, '', true)}
+          </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>小费:{merchant_add_tip_num}笔</Text>
-          <Text
-            style={{color: colors.color333}}>{merchant_add_tip_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_add_tip_amount, '', true)} </Text>
+          <Text style={{color: colors.color333}}>
+            {merchant_add_tip_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_add_tip_amount, '', true)}
+          </Text>
         </View>
       </View>
     )
@@ -155,8 +159,8 @@ class SettlementOrderScene extends PureComponent {
           return (
             <View key={index} style={styles.dropdownRow}>
               <View style={styles.dropdownRowItem}>
-                <Text style={{color: colors.color333}}>{ite.title} </Text>
-                <Text style={{color: colors.color333}}>承担{ite.bearFee}元 </Text>
+                <Text style={{color: colors.color333}}>{ite.title}</Text>
+                <Text style={{color: colors.color333}}>承担{ite.bearFee}元</Text>
               </View>
             </View>
           )

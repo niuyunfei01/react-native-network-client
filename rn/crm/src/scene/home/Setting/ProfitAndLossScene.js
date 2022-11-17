@@ -1,5 +1,15 @@
 import React, {PureComponent} from 'react'
-import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Appearance,
+  Dimensions,
+  FlatList,
+  Image,
+  InteractionManager,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
@@ -256,6 +266,8 @@ class ProfitAndLoss extends PureComponent {
     return (
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'
@@ -279,6 +291,8 @@ class ProfitAndLoss extends PureComponent {
     return (
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'

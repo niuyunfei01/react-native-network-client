@@ -35,6 +35,18 @@ class TabHome extends React.Component {
     this.state = {}
   }
 
+  tabBarOptions = () => {
+    let {show_bottom_tab} = this.props.global;
+    return {
+      activeTintColor: colors.main_color,
+      inactiveTintColor: colors.color666,
+      style: {backgroundColor: colors.white, height: show_bottom_tab ? 49 : 0},
+      animationEnabled: false,
+      lazy: true,
+      labelStyle: {textAlign: 'center', fontSize: 12, opacity: show_bottom_tab ? 1 : 0}
+    }
+  }
+
   render() {
     let remind = this.props.remind?.remindNum;
     let {route} = this.props
@@ -45,15 +57,8 @@ class TabHome extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName={initTab}
-        tabBarOptions={{
-          activeTintColor: colors.main_color,
-          inactiveTintColor: colors.color666,
-          style: {backgroundColor: colors.white, height: show_bottom_tab ? 49 : 0},
-          animationEnabled: false,
-          lazy: true,
-          labelStyle: {textAlign: 'center', fontSize: 12, opacity: show_bottom_tab ? 1 : 0}
-        }}>
-        <If condition={Number(work) === 1}>
+        tabBarOptions={this.tabBarOptions()}>
+        <If condition={Number(work) === 1 && show_bottom_tab}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
                       options={{
@@ -81,7 +86,7 @@ class TabHome extends React.Component {
           }
         />
 
-        <If condition={Number(product) === 1}>
+        <If condition={Number(product) === 1 && show_bottom_tab}>
           <Tab.Screen
             name="Goods"
             getComponent={() => require("../product/Goods/StoreGoodsList").default}
@@ -97,7 +102,7 @@ class TabHome extends React.Component {
           />
         </If>
 
-        <If condition={Number(news) === 1}>
+        <If condition={Number(news) === 1 && show_bottom_tab}>
           <Tab.Screen
             name="Home"
             getComponent={() => require("../notice/NoticeList").default}

@@ -2,7 +2,6 @@ import React, {PureComponent} from 'react'
 import {
   Appearance,
   InteractionManager,
-  PixelRatio,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,13 +13,16 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Dialog from "../../common/component/Dialog";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Cts from "../../../pubilc/common/Cts";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import JbbModal from "../../../pubilc/component/JbbModal";
+import {Button} from "react-native-elements";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -37,11 +39,6 @@ const timeOptions = [
   {label: '自定义', value: 3},
 ]
 const tableTitle = ['配送方式', '配送费', '总发单量', '平均成本', '平均距离']
-const styleLine = {
-  borderTopColor: colors.colorDDD,
-  borderTopWidth: 1 / PixelRatio.get() * 2,
-  borderStyle: "dotted"
-};
 
 class DistributionAnalysisScene extends PureComponent {
   constructor(props) {
@@ -76,7 +73,13 @@ class DistributionAnalysisScene extends PureComponent {
       params: {
         start_time: '',
         end_time: ''
-      }
+      },
+      promptVisible: false,
+      plat_income_txt: '',
+      ship_fee_txt: '',
+      promptTitle: '',
+      promptStatus: '',
+      allowChange: true
     }
     this.getDistributionAnalysisData = this.getDistributionAnalysisData.bind(this);
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
@@ -116,19 +119,19 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   getProfitAndLossAnalysisData = (startTime, endTime) => {
+    ToastShort("查询中");
     this.setParamsTime(startTime, endTime)
     const {currStoreId, accessToken} = this.state;
-    showModal("查询中");
-    const api = `/v1/new_api/analysis/profitAndLoss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/profit_data/${currStoreId}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      hideModal()
       this.setState({
         profitAndLoss: res?.data,
         startTimeSaveValue: startTime,
-        endTimeSaveValue: endTime
+        endTimeSaveValue: endTime,
+        plat_income_txt: res?.plat_income_txt,
+        ship_fee_txt: res?.ship_fee_txt
       })
     }).catch((reason => {
-      hideModal()
       showError(reason?.desc)
       this.setState({
         headerType: 1
@@ -191,13 +194,16 @@ class DistributionAnalysisScene extends PureComponent {
     let oneDay = 24 * 60 * 60 * 1000
     switch (type) {
       case 0:
+        this.setState({allowChange: true})
         startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
         break
       case 1:
-        startTime =  new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
+        startTime = new Date(Date.now() - 7 * oneDay).setHours(0, 0, 0, 0) / 1000
+        this.setState({allowChange: false})
         break
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
+        this.setState({allowChange: false})
         break
       default:
         break
@@ -225,17 +231,35 @@ class DistributionAnalysisScene extends PureComponent {
     })
   }
 
-  navigateToProfitDetail = (item) => {
+  navigateToProfitDetail = () => {
     let {params} = this.state;
     this.onPress(Config.ROUTE_PROFITANDLOSS, {
       info: params
     })
   }
 
+  navigateToPlatformDetail = (item, allowChange) => {
+    let {params} = this.state;
+    if (item?.show_update > 0 && allowChange) {
+      this.onPress(Config.ROUTE_SETTLEMENT_PLATFORM, {
+        info: item,
+        date: params
+      })
+    }
+  }
+
   downProfitInfo = (i) => {
     let profit_list = [...this.state.profitAndLoss]
     profit_list[i].default_show = !profit_list[i].default_show
     this.setState({profitAndLoss: profit_list})
+  }
+
+  promptingMessage = (flag = blur(), title = '', status = '') => {
+    this.setState({
+      promptVisible: flag,
+      promptTitle: title,
+      promptStatus: status
+    })
   }
 
   renderHeaderTab = () => {
@@ -354,7 +378,7 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   renderProfitAndLossAnalysis = () => {
-    const {profitAndLoss, headerType, dateStatus, showRightDateModal} = this.state
+    const {profitAndLoss, headerType, dateStatus, showRightDateModal, allowChange} = this.state
     if (headerType !== 1) {
       return (
         <View>
@@ -384,7 +408,7 @@ class DistributionAnalysisScene extends PureComponent {
                   fontSize: pxToDp(38),
                   fontWeight: "bold"
                 }, {color: colors.main_color, marginVertical: pxToDp(10)}]}>
-                  ¥{item.good_profit}/{item.good_profit_ratio}%
+                  ¥{item.good_profit} / {item.good_profit_ratio}%
                 </Text>
               </View>
 
@@ -396,11 +420,21 @@ class DistributionAnalysisScene extends PureComponent {
                   </View>
                   <View style={styles.cardContent}>
                     <Text style={[styles.cell_rowTitleTextR4]}>亏损单占比 </Text>
-                    <Text style={styles.cell_rowText}>{item.ratio} </Text>
+                    <Text style={styles.cell_rowText}>{item.loss_ratio} </Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
-                    <Text style={styles.cell_rowText}>{item.sum_of_total_income_from_platform}元</Text>
+                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
+                      <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
+                      <Entypo name="help-with-circle"
+                              style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
+                      <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
+                      <If condition={allowChange && item?.show_update > 0}>
+                        <Text style={{color: colors.main_color}}>修改 </Text>
+                        <Entypo name="chevron-thin-right" style={styles.iconShow}/>
+                      </If>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.cardContent}>
                     <Text style={[styles.cell_rowTitleTextR4]}>客单价 </Text>
@@ -410,13 +444,17 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
-                  <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
-                    <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
-                    <View style={styles.cardContent}>
+                  <View style={styles.cardContent}>
+                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
+                      <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
+                      <Entypo name="help-with-circle"
+                              style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.cardContent} onPress={() => this.setState({headerType: 1})}>
                       <Text style={{color: colors.main_color}}>查看 </Text>
                       <Entypo name="chevron-thin-right" style={styles.iconShow}/>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </If>
               <TouchableOpacity
@@ -454,7 +492,6 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   showDatePicker = () => {
-    const colorScheme = Appearance.getColorScheme();
     return <View>
       <TouchableOpacity style={styles.modalCancel} onPress={() => {
         let self = this
@@ -477,12 +514,11 @@ class DistributionAnalysisScene extends PureComponent {
       </TouchableOpacity>
       <DateTimePicker
         cancelTextIOS={'取消'}
+        headerTextIOS={'选择日期'}
+        isDarkModeEnabled={Appearance.getColorScheme() === 'dark'}
         confirmTextIOS={'确定'}
         date={new Date()}
         mode='date'
-        backdropStyleIOS={
-          {backdrop: colorScheme === 'dark' ? colors.back_color : colors.white}
-        }
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
           let d = new Date(value)
@@ -519,11 +555,37 @@ class DistributionAnalysisScene extends PureComponent {
       showRightDateModal: false
     })
     let {startNewDateValue, endNewDateValue, analysis_by, headerType} = this.state
+    this.setState({
+      allowChange: tool.fullDay(startNewDateValue * 1000) === tool.fullDay(endNewDateValue * 1000)
+    })
+
     if (analysis_by === Distribution_Analysis && headerType === 1) {
       this.getDistributionAnalysisData(startNewDateValue, endNewDateValue)
     } else {
       this.getProfitAndLossAnalysisData(startNewDateValue, endNewDateValue)
     }
+  }
+
+  renderPromptingMessage = () => {
+    let {promptVisible, plat_income_txt, ship_fee_txt, promptStatus, promptTitle} = this.state;
+    return (
+      <JbbModal visible={promptVisible} onClose={() => this.promptingMessage(false)} modal_type={'center'}>
+        <View style={{flexDirection: "column", padding: pxToDp(20)}}>
+          <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>{promptTitle} </Text>
+          </View>
+          <Text style={{color: colors.color333, fontSize: 15, marginVertical: 15}}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
+          <Button title={'知道了'}
+                  onPress={() => this.promptingMessage(false)}
+                  containerStyle={{flex: 1}}
+                  buttonStyle={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: 24
+                  }}
+                  titleStyle={{color: colors.white, fontSize: 16, fontWeight: "bold"}}/>
+        </View>
+      </JbbModal>
+    )
   }
 
   render = () => {
@@ -537,6 +599,7 @@ class DistributionAnalysisScene extends PureComponent {
           style={Styles.scrollContainer}>
           {this.renderDistributionAnalysis()}
           {this.renderProfitAndLossAnalysis()}
+          {this.renderPromptingMessage()}
         </ScrollView>
       </View>
     );
@@ -600,15 +663,15 @@ const styles = StyleSheet.create({
   },
   cell_rowTitleTextR1: {
     fontSize: 20,
-    color: colors.main_color,
+    color: colors.color333,
     marginVertical: pxToDp(10),
     fontWeight: 'bold'
   },
   cell_rowTitleTextR2: {
-    fontSize: pxToDp(30),
-    color: colors.color111,
+    fontSize: 13,
+    color: colors.color666,
     marginVertical: pxToDp(10),
-    fontWeight: "bold"
+    fontWeight: "normal"
   },
   cell_rowTitleTextR3: {
     fontSize: pxToDp(30),
@@ -734,6 +797,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
   cardContent: {flexDirection: "row", justifyContent: "space-between", alignItems: "center"},
+  cardLabelContent: {flexDirection: "row", justifyContent: "flex-start", alignItems: "center"},
   iconShow: {
     fontSize: 14,
     color: colors.main_color,
@@ -745,7 +809,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 10,
     backgroundColor: colors.white,
-    padding: 10
+    paddingHorizontal: 10,
+    paddingTop: 10
   }
 });
 

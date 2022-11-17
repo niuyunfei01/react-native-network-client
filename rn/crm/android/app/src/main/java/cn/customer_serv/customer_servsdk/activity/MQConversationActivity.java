@@ -404,11 +404,11 @@ public class MQConversationActivity extends Activity implements View.OnClickList
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 String content = mChatMessageList.get(arg2).getContent();
-                if (!TextUtils.isEmpty(content)) {
-                    MQUtils.clip(MQConversationActivity.this, content);
-                    MQUtils.show(MQConversationActivity.this, R.string.mq_copy_success);
-                    return true;
-                }
+//                if (!TextUtils.isEmpty(content)) {
+//                    MQUtils.clip(MQConversationActivity.this, content);
+//                    MQUtils.show(MQConversationActivity.this, R.string.mq_copy_success);
+//                    return true;
+//                }
                 return false;
             }
         });

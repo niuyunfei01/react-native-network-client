@@ -13,40 +13,41 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderActions";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
-import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker} from "react-native-amap3d/lib/src/index";
 import tool from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
-import {Button} from "react-native-elements";
-import pxToDp from "../../pubilc/util/pxToDp";
-import native from "../../pubilc/util/native";
-import numeral from "numeral";
-import Clipboard from "@react-native-community/clipboard";
+import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
 import Config from "../../pubilc/common/config";
 import {getTime} from "../../pubilc/util/TimeUtil";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
-import PropTypes from "prop-types";
-import BleManager from "react-native-ble-manager";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
-import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderActions";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Tips from "../common/component/Tips";
+import {call, cross_icon} from "../../svg/svg";
+
+import numeral from "numeral";
+import {SvgXml} from "react-native-svg";
+import FastImage from "react-native-fast-image";
+import {Button} from "react-native-elements";
+import native from "../../pubilc/util/native";
+import QRCode from "react-native-qrcode-svg";
+import Clipboard from "@react-native-community/clipboard";
+import BleManager from "react-native-ble-manager";
 import OrderReminds from "../../pubilc/component/OrderReminds";
 import {ActionSheet} from "../../weui";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import {markTaskDone} from "../../reducers/remind/remindActions";
+
 import JbbModal from "../../pubilc/component/JbbModal";
-import QRCode from "react-native-qrcode-svg";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
-import FastImage from "react-native-fast-image";
-import {SvgXml} from "react-native-svg";
-import {call, cross_icon} from "../../svg/svg";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import PropTypes from "prop-types";
 
 const {width, height} = Dimensions.get("window")
 
@@ -102,7 +103,6 @@ class OrderInfoNew extends PureComponent {
     super(props);
     timeObj.method.push({startTime: getTime(), methodName: 'componentDidMount'})
     this.mixpanel = MixpanelInstance;
-
     this.mixpanel.track('订单详情页')
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     const order_id = (this.props.route.params || {}).orderId;
@@ -133,15 +133,14 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       showQrcode: false,
       show_delivery_modal: false,
-
       toastContext: '',
       add_tip_id: 0,
       show_add_tip_modal: false,
       allowRefresh: true,
       show_finish_delivery_modal: false,
-      show_cancel_delivery_modal: false
+      show_cancel_delivery_modal: false,
+      orders_add_tip: true,
     }
-    this.map_height = 290
   }
 
   componentDidMount = () => {
@@ -250,10 +249,13 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
-  fetchOrder = () => {
-    showModal('加载中')
+  fetchOrder = (show_loading = 0) => {
+    if (show_loading !== 1) {
+      showModal('加载中')
+    }
     let {orderId, isFetching} = this.state
     if (!orderId || isFetching) {
+      hideModal()
       return false;
     }
     this.setState({
@@ -261,6 +263,7 @@ class OrderInfoNew extends PureComponent {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    this.fetchShipData()
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       hideModal()
@@ -284,17 +287,16 @@ class OrderInfoNew extends PureComponent {
           this.setState({reminds: data})
         }
       }));
-      this.fetchShipData()
       this.logOrderViewed();
       this.fetchThirdWays()
     }, ((res) => {
       hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
-      ToastLong('操作失败：' + res.reason)
+      ToastShort('操作失败：' + res.reason)
       this.setState({isFetching: false})
     })).catch((e) => {
       hideModal()
-      ToastLong('操作失败：' + e.desc)
+      ToastShort('操作失败：' + e.desc)
       this.setState({isFetching: false})
     })
   }
@@ -325,7 +327,7 @@ class OrderInfoNew extends PureComponent {
         this.handleTimeObj(url, res.executeStatus, res.startTime, res.endTime, 'logOrderViewed', res.endTime - res.startTime)
       }).catch((res) => {
         this.handleTimeObj(url, res.executeStatus, res.startTime, res.endTime, 'logOrderViewed', res.endTime - res.startTime)
-        ToastLong("记录订单访问次数错误！");
+        ToastShort("记录订单访问次数错误！");
       })
     }
   }
@@ -369,7 +371,7 @@ class OrderInfoNew extends PureComponent {
 
   copyToClipboard = (val) => {
     Clipboard.setString(val)
-    ToastLong('复制成功')
+    ToastShort('复制成功')
   }
 
   onPrint = (printer_sn) => {
@@ -395,7 +397,7 @@ class OrderInfoNew extends PureComponent {
       if (ok) {
         ToastShort("已发送到打印机");
       } else {
-        ToastLong('打印失败：' + msg)
+        ToastShort('打印失败：' + msg)
       }
       this._hidePrinterChooser();
     }))
@@ -464,6 +466,8 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
+      show_delivery_modal: false,
+      showQrcode: false,
     })
   }
 
@@ -491,21 +495,18 @@ class OrderInfoNew extends PureComponent {
         this.setState({onSubmitting: true});
         showModal('处理中')
         dispatch(markTaskDone(accessToken, remind.id, Cts.TASK_STATUS_DONE, (ok, msg,) => {
-          const state = {onSubmitting: false};
           hideModal()
+          this.setState({onSubmitting: false});
+          ToastShort(ok ? '已处理' : msg);
           if (ok) {
-            showSuccess('已处理');
             setTimeout(() => {
               remind.status = Cts.TASK_STATUS_DONE;
             }, 2000);
-          } else {
-            ToastLong(msg)
           }
-          this.setState(state);
         }));
         break
       default:
-        ToastLong('暂不支持该处理类型')
+        ToastShort('暂不支持该处理类型')
         break
     }
   }
@@ -516,11 +517,6 @@ class OrderInfoNew extends PureComponent {
     })
   }
 
-  closeQrCodeModal = () => {
-    this.setState({
-      showQrcode: false
-    })
-  }
 
   deliveryModalFlag = () => {
     let {order} = this.state;
@@ -530,9 +526,6 @@ class OrderInfoNew extends PureComponent {
     }
   }
 
-  closeDeliveryModal = () => {
-    this.setState({show_delivery_modal: false})
-  }
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
@@ -551,7 +544,7 @@ class OrderInfoNew extends PureComponent {
 
   callSelfAgain = () => {
     let {order} = this.state
-    this.setState({show_delivery_modal: false})
+    this.closeModal()
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
@@ -562,8 +555,11 @@ class OrderInfoNew extends PureComponent {
       text: '确定', onPress: () => {
         const api = `/api/batch_cancel_third_ship/${id}?access_token=${accessToken}`;
         HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          ToastShort(res.desc);
+          GlobalUtil.setOrderFresh(1)
+          ToastShort(res?.desc);
           this.fetchOrder()
+        }, (e) => {
+          ToastShort(e?.desc)
         }).catch(() => {
           ToastShort("此订单已有骑手接单，取消失败")
         })
@@ -576,17 +572,23 @@ class OrderInfoNew extends PureComponent {
     let {order} = this.state;
     const api = `/api/complete_order/${order?.id}?access_token=${accessToken}`
     HttpUtils.get(api).then(() => {
-      ToastLong('配送已完成')
+      ToastShort('配送已完成')
+      GlobalUtil.setOrderFresh(1)
       this.closeModal();
-      this.fetchOrder()
-    }).catch(() => {
-      showError('配送完成失败，请稍后重试')
+      this.fetchOrder(1);
+    }, (e) => {
+      this.closeModal();
+      ToastShort(e?.desc)
+    }).catch((e) => {
+      this.closeModal();
+      ToastShort(e?.desc)
     })
   }
 
-  openAddTipModal = (order_id) => {
+  openAddTipModal = (add_tip_id, orders_add_tip = true) => {
     this.setState({
-      add_tip_id: order_id,
+      add_tip_id: add_tip_id,
+      orders_add_tip: orders_add_tip,
       show_add_tip_modal: true,
       show_delivery_modal: false
     })
@@ -620,7 +622,7 @@ class OrderInfoNew extends PureComponent {
     } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
 
     return (
-      <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: this.map_height}}>
+      <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: 290}}>
         <MapView
           zoomGesturesEnabled={true}
           scrollGesturesEnabled={true}
@@ -939,8 +941,18 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+  touchRefundBtn = () => {
+    const {order} = this.state
+    const {navigation, global} = this.props;
+    let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${global.accessToken}`
+    HttpUtils.get.bind(this.props)(url).then(() => {
+      navigation.navigate(Config.ROUTE_REFUND_DETAIL, {orderDetail: order})
+    }, () => {
+      ToastLong('获取数据失败')
+    })
+  }
   renderOrderInfoCard = () => {
-    let {order} = this.state;
+    let {order = {}} = this.state;
     const {currStoreId} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
@@ -984,27 +996,34 @@ class OrderInfoNew extends PureComponent {
             <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
           </View>
         </View>
-        <View style={styles.cuttingLine}/>
+        <View style={styles.line}/>
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
             <Text style={styles.remarkLabel}>备注 </Text>
             <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>
-        <View style={styles.cuttingLine}/>
+        <View style={styles.line}/>
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-            <Text
-              style={styles.cardTitle}>商品{order?.product_total_count}件 </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+              <Text style={styles.cardTitle}>
+                商品{order?.product_total_count}件
+              </Text>
+              <TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>
+                <Text style={styles.refundText}>
+                  退款申请
+                </Text>
+              </TouchableOpacity>
+            </View>
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
-                <TouchableOpacity style={styles.productInfo} key={index} onPress={() => {
-                  this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
-                    pid: info?.product_id,
-                    storeId: currStoreId,
-                    item: info
-                  })
-                }}>
+                <TouchableOpacity style={styles.productInfo} key={index}
+                                  onPress={() => this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
+                                    pid: info?.product_id,
+                                    storeId: currStoreId,
+                                    item: info
+                                  })}>
                   <FastImage
                     source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                     style={styles.productImage}
@@ -1041,14 +1060,15 @@ class OrderInfoNew extends PureComponent {
                           </If>
                         </If>
                       </View>
-                      <Text style={styles.productNum}> {info?.num > 1 ? `[x ${info?.num}]` : `x ${info?.num}`} </Text>
+                      <Text
+                        style={info?.num > 1 ? styles.manyProductNum : styles.productNum}>{`x ${info?.num}`} </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
               </For>
             </If>
           </View>
-          <View style={styles.cuttingLine}/>
+          <View style={styles.line}/>
           <View style={[styles.orderCardContainer, {
             flexDirection: "column",
             borderBottomLeftRadius: 6,
@@ -1056,32 +1076,40 @@ class OrderInfoNew extends PureComponent {
           }]}>
             <If condition={order?.is_show_purchasing_price}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>供货价小计 </Text>
-                <Text style={styles.remarkValue}>{order?.bill?.income_base}元 </Text>
-              </View>
-            </If>
-            <If condition={order?.is_show_original_price}>
-              <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>订单原价 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元 </Text>
-              </View>
-            </If>
-            <If condition={order?.is_show_activity_price}>
-              <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>优惠信息 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元 </Text>
+                <Text style={styles.remarkLabel}>供货价小计</Text>
+                <Text style={styles.remarkValue}>{order?.bill?.income_base}元</Text>
               </View>
             </If>
             <If condition={order?.is_show_actual_price}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>顾客实付 </Text>
-                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元 </Text>
+                <Text style={styles.remarkLabel}>顾客实付</Text>
+                <Text style={styles.remarkValue}>{numeral(order?.orderMoney).format('0.00')}元</Text>
+              </View>
+            </If>
+            <If condition={order?.is_show_activity_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>优惠信息</Text>
+                <Text style={styles.remarkValue}>{numeral(order?.self_activity_fee / 100).format('0.00')}元</Text>
               </View>
             </If>
             <If condition={order?.is_show_platform_income}>
               <View style={styles.productItemRow}>
-                <Text style={styles.remarkLabel}>平台结算 </Text>
-                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元 </Text>
+                <Text style={styles.remarkLabel}>平台结算</Text>
+                <Text style={styles.remarkValue}>{order?.bill.total_income_from_platform}元</Text>
+              </View>
+            </If>
+            <If condition={order?.is_show_original_price}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>订单原价</Text>
+                <Text style={styles.remarkValue}>{numeral(order?.total_goods_price / 100).format('0.00')}元</Text>
+              </View>
+            </If>
+            <If condition={order?.shop_deliver_fee}>
+              <View style={styles.productItemRow}>
+                <Text style={styles.remarkLabel}>顾客支付配送费</Text>
+                <Text style={styles.remarkValue}>
+                  {numeral(order?.deliver_fee / 100).format('0.00')}元
+                </Text>
               </View>
             </If>
           </View>
@@ -1095,64 +1123,64 @@ class OrderInfoNew extends PureComponent {
     return (
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
-          <Text style={styles.cardTitle}>配送信息 </Text>
+          <Text style={styles.cardTitle}>配送信息</Text>
 
           <If condition={order?.show_store_name}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>配送门店 </Text>
+              <Text style={styles.remarkLabel}>配送门店</Text>
               <Text style={styles.remarkValue}>{order?.store_name} </Text>
             </View>
           </If>
           <If condition={order?.ship_create_time !== ''}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>下单时间 </Text>
-              <Text style={styles.remarkValue}>{order?.ship_create_time} </Text>
+              <Text style={styles.remarkLabel}>下单时间</Text>
+              <Text style={styles.remarkValue}>{order?.ship_create_time}</Text>
             </View>
           </If>
           <If condition={order?.ship_goods_info !== ''}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>物品信息 </Text>
-              <Text style={styles.remarkValue}>{order?.ship_goods_info} </Text>
+              <Text style={styles.remarkLabel}>物品信息</Text>
+              <Text style={styles.remarkValue}>{order?.ship_goods_info}</Text>
             </View>
           </If>
           <If condition={order?.ship_type_desc !== ''}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>配送方式 </Text>
-              <Text style={styles.remarkValue}>{order?.ship_type_desc} </Text>
+              <Text style={styles.remarkLabel}>配送方式</Text>
+              <Text style={styles.remarkValue}>{order?.ship_type_desc}</Text>
             </View>
           </If>
           <If condition={order?.ship_worker_name !== ''}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>骑手姓名 </Text>
-              <Text style={styles.remarkValue}>{order?.ship_worker_name} </Text>
+              <Text style={styles.remarkLabel}>骑手姓名</Text>
+              <Text style={styles.remarkValue}>{order?.ship_worker_name}</Text>
             </View>
           </If>
           <If condition={order?.ship_worker_mobile !== ''}>
             <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(order?.ship_worker_mobile)}>
-              <Text style={styles.remarkLabel}>骑手电话 </Text>
+              <Text style={styles.remarkLabel}>骑手电话</Text>
               <View style={{flexDirection: "row"}}>
-                <Text style={styles.remarkValue}>{order?.ship_worker_mobile} </Text>
-                <Text style={styles.copyText}>拨打 </Text>
+                <Text style={styles.remarkValue}>{order?.ship_worker_mobile}</Text>
+                <Text style={styles.copyText}>拨打</Text>
               </View>
             </TouchableOpacity>
           </If>
           <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>配送费用 </Text>
-            <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元 </Text>
+            <Text style={styles.remarkLabel}>配送费用</Text>
+            <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-          <View style={styles.cuttingLine1}/>
+          <View style={styles.line}/>
           <If condition={tool.length(order.greeting) > 0}>
             <View style={styles.productItemRow}>
-              <Text style={styles.remarkLabel}>祝福语 </Text>
-              <Text style={styles.remarkValue}>{order?.greeting} </Text>
+              <Text style={styles.remarkLabel}>祝福语</Text>
+              <Text style={styles.remarkValue}>{order?.greeting}</Text>
             </View>
           </If>
           <If condition={tool.length(order?.giver_phone) > 0}>
             <TouchableOpacity style={styles.productItemRow} onPress={() => this.dialNumber(order?.giver_phone)}>
-              <Text style={styles.remarkLabel}>订购人电话 </Text>
+              <Text style={styles.remarkLabel}>订购人电话</Text>
               <View style={{flexDirection: "row"}}>
-                <Text style={styles.remarkValue}>{order?.giver_phone} </Text>
-                <Text style={styles.copyText}>拨打 </Text>
+                <Text style={styles.remarkValue}>{order?.giver_phone}</Text>
+                <Text style={styles.copyText}>拨打</Text>
               </View>
             </TouchableOpacity>
           </If>
@@ -1166,24 +1194,24 @@ class OrderInfoNew extends PureComponent {
     return (
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
-          <Text style={styles.cardTitle}>订单信息 </Text>
+          <Text style={styles.cardTitle}>订单信息</Text>
           <TouchableOpacity style={styles.productItemRow} onPress={() => this.copyToClipboard(order?.id)}>
-            <Text style={styles.remarkLabel}>订单编号 </Text>
+            <Text style={styles.remarkLabel}>订单编号</Text>
             <View style={{flexDirection: "row"}}>
-              <Text style={styles.remarkValue}>{order?.id} </Text>
-              <Text style={styles.copyText}>复制 </Text>
+              <Text style={styles.remarkValue}>{order?.id}</Text>
+              <Text style={styles.copyText}>复制</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.productItemRow} onPress={() => this.copyToClipboard(order?.platform_oid)}>
             <Text style={styles.remarkLabel}>平台单号 </Text>
             <View style={{flexDirection: "row"}}>
-              <Text style={styles.remarkValue}>{order?.platform_oid} </Text>
-              <Text style={styles.copyText}>复制 </Text>
+              <Text style={styles.remarkValue}>{order?.platform_oid}</Text>
+              <Text style={styles.copyText}>复制</Text>
             </View>
           </TouchableOpacity>
           <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>预计送达时间 </Text>
-            <Text style={styles.remarkValue}>{order?.expectTime} </Text>
+            <Text style={styles.remarkLabel}>预计送达时间</Text>
+            <Text style={styles.remarkValue}>{order?.expectTime}</Text>
           </View>
         </View>
       </View>
@@ -1250,12 +1278,12 @@ class OrderInfoNew extends PureComponent {
   renderQrCode = () => {
     let {showQrcode, order} = this.state;
     return (
-      <JbbModal visible={showQrcode} onClose={this.closeQrCodeModal} modal_type={'center'}>
+      <JbbModal visible={showQrcode} onClose={this.closeModal} modal_type={'center'}>
         <View style={styles.QrBox}>
           <View style={styles.QrTitle}>
             <Text style={styles.QrDesc}>查看取货码</Text>
 
-            <SvgXml onPress={this.closeQrCodeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={styles.QrImg}>
@@ -1289,13 +1317,13 @@ class OrderInfoNew extends PureComponent {
         openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
         accessToken={accessToken}
         show_modal={show_delivery_modal}
-        onClose={this.closeDeliveryModal}
+        onClose={this.closeModal}
       />
     )
   }
 
   renderAddTipModal = () => {
-    let {show_add_tip_modal, add_tip_id} = this.state;
+    let {show_add_tip_modal, add_tip_id, orders_add_tip} = this.state;
     const {global, dispatch} = this.props;
     const {accessToken} = global;
     return (
@@ -1303,7 +1331,7 @@ class OrderInfoNew extends PureComponent {
         setState={this.setState.bind(this)}
         accessToken={accessToken}
         id={add_tip_id}
-        orders_add_tip={true}
+        orders_add_tip={orders_add_tip}
         dispatch={dispatch}
         show_add_tip_modal={show_add_tip_modal}/>
     )
@@ -1330,7 +1358,7 @@ class OrderInfoNew extends PureComponent {
     }
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder}/>
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder.bind(this)}/>
 
         <If condition={loadingImg}>
           {this.renderNoInfo()}
@@ -1400,6 +1428,20 @@ class OrderInfoNew extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+
+  refundText: {
+    fontSize: 14,
+    color: colors.color666,
+    lineHeight: 20,
+    paddingVertical: 6,
+    paddingLeft: 11,
+    paddingRight: 10
+  },
+  refundWrap: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.colorCCC
+  },
   Content: {backgroundColor: '#F5F5F5'},
   mapBox: {
     zIndex: 999,
@@ -1409,7 +1451,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   copyText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '400',
     color: colors.main_color,
     marginLeft: 10
@@ -1513,8 +1555,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.1,
-    elevation: 5,
+    shadowOpacity: 0.05,
+    elevation: 2,
     shadowRadius: 12
   },
   orderCardHeader: {
@@ -1533,19 +1575,18 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: 11
   },
-  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: pxToDp(5)},
+  orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: 2.5},
   orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
     padding: 12,
-    paddingRight: pxToDp(12)
+    paddingRight: 6
   },
   cardTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
-    marginBottom: 10
   },
   logLabel: {
     fontSize: 14,
@@ -1563,50 +1604,43 @@ const styles = StyleSheet.create({
     width: width * 0.7
   },
   cardTitleUser: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.color666,
     fontWeight: '400',
-    marginBottom: pxToDp(10)
+    marginBottom: 5
   },
   cardTitleAddress: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.color333,
     fontWeight: 'bold'
   },
   cardTitlePhone: {
     fontSize: 16
   },
-  cuttingLine: {
-    backgroundColor: colors.e5,
-    height: pxToDp(0.5),
-    width: width * 0.86,
-    marginLeft: width * 0.03
+  line: {
+    borderBottomColor: colors.e5,
+    borderBottomWidth: 1,
+    marginHorizontal: 12
   },
-  cuttingLine1: {
-    backgroundColor: colors.e5,
-    height: 0.5,
-    width: width * 0.86,
-    marginVertical: 10
-  },
-  productInfo: {flexDirection: "row", marginVertical: pxToDp(15)},
+  productInfo: {flexDirection: "row", marginVertical: 7.5},
   productImage: {
     width: 60,
     height: 60,
     borderRadius: 5
   },
-  remarkLabel: {fontSize: 12, fontWeight: '400', color: colors.color999},
-  remarkValue: {fontSize: 12, fontWeight: '400', color: colors.color333},
+  remarkLabel: {fontSize: 14, fontWeight: '400', color: colors.color999},
+  remarkValue: {fontSize: 14, fontWeight: '400', color: colors.color333},
   productItem: {
     flexDirection: "column",
-    marginLeft: pxToDp(10)
+    marginLeft: 5
   },
-  productItemName: {fontSize: 12, fontWeight: '400', color: '#1A1614', width: width * 0.7},
-  productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 5},
+  productItemName: {fontSize: 14, fontWeight: '400', color: '#1A1614', width: width * 0.7},
+  productItemId: {fontSize: 12, fontWeight: '400', color: colors.color999, marginTop: 2},
   productItemPrice: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
     width: width * 0.7
   },
   priceBao: {
@@ -1619,7 +1653,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#FF8309',
     textAlign: 'center',
-    marginRight: pxToDp(10)
+    marginRight: 5
   },
   priceWai: {
     width: 15,
@@ -1631,15 +1665,16 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#26B942',
     textAlign: "center",
-    marginRight: pxToDp(10)
+    marginRight: 5
   },
-  price: {fontSize: 12, fontWeight: '400', color: '#1A1614'},
-  productNum: {fontWeight: '400', fontSize: 12, color: colors.color666},
+  price: {fontSize: 14, fontWeight: '400', color: colors.color333},
+  productNum: {fontWeight: 'bold', fontSize: 14, color: colors.color333},
+  manyProductNum: {fontWeight: 'bold', fontSize: 14, color: '#FF8309'},
   productItemRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: pxToDp(10)
+    marginVertical: 5,
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
@@ -1655,7 +1690,7 @@ const styles = StyleSheet.create({
   QrBox: {marginBottom: 20, padding: 12, flexDirection: "column"},
   QrTitle: {flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 20},
   QrDesc: {fontSize: 17, fontWeight: 'bold', color: colors.color333},
-  QrClose: {backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray},
+  QrClose: {backgroundColor: "#fff", fontSize: 22, color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
   QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
   ItemHeader: {

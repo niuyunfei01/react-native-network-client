@@ -8,7 +8,7 @@ import JbbModal from "./JbbModal";
 import {ToastShort} from "../util/ToastUtils";
 import {addTipMoneyNew, addTipMoneys} from "../../reducers/order/orderActions";
 import {Button} from "react-native-elements";
-import {check_icon, cross_circle_icon, cross_icon} from "../../svg/svg";
+import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
 
 const {width} = Dimensions.get("window");
@@ -50,14 +50,12 @@ class AddTipModal extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {id, show_add_tip_modal, add_money} = nextProps;
 
-    if (tool.length(id) <= 0 || Number(id) <= 0 || !show_add_tip_modal) {
+    if (tool.length(id) <= 0 || Number(id) <= 0 || !show_add_tip_modal || this.state.show_modal) {
       return null;
     }
-    tool.debounces(() => {
-      this.setState({
-        show_modal: true,
-        add_money: add_money || 0,
-      })
+    this.setState({
+      show_modal: true,
+      add_money: add_money || 0,
     })
   }
 
@@ -72,18 +70,23 @@ class AddTipModal extends React.Component {
     if (set_add_tip_money) { //修改上级页面加小费金额
       return this.closeModal(Number(add_money));
     }
+
     if (orders_add_tip) { //批量加小费
       return dispatch(addTipMoneys(id, add_money, accessToken, (resp) => {
-        this.setState({add_money: 0})
-        let msg = tool.length(resp?.obj?.error_msg) > 0 ? resp?.obj?.error_msg : '操作成功';
-        ToastShort(msg, 0)
+        if (tool.length(resp?.obj?.error_msg) > 0) {
+          this.setState({respReason: resp?.obj?.error_msg})
+        } else {
+          this.closeModal()
+          ToastShort("加小费成功")
+        }
       }));
     }
+
     //单独加小费
     dispatch(addTipMoneyNew(id, add_money, accessToken, (resp) => {
       if (resp.ok) {
         this.closeModal()
-        ToastShort('操作成功', 0)
+        ToastShort(resp.desc)
       } else {
         this.setState({respReason: resp.desc})
       }
@@ -118,6 +121,9 @@ class AddTipModal extends React.Component {
 
   render(): React.ReactNode {
     let {show_modal, add_money, input_add_money, respReason} = this.state;
+    if (!show_modal) {
+      return null;
+    }
     return (
       <JbbModal visible={show_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -132,9 +138,9 @@ class AddTipModal extends React.Component {
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333, lineHeight: 30}}>
               加小费
-              <Text style={{fontWeight: 'normal',fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
+              <Text style={{fontWeight: 'normal', fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
             </Text>
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
 
           </View>
@@ -199,9 +205,10 @@ class AddTipModal extends React.Component {
               />
             </View>
             <If condition={tool.length(respReason) > 0}>
-
               <View style={{
-                flexDirection: "row", alignItems: "center",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 5,
               }}>
                 <Entypo name={"help-with-circle"}
                         style={{
@@ -212,7 +219,8 @@ class AddTipModal extends React.Component {
                 <Text style={{
                   color: colors.warn_red,
                   fontSize: 14,
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  width: width * 0.6
                 }}>{respReason} </Text>
               </View>
             </If>
@@ -223,10 +231,10 @@ class AddTipModal extends React.Component {
                     }}
                     buttonStyle={[{
                       backgroundColor: colors.main_color,
-                      borderRadius: 24,
-                      length: 48,
+                      borderRadius: 21,
+                      length: 42,
                     }]}
-                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
           </View>
         </View>
       </JbbModal>

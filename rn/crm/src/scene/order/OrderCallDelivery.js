@@ -34,6 +34,7 @@ import native from "../../pubilc/util/native";
 import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 // import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
@@ -332,8 +333,13 @@ class OrderCallDelivery extends Component {
     if (isLoading) {
       return ToastShort("请刷新页面重试")
     }
+
+    GlobalUtil.setOrderFresh(1)
     if (worker_delivery_id > 0) {
       return this.onWorkerDelivery();
+    }
+    if (tool.length(logistic_fee_map) <= 0) {
+      return ToastShort("请选择配送方式")
     }
     tool.debounces(() => {
       let params = {
@@ -596,6 +602,7 @@ class OrderCallDelivery extends Component {
           title={'期望送达时间'}
           modal
           open={show_date_modal}
+          textColor={colors.color666}
           date={new Date()}
           minimumDate={new Date()}
           onConfirm={(date) => {
@@ -1102,7 +1109,7 @@ class OrderCallDelivery extends Component {
                     worker_delivery_id: 0
                   })
                   this.closeModal()
-                }} xml={cross_icon()} width={18} height={18}/>
+                }} xml={cross_icon()}/>
               </View>
 
               <ScrollView automaticallyAdjustContentInsets={false}
@@ -1176,7 +1183,7 @@ class OrderCallDelivery extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品重量
             </Text>
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -1268,7 +1275,7 @@ class OrderCallDelivery extends Component {
               物品价值
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
@@ -1371,7 +1378,7 @@ class OrderCallDelivery extends Component {
               备注
             </Text>
 
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} width={18} height={18}/>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
