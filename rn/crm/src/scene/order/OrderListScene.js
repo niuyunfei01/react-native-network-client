@@ -681,7 +681,11 @@ class OrderListScene extends Component {
   }
   onEndReached = () => {
     if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+      this.setState({isCanLoadMore: false}, () => {
+        if (this.state.query.isAdd) {
+          this.fetchOrders(this.state.orderStatus, 0);
+        }
+      })
     }
   }
   onMomentumScrollBegin = () => {
@@ -733,12 +737,6 @@ class OrderListScene extends Component {
         />
       </View>
     );
-  }
-
-  listmore = () => {
-    if (this.state.query.isAdd) {
-      this.fetchOrders(this.state.orderStatus, 0);
-    }
   }
 
   renderBottomView = () => {

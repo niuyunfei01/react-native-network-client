@@ -184,6 +184,11 @@ class OrderItem extends React.PureComponent {
   touchMobile = () => {
     let {item} = this.props;
     this.mixpanel.track('订单列表页_点击手机号')
+    if (tool.length(item?.phone_backup) > 0) {
+      return this.setState({
+        show_call_user_modal: true
+      })
+    }
     this.dialNumber(item.mobile)
   }
 
@@ -232,6 +237,7 @@ class OrderItem extends React.PureComponent {
 
   renderCallUser = () => {
     let {show_call_user_modal} = this.state;
+    let {item} = this.props;
     return (
       <JbbModal visible={show_call_user_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
@@ -249,7 +255,10 @@ class OrderItem extends React.PureComponent {
             paddingHorizontal: 20,
             paddingTop: 6
           }}>
-            <View style={{
+            <TouchableOpacity onPress={() => {
+              this.dialNumber(item.mobile)
+              this.closeModal()
+            }} style={{
               paddingVertical: 14,
               borderBottomWidth: 0.5,
               borderBottomColor: colors.colorDDD,
@@ -265,29 +274,32 @@ class OrderItem extends React.PureComponent {
                   fontWeight: 'bold',
                   marginTop: 3,
                   lineHeight: 22
-                }}> 13039230245转3408 </Text>
+                }}> {item?.mobile_readable} </Text>
               </View>
               <SvgXml xml={call()}/>
-            </View>
+            </TouchableOpacity>
 
-            <View style={{
+            <TouchableOpacity onPress={() => {
+              this.dialNumber(item?.phone_backup)
+              this.closeModal()
+            }} style={{
               paddingVertical: 14,
               flexDirection: "row",
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
               <View>
-                <Text style={{fontSize: 16, color: colors.color666}}> 虚拟号码 </Text>
+                <Text style={{fontSize: 16, color: colors.color666}}> 备用号码 </Text>
                 <Text style={{
                   fontSize: 16,
                   color: colors.color333,
                   fontWeight: 'bold',
                   marginTop: 3,
                   lineHeight: 22
-                }}> 13039230245转3408 </Text>
+                }}> {item?.phone_backup_readable} </Text>
               </View>
               <SvgXml xml={call()}/>
-            </View>
+            </TouchableOpacity>
 
           </View>
           <TouchableOpacity onPress={this.closeModal} style={{
@@ -685,7 +697,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.batch_add_delivery_tips}>
-          <Button title={'加小费'}
+          <Button title={Number(item?.have_add_tips) > 0 ? '加小费' + item?.have_add_tips + '元' : '加小费'}
                   onPress={() => {
                     this.props.setState && this.props.setState({
                       add_tip_id: item?.id,

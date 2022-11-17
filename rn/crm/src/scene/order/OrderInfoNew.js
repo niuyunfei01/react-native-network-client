@@ -971,7 +971,14 @@ class OrderInfoNew extends PureComponent {
             <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
                        resizeMode={FastImage.resizeMode.contain}/>
             <View style={styles.orderCardInfo}>
-              <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
+                <Text style={{
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  color: '#FF8309'
+                }}>  {order?.friendly_time_info} </Text>
+              </View>
               <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
             </View>
           </View>

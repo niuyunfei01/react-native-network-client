@@ -121,6 +121,7 @@ class OrderCallDelivery extends Component {
       store_est_all_check: false,
       logistic_fee_map: [],
       params_str: '',
+      expect_time_friendly: '',
       show_cancel_delivery_modal: false,
       ship_id: 0,
     };
@@ -225,6 +226,7 @@ class OrderCallDelivery extends Component {
         wm_user_name: obj?.wm_user_name,
         wm_mobile: obj?.wm_mobile,
         order_expect_time: obj?.expect_time,
+        expect_time_friendly: obj?.expect_time_friendly,
         order_money: Number(obj?.wm_order_money),
         order_money_input_value: Number(obj?.wm_order_money),
         weight: Number(obj?.weight),
@@ -922,7 +924,7 @@ class OrderCallDelivery extends Component {
   }
 
   renderHead = () => {
-    let {order_expect_time, wm_platform_day_id, wm_platform} = this.state;
+    let {expect_time_friendly, wm_platform_day_id, wm_platform} = this.state;
     return (
       <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
@@ -933,7 +935,7 @@ class OrderCallDelivery extends Component {
           }}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
-        <If condition={wm_platform && wm_platform_day_id && order_expect_time}>
+        <If condition={wm_platform && wm_platform_day_id && expect_time_friendly}>
           <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
@@ -941,7 +943,7 @@ class OrderCallDelivery extends Component {
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
               <Text
-                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{order_expect_time} </Text>
+                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{expect_time_friendly} </Text>
             </View>
           </View>
         </If>
