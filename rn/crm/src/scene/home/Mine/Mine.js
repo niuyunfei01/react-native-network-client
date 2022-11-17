@@ -51,7 +51,8 @@ import {showError} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout, setUserCfg} from "../../../reducers/global/globalActions";
+import {logout} from "../../../reducers/global/globalActions";
+import AlertModal from "../../../pubilc/component/AlertModal";
 
 const width = Dimensions.get("window").width;
 
@@ -132,7 +133,6 @@ class Mine extends PureComponent {
     let {
       currVendorId,
       currVersion,
-      co_type
     } = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -141,7 +141,6 @@ class Mine extends PureComponent {
       currVersion: currVersion,
       access_token: accessToken,
       wsb_store_account: 0,
-      co_type: co_type,
       storeStatus: {},
       is_mgr: false,
       storeInfo: {
@@ -151,11 +150,14 @@ class Mine extends PureComponent {
       balanceInfo: {
         balance: 0.00,
         disabled_recharge: false,
-        disabled_view_bill: false
+        disabled_view_bill: false,
+        freeze_balance: '',
+        freeze_notice: '冻结金额为待抢单运单最大配送费之和',
       },
       menu_list: menu_list,
       activity: [],
-      img: ''
+      img: '',
+      show_freeze_balance_alert: false
     }
   }
 
@@ -233,6 +235,8 @@ class Mine extends PureComponent {
       this.setState({
         balanceInfo: {
           balance: res.balance,
+          freeze_balance: res?.freeze_balance,
+          freeze_notice: res?.freeze_notice,
           disable_recharge: res.disabled_recharge === 0,
           disable_view_bill: res.disable_view_bill === 0
         }
@@ -362,7 +366,6 @@ class Mine extends PureComponent {
             currentUser: 0,
             currStoreId: 0,
             host: '',
-            co_type: '',
             enabledGoodMgr: '',
             currVendorId: '',
             refreshToken: '',
@@ -492,14 +495,28 @@ class Mine extends PureComponent {
                       start={{x: 0, y: 0}}
                       end={{x: 0, y: 1}}
                       colors={['#E7FFEB', '#FFFFFF']}>
-        <View>
+        <View style={{borderRightColor: colors.e5, borderRightWidth: 0.5, paddingRight: 20}}>
           <Text style={styles.walletLabel}>
-            外送帮账户余额 (元)
+            账户余额(元)
           </Text>
           <Text style={styles.walletValue}>
             {balanceInfo?.disable_view_bill ? balanceInfo?.balance : `*****`}
           </Text>
         </View>
+
+        <View style={{flex: 1, marginLeft: 19}}>
+          <Text style={styles.walletLabel} onPress={() => {
+            this.setState({
+              show_freeze_balance_alert: true
+            })
+          }}>
+            冻结金额(元) <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.colorCCC,}}/>
+          </Text>
+          <Text style={styles.walletValue}>
+            {balanceInfo?.disable_view_bill ? balanceInfo?.freeze_balance : `*****`}
+          </Text>
+        </View>
+
         <Button title={'立即充值'}
                 onPress={() => this.jumpToAccountFill(balanceInfo?.disable_recharge)}
                 buttonStyle={styles.walletBtn}
@@ -508,6 +525,28 @@ class Mine extends PureComponent {
       </LinearGradient>
     )
   }
+
+  closeModal = () => {
+    this.setState({
+      show_freeze_balance_alert: false,
+    })
+  }
+
+  renderFreezeBalanceAlertModal = () => {
+    let {show_freeze_balance_alert, balanceInfo} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_freeze_balance_alert}
+          onClose={this.closeModal}
+          onPress={() => this.closeModal()}
+          title={'冻结金额'}
+          desc={balanceInfo?.freeze_notice}
+          actionText={'知道了'}/>
+      </View>
+    )
+  }
+
 
   renderValueAdded = () => {
     const {navigation, global} = this.props
@@ -674,6 +713,7 @@ class Mine extends PureComponent {
           {this.renderStore()}
           <View style={{position: "relative", top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
+            {this.renderFreezeBalanceAlertModal()}
             {this.renderValueAdded()}
             {this.renderBlock()}
             {this.renderSwiper()}
@@ -741,17 +781,16 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    // justifyContent: "space-between"
   },
   walletLabel: {
-    fontWeight: '400',
     fontSize: 12,
     color: colors.color666,
     marginBottom: 10
   },
   walletValue: {
     fontWeight: 'bold',
-    fontSize: 24,
+    fontSize: 20,
     color: colors.color333
   },
   walletBtn: {
@@ -846,7 +885,7 @@ const headerRightStyles = StyleSheet.create({
   rightBtn: {
     width: 90,
     height: 32,
-    backgroundColor: rgbaColor(255, 255, 255, 0.2),
+    backgroundColor: rgbaColor(0, 0, 0, 0.15),
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     flexDirection: "row",
@@ -854,7 +893,7 @@ const headerRightStyles = StyleSheet.create({
     justifyContent: "center"
   },
   rightText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     color: colors.white,
     marginLeft: 3

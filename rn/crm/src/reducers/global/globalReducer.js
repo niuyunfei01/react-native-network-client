@@ -63,7 +63,7 @@ const initialState = {
   show_float_service_icon: true,
   user_config: {},
   order_list_by: 'orderTime asc',
-  show_bottom_tab: false,
+  show_bottom_tab: true,
   only_one_store: false,
   is_vendor_admin: false,
   menu_list: {

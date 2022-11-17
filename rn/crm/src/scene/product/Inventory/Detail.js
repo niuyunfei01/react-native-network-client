@@ -10,7 +10,7 @@ import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
-import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
 import PopPicker from "rmc-date-picker/lib/Popup";
 import DatePicker from "rmc-date-picker/lib/DatePicker";
@@ -128,7 +128,7 @@ class Detail extends BaseComponent {
       dateHtp: dayjs(date).format('YYYY-MM'),
       date: date,
       start_day: dayjs(date).format('YYYY-MM')
-      }, () => {
+    }, () => {
       this.navigationOptions()
       this.setState({page: 1}, () => this.fetchData())
     })
@@ -174,6 +174,8 @@ class Detail extends BaseComponent {
     let {isLoading, lists} = this.state
     return (
       <FlatList data={lists}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 style={{marginBottom: 10}}
                 onEndReachedThreshold={0.1}
                 onEndReached={this.onEndReached}
