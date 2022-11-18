@@ -341,41 +341,6 @@ class deliveryStatusModal extends React.Component {
                   <If condition={info?.default_show}>
                     {this.renderDeliveryStatus(info)}
 
-                    <If condition={info?.do_btn_list?.add_tip}>
-                      <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        position: 'absolute',
-                        bottom: 1,
-                        right: 1
-                      }}>
-                        <Button title={'加小费'}
-                                onPress={() => {
-                                  this.mixpanel.track('V4配送调度页_加小费')
-                                  this.setState({
-                                    show_modal: false,
-                                    delivery_list: [],
-                                    order_platform_desc: '',
-                                    platform_dayId: '',
-                                    expect_time_desc: '',
-                                    driver_phone: '',
-                                  }, () => {
-                                    this.props.openAddTipModal(info?.id, false)
-                                  })
-                                }}
-                                buttonStyle={{
-                                  borderRadius: 20,
-                                  height: 32,
-                                  width: 80,
-                                  backgroundColor: colors.white,
-                                  borderColor: colors.colorCCC,
-                                  borderWidth: 0.5,
-                                }}
-                                titleStyle={{color: colors.color666, fontSize: 14}}
-                        />
-                      </View>
-                    </If>
-
                   </If>
                 </For>
               </ScrollView>
@@ -417,7 +382,39 @@ class deliveryStatusModal extends React.Component {
                 </If>
               </View>
               <Text style={[styles.platform, {marginTop: 4}]}>{log?.log_call_time} </Text>
+              <If condition={index === (tool.length(info?.log_list) - 1) && info?.do_btn_list?.add_tip}>
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                }}>
+                  <Button title={'加小费'}
+                          onPress={() => {
+                            this.mixpanel.track('V4配送调度页_加小费')
+                            this.setState({
+                              show_modal: false,
+                              delivery_list: [],
+                              order_platform_desc: '',
+                              platform_dayId: '',
+                              expect_time_desc: '',
+                              driver_phone: '',
+                            }, () => {
+                              this.props.openAddTipModal(info?.id, false)
+                            })
+                          }}
+                          buttonStyle={{
+                            borderRadius: 20,
+                            height: 32,
+                            width: 80,
+                            backgroundColor: colors.white,
+                            borderColor: colors.colorCCC,
+                            borderWidth: 0.5,
+                          }}
+                          titleStyle={{color: colors.color666, fontSize: 14}}
+                  />
+                </View>
+              </If>
             </View>
+
           </View>
         </View>
       </For>
@@ -438,7 +435,7 @@ class deliveryStatusModal extends React.Component {
           padding: 12,
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
         }}>
         <If condition={btn_list?.btn_cancel_delivery}>
           <Button title={'取消配送'}
