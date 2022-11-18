@@ -1011,8 +1011,8 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.line}/>
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-              <Text style={styles.cardTitle}>
+            <View style={styles.cardTitleGoodsWrap}>
+              <Text style={styles.cardTitleGoods}>
                 商品{order?.product_total_count}件
               </Text>
               <TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>
@@ -1131,7 +1131,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>配送信息</Text>
 
           <If condition={order?.show_store_name}>
-            <View style={styles.productItemRow}>
+            <View style={[styles.productItemRow]}>
               <Text style={styles.remarkLabel}>配送门店</Text>
               <Text style={styles.remarkValue}>{order?.store_name} </Text>
             </View>
@@ -1173,8 +1173,9 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用</Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-          <View style={styles.line}/>
+
           <If condition={tool.length(order.greeting) > 0}>
+            <View style={styles.line}/>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语</Text>
               <Text style={styles.remarkValue}>{order?.greeting}</Text>
@@ -1200,7 +1201,7 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
           <Text style={styles.cardTitle}>订单信息</Text>
-          <TouchableOpacity style={[styles.productItemRow, {marginTop: 15}]}
+          <TouchableOpacity style={[styles.productItemRow]}
                             onPress={() => this.copyToClipboard(order?.id)}>
             <Text style={styles.remarkLabel}>订单编号</Text>
             <View style={{flexDirection: "row"}}>
@@ -1589,10 +1590,17 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingRight: 6
   },
+  cardTitleGoodsWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15},
+  cardTitleGoods: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
+    marginBottom: 15
   },
   logLabel: {
     fontSize: 14,
@@ -1603,7 +1611,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 15
   },
   cardTitleInfoLeft: {
     flexDirection: "column",
@@ -1628,7 +1635,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     marginHorizontal: 12
   },
-  productInfo: {flexDirection: "row", marginVertical: 7.5},
+  productInfo: {flexDirection: "row", marginBottom: 7.5},
   productImage: {
     width: 60,
     height: 60,
@@ -1680,7 +1687,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 5,
+    marginBottom: 5,
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
