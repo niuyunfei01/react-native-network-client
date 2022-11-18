@@ -23,7 +23,7 @@ import ModalSelector from "../../../pubilc/component/ModalSelector";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../../pubilc/util/tool";
 import Cts from "../../../pubilc/common/Cts";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 //组件
 import _ from 'lodash';
@@ -965,6 +965,51 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
+  changeProductSpec = (status) => {
+    let {type, product_detail = {}} = this.props.route.params;
+    const {series_id = ''} = product_detail
+    if ('add' === type) {
+      this.setState({
+        spec_type: status
+      })
+    } else {
+      if (parseInt(series_id) !== 0) {
+        return ToastShort('不可更改为单规格！')
+      } else {
+        this.setState({
+          spec_type: status
+        }, () => {
+          let {name, upc, weight, price, supply_price, selectWeight, actualNum} = this.state
+          const {multiSpecsList = []} = this.state
+          const multiSpecsInfo = {
+            sku_name: name,
+            supply_price: supply_price,
+            price: price,
+            weight: weight,
+            sku_unit: selectWeight.label,
+            selectWeight: selectWeight,
+            upc: upc,
+            inventory: {
+              actualNum: actualNum,
+              differenceType: 2,
+              totalRemain: '',
+              remark: '',
+              skipCheckChange: 1
+            },
+            checked: false
+          }
+          let multiSpecsListCopy = []
+          if (multiSpecsList.length < 1) {
+            multiSpecsListCopy.push(multiSpecsInfo)
+          }
+          this.setState({
+            multiSpecsList: multiSpecsList.concat(multiSpecsListCopy)
+          })
+        })
+      }
+    }
+  }
+
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, price, store_tags, supply_price,
@@ -1189,14 +1234,14 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-          <If condition={allow_multi_spec === 1 && allow_switch_multi}>
+          <If condition={allow_multi_spec === 1}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品规格
               </Text>
               <View style={styles.saleStatusWrap}>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({spec_type: 'spec_single'})}>
+                                  onPress={() => this.changeProductSpec('spec_single')}>
                   <If condition={spec_type === 'spec_single'}>
                     <SvgXml xml={radioSelected(18, 18)}/>
                   </If>
@@ -1208,7 +1253,7 @@ class GoodsEditScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({spec_type: 'spec_multi'})}>
+                                  onPress={() => this.changeProductSpec('spec_multi')}>
                   <If condition={spec_type === 'spec_multi'}>
                     <SvgXml xml={radioSelected(18, 18)}/>
                   </If>
@@ -1467,7 +1512,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <View style={multiSpecsList.length > 1 ? styles.operationSpecsBtnWrap : {}}>
-          <If condition={multiSpecsList.length === index + 1 && 'add' === type && !vendor_has && !store_has}>
+          <If condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has}>
             <TouchableOpacity style={styles.addSpecsWrap} onPress={this.addSpecs}>
               <AntDesign name={'plus'} size={12} color={colors.main_color}/>
               <Text style={styles.addSpecsText}>
@@ -1494,6 +1539,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit: '克',
       selectWeight: {value: 1, label: '克'},//选择重量
       upc: '',//条形码
+      checked: true,
       inventory: {
         actualNum: '',//库存
         differenceType: 2,
