@@ -309,7 +309,7 @@ class Mine extends PureComponent {
   }
 
   navigateToDeliverySetting = () => {
-    this.onPress(Config.ROUTE_DELIVERY_LIST, {dispatch: this.props.dispatch})
+    this.onPress(Config.ROUTE_DELIVERY_LIST)
   }
 
   navigateToExpense = () => {

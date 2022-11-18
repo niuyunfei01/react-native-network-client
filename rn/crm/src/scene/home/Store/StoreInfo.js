@@ -51,7 +51,11 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
-
+const ActionSheet = [
+  {key: -999, section: true, label: "操作"},
+  {key: 1, label: "初始化商品"}, //force -> true
+  {key: 2, label: "复制商品"} //force -> false
+];
 class StoreInfo extends Component {
   constructor(props) {
     super(props);
@@ -843,11 +847,7 @@ class StoreInfo extends Component {
   renderHeader() {
     const params = this.props.route.params || {}
     let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
-    let ActionSheet = [
-      {key: -999, section: true, label: "操作"},
-      {key: 1, label: "初始化商品"}, //force -> true
-      {key: 2, label: "复制商品"} //force -> false
-    ];
+
     return (
       <View style={{
         flexDirection: 'row',

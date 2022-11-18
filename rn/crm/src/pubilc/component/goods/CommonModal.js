@@ -19,7 +19,9 @@ export default class CommonModal extends PureComponent {
 
   static propTypes = {
     visible: PropTypes.bool,
-    onClose: PropTypes.func,
+    onRequestClose: PropTypes.func,
+    onShow: PropTypes.func,
+    children:PropTypes.element,
     position: PropTypes.string
   }
 

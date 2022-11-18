@@ -11,7 +11,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import store from "../util/configureStore";
-import tool from "../util/tool";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
@@ -89,6 +88,9 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
+        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -98,6 +100,10 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderListScene").default}
                       initialParams={initialRouteParams}/>
+
+        {/*<Stack.Screen name={Config.ROUTE_MINE} options={{headerShown: false}}*/}
+        {/*              getComponent={() => require("../../scene/home/Mine/MineScene").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name={Config.ROUTE_MINE_NEW} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Mine/Mine").default}
                       initialParams={initialRouteParams}/>
@@ -106,11 +112,13 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
+        {/*<Stack.Screen name="Register" options={{headerTitle: '我要注册'}}*/}
+        {/*              getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>*/}
         <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
                       getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送管理'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryInfo").default}/>
@@ -537,6 +545,8 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_EDIT_ACCOUNT}
                       options={{headerTitle: '编辑账号'}}
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
+                      getComponent={()=>require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
