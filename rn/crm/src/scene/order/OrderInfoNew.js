@@ -1200,7 +1200,8 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
           <Text style={styles.cardTitle}>订单信息</Text>
-          <TouchableOpacity style={styles.productItemRow} onPress={() => this.copyToClipboard(order?.id)}>
+          <TouchableOpacity style={[styles.productItemRow, {marginTop: 15}]}
+                            onPress={() => this.copyToClipboard(order?.id)}>
             <Text style={styles.remarkLabel}>订单编号</Text>
             <View style={{flexDirection: "row"}}>
               <Text style={styles.remarkValue}>{order?.id}</Text>
@@ -1595,7 +1596,7 @@ const styles = StyleSheet.create({
   },
   logLabel: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '500',
     color: colors.color333
   },
   cardTitleInfo: {
@@ -1624,7 +1625,7 @@ const styles = StyleSheet.create({
   },
   line: {
     borderBottomColor: colors.e5,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     marginHorizontal: 12
   },
   productInfo: {flexDirection: "row", marginVertical: 7.5},
