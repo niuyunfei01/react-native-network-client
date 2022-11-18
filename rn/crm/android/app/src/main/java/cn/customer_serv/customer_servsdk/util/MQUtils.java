@@ -540,14 +540,14 @@ public class MQUtils {
      *
      * @param text
      */
-    public static void clip(Context context, String text) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboardManager = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboardManager.setText(text);
-        } else {
-            ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("mq_content", text));
-        }
+    public void clip(Context context, String text) {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+//            android.text.ClipboardManager clipboardManager = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+//            clipboardManager.setText(text);
+//        } else {
+//            ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+//            clipboardManager.setPrimaryClip(ClipData.newPlainText("mq_content", text));
+//        }
     }
 
     /**

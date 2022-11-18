@@ -133,7 +133,6 @@ class Mine extends PureComponent {
     let {
       currVendorId,
       currVersion,
-      co_type
     } = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -142,7 +141,6 @@ class Mine extends PureComponent {
       currVersion: currVersion,
       access_token: accessToken,
       wsb_store_account: 0,
-      co_type: co_type,
       storeStatus: {},
       is_mgr: false,
       storeInfo: {
@@ -368,7 +366,6 @@ class Mine extends PureComponent {
             currentUser: 0,
             currStoreId: 0,
             host: '',
-            co_type: '',
             enabledGoodMgr: '',
             currVendorId: '',
             refreshToken: '',
@@ -896,7 +893,7 @@ const headerRightStyles = StyleSheet.create({
     justifyContent: "center"
   },
   rightText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     color: colors.white,
     marginLeft: 3
