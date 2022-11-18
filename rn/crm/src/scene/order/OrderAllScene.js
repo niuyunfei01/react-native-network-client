@@ -12,7 +12,6 @@ import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {back, empty_data, search_icon, this_down, this_up} from "../../svg/svg";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
@@ -48,10 +47,10 @@ class OrderAllScene extends Component {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    GlobalUtil.setOrderFresh(1)
-    let {store_id} = this.props.global;
+    let {store_id, store_info, only_one_store} = this.props.global;
     this.state = {
       store_id,
+      only_one_store,
       is_loading: false,
       query: {
         page_size: 10,
@@ -59,10 +58,13 @@ class OrderAllScene extends Component {
         is_add: true,
       },
       list: [],
+      store_list: [],
       search_start_date: new Date(),
       search_end_date: new Date(),
       search_start_date_input_val: new Date(),
       search_end_date_input_val: new Date(),
+      search_store_id: store_id,
+      search_store_name: store_info?.name,
       search_status: 0,
       search_type: 0,
       search_platform: 0,
@@ -114,19 +116,30 @@ class OrderAllScene extends Component {
 
   componentDidMount() {
     const {navigation} = this.props
+    let {only_one_store} = this.state;
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
     this.blur = navigation.addListener('blur', () => {
       this.closeModal()
     })
+    if (!only_one_store) {
+      this.fetchStoreList()
+    }
+  }
+
+  fetchStoreList = () => {
+    const {accessToken = ''} = this.props.global;
+    const api = `/v4/wsb_store/listCanReadStore?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        store_list: res
+      })
+    })
   }
 
   onRefresh = () => {
-    const {is_loading, query} = this.state
-    if (is_loading) {
-      return
-    }
+    const {query} = this.state
     this.setState({
         query: {...query, page: 1, is_add: true, page_size: 10},
       },
@@ -137,12 +150,12 @@ class OrderAllScene extends Component {
     let {
       is_loading,
       query,
-      store_id,
       search_start_date,
       search_end_date,
       search_type,
       search_status,
-      search_platform
+      search_platform,
+      search_store_id
     } = this.state;
     if (is_loading || !query.is_add) {
       return null;
@@ -153,11 +166,11 @@ class OrderAllScene extends Component {
 
     let {accessToken} = this.props.global;
     let params = {
-      search_store_id: store_id,
+      search_store_id: search_store_id,
       page: query.page,
       page_size: query.page_size,
-      // start_time: dayjs(search_start_date).format('YYYY-MM-DD'),
-      // end_time: dayjs(search_end_date).format('YYYY-MM-DD'),
+      start_time: dayjs(search_start_date).format('YYYY-MM-DD'),
+      end_time: dayjs(search_end_date).format('YYYY-MM-DD'),
       search_type,
       search_status,
       search_platform,
@@ -172,7 +185,7 @@ class OrderAllScene extends Component {
       query.page++;
       this.setState({
         is_loading: false,
-        query: query,
+        query: {...query},
         list: setList === 1 ? res.data : list.concat(res.data),
       })
     }, (res) => {
@@ -286,11 +299,20 @@ class OrderAllScene extends Component {
     })
   }
 
+  checkStore = (item) => {
+    this.setState({
+      show_select_store_modal: false,
+      search_store_id: item?.id,
+      search_store_name: item?.name
+    }, () => {
+      this.fetchOrderList()
+    })
+  }
+
   render() {
     const {currStoreId, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
-      list,
       order_id,
       show_goods_list,
       show_delivery_modal,
@@ -299,16 +321,20 @@ class OrderAllScene extends Component {
       show_select_store_modal,
       show_condition_modal,
       add_tip_id,
+      search_store_id,
       check_list,
+      store_list,
       check_item
     } = this.state
     return (
       <View style={styles.flex1}>
         {this.renderHead()}
 
-        <TopSelectModal list={check_list}
-                        onPress={this.checkItem.bind(this)}
-                        default_val={check_item}
+        <TopSelectModal list={store_list}
+                        label_field={'name'}
+                        value_field={'id'}
+                        onPress={this.checkStore.bind(this)}
+                        default_val={search_store_id}
                         onClose={this.closeModal.bind(this)}
                         visible={show_select_store_modal}
                         marTop={80}
@@ -323,7 +349,7 @@ class OrderAllScene extends Component {
                         marTop={80}
         />
 
-        {this.renderContent(list)}
+        {this.renderContent()}
         {this.renderDateModal()}
         {this.renderFinishDeliveryModal()}
         <GoodsListModal
@@ -575,8 +601,7 @@ class OrderAllScene extends Component {
   }
 
   renderHead = () => {
-    let {store_info, only_one_store} = this.props.global;
-    let {show_select_store_modal} = this.state;
+    let {show_select_store_modal, store_list, only_one_store, search_store_name, search_store_id} = this.state;
     return (
       <View style={{
         flexDirection: 'row',
@@ -594,17 +619,20 @@ class OrderAllScene extends Component {
           if (only_one_store) {
             return;
           }
+          if (tool.length(store_list) <= 0) {
+            this.fetchStoreList()
+            return ToastShort('正在请求店铺信息，请稍后再试');
+          }
           this.setState({
             show_select_store_modal: !show_select_store_modal,
             show_condition_modal: 0
           })
-          return;
         }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,
             fontWeight: 'bold'
-          }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+          }}>{tool.jbbsubstr(search_store_name, 12)} </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={show_select_store_modal ? this_up() : this_down()}/>
           </If>
@@ -613,7 +641,7 @@ class OrderAllScene extends Component {
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
-            this.onPress(Config.ROUTE_SEARCH_ORDER)
+            this.onPress(Config.ROUTE_SEARCH_ORDER, {search_store_id})
           }}
           style={{
             height: 44,
@@ -631,8 +659,15 @@ class OrderAllScene extends Component {
   }
 
   onEndReached = () => {
-    if (this.state.is_can_load_more) {
-      this.setState({is_can_load_more: false}, () => this.onRefresh())
+    let {query, is_can_load_more} = this.state;
+    if (is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => {
+        if (query?.is_add) {
+          this.fetchOrderList(0);
+        } else {
+          ToastShort('已经到底部了')
+        }
+      })
     }
   }
   onMomentumScrollBegin = () => {
@@ -650,8 +685,8 @@ class OrderAllScene extends Component {
   }
 
 
-  renderContent = (list) => {
-    let {is_loading} = this.state;
+  renderContent = () => {
+    let {is_loading, list} = this.state;
     return (
       <View style={styles.orderListContent}>
         <FlatList
@@ -669,7 +704,6 @@ class OrderAllScene extends Component {
           refreshing={is_loading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          // getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
           ListFooterComponent={this.renderBottomView()}
           initialNumToRender={3}
@@ -677,13 +711,6 @@ class OrderAllScene extends Component {
       </View>
     );
   }
-
-  listmore = () => {
-    if (this.state.query.is_add) {
-      this.fetchOrderList(this.state.orderStatus, 0);
-    }
-  }
-
 
   renderItem = (order) => {
     let {item, index} = order;
@@ -704,6 +731,10 @@ class OrderAllScene extends Component {
   }
 
   renderNoOrder = () => {
+    let {list, is_loading} = this.state;
+    if (is_loading, tool.length(list) > 0) {
+      return null
+    }
     return (
       <View style={styles.noOrderContent}>
         <SvgXml xml={empty_data()}/>
@@ -719,7 +750,7 @@ class OrderAllScene extends Component {
       return <View/>
     }
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10}}>
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
         <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
       </View>
     )

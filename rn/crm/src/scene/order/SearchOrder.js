@@ -16,6 +16,7 @@ import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import AlertModal from "../../pubilc/component/AlertModal";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,11 +32,18 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SearchOrder extends PureComponent {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
+    let {search_store_id = 0} = this.props.route.params;
     this.state = {
       keyword: '',
       keyword_type: 0,
+      search_store_id: search_store_id,
       list: [],
       item_list: [],
       end: false,
@@ -57,10 +65,7 @@ class SearchOrder extends PureComponent {
   }
 
   onRefresh = () => {
-    const {is_loading, query} = this.state
-    if (is_loading) {
-      return
-    }
+    const {query} = this.state
     this.setState({
         query: {...query, page: 1, is_add: true, page_size: 10},
       },
@@ -73,8 +78,9 @@ class SearchOrder extends PureComponent {
       query,
       keyword,
       keyword_type,
+      search_store_id
     } = this.state;
-    if (is_loading || !query.is_add) {
+    if (is_loading || !query.is_add || tool.length(keyword) <= 0) {
       return null;
     }
     this.setState({
@@ -82,7 +88,7 @@ class SearchOrder extends PureComponent {
     })
     let {accessToken} = this.props.global;
     let params = {
-      search_store_id: 0,//所有门店
+      search_store_id: search_store_id,
       keyword: keyword,
       keyword_type: keyword_type,
       page: query.page,
@@ -262,7 +268,8 @@ class SearchOrder extends PureComponent {
               height: 20
             }}
             searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
-            clearIcon={<SvgXml xml={cross_circle_icon()}/>}
+            clearIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
+            cancelIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
             inputContainerStyle={{
               backgroundColor: colors.f5,
               height: 32,
@@ -278,21 +285,19 @@ class SearchOrder extends PureComponent {
             }}
             lightTheme={'true'}
             placeholder="请输入关键词进行搜索"
+            value={keyword}
             onChangeText={(keyword) => {
-              let arr = [];
+              let arr = [
+                {label: '订单号', value: 4},
+                {label: '流水号', value: 5},
+                {label: '手机号', value: 6},
+                {label: '取货码', value: 7},
+              ]
               if (/[\u4e00-\u9fa5]+?$/g.test(keyword)) {
                 arr = [
                   {label: '骑手姓名', value: 1},
                   {label: '商品名', value: 2},
                   {label: '收件地址', value: 3},
-                ]
-              }
-              if (/[0-9]+?$/g.test(keyword)) {
-                arr = [
-                  {label: '订单号', value: 4},
-                  {label: '流水号', value: 5},
-                  {label: '手机号', value: 6},
-                  {label: '取货码', value: 7},
                 ]
               }
               this.setState({
@@ -304,10 +309,10 @@ class SearchOrder extends PureComponent {
                 })
               })
             }}
-            onCancel={this.onCancel}
-            value={keyword}
+            onCancel={this.onCancel.bind(this)}
+            onClear={this.onCancel.bind(this)}
           />
-          <Text onPress={() => this.onCancel()}
+          <Text onPress={this.fetchOrderList}
                 style={{textAlign: 'center', width: 52, fontSize: 14, color: colors.main_color}}> 搜索 </Text>
         </View>
         <View style={{
@@ -370,11 +375,17 @@ class SearchOrder extends PureComponent {
   }
 
   onEndReached = () => {
-    if (this.state.is_can_load_more) {
-      this.setState({is_can_load_more: false}, () => this.onRefresh())
+    let {query, is_can_load_more} = this.state;
+    if (is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => {
+        if (query?.is_add) {
+          this.fetchOrderList(0);
+        } else {
+          ToastShort('已经到底部了')
+        }
+      })
     }
   }
-
   onMomentumScrollBegin = () => {
     this.setState({is_can_load_more: true})
   }
@@ -417,17 +428,17 @@ class SearchOrder extends PureComponent {
     let {keyword, is_loading} = this.state;
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
-
-        <If condition={tool.length(keyword) > 0 && !is_loading}>
-          <Text style={styles.noOrderDesc}> 未查询到订单 </Text>
-          <Text style={styles.noOrderDesc}> 目前只支持查询近90天内订单查询 </Text>
-        </If>
-
-        <If condition={tool.length(keyword) <= 0 && !is_loading}>
-          <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
-          <Text style={styles.noOrderDesc}> 订单号、流水号、手机号及尾号后4位； </Text>
-          <Text style={styles.noOrderDesc}> 骑手姓名、商品名、收件地址等 </Text>
+        <If condition={!is_loading}>
+          <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
+          <If condition={tool.length(keyword) > 0}>
+            <Text style={styles.noOrderDesc}> 未查询到订单 </Text>
+            <Text style={styles.noOrderDesc}> 目前只支持查询近90天内订单查询 </Text>
+          </If>
+          <If condition={tool.length(keyword) <= 0}>
+            <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
+            <Text style={styles.noOrderDesc}> 订单号、流水号、手机号及尾号后4位； </Text>
+            <Text style={styles.noOrderDesc}> 骑手姓名、商品名、收件地址等 </Text>
+          </If>
         </If>
       </View>
     )

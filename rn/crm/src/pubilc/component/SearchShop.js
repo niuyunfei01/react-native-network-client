@@ -2,7 +2,17 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {FlatList, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {
+  FlatList,
+  Image,
+  InteractionManager,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
@@ -78,15 +88,20 @@ class SearchShop extends Component {
       city_name: local_city,
       location: map,
       placeholderText: placeholder_text,
-      isCanLoadMore: false,
+      is_can_load_more: false,
       is_add: true,
       page: 1,
-      pagesize: 10
+      page_size: 10
     }
 
     if (tool.length(center) <= 0 && keywords) {
       this.search()
     }
+  }
+
+  onRefresh = () => {
+    this.setState({page: 1, is_add: true, page_size: 10},
+      () => this.search())
   }
 
   search = (isMap = false) => {   //submit 事件 (点击键盘的 enter)
@@ -135,12 +150,10 @@ class SearchShop extends Component {
           key: '85e66c49898d2118cc7805f484243909',
           types: '120100|120200|120202|120203|120300|120301|120302|120303|120304|120201|190108|190400|190403|991401|150500|060100|100100|150501|991000|991001|991001|010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000|160000|170000|180000|190000|200000|',
         }
-
         Object.keys(params).forEach(key => {
             header += '&' + key + '=' + params[key]
           }
         )
-
         fetch(header).then(response => response.json()).then(data => {
           if (data.status === "1" && tool.length(data?.pois) > 0) {
             this.setState({
@@ -173,10 +186,14 @@ class SearchShop extends Component {
   }
 
   goSelectCity = () => {
+    let {show_select_city, city_name} = this.state;
+    if (!show_select_city) {
+      return;
+    }
     this.props.navigation.navigate(
       Config.ROUTE_SELECT_CITY_LIST,
       {
-        city: this.state.city_name,
+        city: city_name,
         callback: (selectCity) => {
           this.setState({
             city_name: selectCity.name,
@@ -217,7 +234,7 @@ class SearchShop extends Component {
   }
 
   renderHeader = () => {
-    let {show_select_city, show_seach_msg, city_name, keyword, placeholderText} = this.state
+    let {show_seach_msg, city_name, keyword, placeholderText} = this.state
     return (
       <View style={{
         backgroundColor: colors.white,
@@ -234,33 +251,31 @@ class SearchShop extends Component {
           height: 32,
           borderRadius: 16,
           flex: 1,
-          paddingLeft: show_select_city ? 0 : 10,
+          paddingLeft: 10,
         }}>
-          <If condition={show_select_city}>
-            <TouchableOpacity
-              style={{
-                width: 66,
-                borderRightWidth: 1,
-                borderRightColor: colors.colorDDD,
-                flexDirection: 'row',
-                justifyContent: 'center'
-              }}
-              onPress={() => this.goSelectCity()}
-            >
-              <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-                {tool.jbbsubstr(city_name, 3)}
-              </Text>
-              <SvgXml xml={this_down()}/>
-            </TouchableOpacity>
-          </If>
+          <TouchableOpacity
+            style={{
+              width: 66,
+              borderRightWidth: 1,
+              borderRightColor: colors.colorDDD,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}
+            onPress={() => this.goSelectCity()}
+          >
+            <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
+              {tool.jbbsubstr(city_name, 3)}
+            </Text>
+            <SvgXml xml={this_down()}/>
+          </TouchableOpacity>
           <TextInput
             underlineColorAndroid='transparent'
             placeholder={placeholderText}
             onChangeText={(v) => this.onChange(v)}
-            maxLength={11}
             value={keyword}
             placeholderTextColor={colors.color999}
             style={{
+              height: 40,
               paddingLeft: 10,
               fontSize: 14,
               color: colors.color333,
@@ -279,7 +294,7 @@ class SearchShop extends Component {
               style={{textAlign: 'right', width: 40, fontSize: 14, color: colors.color333}}>取消</Text>
 
         <If condition={show_seach_msg}>
-          <TouchableOpacity style={{position: 'absolute', top: 20, left: show_select_city ? 56 : 6}}>
+          <TouchableOpacity style={{position: 'absolute', top: 20, left: Platform.OS === "ios" ? 56 : 76}}>
             <Entypo name={'triangle-up'}
                     style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
             <View style={{
@@ -302,6 +317,7 @@ class SearchShop extends Component {
       </View>
     )
   }
+
   onClickItem = (item) => {
     let {isMap, is_default, cityname} = this.state;
     InteractionManager.runAfterInteractions(() => {
@@ -323,11 +339,11 @@ class SearchShop extends Component {
   }
 
   onEndReached = () => {
-    let {isCanLoadMore, is_add} = this.state;
-    if (isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => {
+    let {is_can_load_more, is_add} = this.state;
+    if (is_can_load_more) {
+      this.setState({is_can_load_more: false}, () => {
         if (is_add) {
-          this.search();
+          this.search(0);
         } else {
           ToastShort('已经到底部了')
         }
@@ -336,20 +352,13 @@ class SearchShop extends Component {
   }
 
   onMomentumScrollBegin = () => {
-    this.setState({isCanLoadMore: true})
+    this.setState({is_can_load_more: true})
   }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
-  _getItemLayout = (data, index) => {
-    return {length: 80, offset: 80 * index, index}
-  }
   _keyExtractor = (item) => {
     return item?.id.toString();
-  }
-
-  onRefresh = () => {
-    this.search()
   }
 
   renderList(list) {
@@ -376,7 +385,6 @@ class SearchShop extends Component {
           onMomentumScrollBegin={this.onMomentumScrollBegin}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoData()}
           renderItem={({item, index}) => this.renderItem(item, index)}
         />
@@ -468,17 +476,20 @@ class SearchShop extends Component {
 
   renderNoData = () => {
     let {keyword, loading} = this.state;
+    if (loading) {
+      return null;
+    }
     return (
       <View style={styles.noOrderContent}>
         <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
 
-        <If condition={tool.length(keyword) > 0 && !loading}>
+        <If condition={tool.length(keyword) > 0}>
           <Text style={styles.noOrderDesc}> 找不到该地址 </Text>
           <Text style={styles.noOrderDesc}> 很抱歉，暂未找到您搜索的地址 </Text>
           <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
         </If>
 
-        <If condition={tool.length(keyword) <= 0 && !loading}>
+        <If condition={tool.length(keyword) <= 0}>
           <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
         </If>
       </View>

@@ -590,8 +590,7 @@ class OrderListScene extends Component {
             return;
           }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }}
-                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,
@@ -605,7 +604,7 @@ class OrderListScene extends Component {
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
-            this.onPress(Config.ROUTE_SEARCH_ORDER)
+            this.onPress(Config.ROUTE_SEARCH_ORDER, {search_store_id: store_info?.id})
           }}
           style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
           <SvgXml xml={search_icon()}/>
