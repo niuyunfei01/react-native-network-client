@@ -294,6 +294,12 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_EDIT}
                       getComponent={() => require("../../scene/product/Goods/GoodsEditScene").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_SELECT_SPEC} options={{headerTitle: '选择规格'}}
+                      getComponent={() => require("../../scene/product/Goods/GoodsSelectSpecScene").default}
+                      initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_ADD_SPEC} options={{headerTitle: '新建规格'}}
+                      getComponent={() => require("../../scene/product/Goods/GoodsAddSpecScene").default}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} options={{headerTitle: '申请工单上新'}}
                       getComponent={() => require("../../scene/product/Goods/GoodsWorkNewProductScene").default}
         />

@@ -147,6 +147,8 @@ const C = {
   ROUTE_GOODS: 'goods',
   ROUTE_SELECT_STORE: 'SelectStore',
   ROUTE_GOODS_EDIT: 'GoodsEdit',
+  ROUTE_GOODS_SELECT_SPEC: 'GoodsSelectSpecScene',
+  ROUTE_GOODS_ADD_SPEC: 'GoodsAddSpecScene',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',

@@ -2,7 +2,7 @@ import React, {PureComponent} from "react";
 import {
   Alert,
   Dimensions,
-  FlatList,
+  FlatList, InteractionManager,
   Keyboard,
   SafeAreaView,
   StyleSheet,
@@ -44,6 +44,7 @@ import {imageKey} from "../../../pubilc/util/md5";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import FastImage from "react-native-fast-image";
 import GridView from '../../../pubilc/component/DraggableGridView'
+import Config from "../../../pubilc/common/config";
 
 const {height} = Dimensions.get("window");
 
@@ -208,6 +209,12 @@ class GoodsEditScene extends PureComponent {
     this.getWeightUnitList()
     this.getAllowMultiSpecs()
     this.uploadImageFile()
+  }
+
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
   }
 
   searchGoodsByUpcCode = ({route}) => {
@@ -937,6 +944,27 @@ class GoodsEditScene extends PureComponent {
       isSelectCategory: isSelectCategory
     })
   }
+
+  setPushSpec = (resp) => {
+    let {multiSpecsList} = this.state
+    let multiSpecsListCopy = []
+    // delete resp?.checked
+    let mockSpec = {
+      inventory: {actualNum: ''},
+      selectWeight: {value: "0", label: "克"},
+      price: '',
+      supply_price: '',
+      actualNum: '',
+      ...resp
+    }
+    multiSpecsListCopy.push(mockSpec)
+    this.setState({
+      multiSpecsList: multiSpecsList.concat(multiSpecsListCopy)
+    }, () => {
+      this.renderMultiSpecs()
+    })
+  }
+
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, price, store_tags, supply_price,
@@ -992,7 +1020,7 @@ class GoodsEditScene extends PureComponent {
           }
         </View>
         <LineView/>
-        <If condition={this.isStoreProdEditable() && spec_type === 'spec_single'}>
+        <If condition={spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               报价
@@ -1011,7 +1039,7 @@ class GoodsEditScene extends PureComponent {
           </View>
           <LineView/>
         </If>
-        <If condition={type === 'add' && price_type && spec_type === 'spec_single'}>
+        <If condition={price_type && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               零售价格
@@ -1056,21 +1084,22 @@ class GoodsEditScene extends PureComponent {
                              defaultKey={-999}>
                 <View style={styles.weightUnitWrap}>
                   <Text style={styles.weightUnit}>
-                    {`${selectWeight.label}>`}
+                    {`${selectWeight.label}`}
                   </Text>
+                  <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.color999} size={14}/>
                 </View>
               </ModalSelector>
             </View>
             <LineView/>
           </If>
-          <If condition={!vendor_has && !store_has && this.isStoreProdEditable() && spec_type === 'spec_single'}>
+          <If condition={!vendor_has && !store_has && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品条码
               </Text>
               <TextInput
                 value={upc}
-                editable={this.isStoreProdEditable()}
+                // editable={this.isStoreProdEditable()}
                 onChangeText={upc => this.setState({upc: upc})}
                 style={styles.textInputStyle}
                 placeholderTextColor={colors.color999}
@@ -1082,7 +1111,7 @@ class GoodsEditScene extends PureComponent {
           </If>
 
         </If>
-        <If condition={fnProviding === '1' && this.isStoreProdEditable() && spec_type === 'spec_single'}>
+        <If condition={fnProviding === '1' && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               库存
@@ -1102,7 +1131,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <If condition={!this.isAddProdToStore()}>
-          <If condition={this.isStoreProdEditable() && !vendor_has && !store_has}>
+          <If condition={!vendor_has && !store_has}>
             <TouchableOpacity style={styles.baseRowCenterWrap}
                               onPress={() => this.setSelectHeaderText('闪购类目', true)}>
               <Text style={styles.leftText}>
@@ -1160,7 +1189,7 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-          <If condition={allow_multi_spec === 1 && 'add' === type && allow_switch_multi}>
+          <If condition={allow_multi_spec === 1 && allow_switch_multi}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品规格
@@ -1195,7 +1224,7 @@ class GoodsEditScene extends PureComponent {
             </View>
           </If>
         </If>
-        <If condition={store_has || this.isStoreProdEditable()}>
+        <If condition={store_has}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               上架状态
@@ -1279,14 +1308,38 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type, vendor_has, store_has) => {
-    const {inventory = {}, upc, weight, supply_price, price, sku_name} = multiSpecsList[index]
+    const {inventory = {}, upc, weight, supply_price, price, sku_name, checked = false} = multiSpecsList[index]
     const {actualNum = ''} = inventory
     const {price_type} = this.props.global.vendor_info;
+    let {product_detail = {}} = this.props.route.params;
+    const {series_id = ''} = product_detail;
+    const {currStoreId} = this.props.global;
     return (
       <View style={Styles.zoneWrap} key={index}>
-        <Text style={Styles.headerTitleText}>
-          规格信息
-        </Text>
+        <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+          <Text style={Styles.headerTitleText}>
+            规格信息
+          </Text>
+          <If condition={index === 0 && 'add' !== type}>
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
+              onPress={() =>
+                this.onPress(
+                  Config.ROUTE_GOODS_SELECT_SPEC,
+                  {
+                    series_id: series_id,
+                    store_id: currStoreId,
+                    onBack: resp => {
+                      this.setPushSpec(resp)
+                    }
+                  }
+                )
+              }
+            >
+              <Text style={{color: colors.main_color, fontSize: 14}}>选择规格 </Text>
+              <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
+            </TouchableOpacity>
+          </If>
+        </View>
         <LineView/>
         <View style={styles.baseRowCenterWrap}>
           <Text style={styles.leftText}>
@@ -1307,7 +1360,6 @@ class GoodsEditScene extends PureComponent {
           <View style={styles.rightEmptyView}/>
         </View>
         <LineView/>
-        <If condition={'add' === type}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               报价
@@ -1346,7 +1398,6 @@ class GoodsEditScene extends PureComponent {
             <LineView/>
           </If>
 
-        </If>
         <If condition={!vendor_has && !store_has || 'add' !== type}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
@@ -1371,8 +1422,9 @@ class GoodsEditScene extends PureComponent {
                            defaultKey={-999}>
               <View style={styles.weightUnitWrap}>
                 <Text style={styles.weightUnit}>
-                  {`${item.selectWeight.label}>`}
+                  {`${item.selectWeight.label}`}
                 </Text>
+                <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.color999} size={14}/>
               </View>
             </ModalSelector>
           </View>
@@ -1394,7 +1446,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
 
-        <If condition={fnProviding === '1' && 'add' === type}>
+        <If condition={fnProviding === '1'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               库存
@@ -1424,7 +1476,7 @@ class GoodsEditScene extends PureComponent {
             </TouchableOpacity>
           </If>
           <If condition={multiSpecsList.length > 1 && index !== 0 && !vendor_has && !store_has}>
-            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index)}>
+            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index, checked)}>
               <AntDesign name={'delete'} size={22} color={colors.main_color}/>
             </TouchableOpacity>
           </If>
@@ -1460,9 +1512,9 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
-  deleteSpecs = (index) => {
+  deleteSpecs = (index, checked) => {
     const {type} = this.props.route.params;
-    if ('edit' === type) {
+    if ('edit' === type && !checked) {
       Alert.alert('删除规格', '将从商品库中删除规格信息，会从关联的门店中消失，确定是否要删除？',
         [
           {
@@ -2298,7 +2350,7 @@ const styles = StyleSheet.create({
   },
   plusIcon: {
     fontSize: 48,
-    color: "#bfbfbf",
+    color: colors.color999,
     textAlign: "center"
   },
   itemWrap: {
@@ -2326,7 +2378,7 @@ const styles = StyleSheet.create({
     flex: 1, flexDirection: 'row', alignItems: 'center', width: 40, justifyContent: 'center'
   },
   weightUnit: {
-    fontSize: 12, fontWeight: '400', color: colors.color333, lineHeight: 17,
+    fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 17,
   },
   modalSearchIcon: {width: 40, textAlign: 'center'},
   modalSearch: {color: colors.main_color, fontSize: 14},
@@ -2478,12 +2530,9 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: colors.color777,
-    fontSize: 12,
-    color: colors.white,
-    padding: pxToDp(6),
-    borderRadius: pxToDp(12),
-    marginLeft: pxToDp(6)
+    fontSize: 14,
+    color: colors.main_color,
+    marginRight: pxToDp(22)
   },
   bottomBtn: {
     height: pxToDp(70), flex: 0.8, alignItems: 'center', justifyContent: 'center'
