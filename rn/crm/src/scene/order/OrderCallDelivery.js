@@ -257,8 +257,8 @@ class OrderCallDelivery extends Component {
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
         } else {
-          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
-          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+          maxPrice = Number(info?.delivery_fee) > Number(maxPrice) ? Number(info?.delivery_fee) : Number(maxPrice)
+          minPrice = Number(info?.delivery_fee) < Number(minPrice) ? Number(info?.delivery_fee) : Number(minPrice)
         }
       } else {
         est_all_check = false
@@ -271,14 +271,13 @@ class OrderCallDelivery extends Component {
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
         } else {
-          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
-          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+          maxPrice = Number(info?.delivery_fee) > Number(maxPrice) ? Number(info?.delivery_fee) : Number(maxPrice)
+          minPrice = Number(info?.delivery_fee) < Number(minPrice) ? Number(info?.delivery_fee) : Number(minPrice)
         }
       } else {
         store_est_all_check = false;
       }
     }
-
     this.setState({
       maxPrice: maxPrice,
       minPrice: minPrice,
