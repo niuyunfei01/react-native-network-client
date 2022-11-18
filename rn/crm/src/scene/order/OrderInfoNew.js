@@ -48,6 +48,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
+import LinearGradient from "react-native-linear-gradient";
 
 const {width, height} = Dimensions.get("window")
 
@@ -963,7 +964,11 @@ class OrderInfoNew extends PureComponent {
               left: 0,
               top: 0,
             }}>
-              <View style={styles.ItemHeader}/>
+              <LinearGradient style={{width: 28, height: 26, borderTopLeftRadius: 6}}
+                              start={{x: 0, y: 0.5}}
+                              end={{x: 0.5, y: 1}}
+                              locations={[0.5, 0.5]}
+                              colors={['#FF8309', 'transparent']}/>
               <Text style={styles.ItemHeaderTitle}>预 </Text>
             </View>
           </If>
@@ -1693,15 +1698,6 @@ const styles = StyleSheet.create({
   QrClose: {backgroundColor: "#fff", fontSize: 22, color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
   QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
-  ItemHeader: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 25,
-    borderTopColor: "#FF8309",
-    borderTopLeftRadius: 6,
-    borderRightWidth: 31,
-    borderRightColor: 'transparent',
-  },
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,
