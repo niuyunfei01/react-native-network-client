@@ -979,7 +979,7 @@ class OrderInfoNew extends PureComponent {
                   color: '#FF8309'
                 }}>  {order?.friendly_time_info} </Text>
               </View>
-              <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
+              <Text style={styles.orderCardInfoBottom}>{order?.ext_store_name} #{order?.dayId} </Text>
             </View>
           </View>
           <If condition={order?.platform === '6'}>
@@ -1006,7 +1006,7 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.line}/>
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
-            <Text style={styles.remarkLabel}>备注 </Text>
+            <Text style={[styles.remarkLabel, {color: '#FF8309'}]}>备注: </Text>
             <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>

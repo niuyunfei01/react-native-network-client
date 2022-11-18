@@ -452,7 +452,7 @@ class OrderItem extends React.PureComponent {
             fontSize: 12,
             lineHeight: 17,
             marginTop: 2
-          }}> {item.store_name}&nbsp; #{item.dayId} </Text>
+          }}> {item?.ext_store_name}&nbsp; #{item.dayId} </Text>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 

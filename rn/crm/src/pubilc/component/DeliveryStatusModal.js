@@ -429,7 +429,9 @@ class deliveryStatusModal extends React.Component {
     let {openAddTipModal, order_id} = this.props;
     let obj_num = 0
     tool.objectMap(btn_list, (item, idx) => {
-      obj_num += Number(item)
+      if (idx !== 'add_tip') {
+        obj_num += Number(item)
+      }
     })
     let btn_width = 0.83 / Number(obj_num)
     return (
