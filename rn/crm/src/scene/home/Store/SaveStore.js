@@ -88,6 +88,7 @@ class SaveStore extends PureComponent {
       show_back_modal: false,
       show_category_modal: false,
       show_placeholder: true,
+      referrer_id: ''
     };
     this.fetchCategories()
     if (type === 'edit') {
@@ -230,7 +231,8 @@ class SaveStore extends PureComponent {
       contact_name,
       contact_phone,
       verify_code,
-      type
+      type,
+      referrer_id
     } = this.state;
 
     if (loading) {
@@ -251,7 +253,8 @@ class SaveStore extends PureComponent {
       contact_phone,
       mobile: contact_phone,
       password: verify_code,
-      vendor_id
+      vendor_id,
+      referrer_id
     }
     const validator = new Validator();
     validator.add(store_name, 'required', '请填写门店名称')
@@ -379,7 +382,8 @@ class SaveStore extends PureComponent {
       contact_name,
       contact_phone,
       show_placeholder,
-      type
+      type,
+      referrer_id
     } = this.state;
     return (
       <ScrollView automaticallyAdjustContentInsets={false}
@@ -524,6 +528,8 @@ class SaveStore extends PureComponent {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            borderColor: colors.e5,
+            borderBottomWidth: type !== 'edit' ? 0.5 : 0,
             height: 56
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系电话 </Text>
@@ -541,6 +547,27 @@ class SaveStore extends PureComponent {
                        }}
             />
           </View>
+
+          <If condition={type !== 'edit'}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>推荐人ID </Text>
+              <TextInput placeholder="请填写推荐人(选填)"
+                         underlineColorAndroid="transparent"
+                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={'#999'}
+                         keyboardType={'numeric'}
+                         value={referrer_id}
+                         onChangeText={value => {
+                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                         }}
+              />
+            </View>
+          </If>
 
         </View>
 
