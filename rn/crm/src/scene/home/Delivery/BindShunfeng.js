@@ -626,7 +626,7 @@ class BindShunfeng extends PureComponent {
                   <Text style={styles.modalStoreInfoItemLeftText}>法人姓名</Text>
                   <View style={styles.rowCenter}>
                     <TextInput style={styles.modalStoreInfoItemRightText}
-                               placeholder={'请先写法人姓名'}
+                               placeholder={'请填写法人姓名'}
                                placeholderTextColor={colors.color999}
                                value={store.law_name}
                                onChangeText={text => this.setStoreInfo('law_name', text)}/>
