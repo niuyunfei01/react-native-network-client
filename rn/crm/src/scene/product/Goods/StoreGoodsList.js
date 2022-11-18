@@ -96,8 +96,7 @@ class StoreGoodsList extends Component {
 
   getSGCategory() {
     const {dispatch} = this.props
-    const {accessToken} = this.props.global;
-    let {vendor_id} = this.state;
+    const {accessToken, vendor_id} = this.props.global;
     const url = `/data_dictionary/get_app_sg_tags/${vendor_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((obj) => {
       dispatch(setSGCategory(obj))
