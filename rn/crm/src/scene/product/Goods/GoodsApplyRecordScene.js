@@ -120,7 +120,7 @@ class GoodsApplyRecordScene extends Component {
       return (
         <View style={styles.title}>
           <Text style={[styles.title_text, {flex: 1}]}>图片</Text>
-          <Text style={[styles.title_text, {flex: 3}]}>商品名称</Text>
+          <Text style={[styles.title_text, {flex: 3, marginLeft: 8}]}>商品名称</Text>
           <Text style={[styles.title_text, {flex: 1}]}>原价</Text>
           <Text style={[styles.title_text, {flex: 1}]}>调价</Text>
         </View>
@@ -209,12 +209,15 @@ class GoodsApplyRecordScene extends Component {
                      source={{uri: cover_img}}
                      resizeMode={FastImage.resizeMode.contain}
           />
-          <View style={{flex: 3}}>
+          <View style={{flex: 3, marginLeft: 8}}>
+
             <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
-              {/*<Text style={styles.shan}>闪</Text> <Text style={styles.huo}>活</Text> */}{product_name}
+              {/*<View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View> <View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text></View> <View*/}
+              {/*style={styles.eWrap}><Text style={styles.eText}>饿</Text></View> <View style={styles.huoWrap}><Text*/}
+              {/*style={styles.huoText}>活</Text></View> */}{product_name}
             </Text>
             <Text style={styles.name_time}>
-              #{product_id} {tool.orderExpectTime(created)}
+              #{product_id} {tool.fullDateOther(created)}
             </Text>
           </View>
           <View style={[styles.center, {flex: 1}]}>
@@ -430,7 +433,7 @@ const styles = StyleSheet.create({
   active: {
     color: '#58C587',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     paddingVertical: 10
   },
   title: {
@@ -438,43 +441,71 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  title_text: {
-    paddingVertical: 8,
-    fontSize: 12,
-    color: colors.color999,
-    textAlign: "center"
+  title_text: {paddingVertical: 8, fontSize: 12, color: colors.color999, textAlign: "center"},
+  titleGoodsName: {paddingVertical: 8, fontSize: 12, color: colors.color999,},
+  item: {flexDirection: "row", justifyContent: "space-between", alignItems: "center"},
+  center: {justifyContent: "center", alignItems: "center",},
+  image: {width: pxToDp(90), height: "100%", flexDirection: "row", alignItems: "center"},
+
+  price_text: {fontWeight: 'bold', color: colors.color333, fontSize: 13},
+  shanWrap: {
+    backgroundColor: '#FFD225',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+  shanText: {
+    // width: 14,
+    // height: 14,
+    fontSize: 11,
+    color: colors.color333,
+    // backgroundColor: '#FFD225',
+    // paddingTop: 2,
+    // paddingLeft: 2,
+    // paddingBottom: 1,
+    // paddingRight: 1
   },
-  center: {
-    justifyContent: "center",
-    alignItems: "center",
+  eWrap: {
+    backgroundColor: '#0292FE',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  image: {
-    width: pxToDp(90),
-    height: "100%",
-    flexDirection: "row",
-    alignItems: "center"
+  eText: {
+    // width: 14,
+    // height: 14,
+    fontSize: 11,
+    color: colors.white,
+    // backgroundColor: '#0292FE',
+    // paddingTop: 2,
+    // paddingRight: 2,
+    // paddingLeft: 1,
+    // paddingBottom: 1
+  },
+  huoWrap: {
+    backgroundColor: '#FF8309',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  huoText: {
+
+    fontSize: 11,
+    color: colors.white,
+    // backgroundColor: '#FF8309',
+    // paddingLeft: 1,
+    // paddingBottom: 1,
+    // paddingTop: 2,
+    // paddingRight: 2
   },
 
-  price_text: {
-    fontWeight: '500',
-    color: colors.color333,
-    fontSize: 13
-  },
-  shan: {fontSize: 11, color: colors.color333, backgroundColor: '#FFD225', borderRadius: 2, padding: 2},
-  huo: {fontSize: 11, color: colors.white, backgroundColor: '#FF8309', borderRadius: 2, padding: 2},
-  name_text: {
-    height: 36,
-    fontSize: 13,
-    color: '#1A1614',
-  },
-  name_time: {
-    fontSize: 11,
-    color: colors.color999
-  }
+  name_text: {height: 36, fontSize: 13, color: '#1A1614', lineHeight: 18},
+  name_time: {fontSize: 11, color: colors.color999}
 });
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsApplyRecordScene)

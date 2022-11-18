@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
   Platform,
   RefreshControl,
@@ -17,7 +16,7 @@ import {connect} from "react-redux";
 import dayjs from "dayjs";
 import {Button, CheckBox, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-
+import FastImage from "react-native-fast-image";
 import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -670,9 +669,10 @@ class OrderCallDelivery extends Component {
             show_worker_delivey_modal: true
           })
         }} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
+          <FastImage
             source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+            resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>自配送 </Text>
@@ -696,9 +696,9 @@ class OrderCallDelivery extends Component {
     return (
       <For index='key' each='item' of={exist_waiting_delivery}>
         <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
-            source={{uri: item?.icon}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <FastImage source={{uri: item?.icon}}
+                 style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                 resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.platform_name} </Text>
@@ -802,7 +802,9 @@ class OrderCallDelivery extends Component {
         <TouchableOpacity onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image source={{uri: item?.icon}} style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <FastImage source={{uri: item?.icon}}
+                 style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                 resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.logisticName} </Text>
