@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -173,6 +173,7 @@ class deliveryStatusModal extends React.Component {
   }
   state = {
     show_modal: false,
+    is_loading: false,
     order_platform_desc: '',
     platform_dayId: '',
     expect_time_desc: '',
@@ -200,9 +201,13 @@ class deliveryStatusModal extends React.Component {
 
   getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
+    this.setState({
+      is_loading: true
+    })
     const params = {access_token: accessToken, order_id: order_id, order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
+        is_loading: false,
         delivery_list: res?.do_list,
         order_platform_desc: res?.order_platform_desc,
         platform_dayId: res?.platform_dayId,
@@ -221,7 +226,9 @@ class deliveryStatusModal extends React.Component {
   closeModal = () => {
     this.setState({
       show_modal: false,
+      is_loading: false,
       delivery_list: [],
+      btn_list: {},
       order_platform_desc: '',
       platform_dayId: '',
       expect_time_desc: '',
@@ -276,7 +283,7 @@ class deliveryStatusModal extends React.Component {
   }
 
   render = () => {
-    let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc} = this.state;
+    let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc, is_loading} = this.state;
     if (!show_modal) {
       return null;
     }
@@ -299,54 +306,62 @@ class deliveryStatusModal extends React.Component {
             borderTopRightRadius: 15,
             padding: 20,
           }]}>
-            <View style={styles.flexC}>
-
-              <View style={styles.QrTitle}>
-                <View style={styles.flexC}>
-                  <View style={styles.flexR}>
-                    <Text style={styles.f16}>{order_platform_desc} </Text>
-                    <Text style={styles.f14}>#{platform_dayId} </Text>
-                  </View>
-                  <View style={[styles.flexR, {marginTop: 5}]}>
-                    <Text style={styles.expectTime}>{expect_time_desc} </Text>
-                  </View>
-                </View>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+            <If condition={is_loading}>
+              <View style={{
+                height: 200,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <ActivityIndicator color={colors.color666} size={60}/>
               </View>
-
-              <ScrollView automaticallyAdjustContentInsets={false}
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          style={{maxHeight: 350}}>
-                <For index='index' each='info' of={delivery_list}>
-                  <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
-                    <View style={styles.flexC}>
-                      <View style={styles.flexR}>
-                        <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
-                        <Text style={styles.f14}>第<Text style={styles.orderNum}> {info?.call_rank} </Text>次下单 </Text>
-                      </View>
-                      <View style={[styles.flexR, {marginTop: 10}]}>
-                        <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
-                        <If condition={info?.tip > 0}>
-                          <Text style={styles.f12}>小费：{info?.tip}元 </Text>
-                        </If>
-                      </View>
+            </If>
+            <If condition={!is_loading}>
+              <View style={styles.flexC}>
+                <View style={styles.QrTitle}>
+                  <View style={styles.flexC}>
+                    <View style={styles.flexR}>
+                      <Text style={styles.f16}>{order_platform_desc} </Text>
+                      <Text style={styles.f14}>#{platform_dayId} </Text>
                     </View>
-                    <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
-                            style={styles.IconShow}/>
-                  </TouchableOpacity>
-                  <If condition={info?.default_show}>
-                    {this.renderDeliveryStatus(info)}
-
-                  </If>
-                </For>
-              </ScrollView>
-              {this.renderButton()}
-            </View>
-
+                    <View style={[styles.flexR, {marginTop: 5}]}>
+                      <Text style={styles.expectTime}>{expect_time_desc} </Text>
+                    </View>
+                  </View>
+                  <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+                </View>
+                <ScrollView automaticallyAdjustContentInsets={false}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                            style={{maxHeight: 350}}>
+                  <For index='index' each='info' of={delivery_list}>
+                    <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
+                      <View style={styles.flexC}>
+                        <View style={styles.flexR}>
+                          <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
+                          <Text style={styles.f14}>第<Text style={styles.orderNum}> {info?.call_rank} </Text>次下单 </Text>
+                        </View>
+                        <View style={[styles.flexR, {marginTop: 10}]}>
+                          <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
+                          <If condition={info?.tip > 0}>
+                            <Text style={styles.f12}>小费：{info?.tip}元 </Text>
+                          </If>
+                        </View>
+                      </View>
+                      <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
+                              style={styles.IconShow}/>
+                    </TouchableOpacity>
+                    <If condition={info?.default_show}>
+                      {this.renderDeliveryStatus(info)}
+                      <View style={{height: 15}}/>
+                    </If>
+                  </For>
+                </ScrollView>
+                {this.renderButton()}
+              </View>
+            </If>
           </View>
         </View>
       </Modal>
