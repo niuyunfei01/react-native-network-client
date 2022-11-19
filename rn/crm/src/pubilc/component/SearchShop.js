@@ -2,17 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {
-  FlatList,
-  Image,
-  InteractionManager,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {FlatList, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
@@ -294,7 +284,7 @@ class SearchShop extends Component {
               style={{textAlign: 'right', width: 40, fontSize: 14, color: colors.color333}}>取消</Text>
 
         <If condition={show_seach_msg}>
-          <TouchableOpacity style={{position: 'absolute', top: 20, left: Platform.OS === "ios" ? 56 : 76}}>
+          <TouchableOpacity style={{position: 'absolute', top: 22, left: 80}}>
             <Entypo name={'triangle-up'}
                     style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
             <View style={{
@@ -357,9 +347,6 @@ class SearchShop extends Component {
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
-  _keyExtractor = (item) => {
-    return item?.id.toString();
-  }
 
   renderList(list) {
     let {loading} = this.state;
@@ -383,7 +370,7 @@ class SearchShop extends Component {
           onRefresh={this.onRefresh}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           ListEmptyComponent={this.renderNoData()}
           renderItem={({item, index}) => this.renderItem(item, index)}

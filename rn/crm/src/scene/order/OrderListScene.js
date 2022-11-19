@@ -363,7 +363,6 @@ class OrderListScene extends Component {
     const {currStoreId, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
-      ListData,
       order_id,
       show_goods_list,
       show_delivery_modal,
@@ -380,7 +379,7 @@ class OrderListScene extends Component {
         {/*<FloatServiceIcon fromComponent={'订单列表'}/>*/}
         {this.renderHead()}
         {this.renderStatusTabs()}
-        {this.renderContent(ListData)}
+        {this.renderContent()}
         {this.renderSortModal()}
         {this.renderFinishDeliveryModal()}
         <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
@@ -673,10 +672,6 @@ class OrderListScene extends Component {
     )
   }
 
-  onTouchStart = (e) => {
-    this.pageX = e.nativeEvent.pageX;
-    this.pageY = e.nativeEvent.pageY;
-  }
   onEndReached = () => {
     if (this.state.isCanLoadMore) {
       this.setState({isCanLoadMore: false}, () => {
@@ -689,49 +684,40 @@ class OrderListScene extends Component {
   onMomentumScrollBegin = () => {
     this.setState({isCanLoadMore: true})
   }
-  onTouchMove = (e) => {
-    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-      this.setState({scrollLocking: true});
-    } else {
-      this.setState({scrollLocking: false});
-    }
-  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
-  }
-  _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
   }
   _keyExtractor = (item) => {
     return item.id.toString();
   }
 
+  _getItemLayout = (data, index) => {
+    return {length: 260, offset: 260 * index, index}
+  }
 
-  renderContent = (orders) => {
-    let {isLoading} = this.state;
+  renderContent = () => {
+    let {isLoading, ListData} = this.state;
     return (
       <View style={styles.orderListContent}>
         <FlatList
           contentContainerStyle={{flexGrow: 1}}
-          data={orders}
+          data={ListData}
           legacyImplementation={false}
           directionalLockEnabled={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          onTouchStart={(e) => this.onTouchStart(e)}
           onEndReachedThreshold={0.3}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
           refreshing={isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
           ListFooterComponent={this.renderBottomView()}
-          initialNumToRender={5}
+          getItemLayout={this._getItemLayout}
+          initialNumToRender={3}
         />
       </View>
     );

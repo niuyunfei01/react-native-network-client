@@ -535,7 +535,8 @@ class OrderItem extends React.PureComponent {
           <Text style={{
             fontSize: 14,
             color: colors.color666,
-            lineHeight: 20
+            lineHeight: 20,
+            flex: 1
           }}>{item?.remark} </Text>
         </View>
       </View>

@@ -146,7 +146,7 @@ class StoreList extends PureComponent {
           onRefresh={this.onRefresh}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           // ListEmptyComponent={this.renderNoData()}
@@ -177,9 +177,6 @@ class StoreList extends PureComponent {
   }
   _getItemLayout = (data, index) => {
     return {length: 180, offset: 180 * index, index}
-  }
-  _keyExtractor = (item) => {
-    return item?.id.toString();
   }
 
   onRefresh = () => {

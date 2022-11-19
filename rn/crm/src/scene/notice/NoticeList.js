@@ -183,10 +183,6 @@ class NoticeList extends React.PureComponent {
     return {length: 100, offset: 100 * index, index}
   }
 
-  _keyExtractor = (item) => {
-    return item.id.toString();
-  }
-
   onTouchMove = (e) => {
     this.setState({scrollLocking: Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)});
   }
@@ -318,7 +314,7 @@ class NoticeList extends React.PureComponent {
           renderItem={this.renderItem}
           onRefresh={this.onRefresh.bind(this)}
           refreshing={isLoading}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderEmptyData()}
