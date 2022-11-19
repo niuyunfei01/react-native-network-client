@@ -687,10 +687,6 @@ class OrderAllScene extends Component {
   _getItemLayout = (data, index) => {
     return {length: 120, page_size: 120 * index, index}
   }
-  _keyExtractor = (item) => {
-    return item.id.toString();
-  }
-
 
   renderContent = () => {
     let {is_loading, list} = this.state;
@@ -709,7 +705,7 @@ class OrderAllScene extends Component {
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
           refreshing={is_loading}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           ListEmptyComponent={this.renderNoOrder()}
           ListFooterComponent={this.renderBottomView()}
