@@ -223,7 +223,7 @@ class StoreList extends PureComponent {
           <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(item?.category_desc, 20)} </Text>
         </View>
         <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_DELIVERY_LIST)
+          this.onPress(Config.ROUTE_DELIVERY_LIST, {store_id: item?.id, show_select_store: false})
         }} style={{
           borderTopColor: colors.e5,
           borderTopWidth: 0.5,

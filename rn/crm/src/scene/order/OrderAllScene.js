@@ -105,6 +105,9 @@ class OrderAllScene extends Component {
       show_date_modal: false,
       show_date_select_modal: false,
       show_date_type: 1,
+      fetch_store_page: 1,
+      fetch_store_page_size: 10,
+      is_last_page: false
     }
   }
 
@@ -116,25 +119,33 @@ class OrderAllScene extends Component {
 
   componentDidMount() {
     const {navigation} = this.props
-    let {only_one_store} = this.state;
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
     this.blur = navigation.addListener('blur', () => {
       this.closeModal()
     })
-    if (!only_one_store) {
-      this.fetchStoreList()
-    }
+    this.fetchStoreList()
   }
 
   fetchStoreList = () => {
-    const {accessToken = ''} = this.props.global;
+    const {accessToken, only_one_store} = this.props.global;
+    const {fetch_store_page_size, fetch_store_page, store_list, is_last_page} = this.state
+    if (only_one_store || is_last_page)
+      return
+    let params = {page: fetch_store_page, page_size: fetch_store_page_size}
+    this.setState({refreshing: true})
     const api = `/v4/wsb_store/listCanReadStore?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
+    HttpUtils.get(api, params).then(res => {
+      let list = fetch_store_page !== 1 ? store_list.concat(res?.lists) : res?.lists
       this.setState({
-        store_list: res
+        store_list: list,
+        refreshing: false,
+        fetch_store_page: fetch_store_page + 1,
+        is_last_page: tool.length(res?.lists) < fetch_store_page_size
       })
+    }).catch(() => {
+      this.setState({refreshing: false})
     })
   }
 
@@ -324,34 +335,31 @@ class OrderAllScene extends Component {
       search_store_id,
       check_list,
       store_list,
-      check_item
+      check_item,
+      refreshing
     } = this.state
     return (
       <View style={styles.flex1}>
         {this.renderHead()}
-
-        <TopSelectModal list={store_list}
-                        label_field={'name'}
-                        value_field={'id'}
-                        onPress={this.checkStore.bind(this)}
-                        default_val={search_store_id}
-                        onClose={this.closeModal.bind(this)}
-                        visible={show_select_store_modal}
-                        marTop={80}
-        />
-
         {this.renderConditionTabs()}
-        <TopSelectModal list={check_list}
-                        onPress={this.checkItem.bind(this)}
-                        default_val={check_item}
-                        onClose={this.closeModal.bind(this)}
-                        visible={show_condition_modal > 0}
-                        marTop={80}
-        />
-
         {this.renderContent()}
         {this.renderDateModal()}
         {this.renderFinishDeliveryModal()}
+
+        <TopSelectModal list={show_condition_modal > 0 ? check_list : store_list}
+                        label_field={show_condition_modal > 0 ? undefined : 'name'}
+                        value_field={show_condition_modal > 0 ? undefined : 'id'}
+                        onPress={show_condition_modal > 0 ? this.checkItem.bind(this) : this.checkStore.bind(this)}
+                        default_val={show_condition_modal > 0 ? check_item : search_store_id}
+                        onEndReachedThreshold={0.3}
+                        onEndReached={show_condition_modal > 0 ? undefined : this.fetchStoreList}
+                        refreshing={show_condition_modal > 0 ? undefined : refreshing}
+                        initialNumToRender={10}
+                        onClose={this.closeModal.bind(this)}
+                        visible={show_select_store_modal || show_condition_modal > 0}
+                        marTop={show_condition_modal > 0 ? 80 : 40}
+        />
+
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
@@ -410,7 +418,7 @@ class OrderAllScene extends Component {
     this.setState({
       show_date_modal: false,
       search_start_date_input_val: search_start_date_input_val,
-      show_date_select_modal: search_end_date_input_val,
+      search_end_date_input_val: search_end_date_input_val,
       date_desc,
     }, () => {
       this.onRefresh()
@@ -615,10 +623,7 @@ class OrderAllScene extends Component {
           this.props.navigation.goBack()
         }} xml={back()}/>
 
-        <TouchableOpacity onPress={() => {
-          if (only_one_store) {
-            return;
-          }
+        <TouchableOpacity disabled={only_one_store} onPress={() => {
           if (tool.length(store_list) <= 0) {
             this.fetchStoreList()
             return ToastShort('正在请求店铺信息，请稍后再试');
@@ -670,9 +675,11 @@ class OrderAllScene extends Component {
       })
     }
   }
+
   onMomentumScrollBegin = () => {
     this.setState({is_can_load_more: true})
   }
+
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }

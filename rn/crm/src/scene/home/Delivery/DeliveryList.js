@@ -12,7 +12,8 @@ import Config from "../../../pubilc/common/config";
 import TopSelectModal from "../../../pubilc/component/TopSelectModal";
 import OpenDeliveryModal from "../../../pubilc/component/OpenDeliveryModal";
 import {SvgXml} from "react-native-svg";
-import {down} from "../../../svg/svg";
+import {back, down, head_cross_icon} from "../../../svg/svg";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -27,25 +28,30 @@ const mapDispatchToProps = dispatch => {
 
 
 class DeliveryList extends PureComponent {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
+      show_select_store: this.props.route.params?.show_select_store !== undefined ? this.props.route.params?.show_select_store : true,
       in_review_deliveries: [],
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
       wsb_unbind_deliveries: [],
       openDeliveryVisible: false,//开通运力
-
       deliveryType: -1,//运力类型
       platformId: 0,
       selectStoreVisible: false,
       selectDelivery: {},
-      store_id: props.global.currStoreId,
-      store_name: props.global.store_info.name,
+      store_id: this.props.route.params?.store_id !== undefined ? this.props.route.params?.store_id : props.global?.store_id,
+      store_name: props.global?.store_info?.name,
       storeList: [],
-      page_size: 20,
+      page_size: 10,
       page: 1,
-      isLastPage: false,
+      is_last_page: false,
       refreshing: false
     }
   }
@@ -55,7 +61,6 @@ class DeliveryList extends PureComponent {
   }
 
   componentDidMount() {
-    this.navigationOptions(this.state)
     const {navigation} = this.props
     this.focus = navigation.addListener('focus', () => {
       this.fetchData()
@@ -66,57 +71,30 @@ class DeliveryList extends PureComponent {
 
   getStoreList = () => {
     const {accessToken, only_one_store} = this.props.global;
-    const {page_size, page, storeList, isLastPage} = this.state
-    if (only_one_store || isLastPage)
+    const {page_size, page, storeList, is_last_page, show_select_store} = this.state
+    if (only_one_store || is_last_page || !show_select_store)
       return
     let params = {
-      keywords: '',
       page: page,
       page_size: page_size
     }
     this.setState({refreshing: true})
-    const api = `/v1/new_api/stores/get_can_read_stores?access_token=${accessToken}`;
+    const api = `/v4/wsb_store/listCanReadStore?access_token=${accessToken}`
     HttpUtils.get(api, params).then(res => {
-      const {lists, page, pageSize, count} = res
-      let list = []
-      Object.keys(lists).map((key) => {
-        let item = {...lists[key]};
-        item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
-        item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
-        list.push(item);
-      })
-      list = page !== 1 ? storeList.concat(list) : list
+      const {lists, page, isLastPage} = res
+      if (page === 1) {
+        lists.shift()
+      }
+      let list = page !== 1 ? storeList.concat(lists) : lists
       this.setState({
         storeList: list,
         page: page + 1,
-        page_size: pageSize,
         refreshing: false,
-        isLastPage: lists && page * pageSize >= count
+        is_last_page: isLastPage
       })
     }).catch(() => {
       this.setState({refreshing: false})
     })
-  }
-
-  headerTitle = (store_name) => {
-    const {only_one_store} = this.props.global
-
-    return (
-      <TouchableOpacity disabled={only_one_store}
-                        style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}
-                        onPress={() => this.setState({selectStoreVisible: true})}>
-        <Text style={styles.headerText}>
-          {store_name}
-        </Text>
-        <SvgXml xml={down(20, 20)}/>
-      </TouchableOpacity>
-    )
-  }
-  navigationOptions = ({store_name}) => {
-    const {navigation} = this.props
-
-    const option = {headerTitle: () => this.headerTitle(store_name)}
-    navigation.setOptions(option);
   }
 
   fetchData = () => {
@@ -124,7 +102,7 @@ class DeliveryList extends PureComponent {
     const {accessToken} = this.props.global
     const {store_id} = this.state
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
-    const params = {store_id: store_id}
+    const params = {real_store_id: store_id}
     HttpUtils.post(api, params).then((res) => {
       hideModal()
       const {
@@ -143,7 +121,6 @@ class DeliveryList extends PureComponent {
 
   openDeliveryModal = (item, touchDelivery) => {
     const {type, v2_type} = item
-    // console.log('item', item)
     const {store_id} = this.state
     this.setState({selectDelivery: item})
     if (touchDelivery === 4) {
@@ -183,7 +160,6 @@ class DeliveryList extends PureComponent {
                     </Text>
                   </TouchableOpacity>
                 )
-
               })
             }
           </View>
@@ -205,8 +181,6 @@ class DeliveryList extends PureComponent {
   setStoreInfo = (item) => {
     const {name, id} = item
     this.setState({store_name: name, store_id: id, selectStoreVisible: false}, () => this.fetchData())
-    this.navigationOptions({store_name: name})
-
   }
 
   getTip = () => {
@@ -227,7 +201,8 @@ class DeliveryList extends PureComponent {
 
     const {navigation} = this.props
     return (
-      <>
+      <View style={{flex: 1}}>
+        {this.renderHead()}
         {this.getTip()}
         <ScrollView>
           {this.getDeliveries(in_review_deliveries, '审核中的省钱配送', 1)}
@@ -243,7 +218,7 @@ class DeliveryList extends PureComponent {
                              store_id={store_id}
                              delivery={selectDelivery}/>
         </If>
-        <TopSelectModal visible={selectStoreVisible} marTop={0}
+        <TopSelectModal visible={selectStoreVisible} marTop={40}
                         list={storeList}
                         label_field={'name'}
                         value_field={'id'}
@@ -254,7 +229,44 @@ class DeliveryList extends PureComponent {
                         initialNumToRender={10}
                         onPress={(item) => this.setStoreInfo(item)}
                         onClose={() => this.setState({selectStoreVisible: false})}/>
-      </>
+      </View>
+    )
+  }
+
+  renderHead = () => {
+    let {store_name, show_select_store} = this.state;
+    const {only_one_store} = this.props.global;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 44,
+        backgroundColor: colors.white,
+        paddingHorizontal: 6,
+      }}>
+        <SvgXml style={{height: 44, marginRight: 8}} height={32} width={32} onPress={() => {
+          this.props.navigation.goBack()
+        }} xml={show_select_store ? back() : head_cross_icon()}/>
+        <Text onPress={() => {
+          if (show_select_store) {
+            this.setState({
+              selectStoreVisible: true
+            })
+          }
+        }} style={{
+          color: colors.color333,
+          fontSize: 17,
+          fontWeight: 'bold',
+          lineHeight: 24,
+          marginRight: 40,
+          flex: 1,
+          textAlign: 'center'
+        }}> {store_name}
+          <If condition={!only_one_store && show_select_store}>
+            <SvgXml xml={down(20, 20)}/>
+          </If>
+        </Text>
+      </View>
     )
   }
 }

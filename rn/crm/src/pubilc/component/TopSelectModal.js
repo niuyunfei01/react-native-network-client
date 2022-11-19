@@ -71,6 +71,8 @@ export default class TopSelectModal extends React.Component {
         <TouchableOpacity onPress={this.props.onClose} style={[styles.modalWrap, {top: marTop}]}>
           <TouchableHighlight>
             <FlatList data={list}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       style={[{maxHeight: height * 0.6, backgroundColor: colors.white}, modalStyle]}
                       renderItem={this.renderItem}
                       keyExtractor={(item, index) => `${index}`}

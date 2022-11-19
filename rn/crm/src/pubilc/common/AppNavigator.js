@@ -1,4 +1,4 @@
-import React, {useRef, PureComponent} from "react";
+import React, {PureComponent, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -10,11 +10,11 @@ import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
-import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
 import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
@@ -116,7 +116,7 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送管理'}}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryInfo").default}/>
@@ -550,7 +550,7 @@ const Page = (props) => {
                       options={{headerTitle: '编辑账号'}}
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
         <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
-                      getComponent={()=>require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
+                      getComponent={() => require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
