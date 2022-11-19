@@ -48,6 +48,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
+import LinearGradient from "react-native-linear-gradient";
 
 const {width, height} = Dimensions.get("window")
 
@@ -963,7 +964,11 @@ class OrderInfoNew extends PureComponent {
               left: 0,
               top: 0,
             }}>
-              <View style={styles.ItemHeader}/>
+              <LinearGradient style={{width: 28, height: 26, borderTopLeftRadius: 6}}
+                              start={{x: 0, y: 0.5}}
+                              end={{x: 0.5, y: 1}}
+                              locations={[0.5, 0.5]}
+                              colors={['#FF8309', 'transparent']}/>
               <Text style={styles.ItemHeaderTitle}>预 </Text>
             </View>
           </If>
@@ -1006,8 +1011,8 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.line}/>
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-              <Text style={styles.cardTitle}>
+            <View style={styles.cardTitleGoodsWrap}>
+              <Text style={styles.cardTitleGoods}>
                 商品{order?.product_total_count}件
               </Text>
               <TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>
@@ -1126,7 +1131,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>配送信息</Text>
 
           <If condition={order?.show_store_name}>
-            <View style={styles.productItemRow}>
+            <View style={[styles.productItemRow]}>
               <Text style={styles.remarkLabel}>配送门店</Text>
               <Text style={styles.remarkValue}>{order?.store_name} </Text>
             </View>
@@ -1168,8 +1173,9 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用</Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-          <View style={styles.line}/>
+
           <If condition={tool.length(order.greeting) > 0}>
+            <View style={styles.line}/>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语</Text>
               <Text style={styles.remarkValue}>{order?.greeting}</Text>
@@ -1195,7 +1201,8 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
           <Text style={styles.cardTitle}>订单信息</Text>
-          <TouchableOpacity style={styles.productItemRow} onPress={() => this.copyToClipboard(order?.id)}>
+          <TouchableOpacity style={[styles.productItemRow]}
+                            onPress={() => this.copyToClipboard(order?.id)}>
             <Text style={styles.remarkLabel}>订单编号</Text>
             <View style={{flexDirection: "row"}}>
               <Text style={styles.remarkValue}>{order?.id}</Text>
@@ -1583,21 +1590,27 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingRight: 6
   },
-  cardTitle: {
+  cardTitleGoodsWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15},
+  cardTitleGoods: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
   },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.color333,
+    marginBottom: 15
+  },
   logLabel: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '500',
     color: colors.color333
   },
   cardTitleInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 15
   },
   cardTitleInfoLeft: {
     flexDirection: "column",
@@ -1619,10 +1632,10 @@ const styles = StyleSheet.create({
   },
   line: {
     borderBottomColor: colors.e5,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     marginHorizontal: 12
   },
-  productInfo: {flexDirection: "row", marginVertical: 7.5},
+  productInfo: {flexDirection: "row", marginBottom: 7.5},
   productImage: {
     width: 60,
     height: 60,
@@ -1674,7 +1687,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 5,
+    marginBottom: 5,
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
@@ -1693,15 +1706,6 @@ const styles = StyleSheet.create({
   QrClose: {backgroundColor: "#fff", fontSize: 22, color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
   QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
-  ItemHeader: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 25,
-    borderTopColor: "#FF8309",
-    borderTopLeftRadius: 6,
-    borderRightWidth: 31,
-    borderRightColor: 'transparent',
-  },
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,

@@ -37,6 +37,7 @@ import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
 import {call, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
+import LinearGradient from "react-native-linear-gradient";
 
 let width = Dimensions.get("window").width;
 
@@ -281,7 +282,11 @@ class OrderItem extends React.PureComponent {
             left: 0,
             top: 0,
           }}>
-            <View style={styles.ItemHeader}/>
+            <LinearGradient style={{width: 28, height: 26, borderTopLeftRadius: 6}}
+                            start={{x: 0, y: 0.5}}
+                            end={{x: 0.5, y: 1}}
+                            locations={[0.5, 0.5]}
+                            colors={['#FF8309', 'transparent']}/>
             <Text style={styles.ItemHeaderTitle}>预 </Text>
           </View>
         </If>
@@ -619,15 +624,6 @@ class OrderItem extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-  ItemHeader: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 25,
-    borderTopColor: "#FF8309",
-    borderTopLeftRadius: 6,
-    borderRightWidth: 31,
-    borderRightColor: 'transparent',
-  },
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,
