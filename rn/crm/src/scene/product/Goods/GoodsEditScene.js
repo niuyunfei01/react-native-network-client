@@ -503,6 +503,7 @@ class GoodsEditScene extends PureComponent {
       price: price || '',
       supply_price: supply_price || ''
     });
+    this.getBasicCategory(sg_tag_id)
   }
 
   onReloadUpc = (upc_data) => {
@@ -695,6 +696,9 @@ class GoodsEditScene extends PureComponent {
     };
     formData.spec_type = spec_type
     if (spec_type === 'spec_multi') {
+      Object.keys(multiSpecsList).map(key => {
+        delete multiSpecsList[key]?.checked
+      })
       formData.spec_list = multiSpecsList
     }
     if (type === "add") {
@@ -976,35 +980,31 @@ class GoodsEditScene extends PureComponent {
       if (parseInt(series_id) !== 0) {
         return ToastShort('不可更改为单规格！')
       } else {
+        let {name, upc, weight, price, supply_price, selectWeight, actualNum} = this.state
+        let {multiSpecsList = []} = this.state
+        const multiSpecsInfo = {
+          sku_name: name,
+          supply_price: supply_price,
+          price: price,
+          weight: weight,
+          sku_unit: selectWeight.label,
+          selectWeight: selectWeight,
+          upc: upc,
+          inventory: {
+            actualNum: actualNum,
+            differenceType: 2,
+            totalRemain: '',
+            remark: '',
+            skipCheckChange: 1
+          },
+          checked: false
+        }
+        if (multiSpecsList.length < 1) {
+          multiSpecsList = [...multiSpecsList, multiSpecsInfo]
+        }
         this.setState({
+          multiSpecsList: multiSpecsList,
           spec_type: status
-        }, () => {
-          let {name, upc, weight, price, supply_price, selectWeight, actualNum} = this.state
-          const {multiSpecsList = []} = this.state
-          const multiSpecsInfo = {
-            sku_name: name,
-            supply_price: supply_price,
-            price: price,
-            weight: weight,
-            sku_unit: selectWeight.label,
-            selectWeight: selectWeight,
-            upc: upc,
-            inventory: {
-              actualNum: actualNum,
-              differenceType: 2,
-              totalRemain: '',
-              remark: '',
-              skipCheckChange: 1
-            },
-            checked: false
-          }
-          let multiSpecsListCopy = []
-          if (multiSpecsList.length < 1) {
-            multiSpecsListCopy.push(multiSpecsInfo)
-          }
-          this.setState({
-            multiSpecsList: multiSpecsList.concat(multiSpecsListCopy)
-          })
         })
       }
     }
@@ -1365,7 +1365,7 @@ class GoodsEditScene extends PureComponent {
           <Text style={Styles.headerTitleText}>
             规格信息
           </Text>
-          <If condition={index === 0 && 'add' !== type}>
+          <If condition={index === 0 && 'add' !== type && parseInt(series_id) > 0}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
               onPress={() =>
                 this.onPress(
@@ -1512,7 +1512,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <View style={multiSpecsList.length > 1 ? styles.operationSpecsBtnWrap : {}}>
-          <If condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has}>
+          <If condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has && (parseInt(series_id) <= 0 || 'add' === type)}>
             <TouchableOpacity style={styles.addSpecsWrap} onPress={this.addSpecs}>
               <AntDesign name={'plus'} size={12} color={colors.main_color}/>
               <Text style={styles.addSpecsText}>
