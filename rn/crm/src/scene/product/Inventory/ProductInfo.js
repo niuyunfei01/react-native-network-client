@@ -327,12 +327,7 @@ class ProductInfo extends React.Component {
   }
 
   onScanFail = () => {
-    Alert.alert('错误提示', '货架码不合法，请重新扫描', [
-      {
-        text: '确定', onPress: () => {
-        }
-      },
-    ]);
+    Alert.alert('错误提示', '货架码不合法，请重新扫描', [{text: '确定'}]);
   }
 
   renderScanner = () => {

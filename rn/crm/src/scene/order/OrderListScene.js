@@ -248,7 +248,6 @@ class OrderListScene extends Component {
     let {currStoreId, accessToken, order_list_by = 'orderTime asc'} = this.props.global;
     let search = `store:${currStoreId}`;
     let initQueryType = queryType || orderStatus;
-    const order_by = order_list_by
 
     this.setState({
       orderStatus: initQueryType,
@@ -264,7 +263,7 @@ class OrderListScene extends Component {
       search: search,
       use_v2: 1,
       is_right_once: 1, //预订单类型
-      order_by: order_by
+      order_by: order_list_by
     }
 
     if (vendor_id && accessToken) {

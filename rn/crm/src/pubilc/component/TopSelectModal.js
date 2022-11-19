@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View,} from 'react-native'
+import {StyleSheet, Text, TouchableHighlight, TouchableOpacity, FlatList} from 'react-native'
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import colors from "../styles/colors";
 
@@ -14,14 +14,20 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 999
   },
-  item_text_style: {
-    fontSize: 14,
+  itemWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: "center",
+    paddingVertical: 14,
+    borderBottomColor: colors.e5,
+    borderBottomWidth: 0.5
   }
 })
 
-class TopSelectModal extends React.Component {
+export default class TopSelectModal extends React.Component {
   static propTypes = {
-    list: PropTypes.any,
+    list: PropTypes.array,
     default_val: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
@@ -34,67 +40,49 @@ class TopSelectModal extends React.Component {
     marTop: PropTypes.number,
     children: PropTypes.object,
     modalStyle: PropTypes.object,
+    onEndReachedThreshold: PropTypes.number,
+    onEndReached: PropTypes.func,
+    refreshing: PropTypes.bool,
+    initialNumToRender: PropTypes.number
   }
   static defaultProps = {
     visible: true
   }
 
-
-  render() {
-    const {
-      marTop = 42,
-      visible = false,
-      modalStyle = {},
-      list = [],
-      default_val = 0,
-      label_field = 'label',
-      value_field = 'value',
-    } = this.props
-    if (!visible) {
-      return null;
-    }
+  renderItem = ({item}) => {
+    const {default_val = 0, label_field = 'label', value_field = 'value'} = this.props
     return (
-      <TouchableOpacity onPress={this.props.onClose} style={[styles.modalWrap, {top: marTop}]}>
-        <TouchableHighlight>
-          <ScrollView
-            style={[
-              {
-                width: width,
-                maxHeight: height * 0.6,
-                backgroundColor: colors.white,
-              },
-              modalStyle]}
-          >
-            <View style={{
-              paddingHorizontal: 20,
-            }}>
-              <For index='index' each='item' of={list}>
-                <TouchableOpacity onPress={() => {
-                  this.props.onPress(item);
-                }} key={index} style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: "center",
-                  paddingVertical: 14,
-                  borderBottomColor: colors.e5,
-                  borderBottomWidth: 0.5
-                }}>
-                  <Text style={[
-                    styles.item_text_style,
-                    {
-                      color: default_val === item?.[value_field] ? colors.main_color : colors.color666,
-                      fontWeight: default_val === item?.[value_field] ? 'bold' : 'normal',
-                    }
-                  ]}> {item?.[label_field]} </Text>
-                </TouchableOpacity>
-              </For>
-            </View>
-          </ScrollView>
-        </TouchableHighlight>
+      <TouchableOpacity onPress={() => this.props.onPress(item)} style={styles.itemWrap}>
+        <Text
+          style={[styles.item_text_style, {color: default_val === item?.[value_field] ? colors.main_color : colors.color666}]}>
+          {item?.[label_field]}
+        </Text>
       </TouchableOpacity>
     )
   }
+
+  render() {
+    const {
+      marTop = 42, visible = false, modalStyle = {}, list = [], onEndReachedThreshold, onEndReached, refreshing,
+      initialNumToRender
+    } = this.props
+    if (visible)
+      return (
+        <TouchableOpacity onPress={this.props.onClose} style={[styles.modalWrap, {top: marTop}]}>
+          <TouchableHighlight>
+            <FlatList data={list}
+                      style={[{maxHeight: height * 0.6, backgroundColor: colors.white}, modalStyle]}
+                      renderItem={this.renderItem}
+                      keyExtractor={(item, index) => `${index}`}
+                      onEndReachedThreshold={onEndReachedThreshold}
+                      onEndReached={onEndReached}
+                      refreshing={refreshing}
+                      initialNumToRender={initialNumToRender}/>
+
+          </TouchableHighlight>
+        </TouchableOpacity>
+      )
+    return null
+  }
 }
 
-export default TopSelectModal

@@ -141,7 +141,7 @@ class GoodItemEditBottom extends React.Component {
           >
             <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
           </BottomModal>
-          <CommonModal visible={modalType === 'off_sale'} onClose={this.resetModal} position={'flex-end'}>
+          <CommonModal visible={modalType === 'off_sale'} onRequestClose={this.resetModal} position={'flex-end'}>
             <View style={styles.offSaleWrap}>
               <View style={styles.offSaleTitleWrap}>
                 <View/>

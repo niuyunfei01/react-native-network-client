@@ -151,6 +151,8 @@ const C = {
   ROUTE_GOODS: 'goods',
   ROUTE_SELECT_STORE: 'SelectStore',
   ROUTE_GOODS_EDIT: 'GoodsEdit',
+  ROUTE_GOODS_SELECT_SPEC: 'GoodsSelectSpecScene',
+  ROUTE_GOODS_ADD_SPEC: 'GoodsAddSpecScene',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',
@@ -282,7 +284,7 @@ const C = {
   ROUTE_DELIVERY_LIST: 'DeliveryList',
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
   ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
-
+  ROUTE_CHANGE_DELIVERY_ACCOUNT: 'ChangeDeliveryAccount',
 
   RIDER_TRSJECTORY: 'RiderTrajectory',
 
@@ -294,7 +296,20 @@ const C = {
   serverUrl,
   apiUrl,
   staticUrl,
-  hostPort
+  hostPort,
+  //配送类型
+  SHUN_FENG_TONG_CHENG: 12,
+  GUO_XIAO_DI: 17,
+  DA_DA_JING_JI: 2,
+  DA_DA_JI_SONG: 70,
+  DA_DA_YOU_ZHI: 18,
+  SHUAN_SONG: 13,
+  UU_PAO_TUI: 15,
+
+  MEI_TUAN_KUAI_SU_DA: 7,
+  MEI_TUAN_FEI_SU_DA: 10,
+  MEI_TUAN_PEI_SONG: 16,
+  FENG_NIAO_ZHONG_BAO: 14,
 };
 
 C.Listener = {

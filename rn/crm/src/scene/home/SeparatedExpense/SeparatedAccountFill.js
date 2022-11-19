@@ -293,7 +293,7 @@ class SeparatedAccountFill extends PureComponent {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}>
           <View style={[style.item_body, {flexDirection: 'row', alignItems: 'center'}]}>
-            <Text style={{fontSize: 14, color: colors.color666}}>外送帮余额： </Text>
+            <Text style={{fontSize: 14, color: colors.color666}}>账户余额： </Text>
             <Text style={{fontSize: 18, color: colors.color333, fontWeight: 'bold'}}>{balance}元 </Text>
           </View>
 

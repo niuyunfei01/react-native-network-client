@@ -68,8 +68,9 @@ class SettlementScene extends PureComponent {
   getSupplyList = () => {
     let {currStoreId, accessToken, vendor_id} = this.props.global;
     showModal('加载中...')
+    const params = {new_format: 1}
     let url = `/api/get_supply_bill_list_v2/${vendor_id}/${currStoreId}/${this.state.dates}?access_token=${accessToken}`;
-    HttpUtils.get(url).then(res => {
+    HttpUtils.get(url, params).then(res => {
       hideModal()
       const {bills = [], store_pay_info = [], support_payment = 0} = res
       const today = bills[0]
@@ -154,10 +155,12 @@ class SettlementScene extends PureComponent {
               {item.label}
             </Text>
             <If condition={item.default}>
-              <Text style={{fontSize: 10, backgroundColor: 'red', color: colors.white}}>默认</Text>
+              <View style={{backgroundColor: '#FF8309', borderRadius: 2}}>
+                <Text style={{fontSize: 11, paddingHorizontal: 4, paddingVertical: 2, color: colors.white}}>默认</Text>
+              </View>
             </If>
             <View style={{flex: 1}}/>
-            <Text style={{color: item.status_text === '已绑定' ? colors.main_color : colors.color999, fontSize: 10}}>
+            <Text style={{color: item.status_text === '已绑定' ? colors.color333 : colors.color999, fontSize: 14}}>
               {item.status_text}
             </Text>
           </View>
@@ -173,11 +176,11 @@ class SettlementScene extends PureComponent {
         <Text style={styles.todayHeaderText}>打款记录</Text>
         <View style={styles.todayDetailWrap}>
           <View style={{paddingVertical: 10, flex: 1}}>
-            <Text style={{color: colors.color333, fontSize: 15}}>
+            <Text style={{color: colors.color666, fontSize: 14}}>
               今日数据（{tool.fullDay(new Date())}）
             </Text>
             <Text style={styles.alreadyOrderText}>
-              已完成订单: {orderNum}  &nbsp;&nbsp;  金额: {tool.toFixed(totalPrice)}
+              已完成订单: {orderNum}  &nbsp;&nbsp;  金额: {tool.toFixed(totalPrice)}元
             </Text>
           </View>
           <Entypo name={"chevron-thin-right"} color={colors.color999} size={18}/>
@@ -186,9 +189,9 @@ class SettlementScene extends PureComponent {
     )
   }
 
-  toMonthGather() {
+  toMonthGather = () => {
     let {navigation} = this.props;
-    let {dates} = this.state;
+    let {dates} = this.state
     navigation.navigate(Config.ROUTE_SETTLEMENT_GATHER, {date: dates});
   }
 
@@ -258,19 +261,19 @@ class SettlementScene extends PureComponent {
             {dayjs(bill_date).format('MM-DD')}
           </Text>
 
-          <View style={{width: 40}}>
+          <View style={{width: 32}}>
             <If condition={item.icon}>
               <FontAwesome5 name={item.icon}
                             style={{
-                              marginLeft: 10,
+                              marginLeft: 6,
                               fontSize: item.icon === 'weixin' ? 20 : 25,
                               color: item.icon === 'weixin' ? colors.main_color : colors.fontBlue,
                             }}/>
             </If>
           </View>
 
-          <View>
-            <Text style={{color: pay_datetime ? colors.color999 : colors.warn_color, fontSize: 14}}>
+          <View style={{marginLeft: 4}}>
+            <Text style={{color: pay_datetime ? colors.color666 : colors.warn_color, fontSize: 12}}>
               {status_label}
             </Text>
             <If condition={pay_datetime}>
@@ -293,8 +296,8 @@ const styles = StyleSheet.create({
   page: {flex: 1, padding: 10},
   accountZoneWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8},
   accountWrap: {flexDirection: 'row', alignItems: 'center', height: 45},
-  accountTipText: {color: colors.color333, fontWeight: 'bold', fontSize: 15},
-  moreInfoText: {color: colors.color999, fontSize: 10},
+  accountTipText: {color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 22},
+  moreInfoText: {color: colors.color999, fontSize: 13, lineHeight: 18},
   accountListWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -303,9 +306,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: colors.colorEEE
   },
-  accountNameText: {color: colors.color333, marginLeft: 10, fontWeight: "400", fontSize: 14},
+  accountNameText: {color: colors.color333, marginLeft: 10, fontWeight: "400", fontSize: 16},
   todayWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8, marginTop: 10, paddingBottom: 6},
-  todayHeaderText: {color: colors.color333, fontWeight: 'bold', fontSize: 15, paddingVertical: 12},
+  todayHeaderText: {color: colors.color333, fontWeight: 'bold', fontSize: 16, paddingVertical: 12},
   todayDetailWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -313,11 +316,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: colors.colorEEE,
   },
-  alreadyOrderText: {color: colors.color999, fontSize: 17, marginTop: 3},
+  alreadyOrderText: {color: colors.color333, fontSize: 14, marginTop: 3},
   listWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8, marginTop: 10},
   listHeaderWrap: {flexDirection: 'row', alignItems: 'center', paddingVertical: 6},
-  listDateText: {color: colors.color333, fontWeight: 'bold', fontSize: 15, padding: 5},
-  countCurrentMonthText: {color: colors.main_color, marginLeft: 10, fontWeight: 'bold', fontSize: 15},
+  listDateText: {color: colors.color333, fontWeight: 'bold', fontSize: 14, padding: 5},
+  countCurrentMonthText: {color: colors.color333, marginLeft: 10, fontWeight: 'bold', fontSize: 14},
   listItemWrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -325,9 +328,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     height: 45,
   },
-  listItemDateText: {color: colors.color333, fontSize: 16, fontWeight: 'bold', width: 44},
-  listItemPayDatetimeText: {fontSize: 10, color: colors.color333},
-  listItemPriceText: {color: colors.color333, fontSize: 18, fontWeight: 'bold'}
+  listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 40},
+  listItemPayDatetimeText: {fontSize: 12, color: colors.color666},
+  listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene);

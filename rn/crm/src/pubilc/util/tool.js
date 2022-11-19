@@ -82,6 +82,10 @@ export function orderExpectTime(dt) {
   return dayjs(dt).format("M/DD HH:mm");
 }
 
+export const fullDateOther = (dt) => {
+  return dayjs(dt).format("YYYY/MM/DD HH:mm:ss")
+}
+
 export function fullDate(dt) {
   return dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
 }
