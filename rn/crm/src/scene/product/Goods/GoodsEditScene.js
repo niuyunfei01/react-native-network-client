@@ -1912,6 +1912,8 @@ class GoodsEditScene extends PureComponent {
               </View>
             </View>
             <FlatList data={picList}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       style={{flex: 1}}
                       numColumns={3}
                       getItemLayout={this._getItemLayout}
@@ -2190,6 +2192,8 @@ class GoodsEditScene extends PureComponent {
       return (
         <View style={styles.modalStyle}>
           <FlatList data={searchCategoriesList}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
                     style={{flex: 1}}
                     initialNumToRender={10}
                     getItemLayout={(data, index) => this.getItemLayout(data, index)}
@@ -2200,18 +2204,24 @@ class GoodsEditScene extends PureComponent {
     return (
       <View style={styles.modalStyle}>
         <FlatList data={basic_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
                   keyExtractor={(item, index) => `${index}`}
                   renderItem={(item) => this.renderBasicCategories(item, 1)}/>
         <FlatList data={secondary_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
                   keyExtractor={(item, index) => `${index}`}
                   renderItem={(item) => this.renderBasicCategories(item, 2)}/>
         <FlatList data={three_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}

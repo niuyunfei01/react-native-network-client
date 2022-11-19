@@ -216,6 +216,8 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
     if (goodsList.length > 0)
       return (
         <FlatList data={goodsList}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   getItemLayout={this.getItemLayout}
                   initialNumToRender={10}

@@ -252,7 +252,7 @@ class NoticeList extends React.PureComponent {
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          horizontal={true} showsHorizontalScrollIndicator={false}>
+          horizontal={true} >
           <For index="i" each='tab' of={typeLabels}>
             <TouchableOpacity
               key={i}
@@ -299,6 +299,8 @@ class NoticeList extends React.PureComponent {
           data={list}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onTouchStart={(e) => {
             this.pageX = e.nativeEvent.pageX;
             this.pageY = e.nativeEvent.pageY;

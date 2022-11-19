@@ -104,11 +104,15 @@ class BluePrinterSettings extends PureComponent {
             <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
             <FlatList style={{height: 50 * tool.length(connectedList), flexGrow: 0}}
                       data={connectedList}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       initialNumToRender={1}
                       renderItem={({item}) => this.renderItem(item)}
                       keyExtractor={item => item.id}/>
             <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
             <FlatList data={notConnectedList}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       initialNumToRender={10}
                       renderItem={({item}) => this.renderItem(item)}
                       keyExtractor={item => item.id}/>

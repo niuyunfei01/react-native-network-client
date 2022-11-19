@@ -1,5 +1,5 @@
 import DeviceInfo from 'react-native-device-info';
-import {ToastLong, ToastShort} from './ToastUtils';
+import {hideModal, ToastLong, ToastShort} from './ToastUtils';
 import native from './native'
 import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../common/config.js";
@@ -53,22 +53,19 @@ class HttpUtils {
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
-    let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
 
     if (props && props.global) {
-      store = tool.store(props.global)
-      const {vendor_id = 0} = props.global
-
-      if (store && vendor_id) {
-        options.headers.store_id = store.id || global.noLoginInfo.store_id
+      const {vendor_id = 0,store_id = 0} = props.global
+      if (store_id && vendor_id) {
+        options.headers.store_id = store_id || global.noLoginInfo.store_id
         options.headers.vendor_id = vendor_id || global.noLoginInfo.currVendorId
         options.headers.vendorId = vendor_id || global.noLoginInfo.currVendorId
         if (uri.substr(tool.length(uri) - 1) !== '&') {
           uri += '&'
         }
-        uri += `store_id=${store.id}&vendor_id=${vendor_id}`
+        uri += `store_id=${store_id}&vendor_id=${vendor_id}`
       }
     }
     return new Promise((resolve, reject) => {
@@ -78,6 +75,7 @@ class HttpUtils {
           if (response.ok) {
             return response.json();
           } else {
+            hideModal()
             // reject({status: response.status})
           }
         })
@@ -99,6 +97,7 @@ class HttpUtils {
             resolve(response.obj)
             return;
           }
+          hideModal()
           if (showReason)
             this.error(response, props.navigation);
           if (getNetworkDelay) {
@@ -109,7 +108,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-
+          hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {
             const endTime = getTime();

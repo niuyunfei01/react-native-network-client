@@ -15,7 +15,6 @@ import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
 import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
-import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
 import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
 
@@ -27,7 +26,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
+import {cross_icon, empty_data, menu, menu_left, search_icon, this_down} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -590,8 +589,7 @@ class OrderListScene extends Component {
             return;
           }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }}
-                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,
@@ -605,7 +603,7 @@ class OrderListScene extends Component {
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
-            this.onPress(Config.ROUTE_ORDER_SEARCH)
+            this.onPress(Config.ROUTE_SEARCH_ORDER, {search_store_id: store_info?.id})
           }}
           style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
           <SvgXml xml={search_icon()}/>
@@ -621,7 +619,7 @@ class OrderListScene extends Component {
           onSelect={(e) => this.onSelect(e)}
         >
           <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color333}}/>
+            <SvgXml xml={menu()}/>
           </View>
         </ModalDropdown>
 
@@ -681,7 +679,11 @@ class OrderListScene extends Component {
   }
   onEndReached = () => {
     if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+      this.setState({isCanLoadMore: false}, () => {
+        if (this.state.query.isAdd) {
+          this.fetchOrders(this.state.orderStatus, 0);
+        }
+      })
     }
   }
   onMomentumScrollBegin = () => {
@@ -714,6 +716,8 @@ class OrderListScene extends Component {
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onTouchStart={(e) => this.onTouchStart(e)}
           onEndReachedThreshold={0.3}
           onEndReached={this.onEndReached}
@@ -726,18 +730,24 @@ class OrderListScene extends Component {
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
+          ListFooterComponent={this.renderBottomView()}
           initialNumToRender={5}
         />
       </View>
     );
   }
 
-  listmore = () => {
-    if (this.state.query.isAdd) {
-      this.fetchOrders(this.state.orderStatus, 0);
+  renderBottomView = () => {
+    let {query, ListData} = this.state;
+    if (query?.isAdd || tool.length(ListData) < 3) {
+      return <View/>
     }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
+      </View>
+    )
   }
-
 
   renderItem = (order) => {
     let {item, index} = order;

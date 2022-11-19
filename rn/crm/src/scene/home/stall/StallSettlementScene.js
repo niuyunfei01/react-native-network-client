@@ -145,6 +145,8 @@ class StallSettlementScene extends PureComponent {
   renderList = (stall_list) => {
     return (
       <FlatList data={stall_list}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 numColumns={2}
                 keyExtractor={(item, index) => `${index}`}
                 renderItem={(item) => this.renderItem(item)}

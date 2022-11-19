@@ -22,7 +22,7 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
-import {add_tip, check_icon, cost, cross_icon, remarkIcon, time, weighticon} from "../../svg/svg";
+import {add_tip, check_icon, cost, cross_icon, empty_delivery_data, remarkIcon, time, weighticon} from "../../svg/svg";
 import PropTypes from "prop-types";
 import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
@@ -120,6 +120,7 @@ class OrderCallDelivery extends Component {
       store_est_all_check: false,
       logistic_fee_map: [],
       params_str: '',
+      expect_time_friendly: '',
       show_cancel_delivery_modal: false,
       ship_id: 0,
     };
@@ -216,7 +217,7 @@ class OrderCallDelivery extends Component {
       this.setState({
         params_str: params_json_str,
         store_est: store_est,
-        est: est,
+        est: est.concat(obj?.in_review_deliveries || []),
         exist_waiting_delivery: obj?.exist_waiting_delivery,
         wm_platform: obj?.wm_platform,
         wm_platform_day_id: obj?.wm_platform_day_id,
@@ -224,6 +225,7 @@ class OrderCallDelivery extends Component {
         wm_user_name: obj?.wm_user_name,
         wm_mobile: obj?.wm_mobile,
         order_expect_time: obj?.expect_time,
+        expect_time_friendly: obj?.expect_time_friendly,
         order_money: Number(obj?.wm_order_money),
         order_money_input_value: Number(obj?.wm_order_money),
         weight: Number(obj?.weight),
@@ -358,6 +360,8 @@ class OrderCallDelivery extends Component {
         hideModal();
         this.props.route.params.onBack && this.props.route.params.onBack(res);
         this.props.navigation.goBack()
+      },(e)=>{
+        ToastShort(e?.desc)
       }).catch((res) => {
         hideModal();
         if (res.obj.mobile && res.obj.mobile !== '') {
@@ -584,6 +588,7 @@ class OrderCallDelivery extends Component {
           {this.renderCollect()}
           {this.renderCancelDelivery()}
           {this.renderWsbDelivery()}
+          {this.renderNoDelivery()}
           {this.renderStoreDelivery()}
           {this.renderOwnDelivery()}
         </ScrollView>
@@ -728,6 +733,43 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  renderNoDelivery = () => {
+    let {store_est, est, isLoading} = this.state
+    if (tool.length(est) > 0 || tool.length(store_est) > 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, borderRadius: 4, height: 320}}>
+        <If condition={!isLoading}>
+          <View style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 320
+          }}>
+            <SvgXml xml={empty_delivery_data()}/>
+            <Text style={{
+              fontSize: 15,
+              marginTop: 9,
+              marginBottom: 20,
+              color: colors.color999
+            }}> 暂未开通任何配送 </Text>
+            <Button title={'去开通'}
+                    onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+                    containerStyle={{marginTop: 20}}
+                    buttonStyle={{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 21,
+                      width: 140,
+                      length: 42,
+                    }}
+                    titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
+            />
+          </View>
+        </If>
+      </View>
+    )
+  }
+
   renderWsbDelivery = () => {
     let {est_all_check, est} = this.state
     if (tool.length(est) <= 0) {
@@ -792,14 +834,13 @@ class OrderCallDelivery extends Component {
     )
   }
 
-
   renderDeliveryItem = (list = [], type = 0) => {
     if (tool.length(list) <= 0) {
       return null
     }
     return (
       <For index='key' each='item' of={list}>
-        <TouchableOpacity onPress={() => {
+        <TouchableOpacity disabled={tool.length(item?.deliveryId) <= 0} onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <FastImage source={{uri: item?.icon}}
@@ -819,34 +860,35 @@ class OrderCallDelivery extends Component {
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
-
-          <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
-              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
-            </Text>
-            <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
-              <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
-                优惠{item?.coupons_amount}元
+          <If condition={tool.length(item?.deliveryId) > 0}>
+            <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
+                <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
               </Text>
-            </If>
-          </View>
-          <CheckBox
-            size={18}
-            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-            checkedColor={colors.main_color}
-            uncheckedColor={'#DDDDDD'}
-            containerStyle={{
-              margin: 0,
-              padding: 0,
-              right: -10,
-              top: 0,
-              position: 'relative',
-            }}
-            checked={item?.ischeck}
-            onPress={() => {
-              this.onSelectDelivey(item, key, type)
-            }}
-          />
+              <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
+                <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
+                  优惠{item?.coupons_amount}元
+                </Text>
+              </If>
+            </View>
+            <CheckBox
+              size={18}
+              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+              checkedColor={colors.main_color}
+              uncheckedColor={'#DDDDDD'}
+              containerStyle={{
+                margin: 0,
+                padding: 0,
+                right: -10,
+                top: 0,
+                position: 'relative',
+              }}
+              checked={item?.ischeck}
+              onPress={() => {
+                this.onSelectDelivey(item, key, type)
+              }}
+            />
+          </If>
         </TouchableOpacity>
       </For>
     )
@@ -854,7 +896,7 @@ class OrderCallDelivery extends Component {
 
   renderCollect = () => {
     let {wm_address, wm_user_name, wm_mobile, exist_waiting_delivery} = this.state;
-    if (tool.length(exist_waiting_delivery) > 0 || tool.length(wm_address) <= 0) {
+    if (tool.length(exist_waiting_delivery) > 0) {
       return;
     }
     return (
@@ -883,7 +925,7 @@ class OrderCallDelivery extends Component {
   }
 
   renderHead = () => {
-    let {order_expect_time, wm_platform_day_id, wm_platform} = this.state;
+    let {expect_time_friendly, wm_platform_day_id, wm_platform} = this.state;
     return (
       <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
@@ -894,7 +936,7 @@ class OrderCallDelivery extends Component {
           }}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
-        <If condition={wm_platform && wm_platform_day_id && order_expect_time}>
+        <If condition={wm_platform && wm_platform_day_id && expect_time_friendly}>
           <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
@@ -902,7 +944,7 @@ class OrderCallDelivery extends Component {
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
               <Text
-                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{order_expect_time} </Text>
+                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{expect_time_friendly} </Text>
             </View>
           </View>
         </If>

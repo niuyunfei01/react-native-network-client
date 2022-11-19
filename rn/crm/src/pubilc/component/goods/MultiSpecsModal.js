@@ -241,6 +241,8 @@ export default class MultiSpecsModal extends PureComponent {
               </TouchableOpacity>
             </View>
             <FlatList data={data}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       renderItem={(item) => this.renderItem(item)}
                       initialNumToRender={4}
                       getItemLayout={(data, index) => this.getItemLayout(data, index)}

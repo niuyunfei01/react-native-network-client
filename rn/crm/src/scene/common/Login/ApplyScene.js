@@ -400,7 +400,7 @@ class ApplyScene extends PureComponent {
               this.mixpanel.track("nfo_locatestore_click", {});
               const params = {
                 center: center,
-                cityName: this.state.cityname,
+                city_name: this.state.cityname,
                 keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
                 onBack: (res) => {
                   this.setAddress.bind(this)(res)

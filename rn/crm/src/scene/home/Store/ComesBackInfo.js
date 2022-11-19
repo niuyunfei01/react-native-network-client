@@ -237,6 +237,8 @@ class OrderQueryResultScene extends PureComponent {
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <FlatList
           extraData={orders}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           data={orders}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh.bind(this)}

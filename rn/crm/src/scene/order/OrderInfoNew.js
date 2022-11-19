@@ -976,8 +976,15 @@ class OrderInfoNew extends PureComponent {
             <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
                        resizeMode={FastImage.resizeMode.contain}/>
             <View style={styles.orderCardInfo}>
-              <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
-              <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
+                <Text style={{
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  color: '#FF8309'
+                }}>  {order?.friendly_time_info} </Text>
+              </View>
+              <Text style={styles.orderCardInfoBottom}>{order?.ext_store_name} #{order?.dayId} </Text>
             </View>
           </View>
           <If condition={order?.platform === '6'}>
@@ -1004,7 +1011,7 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.line}/>
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
-            <Text style={styles.remarkLabel}>备注 </Text>
+            <Text style={[styles.remarkLabel, {color: '#FF8309'}]}>备注: </Text>
             <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>
@@ -1173,7 +1180,9 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用</Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-
+          <If condition={tool.length(order.greeting) > 0 || tool.length(order?.giver_phone) > 0}>
+            <View style={styles.cuttingLine1}/>
+          </If>
           <If condition={tool.length(order.greeting) > 0}>
             <View style={styles.line}/>
             <View style={styles.productItemRow}>
@@ -1217,8 +1226,12 @@ class OrderInfoNew extends PureComponent {
             </View>
           </TouchableOpacity>
           <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>预计送达时间</Text>
-            <Text style={styles.remarkValue}>{order?.expectTime}</Text>
+            <Text style={styles.remarkLabel}>预计送达时间 </Text>
+            <Text style={styles.remarkValue}>{order?.expectTime} </Text>
+          </View>
+          <View style={styles.productItemRow}>
+            <Text style={styles.remarkLabel}>下单时间 </Text>
+            <Text style={styles.remarkValue}>{order?.orderTime} </Text>
           </View>
         </View>
       </View>

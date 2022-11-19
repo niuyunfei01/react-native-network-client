@@ -370,6 +370,8 @@ class AutomaticFeedbackScene extends PureComponent {
               <SvgXml xml={close(18, 18)} onPress={() => this.setState({visible: false})}/>
             </View>
             <FlatList data={storeList}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       initialNumToRender={10}
                       ItemSeparatorComponent={LineView}
                       getItemLayout={(data, index) => this.getItemLayout(data, index)}

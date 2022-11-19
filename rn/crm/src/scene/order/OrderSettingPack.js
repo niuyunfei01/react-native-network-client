@@ -20,6 +20,7 @@ import {TextArea} from "../../weui";
 import DatePicker from 'react-native-date-picker'
 import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import Validator from "../../pubilc/util/Validator";
 
 
 let width = Dimensions.get("window").width;
@@ -113,7 +114,7 @@ class OrderSettingScene extends Component {
     }
     const params = {
       center: center,
-      cityName: city,
+      city_name: city,
       show_select_city: false,
       keywords: address,
       onBack: (res) => {
@@ -225,7 +226,7 @@ class OrderSettingScene extends Component {
         mobile: res.phone,
       })
       const params = {
-        cityName: city,
+        city_name: city,
         show_select_city: false,
         keywords: res.address,
         onBack: (res) => {
@@ -259,25 +260,15 @@ class OrderSettingScene extends Component {
         address_id
       } = this.state
 
-      if (!loc_lng && !loc_lng) {
-        ToastShort('请先选择定位', 0);
-        return this.goSelectAddress()
-      }
-
-      if (tool.length(mobile) !== 11) {
-        return ToastShort('请输入正确的手机号');
-      }
-
-      if (tool.length(name) <= 0) {
-        return ToastShort('请输入收件人姓名');
-      }
-
-      if (Number(goods_price) <= 0) {
-        return ToastShort('请选择物品价值');
-      }
-
-      if (Number(weight) <= 0) {
-        return ToastShort('请选择物品重量');
+      const validator = new Validator();
+      validator.add(loc_lng, 'required', '请先选择定位')
+      validator.add(name, 'required', '请输入收件人姓名')
+      validator.add(goods_price, 'required', '请选择物品价值')
+      validator.add(weight, 'required', '请选择物品重量')
+      validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的手机号')
+      const err_msg = validator.start();
+      if (err_msg) {
+        return ToastShort(err_msg)
       }
 
       if (isSaveToBook) {

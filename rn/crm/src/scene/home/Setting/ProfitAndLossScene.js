@@ -316,6 +316,8 @@ class ProfitAndLoss extends PureComponent {
     return (
       <FlatList
         data={profitList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         renderItem={this.renderProfitItem}
         onRefresh={this.onRefresh}
         onEndReachedThreshold={0.1}

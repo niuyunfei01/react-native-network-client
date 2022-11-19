@@ -289,6 +289,8 @@ class GoodsApplyRecordScene extends Component {
       <FlatList
         keyExtractor={(item, index) => `${index}`}
         style={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         data={this.state.list}
         renderItem={this.renderItem}
         onEndReachedThreshold={0.2}

@@ -14,6 +14,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {InputItem} from "@ant-design/react-native";
+import {SvgXml} from "react-native-svg";
+import {empty_data} from "../../../svg/svg";
 
 const {StyleSheet} = ReactNative
 
@@ -60,13 +62,15 @@ class SeparatedExpense extends PureComponent {
 
   // 获取三方配送充值列表
   fetchThirdDeliveryList = () => {
-    showModal('加载中')
     const {global} = this.props;
+    this.setState({
+      isRefreshing: true
+    })
     const url = `/v1/new_api/delivery/delivery_account_balance/${global.currStoreId}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      hideModal()
       this.setState({
-        thirdAccountList: res
+        thirdAccountList: res,
+        isRefreshing: false
       })
     })
   }
@@ -158,7 +162,10 @@ class SeparatedExpense extends PureComponent {
   }
 
   renderTHIRDContainer = () => {
-    const {thirdAccountList, prompt_msg} = this.state
+    const {thirdAccountList, prompt_msg, isRefreshing} = this.state
+    if (isRefreshing) {
+      return <View/>;
+    }
     return (
       <View>
         <View style={Styles.THIRDHeader}>
@@ -202,18 +209,32 @@ class SeparatedExpense extends PureComponent {
     )
   }
 
+
   renderNOTHIRDList = () => {
     return (
-      <View style={Styles.THIRDContainerNOList}>
-        <Text style={Styles.NoTHIRDListText}>
-          未授权商家自有账号
-        </Text>
-        <Button buttonStyle={Styles.NoTHIRDListBtn}
-                titleStyle={{fontSize: pxToDp(25), fontWeight: "bold"}}
-                title={'去授权'}
-                onPress={() => {
-                  this.toAuthorization()
-                }}/>
+      <View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 80,
+      }}>
+        <SvgXml xml={empty_data()}/>
+        <Text style={Styles.noOrderDesc}> 您当前还未绑定自有账号, </Text>
+        <Text style={Styles.noOrderDesc}> 点击下方按钮进行绑定, </Text>
+        <Text style={Styles.noOrderDesc}> 运力更多接起更快 </Text>
+        <Button title={'去绑定'}
+                onPress={this.toAuthorization}
+                buttonStyle={{
+                  width: 180,
+                  borderRadius: 20,
+                  backgroundColor: colors.main_color,
+                  paddingVertical: 10,
+                  marginTop: 20
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
       </View>
     )
   }
@@ -258,6 +279,7 @@ class SeparatedExpense extends PureComponent {
 }
 
 const Styles = StyleSheet.create({
+  noOrderDesc: {flex: 1, fontSize: 15, color: colors.color999, lineHeight: 21},
   flexRowStyle: {flexDirection: 'row', justifyContent: "space-between", alignItems: 'center', marginBottom: 20},
   modalTitle: {fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333},
   flex1: {flex: 1},
@@ -485,11 +507,9 @@ const Styles = StyleSheet.create({
     marginLeft: pxToDp(10)
   },
   NoTHIRDListText: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "bold",
     color: '#999999',
-    marginTop: '30%',
-    marginLeft: '20%'
   },
   NoTHIRDListBtn: {
     width: "96%",

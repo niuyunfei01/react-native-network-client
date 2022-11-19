@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import Entypo from "react-native-vector-icons/Entypo";
 import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import Validator from "../../../pubilc/util/Validator";
 
 function mapStateToProps(state) {
   return {
@@ -39,6 +40,7 @@ function mapDispatchToProps(dispatch) {
 class LoginScene extends PureComponent {
   static propTypes = {
     dispatch: PropTypes.func,
+    route: PropTypes.object,
   }
 
   constructor(props) {
@@ -125,11 +127,13 @@ class LoginScene extends PureComponent {
           show_auth_modal: true
         })
       }
-      if (tool.length(mobile) < 10) {
-        return ToastShort("请输入正确的手机号", 0)
-      }
-      if (!verifyCode) {
-        return ToastShort("请填写验证码", 0)
+
+      const validator = new Validator();
+      validator.add(verifyCode, 'required', '请填写验证码')
+      validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的手机号')
+      const err_msg = validator.start();
+      if (err_msg) {
+        return ToastShort(err_msg)
       }
       this._signIn(mobile, verifyCode);
     })
@@ -153,7 +157,11 @@ class LoginScene extends PureComponent {
         })
       } else {
         if (msg === 401) { //未注册
-          return this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
+          return this.props.navigation.navigate(Config.ROUTE_SAVE_STORE, {
+            type: 'register',
+            mobile,
+            verify_code: password
+          })
         }
         ToastShort(msg, 0)
       }
@@ -162,32 +170,19 @@ class LoginScene extends PureComponent {
 
   queryConfig = () => {
     let {accessToken, currStoreId} = this.props.global;
-    const {dispatch} = this.props;
+    const {dispatch, navigation} = this.props;
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
-        let store_id = cfg?.store_id || currStoreId;
-        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
+        dispatch(setCurrentStore(cfg?.store_id || currStoreId));
+        tool.resetNavStack(navigation, cfg?.show_bottom_tab ? Config.ROUTE_ORDERS : Config.ROUTE_ALERT, cfg?.show_bottom_tab ? {} : {
+          initTab: Config.ROUTE_ORDERS,
+          initialRouteName: Config.ROUTE_ALERT
+        });
+        hideModal()
       } else {
         ToastShort(err_msg, 0);
       }
     }));
-  }
-
-  doneSelectStore = (storeId, show_bottom_tab = false) => {
-    const {dispatch, navigation} = this.props;
-    dispatch(setCurrentStore(storeId));
-
-    if (!show_bottom_tab) {
-      hideModal()
-      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
-    }
-
-    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-      initTab: Config.ROUTE_ORDERS,
-      initialRouteName: Config.ROUTE_ALERT
-    });
-
-    hideModal()
   }
 
   closeModal = () => {

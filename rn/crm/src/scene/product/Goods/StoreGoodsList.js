@@ -463,6 +463,8 @@ class StoreGoodsList extends Component {
               style={{flex: 1}}
               legacyImplementation={false}
               directionalLockEnabled={true}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
               onEndReachedThreshold={0.5}
               onEndReached={this.onEndReached}
               onMomentumScrollBegin={this.onMomentumScrollBegin}

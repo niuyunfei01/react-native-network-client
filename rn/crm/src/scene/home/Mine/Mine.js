@@ -318,14 +318,7 @@ class Mine extends PureComponent {
 
 
   navigateToStoreManager = () => {
-    const {currentUser, vendor_info} = this.props.global;
-    const {is_mgr, currVendorId} = this.state
-    this.onPress(Config.ROUTE_STORE, {
-      currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: vendor_info?.brand_name,
-      is_mgr: is_mgr
-    });
+    this.onPress(Config.ROUTE_STORE_LIST);
   }
 
   navigateToWorker = () => {
@@ -394,10 +387,15 @@ class Mine extends PureComponent {
 
   touchBlockNavigate = (info) => {
     this.mixpanel.track(`${info?.name}`)
+
+    let {is_service_mgr} = tool.vendor(this.props.global);
     if (info?.type === 'Router') {
       switch (info?.path) {
         case 'Store':
-          this.navigateToStoreManager()
+          this.onPress(Config.ROUTE_STORE_LIST);
+          break
+        case 'OrderSearchResult':
+          this.onPress(is_service_mgr ? Config.ROUTE_ORDER_SEARCH_RESULT : Config.ROUTE_ORDER_ALL);
           break
         case 'Worker':
           this.navigateToWorker()
