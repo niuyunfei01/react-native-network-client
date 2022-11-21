@@ -159,6 +159,23 @@ class SearchShop extends Component {
     }, 1000)
   }
 
+  getPoiInfo = (item) => {
+    let header = `https://restapi.amap.com/v3/geocode/regeo?key=85e66c49898d2118cc7805f484243909&location=${item?.location}`
+    fetch(header).then(response => response.json()).then(data => {
+      if (data?.status === "1") {
+        let {district = '', city = '', province = '', adcode = '', citycode = ''} = data?.regeocode?.addressComponent;
+        let city_info = {
+          adname: district,
+          cityname: tool.length(city) > 0 ? city : province,
+          adcode: adcode,
+          citycode: citycode,
+        }
+        this.setState({city_info})
+      } else {
+        ToastLong('操作失败，请重试')
+      }
+    });
+  }
 
   setLatLng = (latitude, longitude) => {
     let {shopmsg} = this.state;
@@ -203,6 +220,29 @@ class SearchShop extends Component {
 
       </View>
     )
+  }
+
+  onClickItem = (item) => {
+    let {isMap, is_default, cityname, city_info} = this.state;
+    InteractionManager.runAfterInteractions(() => {
+      if (isMap) {
+        if (!is_default) {
+          if (!item?.adname) {
+            item = {...item, ...city_info}
+          }
+          this.props.route.params.onBack(item);
+        }
+        this.props.navigation.goBack();
+      } else {
+        this.setState({
+          isMap: true,
+          shopmsg: item
+        }, () => {
+          this.getPoiInfo(item)
+        })
+
+      }
+    })
   }
 
   renderHeader = () => {
@@ -280,25 +320,6 @@ class SearchShop extends Component {
         </If>
       </View>
     )
-  }
-  onClickItem = (item) => {
-    let {isMap, is_default, cityname} = this.state;
-    InteractionManager.runAfterInteractions(() => {
-      if (isMap) {
-        if (!is_default) {
-          if (!item?.adname) {
-            item.adname = cityname
-          }
-          this.props.route.params.onBack(item);
-        }
-        this.props.navigation.goBack();
-      } else {
-        this.setState({
-          isMap: true,
-          shopmsg: item
-        })
-      }
-    })
   }
 
   renderList(list) {
