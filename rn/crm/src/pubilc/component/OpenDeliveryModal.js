@@ -318,7 +318,8 @@ class OpenDeliveryModal extends PureComponent {
     let {mobile, verificationCode} = this.state
 
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
-      ToastShort('请输入手机号或者验证码')
+      this.setState({selectGeneralDelivery: false})
+      ToastShort('请输入手机号或者验证码',1)
       return;
     }
     const api = `/v1/new_api/Delivery/get_bind_user?access_token=${accessToken}&vendorId=${vendor_id}`
@@ -326,19 +327,22 @@ class OpenDeliveryModal extends PureComponent {
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
       fetchData && fetchData()
-      ToastShort(res.desc)
+      ToastShort(res.desc,1)
 
-    }).catch((reason) => {
-      ToastShort(reason.desc)
+    }).catch(async (reason) => {
+      await this.closeModal()
+      ToastShort(reason.desc,1)
     })
   }
 
   getUUPTAuthorizedToLog = () => {
+
     const {global, fetchData, store_id} = this.props
     let {accessToken, vendor_id} = global
     let {mobile, verificationCode} = this.state
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
-      ToastShort('请输入手机号或者验证码')
+      this.setState({selectGeneralDelivery: false})
+      ToastShort('请输入手机号或者验证码', 1)
       return;
     }
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${vendor_id}`
@@ -351,9 +355,10 @@ class OpenDeliveryModal extends PureComponent {
       await this.closeModal()
       fetchData && fetchData()
 
-      ToastShort(res.desc)
-    }).catch((reason) => {
-      ToastShort(reason.desc)
+      ToastShort(res.desc, 1)
+    }).catch(async (reason) => {
+      await this.closeModal()
+      ToastShort(reason.desc, 1)
     })
   }
   handlerOpenDelivery = async () => {
@@ -383,7 +388,7 @@ class OpenDeliveryModal extends PureComponent {
         break
       case Config.UU_PAO_TUI:
         if (selectGeneralDelivery)
-          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name}`})
+          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
         else {
           this.setState({selectGeneralDelivery: true})
           if (selectAccountType === 1)
@@ -394,7 +399,7 @@ class OpenDeliveryModal extends PureComponent {
         break
       case Config.GUO_XIAO_DI:
         if (selectGeneralDelivery)
-          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name}`})
+          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
         else {
 
           this.setState({selectGeneralDelivery: true})
@@ -410,7 +415,7 @@ class OpenDeliveryModal extends PureComponent {
 
   closeModal = async () => {
     const {onRequestClose} = this.props
-    onRequestClose && onRequestClose()
+    onRequestClose && await onRequestClose()
     await this.setState({
       mobile: '',
       verificationCode: '',
