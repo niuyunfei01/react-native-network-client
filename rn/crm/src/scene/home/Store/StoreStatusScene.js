@@ -400,7 +400,6 @@ class StoreStatusScene extends PureComponent {
     return (
       <View style={{
         flex: 1,
-        backgroundColor: 'red'
       }}>
         {
           business_status && business_status.map((store, index) => {
