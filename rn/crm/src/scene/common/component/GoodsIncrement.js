@@ -8,9 +8,8 @@ import {autoPackage, autoReply, bell} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import Entypo from "react-native-vector-icons/Entypo";
-import {getConfig} from "../../../reducers/global/globalActions";
-import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
 
 
 const styles = StyleSheet.create({

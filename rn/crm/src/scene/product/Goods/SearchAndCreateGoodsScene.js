@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import FastImage from "react-native-fast-image";
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import {SvgXml} from "react-native-svg";

@@ -22,7 +22,7 @@ class AddAccount extends PureComponent {
     this.state = {
       workerRoles: [],
       // storeList: [
-        // {label: '所有门店', value: 0}
+      // {label: '所有门店', value: 0}
       // ],
       roleStoreList: [],
       worker_role_grade: '',

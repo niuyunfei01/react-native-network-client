@@ -292,7 +292,7 @@ class deliveryStatusModal extends React.Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_modal}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',

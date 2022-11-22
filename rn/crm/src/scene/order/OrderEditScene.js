@@ -2,18 +2,14 @@ import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Config from "../../pubilc/common/config";
-import AppConfig from "../../pubilc/common/config";
 import CommonStyle from "../../pubilc/util/CommonStyles";
 
-import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
+import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import tool from "../../pubilc/util/tool";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
-import UserTagPopup from "../common/component/UserTagPopup";
-import FetchEx from "../../pubilc/util/fetchEx";
-import {WhiteSpace} from "@ant-design/react-native"
 
 import {
   Cell,
@@ -179,7 +175,7 @@ class OrderEditScene extends Component {
     const {state, navigate} = this.props.navigation;
     const params = {
       show_select_city: false,
-      center: this.state.loc_data ,
+      center: this.state.loc_data,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },

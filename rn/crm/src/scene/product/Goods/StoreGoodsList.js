@@ -8,7 +8,7 @@ import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import PropTypes from "prop-types";

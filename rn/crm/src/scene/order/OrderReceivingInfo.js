@@ -12,7 +12,6 @@ import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import PropTypes from "prop-types";
 import JbbModal from "../../pubilc/component/JbbModal";
-import Entypo from "react-native-vector-icons/Entypo";
 import {TextArea} from "../../weui";
 import {SvgXml} from "react-native-svg";
 import {cross_icon} from "../../svg/svg";
@@ -448,7 +447,7 @@ class OrderReceivingInfo extends Component {
   renderSmartModal = () => {
     let {show_smart_modal, address, name, street_block, mobile} = this.state;
     return (
-      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'center'}>
         <View style={{marginBottom: 20}}>

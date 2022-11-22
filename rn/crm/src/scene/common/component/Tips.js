@@ -51,7 +51,6 @@ class Tips extends Component {
 
       <View>
         <JbbModal visible={this.state.modalTip} onClose={() => this.props.onItemClick()} modal_type={'bottom'}
-                  modalStyle={{padding: 0}}
         >
           <>
             <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>

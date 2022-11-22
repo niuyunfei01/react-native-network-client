@@ -26,7 +26,7 @@ class AlertModal extends PureComponent {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.props.onClose}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={this.props.visible}>
         <TouchableOpacity onPress={this.props.onClose} style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',

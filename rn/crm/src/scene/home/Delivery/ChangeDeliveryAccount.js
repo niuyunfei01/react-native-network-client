@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Text, View, StyleSheet, Switch, TouchableOpacity} from "react-native";
+import {StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";

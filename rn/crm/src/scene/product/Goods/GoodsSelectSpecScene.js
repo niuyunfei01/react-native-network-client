@@ -2,7 +2,8 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Dimensions,
-  InteractionManager, RefreshControl,
+  InteractionManager,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -157,7 +158,8 @@ class GoodsSelectSpecScence extends PureComponent {
           </For>
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
             <Text style={{fontSize: 14, color: colors.color999}}>无合适规格， </Text>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", paddingVertical: 10}} onPress={() => this.onPress(Config.ROUTE_GOODS_ADD_SPEC, {series_id: series_id})}>
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", paddingVertical: 10}}
+                              onPress={() => this.onPress(Config.ROUTE_GOODS_ADD_SPEC, {series_id: series_id})}>
               <Text style={{fontSize: 14, color: colors.main_color}}>去新增规格 </Text>
               <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
             </TouchableOpacity>

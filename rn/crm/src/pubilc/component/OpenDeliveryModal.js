@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Text, TouchableOpacity, View, StyleSheet, TextInput, InteractionManager} from "react-native";
+import {InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CommonModal from "./goods/CommonModal";
 import {connect} from "react-redux";
 import Config from "../common/config";
@@ -319,7 +319,7 @@ class OpenDeliveryModal extends PureComponent {
 
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
       this.setState({selectGeneralDelivery: false})
-      ToastShort('请输入手机号或者验证码',1)
+      ToastShort('请输入手机号或者验证码', 1)
       return;
     }
     const api = `/v1/new_api/Delivery/get_bind_user?access_token=${accessToken}&vendorId=${vendor_id}`
@@ -327,11 +327,11 @@ class OpenDeliveryModal extends PureComponent {
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
       fetchData && fetchData()
-      ToastShort(res.desc,1)
+      ToastShort(res.desc, 1)
 
     }).catch(async (reason) => {
       await this.closeModal()
-      ToastShort(reason.desc,1)
+      ToastShort(reason.desc, 1)
     })
   }
 

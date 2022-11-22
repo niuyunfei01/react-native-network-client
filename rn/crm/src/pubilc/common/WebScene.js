@@ -16,7 +16,7 @@ import {
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
 import Config from "./config";
-import {showError, showSuccess, ToastShort} from "../util/ToastUtils";
+import {showError, showSuccess} from "../util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 import native from "../util/native";
 import tool from "../util/tool";

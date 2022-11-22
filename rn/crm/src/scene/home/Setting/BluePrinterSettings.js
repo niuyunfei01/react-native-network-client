@@ -1,13 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View
-} from 'react-native';
+import {FlatList, SafeAreaView, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
