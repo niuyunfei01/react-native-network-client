@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  InteractionManager,
+  InteractionManager, Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -173,6 +173,7 @@ class SearchShop extends Component {
         page_size
       }
       HttpUtils.get.bind(this.props)(api, params).then((res) => {
+        Keyboard.dismiss()
         this.setState({
           keyword: '',
           page: page + 1,
