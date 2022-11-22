@@ -101,6 +101,7 @@ class GoodsApplyRecordScene extends Component {
     let {accessToken} = this.props.global;
     const url = `api/store_audit_list/${viewStoreId}/${auditStatus}/${page}.json?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
+      hideModal()
       let {total_page, audit_list = []} = res;
       this.setState({
         list: refresh ? audit_list : list.concat(audit_list),
@@ -215,11 +216,16 @@ class GoodsApplyRecordScene extends Component {
           <View style={{flex: 3, marginLeft: 8}}>
 
             <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
-              <If condition={act_plat_3}><View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View>
-              </If> <If condition={act_plat_7}><View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text>
-            </View></If> <If condition={act_plat_1}><View style={styles.eWrap}><Text style={styles.eText}>饿</Text>
-            </View></If> <If condition={is_act}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
-            </View> </If> {product_name}
+              <If condition={is_act == 1}>
+                <If condition={act_plat_3}><View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View>
+                </If> <If condition={act_plat_7}><View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text>
+              </View></If> <If condition={act_plat_1}><View style={styles.eWrap}><Text style={styles.eText}>饿</Text>
+              </View></If> <If condition={is_act}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
+              </View> </If>{product_name}
+              </If>
+              <If condition={is_act != 1}>
+                {product_name}
+              </If>
             </Text>
             <Text style={styles.name_time}>
               #{product_id} {tool.fullDateOther(created)}
