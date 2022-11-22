@@ -910,7 +910,7 @@ class OrderCallDelivery extends Component {
     }
     return (
       <For index='key' each='item' of={list}>
-        <TouchableOpacity disabled={tool.length(item?.deliveryId) <= 0} onPress={() => {
+        <TouchableOpacity disabled={Number(item?.deliveryId) <= 0} onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <FastImage source={{uri: item?.icon}}
@@ -930,7 +930,7 @@ class OrderCallDelivery extends Component {
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
-          <If condition={tool.length(item?.deliveryId) > 0}>
+          <If condition={Number(item?.delivery_fee) > 0}>
             <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
               <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
                 <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元

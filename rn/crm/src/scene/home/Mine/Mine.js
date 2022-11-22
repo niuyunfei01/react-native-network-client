@@ -313,11 +313,6 @@ class Mine extends PureComponent {
     this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})
   }
 
-
-  navigateToStoreManager = () => {
-    this.onPress(Config.ROUTE_STORE_LIST);
-  }
-
   navigateToWorker = () => {
     const {currentUser, vendor_info, vendor_id} = this.props.global;
     this.onPress(Config.ROUTE_WORKER, {
@@ -339,8 +334,29 @@ class Mine extends PureComponent {
     });
   }
 
+  logout = () => {
+    const {dispatch, navigation} = this.props;
+    this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      currentUser: 0,
+      currStoreId: 0,
+      host: '',
+      enabledGoodMgr: '',
+      currVendorId: '',
+      refreshToken: '',
+      expireTs: 0,
+      printer_id: '0',
+      order_list_by: 'orderTime asc'
+    }
+
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
+    dispatch(logout(() => {
+      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
+    }));
+  }
   logOutAccount = () => {
-    const {dispatch, navigation, global} = this.props;
+
     Alert.alert('提醒', `确定要退出吗？`, [
       {
         text: '取消',
@@ -349,25 +365,7 @@ class Mine extends PureComponent {
       {
         text: '确定',
         style: 'default',
-        onPress: () => {
-          this.mixpanel.reset();
-          const noLoginInfo = {
-            accessToken: '',
-            currentUser: 0,
-            currStoreId: 0,
-            host: '',
-            enabledGoodMgr: '',
-            currVendorId: '',
-            refreshToken: '',
-            expireTs: 0,
-            printer_id: '0',
-            order_list_by: 'orderTime asc'
-          }
-          setNoLoginInfo(JSON.stringify(noLoginInfo))
-          dispatch(logout(() => {
-            tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
-          }));
-        }
+        onPress: this.logout
       }
     ]);
   }

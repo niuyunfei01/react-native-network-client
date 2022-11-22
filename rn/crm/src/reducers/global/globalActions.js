@@ -23,7 +23,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
-import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
+import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
 import dayjs from "dayjs";
 
@@ -202,6 +202,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout().then();
+    doJPushStop()
     doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();

@@ -54,6 +54,7 @@ class OrderItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     accessToken: PropTypes.string,
+    order_status: PropTypes.number,
     showBtn: PropTypes.bool,
     fetchData: PropType.func,
     setState: PropType.func,
@@ -644,7 +645,7 @@ class OrderItem extends React.PureComponent {
 
 
   renderButton = () => {
-    let {item, comesBackBtn, orderStatus} = this.props;
+    let {item, comesBackBtn, order_status} = this.props;
     let obj_num = 0
     if (comesBackBtn) {
       obj_num = 1
@@ -735,7 +736,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
-          <Button title={orderStatus === 8 ? '重新下单' : '下配送单'}
+          <Button title={order_status === 8 ? '重新下单' : '下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('V4订单列表_下配送单')

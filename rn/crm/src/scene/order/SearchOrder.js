@@ -61,6 +61,7 @@ class SearchOrder extends PureComponent {
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
       show_finish_delivery_modal: false,
+      show_placeholder: true,
     };
   }
 
@@ -257,7 +258,7 @@ class SearchOrder extends PureComponent {
   }
 
   renderHeader = () => {
-    let {keyword, keyword_type = 1, item_list} = this.state
+    let {keyword, keyword_type = 1, item_list, show_placeholder} = this.state
     return (
       <View style={{backgroundColor: colors.white}}>
         <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 6}}>
@@ -270,9 +271,21 @@ class SearchOrder extends PureComponent {
               width: 20,
               height: 20
             }}
+            autoFocus={true}
             searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
             clearIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
             cancelIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
+            placeholderTextColor={show_placeholder ? colors.color999 : colors.f5}
+            onBlur={() => {
+              this.setState({
+                show_placeholder: true
+              })
+            }}
+            onFocus={() => {
+              this.setState({
+                show_placeholder: false
+              })
+            }}
             inputContainerStyle={{
               backgroundColor: colors.f5,
               height: 32,
@@ -422,7 +435,7 @@ class SearchOrder extends PureComponent {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
-                 orderStatus={0}
+                 order_status={0}
       />
     );
   }

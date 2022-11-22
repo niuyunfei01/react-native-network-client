@@ -82,7 +82,7 @@ class SaveStore extends PureComponent {
       category_id_input_vlue_desc: '',
       category_desc: '',
       contact_name: '',
-      contact_phone: mobile,
+      contact_phone: '',
       verify_code: verify_code,
       city: '',
       show_back_modal: false,
@@ -410,13 +410,13 @@ class SaveStore extends PureComponent {
                            show_placeholder: true
                          })
                        }}
-                       multiline={true}
-                       numberOfLines={2}
                        onFocus={() => {
                          this.setState({
                            show_placeholder: false
                          })
                        }}
+                       multiline={true}
+                       numberOfLines={2}
                        onChangeText={store_name => {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
@@ -522,14 +522,14 @@ class SaveStore extends PureComponent {
             borderBottomWidth: type !== 'edit' ? 0.5 : 0,
             height: 56
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系电话 </Text>
+            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店电话 </Text>
             <TextInput placeholder="请填写门店联系电话"
                        underlineColorAndroid="transparent"
                        style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                        placeholderTextColor={'#999'}
                        maxLength={11}
                        keyboardType={'numeric'}
-                       editable={type !== 'register'}
+              // editable={type !== 'register'}
                        value={contact_phone}
                        onChangeText={value => {
                          // const newText = value.replace(/[^\d]+/, '');
@@ -546,7 +546,7 @@ class SaveStore extends PureComponent {
               height: 56
             }}>
               <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>推荐人ID </Text>
-              <TextInput placeholder="请填写推荐人(选填)"
+              <TextInput placeholder="请填写推荐人ID(选填)"
                          underlineColorAndroid="transparent"
                          style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                          placeholderTextColor={'#999'}
