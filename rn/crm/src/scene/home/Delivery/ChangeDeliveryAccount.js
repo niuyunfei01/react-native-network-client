@@ -171,7 +171,7 @@ class ChangeDeliveryAccount extends PureComponent {
     const {accessToken} = global;
     const {v2_type} = route.params.delivery;
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
-    const params = {store_id: store_id, choose_v2_type: v2_type}
+    const params = {real_store_id: store_id, choose_v2_type: v2_type}
     HttpUtils.get(api, params).then(res => {
       const {wsb_bind_deliveries = [], store_bind_deliveries = []} = res
       this.setState({
@@ -223,11 +223,9 @@ class ChangeDeliveryAccount extends PureComponent {
 
   render() {
     const {delivery = {}, deliveryStatusObj, deliveryType, openDeliveryVisible, store_id} = this.state
-    const {is_forbidden = 0} = delivery
-    const {apply_status = 2, account_desc = '', reason = ''} = deliveryStatusObj
-
+    const {is_forbidden = 0, bind_type = ''} = delivery
+    const {apply_status = '', account_desc = '', reason = '',} = deliveryStatusObj
     const {navigation} = this.props
-
     switch (apply_status) {
       case 0:
         status = '未申请'
@@ -258,8 +256,9 @@ class ChangeDeliveryAccount extends PureComponent {
                 {account_desc}
               </Text>
             </View>
-            <View style={styles.line}/>
-            <If condition={apply_status !== 2}>
+
+            <If condition={bind_type === 'wsb' && apply_status !== 2}>
+              <View style={styles.line}/>
               <View style={styles.deliveryRowWrap}>
                 <Text style={styles.deliveryTitle}>
                   状态

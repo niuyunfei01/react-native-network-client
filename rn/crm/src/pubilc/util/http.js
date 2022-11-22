@@ -42,8 +42,6 @@ class HttpUtils {
         version: DeviceInfo.getVersion(),
         build_number: DeviceInfo.getBuildNumber(),
         device_id: DeviceInfo.getUniqueId(),
-        store_id: 0,
-        vendor_id: 0,
         Accept: 'application/json',
         'Content-Type': 'application/json'
       }
@@ -57,7 +55,7 @@ class HttpUtils {
     let options = this.getOptions(method, params)
 
     if (props && props.global) {
-      const {vendor_id = 0,store_id = 0} = props.global
+      const {vendor_id = 0, store_id = 0} = props.global
       if (store_id && vendor_id) {
         options.headers.store_id = store_id || global.noLoginInfo.store_id
         options.headers.vendor_id = vendor_id || global.noLoginInfo.currVendorId

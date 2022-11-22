@@ -174,10 +174,9 @@ class LoginScene extends PureComponent {
     dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         dispatch(setCurrentStore(cfg?.store_id || currStoreId));
-        tool.resetNavStack(navigation, cfg?.show_bottom_tab ? Config.ROUTE_ORDERS : Config.ROUTE_ALERT, cfg?.show_bottom_tab ? {} : {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
+        tool.resetNavStack(navigation,
+          cfg?.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS,
+          cfg?.show_bottom_tab ? {initTab: Config.ROUTE_ORDERS, initialRouteName: Config.ROUTE_ALERT} : {});
         hideModal()
       } else {
         ToastShort(err_msg, 0);
