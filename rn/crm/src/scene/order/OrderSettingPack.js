@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {Dimensions, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -722,7 +722,7 @@ class OrderSettingScene extends Component {
   renderWeightModal = () => {
     let {showWeightModal, weight_min, weight_max, weight_input_value} = this.state;
     return (
-      <JbbModal visible={showWeightModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={showWeightModal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View>
@@ -805,17 +805,16 @@ class OrderSettingScene extends Component {
   renderGoodsPriceModal = () => {
     let {showGoodsPriceModal, goods_price_value, goods_price_input_value, goods_price} = this.state;
     return (
-      <JbbModal visible={showGoodsPriceModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={showGoodsPriceModal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
-
             <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
-
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{
@@ -858,7 +857,7 @@ class OrderSettingScene extends Component {
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
+                  width: width * 0.56,
                   height: 36,
                   borderRadius: 4,
                   borderWidth: 0.5,
@@ -899,9 +898,11 @@ class OrderSettingScene extends Component {
   renderSmartModal = () => {
     let {show_smart_modal, address, name, street_block, mobile} = this.state;
     return (
-      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_smart_modal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -976,8 +977,11 @@ class OrderSettingScene extends Component {
   renderContentModal = () => {
     let {showContentModal, remark} = this.state;
     return (
-      <JbbModal visible={showContentModal} onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={showContentModal}
+        onClose={this.closeModal}
+        HighlightStyle={{padding: 0}}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -987,8 +991,7 @@ class OrderSettingScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               备注
             </Text>
-
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} />
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea

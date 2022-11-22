@@ -2,17 +2,16 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
+  Animated,
   Dimensions,
   Image,
   ImageBackground,
   InteractionManager,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  Animated
+  View
 } from 'react-native';
 import HttpUtils from "../../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";

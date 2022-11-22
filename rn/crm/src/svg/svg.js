@@ -1238,7 +1238,7 @@ export const this_up = (width = 16, height = 16) => {
 }
 
 
-export const search_icon = (color='#333333') => {
+export const search_icon = (color = '#333333') => {
   return (
     `
 <svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -2580,7 +2580,6 @@ export const empty_order = () => {
 }
 
 
-
 export const local_icon = () => {
   return (
     `
@@ -2603,7 +2602,6 @@ export const local_icon = () => {
 }
 
 
-
 export const id_icon = () => {
   return (
     `
@@ -2624,7 +2622,6 @@ export const id_icon = () => {
     `
   )
 }
-
 
 
 export const class_icon = () => {

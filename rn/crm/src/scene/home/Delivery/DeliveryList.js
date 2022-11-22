@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions} from 'react-native'
+import {Dimensions, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
@@ -233,7 +233,7 @@ class DeliveryList extends PureComponent {
     return (
       <View style={styles.headerWrap}>
         <SvgXml height={32} width={32} onPress={() => this.props.navigation.goBack()}
-          xml={show_select_store ? back() : head_cross_icon()}/>
+                xml={show_select_store ? back() : head_cross_icon()}/>
         <If condition={!only_one_store}>
           <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
             <Text style={styles.headerText}>{store_name}</Text>

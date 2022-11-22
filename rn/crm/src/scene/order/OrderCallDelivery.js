@@ -4,7 +4,6 @@ import {
   Alert,
   Dimensions,
   Modal,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -1220,7 +1219,7 @@ class OrderCallDelivery extends Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_worker_delivey_modal}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
@@ -1305,7 +1304,7 @@ class OrderCallDelivery extends Component {
   renderWeightModal = () => {
     let {show_weight_modal, weight_min, weight_max, weight_input_value, weight_step} = this.state;
     return (
-      <JbbModal visible={show_weight_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_weight_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View>
@@ -1398,9 +1397,11 @@ class OrderCallDelivery extends Component {
   renderGoodsPriceModal = () => {
     let {show_goods_price_modal, order_money_value, order_money, order_money_input_value} = this.state;
     return (
-      <JbbModal visible={show_goods_price_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_goods_price_modal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1460,7 +1461,7 @@ class OrderCallDelivery extends Component {
                   fontSize: 14,
                   height: 36,
                   borderRadius: 4,
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
+                  width: width * 0.56,
                   borderWidth: 0.5,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
@@ -1502,8 +1503,10 @@ class OrderCallDelivery extends Component {
   renderRemarkModal = () => {
     let {show_remark_modal, remark_input_value, remark} = this.state;
     return (
-      <JbbModal visible={show_remark_modal} onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_remark_modal}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',

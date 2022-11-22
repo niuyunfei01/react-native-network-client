@@ -159,7 +159,6 @@ export function setPrinterName(printerInfo) {
 }
 
 
-
 export function setFloatSerciceIcon(show) {
   return {
     type: SET_SHOW_FLOAT_SERVICE_ICON,

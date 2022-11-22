@@ -392,7 +392,7 @@ class RegisterShunfeng extends PureComponent {
     )
   }
 
-  find =async () => {
+  find = async () => {
     try {
       const {currVendorId} = tool.vendor(this.props.global)
       const data = {
@@ -402,7 +402,7 @@ class RegisterShunfeng extends PureComponent {
         m: this.props.global.currentUserProfile.mobilephone,
         place: 'mine'
       }
-     await JumpMiniProgram("/pages/service/index", data);
+      await JumpMiniProgram("/pages/service/index", data);
     } catch (e) {
       showError('打开小程序失败')
     }

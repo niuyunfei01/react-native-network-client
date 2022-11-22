@@ -1,18 +1,9 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  InteractionManager,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";

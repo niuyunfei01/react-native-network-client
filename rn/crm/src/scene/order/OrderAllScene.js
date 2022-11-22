@@ -435,7 +435,6 @@ class OrderAllScene extends Component {
     } = this.state;
     return (
       <JbbModal visible={show_date_modal} onClose={this.closeModal} modal_type={'bottom'}
-                modalStyle={{padding: 0}}
       >
         <View>
           <View style={{

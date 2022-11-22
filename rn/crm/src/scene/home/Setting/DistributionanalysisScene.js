@@ -423,13 +423,16 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.loss_ratio} </Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
+                    <TouchableOpacity style={styles.cardLabelContent}
+                                      onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
                       <Entypo name="help-with-circle"
                               style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
-                      <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
+                    <TouchableOpacity style={styles.cardContent}
+                                      onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
+                      <Text
+                        style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
                       <If condition={allowChange && item?.show_update > 0}>
                         <Text style={{color: colors.main_color}}>修改 </Text>
                         <Entypo name="chevron-thin-right" style={styles.iconShow}/>
@@ -445,7 +448,8 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
+                    <TouchableOpacity style={styles.cardLabelContent}
+                                      onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
                       <Entypo name="help-with-circle"
                               style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
@@ -574,7 +578,11 @@ class DistributionAnalysisScene extends PureComponent {
           <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>{promptTitle} </Text>
           </View>
-          <Text style={{color: colors.color333, fontSize: 15, marginVertical: 15}}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
+          <Text style={{
+            color: colors.color333,
+            fontSize: 15,
+            marginVertical: 15
+          }}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
           <Button title={'知道了'}
                   onPress={() => this.promptingMessage(false)}
                   containerStyle={{flex: 1}}

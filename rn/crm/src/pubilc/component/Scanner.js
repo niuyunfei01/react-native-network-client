@@ -23,7 +23,7 @@ const barCodeTypes = [
   // RNCamera.Constants.BarCodeType.code39,
   // RNCamera.Constants.BarCodeType.code39mod43,
   // RNCamera.Constants.BarCodeType.code93,
-   RNCamera.Constants.BarCodeType.ean13,
+  RNCamera.Constants.BarCodeType.ean13,
   // RNCamera.Constants.BarCodeType.ean8,
   // RNCamera.Constants.BarCodeType.pdf417,
   // RNCamera.Constants.BarCodeType.upc_e,
@@ -79,7 +79,7 @@ class Scanner extends React.Component {
   onGoogleVisionBarcodesDetected = (event) => {
 
     const {barcodes = []} = event
-    console.log('barcodes',barcodes)
+    console.log('barcodes', barcodes)
     if (barcodes[0] && allowPlay) {
       allowPlay = false
       this.props.onScanSuccess && this.props.onScanSuccess(barcodes[0].data)

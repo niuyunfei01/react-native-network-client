@@ -165,10 +165,16 @@ class SettlementGatherScene extends PureComponent {
                 style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
               >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontSize: pxToDp(32), color: colors.main_color, fontWeight: '900', marginRight: pxToDp(10)}}>
+                  <Text style={{
+                    fontSize: pxToDp(32),
+                    color: colors.main_color,
+                    fontWeight: '900',
+                    marginRight: pxToDp(10)
+                  }}>
                     {key}
                   </Text>
-                  <Text style={{color: colors.color666, fontSize: pxToDp(28), fontWeight: '100', marginLeft: pxToDp(20)}}>
+                  <Text
+                    style={{color: colors.color666, fontSize: pxToDp(28), fontWeight: '100', marginLeft: pxToDp(20)}}>
                     共{tool.toFixed(this.arraySum(item))}
                   </Text>
 

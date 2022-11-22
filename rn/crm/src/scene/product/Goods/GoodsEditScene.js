@@ -2,7 +2,8 @@ import React, {PureComponent} from "react";
 import {
   Alert,
   Dimensions,
-  FlatList, InteractionManager,
+  FlatList,
+  InteractionManager,
   Keyboard,
   SafeAreaView,
   StyleSheet,
@@ -1367,18 +1368,18 @@ class GoodsEditScene extends PureComponent {
           </Text>
           <If condition={index === 0 && 'add' !== type && parseInt(series_id) > 0}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
-              onPress={() =>
-                this.onPress(
-                  Config.ROUTE_GOODS_SELECT_SPEC,
-                  {
-                    series_id: series_id,
-                    store_id: currStoreId,
-                    onBack: resp => {
-                      this.setPushSpec(resp)
-                    }
-                  }
-                )
-              }
+                              onPress={() =>
+                                this.onPress(
+                                  Config.ROUTE_GOODS_SELECT_SPEC,
+                                  {
+                                    series_id: series_id,
+                                    store_id: currStoreId,
+                                    onBack: resp => {
+                                      this.setPushSpec(resp)
+                                    }
+                                  }
+                                )
+                              }
             >
               <Text style={{color: colors.main_color, fontSize: 14}}>选择规格 </Text>
               <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
@@ -1405,43 +1406,43 @@ class GoodsEditScene extends PureComponent {
           <View style={styles.rightEmptyView}/>
         </View>
         <LineView/>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            报价
+            <Text style={styles.leftFlag}>
+              *
+            </Text>
+          </Text>
+          <TextInput
+            keyboardType={'numeric'}
+            value={supply_price}
+            //editable={this.isStoreProdEditable()}
+            onChangeText={value => this.setMultiSpecsInfo(index, 'supply_price', value)}
+            style={styles.textInputStyle}
+            placeholderTextColor={colors.color999}
+            placeholder={'请输入商品报价'}/>
+          <View style={styles.rightEmptyView}/>
+        </View>
+        <LineView/>
+        <If condition={price_type === 1}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
-              报价
+              零售价格
               <Text style={styles.leftFlag}>
                 *
               </Text>
             </Text>
             <TextInput
               keyboardType={'numeric'}
-              value={supply_price}
-              //editable={this.isStoreProdEditable()}
-              onChangeText={value => this.setMultiSpecsInfo(index, 'supply_price', value)}
+              value={price}
+              onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
               style={styles.textInputStyle}
               placeholderTextColor={colors.color999}
-              placeholder={'请输入商品报价'}/>
+              placeholder={'请输入商品零售价格'}/>
             <View style={styles.rightEmptyView}/>
           </View>
           <LineView/>
-          <If condition={price_type === 1}>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                零售价格
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>
-              </Text>
-              <TextInput
-                keyboardType={'numeric'}
-                value={price}
-                onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
-                style={styles.textInputStyle}
-                placeholderTextColor={colors.color999}
-                placeholder={'请输入商品零售价格'}/>
-              <View style={styles.rightEmptyView}/>
-            </View>
-            <LineView/>
-          </If>
+        </If>
 
         <If condition={!vendor_has && !store_has || 'add' !== type}>
           <View style={styles.baseRowCenterWrap}>
@@ -1512,7 +1513,8 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <View style={multiSpecsList.length > 1 ? styles.operationSpecsBtnWrap : {}}>
-          <If condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has && (parseInt(series_id) <= 0 || 'add' === type)}>
+          <If
+            condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has && (parseInt(series_id) <= 0 || 'add' === type)}>
             <TouchableOpacity style={styles.addSpecsWrap} onPress={this.addSpecs}>
               <AntDesign name={'plus'} size={12} color={colors.main_color}/>
               <Text style={styles.addSpecsText}>

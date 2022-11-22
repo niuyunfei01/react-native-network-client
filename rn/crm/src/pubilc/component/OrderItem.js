@@ -240,7 +240,7 @@ class OrderItem extends React.PureComponent {
     let {show_call_user_modal} = this.state;
     let {item} = this.props;
     return (
-      <JbbModal visible={show_call_user_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_call_user_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View style={{
@@ -324,7 +324,7 @@ class OrderItem extends React.PureComponent {
   renderPickModal = () => {
     let {verification_modal, pickupCode, err_msg} = this.state;
     return (
-      <JbbModal visible={verification_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={verification_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'center'}>
         <View style={{paddingHorizontal: 12, paddingVertical: 15}}>

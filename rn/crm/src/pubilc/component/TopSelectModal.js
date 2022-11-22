@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StyleSheet, Text, TouchableHighlight, TouchableOpacity, FlatList} from 'react-native'
+import {FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity} from 'react-native'
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import colors from "../styles/colors";
 

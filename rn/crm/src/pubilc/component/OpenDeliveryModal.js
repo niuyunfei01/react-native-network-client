@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Text, TouchableOpacity, View, StyleSheet, TextInput, InteractionManager} from "react-native";
+import {InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CommonModal from "./goods/CommonModal";
 import {connect} from "react-redux";
 import Config from "../common/config";

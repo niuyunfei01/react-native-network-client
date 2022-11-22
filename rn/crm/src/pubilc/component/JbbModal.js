@@ -1,17 +1,16 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ScrollView, TouchableHighlight, TouchableOpacity, View} from 'react-native'
+import {KeyboardAvoidingView, Modal, Platform, TouchableOpacity} from 'react-native'
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
-const height = Dimensions.get("window").height;
+const {height, width} = Dimensions.get("window");
 
 class JbbModal extends PureComponent {
   static propTypes = {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
     modal_type: PropTypes.string,
-    modalStyle: PropTypes.object,
     children: PropTypes.object,
     HighlightStyle: PropTypes.object,
   }
@@ -20,44 +19,42 @@ class JbbModal extends PureComponent {
   }
 
   render() {
+    let {modal_type, onClose, visible, children, HighlightStyle} = this.props;
     return (
       <Modal hardwareAccelerated={true}
-             onRequestClose={this.props.onClose}
-             maskClosable transparent={true}
-             animationType="fade"
-             visible={this.props.visible}>
-        <TouchableOpacity onPress={this.props.onClose} style={[{
+             onRequestClose={onClose}
+             transparent={true}
+             animationType="slide"
+             visible={visible}>
+        <TouchableOpacity onPress={onClose} style={{
           backgroundColor: 'rgba(0,0,0,0.25)',
-        }, this.props.modal_type && this.props.modal_type === 'center' ? {
+          flexGrow: 1,
+          flexDirection: 'row',
           justifyContent: 'center',
-          alignItems: 'center',
-          flexGrow: 1
-        } : {flex: 1}]}>
-          <If condition={this.props.modal_type !== 'center'}>
-            <View style={{flexGrow: 1}}/>
-          </If>
-          <TouchableHighlight style={[{
-            backgroundColor: colors.white,
-            maxHeight: height * 0.8
-          }, this.props.modal_type && this.props.modal_type === 'center' ? {
-            borderRadius: 15,
-            width: '88%',
-          } : {
-            borderTopLeftRadius: 15,
-            borderTopRightRadius: 15,
-            paddingBottom: 20,
-          }, this.props.HighlightStyle]}>
-
-            <ScrollView
-              automaticallyAdjustContentInsets={false}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false} style={[{
+          alignItems: modal_type !== 'center' ? 'flex-end' : 'center',
+        }}>
+          <KeyboardAvoidingView
+            scrollEnabled={false}
+            enableOnAndroid={false}
+            automaticallyAdjustContentInsets={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            behavior={Platform.select({android: 'height', ios: 'padding'})}
+            style={[{
               padding: 10,
-            }, this.props.modalStyle]}>
-              {this.props.children}
-            </ScrollView>
-
-          </TouchableHighlight>
+              backgroundColor: colors.white,
+              maxHeight: height * 0.8
+            }, modal_type === 'center' ? {
+              borderRadius: 15,
+              width: '88%',
+            } : {
+              width: width,
+              borderTopLeftRadius: 15,
+              borderTopRightRadius: 15,
+              paddingBottom: 20,
+            }, HighlightStyle]}>
+            {children}
+          </KeyboardAvoidingView>
         </TouchableOpacity>
       </Modal>
     )

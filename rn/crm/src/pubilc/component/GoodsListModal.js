@@ -117,7 +117,7 @@ class GoodsListModal extends React.Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_goods_list_modal}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',

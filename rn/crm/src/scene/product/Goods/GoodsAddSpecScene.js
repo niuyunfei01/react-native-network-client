@@ -1,14 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Alert,
-  Dimensions,
-  InteractionManager,
-  ScrollView,
-  StyleSheet,
-  Text, TextInput,
-  View
-} from 'react-native';
+import {Alert, Dimensions, InteractionManager, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {Button} from "react-native-elements";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
@@ -214,7 +206,9 @@ class GoodsAddSpecScence extends PureComponent {
     return (
       <View style={styles.bottomBtn}>
         <Button title={'提交'}
-                onPress={() => {this.submitSpec()}}
+                onPress={() => {
+                  this.submitSpec()
+                }}
                 containerStyle={{flex: 1}}
                 buttonStyle={styles.btn}
                 titleStyle={styles.btnTitle}
@@ -289,7 +283,13 @@ const styles = StyleSheet.create({
   },
   selectWeight: {flex: 1, flexDirection: 'row', alignItems: 'center', width: 40, justifyContent: 'center'},
   selectWeightLabel: {fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 17},
-  weightRow: {justifyContent: "space-between", borderTopWidth: 1, borderTopColor: colors.e5, borderBottomColor: colors.e5, borderBottomWidth: 1}
+  weightRow: {
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderTopColor: colors.e5,
+    borderBottomColor: colors.e5,
+    borderBottomWidth: 1
+  }
 });
 
 export default connect(mapStateToProps)(GoodsAddSpecScence)

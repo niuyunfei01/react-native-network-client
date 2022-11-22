@@ -416,7 +416,6 @@ class ProfitAndLoss extends PureComponent {
     let {showModal, startDate, endDate} = this.state;
     return (
       <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}
-                modalStyle={{padding: 0}}
       >
         <View style={{
           flexDirection: "row",
