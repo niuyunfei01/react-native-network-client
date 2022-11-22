@@ -11,7 +11,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Animated
 } from 'react-native';
 import HttpUtils from "../../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -157,7 +158,9 @@ class Mine extends PureComponent {
       menu_list: menu_list,
       activity: [],
       img: '',
-      show_freeze_balance_alert: false
+      show_freeze_balance_alert: false,
+      headerOpacity: new Animated.Value(0),
+      headerHeight: new Animated.Value(0),
     }
   }
 
@@ -211,10 +214,7 @@ class Mine extends PureComponent {
     let {currStoreId} = this.state;
     const {accessToken} = this.props.global
     const api = `/v4/wsb_user/personalCenter`;
-    HttpUtils.get.bind(this.props)(api, {
-      store_id: currStoreId,
-      access_token: accessToken
-    }).then(res => {
+    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId, access_token: accessToken}).then(res => {
       this.setState({
         storeInfo: {
           store_name: res.store_name,
@@ -229,9 +229,7 @@ class Mine extends PureComponent {
   fetchWsbWallet = () => {
     const {accessToken} = this.props.global
     const api = `/v4/wsbWallet/balance`;
-    HttpUtils.get.bind(this.props)(api, {
-      access_token: accessToken
-    }).then(res => {
+    HttpUtils.get.bind(this.props)(api, {access_token: accessToken}).then(res => {
       this.setState({
         balanceInfo: {
           balance: res.balance,
@@ -421,12 +419,8 @@ class Mine extends PureComponent {
 
   renderHeader = () => {
     return (
-      <View
-        style={headerRightStyles.resetBind}>
-        <TouchableOpacity style={{
-          width: 90,
-          height: 32,
-        }} onPress={() => this.navigateToBack()}>
+      <View style={headerRightStyles.resetBind}>
+        <TouchableOpacity style={{width: 90, height: 32}} onPress={() => this.navigateToBack()}>
           <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => this.JumpToServices()} style={headerRightStyles.rightBtn}>
@@ -455,9 +449,7 @@ class Mine extends PureComponent {
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
-          <TouchableOpacity onPress={() => {
-            this.jumpToAddStore()
-          }} style={styles.storeContent}>
+          <TouchableOpacity onPress={() => this.jumpToAddStore()} style={styles.storeContent}>
             <Text style={styles.storeName}>
               {tool.jbbsubstr(storeInfo?.store_name, 12)}
             </Text>
@@ -628,7 +620,7 @@ class Mine extends PureComponent {
       <For of={menu_list} each='item' index='index'>
         <View style={[styles.zoneWrap]} key={index}>
           <Text style={styles.zoneWrapTitle}>{item?.title} </Text>
-          <View style={{flexDirection: 'row', justifyContent: 'center', flex: 1}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
             <View style={styles.flexRowWrap}>
               <For of={item?.items} each='info' index='index'>
                 <TouchableOpacity style={[block_styles.block_box]} key={index}
@@ -695,21 +687,54 @@ class Mine extends PureComponent {
   }
 
 
+  onScroll = ({nativeEvent}) => {
+    const {y} = nativeEvent.contentOffset
+    this.contentOffset = y
+    let headerOpacity = y / 130
+    let headerHeight = y / 130 * 100
+    if (headerHeight >= 44)
+      headerHeight = 44
+    if (headerHeight <= 0)
+      headerHeight = 0
+    if (headerOpacity <= 0)
+      headerOpacity = 0
+    if (headerOpacity >= 1)
+      headerOpacity = 1
+    this.setState({headerOpacity: headerOpacity, headerHeight: headerHeight})
+
+  }
+
+  renderMineHeader = () => {
+    const {headerOpacity, headerHeight} = this.state
+    return (
+      <Animated.View style={[styles.showHeaderWrap, {opacity: headerOpacity, height: headerHeight}]}>
+        <Entypo name="chevron-thin-left" style={styles.showHeaderBackIcon} onPress={this.navigateToBack}/>
+        <Text style={styles.showHeaderText}>我的</Text>
+        <TouchableOpacity onPress={() => this.JumpToServices()} style={styles.showHeaderRightWrap}>
+          <SvgXml xml={Service(18, 18, colors.color333)}/>
+          <Text style={styles.showHeaderRightText}>联系客服 </Text>
+        </TouchableOpacity>
+      </Animated.View>
+    )
+  }
+
   render() {
     let {isRefreshing} = this.state;
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh}/>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={() => this.onRefresh()}
-              tintColor='gray'
-            />}
-          style={styles.Content}>
+        {this.renderMineHeader()}
+        <Animated.ScrollView onScroll={event => this.onScroll(event)}
+                             scrollEventThrottle={16}
+                             refreshControl={
+                               <RefreshControl
+                                 refreshing={isRefreshing}
+                                 onRefresh={() => this.onRefresh()}
+                                 tintColor='gray'
+                               />}
+                             style={styles.Content}>
           {this.renderStore()}
-          <View style={{position: "relative", top: -53, paddingHorizontal: 12}}>
+          <View style={{top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
             {this.renderFreezeBalanceAlertModal()}
             {this.renderValueAdded()}
@@ -718,13 +743,24 @@ class Mine extends PureComponent {
             {this.renderLoginOut()}
             {this.renderCopyRight()}
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+
+  showHeaderWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+  },
+  showHeaderBackIcon: {fontSize: 20, color: colors.color333, marginHorizontal: 12, width: 80},
+  showHeaderText: {fontSize: 17, fontWeight: 'bold', color: colors.color333,},
+  showHeaderRightWrap: {flexDirection: 'row', alignItems: 'center', marginRight: 12, width: 80},
+  showHeaderRightText: {fontSize: 14, fontWeight: 'bold', color: colors.color333, paddingLeft: 4},
   Content: {backgroundColor: '#F5F5F5'},
   storeInfoBox: {
     flexDirection: "row",
@@ -802,42 +838,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.white
   },
-  ValueAddBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 15,
-    paddingHorizontal: 11
-  },
-  ValueAddBoxLeft: {flexDirection: "row", alignItems: "center"},
-  ValueAddBtn: {
-    fontWeight: '400',
-    fontSize: 12,
-    color: '#AD6500'
-  },
-  ValueAddIcon: {
-    fontSize: 12,
-    color: '#AD6500'
-  },
-  content: {
-    width: width * 0.92,
-    marginLeft: width * 0.04,
-    height: 250,
-    borderRadius: 6,
-    backgroundColor: colors.white,
-    marginTop: 10
-  },
-  ValueAddLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#985800',
-    marginRight: 5
-  },
-  ValueAddDesc: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#C5852C'
-  },
+
   zoneWrap: {
     backgroundColor: colors.white,
     borderRadius: 6,

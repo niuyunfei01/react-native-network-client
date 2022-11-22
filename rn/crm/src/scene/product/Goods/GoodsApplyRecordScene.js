@@ -18,6 +18,7 @@ import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBott
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import HttpUtils from "../../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -98,21 +99,23 @@ class GoodsApplyRecordScene extends Component {
     }
     showModal('加载中')
     let {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-    dispatch(
-      fetchApplyRocordList(viewStoreId, auditStatus, page, accessToken, async resp => {
-        if (resp.ok) {
-          let {total_page, audit_list = []} = resp.obj;
-          this.setState({
-            list: refresh ? audit_list : list.concat(audit_list),
-            total_page: total_page,
-            curr_page: page
-          });
-        }
-        hideModal()
-        this.setState({pullLoading: false, refresh: false, query: false});
-      })
-    );
+    const url = `api/store_audit_list/${viewStoreId}/${auditStatus}/${page}.json?access_token=${accessToken}`
+    HttpUtils.get(url).then(res => {
+      let {total_page, audit_list = []} = res;
+      this.setState({
+        list: refresh ? audit_list : list.concat(audit_list),
+        total_page: total_page,
+        curr_page: page,
+        pullLoading: false,
+        refresh: false,
+        query: false
+      });
+
+    }).catch(error => {
+      hideModal()
+      this.setState({pullLoading: false, refresh: false, query: false});
+    })
+
   }
 
   renderTitle() {
@@ -198,7 +201,7 @@ class GoodsApplyRecordScene extends Component {
   renderItem = ({item}) => {
     const {
       audit_status, auto_reject_time, product_id, store_id, apply_price, cover_img, product_name, created, before_price,
-      audit_desc, remark, lower, upper, id
+      audit_desc, remark, lower, upper, id, act_plat_1, act_plat_3, act_plat_7, is_act
     } = item
     const {auditStatus, isKf} = this.state
     return (
@@ -212,9 +215,11 @@ class GoodsApplyRecordScene extends Component {
           <View style={{flex: 3, marginLeft: 8}}>
 
             <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
-              {/*<View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View> <View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text></View> <View*/}
-              {/*style={styles.eWrap}><Text style={styles.eText}>饿</Text></View> <View style={styles.huoWrap}><Text*/}
-              {/*style={styles.huoText}>活</Text></View> */}{product_name}
+              <If condition={act_plat_3}><View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View>
+              </If> <If condition={act_plat_7}><View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text>
+            </View></If> <If condition={act_plat_1}><View style={styles.eWrap}><Text style={styles.eText}>饿</Text>
+            </View></If> <If condition={is_act}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
+            </View> </If> {product_name}
             </Text>
             <Text style={styles.name_time}>
               #{product_id} {tool.fullDateOther(created)}
