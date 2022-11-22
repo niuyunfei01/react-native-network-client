@@ -1,12 +1,9 @@
 import React, {PureComponent} from "react";
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions} from 'react-native'
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import {hideModal, showModal,} from "../../../pubilc/util/ToastUtils";
-import * as globalActions from "../../../reducers/global/globalActions";
-import {bindActionCreators} from "redux";
-import {unDisable} from "../../../reducers/mine/mineActions";
 import FastImage from "react-native-fast-image";
 import Config from "../../../pubilc/common/config";
 import TopSelectModal from "../../../pubilc/component/TopSelectModal";
@@ -15,28 +12,19 @@ import {SvgXml} from "react-native-svg";
 import {back, down, head_cross_icon} from "../../../svg/svg";
 import PropTypes from "prop-types";
 
-function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global};
-}
+const {width} = Dimensions.get('window')
 
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({unDisable, ...globalActions}, dispatch)
-  }
-}
-
+const mapStateToProps = ({global}) => ({global: global})
 
 class DeliveryList extends PureComponent {
   static propTypes = {
-    dispatch: PropTypes.func,
     route: PropTypes.object,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      show_select_store: this.props.route.params?.show_select_store !== undefined ? this.props.route.params?.show_select_store : true,
+      show_select_store: props.route.params?.show_select_store !== undefined ? props.route.params?.show_select_store : true,
       in_review_deliveries: [],
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
@@ -46,7 +34,7 @@ class DeliveryList extends PureComponent {
       platformId: 0,
       selectStoreVisible: false,
       selectDelivery: {},
-      store_id: this.props.route.params?.store_id !== undefined ? this.props.route.params?.store_id : props.global?.store_id,
+      store_id: props.route.params?.store_id !== undefined ? props.route.params?.store_id : props.global?.store_id,
       store_name: props.global?.store_info?.name,
       storeList: [],
       page_size: 10,
@@ -102,8 +90,8 @@ class DeliveryList extends PureComponent {
     const {accessToken} = this.props.global
     const {store_id} = this.state
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
-    const params = {real_store_id: store_id}
-    HttpUtils.post(api, params).then((res) => {
+    const params = {real_store_id: store_id, choose_v2_type: 0}
+    HttpUtils.get(api, params).then((res) => {
       hideModal()
       const {
         in_review_deliveries = [], store_bind_deliveries = [], wsb_bind_deliveries = [], wsb_unbind_deliveries = []
@@ -155,9 +143,7 @@ class DeliveryList extends PureComponent {
                     <FastImage resizeMode={FastImage.resizeMode.contain}
                                source={{uri: icon}}
                                style={styles.itemImage}/>
-                    <Text style={styles.itemText}>
-                      {name}
-                    </Text>
+                    <Text style={styles.itemText}>{name}  </Text>
                   </TouchableOpacity>
                 )
               })
@@ -202,7 +188,7 @@ class DeliveryList extends PureComponent {
     const {navigation} = this.props
     return (
       <View style={{flex: 1}}>
-        {this.renderHead()}
+        {this.renderHeader()}
         {this.getTip()}
         <ScrollView>
           {this.getDeliveries(in_review_deliveries, '审核中的省钱配送', 1)}
@@ -233,39 +219,33 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  renderHead = () => {
+  selectStore = () => {
+    let {show_select_store} = this.state;
+    if (show_select_store) {
+      this.setState({
+        selectStoreVisible: true
+      })
+    }
+  }
+  renderHeader = () => {
     let {store_name, show_select_store} = this.state;
     const {only_one_store} = this.props.global;
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 44,
-        backgroundColor: colors.white,
-        paddingHorizontal: 6,
-      }}>
-        <SvgXml style={{height: 44, marginRight: 8}} height={32} width={32} onPress={() => {
-          this.props.navigation.goBack()
-        }} xml={show_select_store ? back() : head_cross_icon()}/>
-        <Text onPress={() => {
-          if (show_select_store) {
-            this.setState({
-              selectStoreVisible: true
-            })
-          }
-        }} style={{
-          color: colors.color333,
-          fontSize: 17,
-          fontWeight: 'bold',
-          lineHeight: 24,
-          marginRight: 40,
-          flex: 1,
-          textAlign: 'center'
-        }}> {store_name}
-          <If condition={!only_one_store && show_select_store}>
-            <SvgXml xml={down(20, 20)}/>
-          </If>
-        </Text>
+      <View style={styles.headerWrap}>
+        <SvgXml height={32} width={32} onPress={() => this.props.navigation.goBack()}
+          xml={show_select_store ? back() : head_cross_icon()}/>
+        <If condition={!only_one_store}>
+          <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
+            <Text style={styles.headerText}>{store_name}</Text>
+            <If condition={!only_one_store && show_select_store}>
+              <SvgXml xml={down(20, 20)}/>
+            </If>
+          </TouchableOpacity>
+        </If>
+        <If condition={only_one_store}>
+          <Text style={styles.headerText}>配送管理</Text>
+        </If>
+        <View/>
       </View>
     )
   }
@@ -274,14 +254,30 @@ class DeliveryList extends PureComponent {
 const styles = StyleSheet.create({
   zoneHeaderText: {fontSize: 15, fontWeight: 'bold', color: colors.color333, padding: 12},
   zoneWrap: {backgroundColor: colors.white, marginHorizontal: 12, marginBottom: 10, borderRadius: 6},
-  headerText: {fontSize: 15, fontWeight: 'bold', color: colors.color333, textAlign: 'center'},
-  allItemWrap: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
+  headerWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    paddingHorizontal: 6,
+  },
+  headerTextWrap: {flexDirection: 'row', alignItems: 'center',},
+  headerText: {
+    color: colors.color333,
+    fontSize: 17,
+    fontWeight: 'bold',
+    lineHeight: 24,
+    marginRight: 4,
+    textAlign: 'center'
+  },
+  allItemWrap: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', paddingBottom: 5},
   itemWrap: {
     backgroundColor: '#F9F9F9',
     borderRadius: 4,
     marginLeft: 12,
     marginBottom: 10,
-    width: 150,
+    width: (width - 4 * 12 - 10) / 2,
     height: 90,
     alignItems: 'center',
     justifyContent: 'center'
@@ -345,4 +341,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeliveryList)
+export default connect(mapStateToProps)(DeliveryList)

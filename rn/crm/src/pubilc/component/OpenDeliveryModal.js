@@ -149,9 +149,9 @@ class OpenDeliveryModal extends PureComponent {
         store_id: store_id,
         phone: phone
       }).then(res => {
-        ToastShort(res.desc)
+        ToastShort(res.desc, 1)
       }).catch((reason) => {
-        ToastShort(reason.desc)
+        ToastShort(reason.desc, 1)
       })
     }
   }
@@ -161,23 +161,23 @@ class OpenDeliveryModal extends PureComponent {
     if (count_down <= 0) {
       const params = {access_token: accessToken, vendorId: vendor_id}
       HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(res => {
-        ToastShort(res.desc)
+        ToastShort(res.desc, 1)
       }).catch((reason) => {
-        ToastShort(reason.desc)
+        ToastShort(reason.desc, 1)
       })
     }
   }
   getVerificationCode = () => {
     const {mobile, deliveryType, count_down} = this.state
     if (!mobile) {
-      ToastShort('请输入手机号', 2)
+      ToastShort('请输入手机号', 1)
       return
     }
     if (count_down > 0) {
-      ToastShort('请稍后重试', 2)
+      ToastShort('请稍后重试', 1)
       return
     }
-    showSuccess('验证码发送成功！')
+    showSuccess('验证码发送成功！', 1)
     if (deliveryType === Config.UU_PAO_TUI)
       this.getUUPTPhoneCode()
     if (deliveryType === Config.GUO_XIAO_DI)
@@ -243,9 +243,9 @@ class OpenDeliveryModal extends PureComponent {
 
   openWSBDelivery = () => {
     const {fetchData, global, store_id, delivery} = this.props
-    const {platformId,} = this.state
+    const {v2_type} = delivery
     const {accessToken} = global
-    let data = {store_id: store_id, platform: platformId}
+    let data = {store_id: store_id, platform: v2_type}
 
     const url = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
     HttpUtils.post(url, data).then(async () => {
@@ -379,7 +379,7 @@ class OpenDeliveryModal extends PureComponent {
         if (selectAccountType === 1)
           this.openWSBDelivery()
         if (selectAccountType === 2)
-          this.requestUrl(delivery.type)
+          await this.requestUrl(delivery.type)
         break
       case Config.UU_PAO_TUI:
         if (selectGeneralDelivery)

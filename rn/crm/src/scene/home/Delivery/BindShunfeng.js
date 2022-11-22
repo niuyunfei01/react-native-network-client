@@ -645,28 +645,25 @@ class BindShunfeng extends PureComponent {
                   </View>
                 </View>
                 <Text style={styles.modalTipText}>营业执照</Text>
-                <View style={{backgroundColor: colors.white}}>
-                  <View style={styles.rowCenter}>
-                    <BackgroundImage style={styles.uploadImageWrap} source={exampleImg}>
-                      <Text style={styles.exampleImageText}>示例图</Text>
-                    </BackgroundImage>
-                    <TouchableOpacity style={styles.uploadImageWrap} onPress={this.uploadImageItem}>
-                      <If condition={business_license}>
-                        <FastImage style={{width: 148, height: 102}}
-                                   source={{uri: business_license}}
-                                   resizeMode={FastImage.resizeMode.contain}/>
-                        <SvgXml xml={closeRound(32, 32)}
-                                style={styles.deleteImage}
-                                onPress={() => this.setStoreInfo('business_license', '')}/>
-                      </If>
-                      <If condition={!business_license}>
-                        <Text style={{fontSize: 32, color: colors.color999}}>+</Text>
-                        <Text style={styles.uploadImageTipText}>点击上传营业执照</Text>
-                      </If>
+                <View style={styles.rowCenter}>
+                  <BackgroundImage style={styles.uploadImageWrap} source={exampleImg}>
+                    <Text style={styles.exampleImageText}>示例图</Text>
+                  </BackgroundImage>
+                  <TouchableOpacity style={styles.uploadImageWrap} onPress={this.uploadImageItem}>
+                    <If condition={business_license}>
+                      <FastImage style={{width: 148, height: 102}}
+                                 source={{uri: business_license}}
+                                 resizeMode={FastImage.resizeMode.contain}/>
+                      <SvgXml xml={closeRound(32, 32)}
+                              style={styles.deleteImage}
+                              onPress={() => this.setStoreInfo('business_license', '')}/>
+                    </If>
+                    <If condition={!business_license}>
+                      <Text style={{fontSize: 32, color: colors.color999}}>+</Text>
+                      <Text style={styles.uploadImageTipText}>点击上传营业执照</Text>
+                    </If>
 
-                    </TouchableOpacity>
-                  </View>
-
+                  </TouchableOpacity>
                 </View>
 
               </KeyboardAwareScrollView>
@@ -922,7 +919,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
   },
   modalHeaderText: {fontSize: 16, fontWeight: 'bold', color: colors.color333, padding: 20},
   closeModal: {padding: 12, marginRight: 12},
@@ -937,14 +933,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
     flex: 1
   },
   modalStoreInfoNotRightItemWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
     paddingRight: 20,
     flex: 1
   },
