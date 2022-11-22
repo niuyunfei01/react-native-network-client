@@ -583,7 +583,20 @@ class OrderItem extends React.PureComponent {
     }
     return (
       <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
-        <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>{item?.ship_status_desc} </Text>
+        <View style={{flex: 1,}}>
+          <If condition={item?.is_show_ship_status}>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: colors.color333,
+                fontWeight: 'bold',
+                lineHeight: 20,
+                marginBottom: 4
+              }}>{item?.ship_status} </Text>
+          </If>
+          <Text style={{flex: 1, fontSize: 14, color: colors.color666, lineHeight: 20}}>{item?.ship_status_desc} </Text>
+        </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
     )
