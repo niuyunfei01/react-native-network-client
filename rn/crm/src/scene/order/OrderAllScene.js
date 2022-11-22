@@ -617,13 +617,19 @@ class OrderAllScene extends Component {
         height: 44,
         width: width,
         backgroundColor: colors.white,
-        paddingHorizontal: 12,
+        paddingHorizontal: 6,
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => {
+        <SvgXml style={{marginRight: 4}} onPress={() => {
           this.props.navigation.goBack()
         }} xml={back()}/>
 
         <TouchableOpacity disabled={only_one_store} onPress={() => {
+
+          let {is_service_mgr} = tool.vendor(this.props.global);
+          if (is_service_mgr) {
+            return this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.checkStore(item)})
+          }
+
           if (tool.length(store_list) <= 0) {
             this.fetchStoreList()
             return ToastShort('正在请求店铺信息，请稍后再试');

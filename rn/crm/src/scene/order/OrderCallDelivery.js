@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Modal,
@@ -67,7 +68,7 @@ class OrderCallDelivery extends Component {
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
     // let {call_delivery_list} = this.props.global
     this.state = {
-      isLoading: false,
+      loading: false,
       order_id: order_id,
       store_id: store_id,
       if_reship: if_reship,
@@ -122,6 +123,7 @@ class OrderCallDelivery extends Component {
       params_str: '',
       expect_time_friendly: '',
       show_cancel_delivery_modal: false,
+      is_only_show_self_delivery: false,
       ship_id: 0,
     };
 
@@ -161,7 +163,7 @@ class OrderCallDelivery extends Component {
       add_tips,
       order_money,
       params_str,
-      isLoading,
+      loading,
       logistic_fee_map
     } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
@@ -176,11 +178,11 @@ class OrderCallDelivery extends Component {
     }
 
     let params_json_str = JSON.stringify(params);
-    if (params_str === params_json_str || isLoading) {
+    if (params_str === params_json_str || loading) {
       return;
     }
     this.setState({
-      isLoading: true
+      loading: true
     })
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(api, params).then(obj => {
@@ -216,6 +218,7 @@ class OrderCallDelivery extends Component {
       }
       this.setState({
         params_str: params_json_str,
+        is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
         store_est: store_est,
         est: est.concat(obj?.in_review_deliveries || []),
         exist_waiting_delivery: obj?.exist_waiting_delivery,
@@ -237,7 +240,7 @@ class OrderCallDelivery extends Component {
         mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         remark: obj?.remark || '',
-        isLoading: false,
+        loading: false,
       })
       this.priceFn();
     })
@@ -325,12 +328,12 @@ class OrderCallDelivery extends Component {
       add_tips,
       remark,
       worker_delivery_id,
-      isLoading
+      loading
     } = this.state;
 
     this.mixpanel.track("V4配送下单_立即发单")
 
-    if (isLoading) {
+    if (loading) {
       return ToastShort("请刷新页面重试")
     }
 
@@ -360,7 +363,7 @@ class OrderCallDelivery extends Component {
         hideModal();
         this.props.route.params.onBack && this.props.route.params.onBack(res);
         this.props.navigation.goBack()
-      },(e)=>{
+      }, (e) => {
         ToastShort(e?.desc)
       }).catch((res) => {
         hideModal();
@@ -447,9 +450,9 @@ class OrderCallDelivery extends Component {
   }
 
   onSelectDeliveyAll = (type, cancel = 0) => {
-    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, isLoading} = this.state;
+    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, loading} = this.state;
 
-    if (isLoading) {
+    if (loading) {
       return ToastShort('请刷新页面重试')
     }
 
@@ -503,8 +506,8 @@ class OrderCallDelivery extends Component {
       })
   }
   onSelectDelivey = (item, key, type) => {
-    let {est, store_est, logistic_fee_map, isLoading} = this.state;
-    if (isLoading) {
+    let {est, store_est, logistic_fee_map, loading} = this.state;
+    if (loading) {
       return ToastShort('请刷新页面重试')
     }
     let list = type === 0 ? est : store_est;
@@ -563,13 +566,14 @@ class OrderCallDelivery extends Component {
   render() {
     let {accessToken} = this.props.global;
     let {
-      isLoading,
+      loading,
       order_id,
       add_tips,
       show_add_tip_modal,
       show_date_modal,
       ship_id,
-      show_cancel_delivery_modal
+      show_cancel_delivery_modal,
+      is_only_show_self_delivery
     } = this.state
     return (
       <View style={{flexGrow: 1}}>
@@ -580,19 +584,39 @@ class OrderCallDelivery extends Component {
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              refreshing={isLoading}
-              onRefresh={() => this.fetchData()}
+              refreshing={loading}
+              onRefresh={this.fetchData}
               tintColor='gray'
             />
           } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
-          {this.renderCollect()}
-          {this.renderCancelDelivery()}
-          {this.renderWsbDelivery()}
-          {this.renderNoDelivery()}
-          {this.renderStoreDelivery()}
-          {this.renderOwnDelivery()}
+          <If condition={!loading}>
+            {this.renderCollect()}
+            <If condition={is_only_show_self_delivery}>
+              {this.renderWorkerDelivery()}
+            </If>
+            <If condition={!is_only_show_self_delivery}>
+              {this.renderCancelDelivery()}
+              {this.renderWsbDelivery()}
+              {this.renderNoDelivery()}
+              {this.renderStoreDelivery()}
+              {this.renderOwnDelivery()}
+            </If>
+          </If>
+          <If condition={loading}>
+            <View style={{
+              paddingVertical: 250,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignContent: 'center'
+            }}>
+              <ActivityIndicator color={colors.color666} size={'large'}/>
+              <Text style={{fontSize: 26, color: colors.color999}}> 加载中… </Text>
+            </View>
+          </If>
         </ScrollView>
-        {this.renderBtn()}
+        <If condition={!loading}>
+          {is_only_show_self_delivery ? this.renderWorkerDeliveryBtn() : this.renderBtn()}
+        </If>
         {this.renderWorkerDeliveryModal()}
         {this.renderWeightModal()}
         {this.renderGoodsPriceModal()}
@@ -702,8 +726,8 @@ class OrderCallDelivery extends Component {
       <For index='key' each='item' of={exist_waiting_delivery}>
         <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <FastImage source={{uri: item?.icon}}
-                 style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
-                 resizeMode={FastImage.resizeMode.contain}/>
+                     style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                     resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.platform_name} </Text>
@@ -734,38 +758,36 @@ class OrderCallDelivery extends Component {
   }
 
   renderNoDelivery = () => {
-    let {store_est, est, isLoading} = this.state
+    let {store_est, est} = this.state
     if (tool.length(est) > 0 || tool.length(store_est) > 0) {
       return;
     }
     return (
       <View style={{marginTop: 10, backgroundColor: colors.white, borderRadius: 4, height: 320}}>
-        <If condition={!isLoading}>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 320
-          }}>
-            <SvgXml xml={empty_delivery_data()}/>
-            <Text style={{
-              fontSize: 15,
-              marginTop: 9,
-              marginBottom: 20,
-              color: colors.color999
-            }}> 暂未开通任何配送 </Text>
-            <Button title={'去开通'}
-                    onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
-                    containerStyle={{marginTop: 20}}
-                    buttonStyle={{
-                      backgroundColor: colors.main_color,
-                      borderRadius: 21,
-                      width: 140,
-                      length: 42,
-                    }}
-                    titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
-            />
-          </View>
-        </If>
+        <View style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 320
+        }}>
+          <SvgXml xml={empty_delivery_data()}/>
+          <Text style={{
+            fontSize: 15,
+            marginTop: 9,
+            marginBottom: 20,
+            color: colors.color999
+          }}> 暂未开通任何配送 </Text>
+          <Button title={'去开通'}
+                  onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+                  containerStyle={{marginTop: 20}}
+                  buttonStyle={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: 21,
+                    width: 140,
+                    length: 42,
+                  }}
+                  titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
+          />
+        </View>
       </View>
     )
   }
@@ -802,6 +824,55 @@ class OrderCallDelivery extends Component {
       </View>
     )
   }
+
+
+  renderWorkerDelivery = () => {
+    let {worker_list, worker_delivery_id} = this.state
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+        <TouchableOpacity
+          onPress={() => this.onSelectDeliveyAll(1)}
+          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}> 自配送 </Text>
+          </View>
+        </TouchableOpacity>
+        <ScrollView automaticallyAdjustContentInsets={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                    style={{maxHeight: 350}}>
+          <If condition={tool.length(worker_list) > 0}>
+            <For each='worker' index='idx' of={worker_list}>
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  worker_delivery_id: worker?.id,
+                  worker_name: worker?.nickname,
+                  worker_mobile: worker?.mobile,
+                })
+              }} key={idx} style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 14,
+                borderColor: colors.colorDDD,
+                borderBottomWidth: 0.2
+              }}>
+                <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                  <Text
+                    style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.nickname} </Text>
+                  <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
+                </View>
+                <If condition={worker_delivery_id === worker?.id}>
+                  <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+                </If>
+              </TouchableOpacity>
+            </For>
+          </If>
+        </ScrollView>
+      </View>
+    )
+  }
+
 
   renderStoreDelivery = () => {
     let {store_est_all_check, store_est} = this.state
@@ -844,8 +915,8 @@ class OrderCallDelivery extends Component {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
           <FastImage source={{uri: item?.icon}}
-                 style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
-                 resizeMode={FastImage.resizeMode.contain}/>
+                     style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                     resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.logisticName} </Text>
@@ -944,7 +1015,12 @@ class OrderCallDelivery extends Component {
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
               <Text
-                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{expect_time_friendly} </Text>
+                style={{
+                  fontSize: 12,
+                  color: '#FF8309',
+                  flex: 1,
+                  textAlign: 'center'
+                }}>预计送达时间{expect_time_friendly} </Text>
             </View>
           </View>
         </If>
@@ -953,6 +1029,23 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  renderWorkerDeliveryBtn = () => {
+    let {worker_delivery_id} = this.state
+    return (
+      <View style={{padding: 10, backgroundColor: colors.white}}>
+        <Button title={'配送下单'}
+                onPress={() => {
+                  this.onWorkerDelivery()
+                }}
+                buttonStyle={[{
+                  backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
+                  borderRadius: 21,
+                  length: 42,
+                }]}
+                titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
+      </View>
+    )
+  }
 
   renderBtn = () => {
     let {
