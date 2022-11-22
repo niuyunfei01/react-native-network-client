@@ -270,7 +270,7 @@ const C = {
   ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
 
   //  店铺搜索地图
-  ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
+  ROUTE_SEARCH_SHOP: 'Searchshop',//店铺-搜索
   ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
   // 店铺修改
   ROUTE_SHOP_ORDER: 'StoreOrderMsg',//店铺 - 订单信息选填

@@ -106,7 +106,7 @@ class BindShunfeng extends PureComponent {
       keywords: store.address,
       onBack: (address) => this.setAddress.bind(this)(address),
     };
-    this.navigateRoute(Config.ROUTE_SEARC_HSHOP, params);
+    this.navigateRoute(Config.ROUTE_SEARCH_SHOP, params);
   }
   uploadImageTask = () => {
     //所有的原生通知统一管理

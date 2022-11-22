@@ -184,7 +184,7 @@ class OrderEditScene extends Component {
         this.setAddress.bind(this)(res)
       },
     };
-    navigate(Config.ROUTE_SEARC_HSHOP, params);
+    navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   _onChangeDetailAddr(detailAddr) {

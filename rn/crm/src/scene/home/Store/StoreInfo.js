@@ -51,11 +51,13 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
 const ActionSheet = [
   {key: -999, section: true, label: "操作"},
   {key: 1, label: "初始化商品"}, //force -> true
   {key: 2, label: "复制商品"} //force -> false
 ];
+
 class StoreInfo extends Component {
   constructor(props) {
     super(props);
@@ -108,10 +110,7 @@ class StoreInfo extends Component {
       workerPopupVisible: false,
       workerPopupMulti: false,
       err_num: 0,
-      selectCity: {
-        cityId: '',
-        name: "点击选择城市"
-      },
+      city_name: '',
       shelfNos: [],
       shoptypes: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
       pickerValue: "",
@@ -167,7 +166,6 @@ class StoreInfo extends Component {
       call_not_print = "0",
       ship_way = Cts.SHIP_AUTO,
       city = undefined,
-      city_code = undefined,
       fn_price_controlled = 1,
       reservation_order_print = -1,
       sale_category_name,
@@ -229,10 +227,7 @@ class StoreInfo extends Component {
       reservation_order_print,
       sale_category_name,
       sale_category,
-      selectCity: {
-        cityId: city ? city_code : undefined,
-        name: city ? city : "点击选择城市"
-      },
+      city_name: city ? city : '',
       qualification: {
         name: files && tool.length(files) ? "资质已上传" : "点击上传资质",
         info: undefined
@@ -496,17 +491,14 @@ class StoreInfo extends Component {
       location_long: Lng,
       location_lat: lat,
     }
-    if (res.cityname && res.citycode) {
-      states.selectCity = {
-        name: res.cityname,
-        cityId: res.citycode
-      }
+    if (res.city) {
+      states.city_name = res.city
+    }
+    if (res?.area) {
+      states.district = res.area
     }
     if (res?.address) {
       states.dada_address = res.address;
-    }
-    if (res?.adname) {
-      states.district = res.adname
     }
     this.setState(states)
   }
@@ -546,6 +538,7 @@ class StoreInfo extends Component {
       doneUpload();
     }
   };
+
   upload = (imageInfo, name, barrier) => {
     let handleResp = resp => {
       if (resp.ok) {
@@ -608,18 +601,15 @@ class StoreInfo extends Component {
     let _this = this;
     if (this.onCheckData()) {
       let {
-        currVendorId,
         btn_type,
         store_id,
         type,
-        alias,
         name,
         district,
         owner_name,
         owner_nation_id,
         location_long,
         location_lat,
-        deleted,
         tel,
         mobile,
         dada_address,
@@ -629,22 +619,21 @@ class StoreInfo extends Component {
         vice_mgr,
         call_not_print,
         ship_way,
-        printer_cfg,
-        auto_add_tips,
         fn_price_controlled,
         bankcard_code,
         bankcard_address,
         bankcard_username,
         reservation_order_print,
         remark,
-        sale_category
+        sale_category,
+        city_name
       } = this.state;
 
       let send_data = {
         app_open_time_conf: JSON.stringify(this.state.open_time_conf),
         type: type, //品牌id
         name: name,
-        city: this.state.selectCity.name,
+        city: city_name,
         owner_name: owner_name,
         owner_nation_id: owner_nation_id,
         owner_id: owner_id,
@@ -669,7 +658,6 @@ class StoreInfo extends Component {
       };
       if (this.state.isServiceMgr || this.state.isBd) {
         send_data["tpl_store"] = this.state.templateInfo.key ? this.state.templateInfo.key : 0;
-
         send_data["service_bd"] = this.state.bdInfo.key ? this.state.bdInfo.key : 0;
       }
 
@@ -722,13 +710,7 @@ class StoreInfo extends Component {
       mobile,
       dada_address,
       owner_id,
-      open_end,
-      open_start,
-      vice_mgr,
-      call_not_print,
-      ship_way,
-      printer_cfg,
-      auto_add_tips,
+      city_name,
       sale_category
     } = this.state;
     let error_msg = "";
@@ -745,7 +727,7 @@ class StoreInfo extends Component {
       error_msg = "请输入门店所在区域";
     } else if (location_long === "" || location_lat === "") {
       error_msg = "请选择门店定位信息";
-    } else if (!this.state.selectCity.cityId) {
+    } else if (tool.length(city_name) <= 0) {
       error_msg = "请选择门店所在城市";
     } else if (!owner_nation_id || (tool.length(owner_nation_id) !== 18 && tool.length(owner_nation_id) !== 11)) {
       // error_msg = "身份证格式有误";
@@ -961,12 +943,12 @@ class StoreInfo extends Component {
             }
             const params = {
               center: center,
-              keywords: this.props.route.params.btn_type === 'add',
+              keywords: this.state.dada_address,
               onBack: (res) => {
                 this.setAddress.bind(this)(res)
               },
             };
-            this.onPress(Config.ROUTE_SEARC_HSHOP, params);
+            this.onPress(Config.ROUTE_SEARCH_SHOP, params);
           }} style={{fontSize: 14, color: colors.color333, flex: 1, textAlign: "right"}}>
             {location_long !== "" && location_lat !== "" && location_lat !== undefined
               ? `${location_long}、${location_lat}`

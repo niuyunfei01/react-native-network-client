@@ -108,24 +108,14 @@ class SaveStore extends PureComponent {
     let that = this
     geolocation.getCurrentPosition((pos) => {
       let coords = pos.coords;
-      let location = coords.longitude + "," + coords.latitude;
-      let url = "https://restapi.amap.com/v3/geocode/regeo?parameters?";
-      const params = {
-        key: '85e66c49898d2118cc7805f484243909',
-        location: location,
-      }
-      Object.keys(params).forEach(key => {
-          url += '&' + key + '=' + params[key]
-        }
-      )
+      let location = coords?.longitude + "," + coords?.latitude;
+      let url = `https://restapi.amap.com/v3/geocode/regeo?key=85e66c49898d2118cc7805f484243909&location=${location}`;
       fetch(url).then(response => response.json()).then((data) => {
         if (data.status === "1") {
           that.setState({
             city: data?.regeocode?.addressComponent?.city,
-            // store_address: data?.regeocode?.addressComponent?.township,
-            // street_block: data?.regeocode?.addressComponent?.streetNumber?.street,
-            location_long: coords.longitude,
-            location_lat: coords.latitude,
+            lng: coords?.longitude,
+            lat: coords?.latitude,
           })
         }
       });
@@ -214,7 +204,7 @@ class SaveStore extends PureComponent {
         this.setAddress.bind(this)(res)
       },
     };
-    this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+    this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   submit = () => {
