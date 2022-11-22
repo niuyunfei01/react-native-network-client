@@ -110,7 +110,7 @@ class StoreList extends PureComponent {
         backgroundColor: colors.white,
         paddingHorizontal: 6,
       }}>
-        <SvgXml style={{height: 44, marginRight: 8}} height={32} width={32} onPress={() => {
+        <SvgXml style={{height: 44, marginRight: 4}}  onPress={() => {
           this.props.navigation.goBack()
         }} xml={back()}/>
         <Text style={{

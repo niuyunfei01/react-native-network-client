@@ -9,7 +9,7 @@ import colors from "../../pubilc/styles/colors";
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {SearchBar} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {cross_circle_icon, empty_order, search_icon} from "../../svg/svg";
+import {back, cross_circle_icon, empty_order, search_icon} from "../../svg/svg";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
@@ -260,7 +260,10 @@ class SearchOrder extends PureComponent {
     let {keyword, keyword_type = 1, item_list} = this.state
     return (
       <View style={{backgroundColor: colors.white}}>
-        <View style={{flexDirection: "row", alignItems: "center", padding: 10}}>
+        <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 6}}>
+          <SvgXml style={{marginHorizontal: 4}} onPress={() => {
+            this.props.navigation.goBack()
+          }} xml={back()}/>
           <SearchBar
             inputStyle={{fontSize: 14, color: colors.color333}}
             leftIconContainerStyle={{

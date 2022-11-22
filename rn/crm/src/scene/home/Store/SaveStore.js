@@ -342,7 +342,7 @@ class SaveStore extends PureComponent {
         backgroundColor: colors.white,
         paddingHorizontal: 6,
       }}>
-        <SvgXml style={{height: 44, marginRight: 8}} height={32} width={32} onPress={() => {
+        <SvgXml style={{marginRight: 4}} onPress={() => {
           if (type === 'add') {
             return this.setState({
               show_back_modal: true,

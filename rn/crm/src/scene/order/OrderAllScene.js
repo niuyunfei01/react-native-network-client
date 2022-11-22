@@ -617,9 +617,9 @@ class OrderAllScene extends Component {
         height: 44,
         width: width,
         backgroundColor: colors.white,
-        paddingHorizontal: 12,
+        paddingHorizontal: 6,
       }}>
-        <SvgXml style={{height: 44, marginRight: 16}} onPress={() => {
+        <SvgXml style={{marginRight: 4}} onPress={() => {
           this.props.navigation.goBack()
         }} xml={back()}/>
 

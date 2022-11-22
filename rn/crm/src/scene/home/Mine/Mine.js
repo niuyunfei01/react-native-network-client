@@ -394,7 +394,7 @@ class Mine extends PureComponent {
           this.onPress(Config.ROUTE_STORE_LIST);
           break
         case 'OrderSearchResult':
-          this.onPress( Config.ROUTE_ORDER_ALL);
+          this.onPress(Config.ROUTE_ORDER_ALL);
           break
         case 'Worker':
           this.navigateToWorker()
