@@ -61,7 +61,7 @@ class SearchOrder extends PureComponent {
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
       show_finish_delivery_modal: false,
-      show_placeholder: false,
+      show_placeholder: true,
     };
   }
 
@@ -271,6 +271,7 @@ class SearchOrder extends PureComponent {
               width: 20,
               height: 20
             }}
+            autoFocus={true}
             searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
             clearIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
             cancelIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}

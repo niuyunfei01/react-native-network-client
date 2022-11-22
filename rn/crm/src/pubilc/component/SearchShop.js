@@ -92,7 +92,7 @@ class SearchShop extends Component {
       location: map,
       placeholderText: placeholder_text,
       is_can_load_more: false,
-      show_placeholder: false,
+      show_placeholder: true,
       is_add: true,
       page: 1,
       page_size: 20,
@@ -174,11 +174,13 @@ class SearchShop extends Component {
       }
       HttpUtils.get.bind(this.props)(api, params).then((res) => {
         this.setState({
+          keyword: '',
           page: page + 1,
           shops: page === 1 ? res : shops.concat(res),
           ret_list: page === 1 ? res : ret_list.concat(res),
           loading: false,
-          is_add: tool.length(res) >= page_size
+          is_add: tool.length(res) >= page_size,
+          show_placeholder: true
         })
       })
 
