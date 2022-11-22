@@ -35,6 +35,7 @@ import BottomModal from "../../../pubilc/component/BottomModal";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import PropTypes from "prop-types";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
+import DeviceInfo from "react-native-device-info";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const width = Dimensions.get("window").width;
@@ -87,6 +88,8 @@ class SettingScene extends PureComponent {
       funds_thresholds: 0,
       threshold_key: 0,
       owner_mobile: '',
+      server_list: [],
+      show_version: 0
     }
   }
 
@@ -135,6 +138,7 @@ class SettingScene extends PureComponent {
         funds_threshold_mapping,
         show_remark_to_rider: Boolean(res.show_remark_to_rider),
         owner_mobile: res?.owner_mobile,
+        server_list: res?.server_list,
         invoice_serial_font: res?.invoice_serial_font,
         hide_good_titles_to_shipper: Boolean(res.hide_good_titles_to_shipper),
         use_real_weight: Number(res?.use_real_weight) === 1,
@@ -213,7 +217,7 @@ class SettingScene extends PureComponent {
     const {accessToken, store_id} = this.props.global;
     this.closeModal()
     const url = `/v4/wsb_store/destroyStore?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url,{
+    HttpUtils.get.bind(this.props)(url, {
       store_id,
     }).then(() => {
         ToastLong('注销成功,正在退出登录', 0)
@@ -249,7 +253,7 @@ class SettingScene extends PureComponent {
   }
 
   render() {
-    const {isRefreshing} = this.state
+    const {isRefreshing, show_version} = this.state
     return (
       <ScrollView
         refreshControl={
@@ -267,6 +271,9 @@ class SettingScene extends PureComponent {
         {this.renderPrivacyPolicy()}
         {this.renderBtn()}
         {this.renderModal()}
+        <If condition={show_version >= 5}>
+          {this.renderServer()}
+        </If>
       </ScrollView>
     );
   }
@@ -467,11 +474,25 @@ class SettingScene extends PureComponent {
 
 
   renderGoods = () => {
-    let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, order_list_show_product} = this.state
+    let {
+      hide_good_titles_to_shipper,
+      use_real_weight,
+      is_alone_pay_vendor,
+      order_list_show_product,
+      show_version
+    } = this.state
     return (
       <View>
         <View style={styles.item_body}>
-          <Text style={styles.item_title}>商品 </Text>
+          <Text style={styles.item_title} onPress={() => {
+            this.setState({
+              show_version: show_version + 1
+            }, () => {
+              if (show_version === 2) {
+                ToastShort('再点击三次展示服务器信息')
+              }
+            })
+          }}>商品 </Text>
 
           <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
             <TouchableOpacity onPress={() => {
@@ -549,15 +570,16 @@ class SettingScene extends PureComponent {
 
   renderServer = () => {
     const host = Config.hostPort()
-    let {servers} = this.state;
+    let {server_list} = this.state;
+    const version_name = DeviceInfo.getVersion();
+    const version_code = DeviceInfo.getBuildNumber();
     return (
-
       <View style={styles.item_body}>
-        <Text style={styles.item_title}>选择服务器 </Text>
+        <Text style={styles.item_title}>选择服务器 {version_name}---{version_code}</Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <For index='idx' each='item' of={servers}>
+          <For index='idx' each='item' of={server_list}>
             <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
-              <Text style={styles.row_label}>{item.name}resp, msg </Text>
+              <Text style={styles.row_label}>{item.name} </Text>
               <If condition={host === item.host}>
                 <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
               </If>
