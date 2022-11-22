@@ -1367,19 +1367,20 @@ class GoodsEditScene extends PureComponent {
             规格信息
           </Text>
           <If condition={index === 0 && 'add' !== type && parseInt(series_id) > 0}>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
-                              onPress={() =>
-                                this.onPress(
-                                  Config.ROUTE_GOODS_SELECT_SPEC,
-                                  {
-                                    series_id: series_id,
-                                    store_id: currStoreId,
-                                    onBack: resp => {
-                                      this.setPushSpec(resp)
-                                    }
-                                  }
-                                )
-                              }
+            <TouchableOpacity
+              style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
+              onPress={() =>
+                this.onPress(
+                  Config.ROUTE_GOODS_SELECT_SPEC,
+                  {
+                    series_id: series_id,
+                    store_id: currStoreId,
+                    onBack: resp => {
+                      this.setPushSpec(resp)
+                    }
+                  }
+                )
+              }
             >
               <Text style={{color: colors.main_color, fontSize: 14}}>选择规格 </Text>
               <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
