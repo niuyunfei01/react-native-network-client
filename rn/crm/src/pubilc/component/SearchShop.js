@@ -92,6 +92,7 @@ class SearchShop extends Component {
       location: map,
       placeholderText: placeholder_text,
       is_can_load_more: false,
+      show_placeholder: false,
       is_add: true,
       page: 1,
       page_size: 20,
@@ -246,7 +247,7 @@ class SearchShop extends Component {
   }
 
   renderHeader = () => {
-    let {show_seach_msg, city_name, keyword, placeholderText} = this.state
+    let {show_seach_msg, city_name, keyword, placeholderText, show_placeholder} = this.state
     return (
       <View style={{
         backgroundColor: colors.white,
@@ -285,7 +286,17 @@ class SearchShop extends Component {
             placeholder={placeholderText}
             onChangeText={(v) => this.onChange(v)}
             value={keyword}
-            placeholderTextColor={colors.color999}
+            placeholderTextColor={show_placeholder ? colors.color999 : colors.f5}
+            onBlur={() => {
+              this.setState({
+                show_placeholder: true
+              })
+            }}
+            onFocus={() => {
+              this.setState({
+                show_placeholder: false
+              })
+            }}
             style={{
               height: 40,
               paddingLeft: 10,

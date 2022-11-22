@@ -410,13 +410,13 @@ class SaveStore extends PureComponent {
                            show_placeholder: true
                          })
                        }}
-                       multiline={true}
-                       numberOfLines={2}
                        onFocus={() => {
                          this.setState({
                            show_placeholder: false
                          })
                        }}
+                       multiline={true}
+                       numberOfLines={2}
                        onChangeText={store_name => {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
@@ -529,7 +529,7 @@ class SaveStore extends PureComponent {
                        placeholderTextColor={'#999'}
                        maxLength={11}
                        keyboardType={'numeric'}
-                       // editable={type !== 'register'}
+              // editable={type !== 'register'}
                        value={contact_phone}
                        onChangeText={value => {
                          // const newText = value.replace(/[^\d]+/, '');
