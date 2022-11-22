@@ -70,7 +70,7 @@ const initState = {
     page: 1,
     limit: 10,
     maxPastDays: 100,
-    isAdd: true,
+    is_add: true,
   },
   sort_list: [
     {"label": '最新来单', 'value': 'orderTime desc'},
@@ -78,11 +78,11 @@ const initState = {
     {"label": '送达时间', 'value': 'expectTime desc'},
   ],
   ListData: [],
-  orderStatus: 9,
-  showSortModal: false,
+  order_status: 9,
+  show_sort_modal: false,
   show_bind_button: false,
   orderNum: {},
-  isCanLoadMore: false,
+  is_can_load_more: false,
   scanBoolean: false,
   order_id: 0,
   show_goods_list: false,
@@ -120,6 +120,7 @@ class OrderListScene extends Component {
 
     this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
+    this.list_ref = undefined;
   }
 
 
@@ -198,7 +199,7 @@ class OrderListScene extends Component {
       return;
     }
     this.setState({
-        query: {...query, page: 1, isAdd: true, offset: 0}
+        query: {...query, page: 1, is_add: true, offset: 0}
       },
       () => this.fetchOrders(status))
     // }, 500)
@@ -239,18 +240,18 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType, setList = 1) => {
-    let {isLoading, query, orderStatus} = this.state;
-    if (isLoading || !query.isAdd) {
+    let {isLoading, query, order_status} = this.state;
+    if (isLoading || !query.is_add) {
       return null;
     }
     this.fetorderNum();
     let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
     let {currStoreId, accessToken, order_list_by = 'orderTime asc'} = this.props.global;
     let search = `store:${currStoreId}`;
-    let initQueryType = queryType || orderStatus;
+    let initQueryType = queryType || order_status;
 
     this.setState({
-      orderStatus: initQueryType,
+      order_status: initQueryType,
       isLoading: true,
     })
 
@@ -265,13 +266,15 @@ class OrderListScene extends Component {
       is_right_once: 1, //预订单类型
       order_by: order_list_by
     }
-
+    if (setList === 1 && this.list_ref) {
+      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
+    }
     if (vendor_id && accessToken) {
       const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
-          query.isAdd = false;
+          query.is_add = false;
         }
         query.page++;
         query.listType = initQueryType
@@ -301,13 +304,13 @@ class OrderListScene extends Component {
   }
 
   onSelect = (e) => {
-    let {showSortModal} = this.state;
+    let {show_sort_modal} = this.state;
     if (e === 1) {
       this.mixpanel.track('V4订单列表_手动下单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
     } else if (e === 0) {
       this.mixpanel.track('V4订单列表_订单排序')
-      this.setState({showSortModal: !showSortModal})
+      this.setState({show_sort_modal: !show_sort_modal})
     } else {
       this.mixpanel.track('订单列表扫描')
       this.setState({
@@ -369,7 +372,7 @@ class OrderListScene extends Component {
       show_add_tip_modal,
       show_cancel_delivery_modal,
       add_tip_id,
-      orderStatus,
+      order_status,
       orders_add_tip,
     } = this.state
 
@@ -395,7 +398,7 @@ class OrderListScene extends Component {
 
         <DeliveryStatusModal
           order_id={order_id}
-          order_status={orderStatus}
+          order_status={order_status}
           store_id={currStoreId}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
@@ -438,7 +441,7 @@ class OrderListScene extends Component {
       order_id: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      showSortModal: false,
+      show_sort_modal: false,
       show_finish_delivery_modal: false,
     })
   }
@@ -488,9 +491,9 @@ class OrderListScene extends Component {
 
   renderSortModal = () => {
     let {order_list_by = 'orderTime asc'} = this.props.global;
-    let {showSortModal, sort_list} = this.state;
+    let {show_sort_modal, sort_list} = this.state;
     return (
-      <JbbModal visible={showSortModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_sort_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
@@ -627,7 +630,7 @@ class OrderListScene extends Component {
   }
 
   renderStatusTabs = () => {
-    let {orderStatus, orderNum, categoryLabels} = this.state;
+    let {order_status, orderNum, categoryLabels} = this.state;
     const tab_width = 1 / tool.length(categoryLabels);
     if (!tool.length(categoryLabels) > 0) {
       return;
@@ -645,8 +648,8 @@ class OrderListScene extends Component {
               paddingTop: 10,
             }}>
               <Text style={[styles.f14c33, {
-                fontWeight: orderStatus === tab.status ? "bold" : "normal",
-                color: orderStatus === tab.status ? colors.main_color : colors.color333
+                fontWeight: order_status === tab.status ? "bold" : "normal",
+                color: order_status === tab.status ? colors.main_color : colors.color333
               }]}>
                 {orderNum[tab.status] > 0 ? orderNum[tab.status] > 999 ? '999+' : orderNum[tab.status] : '-'}
               </Text>
@@ -657,13 +660,13 @@ class OrderListScene extends Component {
               paddingBottom: 10,
             }}>
               <Text style={[styles.f14c33, {
-                fontWeight: orderStatus === tab.status ? "bold" : "normal",
-                color: orderStatus === tab.status ? colors.main_color : colors.color333
+                fontWeight: order_status === tab.status ? "bold" : "normal",
+                color: order_status === tab.status ? colors.main_color : colors.color333
               }]}>
                 {tab.tabname}
               </Text>
             </View>
-            <If condition={orderStatus === tab.status}>
+            <If condition={order_status === tab.status}>
               <View style={styles.statusTabRight}/>
             </If>
           </TouchableOpacity>
@@ -673,16 +676,16 @@ class OrderListScene extends Component {
   }
 
   onEndReached = () => {
-    if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => {
-        if (this.state.query.isAdd) {
-          this.fetchOrders(this.state.orderStatus, 0);
-        }
+    if (this.state.is_can_load_more && this.state.query.is_add) {
+      this.setState({is_can_load_more: false}, () => {
+        this.fetchOrders(this.state.order_status, 0);
       })
     }
   }
   onMomentumScrollBegin = () => {
-    this.setState({isCanLoadMore: true})
+    if (this.state.query.is_add) {
+      this.setState({is_can_load_more: true})
+    }
   }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
@@ -692,7 +695,7 @@ class OrderListScene extends Component {
   }
 
   _getItemLayout = (data, index) => {
-    return {length: 260, offset: 260 * index, index}
+    return {length: 340, offset: 340 * index, index}
   }
 
   renderContent = () => {
@@ -700,7 +703,6 @@ class OrderListScene extends Component {
     return (
       <View style={styles.orderListContent}>
         <FlatList
-          contentContainerStyle={{flexGrow: 1}}
           data={ListData}
           legacyImplementation={false}
           directionalLockEnabled={true}
@@ -711,6 +713,9 @@ class OrderListScene extends Component {
           onMomentumScrollBegin={this.onMomentumScrollBegin}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
+          ref={(ref) => {
+            this.list_ref = ref
+          }}
           refreshing={isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
@@ -725,7 +730,7 @@ class OrderListScene extends Component {
 
   renderBottomView = () => {
     let {query, ListData} = this.state;
-    if (query?.isAdd || tool.length(ListData) < 3) {
+    if (query?.is_add || tool.length(ListData) < 3) {
       return <View/>
     }
     return (
@@ -737,7 +742,7 @@ class OrderListScene extends Component {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {orderStatus} = this.state;
+    let {order_status} = this.state;
     let {accessToken} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
@@ -749,7 +754,7 @@ class OrderListScene extends Component {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
-                 orderStatus={orderStatus}
+                 order_status={order_status}
       />
     );
   }

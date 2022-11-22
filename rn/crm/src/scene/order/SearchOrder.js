@@ -422,7 +422,7 @@ class SearchOrder extends PureComponent {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
-                 orderStatus={0}
+                 order_status={0}
       />
     );
   }
