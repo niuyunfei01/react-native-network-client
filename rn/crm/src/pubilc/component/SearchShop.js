@@ -2,7 +2,17 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {FlatList, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  InteractionManager,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import tool from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
@@ -12,6 +22,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import PropTypes from "prop-types";
 import {SvgXml} from "react-native-svg";
 import {cross_circle_icon, empty_order, this_down} from "../../svg/svg";
+import HttpUtils from "../util/http";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -41,18 +52,18 @@ class SearchShop extends Component {
       show_select_city = true
     } = this.props.route.params;
     let map = {};
-
-    let isMap = false;
+    let show_map = false;
     let show_seach_msg = true;
     let local_city = '北京';
 
     let {store_info = {}} = this.props.global;
+
     if (tool.length(store_info) > 0) {
       local_city = store_info?.city
       map.location = store_info?.loc_lng + "," + store_info?.loc_lat;
     }
 
-    if (keywords) {
+    if (tool.length(keywords) > 0) {
       map.address = keywords
       show_seach_msg = false
     }
@@ -63,7 +74,9 @@ class SearchShop extends Component {
 
     if (tool.length(center) > 0) {
       map.location = center
-      isMap = true;
+      if (tool.length(keywords) > 0) {
+        show_map = true;
+      }
     }
 
     this.state = {
@@ -73,113 +86,63 @@ class SearchShop extends Component {
       shops: [],
       ret_list: [],
       keyword: keywords,
-      isMap: isMap, //控制显示搜索还是展示地图
-      is_default: isMap,
+      show_map: show_map, //控制显示搜索还是展示地图
+      is_default: show_map,
       city_name: local_city,
       location: map,
       placeholderText: placeholder_text,
       is_can_load_more: false,
       is_add: true,
       page: 1,
-      page_size: 10,
-      city_info:{}
+      page_size: 20,
     }
 
-    if (tool.length(center) <= 0 && keywords) {
-      this.search()
+    if (tool.length(center) > 0 && tool.length(keywords) <= 0) {
+      this.searchLngLat()
     }
   }
 
   onRefresh = () => {
-    this.setState({page: 1, is_add: true, page_size: 10},
-      () => this.search())
+    this.setState({page: 1, is_add: true},
+      () => {
+        if (this.state.show_map) {
+          this.searchLngLat()
+        } else {
+          this.search()
+        }
+      })
   }
 
-  search = (isMap = false) => {   //submit 事件 (点击键盘的 enter)
-    let {keyword, city_name} = this.state;
-    this.setState({loading: true})
+  search = () => {   //submit 事件 (点击键盘的 enter)
+    let {keyword, city_name, page, page_size, shops, ret_list, is_add} = this.state;
+    if (!is_add) {
+      return;
+    }
+    this.setState({loading: true, show_map: false})
     tool.debounces(() => {
-      if (keyword) {
-        let header = 'https://restapi.amap.com/v3/assistant/inputtips?parameters?'
-        const params = {
-          keywords: keyword,
-          key: '85e66c49898d2118cc7805f484243909',
-          city: city_name,
-          citylimit: true
+      if (tool.length(keyword) > 0) {
+        const api = `v4/wsb_map/getKeywordTips`
+        let params = {
+          keyword: keyword,
+          region: city_name,
+          region_fix: 1,
+          policy: 1,
+          page_index: page,
+          page_size
         }
-        Object.keys(params).forEach(key => {
-            header += '&' + key + '=' + params[key]
-          }
-        )
-        fetch(header).then(response => response.json()).then(data => {
-          if (data.status === "1") {
-            this.setState({
-              shops: data?.tips,
-              ret_list: data?.tips,
-              loading: false,
-              isMap: isMap,
-            })
-          }
-        });
+        HttpUtils.get.bind(this.props)(api, params).then((res) => {
+          this.setState({
+            page: page + 1,
+            shops: page === 1 ? res : shops.concat(res),
+            ret_list: page === 1 ? res : ret_list.concat(res),
+            loading: false,
+            is_add: tool.length(res) >= page_size
+          })
+        })
       } else {
         ToastLong("请输入门店位置信息")
       }
-    }, 1000)
-  }
-
-  searchLngLat = () => {   //submit 事件 (点击键盘的 enter)
-    let {location, keyword, city_name} = this.state;
-    this.setState({loading: true})
-    tool.debounces(() => {
-      if (location?.location) {
-        let header = 'https://restapi.amap.com/v5/place/around?'
-        const params = {
-          region: city_name,
-          location: location?.location,
-          keywords: keyword,
-          radius: 100,
-          key: '85e66c49898d2118cc7805f484243909',
-          types: '120100|120200|120202|120203|120300|120301|120302|120303|120304|120201|190108|190400|190403|991401|150500|060100|100100|150501|991000|991001|991001|010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000|160000|170000|180000|190000|200000|',
-        }
-        Object.keys(params).forEach(key => {
-            header += '&' + key + '=' + params[key]
-          }
-        )
-        fetch(header).then(response => response.json()).then(data => {
-          if (data.status === "1" && tool.length(data?.pois) > 0) {
-            this.setState({
-              ret_list: data?.pois,
-              loading: false,
-              keyword: ''
-            })
-          } else {
-            this.search(true)
-            this.setState({
-              loading: false,
-              keyword: ''
-            })
-          }
-        });
-      }
-    }, 1000)
-  }
-
-  getPoiInfo = (item) => {
-    let header = `https://restapi.amap.com/v3/geocode/regeo?key=85e66c49898d2118cc7805f484243909&location=${item?.location}`
-    fetch(header).then(response => response.json()).then(data => {
-      if (data?.status === "1") {
-        let {district = '', city = '', province = '', adcode = '', citycode = ''} = data?.regeocode?.addressComponent;
-        let city_info = {
-          adname: district,
-          cityname: tool.length(city) > 0 ? city : province,
-          adcode: adcode,
-          citycode: citycode,
-        }
-        this.setState({city_info})
-      } else {
-        ToastLong('操作失败，请重试')
-      }
-    });
+    })
   }
 
   setLatLng = (latitude, longitude) => {
@@ -187,10 +150,38 @@ class SearchShop extends Component {
     location.location = longitude + ',' + latitude
     this.setState({
       is_default: false,
+      page: 1,
+      is_add: true,
       location
     }, () => {
       this.searchLngLat()
     })
+  }
+
+  searchLngLat = () => {
+    let {location, page, page_size, is_add, shops, ret_list} = this.state;
+    if (!is_add) {
+      return;
+    }
+    this.setState({loading: true})
+    tool.debounces(() => {
+      const api = `/v4/wsb_map/getNearbyLocation`
+      let params = {
+        location: location?.location,
+        page,
+        page_size
+      }
+      HttpUtils.get.bind(this.props)(api, params).then((res) => {
+        this.setState({
+          page: page + 1,
+          shops: page === 1 ? res : shops.concat(res),
+          ret_list: page === 1 ? res : ret_list.concat(res),
+          loading: false,
+          is_add: tool.length(res) >= page_size
+        })
+      })
+
+    }, 300)
   }
 
   goSelectCity = () => {
@@ -202,38 +193,34 @@ class SearchShop extends Component {
       Config.ROUTE_SELECT_CITY_LIST,
       {
         city: city_name,
-        callback: (selectCity) => {
+        callback: (item) => {
           this.setState({
-            city_name: selectCity.name,
+            city_name: item.name,
           })
         }
       }
     )
   }
 
-  onCancel = () => { //点击取消
-    this.setState({keyword: '', shops: []});
-  }
-
   onChange = (keyword) => {
     let show_seach_msg = tool.length(keyword) <= 0
-    this.setState({keyword, show_seach_msg}, () => {
+    this.setState({keyword, show_seach_msg, is_add: true, loading: true, page: 1}, () => {
       this.search()
     });
   }
 
   render() {
-    let {shops, ret_list, isMap} = this.state;
+    let {shops, ret_list, show_map} = this.state;
     return (
       <View style={{flex: 1}}>
 
         {this.renderHeader()}
-        <If condition={!isMap}>
+        <If condition={!show_map}>
           <View style={{paddingHorizontal: 12, paddingVertical: 10, flex: 1,}}>
             {this.renderList(shops)}
           </View>
         </If>
-        <If condition={isMap}>
+        <If condition={show_map}>
           {this.renderMap()}
           {this.renderList(ret_list)}
         </If>
@@ -242,24 +229,18 @@ class SearchShop extends Component {
   }
 
   onClickItem = (item) => {
-    let {isMap, is_default, city_info} = this.state;
+    let {show_map, is_default} = this.state;
     InteractionManager.runAfterInteractions(() => {
-      if (isMap) {
+      if (show_map) {
         if (!is_default) {
-          if (!item?.adname) {
-            item = {...item, ...city_info}
-          }
           this.props.route.params.onBack(item);
         }
         this.props.navigation.goBack();
       } else {
         this.setState({
-          isMap: true,
+          show_map: true,
           location: item
-        }, () => {
-          this.getPoiInfo(item)
         })
-
       }
     })
   }
@@ -269,7 +250,7 @@ class SearchShop extends Component {
     return (
       <View style={{
         backgroundColor: colors.white,
-        marginBottom: show_seach_msg ? 30 : 0,
+        // marginBottom: show_seach_msg ? 30 : 0,
         paddingHorizontal: 12,
         paddingVertical: 6,
         flexDirection: "row",
@@ -324,38 +305,42 @@ class SearchShop extends Component {
         <Text onPress={() => this.props.navigation.goBack()}
               style={{textAlign: 'right', width: 40, fontSize: 14, color: colors.color333}}>取消</Text>
 
-        <If condition={show_seach_msg}>
-          <TouchableOpacity style={{position: 'absolute', top: 22, left: 80}}>
-            <Entypo name={'triangle-up'}
-                    style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>
-            <View style={{
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              borderRadius: 4,
-              height: 36,
-              width: 280,
-              position: 'absolute',
-              top: 17.4,
-              left: 3,
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}>
-                请输入准确的地址信息进行搜索，如小区，大厦等
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </If>
+        {/*<If condition={show_seach_msg}>*/}
+        {/*  <TouchableOpacity style={{position: 'absolute', top: 22, left: 80}}>*/}
+        {/*    <Entypo name={'triangle-up'}*/}
+        {/*            style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>*/}
+        {/*    <View style={{*/}
+        {/*      backgroundColor: 'rgba(0,0,0,0.7)',*/}
+        {/*      borderRadius: 4,*/}
+        {/*      height: 36,*/}
+        {/*      width: 280,*/}
+        {/*      position: 'absolute',*/}
+        {/*      top: 17.4,*/}
+        {/*      left: 3,*/}
+        {/*      alignItems: 'center',*/}
+        {/*      justifyContent: 'center'*/}
+        {/*    }}>*/}
+        {/*      <Text style={{fontSize: 12, color: colors.f7, lineHeight: 17}}>*/}
+        {/*        请输入准确的地址信息进行搜索，如小区，大厦等*/}
+        {/*      </Text>*/}
+        {/*    </View>*/}
+        {/*  </TouchableOpacity>*/}
+        {/*</If>*/}
       </View>
     )
   }
 
 
   onEndReached = () => {
-    let {is_can_load_more, is_add} = this.state;
+    let {is_can_load_more, is_add, show_map} = this.state;
     if (is_can_load_more) {
       this.setState({is_can_load_more: false}, () => {
         if (is_add) {
-          this.search(0);
+          if (show_map) {
+            this.searchLngLat();
+          } else {
+            this.search();
+          }
         } else {
           ToastShort('已经到底部了')
         }
@@ -366,6 +351,7 @@ class SearchShop extends Component {
   onMomentumScrollBegin = () => {
     this.setState({is_can_load_more: true})
   }
+
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
@@ -395,12 +381,39 @@ class SearchShop extends Component {
           keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           ListEmptyComponent={this.renderNoData()}
+          ListFooterComponent={this.renderBottomView()}
           renderItem={({item, index}) => this.renderItem(item, index)}
         />
       </View>
     )
   }
 
+  renderBottomView = () => {
+    let {is_add, ret_list, loading} = this.state;
+
+    if (loading && tool.length(ret_list) > 10) {
+      return (
+        <View style={{
+          paddingVertical: 10,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignContent: 'center'
+        }}>
+          <ActivityIndicator color={colors.color666} size={20}/>
+          <Text style={{fontSize: 14, color: colors.color999}}> 加载中… </Text>
+        </View>
+      )
+    }
+
+    if (is_add || tool.length(ret_list) < 10) {
+      return <View/>
+    }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
+      </View>
+    )
+  }
   renderItem = (item, index) => {
     return (
       <TouchableOpacity key={index}
@@ -499,7 +512,8 @@ class SearchShop extends Component {
         </If>
 
         <If condition={tool.length(keyword) <= 0}>
-          <Text style={styles.noOrderDesc}> 建议扩大关键词范围进行搜索 </Text>
+          <Text style={styles.noOrderDesc}> 请输入准确的地址信息进行搜索 </Text>
+          <Text style={styles.noOrderDesc}> 如小区，大厦等 </Text>
         </If>
       </View>
     )

@@ -121,7 +121,7 @@ class OrderSettingScene extends Component {
         this.setAddress.bind(this)(res)
       },
     };
-    this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+    this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   setAddress = (res) => {
@@ -234,7 +234,7 @@ class OrderSettingScene extends Component {
           this.setState({show_smart_modal: true,})
         },
       };
-      this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+      this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
     })
   }
 

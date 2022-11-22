@@ -406,7 +406,7 @@ class ApplyScene extends PureComponent {
                   this.setAddress.bind(this)(res)
                 },
               };
-              this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+              this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
             }} buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}
                     titleStyle={{fontSize: 14, color: colors.white}}
                     title={"定位门店"}/>

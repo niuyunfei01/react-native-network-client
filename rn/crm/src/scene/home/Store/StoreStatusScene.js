@@ -26,6 +26,8 @@ import {Button} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {SvgXml} from "react-native-svg";
 import {
+  check_circle_icon,
+  cross_circle_icon,
   empty_data,
   platformLogoEleme,
   platformLogoJD,
@@ -485,15 +487,15 @@ class StoreStatusScene extends PureComponent {
                         marginTop: 5
                       }}>
                         <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                          <Image
-                            source={store.auto_call == '已开启自动呼叫' ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
-                            style={{width: 12, height: 12, marginRight: 5}}/>
+                          <SvgXml width={12} height={12} style={{marginRight: 5}}
+                                  xml={store.auto_call == '已开启自动呼叫' ? check_circle_icon() : cross_circle_icon()}/>
+
                           <Text style={{color: colors.color333}}>自动呼叫配送</Text>
                         </View>
                         <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                          <Image
-                            source={suspend_confirm_order == 1 ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
-                            style={{width: 12, height: 12, marginRight: 5}}/>
+                          <SvgXml width={12} height={12} style={{marginRight: 5}}
+                                  xml={suspend_confirm_order == 1 ? check_circle_icon() : cross_circle_icon()}/>
+
                           <Text style={{color: colors.color333}}>自动接单</Text>
                         </View>
                         <View style={{width: 35}}>

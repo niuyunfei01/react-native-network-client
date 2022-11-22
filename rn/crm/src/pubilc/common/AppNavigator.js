@@ -286,8 +286,8 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_GOOD_STORE_DETAIL} options={{headerTitle: '门店商品详情'}}
                       getComponent={() => require("../../scene/product/Goods/GoodStoreDetailScene").default}
         />
-        <Stack.Screen name={Config.ROUTE_VERSION} options={{headerTitle: '版本信息'}}
-                      getComponent={() => require("../../scene/home/Mine/VersionScene").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_VERSION} options={{headerTitle: '版本信息'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Mine/VersionScene").default}/>*/}
         <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} options={{headerTitle: '申请记录'}}
                       getComponent={() => require("../../scene/product/Goods/GoodsApplyRecordScene").default}
                       initialParams={initialRouteParams}/>
@@ -468,7 +468,7 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       getComponent={() => require('../../scene/product/Inventory/Detail').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerShown: false}}
+        <Stack.Screen name={Config.ROUTE_SEARCH_SHOP} options={{headerShown: false}}
                       getComponent={() => require('../component/SearchShop').default}
         />
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
