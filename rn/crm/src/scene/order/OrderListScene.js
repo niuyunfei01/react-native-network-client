@@ -198,6 +198,10 @@ class OrderListScene extends Component {
         this.setState({isLoading: true})
       return;
     }
+
+    if (status && this.list_ref) {
+      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
+    }
     this.setState({
         query: {...query, page: 1, is_add: true, offset: 0}
       },
@@ -265,9 +269,6 @@ class OrderListScene extends Component {
       use_v2: 1,
       is_right_once: 1, //预订单类型
       order_by: order_list_by
-    }
-    if (setList === 1 && this.list_ref) {
-      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
     }
     if (vendor_id && accessToken) {
       const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
