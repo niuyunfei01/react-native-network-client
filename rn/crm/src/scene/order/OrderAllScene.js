@@ -624,6 +624,12 @@ class OrderAllScene extends Component {
         }} xml={back()}/>
 
         <TouchableOpacity disabled={only_one_store} onPress={() => {
+
+          let {is_service_mgr} = tool.vendor(this.props.global);
+          if (is_service_mgr) {
+            return this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.checkStore(item)})
+          }
+
           if (tool.length(store_list) <= 0) {
             this.fetchStoreList()
             return ToastShort('正在请求店铺信息，请稍后再试');

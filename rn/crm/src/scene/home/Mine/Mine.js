@@ -388,14 +388,13 @@ class Mine extends PureComponent {
   touchBlockNavigate = (info) => {
     this.mixpanel.track(`${info?.name}`)
 
-    let {is_service_mgr} = tool.vendor(this.props.global);
     if (info?.type === 'Router') {
       switch (info?.path) {
         case 'Store':
           this.onPress(Config.ROUTE_STORE_LIST);
           break
         case 'OrderSearchResult':
-          this.onPress(is_service_mgr ? Config.ROUTE_ORDER_SEARCH_RESULT : Config.ROUTE_ORDER_ALL);
+          this.onPress( Config.ROUTE_ORDER_ALL);
           break
         case 'Worker':
           this.navigateToWorker()
