@@ -417,8 +417,8 @@ class OrderAllScene extends Component {
     }
     this.setState({
       show_date_modal: false,
-      search_start_date_input_val: search_start_date_input_val,
-      search_end_date_input_val: search_end_date_input_val,
+      search_start_date: search_start_date_input_val,
+      search_end_date: search_end_date_input_val,
       date_desc,
     }, () => {
       this.onRefresh()
