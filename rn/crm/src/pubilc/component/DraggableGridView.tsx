@@ -432,7 +432,7 @@ const GridView = memo((props: GridViewProps) => {
             const {cellSize, grid} = self
             const p = grid[index]
             const isLocked = locked && locked(item, index)
-            const key = (keyExtractor && keyExtractor(item)) || (typeof item == 'string' ? item : `${index}`)
+
             let style: ViewStyle = {
                 position: 'absolute',
                 width: cellSize,
@@ -443,14 +443,14 @@ const GridView = memo((props: GridViewProps) => {
                 style = {zIndex: 1, ...style, ...selectedStyle}
             if (isLocked)
                 return (
-                    <View key={key} style={[style, {left: p.x, top: p.y}]}>
+                    <View key={index} style={[style, {left: p.x, top: p.y}]}>
                         {renderLockedItem(item, index)}
                     </View>
                 )
             return (
                 <Animated.View
                     {...self.panResponder.panHandlers}
-                    key={key}
+                    key={index}
                     style={[style, {transform: pos.getTranslateTransform(), opacity}]}>
                     <TouchableOpacity
                         style={{flex: 1}}

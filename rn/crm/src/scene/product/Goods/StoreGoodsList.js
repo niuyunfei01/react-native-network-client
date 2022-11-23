@@ -300,7 +300,7 @@ class StoreGoodsList extends Component {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
       storeId: this.props.global.currStoreId,
-      updatedCallback: this.doneProdUpdate
+      // updatedCallback: this.doneProdUpdate
     })
   }
 

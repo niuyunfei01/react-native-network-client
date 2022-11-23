@@ -100,7 +100,7 @@ class ChangeDeliveryAccount extends PureComponent {
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
       delivery: delivery,
-      deliveryStatusObj: {},
+      deliveryStatusObj: {apply_status: 2},
       store_id: store_id
     }
   }
@@ -153,17 +153,34 @@ class ChangeDeliveryAccount extends PureComponent {
   getDeliverStatus = () => {
     const {accessToken, vendor_id} = this.props.global;
 
-    const {store_id, delivery} = this.state
-    const {id} = delivery;
-    const params = {
-      store_id: store_id,
-      delivery_id: id,
-      vendor_id: vendor_id
+    const {store_id, delivery, deliveryStatusObj} = this.state
+    const {id, v2_type, type, bind_type} = delivery;
+    if (id) {
+      const params = {
+        store_id: store_id,
+        delivery_id: id,
+        vendor_id: vendor_id
+      }
+      const url = `/v4/wsb_delivery/getDeliveryStatus/?access_token=${accessToken}`
+      HttpUtils.get(url, params).then(res => {
+        this.setState({deliveryStatusObj: res})
+      }).catch((error) => ToastShort(error.reason))
+      return
     }
-    const url = `/v4/wsb_delivery/getDeliveryStatus/?access_token=${accessToken}`
+    const delivery_id = bind_type === 'wsb' ? v2_type : type
+    const url = `/v1/new_api/delivery/get_delivery_status/${store_id}/${delivery_id}?access_token=${accessToken}`
+    const params = {vendorId: vendor_id}
     HttpUtils.get(url, params).then(res => {
-      this.setState({deliveryStatusObj: res})
-    })
+      const {apply_status, account_desc} = res
+      this.setState({
+          deliveryStatusObj: {
+            ...deliveryStatusObj,
+            apply_status: apply_status,
+            account_desc: account_desc
+          }
+        }
+      )
+    }).catch((error) => ToastShort(error.reason))
   }
 
   getDeliveryList = ({global, route}) => {
@@ -178,6 +195,7 @@ class ChangeDeliveryAccount extends PureComponent {
         wsb_bind_deliveries: wsb_bind_deliveries,
         store_bind_deliveries: store_bind_deliveries
       })
+    }).catch(() => {
     })
   }
 
@@ -226,7 +244,7 @@ class ChangeDeliveryAccount extends PureComponent {
     const {is_forbidden = 0, bind_type = ''} = delivery
     const {apply_status = '', account_desc = '', reason = '',} = deliveryStatusObj
     const {navigation} = this.props
-    switch (apply_status) {
+    switch (parseInt(apply_status)) {
       case 0:
         status = '未申请'
         break
@@ -239,8 +257,10 @@ class ChangeDeliveryAccount extends PureComponent {
       case 3:
         status = '失败'
         break
+      default:
+        status = ''
+        break
     }
-
     return (
       <View>
         <If condition={Config.MEI_TUAN_PEI_SONG != deliveryType}>
@@ -257,7 +277,7 @@ class ChangeDeliveryAccount extends PureComponent {
               </Text>
             </View>
 
-            <If condition={bind_type === 'wsb' && apply_status !== 2}>
+            <If condition={bind_type === 'wsb' && apply_status != 2}>
               <View style={styles.line}/>
               <View style={styles.deliveryRowWrap}>
                 <Text style={styles.deliveryTitle}>
