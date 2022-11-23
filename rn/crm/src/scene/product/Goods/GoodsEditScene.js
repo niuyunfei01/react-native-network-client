@@ -189,7 +189,8 @@ class GoodsEditScene extends PureComponent {
       allow_multi_spec: 0,
       searchCategoriesKey: '',
       searchCategoriesList: [],
-      allow_switch_multi: true
+      allow_switch_multi: true,
+      selected_pids: []
     };
 
   }
@@ -951,18 +952,21 @@ class GoodsEditScene extends PureComponent {
   }
 
   setPushSpec = (resp) => {
-    let {multiSpecsList} = this.state
+    let {multiSpecsList, selected_pids} = this.state
     let multiSpecsListCopy = []
-    // delete resp?.checked
-    let mockSpec = {
-      inventory: {actualNum: ''},
-      selectWeight: {value: "0", label: "克"},
-      price: '',
-      supply_price: '',
-      actualNum: '',
-      ...resp
-    }
-    multiSpecsListCopy.push(mockSpec)
+    resp.map(item => {
+      item = {
+        ...item,
+        inventory: {actualNum: ''},
+        selectWeight: item?.unit_info,
+        price: '',
+        supply_price: '',
+        actualNum: ''
+      }
+      delete item?.unit_info
+      multiSpecsListCopy.push(item)
+      selected_pids.push(item.id)
+    })
     this.setState({
       multiSpecsList: multiSpecsList.concat(multiSpecsListCopy)
     }, () => {
@@ -1037,6 +1041,7 @@ class GoodsEditScene extends PureComponent {
             style={styles.textInputStyle}
             onChangeText={text => this.onNameChanged(text)}
             placeholderTextColor={colors.color999}
+            maxLength={40}
             placeholder={'不超过40个字符'}/>
           <If condition={name}>
             <Text style={styles.clearBtn} onPress={this.onNameClear}>
@@ -1358,8 +1363,9 @@ class GoodsEditScene extends PureComponent {
     const {actualNum = ''} = inventory
     const {price_type} = this.props.global.vendor_info;
     let {product_detail = {}} = this.props.route.params;
-    const {series_id = ''} = product_detail;
+    const {series_id = '', sku_max_num = 0} = product_detail;
     const {currStoreId} = this.props.global;
+    const {selected_pids} = this.state;
     return (
       <View style={Styles.zoneWrap} key={index}>
         <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
@@ -1375,6 +1381,8 @@ class GoodsEditScene extends PureComponent {
                   {
                     series_id: series_id,
                     store_id: currStoreId,
+                    selected_pids: selected_pids,
+                    sku_max_num: sku_max_num,
                     onBack: resp => {
                       this.setPushSpec(resp)
                     }
@@ -1396,7 +1404,7 @@ class GoodsEditScene extends PureComponent {
             </Text>
           </Text>
           <TextInput
-            maxLength={40}
+            maxLength={20}
             value={sku_name}
             editable={!vendor_has && !store_has}
             //editable={this.isStoreProdEditable()}
@@ -1454,7 +1462,6 @@ class GoodsEditScene extends PureComponent {
               </Text>
             </Text>
             <TextInput
-
               style={styles.textInputStyle}
               value={weight}
               keyboardType={'numeric'}
@@ -1524,7 +1531,7 @@ class GoodsEditScene extends PureComponent {
             </TouchableOpacity>
           </If>
           <If condition={multiSpecsList.length > 1 && index !== 0 && !vendor_has && !store_has}>
-            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index, checked)}>
+            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index, checked, item.id)}>
               <AntDesign name={'delete'} size={22} color={colors.main_color}/>
             </TouchableOpacity>
           </If>
@@ -1561,7 +1568,7 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
-  deleteSpecs = (index, checked) => {
+  deleteSpecs = (index, checked, id = '') => {
     const {type} = this.props.route.params;
     if ('edit' === type && !checked) {
       Alert.alert('删除规格', '将从商品库中删除规格信息，会从关联的门店中消失，确定是否要删除？',
@@ -1578,6 +1585,9 @@ class GoodsEditScene extends PureComponent {
           }
         ])
       return
+    }
+    if (id) {
+      this.state.selected_pids.splice(this.state.selected_pids.findIndex(item => item == id), 1)
     }
     this.deletedSpecsInfo(index)
   }

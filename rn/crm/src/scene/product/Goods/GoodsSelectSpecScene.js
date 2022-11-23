@@ -16,6 +16,8 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
+import {check_icon} from "../../../svg/svg";
+import {SvgXml} from "react-native-svg";
 
 const width = Dimensions.get("window").width;
 
@@ -43,7 +45,10 @@ class GoodsSelectSpecScence extends PureComponent {
       store_id: this.props.route.params?.store_id,
       currentSpecs: [],
       otherSpec: [],
-      checkedSpec: {}
+      selectArr: [],
+      selected_pids: this.props.route.params?.selected_pids || '',
+      sku_max_num: this.props.route.params?.sku_max_num || 0,
+      initLength: 0
     }
   }
 
@@ -59,33 +64,41 @@ class GoodsSelectSpecScence extends PureComponent {
 
   fetchSpecList = () => {
     const {accessToken} = this.props.global;
-    let {series_id, store_id} = this.state;
+    let {series_id, store_id, selected_pids} = this.state;
     const api = `/v1/new_api/store_product/product_sku_list/${store_id}/${series_id}`
     HttpUtils.get.bind(this.props)(api, {
-      access_token: accessToken
+      access_token: accessToken,
+      selected_pids: selected_pids
     }).then(res => {
       this.setState({
         currentSpecs: res?.skus,
-        otherSpec: res?.no_skus
+        otherSpec: res?.no_skus,
+        initLength: res?.skus.length + res?.no_skus.length
       })
     })
   }
 
   touchOtherSpecItem = (idx, info) => {
-    let menus = [...this.state.otherSpec]
-    menus.forEach(item => {
-      item.checked = false
-    })
-    menus[idx].checked = true
+    let {selectArr} = this.state;
+    let menu = [...this.state.otherSpec]
+    menu[idx].checked = !menu[idx].checked;
     this.setState({
-      otherSpec: menus,
-      checkedSpec: info
+      menus: menu
+    })
+    if (menu[idx].checked) {
+      selectArr.push(info)
+    } else {
+      selectArr.splice(selectArr.findIndex(index => Number(index) == info.id), 1)
+    }
+    this.setState({
+      selectArr,
+      otherSpec: menu
     })
   }
 
   sureCheckSpec = () => {
-    let {checkedSpec} = this.state;
-    this.props.route.params.onBack(checkedSpec)
+    let {selectArr} = this.state;
+    this.props.route.params.onBack(selectArr)
     this.props.navigation.goBack();
   }
 
@@ -114,7 +127,7 @@ class GoodsSelectSpecScence extends PureComponent {
 
   renderEditInfo = () => {
     let {
-      currentSpecs, otherSpec, series_id
+      currentSpecs, otherSpec, series_id, sku_max_num, initLength
     } = this.state
     return (
       <View style={styles.InfoBox}>
@@ -123,15 +136,17 @@ class GoodsSelectSpecScence extends PureComponent {
             <Text style={styles.item_title}>当前使用的规格 </Text>
           </View>
           <For of={currentSpecs} each="info" index="idx">
-            <View style={styles.flexRowNormal} key={idx}>
-              <View>
-                <Text style={styles.specSkuName}>{info.sku_name} </Text>
-                <Text style={styles.specSkuUpc}>upc: {info.upc} </Text>
+            <View key={idx}>
+              <View style={styles.flexRowNormal}>
+                <View>
+                  <Text style={styles.specSkuName}>{info.sku_name} </Text>
+                  <Text style={styles.specSkuUpc}>upc: {info.upc} </Text>
+                </View>
               </View>
+              <If condition={currentSpecs.length - 1 !== idx}>
+                <View style={styles.cutLine}/>
+              </If>
             </View>
-            <If condition={currentSpecs.length - 1 !== idx}>
-              <View style={styles.cutLine}/>
-            </If>
           </For>
         </View>
         <View style={styles.item_body}>
@@ -139,31 +154,36 @@ class GoodsSelectSpecScence extends PureComponent {
             <Text style={styles.item_title}>其他规格 </Text>
           </View>
           <For of={otherSpec} each="info" index="idx">
-            <TouchableOpacity style={styles.flexRowNormal} key={idx} onPress={() => this.touchOtherSpecItem(idx, info)}>
-              <CheckBox
-                checked={info.checked}
-                checkedColor={colors.main_color}
-                checkedIcon='dot-circle-o'
-                uncheckedIcon='circle-o'
-                uncheckedColor='#979797'
-                size={18}
-                onPress={() => this.touchOtherSpecItem(idx, info)}
-              />
-              <View>
-                <Text style={styles.specSkuName}>{info.sku_name} </Text>
-                <Text style={styles.specSkuUpc}>upc: {info.upc} </Text>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.cutLine}/>
+            <View key={idx}>
+              <TouchableOpacity style={styles.flexRowNormal} onPress={() => this.touchOtherSpecItem(idx, info)}>
+                <CheckBox
+                  checked={info.checked}
+                  checkedColor={colors.main_color}
+                  checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+                  uncheckedColor={'#DDDDDD'}
+                  size={18}
+                  onPress={() => this.touchOtherSpecItem(idx, info)}
+                />
+                <View>
+                  <Text style={styles.specSkuName}>{info.sku_name} </Text>
+                  <Text style={styles.specSkuUpc}>upc: {info.upc} </Text>
+                </View>
+              </TouchableOpacity>
+              <If condition={idx !== otherSpec.length - 1}>
+                <View style={styles.cutLine}/>
+              </If>
+            </View>
           </For>
-          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
-            <Text style={{fontSize: 14, color: colors.color999}}>无合适规格， </Text>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center", paddingVertical: 10}}
-                              onPress={() => this.onPress(Config.ROUTE_GOODS_ADD_SPEC, {series_id: series_id})}>
-              <Text style={{fontSize: 14, color: colors.main_color}}>去新增规格 </Text>
-              <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
-            </TouchableOpacity>
-          </View>
+          <If condition={initLength <= sku_max_num}>
+            <View style={styles.cutLine}/>
+            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
+              <Text style={{fontSize: 14, color: colors.color999}}>无合适规格， </Text>
+              <TouchableOpacity style={{flexDirection: "row", alignItems: "center", paddingVertical: 10}} onPress={() => this.onPress(Config.ROUTE_GOODS_ADD_SPEC, {series_id: series_id})}>
+                <Text style={{fontSize: 14, color: colors.main_color}}>去新增规格 </Text>
+                <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
+              </TouchableOpacity>
+            </View>
+          </If>
         </View>
       </View>
     )
