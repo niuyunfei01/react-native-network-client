@@ -114,10 +114,11 @@ class StoreStatusScene extends PureComponent {
     const {navigation, global} = this.props
     let {currStoreId, vendor_id} = global
     let {is_service_mgr} = tool.vendor(this.props.global);
-    let {show_body, allow_merchants_store_bind, total_wm_stores} = this.state;
+    let {total_wm_stores} = this.state;
+    this.mixpanel.track("mine.wm_store_list", {currStoreId, vendor_id, total_wm_stores});
     navigation.setOptions({
       headerRight: () => {
-        if (show_body && (allow_merchants_store_bind || is_service_mgr)) {
+        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
@@ -135,7 +136,6 @@ class StoreStatusScene extends PureComponent {
       this.fetchData()
     })
 
-    this.mixpanel.track("mine.wm_store_list", {currStoreId, vendor_id, total_wm_stores});
   }
 
 
@@ -400,7 +400,6 @@ class StoreStatusScene extends PureComponent {
     return (
       <View style={{
         flex: 1,
-        backgroundColor: 'red'
       }}>
         {
           business_status && business_status.map((store, index) => {
