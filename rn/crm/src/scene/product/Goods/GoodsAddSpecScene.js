@@ -142,7 +142,8 @@ class GoodsAddSpecScence extends PureComponent {
               style={styles.textInputStyle}
               onChangeText={text => this.onNameChanged(text)}
               placeholderTextColor={colors.color999}
-              placeholder={'不超过40个字符'}/>
+              maxLength={20}
+              placeholder={'不超过20个字符'}/>
             <If condition={sku_name}>
               <Text style={styles.clearBtn} onPress={this.onNameClear}>
                 清除
