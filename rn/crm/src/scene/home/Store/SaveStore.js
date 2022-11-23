@@ -94,6 +94,11 @@ class SaveStore extends PureComponent {
       show_placeholder: true,
       referrer_id: ''
     };
+
+  }
+
+  componentDidMount() {
+    let {type = 'add'} = this.state
     this.fetchCategories()
     if (type === 'edit') {
       this.fetchData()

@@ -23,8 +23,9 @@ class DeliveryList extends PureComponent {
 
   constructor(props) {
     super(props)
+    const {show_select_store, store_id, store_name} = props.route.params || {}
     this.state = {
-      show_select_store: props.route.params?.show_select_store !== undefined ? props.route.params?.show_select_store : true,
+      show_select_store: show_select_store !== undefined ? show_select_store : true,
       in_review_deliveries: [],
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
@@ -34,8 +35,8 @@ class DeliveryList extends PureComponent {
       platformId: 0,
       selectStoreVisible: false,
       selectDelivery: {},
-      store_id: props.route.params?.store_id !== undefined ? props.route.params?.store_id : props.global?.store_id,
-      store_name: props.global?.store_info?.name,
+      store_id: store_id !== undefined ? store_id : props.global?.store_id,
+      store_name: store_name !== undefined ? store_name : props.global?.store_info?.name,
       storeList: [],
       page_size: 10,
       page: 1,
@@ -232,7 +233,9 @@ class DeliveryList extends PureComponent {
     const {only_one_store} = this.props.global;
     return (
       <View style={styles.headerWrap}>
-        <SvgXml height={32} width={32} onPress={() => this.props.navigation.goBack()}
+        <SvgXml height={32}
+                width={32}
+                onPress={() => this.props.navigation.goBack()}
                 xml={show_select_store ? back() : head_cross_icon()}/>
         <If condition={!only_one_store}>
           <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
