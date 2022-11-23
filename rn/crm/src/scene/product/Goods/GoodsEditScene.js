@@ -1824,7 +1824,7 @@ class GoodsEditScene extends PureComponent {
                       onReleaseCell={this.onReleaseCell}
                       onEndDragging={(item, index) => this.onEndDragging(item, index)}
                       onPressCell={(item, index) => this.onPressCell(item, index)}
-                      keyExtractor={(item) => item.id}
+                      keyExtractor={(item, index) => `${index}`}
                       delayLongPress={100}
                       renderItem={(item, index) => this.renderModalItem(item, index)}/>
             <View style={styles.modifyPicBtnWrap}>
