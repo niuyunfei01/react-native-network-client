@@ -353,7 +353,7 @@ class SaveStore extends PureComponent {
         paddingHorizontal: 6,
       }}>
         <SvgXml style={{marginRight: 4}} onPress={() => {
-          if (type === 'add') {
+          if (type !== 'edit') {
             return this.setState({
               show_back_modal: true,
             })
