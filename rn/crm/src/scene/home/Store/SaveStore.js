@@ -67,6 +67,9 @@ class SaveStore extends PureComponent {
   constructor(props) {
     super(props);
     let {store_id = 0, type = 'add', mobile = '', verify_code = ''} = this.props.route.params;
+    if (tool.length(mobile) <= 0) {
+      mobile = this.props.global.store_info?.mobile
+    }
     this.state = {
       loading: false,
       store_id,
@@ -83,6 +86,7 @@ class SaveStore extends PureComponent {
       category_desc: '',
       contact_name: '',
       contact_phone: '',
+      mobile,
       verify_code: verify_code,
       city: '',
       show_back_modal: false,
@@ -222,7 +226,8 @@ class SaveStore extends PureComponent {
       contact_phone,
       verify_code,
       type,
-      referrer_id
+      mobile,
+      referrer_id,
     } = this.state;
 
     if (loading) {
@@ -241,7 +246,7 @@ class SaveStore extends PureComponent {
       category_desc,
       contact_name,
       contact_phone,
-      mobile: contact_phone,
+      mobile,
       password: verify_code,
       vendor_id,
       referrer_id
