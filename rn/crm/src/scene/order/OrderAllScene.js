@@ -631,7 +631,6 @@ class OrderAllScene extends Component {
         flexDirection: 'row',
         alignItems: 'center',
         height: 44,
-        width: width,
         backgroundColor: colors.white,
         paddingHorizontal: 6,
       }}>
@@ -654,14 +653,20 @@ class OrderAllScene extends Component {
             show_select_store_modal: !show_select_store_modal,
             show_condition_modal: 0
           })
-        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        }} style={{
+          height: 44,
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,
             fontWeight: 'bold'
           }}>{tool.jbbsubstr(search_store_name, 12)} </Text>
           <If condition={!only_one_store}>
-            <SvgXml xml={show_select_store_modal ? this_up() : this_down()}/>
+            <SvgXml xml={show_select_store_modal ? this_up(colors.color333) : this_down(colors.color333)}/>
           </If>
         </TouchableOpacity>
 
