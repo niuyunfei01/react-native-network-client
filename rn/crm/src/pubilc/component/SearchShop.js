@@ -56,6 +56,7 @@ class SearchShop extends Component {
     let show_map = false;
     let show_seach_msg = true;
     let local_city = '北京';
+    let location_name = '北京';
 
     let {store_info = {}} = this.props.global;
 
@@ -66,6 +67,7 @@ class SearchShop extends Component {
 
     if (tool.length(keywords) > 0) {
       map.address = keywords
+      location_name = keywords
       show_seach_msg = false
     }
 
@@ -92,6 +94,7 @@ class SearchShop extends Component {
       city_name: local_city,
       location: map,
       placeholderText: placeholder_text,
+      location_name: location_name,
       is_can_load_more: false,
       show_placeholder: true,
       is_add: true,
@@ -107,7 +110,7 @@ class SearchShop extends Component {
   onRefresh = () => {
     this.setState({page: 1, is_add: true},
       () => {
-        if (this.state.show_map) {
+        if (this.state.show_map || tool.length(this.state.keyword) <= 0) {
           this.searchLngLat()
         } else {
           this.search()
@@ -142,6 +145,7 @@ class SearchShop extends Component {
           })
         })
       } else {
+        this.setState({loading: false})
         ToastLong("请输入门店位置信息")
       }
     })
@@ -161,7 +165,7 @@ class SearchShop extends Component {
   }
 
   searchLngLat = () => {
-    let {location, page, page_size, is_add, shops, ret_list} = this.state;
+    let {location, page, page_size, is_add, shops, ret_list, location_name} = this.state;
     if (!is_add) {
       return;
     }
@@ -175,7 +179,16 @@ class SearchShop extends Component {
       }
       HttpUtils.get.bind(this.props)(api, params).then((res) => {
         Keyboard.dismiss()
+        if (page === 1 && tool.length(res) > 0) {
+          for (let idx in res) {
+            if (Number(idx) === 0) {
+              res[idx].default = true
+              location_name = res[idx]?.name
+            }
+          }
+        }
         this.setState({
+          location_name,
           keyword: '',
           page: page + 1,
           shops: page === 1 ? res : shops.concat(res),
@@ -200,6 +213,8 @@ class SearchShop extends Component {
         city: city_name,
         callback: (item) => {
           this.setState({
+            ret_list: [],
+            shops: [],
             city_name: item.name,
           })
         }
@@ -439,7 +454,21 @@ class SearchShop extends Component {
                           backgroundColor: 'white',
                         }}
                         onPress={() => this.onClickItem(item)}>
-        <Text style={{color: colors.color333, fontSize: 16}}> {item?.name}  </Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={{color: colors.color333, fontSize: 16}}> {item?.name} </Text>
+          <If condition={item?.default && this.state.show_map}>
+            <View style={{
+              backgroundColor: colors.main_color,
+              height: 16,
+              borderRadius: 2,
+              marginLeft: 4,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{color: colors.white, marginHorizontal: 4, fontSize: 11,}}> 当前定位 </Text>
+            </View>
+          </If>
+        </View>
         <Text style={{
           color: colors.color999,
           fontSize: 12,
@@ -450,13 +479,12 @@ class SearchShop extends Component {
   }
 
   renderMap() {
-    let {location} = this.state;
+    let {location, location_name} = this.state;
     let lat = location.location.split(",")[1];
     let lng = location.location.split(",")[0];
     if (!lat || !lng) {
       return null
     }
-    let address = location?.name ? location?.name : location?.address;
     return (
       <View style={{height: 300}}>
         <MapView
@@ -492,9 +520,14 @@ class SearchShop extends Component {
                 marginBottom: 15,
                 padding: 8,
                 borderRadius: 6,
+                shadowColor: '#000',
+                shadowOffset: {width: 0, height: 0},
+                shadowOpacity: 0.1,
+                elevation: 3,
+                shadowRadius: 8,
               }}>
                 <Text style={{color: colors.color333, fontSize: 12}}>
-                  {tool.jbbsubstr(address, 5, 0, '标注点')}
+                  {tool.jbbsubstr(location_name, 15, 0, '标注点')}
                 </Text>
               </View>
               <Entypo name={'triangle-down'}
