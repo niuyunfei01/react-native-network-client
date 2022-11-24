@@ -242,7 +242,7 @@ class OpenDeliveryModal extends PureComponent {
   }
 
   openWSBDelivery = () => {
-    const {fetchData, global, store_id, delivery} = this.props
+    const {refreshDeliveyList, global, store_id, delivery} = this.props
     const {v2_type} = delivery
     const {accessToken} = global
     let data = {store_id: store_id, platform: v2_type}
@@ -255,7 +255,7 @@ class OpenDeliveryModal extends PureComponent {
         ToastShort('申请成功，审核中')
       else ToastShort('开通成功')
 
-      fetchData && fetchData()
+      refreshDeliveyList && refreshDeliveyList()
     }, async (ret) => {
       await this.closeModal()
       ToastLong(ret.desc);
@@ -313,7 +313,7 @@ class OpenDeliveryModal extends PureComponent {
 
   }
   getGxdAuthorizedToLog = () => {
-    const {global, fetchData, store_id} = this.props
+    const {global, refreshDeliveyList, store_id} = this.props
     let {accessToken, vendor_id} = global
     let {mobile, verificationCode} = this.state
 
@@ -326,7 +326,7 @@ class OpenDeliveryModal extends PureComponent {
     const params = {store_id: store_id, phone: mobile, code: verificationCode}
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
-      fetchData && fetchData()
+      refreshDeliveyList && refreshDeliveyList()
       ToastShort(res.desc, 1)
 
     }).catch(async (reason) => {
@@ -337,7 +337,7 @@ class OpenDeliveryModal extends PureComponent {
 
   getUUPTAuthorizedToLog = () => {
 
-    const {global, fetchData, store_id} = this.props
+    const {global, refreshDeliveyList, store_id} = this.props
     let {accessToken, vendor_id} = global
     let {mobile, verificationCode} = this.state
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
@@ -353,7 +353,7 @@ class OpenDeliveryModal extends PureComponent {
     }
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
-      fetchData && fetchData()
+      refreshDeliveyList && refreshDeliveyList()
 
       ToastShort(res.desc, 1)
     }).catch(async (reason) => {
@@ -387,28 +387,26 @@ class OpenDeliveryModal extends PureComponent {
           await this.requestUrl(delivery.type)
         break
       case Config.UU_PAO_TUI:
-        if (selectGeneralDelivery)
-          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
-        else {
-          this.setState({selectGeneralDelivery: true})
-          if (selectAccountType === 1)
-            this.openWSBDelivery()
-          if (selectAccountType === 2)
+        if (selectAccountType === 1)
+          this.openWSBDelivery()
+        if (selectAccountType === 2) {
+          if (selectGeneralDelivery)
+            this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
+          else
             this.getUUPTAuthorizedToLog()
         }
         break
-      case Config.GUO_XIAO_DI:
-        if (selectGeneralDelivery)
-          this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
-        else {
-
-          this.setState({selectGeneralDelivery: true})
-          if (selectAccountType === 1)
-            this.openWSBDelivery()
-          if (selectAccountType === 2)
+      case
+      Config.GUO_XIAO_DI:
+        if (selectAccountType === 1)
+          this.openWSBDelivery()
+        if (selectAccountType === 2) {
+          if (selectGeneralDelivery)
+            this.setState({selectGeneralDelivery: false, headerText: `绑定${delivery.name} `})
+          else
             this.getGxdAuthorizedToLog()
-
         }
+
         break
     }
   }

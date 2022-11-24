@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
-  orderListContent: {flex: 1, backgroundColor: colors.f5,},
+  orderListContent: {flex: 1, backgroundColor: colors.f5, marginTop: 10},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   noOrderContent: {
     alignItems: 'center',
