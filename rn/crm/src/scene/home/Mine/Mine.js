@@ -481,7 +481,7 @@ class Mine extends PureComponent {
                       start={{x: 0, y: 0}}
                       end={{x: 0, y: 1}}
                       colors={['#E7FFEB', '#FFFFFF']}>
-        <View style={{borderRightColor: colors.e5, borderRightWidth: 0.5, paddingRight: 20}}>
+        <View style={{borderRightColor: colors.e5, borderRightWidth: 0.5, paddingRight: 15}}>
           <Text style={styles.walletLabel}>
             账户余额(元)
           </Text>
@@ -490,13 +490,9 @@ class Mine extends PureComponent {
           </Text>
         </View>
 
-        <View style={{flex: 1, marginLeft: 19}}>
-          <Text style={styles.walletLabel} onPress={() => {
-            this.setState({
-              show_freeze_balance_alert: true
-            })
-          }}>
-            冻结金额(元) <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.colorCCC,}}/>
+        <View style={{paddingHorizontal: 14}}>
+          <Text style={styles.walletLabel} onPress={() => this.setState({show_freeze_balance_alert: true})}>
+            冻结金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <Text style={styles.walletValue}>
             {balanceInfo?.disable_view_bill ? balanceInfo?.freeze_balance : `*****`}
@@ -521,15 +517,13 @@ class Mine extends PureComponent {
   renderFreezeBalanceAlertModal = () => {
     let {show_freeze_balance_alert, balanceInfo} = this.state;
     return (
-      <View>
-        <AlertModal
-          visible={show_freeze_balance_alert}
-          onClose={this.closeModal}
-          onPress={() => this.closeModal()}
-          title={'冻结金额'}
-          desc={balanceInfo?.freeze_notice}
-          actionText={'知道了'}/>
-      </View>
+      <AlertModal
+        visible={show_freeze_balance_alert}
+        onClose={this.closeModal}
+        onPress={() => this.closeModal()}
+        title={'冻结金额'}
+        desc={balanceInfo?.freeze_notice}
+        actionText={'知道了'}/>
     )
   }
 
@@ -808,26 +802,27 @@ const styles = StyleSheet.create({
   walletBox: {
     height: 86,
     borderRadius: 6,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 15,
     flexDirection: "row",
     alignItems: "center",
-    // justifyContent: "space-between"
+    justifyContent: 'space-between'
   },
   walletLabel: {
     fontSize: 12,
     color: colors.color666,
-    marginBottom: 10
+    marginBottom: 4
   },
   walletValue: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 18,
     color: colors.color333
   },
   walletBtn: {
     width: 93,
     height: 36,
     backgroundColor: '#FF8309',
-    borderRadius: 21
+    borderRadius: 21,
   },
   walletBtnTitle: {
     fontSize: 14,
