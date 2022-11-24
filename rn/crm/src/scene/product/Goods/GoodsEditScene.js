@@ -760,52 +760,52 @@ class GoodsEditScene extends PureComponent {
     let {type = 'add'} = this.props.route.params;
     const {fnProviding} = this.state
     const {
-      id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type, inventory
+      id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type, inventory, sg_tag_id,
+      upload_files
     } = formData;
     if (type === "edit" && id <= 0) {
       ToastLong('数据异常, 无法保存')
       return false
     }
-    if (type === "add") {
-      //增加商品
-      let {supply_price, sale_status, provided, price} = store_goods_status;
-      if ('spec_single' === spec_type) {
-        if (parseInt(supply_price) < 0) {
-          ToastLong('请输入正确的报价')
-          return false
-        }
-        if (!supply_price) {
-          ToastLong('请输入报价')
-          return false
-        }
-        if (price_type === 1 && parseInt(price) < 0) {
-          ToastLong('请输入正确的零售价格')
-          return false
-        }
-        if (price_type === 1 && !price) {
-          ToastLong('请输入零售价格')
-          return false
-        }
-        if (!inventory.actualNum && fnProviding === '1') {
-          ToastLong('请输入商品库存')
-          return false
-        }
-        if (Number(inventory.actualNum) < 0 && fnProviding === '1') {
-          ToastLong('请输入正确的商品库存')
-          return false
-        }
-      }
 
-      if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
-        ToastLong('请选择上架状态')
+    let {supply_price, sale_status, provided, price} = store_goods_status;
+    if ('spec_single' === spec_type) {
+      if (parseInt(supply_price) < 0) {
+        ToastLong('请输入正确的报价')
         return false
       }
-      if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
-        ToastLong('选择供货方式')
+      if (!supply_price) {
+        ToastLong('请输入报价')
         return false
       }
-
+      if (price_type === 1 && parseInt(price) < 0) {
+        ToastLong('请输入正确的零售价格')
+        return false
+      }
+      if (price_type === 1 && !price) {
+        ToastLong('请输入零售价格')
+        return false
+      }
+      if (!inventory.actualNum && fnProviding === '1') {
+        ToastLong('请输入商品库存')
+        return false
+      }
+      if (Number(inventory.actualNum) < 0 && fnProviding === '1') {
+        ToastLong('请输入正确的商品库存')
+        return false
+      }
     }
+
+    if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
+      ToastLong('请选择上架状态')
+      return false
+    }
+    if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
+      ToastLong('选择供货方式')
+      return false
+    }
+
+
 
     if ('spec_multi' === spec_type) {
       if (!Array.isArray(spec_list) || spec_list.length <= 0) {
@@ -841,6 +841,10 @@ class GoodsEditScene extends PureComponent {
         ToastLong('请输入商品名称')
         return false
       }
+      if (upload_files.length <= 0) {
+        ToastLong('请添加商品图片')
+        return false
+      }
       if (!(vendor_id > 0)) {
         ToastLong('无效的品牌商')
         return false
@@ -849,6 +853,10 @@ class GoodsEditScene extends PureComponent {
       if (!(weight > 0) && 'spec_single' === spec_type) {
 
         ToastLong('请输入正确的重量')
+        return false
+      }
+      if (sg_tag_id == 0) {
+        ToastLong('请选择闪购类目')
         return false
       }
       if (tool.length(store_categories) <= 0) {

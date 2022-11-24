@@ -3,6 +3,8 @@ import {
   Alert,
   FlatList,
   InteractionManager,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -364,7 +366,8 @@ class BindShunfeng extends PureComponent {
     if (bindShunFengByIdVisible)
       return (
         <CommonModal visible={bindShunFengByIdVisible} position={'flex-end'} onRequestClose={this.closeModalByBindId}>
-          <View style={styles.modalWrap}>
+          <KeyboardAvoidingView style={styles.modalWrap}
+                                behavior={Platform.select({android: 'height', ios: 'padding'})}>
             <View style={styles.modalHeaderWrap}>
               <Text style={styles.modalHeaderText}>
                 绑定顺丰
@@ -394,7 +397,7 @@ class BindShunfeng extends PureComponent {
                 立即绑定
               </Text>
             </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
         </CommonModal>
       )
   }

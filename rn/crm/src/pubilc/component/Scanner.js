@@ -18,20 +18,20 @@ import Sound from 'react-native-sound';
 
 Sound.setCategory('Playback');
 const barCodeTypes = [
-  // RNCamera.Constants.BarCodeType.aztec,
-  // RNCamera.Constants.BarCodeType.code128,
-  // RNCamera.Constants.BarCodeType.code39,
-  // RNCamera.Constants.BarCodeType.code39mod43,
-  // RNCamera.Constants.BarCodeType.code93,
+  RNCamera.Constants.BarCodeType.aztec,
+  RNCamera.Constants.BarCodeType.code128,
+  RNCamera.Constants.BarCodeType.code39,
+  RNCamera.Constants.BarCodeType.code39mod43,
+  RNCamera.Constants.BarCodeType.code93,
   RNCamera.Constants.BarCodeType.ean13,
-  // RNCamera.Constants.BarCodeType.ean8,
-  // RNCamera.Constants.BarCodeType.pdf417,
-  // RNCamera.Constants.BarCodeType.upc_e,
-  // RNCamera.Constants.BarCodeType.interleaved2of5,
-  // RNCamera.Constants.BarCodeType.itf14,
-  // RNCamera.Constants.BarCodeType.datamatrix,
+  RNCamera.Constants.BarCodeType.ean8,
+  RNCamera.Constants.BarCodeType.pdf417,
+  RNCamera.Constants.BarCodeType.upc_e,
+  RNCamera.Constants.BarCodeType.interleaved2of5,
+  RNCamera.Constants.BarCodeType.itf14,
+  RNCamera.Constants.BarCodeType.datamatrix,
 ]
-const googleVisionBarcodeType = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.EAN_13
+const googleVisionBarcodeType = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX
 const googleVisionBarcodeMode = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeMode.ALTERNATE
 
 let allowPlay = true
@@ -123,15 +123,58 @@ class Scanner extends React.Component {
     }
   }
 
+  onBarCodeRead = (result) => {
+    const {data} = result;
+    if (data && allowPlay) {
+      allowPlay = false
+      this.props.onScanSuccess && this.props.onScanSuccess(data)
+      // 扫码提示音
+      const whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+          whoosh.pause()
+          whoosh.release();
+          allowPlay = true
+          this.props.onClose && this.props.onClose()
+          return;
+        }
+        //  loaded successfully
+        // console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+
+        // Play the sound with an onEnd callback
+        whoosh.play((success) => {
+          if (success) {
+            whoosh.pause()
+            whoosh.setNumberOfLoops(1);
+            whoosh.release();
+
+            //手机振动
+            switch (Platform.OS) {
+              case "android":
+                Vibration.vibrate([0, 100], false)
+                break
+              case "ios":
+                Vibration.vibrate(100, false)
+                break
+            }
+          }
+          allowPlay = true
+          this.props.onClose && this.props.onClose()
+        });
+      });
+
+    }
+  }
+
   render() {
+    const {visible, onClose, title} = this.props
     return (
 
-      <Modal visible={this.props.visible} onRequestClose={this.props.onClose}>
+      <Modal visible={visible} onRequestClose={onClose} hardwareAccelerated={true} transparent={true}>
         <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
           <View style={styles.container}>
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => this.props.onClose()}>
-                <Text style={styles.title}>{this.props.title} </Text>
+              <TouchableOpacity onPress={onClose}>
+                <Text style={styles.title}>{title} </Text>
               </TouchableOpacity>
             </View>
             <RNCamera
@@ -141,11 +184,11 @@ class Scanner extends React.Component {
               flashMode={RNCamera.Constants.FlashMode.on}
               barCodeTypes={barCodeTypes}
               detectedImageInEvent={false}
-              // onBarCodeRead={this.onBarCodeRead}
+              onBarCodeRead={this.onBarCodeRead}
               googleVisionBarcodeType={googleVisionBarcodeType}
               googleVisionBarcodeMode={googleVisionBarcodeMode}
               captureAudio={false}
-              onGoogleVisionBarcodesDetected={event => this.onGoogleVisionBarcodesDetected(event)}
+
             >
               <View style={styles.rectangleContainer}>
                 <View style={styles.rectangle}/>
