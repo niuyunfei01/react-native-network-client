@@ -275,7 +275,7 @@ class SearchOrder extends PureComponent {
             searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
             clearIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
             cancelIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
-            placeholderTextColor={show_placeholder ? colors.color999 : colors.f5}
+            placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
             onBlur={() => {
               this.setState({
                 show_placeholder: true

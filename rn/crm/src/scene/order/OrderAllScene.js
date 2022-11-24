@@ -434,7 +434,10 @@ class OrderAllScene extends Component {
       show_date_type
     } = this.state;
     return (
-      <JbbModal visible={show_date_modal} onClose={this.closeModal} modal_type={'bottom'}
+      <JbbModal
+        visible={show_date_modal}
+        onClose={this.closeModal}
+        HighlightStyle={{padding: 10}}
       >
         <View>
           <View style={{
@@ -442,11 +445,15 @@ class OrderAllScene extends Component {
             justifyContent: "space-between",
             alignItems: "center",
             height: 50,
-            marginHorizontal: 20
           }}>
             <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}> 选择日期 </Text>
             <Text
-              style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}}
+              style={{
+                fontSize: 16,
+                lineHeight: 50,
+                paddingHorizontal: 10,
+                color: colors.main_color,
+              }}
               onPress={this.confirmDate}> 确定 </Text>
           </View>
 
@@ -459,11 +466,21 @@ class OrderAllScene extends Component {
             <TouchableOpacity onPress={() => {
               this.setState({show_date_select_modal: true, show_date_type: 1})
             }}>
-              <Text> {dayjs(search_start_date_input_val).format('YYYY-MM-DD')} </Text>
+              <Text style={{
+                fontSize: 16,
+                color: colors.color333,
+                lineHeight: 70
+              }}> {dayjs(search_start_date_input_val).format('YYYY-MM-DD')} </Text>
             </TouchableOpacity>
             <Text>-</Text>
-            <TouchableOpacity onPress={() => this.setState({show_date_select_modal: true, show_date_type: 2})}>
-              <Text> {dayjs(search_end_date_input_val).format('YYYY-MM-DD')} </Text>
+            <TouchableOpacity onPress={() => {
+              this.setState({show_date_select_modal: true, show_date_type: 2})
+            }}>
+              <Text style={{
+                fontSize: 16,
+                color: colors.color333,
+                lineHeight: 70
+              }}> {dayjs(search_end_date_input_val).format('YYYY-MM-DD')} </Text>
             </TouchableOpacity>
 
             <DatePicker

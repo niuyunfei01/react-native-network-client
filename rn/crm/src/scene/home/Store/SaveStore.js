@@ -353,7 +353,7 @@ class SaveStore extends PureComponent {
         paddingHorizontal: 6,
       }}>
         <SvgXml style={{marginRight: 4}} onPress={() => {
-          if (type !== 'edit') {
+          if (type === 'register') {
             return this.setState({
               show_back_modal: true,
             })
@@ -399,7 +399,6 @@ class SaveStore extends PureComponent {
           paddingHorizontal: 12,
         }}>
 
-
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -412,7 +411,7 @@ class SaveStore extends PureComponent {
             <TextInput placeholder={"请填写门店名称"}
                        underlineColorAndroid="transparent"
                        style={{flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={show_placeholder ? '#999' : colors.white}
+                       placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
                        value={store_name}
                        maxLength={20}
                        onBlur={() => {

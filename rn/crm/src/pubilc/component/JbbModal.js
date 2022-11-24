@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
-import {KeyboardAvoidingView, Modal, Platform, TouchableOpacity} from 'react-native'
+import {KeyboardAvoidingView, Modal, Platform, TouchableHighlight, TouchableOpacity} from 'react-native'
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
@@ -53,7 +53,9 @@ class JbbModal extends PureComponent {
               borderTopRightRadius: 15,
               paddingBottom: 20,
             }, HighlightStyle]}>
-            {children}
+            <TouchableHighlight>
+              {children}
+            </TouchableHighlight>
           </KeyboardAvoidingView>
         </TouchableOpacity>
       </Modal>
