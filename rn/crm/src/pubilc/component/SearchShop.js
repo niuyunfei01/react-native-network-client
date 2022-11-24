@@ -290,7 +290,7 @@ class SearchShop extends Component {
             placeholder={placeholderText}
             onChangeText={(v) => this.onChange(v)}
             value={keyword}
-            placeholderTextColor={show_placeholder ? colors.color999 : colors.f5}
+            placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
             onBlur={() => {
               this.setState({
                 show_placeholder: true
