@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
   ItemContent: {
     flexDirection: "column",
     backgroundColor: colors.white,
-    marginTop: 10,
+    marginBottom: 10,
     marginHorizontal: 12,
     borderRadius: 6,
     shadowColor: '#000',
