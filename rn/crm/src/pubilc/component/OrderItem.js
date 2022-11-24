@@ -837,13 +837,13 @@ const styles = StyleSheet.create({
   ItemContent: {
     flexDirection: "column",
     backgroundColor: colors.white,
-    marginBottom: 10,
+    marginVertical: 5,
     marginHorizontal: 12,
     borderRadius: 6,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.1,
-    elevation: 5,
+    elevation: 3,
     shadowRadius: 8,
   },
   modalBtn: {
