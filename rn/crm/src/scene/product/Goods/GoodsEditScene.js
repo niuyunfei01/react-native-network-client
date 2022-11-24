@@ -703,24 +703,23 @@ class GoodsEditScene extends PureComponent {
       })
       formData.spec_list = multiSpecsList
     }
-    if (type === "add") {
-      formData.store_goods_status = {
-        sale_status: sale_status,
-        provided: provided
-      };
 
-      if (spec_type === 'spec_single') {
-        if (vendor_info.price_type === 1)
-          formData.store_goods_status.price = price
-        formData.store_goods_status.supply_price = supply_price
-        formData.inventory = {
-          actualNum: actualNum,
-          differenceType: 2,
-          totalRemain: actualNum,
-          remark: '',
-          store_id: currStoreId,
-          skipCheckChange: 1
-        }
+    formData.store_goods_status = {
+      sale_status: sale_status,
+      provided: provided
+    };
+
+    if (spec_type === 'spec_single') {
+      if (vendor_info.price_type === 1)
+        formData.store_goods_status.price = price
+      formData.store_goods_status.supply_price = supply_price
+      formData.inventory = {
+        actualNum: actualNum,
+        differenceType: 2,
+        totalRemain: actualNum,
+        remark: '',
+        store_id: currStoreId,
+        skipCheckChange: 1
       }
     }
 
@@ -1275,44 +1274,42 @@ class GoodsEditScene extends PureComponent {
             </View>
           </If>
         </If>
-        <If condition={store_has}>
-          <View style={styles.baseRowCenterWrap}>
-            <Text style={styles.leftText}>
-              上架状态
-              <Text style={styles.leftFlag}>
-                *
-              </Text>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            上架状态
+            <Text style={styles.leftFlag}>
+              *
             </Text>
-            <View style={styles.saleStatusWrap}>
-              <TouchableOpacity style={styles.saleStatusItemWrap}
-                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
-                <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
-                  <SvgXml xml={radioSelected(18, 18)}/>
-                </If>
-                <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
-                  <SvgXml xml={radioUnSelected(18, 18)}/>
-                </If>
-                <Text style={styles.saleStatusText}>
-                  上架
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saleStatusItemWrap}
-                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
-                <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
-                  <SvgXml xml={radioSelected(18, 18)}/>
-                </If>
-                <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
-                  <SvgXml xml={radioUnSelected(18, 18)}/>
-                </If>
-                <Text style={styles.saleStatusText}>
-                  下架
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.rightEmptyView}/>
+          </Text>
+          <View style={styles.saleStatusWrap}>
+            <TouchableOpacity style={styles.saleStatusItemWrap}
+                              onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
+              <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
+                <SvgXml xml={radioSelected(18, 18)}/>
+              </If>
+              <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
+                <SvgXml xml={radioUnSelected(18, 18)}/>
+              </If>
+              <Text style={styles.saleStatusText}>
+                上架
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saleStatusItemWrap}
+                              onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
+              <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
+                <SvgXml xml={radioSelected(18, 18)}/>
+              </If>
+              <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
+                <SvgXml xml={radioUnSelected(18, 18)}/>
+              </If>
+              <Text style={styles.saleStatusText}>
+                下架
+              </Text>
+            </TouchableOpacity>
           </View>
-          <LineView/>
-        </If>
+          <View style={styles.rightEmptyView}/>
+        </View>
+        <LineView/>
       </View>
     )
   }
