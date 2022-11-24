@@ -327,6 +327,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT_PROTOCOL} options={{headerTitle: '结算协议'}}
+                      getComponent={() => require('../../scene/home/Settlement/SettlementProtocolScene').default}
+        />
 
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}

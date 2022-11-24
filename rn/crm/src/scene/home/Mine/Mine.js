@@ -47,7 +47,7 @@ import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {showError} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
@@ -160,12 +160,14 @@ class Mine extends PureComponent {
       show_freeze_balance_alert: false,
       headerOpacity: new Animated.Value(0),
       headerHeight: new Animated.Value(0),
+      showSettle: false
     }
   }
 
   componentDidMount = () => {
     this.getActivitySwiper()
     this.getStoreDataOfMine()
+    this.fetchShowSettleProtocol()
   }
 
   handleTimeObj = (api = '', executeStatus = 'success', startTime, endTime, methodName = '', executeTime) => {
@@ -271,6 +273,20 @@ class Mine extends PureComponent {
     })
   }
 
+  fetchShowSettleProtocol = () => {
+    let {currStoreId, accessToken} = this.props.global;
+    let url = `/api/show_settle_protocol/20481`;
+    HttpUtils.get(url, {
+      access_token: '99adfa584158930ddd8bca1f94cf27709a8ee85d'
+    }).then(res => {
+      this.setState({
+        showSettle: res.is_show == 0
+      })
+    }).catch((res) => {
+      ToastShort(res.reason)
+    })
+  }
+
   // 联系客服
   JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
@@ -311,6 +327,10 @@ class Mine extends PureComponent {
 
   navigateToExpense = () => {
     this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})
+  }
+
+  navigateToSettle = () => {
+    this.onPress(Config.ROUTE_SETTLEMENT, {showSettle: this.state.showSettle})
   }
 
   navigateToWorker = () => {
@@ -402,6 +422,9 @@ class Mine extends PureComponent {
           break
         case 'OldSeparatedExpense':
           this.navigateToExpense()
+          break
+        case 'Settlement':
+          this.navigateToSettle()
           break
         default:
           this.onPress(info?.path)
