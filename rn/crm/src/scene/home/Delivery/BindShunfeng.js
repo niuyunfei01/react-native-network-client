@@ -88,14 +88,14 @@ class BindShunfeng extends PureComponent {
       navigation.navigate(route, params, callback);
     });
   }
-  setAddress = (detailAdress) => {
-    const {address = '', cityname = '', adname = '', pname = ''} = detailAdress
+  setAddress = (detailAddress) => {
+    const {address = '', city = '', area = '', province = ''} = detailAddress
     const {store} = this.state
     this.setState({
       registerShunFengVisible: true,
       store: {
         ...store,
-        address: pname === cityname ? cityname + adname : pname + cityname + adname,
+        address: province === city ? city + area : province + city + area,
         detailAddress: address
       }
     })
