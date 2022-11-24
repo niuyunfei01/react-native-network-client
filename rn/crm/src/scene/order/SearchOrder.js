@@ -346,7 +346,7 @@ class SearchOrder extends PureComponent {
                 keyword_type: Number(info.value) === keyword_type ? 0 : Number(info.value)
               }, () => {
                 tool.debounces(() => {
-                  this.fetchOrderList()
+                  this.onRefresh()
                 })
               })
             }} key={index} style={{
