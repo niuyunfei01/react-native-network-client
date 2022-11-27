@@ -874,7 +874,7 @@ const headerRightStyles = StyleSheet.create({
   rightBtn: {
     width: 90,
     height: 32,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.15)',
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     flexDirection: "row",
