@@ -53,9 +53,9 @@ class HttpUtils {
     return options
   }
 
-  static upLoadData = (error) => {
-    const url = '/util/crm_error_report/1'
-    const params = {
+  static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
+    const report_url = '/util/crm_error_report/1'
+    const report_params = {
       APP_VERSION_CODE: DeviceInfo.getVersion(),
       CUSTOM_DATA: {
         'CURR-STORE': global.noLoginInfo.store_id,
@@ -65,11 +65,16 @@ class HttpUtils {
       PHONE_MODEL: DeviceInfo.getModel(),
       STACK_TRACE: {
         error: error,
+        uri: uri,
+        options: options,
+        url: url,
+        params: params,
+        method: method,
         noLoginInfo: global.noLoginInfo,
         currentRouteName: global.currentRouteName
       }
     };
-    HttpUtils.post(url, params).then()
+    HttpUtils.post(report_url, report_params).then()
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
@@ -118,7 +123,7 @@ class HttpUtils {
             return;
           }
           hideModal()
-          this.upLoadData(response)
+          this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
             this.error(response, method, url, params);
           if (getNetworkDelay) {
@@ -129,7 +134,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-          this.upLoadData(error.message)
+          this.upLoadData(error.message, uri, url, options, params, method)
           hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {
