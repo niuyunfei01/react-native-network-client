@@ -83,15 +83,15 @@ class HttpUtils {
 
     if (props && props.global) {
       const {vendor_id = 0, store_id = 0} = props.global
-      if (store_id && vendor_id) {
-        options.headers.store_id = store_id || global.noLoginInfo.store_id
-        options.headers.vendor_id = vendor_id || global.noLoginInfo.currVendorId
-        options.headers.vendorId = vendor_id || global.noLoginInfo.currVendorId
-        if (uri.substr(tool.length(uri) - 1) !== '&') {
-          uri += '&'
-        }
-        uri += `store_id=${store_id}&vendor_id=${vendor_id}`
+      const storeId = Number(store_id) || global.noLoginInfo.store_id
+      const vendorId = Number(vendor_id) || global.noLoginInfo.vendor_id
+      options.headers.store_id = storeId
+      options.headers.vendor_id = vendorId
+      options.headers.vendorId = vendorId
+      if (uri.substr(tool.length(uri) - 1) !== '&') {
+        uri += '&'
       }
+      uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
     return new Promise((resolve, reject) => {
       const startTime = getTime()
