@@ -100,9 +100,9 @@ class SeparatedExpense extends PureComponent {
     timeObj.method[0].methodName = "componentDidMount"
     timeObj.method[0].interfaceName = ""
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {store_id, currentUser, accessToken, config} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "我的"
     timeObj['componentName'] = "SeparatedExpense"
@@ -125,7 +125,7 @@ class SeparatedExpense extends PureComponent {
   fetchExpenses() {
     showModal('加载中')
     const {global} = this.props;
-    const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
+    const url = `api/store_separated_items_statistics/${global.store_id}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
       const {obj} = res
       timeObj.method.push({
@@ -160,7 +160,7 @@ class SeparatedExpense extends PureComponent {
   fetchServiceCharge() {
     const {global} = this.props;
     const url = `/v1/new_api/delivery/service_fee?access_token=${global.accessToken}`;
-    HttpUtils.post.bind(this.props)(url, {store_id: global.currStoreId}, true).then(res => {
+    HttpUtils.post.bind(this.props)(url, {store_id: global.store_id}, true).then(res => {
       timeObj.method.push({
         interfaceName: url,
         executeStatus: res.executeStatus,
@@ -188,7 +188,7 @@ class SeparatedExpense extends PureComponent {
   // 获取充值记录
   fetchRechargeRecord = () => {
     const {global} = this.props;
-    const url = `new_api/stores/store_recharge_log/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}`;
+    const url = `new_api/stores/store_recharge_log/${global.store_id}/${this.state.start_day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       if (res.records) {
         this.setState({records2: res.records})
@@ -201,7 +201,7 @@ class SeparatedExpense extends PureComponent {
   fetchServiceList = () => {
     const {global} = this.props;
     const url = `/v1/new_api/delivery/service_fee_list?access_token=${global.accessToken}`;
-    HttpUtils.post.bind(this.props)(url, {store_id: global.currStoreId, month: this.state.start_day}).then(res => {
+    HttpUtils.post.bind(this.props)(url, {store_id: global.store_id, month: this.state.start_day}).then(res => {
       if (res.records) {
         this.setState({records3: res.records})
       }

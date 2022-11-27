@@ -45,10 +45,10 @@ class OperateProfitScene extends PureComponent {
 
   getProfitHome = () => {
     const {dispatch} = this.props;
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     showModal('加载中')
     dispatch(
-      fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
+      fetchProfitHome(store_id, accessToken, async (ok, obj, desc) => {
         if (ok) {
           this.setState({
             unbalanced: obj.unbalanced,

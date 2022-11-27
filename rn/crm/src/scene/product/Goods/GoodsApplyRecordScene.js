@@ -68,7 +68,7 @@ class GoodsApplyRecordScene extends Component {
 
   initData() {
     let {viewStoreId} = this.props.route.params;
-    let storeId = this.props.global.currStoreId;
+    let storeId = this.props.global.store_id;
     if (viewStoreId) {
       storeId = viewStoreId;
     }

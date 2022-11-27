@@ -24,7 +24,7 @@ const initState = {
 class RemindModal extends React.Component {
   static propTypes = {
     accessToken: PropTypes.string,
-    currStoreId: PropTypes.oneOfType([
+    store_id: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
     ]),
@@ -38,9 +38,9 @@ class RemindModal extends React.Component {
   }
 
   getAdvicesInfo = () => {
-    const {accessToken, currStoreId} = this.props;
+    const {accessToken, store_id} = this.props;
     const url = '/v1/new_api/advice/showPopAdvice'
-    const params = {store_id: currStoreId, access_token: accessToken}
+    const params = {store_id: store_id, access_token: accessToken}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         advicesInfoArray: res,
@@ -51,7 +51,7 @@ class RemindModal extends React.Component {
 
     let api = 'v4/wsbServerConfig/getServer?access_token=' + accessToken
     let data = {
-      store_id: currStoreId,
+      store_id: store_id,
     }
     HttpUtils.post.bind(this.props)(api, data).then(res => {
       if (res?.host && res?.host !== GlobalUtil.getHostPort()) {

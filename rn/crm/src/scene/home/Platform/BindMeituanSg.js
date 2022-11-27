@@ -38,9 +38,9 @@ class BindMeituanSg extends PureComponent {
   }
 
   accreditSgStore() {
-    let {accessToken, currStoreId} = this.props.global
+    let {accessToken, store_id} = this.props.global
     if (this.state.shop_id) {
-      HttpUtils.get.bind(this.props)(`/api/sg_accredit_url/${this.state.shop_id}/${currStoreId}?access_token=${accessToken}`).then(res => {
+      HttpUtils.get.bind(this.props)(`/api/sg_accredit_url/${this.state.shop_id}/${store_id}?access_token=${accessToken}`).then(res => {
         if (res) {
           this.props.navigation.navigate(Config.ROUTE_WEB, {
             url: Config.serverUrl(res)

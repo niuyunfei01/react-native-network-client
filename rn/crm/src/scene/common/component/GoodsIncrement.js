@@ -94,8 +94,8 @@ class GoodsIncrement extends PureComponent {
   }
 
   componentDidMount() {
-    const {global, navigation, dispatch} = this.props
-    const {store_info, currStoreId, accessToken} = global
+    const {global, navigation} = this.props
+    const {store_info} = global
     this.focus = navigation.addListener('focus', () => {
       const currentDate = dayjs().format('YYYY-MM-DD')
       const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)

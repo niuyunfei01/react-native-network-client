@@ -358,9 +358,9 @@ class StoreInfo extends Component {
     if (this.props.route.params.btn_type === "add") {
       return null;
     }
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
+    HttpUtils.post.bind(this.props)(api, {store_id: store_id}).then((res) => {
       if (res.diff_count > 0) {
         this.setState({
           err_num: res.diff_count
@@ -397,7 +397,7 @@ class StoreInfo extends Component {
     if (owner_id > 0) {
       const owner = user_list[owner_id];
       if (!owner) {
-        store_mgr_name = this.state.createUserName || '未知'
+        store_mgr_name = this.state.createUserName || this.state.owner_name || '未知'
       } else {
         store_mgr_name = `${owner['nickname']}(${owner['mobilephone']})`
       }

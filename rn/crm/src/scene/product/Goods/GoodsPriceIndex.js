@@ -24,7 +24,7 @@ class GoodsPriceIndex extends Component {
     super(props)
     this.state = {
       access_token: this.props.global.accessToken,
-      store_id: this.props.global.currStoreId,
+      store_id: this.props.global.store_id,
       tabOptions: [{label: '建议降低价格', value: '0'}, {label: '建议提高价格', value: '1'}],
       bigImageUri: [],
       bigImageVisible: false,

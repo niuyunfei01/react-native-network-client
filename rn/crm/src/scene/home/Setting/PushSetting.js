@@ -39,9 +39,9 @@ class PushSetting extends PureComponent {
   }
 
   getUserNotifySetting() {
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     showModal("加载中");
-    const api = `api/read_user_notify_settings/${currStoreId}?access_token=${accessToken}`
+    const api = `api/read_user_notify_settings/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       hideModal()
       this.setState({
@@ -62,9 +62,9 @@ class PushSetting extends PureComponent {
   }
 
   onChangeSwitch(type, change) {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     showModal("加载中");
-    let url = `/api/update_user_notify_settings/${currStoreId}/${type}/${change}?access_token=${accessToken}`;
+    let url = `/api/update_user_notify_settings/${store_id}/${type}/${change}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       let data = this.state;
       data[type] = change

@@ -83,49 +83,45 @@ class DistributionOrder extends PureComponent {
 
   renderBody = () => {
     let {business_status} = this.state
-    let items = []
-    for (let i in business_status) {
-      items.push(<View style={styles.shopItem}>
-        <View style={styles.shopItemleft}>
-          <Text style={{color: colors.color333}}>{business_status[i].name} </Text>
-        </View>
-        <TouchableOpacity style={styles.shopItemright}
-                          onPress={() => {
-                            Alert.alert('确认删除', '删除就近分配订单门店，将无法收到该门店的订单', [{
-                              text: '取消'
-                            }, {
-                              text: '确定',
-                              onPress: () => {
-                                this.deleFn(business_status[i].id)
-                              }
-                            }])
-                          }}>
-          <Text style={styles.shopItemrightText}>删除</Text>
-        </TouchableOpacity>
-      </View>)
-    }
-    return (<View>
+
+    return (
+      <View>
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={styles.bodyContainer}>
-          {items}
+          {
+            business_status && business_status.map((item, index) => {
+              return (
+                <View style={styles.shopItem} key={index}>
+                  <View style={styles.shopItemleft}>
+                    <Text style={{color: colors.color333}}>{item.name} </Text>
+                  </View>
+                  <TouchableOpacity style={styles.shopItemright}
+                                    onPress={() => {
+                                      Alert.alert('确认删除', '删除就近分配订单门店，将无法收到该门店的订单', [
+                                        {text: '取消'},
+                                        {text: '确定', onPress: () => this.deleFn(item.id)}
+                                      ])
+                                    }}>
+                    <Text style={styles.shopItemrightText}>删除</Text>
+                  </TouchableOpacity>
+                </View>
+              )
+            })
+          }
         </ScrollView>
       </View>
     )
   }
 
   render() {
-    return (<View style={{flex: 1}}>
+    return (
+      <View style={{flex: 1}}>
         {this.renderBody()}
-        <TouchableOpacity style={styles.footerContainer} onPress={() => {
-          this.onPress(Config.ROUTE_STORE_SELECT, {
-            onBack: (item) => {
-              this.onCanChangeStore(item.id);
-            }
-          })
-        }}>
+        <TouchableOpacity style={styles.footerContainer}
+                          onPress={() => this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item.id)})}>
           <View style={[styles.footerBtn]}>
             <Text style={styles.footerBtnText}>添加门店 </Text>
           </View>
@@ -140,30 +136,39 @@ export default connect(mapStateToProps, mapDispatchToProps)(DistributionOrder)
 const styles = StyleSheet.create({
   footerContainer: {
     flexDirection: 'row', height: pxToDp(80), width: '80%', margin: '10%',
-  }, footerBtn: {
+  },
+  footerBtn: {
     alignItems: 'center', justifyContent: 'center', flex: 1, width: '100%', backgroundColor: '#59b26a'
-  }, title: {
+  },
+  title: {
     width: '100%', marginTop: pxToDp(30), alignItems: 'center',
-  }, shopitem: {
+  },
+  shopitem: {
     flexDirection: 'row', padding: pxToDp(30)
-  }, shoplabel: {
+  },
+  shoplabel: {
     width: '80%',
 
-  }, footerBtnText: {
+  },
+  footerBtnText: {
     color: 'white',
-  }, shopItem: {
+  },
+  shopItem: {
     padding: pxToDp(40),
     flexDirection: 'row',
     backgroundColor: 'white',
     borderBottomWidth: pxToDp(2),
     borderBottomColor: '#cccccc',
 
-  }, shopItemleft: {
+  },
+  shopItemleft: {
     flex: 8
-  }, shopItemright: {
+  },
+  shopItemright: {
     flex: 1,
 
-  }, shopItemrightText: {
+  },
+  shopItemrightText: {
     color: 'red'
   }
 })

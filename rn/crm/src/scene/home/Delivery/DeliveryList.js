@@ -242,7 +242,7 @@ class DeliveryList extends PureComponent {
           <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
             <Text style={styles.headerText}>{store_name}</Text>
             <If condition={!only_one_store && show_select_store}>
-              <SvgXml xml={down(20, 20)}/>
+              <SvgXml xml={down(20, 20, colors.color333)}/>
             </If>
           </TouchableOpacity>
         </If>

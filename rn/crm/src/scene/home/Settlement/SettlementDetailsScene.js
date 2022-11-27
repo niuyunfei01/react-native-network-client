@@ -59,9 +59,9 @@ class SettlementDetailsScene extends React.Component {
 
   fetchData() {
     let {date, id} = this.state;
-    let {accessToken, currStoreId} = this.props.global;
+    let {accessToken, store_id} = this.props.global;
     showModal("加载中");
-    HttpUtils.get.bind(this.props)(`/api/settlement_detail/${id}/${currStoreId}/${date}?access_token=${accessToken}`).then((res) => {
+    HttpUtils.get.bind(this.props)(`/api/settlement_detail/${id}/${store_id}/${date}?access_token=${accessToken}`).then((res) => {
       hideModal();
       this.setState({
         goodsList: res.goods_list,

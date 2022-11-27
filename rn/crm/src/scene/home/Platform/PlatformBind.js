@@ -93,8 +93,8 @@ class PlatformBind extends React.Component {
       ],
       mtDeveloperId: '',
       businessId: 2,
-      ePoiId: this.props.global.currStoreId,
-      ePoiIds: this.props.global.currStoreId,
+      ePoiId: this.props.global.store_id,
+      ePoiIds: this.props.global.store_id,
       sign: '',
       ePoiName: '',
       timestamp: '',
@@ -257,7 +257,7 @@ class PlatformBind extends React.Component {
           let {currVendorId} = tool.vendor(this.props.global)
           let data = {
             v: currVendorId,
-            s: this.props.global.currStoreId,
+            s: this.props.global.store_id,
             u: this.props.global.currentUser,
             m: this.props.global.currentUserProfile.mobilephone,
             place: 'bind'

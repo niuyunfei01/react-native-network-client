@@ -32,8 +32,8 @@ class StallSettlementScene extends PureComponent {
   }
 
   getAllStallList = (selectedDate) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/api/get_all_stall_bill_list/${currStoreId}/${selectedDate}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `/api/get_all_stall_bill_list/${store_id}/${selectedDate}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({stallInfo: res})
     }).catch(error => {
@@ -127,7 +127,7 @@ class StallSettlementScene extends PureComponent {
   viewStallDetailScene = (item) => {
     const {navigation} = this.props
     const {selectedDate} = this.state
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const {stall_id, stall_name, f_settle_amount, f_refund_fee, order_num} = item
     const params = {
       stall_id: stall_id,
@@ -137,7 +137,7 @@ class StallSettlementScene extends PureComponent {
       order_num: order_num,
       selectedDate: selectedDate,
       accessToken: accessToken,
-      currStoreId: currStoreId
+      store_id: store_id
     }
     navigation.navigate(Config.ROUTE_HOME_SETTLEMENT_STALL_DETAIL, params);
   }

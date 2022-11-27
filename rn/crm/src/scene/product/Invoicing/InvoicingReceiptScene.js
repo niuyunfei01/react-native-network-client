@@ -74,7 +74,7 @@ class InvoicingReceiptScene extends PureComponent {
     const {global} = this.props
     const {pageNum, pageSize, dataSource, checkedStoreId, checkedSupplierId} = this.state
     let token = global['accessToken']
-    let store_id = checkedStoreId ? checkedStoreId : global['currStoreId']
+    let store_id = checkedStoreId ? checkedStoreId : global['store_id']
     const url = `InventoryApi/list_balance_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
       store_id: store_id,

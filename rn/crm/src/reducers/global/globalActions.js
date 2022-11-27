@@ -132,12 +132,12 @@ export function setUserProfile(profile) {
 
 /**
  *
- * @param currStoreId
+ * @param store_id
  * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
  * @returns {{payload: {id: *}, type: *}}
  */
-export function setCurrentStore(currStoreId) {
-  const payload = {id: currStoreId};
+export function setCurrentStore(store_id) {
+  const payload = {id: store_id};
   return {
     type: SET_CURR_STORE,
     payload: payload

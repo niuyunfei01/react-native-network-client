@@ -73,7 +73,7 @@ class SeparatedExpense extends PureComponent {
     const self = this;
     showModal('加载中')
     const {global} = self.props;
-    const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
+    const url = `api/store_separated_items_statistics/${global.store_id}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels}, () => {
         hideModal()

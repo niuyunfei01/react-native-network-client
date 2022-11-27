@@ -2420,13 +2420,13 @@ export const isSelected = (width = 20, height = 20) => {
   )
 }
 
-export const down = (width = 16, height = 16) => {
+export const down = (width = 16, height = 16, fill = '#999') => {
   return (
     `
 <svg width="${width}" height="${height}" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>向下</title>
     <g id="创建门店/订单搜索" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="副导航图标/箭头-未选中备份" fill="#999999" fill-rule="nonzero" stroke="#999999" stroke-width="0.25">
+        <g id="副导航图标/箭头-未选中备份" fill="${fill}" fill-rule="nonzero" stroke="${fill}" stroke-width="0.25">
             <path d="M9.94511909,3.74332344 L10.0282056,3.79880389 C10.1579141,3.90169169 10.1950804,4.07800987 10.1274611,4.22158281 L10.0723657,4.30503458 L6.77687317,8.01532897 L10.0490584,11.6993711 C10.1589677,11.8231354 10.1650398,12.0032203 10.0735827,12.1329148 L10.0124,12.1994206 L10.0048704,12.2055656 C9.81789682,12.3538774 9.54763165,12.3303012 9.3891622,12.1518554 L5.91986308,8.24522129 C5.79815735,8.10817351 5.80321326,7.90038807 5.92976358,7.77001717 L9.42262293,3.84110722 C9.55636848,3.69050198 9.7724803,3.65428257 9.94511909,3.74332344 Z" id="icon" transform="translate(7.996122, 7.999154) rotate(-90.000000) translate(-7.996122, -7.999154) "></path>
         </g>
     </g>

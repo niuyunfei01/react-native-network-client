@@ -56,9 +56,9 @@ class InvoicingShippingScene extends PureComponent {
   reloadData() {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
-    let currStoreId = global['currStoreId'];
+    let store_id = global['store_id'];
     let _this = this;
-    dispatch(fetchLocked(currStoreId, token, function (ok, reason) {
+    dispatch(fetchLocked(store_id, token, function (ok, reason) {
       _this.setState({isRefreshing: false});
     }));
   }

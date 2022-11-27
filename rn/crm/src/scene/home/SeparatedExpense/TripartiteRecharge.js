@@ -66,7 +66,7 @@ class SeparatedExpense extends PureComponent {
     this.setState({
       isRefreshing: true
     })
-    const url = `/v1/new_api/delivery/delivery_account_balance/${global.currStoreId}?access_token=${global.accessToken}`;
+    const url = `/v1/new_api/delivery/delivery_account_balance/${global.store_id}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       this.setState({
         thirdAccountList: res,
@@ -87,7 +87,7 @@ class SeparatedExpense extends PureComponent {
       const {global} = this.props;
       const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
       HttpUtils.post.bind(this.props)(url, {
-        store_id: global.currStoreId,
+        store_id: global.store_id,
         delivery_type_v1: row.type,
         amount: 0
       }).then(res => {
@@ -112,7 +112,7 @@ class SeparatedExpense extends PureComponent {
     const {global} = this.props;
     const url = `/v1/new_api/delivery/delivery_pay_url?access_token=${global.accessToken}`;
     HttpUtils.post.bind(this.props)(url, {
-      store_id: global.currStoreId,
+      store_id: global.store_id,
       delivery_type_v1: type_dada,
       amount: dadaAccountNum
     }).then(res => {

@@ -125,13 +125,13 @@ class AutomaticFeedbackScene extends PureComponent {
 
   getStoreList = () => {
     const {global} = this.props
-    const {accessToken, currStoreId} = global
+    const {accessToken, store_id} = global
     const {selectStore, settings} = this.state
 
-    const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
+    const api = `/v1/new_api/added/ext_store_list/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
 
-      const lists = [{id: '0', name: '全部', platform: '0', store: currStoreId}].concat(list)
+      const lists = [{id: '0', name: '全部', platform: '0', store: store_id}].concat(list)
       if (!selectStore.id) {
         let _selectStore = tool.length(lists) > 0 ? lists[0] : selectStore
         Object.keys(settings).map(key => {
@@ -153,8 +153,8 @@ class AutomaticFeedbackScene extends PureComponent {
   getSetting = () => {
     const {global} = this.props
 
-    const {accessToken, currStoreId} = global
-    const api = `/v1/new_api/added/auto_reply_info/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = global
+    const api = `/v1/new_api/added/auto_reply_info/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(res => {
       this.setState({
         settings: res
@@ -202,7 +202,7 @@ class AutomaticFeedbackScene extends PureComponent {
 
   touchTempDetail = (item) => {
     const {global} = this.props
-    const {currStoreId, accessToken} = global
+    const {store_id, accessToken} = global
     const {selectStore, settings} = this.state
     let tpl_content = '', tpl_type = 0
     Object.keys(settings).map(key => {
@@ -218,7 +218,7 @@ class AutomaticFeedbackScene extends PureComponent {
     })
     this.props.navigation.navigate(Config.ROUTE_TEMPLATE_SETTINGS, {
       store: {
-        store_id: currStoreId,
+        store_id: store_id,
         ext_store_id: selectStore.id,
         tpl_level: `${item.id}`,
         tpl_content: tpl_content,
@@ -313,10 +313,10 @@ class AutomaticFeedbackScene extends PureComponent {
   saveSetting = () => {
     const {selectStore} = this.state
     const {global} = this.props
-    const {accessToken, currStoreId} = global
+    const {accessToken, store_id} = global
     const api = `/v1/new_api/added/auto_reply?access_token=${accessToken}`
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       ext_store_id: selectStore.id,
       score_5: selectStore.status.score_5,
       score_4: selectStore.status.score_4,

@@ -163,13 +163,13 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
   }
   search = () => {
     const {searchKeywords, goodsList, page, pageSize} = this.state
-    const {accessToken, currStoreId, vendor_id} = this.props.global
+    const {accessToken, store_id, vendor_id} = this.props.global
     if (!searchKeywords)
       return
     const url = `/api/get_product_by_name`
     const params = {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       name: searchKeywords,
       page: page,

@@ -72,9 +72,9 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   fetchInfo = () => {
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       ext_store_id: this.props.route.params.ext_store_id,
     }
     let url = `/v1/new_api/delivery_sync_log/detail?access_token=${accessToken}`;
@@ -94,10 +94,10 @@ class OrderQueryResultScene extends PureComponent {
   fetchOrders = () => {
     showModal("加载中")
     this.setState({isLoading: true})
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     let {query} = this.state;
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       ext_store_id: this.props.route.params.ext_store_id,
       page: query.page,
       page_size: query.limit,
