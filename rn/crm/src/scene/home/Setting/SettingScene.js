@@ -285,7 +285,7 @@ class SettingScene extends PureComponent {
     return (
       <TouchableOpacity style={styles.item_row} onPress={this.playOrStopMusic}>
         <Text style={styles.row_label}>播放状态 </Text>
-        <Text>{isPlayMusic ? '正在播放 ' : '未播放 '}</Text>
+        <Text style={styles.row_footer}>{isPlayMusic ? '正在播放 ' : '未播放 '}</Text>
       </TouchableOpacity>
     )
   }

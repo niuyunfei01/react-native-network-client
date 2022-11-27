@@ -396,7 +396,6 @@ class StoreInfo extends Component {
     let store_mgr_name;
     if (owner_id > 0) {
       const owner = user_list[owner_id];
-      console.log('owner',owner)
       if (!owner) {
         store_mgr_name = this.state.createUserName || this.state.owner_name || '未知'
       } else {
