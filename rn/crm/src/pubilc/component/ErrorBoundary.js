@@ -79,6 +79,7 @@ class ErrorBoundary extends React.Component {
       STACK_TRACE: {
         error: `${error}`,
         errorInfo: `${errorInfo}`,
+        noLoginInfo: global.noLoginInfo,
         currentRouteName: global.currentRouteName
       }
     };
