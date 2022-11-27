@@ -64,7 +64,7 @@ class HttpUtils {
       BRAND: DeviceInfo.getBrand(),
       PHONE_MODEL: DeviceInfo.getModel(),
       STACK_TRACE: {
-        error: `${error}`,
+        error: error,
         noLoginInfo: global.noLoginInfo,
         currentRouteName: global.currentRouteName
       }
