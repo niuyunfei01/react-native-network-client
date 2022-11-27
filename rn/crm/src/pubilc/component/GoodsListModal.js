@@ -30,7 +30,7 @@ class GoodsListModal extends React.Component {
       PropTypes.number,
       PropTypes.string
     ]),
-    currStoreId: PropTypes.oneOfType([
+    store_id: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
     ]),
@@ -100,7 +100,7 @@ class GoodsListModal extends React.Component {
 
 
   render(): React.ReactNode {
-    let {currStoreId, onPress} = this.props;
+    let {store_id, onPress} = this.props;
     let {
       show_goods_list_modal,
       goods_list,
@@ -161,7 +161,7 @@ class GoodsListModal extends React.Component {
                   <For index='idx' of={goods_list} each='item'>
                     <TouchableOpacity key={idx} onPress={() => {
                       this.closeModal()
-                      onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: currStoreId, item: item})
+                      onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: store_id, item: item})
                     }} style={Styles.ItemRowContent}>
                       {tool.length(item.product_img) > 0 ?
                         <Image

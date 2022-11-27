@@ -96,12 +96,12 @@ class AddAccount extends PureComponent {
   }
 
   deleteWorker = () => {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     let {worker_id} = this.state
     const api = `/v4/wsb_worker/workerDelete`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       worker_id: worker_id
     }).then(res => {
@@ -123,7 +123,7 @@ class AddAccount extends PureComponent {
   }
 
   editWorker = () => {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     let {
       worker_role_grade_value,
       worker_store_id_belong_value,
@@ -152,7 +152,7 @@ class AddAccount extends PureComponent {
     const api = `/v4/wsb_worker/workerAddOrUpdate`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       worker_role_grade: worker_role_grade_value,
       worker_store_id_belong: Number(worker_store_id_belong_value),

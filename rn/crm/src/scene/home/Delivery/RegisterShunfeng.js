@@ -44,8 +44,8 @@ class RegisterShunfeng extends PureComponent {
   }
   subjectTextTip = '需与营业执照信息保持一致'
 
-  getStoreInfo = (currStoreId, accessToken) => {
-    const url = `/api/read_store/${currStoreId}/1?access_token=${accessToken}`
+  getStoreInfo = (store_id, accessToken) => {
+    const url = `/api/read_store/${store_id}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url, {}).then(res => {
       const {name, dada_address, owner_name, tel, location_lat, location_long} = res
       this.setState({
@@ -94,9 +94,9 @@ class RegisterShunfeng extends PureComponent {
   }
 
   componentDidMount() {
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
 
-    this.getStoreInfo(currStoreId, accessToken)
+    this.getStoreInfo(store_id, accessToken)
     this.uploadImageTask()
   }
 
@@ -347,10 +347,10 @@ class RegisterShunfeng extends PureComponent {
   submitInfo = () => {
     if (this.enableSubmit) {
       const {store, subject, imageUrl} = this.state
-      const {currStoreId, accessToken} = this.props.global
+      const {store_id, accessToken} = this.props.global
       let {currVendorId} = tool.vendor(this.props.global);
       const params = {
-        store_id: currStoreId,
+        store_id: store_id,
         account_contact_name: store.name,
         shop_product_type: store.saleCategory.value,
         account_contact_phone: subject.phone,
@@ -397,7 +397,7 @@ class RegisterShunfeng extends PureComponent {
       const {currVendorId} = tool.vendor(this.props.global)
       const data = {
         v: currVendorId,
-        s: this.props.global.currStoreId,
+        s: this.props.global.store_id,
         u: this.props.global.currentUser,
         m: this.props.global.currentUserProfile.mobilephone,
         place: 'mine'

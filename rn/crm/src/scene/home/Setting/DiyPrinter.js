@@ -47,8 +47,8 @@ class DiyPrinter extends PureComponent {
   }
 
   get_printer_custom_cfg() {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/get_printer_custom_cfg/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         font_size: res.font_size,
@@ -86,7 +86,7 @@ class DiyPrinter extends PureComponent {
   submit = () => {
     this.setState({isRefreshing: true});
     tool.debounces(() => {
-      const {currStoreId, accessToken} = this.props.global;
+      const {store_id, accessToken} = this.props.global;
       const {
         font_size,
         remark_max,
@@ -104,7 +104,7 @@ class DiyPrinter extends PureComponent {
         show_product_discounts: show_product_discounts,
         show_distribution_distance: show_distribution_distance,
         show_goods_code: show_goods_code,
-        store_id: currStoreId,
+        store_id: store_id,
         upc: upc,
         show_shelves_code: show_shelves_code,
       }

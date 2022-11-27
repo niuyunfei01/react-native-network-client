@@ -80,8 +80,8 @@ class CloudPrinterScene extends PureComponent {
 
   get_store_print() {
     showModal('加载中...')
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/get_store_printers_info/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
       let printer_name = this.state.printer_name;
       let printer = this.state.printer;
@@ -112,8 +112,8 @@ class CloudPrinterScene extends PureComponent {
 
   printTest() {
     tool.debounces(() => {
-      const {currStoreId, accessToken} = this.props.global;
-      const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
+      const {store_id, accessToken} = this.props.global;
+      const api = `api/print_test/${store_id}?access_token=${accessToken}`
       if (this.state.count_down <= 0) {
         HttpUtils.get.bind(this.props)(api).then(() => {
           Alert.alert('提示', `打印成功，请查看小票`, [{
@@ -166,9 +166,9 @@ class CloudPrinterScene extends PureComponent {
         ToastLong("参数缺失");
         return;
       }
-      const {currStoreId, accessToken} = this.props.global;
+      const {store_id, accessToken} = this.props.global;
       let fromData = {
-        storeId: currStoreId,
+        storeId: store_id,
         sn: that.state.sn,
         key: that.state.key,
         type: that.state.printer_type,
@@ -181,7 +181,7 @@ class CloudPrinterScene extends PureComponent {
           return;
         }
       }
-      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+      const api = `api/bind_store_printers/${store_id}?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
         dispatch(setPrinterName(res));
         that.setState({
@@ -208,8 +208,8 @@ class CloudPrinterScene extends PureComponent {
         return;
       }
       showModal('解绑中...')
-      const {currStoreId, accessToken} = this.props.global;
-      const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
+      const {store_id, accessToken} = this.props.global;
+      const api = `api/clear_printers_and_read_store/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(() => {
         dispatch(setPrinterName([]));
         that.setState({

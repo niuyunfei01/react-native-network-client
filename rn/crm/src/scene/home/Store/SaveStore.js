@@ -313,11 +313,11 @@ class SaveStore extends PureComponent {
     })
   }
 
-  queryConfig = (accessToken, currStoreId) => {
+  queryConfig = (accessToken, store_id) => {
     const {dispatch, navigation} = this.props;
-    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
-        dispatch(setCurrentStore(cfg?.store_id || currStoreId));
+        dispatch(setCurrentStore(cfg?.store_id || store_id));
         tool.resetNavStack(navigation, cfg?.show_bottom_tab ? Config.ROUTE_ORDERS : Config.ROUTE_ALERT, cfg?.show_bottom_tab ? {} : {
           initTab: Config.ROUTE_ORDERS,
           initialRouteName: Config.ROUTE_ALERT

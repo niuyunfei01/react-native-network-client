@@ -46,9 +46,9 @@ class ComesBack extends PureComponent {
 
   fetchData = () => {
     this.setState({isRefreshing: true})
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     const api = `/v1/new_api/delivery_sync_log/list?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then(res => {
+    HttpUtils.post.bind(this.props)(api, {store_id: store_id}).then(res => {
       this.setState({
         list: res.list,
         isRefreshing: false,
@@ -90,13 +90,13 @@ class ComesBack extends PureComponent {
   }
 
   renderList = () => {
-    const {currStoreId} = this.props.global
+    const {store_id} = this.props.global
     let {list} = this.state
     return (
       <For of={list} each='item' index='key'>
         <TouchableOpacity onPress={() => {
           this.props.navigation.navigate(Config.ROUTE_COMES_BACK_INFO, {
-            store_id: currStoreId,
+            store_id: store_id,
             ext_store_id: item.ext_store_id
           });
           this.mixpanel.track('配送回传页_查看详情')

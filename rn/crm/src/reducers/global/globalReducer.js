@@ -34,7 +34,6 @@ const {
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
-  currStoreId: 0,
   currentUser: null,
   currentNewProductStoreId: 0,
   expireTs: 0,
@@ -62,7 +61,7 @@ const initialState = {
   customer_service_auth: {},
   show_float_service_icon: true,
   user_config: {},
-  order_list_by: 'orderTime asc',
+  order_list_by: 'expectTime asc',
   show_bottom_tab: true,
   only_one_store: false,
   is_vendor_admin: false,
@@ -122,18 +121,23 @@ export default function globalReducer(state = initialState, action) {
       break
     case SET_NO_LOGIN_INFO:
       if (action.payload) {
+        if (action.payload.store_id == 0 || action.payload.vendor_id == 0 || action.payload.currentUser == 0)
+          return state
         return {
           ...state,
           currentUser: action.payload.currentUser,
           accessToken: action.payload.accessToken,
-          currStoreId: action.payload.currStoreId,
+          store_id: action.payload.store_id,
+          vendor_id: action.payload.vendor_id,
           host: action.payload.host,
           printer_id: action.payload.printer_id,
           autoBluetoothPrint: action.payload.autoBluetoothPrint,
           refreshToken: action.payload.refreshToken,
           expireTs: action.payload.expireTs,
           getTokenTs: action.payload.getTokenTs,
-          order_list_by: action.payload.order_list_by
+          order_list_by: action.payload.order_list_by,
+          show_bottom_tab: action.payload.show_bottom_tab,
+          enabled_good_mgr: action.payload.enabled_good_mgr
         }
       }
       break
@@ -151,7 +155,7 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_CURR_STORE:
       if (action.payload) {
-        return {...state, currStoreId: action.payload.id}
+        return {...state, store_id: action.payload.id}
       } else return state;
 
     case SESSION_TOKEN_SUCCESS:
@@ -178,11 +182,20 @@ export default function globalReducer(state = initialState, action) {
     case LOGOUT_SUCCESS:
       return {
         ...state,
-        currentUser: null,
-        currStoreId: 0,
-        currentUserProfile: {},
+        currentUser: 0,
         accessToken: '',
+        store_id: 0,
+        vendor_id: 0,
+        host: '',
+        printer_id: '0',
+        autoBluetoothPrint: false,
         refreshToken: '',
+        expireTs: 0,
+        getTokenTs: 0,
+        order_list_by: 'expectTime asc',
+        show_bottom_tab: false,
+        enabled_good_mgr: false,
+        currentUserProfile: {},
         currentNewProductStoreId: 0,
         bleStarted: false
       };
@@ -191,7 +204,6 @@ export default function globalReducer(state = initialState, action) {
     case UPDATE_CONFIG:
       return action.payload ? {
         ...state,
-        currStoreId: action.payload.store_id || state.currStoreId,
         store_id: action.payload.store_id || state.store_id,
         vendor_id: action.payload.vendor_id || state.vendor_id,
         store_info: action.payload.store_info || state.store_info,

@@ -106,9 +106,9 @@ class AddMissingPictureScene extends React.PureComponent {
   ]
 
   getProductInfo = () => {
-    const {vendor_id, currStoreId, accessToken} = this.props.global
+    const {vendor_id, store_id, accessToken} = this.props.global
     const {goodsInfo} = this.props.route.params
-    const url = `/api/get_product_detail/${goodsInfo?.id}/${vendor_id}/${currStoreId}?access_token=${accessToken}`
+    const url = `/api/get_product_detail/${goodsInfo?.id}/${vendor_id}/${store_id}?access_token=${accessToken}`
 
     HttpUtils.get.bind(this.props)(url).then(res => {
       this.setState({productInfo: res})
@@ -282,11 +282,11 @@ class AddMissingPictureScene extends React.PureComponent {
 
   upLoad = () => {
     const {dispatch, global} = this.props;
-    const {vendor_id, currStoreId, accessToken} = global
+    const {vendor_id, store_id, accessToken} = global
     const {productInfo, upload_files} = this.state
     const formData = {
       id: productInfo.id,
-      limit_stores: [currStoreId],
+      limit_stores: [store_id],
       name: productInfo.name,
       sg_tag_id: productInfo.sg_tag_id,
       sku_having_unit: productInfo.sku_having_unit,

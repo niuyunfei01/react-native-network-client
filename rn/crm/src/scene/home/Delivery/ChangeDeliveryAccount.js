@@ -100,7 +100,7 @@ class ChangeDeliveryAccount extends PureComponent {
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
       delivery: delivery,
-      deliveryStatusObj: {apply_status: 2},
+      deliveryStatusObj: {apply_status: 2, apply_status_desc: ''},
       store_id: store_id
     }
   }
@@ -153,33 +153,17 @@ class ChangeDeliveryAccount extends PureComponent {
   getDeliverStatus = () => {
     const {accessToken, vendor_id} = this.props.global;
 
-    const {store_id, delivery, deliveryStatusObj} = this.state
-    const {id, v2_type, type, bind_type} = delivery;
-    if (id) {
-      const params = {
-        store_id: store_id,
-        delivery_id: id,
-        vendor_id: vendor_id
-      }
-      const url = `/v4/wsb_delivery/getDeliveryStatus/?access_token=${accessToken}`
-      HttpUtils.get(url, params).then(res => {
-        this.setState({deliveryStatusObj: res})
-      }).catch((error) => ToastShort(error.reason))
-      return
+    const {store_id, delivery} = this.state
+    const {id = 0, v2_type} = delivery;
+    const params = {
+      store_id: store_id,
+      delivery_id: id,
+      vendor_id: vendor_id,
+      v2_type: v2_type
     }
-    const delivery_id = bind_type === 'wsb' ? v2_type : type
-    const url = `/v1/new_api/delivery/get_delivery_status/${store_id}/${delivery_id}?access_token=${accessToken}`
-    const params = {vendorId: vendor_id}
+    const url = `/v4/wsb_delivery/getDeliveryStatus/?access_token=${accessToken}`
     HttpUtils.get(url, params).then(res => {
-      const {apply_status, account_desc} = res
-      this.setState({
-          deliveryStatusObj: {
-            ...deliveryStatusObj,
-            apply_status: apply_status,
-            account_desc: account_desc
-          }
-        }
-      )
+      this.setState({deliveryStatusObj: res})
     }).catch((error) => ToastShort(error.reason))
   }
 
@@ -201,21 +185,38 @@ class ChangeDeliveryAccount extends PureComponent {
 
   switchDeliveryStatus = (deliveryStatus) => {
     let {accessToken, vendor_id} = this.props.global
+    const {navigation} = this.props
+    let {delivery, store_id, deliveryStatusObj} = this.state
 
-    let {delivery, store_id} = this.state
+    const {id = 0, v2_type, bind_type} = delivery
+    const {apply_status} = deliveryStatusObj
 
-    const {is_forbidden, v2_type} = delivery
-    let params = {
-      store_id: store_id,
-      delivery_way_v2: v2_type,
-      state: is_forbidden
+    if ('wsb' === bind_type) {
+
+      let params = {
+        store_id: store_id,
+        v2_type: v2_type,
+        delivery_id: id,
+        status: apply_status == 2 ? 1 : 0
+      }
+
+      let url = `/v4/wsb_delivery/setDeliveryStatus?access_token=${accessToken}`;
+      HttpUtils.post(url, params).then(() => {
+        // this.setState({delivery: {...delivery, is_forbidden: deliveryStatus ? 0 : 1}})
+        ToastShort(`${deliveryStatus ? '恢复' : '禁用'}成功`)
+        navigation.goBack()
+      }).catch((error) => {
+        ToastLong(`${deliveryStatus ? '恢复' : '禁用'}失败，原因：${error}`)
+      })
+      return
     }
-    let url = `/v1/new_api/Delivery/delivery_switch?vendorId=${vendor_id}&access_token=${accessToken}`;
+    const params = {store_id: store_id, delivery_type: v2_type}
+    const url = `/v1/new_api/delivery/unbind_store_delivery?vendorId=${vendor_id}&access_token=${accessToken}`
     HttpUtils.post(url, params).then(() => {
-      this.setState({delivery: {...delivery, is_forbidden: deliveryStatus ? 0 : 1}})
-      ToastShort(`${deliveryStatus ? '恢复' : '禁用'}成功`)
+      ToastShort(`解绑成功`)
+      navigation.goBack()
     }).catch((error) => {
-      ToastLong(`${deliveryStatus ? '恢复' : '禁用'}失败，原因：${error.reason}`)
+      ToastLong(`解绑失败，原因：${error}`)
     })
   }
   openDeliveryModal = () => {
@@ -232,35 +233,17 @@ class ChangeDeliveryAccount extends PureComponent {
   touchEditStore = () => {
     const {store_id} = this.state
     const params = {
-      btn_type: "edit",
-      is_mgr: true,
-      editStoreId: store_id
+      type: 'edit',
+      store_id: store_id
     }
-    this.props.navigation.navigate(Config.ROUTE_STORE_ADD, params)
+    this.props.navigation.navigate(Config.ROUTE_SAVE_STORE, params)
   }
 
   render() {
     const {delivery = {}, deliveryStatusObj, deliveryType, openDeliveryVisible, store_id} = this.state
     const {is_forbidden = 0, bind_type = ''} = delivery
-    const {apply_status = '', account_desc = '', reason = '',} = deliveryStatusObj
+    const {apply_status = '', account_desc = '', reason, apply_status_desc} = deliveryStatusObj
     const {navigation} = this.props
-    switch (parseInt(apply_status)) {
-      case 0:
-        status = '未申请'
-        break
-      case 1:
-        status = '申请中'
-        break
-      case 2:
-        status = '成功'
-        break
-      case 3:
-        status = '失败'
-        break
-      default:
-        status = ''
-        break
-    }
     return (
       <View>
         <If condition={Config.MEI_TUAN_PEI_SONG != deliveryType}>
@@ -284,12 +267,12 @@ class ChangeDeliveryAccount extends PureComponent {
                   状态
                 </Text>
                 <Text style={styles.deliveryStatus}>
-                  {status}
+                  {apply_status_desc}
                 </Text>
               </View>
               <View style={styles.line}/>
             </If>
-            <If condition={reason}>
+            <If condition={apply_status == 3}>
               <View style={styles.deliveryRowWrap}>
                 <Text style={styles.deliveryTitle}>
                   原因

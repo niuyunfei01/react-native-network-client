@@ -181,7 +181,7 @@ class SearchOrder extends PureComponent {
   }
 
   render() {
-    const {currStoreId, accessToken, dispatch} = this.props.global;
+    const {store_id, accessToken, dispatch} = this.props.global;
     const {
       is_loading,
       list,
@@ -219,12 +219,12 @@ class SearchOrder extends PureComponent {
           onPress={this.onPress.bind(this)}
           accessToken={accessToken}
           order_id={order_id}
-          currStoreId={currStoreId}
+          store_id={store_id}
           show_goods_list={show_goods_list}/>
         <DeliveryStatusModal
           order_id={order_id}
           order_status={0}
-          store_id={currStoreId}
+          store_id={store_id}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}

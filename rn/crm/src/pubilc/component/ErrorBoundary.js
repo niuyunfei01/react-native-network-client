@@ -66,12 +66,12 @@ class ErrorBoundary extends React.Component {
   uploadData = () => {
     const {error, errorInfo} = this.state
     const {device} = this.props
-    const {currStoreId, currentUser} = this.props.global
+    const {store_id, currentUser} = this.props.global
     const url = '/util/crm_error_report/1'
     const params = {
       APP_VERSION_CODE: device?.deviceInfo?.appVersion,
       CUSTOM_DATA: {
-        'CURR-STORE': currStoreId,
+        'CURR-STORE': store_id,
         'UID': currentUser
       },
       BRAND: device?.deviceInfo?.brand,

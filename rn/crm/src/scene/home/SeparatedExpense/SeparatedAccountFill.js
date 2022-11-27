@@ -100,7 +100,7 @@ class SeparatedAccountFill extends PureComponent {
   //获取余额
   fetchBalance() {
     const {global} = this.props;
-    const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
+    const url = `new_api/stores/store_remaining_fee/${global.store_id}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url, {}, true).then(res => {
       timeObj.method.push({
         interfaceName: url,
@@ -143,13 +143,13 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   aliPay = () => {
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     let {to_fill_yuan, customMoney, isCustomMoney} = this.state;
     showModal("支付跳转中...")
     let payMoney = to_fill_yuan
     if (isCustomMoney)
       payMoney = customMoney
-    const url = `/api/gen_pay_app_order/${payMoney}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${currStoreId}`;
+    const url = `/api/gen_pay_app_order/${payMoney}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${store_id}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
       hideModal();
       const resule = await Alipay.alipay(res.result);

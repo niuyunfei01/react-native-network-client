@@ -351,7 +351,7 @@ class StallDetailScene extends PureComponent {
       return
     }
     const {stallInfo} = this.state
-    const {accessToken, stall_id, currStoreId} = this.props.route.params
+    const {accessToken, stall_id, store_id} = this.props.route.params
     const url = `/api/mod_stall_bill_deduct?access_token=${accessToken}`
     const params = {
       bill_id: stallInfo?.bill_info?.bill_id ? stallInfo.bill_info.bill_id : 0,
@@ -359,7 +359,7 @@ class StallDetailScene extends PureComponent {
       amount: parseFloat(modalContentObj.money).toFixed(2),
       remark: modalContentObj.remark,
       stall_id: parseInt(stall_id),
-      store_id: currStoreId
+      store_id: store_id
     }
     HttpUtils.post.bind(this.props)(url, params).then(res => {
       this.getStallBillDetail()

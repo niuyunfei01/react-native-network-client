@@ -55,9 +55,9 @@ class SettlementPlatform extends PureComponent {
   }
 
   get_log = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {date} = this.state;
-    const api = `/v1/new_api/analysis/plat_income_log/${currStoreId}`
+    const api = `/v1/new_api/analysis/plat_income_log/${store_id}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
       date: date
@@ -73,12 +73,12 @@ class SettlementPlatform extends PureComponent {
 
   submit = () => {
     showModal('修改中')
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {date, remark_input_value, platformMoney} = this.state;
-    const api = `/v1/new_api/analysis/update_plat_income/${currStoreId}`
+    const api = `/v1/new_api/analysis/update_plat_income/${store_id}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       date: date,
       amount: platformMoney,
       remark: remark_input_value

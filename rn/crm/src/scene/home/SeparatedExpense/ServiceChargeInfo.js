@@ -43,7 +43,7 @@ class ServiceChargeInfo extends PureComponent {
     const {global} = self.props;
     const url = `/v1/new_api/delivery/service_fee_detail?access_token=${global.accessToken}`;
     HttpUtils.post.bind(this.props)(url, {
-      store_id: global.currStoreId,
+      store_id: global.store_id,
       date: self.props.route.params.day
     }).then(res => {
       self.setState({

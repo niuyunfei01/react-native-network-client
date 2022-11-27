@@ -84,7 +84,7 @@ class NoticeList extends React.PureComponent {
   fetchData = (paramsStatus, setList = 1) => {
     showModal("加载中...")
     if (setList === 1) this.fetchNum();
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let {queryParams, checkStatus, list} = this.state;
     let QueryStatus = paramsStatus || checkStatus;
@@ -93,7 +93,7 @@ class NoticeList extends React.PureComponent {
       checkStatus: [100, 101, 102, 103, -1].indexOf(QueryStatus) === -1 ? checkStatus : QueryStatus,
       isLoading: true,
     })
-    const url = `/api/list_notice/${currVendorId}/${currStoreId}/${QueryStatus}/${status}/${queryParams.page}?access_token=${accessToken}`;
+    const url = `/api/list_notice/${currVendorId}/${store_id}/${QueryStatus}/${status}/${queryParams.page}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, {}).then(res => {
       if (tool.length(res.list) < 10) {
         queryParams.isAdd = false;
@@ -111,11 +111,11 @@ class NoticeList extends React.PureComponent {
   }
 
   fetchNum = () => {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let {categoryLabels, typeLabels} = this.state;
     let that = this;
-    const url = `/api/list_notice_count/${currVendorId}/${currStoreId}?access_token=${accessToken}`;
+    const url = `/api/list_notice_count/${currVendorId}/${store_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, {}).then(res => {
       tool.objectMap(res.result, (item, idx) => {
         categoryLabels.forEach((itm, key) => {

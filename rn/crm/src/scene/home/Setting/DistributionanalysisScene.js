@@ -45,12 +45,12 @@ class DistributionAnalysisScene extends PureComponent {
 
     super(props);
 
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
 
     this.state = {
       timeType: "",
       showDateModal: false,
-      currStoreId: currStoreId,
+      store_id: store_id,
       accessToken: accessToken,
       DistributionAnalysisData: [],
       total_delivery: '',
@@ -102,9 +102,9 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   getDistributionAnalysisData = (startTime, endTime) => {
-    const {currStoreId, filterPlatform, accessToken} = this.state;
+    const {store_id, filterPlatform, accessToken} = this.state;
     ToastShort("查询中");
-    const api = `/v1/new_api/analysis/delivery/${currStoreId}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/delivery/${store_id}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         DistributionAnalysisData: res?.data?.statistic,
@@ -121,8 +121,8 @@ class DistributionAnalysisScene extends PureComponent {
   getProfitAndLossAnalysisData = (startTime, endTime) => {
     ToastShort("查询中");
     this.setParamsTime(startTime, endTime)
-    const {currStoreId, accessToken} = this.state;
-    const api = `/v1/new_api/analysis/profit_data/${currStoreId}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
+    const {store_id, accessToken} = this.state;
+    const api = `/v1/new_api/analysis/profit_data/${store_id}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         profitAndLoss: res?.data,

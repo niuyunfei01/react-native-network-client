@@ -59,8 +59,8 @@ class PrinterRemark extends PureComponent {
 
   get_printer_custom_cfg() {
     showModal('加载中...')
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/get_printer_custom_cfg/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         remark: res.remark,
@@ -130,12 +130,12 @@ class PrinterRemark extends PureComponent {
 
   submit = () => {
     tool.debounces(() => {
-      const {currStoreId, accessToken} = this.props.global;
+      const {store_id, accessToken} = this.props.global;
       const {remark, img} = this.state;
       let fromData = {
         remark: remark,
         remark_img: img,
-        store_id: currStoreId,
+        store_id: store_id,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(() => {

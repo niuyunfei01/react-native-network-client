@@ -321,7 +321,7 @@ class OrderAllScene extends Component {
   }
 
   render() {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
       order_id,
@@ -365,13 +365,13 @@ class OrderAllScene extends Component {
           onPress={this.onPress.bind(this)}
           accessToken={accessToken}
           order_id={order_id}
-          currStoreId={currStoreId}
+          store_id={store_id}
           show_goods_list={show_goods_list}/>
 
         <DeliveryStatusModal
           order_id={order_id}
           order_status={0}
-          store_id={currStoreId}
+          store_id={store_id}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}

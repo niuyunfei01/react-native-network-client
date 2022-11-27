@@ -46,7 +46,7 @@ class PermissionToIdentify extends PureComponent {
   }
 
   get_wsb_workers = () => {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     let {page, pageSize} = this.state.query
     if (this.state.isLoading)
       return
@@ -54,7 +54,7 @@ class PermissionToIdentify extends PureComponent {
     const api = `/v4/wsb_worker/workerList?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       page: page,
       page_size: pageSize

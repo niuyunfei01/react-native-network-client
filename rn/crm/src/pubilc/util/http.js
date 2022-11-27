@@ -6,7 +6,10 @@ import AppConfig from "../common/config.js";
 import tool from "./tool";
 import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
+import store from "./configureStore";
+import dayjs from "dayjs";
 
+const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -48,6 +51,25 @@ class HttpUtils {
     }
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
     return options
+  }
+
+  static upLoadData = (error) => {
+    const url = '/util/crm_error_report/1'
+    const params = {
+      APP_VERSION_CODE: DeviceInfo.getVersion(),
+      CUSTOM_DATA: {
+        'CURR-STORE': global.noLoginInfo.store_id,
+        'UID': global.noLoginInfo.currentUser
+      },
+      BRAND: DeviceInfo.getBrand(),
+      PHONE_MODEL: DeviceInfo.getModel(),
+      STACK_TRACE: {
+        error: `${error}`,
+        noLoginInfo: global.noLoginInfo,
+        currentRouteName: global.currentRouteName
+      }
+    };
+    HttpUtils.post(url, params).then()
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
@@ -96,8 +118,9 @@ class HttpUtils {
             return;
           }
           hideModal()
+          this.upLoadData(response)
           if (showReason)
-            this.error(response, props.navigation);
+            this.error(response, method, url, params);
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -106,6 +129,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
+          this.upLoadData(error.message)
           hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {
@@ -118,15 +142,61 @@ class HttpUtils {
     })
   }
 
-  static error(response, navigation) {
+  static requestUrl = (method, request_url, request_params, accessToken) => {
+    const tokenIndex = request_url.indexOf('access_token=')
+    if (tokenIndex !== -1) {
+      request_url = request_url.substring(0, tokenIndex + 14) + accessToken
+    }
+    if (request_params && request_params.accessToken) {
+      request_params.accessToken = accessToken
+    }
+    if (request_params && request_params.access_token) {
+      request_params.access_token = accessToken
+    }
+    if (method === 'GET') {
+      this.get(request_url, request_params)
+        .then(res => {
+        })
+        .catch(error => {
+        })
+      return
+    }
+    if (method === 'POST') {
+      this.post(request_url, request_params)
+        .then(res => {
+        })
+        .catch(error => {
+        })
+    }
+  }
+
+  static refreshAccessToken = (method, request_url, request_params) => {
+    const url = `/v4/WsbUser/refreshToken`
+    if (global.noLoginInfo.refreshToken) {
+      const params = {refresh_token: global.noLoginInfo.refreshToken}
+      this.post(url, params).then(res => {
+        const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+        store.dispatch({
+          type: SESSION_TOKEN_SUCCESS,
+          payload: {
+            access_token: access_token,
+            refresh_token: refresh_token,
+            expires_in_ts: expires_in_ts,
+            getTokenTs: dayjs().valueOf()
+          }
+        })
+        this.requestUrl(method, request_url, request_params, access_token)
+      })
+    }
+  }
+
+  static error(response, method, url, params) {
     switch (response.error_code) {
       case 10001:
-        ToastShort('登录信息过期,请重新登录')
-        this.logout(navigation)
-        break
       case 21327:
-        ToastShort('登录信息过期,请退出重新登录')
-        this.logout(navigation)
+        ToastLong('请确认信息是否正确，若不正确请重新操作')
+        // this.logout(navigation)
+        this.refreshAccessToken(method, url, params)
         break
       case 30001:
         ToastShort('客户端版本过低')

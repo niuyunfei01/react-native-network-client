@@ -95,7 +95,7 @@ class GoodsEditScene extends PureComponent {
     this.mixpanel = MixpanelInstance;
     const {currVendorId} = tool.vendor(props.global);
     const {scan, product_detail} = (props.route.params || {});
-    const {currStoreId, store_info} = this.props.global;
+    const {store_id, store_info} = this.props.global;
     this.isCanLoadMore = false
     this.state = {
       isSelectCategory: true,
@@ -180,7 +180,7 @@ class GoodsEditScene extends PureComponent {
           differenceType: 2,
           totalRemain: '',
           remark: '',
-          store_id: currStoreId,
+          store_id: store_id,
           skipCheckChange: 1
         }
       }],
@@ -229,9 +229,10 @@ class GoodsEditScene extends PureComponent {
     const {goodsInfo} = route.params || {}
     if (goodsInfo) {
       const {
-        barcode, name, sg_tag_id, weight, sku_unit, category_id, pic, vendor_has, store_has, series_id, spec_list
+        barcode, name, sg_tag_id, weight, sku_unit, category_id, pic, vendor_has, store_has, series_id, spec_list, id
       } = goodsInfo
       this.setState({
+        id: id,
         upc: barcode,
         name: name,
         sg_tag_id: sg_tag_id,
@@ -403,7 +404,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   initEmptyState(appendState) {
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     this.setState({
       provided: 1,
       name: "",
@@ -446,7 +447,7 @@ class GoodsEditScene extends PureComponent {
           differenceType: 2,
           totalRemain: '',
           remark: '',
-          store_id: currStoreId,
+          store_id: store_id,
           skipCheckChange: 1
         }
       }],
@@ -543,12 +544,12 @@ class GoodsEditScene extends PureComponent {
     if (!name) {
       return
     }
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     const url = `/api_products/get_sg_tags_by_name?access_token=${accessToken}`
 
     const params = {
       vendor_id: vendor_id,
-      store_id: currStoreId,
+      store_id: store_id,
       name: name
     }
     HttpUtils.get(url, params).then(res => {
@@ -679,7 +680,7 @@ class GoodsEditScene extends PureComponent {
     if (!fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
-    const {accessToken, currStoreId, vendor_info} = this.props.global;
+    const {accessToken, store_id, vendor_info} = this.props.global;
 
     let formData = {
       id,
@@ -694,7 +695,7 @@ class GoodsEditScene extends PureComponent {
       task_id,
       upc: upc,
       sku_tag_id: 0,
-      limit_stores: [currStoreId],
+      limit_stores: [store_id],
     };
     formData.spec_type = spec_type
     if (spec_type === 'spec_multi') {
@@ -718,7 +719,7 @@ class GoodsEditScene extends PureComponent {
         differenceType: 2,
         totalRemain: actualNum,
         remark: '',
-        store_id: currStoreId,
+        store_id: store_id,
         skipCheckChange: 1
       }
     }
@@ -806,7 +807,6 @@ class GoodsEditScene extends PureComponent {
     }
 
 
-
     if ('spec_multi' === spec_type) {
       if (!Array.isArray(spec_list) || spec_list.length <= 0) {
         ToastLong('多规格数据异常, 无法保存')
@@ -887,8 +887,8 @@ class GoodsEditScene extends PureComponent {
   getProdDetailByUpc = (upc) => {
     showModal("加载商品中...", 'loading', 20000)
     const {dispatch} = this.props;
-    const {accessToken, currStoreId} = this.props.global;
-    dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
+    const {accessToken, store_id} = this.props.global;
+    dispatch(getProdDetailByUpc(accessToken, store_id, upc, this.state.vendor_id, async (ok, desc, p) => {
       if (ok) {
         hideModal()
         const {id, upc_data} = p
@@ -1340,7 +1340,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   setMultiSpecsInfo = (index, key, value) => {
-    const {currStoreId, vendor_info} = this.props.global;
+    const {store_id, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
 
     const multiSpecsInfo = multiSpecsList[index]
@@ -1354,7 +1354,7 @@ class GoodsEditScene extends PureComponent {
         differenceType: 2,
         totalRemain: value,
         remark: '',
-        store_id: currStoreId,
+        store_id: store_id,
         skipCheckChange: 1
       }
     this.setState({
@@ -1369,7 +1369,7 @@ class GoodsEditScene extends PureComponent {
     const {price_type} = this.props.global.vendor_info;
     let {product_detail = {}} = this.props.route.params;
     const {series_id = '', sku_max_num = 0} = product_detail;
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     const {selected_pids} = this.state;
     return (
       <View style={Styles.zoneWrap} key={index}>
@@ -1385,7 +1385,7 @@ class GoodsEditScene extends PureComponent {
                   Config.ROUTE_GOODS_SELECT_SPEC,
                   {
                     series_id: series_id,
-                    store_id: currStoreId,
+                    store_id: store_id,
                     selected_pids: selected_pids,
                     sku_max_num: sku_max_num,
                     onBack: resp => {
@@ -1545,7 +1545,7 @@ class GoodsEditScene extends PureComponent {
     )
   }
   addSpecs = () => {
-    const {currStoreId, vendor_info} = this.props.global;
+    const {store_id, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
     const multiSpecsInfo = {
       sku_name: '',//规格
@@ -1560,7 +1560,7 @@ class GoodsEditScene extends PureComponent {
         differenceType: 2,
         totalRemain: '',
         remark: '',
-        store_id: currStoreId,
+        store_id: store_id,
         skipCheckChange: 1
 
       }
@@ -1598,14 +1598,14 @@ class GoodsEditScene extends PureComponent {
   }
 
   deleteSpecsInfoToServer = (index) => {
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     const {multiSpecsList} = this.state
     const {id} = multiSpecsList[index]
     if (!id) {
       showError('规格信息不完整，不可删除')
       return
     }
-    const url = `/v1/new_api/store_product/del_store_pro/${currStoreId}/${id}`
+    const url = `/v1/new_api/store_product/del_store_pro/${store_id}/${id}`
     HttpUtils.get(url, {}, false, true).then((res) => {
       showSuccess(`${res.reason}`)
     }, error => {
@@ -2135,11 +2135,11 @@ class GoodsEditScene extends PureComponent {
   })
 
   getCategoryIdBySGId = (sg_tag_id) => {
-    const {accessToken, vendor_id, currStoreId} = this.props.global
+    const {accessToken, vendor_id, store_id} = this.props.global
     const url = `/api_products/get_self_tags_by_sg?access_token=${accessToken}`
     const params = {
       vendor_id: vendor_id,
-      store_id: currStoreId,
+      store_id: store_id,
       sg_id: sg_tag_id
     }
     HttpUtils.get(url, params).then(res => {

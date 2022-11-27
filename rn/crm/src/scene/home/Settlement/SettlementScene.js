@@ -6,7 +6,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {get_supply_bill_list} from "../../../reducers/settlement/settlementActions";
 
 import Config from "../../../pubilc/common/config";
-import tool from "../../../pubilc/util/tool.js";
+import tool, {dateTime} from "../../../pubilc/util/tool.js";
 import colors from "../../../pubilc/styles/colors";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
@@ -66,10 +66,10 @@ class SettlementScene extends PureComponent {
   }
 
   getSupplyList = () => {
-    let {currStoreId, accessToken, vendor_id} = this.props.global;
+    let {store_id, accessToken, vendor_id} = this.props.global;
     showModal('加载中...')
     const params = {new_format: 1}
-    let url = `/api/get_supply_bill_list_v2/${vendor_id}/${currStoreId}/${this.state.dates}?access_token=${accessToken}`;
+    let url = `/api/get_supply_bill_list_v2/${vendor_id}/${store_id}/${this.state.dates}?access_token=${accessToken}`;
     HttpUtils.get(url, params).then(res => {
       hideModal()
       const {bills = [], store_pay_info = [], support_payment = 0} = res
@@ -278,7 +278,7 @@ class SettlementScene extends PureComponent {
             </Text>
             <If condition={pay_datetime}>
               <Text style={styles.listItemPayDatetimeText}>
-                打款时间：{pay_datetime}
+                打款时间：{dateTime(pay_datetime)}
               </Text>
             </If>
           </View>

@@ -29,7 +29,7 @@ class InventoryItems extends Component {
     super(props);
 
     this.state = {
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       till: '', //到某一秒的库存
       fnPriceControlled: false,
       goods: [],

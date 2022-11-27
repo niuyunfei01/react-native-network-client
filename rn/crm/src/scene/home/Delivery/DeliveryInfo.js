@@ -63,9 +63,9 @@ class DeliveryInfo extends PureComponent {
 
   fetchData() {
     showModal("请求中...")
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     const api = `/v1/new_api/Delivery/shop_bind_info?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_id: this.state.delivery_id}).then((res) => {
+    HttpUtils.post.bind(this.props)(api, {store_id: store_id, delivery_id: this.state.delivery_id}).then((res) => {
       let show_btn_type = 0;
       if (res.has_edit_permission) {
         show_btn_type = 1
@@ -100,9 +100,9 @@ class DeliveryInfo extends PureComponent {
 
   sync_shop_info() {
     showModal("同步中...")
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     const api = `/v1/new_api/Delivery/sync_shop_info?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_id: this.state.delivery_id}).then((res) => {
+    HttpUtils.post.bind(this.props)(api, {store_id: store_id, delivery_id: this.state.delivery_id}).then((res) => {
       if (!res.ok) {
         this.setState({
           apply_status: 3,

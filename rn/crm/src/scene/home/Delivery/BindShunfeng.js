@@ -228,7 +228,7 @@ class BindShunfeng extends PureComponent {
       app_key: '',
       app_secret: '',
       shop_id: sfStoreID,
-      model_id: this.props.global.currStoreId,
+      model_id: this.props.global.store_id,
     }
     if (!sfStoreID) {
       ToastShort('请输入顺丰店铺id', 1)

@@ -4,13 +4,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Alert, Dimensions, Platform} from "react-native";
+import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
+import {setCheckVersionAt} from "../../reducers/global/globalActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
@@ -22,8 +22,10 @@ import GlobalUtil from "../util/GlobalUtil";
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 import {AMapSdk} from "react-native-amap3d";
 import DeviceInfo from "react-native-device-info";
-import {downloadApk} from "rn-app-upgrade";
+import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
+import {initMusic, unInitMusic} from "../component/PlayMusic";
+import CommonModal from "../component/goods/CommonModal";
 
 let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
@@ -556,47 +558,65 @@ const Page = (props) => {
   );
 }
 let notInit = true
+let ios_info = {}
+const appid = '1587325388'
+const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
 
 class AppNavigator extends PureComponent {
 
-  checkVersion = () => {
-    HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
-      if (res.yes) {
-        Alert.alert('新版本提示', res.desc, [
-          {text: '稍等再说', style: 'cancel'},
-          {
-            text: '现在更新',
-            style: 'default',
-            onPress: async () => {
-              await downloadApk({
-                interval: 250, // listen to upload progress event, emit every 666ms
-                apkUrl: res.download_url,
-                downloadInstall: true
-              })
-            }
-          },
-        ])
-      }
-    })
+  checkVersion = async () => {
+    switch (Platform.OS) {
+      case "ios":
+        ios_info = await checkUpdate(appid, DeviceInfo.getVersion())
+        if (ios_info.code === 1) {
+          this.setModalStatus(true, ios_info.msg, '')
+        }
+        break
+      case "android":
+        HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+          if (res.yes) {
+            this.setModalStatus(true, res.desc, res.download_url)
+          }
+        })
+        break
+    }
+
+  }
+
+  updateAPP = async () => {
+    const {download_url} = this.state
+    switch (Platform.OS) {
+      case "android":
+        await downloadApk({interval: 250, apkUrl: download_url, downloadInstall: true})
+        break
+      case "ios":
+        this.setModalStatus()
+        await Linking.openURL(appUrl)
+        break
+    }
+
   }
 
   handleNoLoginInfo = (reduxGlobal) => {
-    if ((dayjs().valueOf() - reduxGlobal?.getTokenTs) / 1000 >= reduxGlobal?.expireTs * 0.9 && reduxGlobal?.refreshToken)
-      this.refreshAccessToken(reduxGlobal?.refreshToken)
-    if (reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+    if (reduxGlobal?.printer_id === '') {
       return;
     }
-    if (reduxGlobal.store_id === 0)
+    if (reduxGlobal.store_id == 0)
       return;
-    if (reduxGlobal.vendor_id === 0)
+    if (reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal.vendor_id == 0)
       return;
-    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
-      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
-      reduxGlobal.store_id === global.noLoginInfo.store_id &&
-      reduxGlobal.host === global.noLoginInfo.host &&
-      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
-      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
-      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
+    const flag = reduxGlobal?.accessToken === global.noLoginInfo?.accessToken &&
+      reduxGlobal?.currentUser == global.noLoginInfo?.currentUser &&
+      reduxGlobal?.host === global.noLoginInfo?.host &&
+      reduxGlobal?.enabled_good_mgr == global.noLoginInfo?.enabled_good_mgr &&
+      reduxGlobal.vendor_id == global.noLoginInfo?.vendor_id &&
+      reduxGlobal?.printer_id == global.noLoginInfo?.printer_id &&
+      reduxGlobal?.store_id == global.noLoginInfo?.store_id &&
+      reduxGlobal?.show_bottom_tab == global.noLoginInfo?.show_bottom_tab &&
+      reduxGlobal?.autoBluetoothPrint == global.noLoginInfo?.autoBluetoothPrint &&
+      reduxGlobal?.refreshToken == global.noLoginInfo?.refreshToken &&
+      reduxGlobal?.expireTs == global.noLoginInfo?.expireTs &&
+      reduxGlobal?.getTokenTs == global.noLoginInfo?.getTokenTs &&
       reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by
 
     if (flag) {
@@ -605,14 +625,14 @@ class AppNavigator extends PureComponent {
     const noLoginInfo = {
       accessToken: reduxGlobal.accessToken,
       currentUser: reduxGlobal.currentUser,
-      currStoreId: reduxGlobal.store_id,
+      store_id: reduxGlobal.store_id,
       host: reduxGlobal.host || Config.defaultHost,
-      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
-      currVendorId: reduxGlobal.vendor_id,
+      enabled_good_mgr: reduxGlobal.enabled_good_mgr,
+      vendor_id: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
-      show_bottom_tab: reduxGlobal.show_bottom_tab,
-      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
-      refreshToken: reduxGlobal.refreshToken,
+      show_bottom_tab: reduxGlobal.show_bottom_tab || false,
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint || false,
+      refreshToken: reduxGlobal.refreshToken || '',
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
       order_list_by: reduxGlobal.order_list_by,
@@ -622,15 +642,7 @@ class AppNavigator extends PureComponent {
 
   }
 
-  refreshAccessToken = (refreshToken) => {
-    const url = `/v4/WsbUser/refreshToken`
-    const params = {refresh_token: refreshToken}
-    const {dispatch} = this.props
-    HttpUtils.post(url, params).then(res => {
-      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
-      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
-    })
-  }
+
   initJPush = () => {
 
     JPush.setLoggerEnable(false)
@@ -645,7 +657,7 @@ class AppNavigator extends PureComponent {
     //     console.log("registerID:" + JSON.stringify(registerID))
     //   }
     // )
-    const {accessToken, autoBluetoothPrint, currentUser, currStoreId} = this.props.global
+    const {accessToken, autoBluetoothPrint, currentUser, store_id} = this.props.global
     //tag alias事件回调
     JPush.addTagAliasListener(({code}) => {
       //console.log("tagAliasListener:" + code)
@@ -663,14 +675,14 @@ class AppNavigator extends PureComponent {
         if (type !== 'new_order') {
           sendDeviceStatus(accessToken, {
             msgId: messageID,
-            listener_stores: currStoreId,
+            listener_stores: store_id,
             orderId: order_id,
             btConnected: '收到极光推送，不是新订单不需要打印',
             auto_print: autoBluetoothPrint
           })
           return
         }
-        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: currStoreId})
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
@@ -694,9 +706,9 @@ class AppNavigator extends PureComponent {
         await initBlueTooth(global)
 
         const currentTs = dayjs().valueOf()
-        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+        if (currentTs - lastCheckVersion > 8 * 3600) {
           store.dispatch(setCheckVersionAt(currentTs))
-          this.checkVersion();
+          await this.checkVersion()
         }
 
         GlobalUtil.getDeviceInfo().then(deviceInfo => store.dispatch(setDeviceInfo(deviceInfo)))
@@ -707,12 +719,14 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
+        initMusic()
       }
     })
   }
 
   componentDidMount() {
     this.whiteNoLoginInfo()
+    unInitMusic()
   }
 
   componentWillUnmount() {
@@ -730,11 +744,11 @@ class AppNavigator extends PureComponent {
         const duration = startAppEndTime - parseInt(startAppTime)
         if (global.isLoginToOrderList)
           return
-        const {currStoreId, currentUser} = this.props.global
+        const {store_id, currentUser} = this.props.global
 
         nrRecordMetric("start_app_end_time", {
           startAppTimeDuration: duration,
-          store_id: currStoreId,
+          store_id: store_id,
           user_id: currentUser
         })
       }
@@ -777,15 +791,73 @@ class AppNavigator extends PureComponent {
   //   }
   // }
 
+  state = {
+    version_visible: false,
+    desc: '',
+    download_url: ''
+  }
+
+  setModalStatus = (version_visible = false, desc = '', download_url = '') => {
+    this.setState({version_visible: version_visible, desc: desc, download_url: download_url})
+  }
 
   render() {
     const {initialRouteName, initialRouteParams} = this.props;
+    const {version_visible, desc} = this.state
     return (
-      <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+      <>
+        <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
+          <>
+            <ImageBackground style={styles.image} source={new_version_background_url}>
+              <Text style={styles.headerText}>
+                新版本提示
+              </Text>
+            </ImageBackground>
+            <View style={styles.content}>
+              <Text style={styles.updateContentText}>
+                {desc}
+              </Text>
+              <View style={styles.btnWrap}>
+                <TouchableOpacity style={styles.cancelWrap} onPress={this.setModalStatus}>
+                  <Text style={styles.cancelText}>
+                    暂不更新
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.updateWrap} onPress={this.updateAPP}>
+                  <Text style={styles.updateText}>
+                    立即更新
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        </CommonModal>
+        <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+
+      </>
     );
   }
 
 }
 
+const new_version_background_url = {uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/new_version_background%403x.png'}
+const styles = StyleSheet.create({
+  content: {borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginHorizontal: 27, backgroundColor: 'white'},
+  image: {height: 148, marginHorizontal: 27, alignItems: 'center', justifyContent: 'center'},
+  updateContentText: {fontSize: 14, color: '#333', lineHeight: 20, paddingHorizontal: 20, paddingTop: 10},
+  headerText: {fontWeight: '500', color: 'white', lineHeight: 30, fontSize: 22},
+  btnWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20},
+  cancelWrap: {backgroundColor: '#f5f5f5', borderRadius: 20},
+  cancelText: {fontSize: 16, fontWeight: '500', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
+  updateWrap: {backgroundColor: '#26B942', borderRadius: 20, marginLeft: 10},
+  updateText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingHorizontal: 36,
+    paddingVertical: 9,
+    color: 'white'
+  }
+
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppNavigator);

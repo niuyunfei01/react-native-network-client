@@ -90,10 +90,10 @@ class Operation extends BaseComponent {
   }
 
   fetchData() {
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     const self = this
     self.setState({isRefreshing: true})
-    HttpUtils.get.bind(this.props)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/store_competition/${store_id}?access_token=${accessToken}`).then(res => {
       self.setState({competition: res, isRefreshing: false})
     })
   }

@@ -147,12 +147,12 @@ class UserScene extends PureComponent {
     const noLoginInfo = {
       accessToken: '',
       currentUser: 0,
-      currStoreId: 0,
+      store_id: 0,
       host: '',
-      enabledGoodMgr: '',
+      enabled_good_mgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      order_list_by: 'orderTime asc'
+      order_list_by: 'expectTime asc'
     }
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 

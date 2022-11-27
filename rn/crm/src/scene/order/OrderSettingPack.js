@@ -53,10 +53,10 @@ class OrderSettingScene extends Component {
     super(props);
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("手动发单页");
-    let {currStoreId, accessToken, store_info} = this.props.global
+    let {store_id, accessToken, store_info} = this.props.global
     this.state = {
       accessToken: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       city: store_info?.city,
       store_name: store_info?.name,
       store_address: store_info?.dada_address,

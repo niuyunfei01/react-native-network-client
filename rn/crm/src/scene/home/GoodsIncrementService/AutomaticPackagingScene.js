@@ -66,8 +66,8 @@ class AutomaticPackagingScene extends PureComponent {
   }
 
   getSetting = (global) => {
-    const {accessToken, currStoreId} = global
-    const api = `/v1/new_api/added/auto_pack_info/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = global
+    const api = `/v1/new_api/added/auto_pack_info/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(res => {
 
       this.setState({packageTime: `${res.pack_time}`, packageStatus: res.auto_pack})
@@ -86,11 +86,11 @@ class AutomaticPackagingScene extends PureComponent {
 
   saveSetting = () => {
     const {global} = this.props
-    const {accessToken, currStoreId} = global
+    const {accessToken, store_id} = global
     const {packageStatus} = this.state
     const api = `/v1/new_api/added/auto_pack?access_token=${accessToken}`
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       auto_pack: packageStatus,
       pack_time: 0
     }

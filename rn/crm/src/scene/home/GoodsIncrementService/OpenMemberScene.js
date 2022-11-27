@@ -137,10 +137,10 @@ class OpenMemberScene extends PureComponent {
   }
 
   openMiniProgram = async () => {
-    const {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global
+    const {store_id, currentUser, currentUserProfile, vendor_id} = this.props.global
     let data = {
       v: vendor_id,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'mine'
@@ -206,20 +206,20 @@ class OpenMemberScene extends PureComponent {
 
   }
   openMember = () => {
-    const {currStoreId, accessToken, store_info, vendor_info} = this.props.global
+    const {store_id, accessToken, store_info, vendor_info} = this.props.global
     const {selectedOpenMember} = this.state
     const {vip_info} = store_info
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       pay_money: selectedOpenMember.pay_money_actual,
       pay_type: selectedOpenMember.months,
       product_package_id: vip_info.id,
     }
     this.mixpanel.track('会员_继续开通')
-    const api = `/v1/new_api/product_package/vip_open/${currStoreId}?access_token=${accessToken}`
+    const api = `/v1/new_api/product_package/vip_open/${store_id}?access_token=${accessToken}`
     HttpUtils.post(api, params, false, false, false).then(() => {
       showSuccess(vip_info.exist_vip ? '续费成功' : '开通成功')
-      this.props.dispatch(getConfig(accessToken, currStoreId));
+      this.props.dispatch(getConfig(accessToken, store_id));
     }, error => {
       if ('0' === vendor_info.wsb_store_account) {
         showError('品牌余额不足，请先充值')

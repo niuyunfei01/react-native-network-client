@@ -525,9 +525,9 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStallData()
   }
   getStallData = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const url = `/api_products/get_stall_by_store_id?access_token=${accessToken}`
-    const params = {store_id: currStoreId}
+    const params = {store_id: store_id}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const stallArray = []
       res && res.map(item => {
@@ -550,8 +550,8 @@ class GoodStoreDetailScene extends PureComponent {
       showError('请先选择摊位或者规格')
       return
     }
-    const {currStoreId, accessToken} = this.props.global;
-    const params = {store_id: currStoreId, product_id: product_id, stall_id: stall_id}
+    const {store_id, accessToken} = this.props.global;
+    const params = {store_id: store_id, product_id: product_id, stall_id: stall_id}
     const url = `/api_products/save_prod_stall?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('绑定成功', 3)

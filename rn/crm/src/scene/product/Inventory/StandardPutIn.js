@@ -206,8 +206,8 @@ class StandardPutIn extends BaseComponent {
   fetchStandardProducts() {
     const self = this
     const accessToken = this.props.global.accessToken
-    const currStoreId = this.props.global.currStoreId
-    const api = `api_products/standard_products?access_token=${accessToken}&_sid=${currStoreId}`
+    const store_id = this.props.global.store_id
+    const api = `api_products/standard_products?access_token=${accessToken}&_sid=${store_id}`
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({standardProducts: res})
     })
