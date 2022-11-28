@@ -434,7 +434,7 @@ class OrderItem extends React.PureComponent {
             }}>#{item.platform_dayId} </Text>
             <If condition={Number(item?.pickType) === 1}>
               <Text style={{
-                borderWidth: 0.2,
+                borderWidth: 0.5,
                 borderColor: colors.main_color,
                 borderRadius: 2,
                 color: colors.main_color,

@@ -739,7 +739,7 @@ class OrderCallDelivery extends Component {
                     borderRadius: 20,
                     backgroundColor: colors.white,
                     borderColor: colors.colorDDD,
-                    borderWidth: 0.2
+                    borderWidth: 0.5
                   }}
                   titleStyle={{color: colors.color666, fontSize: 14, lineHeight: 20}}
           />
