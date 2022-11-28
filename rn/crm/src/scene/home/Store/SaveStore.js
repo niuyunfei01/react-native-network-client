@@ -402,8 +402,6 @@ class SaveStore extends PureComponent {
     return (
       <KeyboardAvoidingView
         behavior={Platform.select({android: 'height', ios: 'padding'})}
-        scrollEnabled={false}
-        enableOnAndroid={false}
         automaticallyAdjustContentInsets={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}

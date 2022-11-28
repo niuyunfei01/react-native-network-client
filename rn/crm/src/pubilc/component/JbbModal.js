@@ -34,8 +34,6 @@ class JbbModal extends PureComponent {
           alignItems: modal_type !== 'center' ? 'flex-end' : 'center',
         }}>
           <KeyboardAvoidingView
-            scrollEnabled={false}
-            enableOnAndroid={false}
             automaticallyAdjustContentInsets={false}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
