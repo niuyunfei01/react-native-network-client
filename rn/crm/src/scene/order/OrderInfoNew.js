@@ -621,6 +621,7 @@ class OrderInfoNew extends PureComponent {
       ship_distance_store
     } = this.state.order;
 
+    let zoom = dada_distance > 2000 ? dada_distance > 2000 ? 12 : 13 : 14;
     let {
       aLon,
       aLat
@@ -634,11 +635,11 @@ class OrderInfoNew extends PureComponent {
           zoomControlsEnabled={false}
           mapType={MapType.Standard}
           style={StyleSheet.absoluteFill}
-          minZoom={12}
+          minZoom={10}
           maxZoom={20}
           initialCameraPosition={{
             target: {latitude: Number(aLat), longitude: Number(aLon)},
-            zoom: dada_distance > 2000 ? 13 : 14
+            zoom: zoom
           }}>
           {/*门店定位*/}
           <If condition={ship_distance_destination <= 0}>
@@ -660,8 +661,6 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
-              onPress={() => {
-              }}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>

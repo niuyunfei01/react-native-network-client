@@ -61,6 +61,9 @@ class RiderTrajectory extends Component {
     let api = `/v4/wsb_order/get_order_track/${order_id}/${delivery_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let zoom = res.distance_order > 0 && res.distance_order > 2000 ? 13 : 14;
+      if (res?.distance_order > 4000) {
+        zoom = 12
+      }
       let list = [];
       let item = {};
       if (tool.length(res.track_list) > 0) {
