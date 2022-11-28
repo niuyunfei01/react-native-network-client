@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Easing, FlatList, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -17,6 +17,11 @@ import popupStyles from 'rmc-picker/lib/PopupStyles';
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import {Button} from "react-native-elements";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import WebView from "react-native-webview";
+import 'react-native-get-random-values';
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -36,12 +41,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    return navigation.addListener('focus', () => onRefresh());
-  }, [navigation])
-  return null;
-}
+const {width, height} = Dimensions.get("window");
 
 class SettlementScene extends PureComponent {
 
@@ -57,12 +57,39 @@ class SettlementScene extends PureComponent {
       dates: this.format(date),
       store_pay_info: [],
       show_pay_info: false,
+      showAgreement: props.route.params?.showSettle || false,
+      showPrompt: false,
+      settleProtocolInfo: {},
+      fadeOutOpacity: new Animated.Value(0)
     };
 
   }
 
   componentDidMount() {
-    this.getSupplyList();
+    this.fetchSettleProtocol()
+    this.getSupplyList()
+    let {navigation} = this.props;
+    navigation.setOptions({
+      headerRight: () => this.renderHeaderRight()
+    })
+  }
+
+  onPress(route, params = {}) {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
+  }
+
+  fetchSettleProtocol = () => {
+    let {store_id, accessToken} = this.props.global;
+    let url = `/api/settle_protocol_desc/${store_id}`;
+    HttpUtils.get(url, {
+      access_token: accessToken
+    }).then(res => {
+      this.setState({
+        settleProtocolInfo: res
+      })
+    })
   }
 
   getSupplyList = () => {
@@ -89,16 +116,58 @@ class SettlementScene extends PureComponent {
     })
   }
 
-  // this.forceUpdate(); 刷新页面
+  startAnimation() {
+    this.state.fadeOutOpacity.setValue(1);
+    Animated.timing(this.state.fadeOutOpacity, {
+      toValue: 0,
+      duration: 3000,
+      easing: Easing.linear,
+    }).start();
+  }
+
+  renderHeaderRight = () => {
+    let {settleProtocolInfo, fadeOutOpacity} = this.state;
+    return (
+      <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
+        <Text style={styles.headerRightText}>结算协议 </Text>
+        <Animated.View
+          style = {{
+            opacity: fadeOutOpacity}}>
+          <View style={styles.rightTip}>
+            <Text style={styles.rightTipText}>{settleProtocolInfo.toast_ptl} </Text>
+          </View>
+          <View style={styles.up}/>
+        </Animated.View >
+      </TouchableOpacity>
+    )
+  }
+
   toDetail(date, status, id, profit) {
     let {navigation, route} = this.props;
+    let {settleProtocolInfo} = this.state;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
       status: status,
       id: id,
       profit,
-      key: route.key
+      key: route.key,
+      totalPrePriceDesc: settleProtocolInfo.toast_total,
+      shipPriceDesc: settleProtocolInfo.toast_ship
     });
+  }
+
+  toSettleProtocol = (flag = false) => {
+    let {settleProtocolInfo} = this.state;
+    this.setState({
+      showPrompt: false
+    })
+    this.onPress(Config.ROUTE_SETTLEMENT_PROTOCOL, {
+      ptl_sign: settleProtocolInfo?.ptl_sign || '',
+      showPrompt: flag,
+      onBack: (res) => {
+        this.setState({showPrompt: res})
+      }
+    })
   }
 
   onChange = (date) => {
@@ -113,9 +182,57 @@ class SettlementScene extends PureComponent {
     return `${date.getFullYear()}-${month}`;
   }
 
+  closeAgreeModal = () => {
+    this.setState({showAgreement: false, showPrompt: true})
+  }
+
+  closePromptModal = () => {
+    this.setState({showPrompt: false})
+  }
+
+  touchPromptBtn = (type) => {
+    let {navigation} = this.props;
+    this.closePromptModal()
+    switch (type) {
+      case 'no':
+        this.clickProtocol('tip_reject')
+        navigation.goBack()
+        break
+      case 'agree':
+        this.clickProtocol('tip_agree')
+        this.submitAgree()
+        break
+      default:
+        break
+    }
+  }
+
+  submitAgree = () => {
+    let {store_id, accessToken} = this.props.global;
+    let url = `/api/settle_protocol_agree/${store_id}`;
+    HttpUtils.get(url, {
+      access_token: accessToken
+    }).then(res => {
+      ToastShort('操作成功')
+      this.startAnimation()
+    }).catch((res) => {
+      ToastShort(res.reason)
+    })
+  }
+
+  clickProtocol = (type = '') => {
+    let {store_id, accessToken} = this.props.global;
+    let url = `/api/protocol_click_stat/${store_id}`;
+    HttpUtils.get(url, {
+      access_token: accessToken,
+      type: type
+    }).then(res => {
+    }).catch((res) => {
+      ToastShort(res.reason)
+    })
+  }
 
   render() {
-    const {navigation} = this.props
     const {show_pay_info} = this.state
     return (
       <ScrollView
@@ -123,12 +240,13 @@ class SettlementScene extends PureComponent {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={styles.page}>
-        <FetchView navigation={navigation} onRefresh={this.getSupplyList}/>
         <If condition={show_pay_info}>
           {this.renderPayList()}
         </If>
         {this.renderToday()}
         {this.renderList()}
+        {this.renderAgreementModal()}
+        {this.renderPromptModal()}
       </ScrollView>
     );
   }
@@ -290,6 +408,86 @@ class SettlementScene extends PureComponent {
         </TouchableOpacity>
       );
   }
+
+  renderAgreementModal = () => {
+    let {showAgreement, settleProtocolInfo} = this.state;
+    return (
+      <CommonModal visible={showAgreement} position={'center'} onRequestClose={this.closeAgreeModal} animationType={'fade'}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>
+            {settleProtocolInfo.ptl_title}
+          </Text>
+          <Text style={[styles.modalContentDesc, {marginVertical: 10}]}>
+            {settleProtocolInfo.ptl_desc}
+          </Text>
+          <View style={{width: width * 0.8, height: height * 0.4}}>
+            <WebView
+              style={{
+                backgroundColor: colors.white,
+                flex: 1
+              }}
+              automaticallyAdjustContentInsets={true}
+              source={{uri: 'https://fire7.waisongbang.com/SettlePolicy.html'}}
+              scrollEnabled={true}
+            />
+          </View>
+          <View style={styles.modalBtnBottom}>
+            <Button title={'不同意'}
+                    onPress={() => {
+                      this.clickProtocol('ptl_reject')
+                      this.closeAgreeModal()
+                    }}
+                    buttonStyle={[styles.modalBtnWrap, {backgroundColor: colors.f5}]}
+                    titleStyle={[styles.modalBtnText, {color: colors.color666}]}
+            />
+            <Button title={'同意'}
+                    onPress={() => {
+                      this.clickProtocol('ptl_agree')
+                      this.setState({showAgreement: false}, () => {
+                        this.submitAgree()
+                      })
+                    }}
+                    buttonStyle={[styles.modalBtnWrap, {backgroundColor: colors.main_color}]}
+                    titleStyle={[styles.modalBtnText, {color: colors.white}]}
+            />
+          </View>
+        </View>
+      </CommonModal>
+    )
+  }
+
+  renderPromptModal = () => {
+    let {showPrompt, settleProtocolInfo} = this.state;
+    return (
+      <CommonModal visible={showPrompt} position={'center'} onRequestClose={this.closePromptModal} animationType={'fade'}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>
+            {settleProtocolInfo.tip_title}
+          </Text>
+          <Text style={[styles.modalContentDesc, {marginVertical: 10}]}>
+            {settleProtocolInfo.tip_desc}<Text style={styles.agreementText} onPress={() => {
+              this.setState({
+                showPrompt
+              }, () => this.toSettleProtocol(true))
+          }}>《结算协议》 </Text>。
+          </Text>
+          <View style={styles.modalBtnBottom}>
+            <Button title={'暂不'}
+                    onPress={() => this.touchPromptBtn('no')}
+                    buttonStyle={[styles.modalBtnWrap, {backgroundColor: colors.f5}]}
+                    titleStyle={[styles.modalBtnText, {color: colors.color666}]}
+            />
+            <Button title={'同意'}
+                    onPress={() => this.touchPromptBtn('agree')}
+                    buttonStyle={[styles.modalBtnWrap, {backgroundColor: colors.main_color}]}
+                    titleStyle={[styles.modalBtnText, {color: colors.white}]}
+            />
+          </View>
+        </View>
+      </CommonModal>
+    )
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -330,7 +528,79 @@ const styles = StyleSheet.create({
   },
   listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 40},
   listItemPayDatetimeText: {fontSize: 12, color: colors.color666},
-  listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'}
+  listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'},
+  headerRightText: {color: colors.color333, fontSize: 15, marginRight: 10},
+  Content: {
+    backgroundColor: colors.white,
+    maxHeight: 300
+  },
+  modalContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    width: width * 0.9,
+    marginLeft: width * 0.05
+  },
+  modalTitle: {
+    color: colors.color333,
+    fontWeight: "bold",
+    fontSize: 16
+  },
+  modalContentDesc: {
+    color: colors.color333,
+    fontSize: 14,
+    lineHeight: 20
+  },
+  modalBtnBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    width: width * 0.75
+  },
+  modalBtnWrap: {
+    width: width * 0.35,
+    height: 40,
+    borderRadius: 20
+  },
+  modalBtnText: {
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  agreementText: {
+    color: colors.main_color,
+    fontSize: 15
+  },
+  rightTip: {
+    width: 181,
+    height: 36,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 15,
+    right: 10
+  },
+  rightTipText: {
+    color: colors.white,
+    fontSize: 14
+  },
+  up: {
+    width: 0,
+    height: 0,
+    borderRightWidth: 5,
+    borderRightColor: 'transparent',
+    borderLeftWidth: 5,
+    borderLeftColor: 'transparent',
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(0,0,0,0.6)',
+    position: "absolute",
+    right: 40,
+    top: 5
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene);
