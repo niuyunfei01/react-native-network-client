@@ -1004,7 +1004,8 @@ class OrderInfoNew extends PureComponent {
                   color: '#FF8309'
                 }}>  {order?.friendly_time_info} </Text>
               </View>
-              <Text style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name,18)} #{order?.dayId} </Text>
+              <Text
+                style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name, 18)} #{order?.dayId} </Text>
             </View>
           </View>
           <If condition={order?.platform === '6'}>
