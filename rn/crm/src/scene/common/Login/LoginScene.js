@@ -169,11 +169,11 @@ class LoginScene extends PureComponent {
   }
 
   queryConfig = () => {
-    let {accessToken, currStoreId} = this.props.global;
+    let {accessToken, store_id} = this.props.global;
     const {dispatch, navigation} = this.props;
-    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
-        dispatch(setCurrentStore(cfg?.store_id || currStoreId));
+        dispatch(setCurrentStore(cfg?.store_id || store_id));
         tool.resetNavStack(navigation,
           cfg?.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS,
           cfg?.show_bottom_tab ? {initTab: Config.ROUTE_ORDERS, initialRouteName: Config.ROUTE_ALERT} : {});

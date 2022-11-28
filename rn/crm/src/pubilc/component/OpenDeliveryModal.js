@@ -265,10 +265,10 @@ class OpenDeliveryModal extends PureComponent {
   // 联系客服
   JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
-    let {currStoreId} = this.state;
+    let {store_id} = this.state;
     let data = {
       v: vendor_id,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'

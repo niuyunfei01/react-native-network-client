@@ -35,10 +35,10 @@ class Operation extends BaseComponent {
   }
 
   fetchProductLogData() {
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const self = this
     self.setState({isRefreshing: true})
-    HttpUtils.get.bind(this.props)(`/api/store_product_log/${currStoreId}/${this.state.dateHtp}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/store_product_log/${store_id}/${this.state.dateHtp}?access_token=${accessToken}`).then(res => {
       self.setState({
         isRefreshing: false,
         total: res.total,

@@ -62,9 +62,9 @@ class BindMeituan extends PureComponent {
 
   fetchData() {
     showModal('加载中...')
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const api = `/api/get_mt_bind_info?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, ext_store_id: this.state.ext_store_id}).then(res => {
+    HttpUtils.post.bind(this.props)(api, {store_id: store_id, ext_store_id: this.state.ext_store_id}).then(res => {
       hideModal()
       this.setState({
         headerTitle: res.notice,
@@ -197,7 +197,7 @@ class BindMeituan extends PureComponent {
               let {currVendorId} = tool.vendor(this.props.global)
               let data = {
                 v: currVendorId,
-                s: this.props.global.currStoreId,
+                s: this.props.global.store_id,
                 u: this.props.global.currentUser,
                 m: this.props.global.currentUserProfile.mobilephone,
                 place: 'bindMeituan'

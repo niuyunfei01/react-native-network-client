@@ -181,7 +181,7 @@ class SearchOrder extends PureComponent {
   }
 
   render() {
-    const {currStoreId, accessToken, dispatch} = this.props.global;
+    const {store_id, accessToken, dispatch} = this.props.global;
     const {
       is_loading,
       list,
@@ -219,12 +219,12 @@ class SearchOrder extends PureComponent {
           onPress={this.onPress.bind(this)}
           accessToken={accessToken}
           order_id={order_id}
-          currStoreId={currStoreId}
+          store_id={store_id}
           show_goods_list={show_goods_list}/>
         <DeliveryStatusModal
           order_id={order_id}
           order_status={0}
-          store_id={currStoreId}
+          store_id={store_id}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
@@ -275,7 +275,7 @@ class SearchOrder extends PureComponent {
             searchIcon={<SvgXml xml={search_icon(colors.color666)} height={26} width={26}/>}
             clearIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
             cancelIcon={<SvgXml onPress={this.onCancel} xml={cross_circle_icon()}/>}
-            placeholderTextColor={show_placeholder ? colors.color999 : colors.f5}
+            placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
             onBlur={() => {
               this.setState({
                 show_placeholder: true
@@ -346,7 +346,7 @@ class SearchOrder extends PureComponent {
                 keyword_type: Number(info.value) === keyword_type ? 0 : Number(info.value)
               }, () => {
                 tool.debounces(() => {
-                  this.fetchOrderList()
+                  this.onRefresh()
                 })
               })
             }} key={index} style={{

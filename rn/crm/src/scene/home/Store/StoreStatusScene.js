@@ -112,17 +112,17 @@ class StoreStatusScene extends PureComponent {
 
   componentDidMount() {
     const {navigation, global} = this.props
-    let {currStoreId, vendor_id} = global
+    let {store_id, vendor_id} = global
     let {is_service_mgr} = tool.vendor(this.props.global);
     let {total_wm_stores} = this.state;
-    this.mixpanel.track("mine.wm_store_list", {currStoreId, vendor_id, total_wm_stores});
+    this.mixpanel.track("mine.wm_store_list", {store_id, vendor_id, total_wm_stores});
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, vendor_id});
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
                                    }}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: 15, color: colors.main_color,}}>绑定外卖店铺 </Text>
@@ -144,11 +144,11 @@ class StoreStatusScene extends PureComponent {
   }
 
   fetchData = () => {
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     this.setState({
       loading: true,
     })
-    const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+    const api = `/api/get_store_business_status/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       let show_body = false;
       if (tool.length(res.business_status) > 0) {
@@ -189,8 +189,8 @@ class StoreStatusScene extends PureComponent {
 
   openStore() {
     showModal('请求中...')
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/api/open_store/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global
+    const api = `/api/open_store/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(() => {
       hideModal()
       this.fetchData()
@@ -241,8 +241,8 @@ class StoreStatusScene extends PureComponent {
 
   setAutoTaskOrder() {
     showModal("修改中");
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/api/set_store_suspend_confirm_order/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global
+    const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       hideModal()
       showSuccess('操作成功');
@@ -345,7 +345,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   renderBtn = () => {
-    const {accessToken, currStoreId} = this.props.global
+    const {accessToken, store_id} = this.props.global
     let {all_open, allow_self_open, all_close} = this.state;
     let canOpen = !all_open && allow_self_open
     let canClose = !all_close && allow_self_open
@@ -374,7 +374,7 @@ class StoreStatusScene extends PureComponent {
                               this.onPress(Config.ROUTE_STORE_CLOSE, {
                                 data: timeOptions,
                                 access_token: accessToken,
-                                store_id: currStoreId
+                                store_id: store_id
                               })
                             }}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
@@ -396,7 +396,7 @@ class StoreStatusScene extends PureComponent {
 
   renderBody = () => {
     const {business_status} = this.state
-    const {currStoreId, vendor_id} = this.props.global
+    const {store_id, vendor_id} = this.props.global
     return (
       <View style={{
         flex: 1,
@@ -406,10 +406,10 @@ class StoreStatusScene extends PureComponent {
             let suspend_confirm_order = store.suspend_confirm_order === '0'
             return (
               <TouchableOpacity key={index} onPress={() => {
-                this.mixpanel.track("mine.wm_store_list.click_store", {currStoreId, vendor_id});
+                this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
                 this.onPress(Config.ROUTE_SEETING_DELIVERY, {
                   ext_store_id: store.id,
-                  store_id: currStoreId,
+                  store_id: store_id,
                   poi_name: store.poi_name,
                   showBtn: store.zs_way === '商家自送',
                 })

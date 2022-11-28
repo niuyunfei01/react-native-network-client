@@ -146,7 +146,7 @@ class OrderInfoNew extends PureComponent {
 
   componentDidMount = () => {
     const {deviceInfo} = this.props?.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
+    const {store_id, currentUser, accessToken} = this.props.global;
     this.navigationOptions()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -154,7 +154,7 @@ class OrderInfoNew extends PureComponent {
     timeObj.method[0].interfaceName = ''
     timeObj.method[0].methodName = 'componentDidUpdate'
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderInfo"
@@ -954,7 +954,7 @@ class OrderInfoNew extends PureComponent {
   }
   renderOrderInfoCard = () => {
     let {order = {}} = this.state;
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
@@ -1033,7 +1033,7 @@ class OrderInfoNew extends PureComponent {
                 <TouchableOpacity style={styles.productInfo} key={index}
                                   onPress={() => this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
                                     pid: info?.product_id,
-                                    storeId: currStoreId,
+                                    storeId: store_id,
                                     item: info
                                   })}>
                   <FastImage
@@ -1323,13 +1323,13 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderDeliveryModal = () => {
-    let {show_delivery_modal, orderId, currStoreId} = this.state;
+    let {show_delivery_modal, orderId, store_id} = this.state;
     const {global} = this.props;
     const {accessToken} = global;
     return (
       <DeliveryStatusModal
         order_id={orderId}
-        store_id={currStoreId}
+        store_id={store_id}
         order_status={0}
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}

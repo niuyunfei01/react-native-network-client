@@ -6,7 +6,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {get_supply_bill_list} from "../../../reducers/settlement/settlementActions";
 
 import Config from "../../../pubilc/common/config";
-import tool from "../../../pubilc/util/tool.js";
+import tool, {dateTime} from "../../../pubilc/util/tool.js";
 import colors from "../../../pubilc/styles/colors";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
@@ -399,7 +399,7 @@ class SettlementScene extends PureComponent {
             </Text>
             <If condition={pay_datetime}>
               <Text style={styles.listItemPayDatetimeText}>
-                打款时间：{pay_datetime}
+                打款时间：{dateTime(pay_datetime)}
               </Text>
             </If>
           </View>

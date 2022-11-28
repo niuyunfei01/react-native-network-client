@@ -91,8 +91,8 @@ class PrinterSetting extends PureComponent {
   get_print_settings(callback = () => {
   }) {
     const {dispatch} = this.props
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/read_store/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
       let {printer_name} = this.state;
       if (store_info.printer_cfg) {
@@ -117,8 +117,8 @@ class PrinterSetting extends PureComponent {
   }
 
   setPrintSettings(settings) {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_order_print_settings/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/set_order_print_settings/${store_id}?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, settings).then(() => {
       this.setState({
         print_pre_order: settings.print_pre_order,
@@ -131,8 +131,8 @@ class PrinterSetting extends PureComponent {
 
   set_master_print_item = () => {
     let data = {master_print_item: !this.state.master_print_item ? 1 : 0, customer_print_item: 1};
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/v1/new_api/stores/set_print_item/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `/v1/new_api/stores/set_print_item/${store_id}?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, data).then(() => {
       this.setState({
         master_print_item: !this.state.master_print_item

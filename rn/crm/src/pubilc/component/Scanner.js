@@ -144,7 +144,7 @@ class Scanner extends React.Component {
         whoosh.play((success) => {
           if (success) {
             whoosh.pause()
-            whoosh.setNumberOfLoops(1);
+            whoosh.setNumberOfLoops(0);
             whoosh.release();
 
             //手机振动

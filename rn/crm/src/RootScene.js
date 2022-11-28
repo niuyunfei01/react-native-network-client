@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
-import {getConfig, setNoLoginInfo, setOrderListBy, setUserProfile} from "./reducers/global/globalActions";
+import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import {Provider} from "react-redux";
@@ -42,11 +42,18 @@ class RootScene extends PureComponent {
     this.state = {
       noLoginInfo: {
         accessToken: '',
+        refreshToken: '',
         currentUser: '',
-        currStoreId: 0,
-        currVendorId: 0,
+        store_id: 0,
+        vendor_id: 0,
         host: Config.defaultHost,
-        enabledGoodMgr: 0
+        enabled_good_mgr: false,
+        autoBluetoothPrint: false,
+        expireTs: 0,
+        getTokenTs: 0,
+        order_list_by: 'expectTime asc',
+        printer_id: '0',
+        show_bottom_tab: false
       },
       rehydrated: false,
       onGettingCommonCfg: false,
@@ -59,9 +66,10 @@ class RootScene extends PureComponent {
     getNoLoginInfo().then(info => {
       this.passed_ms = dayjs().valueOf() - startTime
       const noLoginInfo = JSON.parse(info)
+      global.noLoginInfo = noLoginInfo
       GlobalUtil.setHostPort(noLoginInfo.host)
-      if (noLoginInfo.accessToken && noLoginInfo.currStoreId && noLoginInfo.currVendorId) {
-        store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.currStoreId))
+      if (noLoginInfo.accessToken && noLoginInfo.store_id && noLoginInfo.vendor_id) {
+        store.dispatch(getConfig(noLoginInfo.accessToken, noLoginInfo.store_id))
         store.dispatch(setNoLoginInfo(noLoginInfo))
         HttpUtils.get(`/api/user_info2?access_token=${noLoginInfo.accessToken}`).then(res => {
           store.dispatch(setUserProfile(res));
@@ -75,7 +83,6 @@ class RootScene extends PureComponent {
           rehydrated: true,
         });
       }
-      store.dispatch(setOrderListBy(noLoginInfo?.order_list_by));
       SplashScreen.hide();
     }).catch(() => {
       SplashScreen.hide();
@@ -100,33 +107,21 @@ class RootScene extends PureComponent {
 
   getRootView = () => {
     global.isLoginToOrderList = false
-    const {launchProps} = this.props;
-    const {orderId, backPage} = launchProps;
-    let initialRouteName = launchProps["_action"];
-    if (backPage) {
-      launchProps["_action_params"]["backPage"] = backPage;
-    }
-    let initialRouteParams = launchProps["_action_params"] || {};
+    let initialRouteName;
+    let initialRouteParams =  {};
     const {noLoginInfo} = this.state;
     global.noLoginInfo = noLoginInfo
+
     if (!noLoginInfo.accessToken) {
       initialRouteName = Config.ROUTE_LOGIN;
       initialRouteParams = {next: "", nextParams: {}};
     } else {
-
-      if (!initialRouteName) {
-        if (orderId) {
-          initialRouteName = Config.ROUTE_ORDER_NEW;
-          initialRouteParams = {orderId};
-        } else {
-          initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
-        }
-      }
+      initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
     }
 
     nrRecordMetric("restore_redux", {
       time: this.passed_ms,
-      store_id: noLoginInfo.currStoreId ?? '未登录',
+      store_id: noLoginInfo.store_id ?? '未登录',
       login_user: noLoginInfo.currentUser ?? '未登录'
     })
     return (

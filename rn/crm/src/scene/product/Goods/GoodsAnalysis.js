@@ -22,7 +22,7 @@ class GoodsAnalysis extends Component {
     super(props)
     this.state = {
       access_token: this.props.global.accessToken,
-      store_id: this.props.global.currStoreId,
+      store_id: this.props.global.store_id,
       bigImageUri: [],
       bigImageVisible: false,
       isLoading: false,

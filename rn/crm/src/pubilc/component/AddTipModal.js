@@ -104,6 +104,7 @@ class AddTipModal extends React.Component {
     }, () => {
       let params = {
         show_add_tip_modal: false,
+        orders_add_tip: true,
         add_tip_id: 0,
       }
       if (set_add_tip_money) {

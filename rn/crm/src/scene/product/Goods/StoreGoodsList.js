@@ -117,9 +117,9 @@ class StoreGoodsList extends Component {
   }
 
   fetchGoodsCount() {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${store_id}?access_token=${accessToken}`,).then(res => {
       let newStatusList
       if (res.strict_providing === '1') {
         newStatusList = [
@@ -156,7 +156,7 @@ class StoreGoodsList extends Component {
         inventorySummary: res,
         onStrict: res.strict_providing === '1'
       }, () => {
-        this.fetchCategories(currStoreId, prod_status, accessToken)
+        this.fetchCategories(store_id, prod_status, accessToken)
       })
     }, (res) => {
       ToastLong('加载数量错误' + res.reason)
@@ -203,7 +203,7 @@ class StoreGoodsList extends Component {
     if (isLoading) {
       return;
     }
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     const {prod_status} = this.props.route.params || {};
     this.setState({
       isLoading: true,
@@ -214,9 +214,9 @@ class StoreGoodsList extends Component {
       tagId: selectedChildTagId ? selectedChildTagId : selectedTagId,
       page: page,
       pageSize: pageNum,
-      storeId: currStoreId,
+      storeId: store_id,
     }
-    if (currStoreId) {
+    if (store_id) {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
@@ -299,7 +299,7 @@ class StoreGoodsList extends Component {
   gotoGoodDetail = (pid) => {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       // updatedCallback: this.doneProdUpdate
     })
   }
@@ -372,15 +372,15 @@ class StoreGoodsList extends Component {
       isSelectedCategory: '',
       selectedChildTagId: '',
     }, () => {
-      const {accessToken, currStoreId} = this.props.global;
+      const {accessToken, store_id} = this.props.global;
       const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-      this.fetchCategories(currStoreId, prod_status, accessToken)
+      this.fetchCategories(store_id, prod_status, accessToken)
     })
   }
 
   readNotification = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${currStoreId}/?access_token=${accessToken}`).then(res => {
+    const {accessToken, store_id} = this.props.global;
+    HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${store_id}/?access_token=${accessToken}`).then(res => {
       // ToastShort("设置为已读");
     })
     this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
@@ -443,7 +443,7 @@ class StoreGoodsList extends Component {
 
   render() {
 
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     let {selectedProduct, goods, isLoading} = this.state;
     const {sp} = selectedProduct;
     return (
@@ -487,7 +487,7 @@ class StoreGoodsList extends Component {
                                 skuName={selectedProduct.sku_name}
                                 productName={selectedProduct.name}
                                 strictProviding={false} accessToken={accessToken}
-                                storeId={Number(currStoreId)}
+                                storeId={Number(store_id)}
                                 currStatus={Number(sp.status)}
                                 vendor_id={vendor_id}
                                 doneProdUpdate={this.doneProdUpdate}

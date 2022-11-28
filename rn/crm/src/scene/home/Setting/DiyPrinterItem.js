@@ -50,8 +50,8 @@ class DiyPrinterItem extends PureComponent {
   }
 
   get_printer_custom_cfg() {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `api/get_printer_custom_cfg/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         remark_max: res.remark_max,
@@ -85,7 +85,7 @@ class DiyPrinterItem extends PureComponent {
   submit = () => {
     this.setState({isRefreshing: true});
     tool.debounces(() => {
-      const {currStoreId, accessToken} = this.props.global;
+      const {store_id, accessToken} = this.props.global;
       const {
         remark_max,
         product_info_max,
@@ -97,7 +97,7 @@ class DiyPrinterItem extends PureComponent {
         product_info_max: product_info_max,
         show_product_info: show_product_info,
         show_store_name: show_store_name,
-        store_id: currStoreId,
+        store_id: store_id,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {

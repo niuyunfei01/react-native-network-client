@@ -33,7 +33,7 @@ class StoreGoodsSearch extends Component {
     const {limit_store, searchKeywords = ''} = this.props.route.params;
 
     this.state = {
-      storeId: limit_store ? limit_store : this.props.global.currStoreId,
+      storeId: limit_store ? limit_store : this.props.global.store_id,
       fnPriceControlled: false,
       goods: [],
       page: 1,
@@ -355,7 +355,7 @@ class StoreGoodsSearch extends Component {
                                      productName={selectedProduct.name}
                                      skuName={selectedProduct.sku_name}
                                      strictProviding={onStrict} accessToken={accessToken}
-                                     storeId={Number(this.props.global.currStoreId)}
+                                     storeId={Number(this.props.global.store_id)}
                                      currStatus={Number(sp.status)}
                                      doneProdUpdate={this.doneProdUpdate}
                                      onClose={this.closeModal}

@@ -60,8 +60,8 @@ class SettlementGatherScene extends PureComponent {
   getDateilsList() {
     let {date} = this.state
     const {dispatch, global} = this.props;
-    let {currStoreId, accessToken} = global;
-    dispatch(get_supply_items(currStoreId, date, 'month', accessToken, async (resp) => {
+    let {store_id, accessToken} = global;
+    dispatch(get_supply_items(store_id, date, 'month', accessToken, async (resp) => {
       if (resp.ok) {
         this.setState({
           list: resp.obj.goods_list,

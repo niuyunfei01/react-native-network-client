@@ -211,11 +211,11 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (accessToken, currStoreId) => {
+  queryConfig = (accessToken, storeId) => {
     const {dispatch} = this.props;
-    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, storeId, (ok, err_msg, cfg) => {
       if (ok) {
-        let store_id = cfg?.store_id || currStoreId;
+        let store_id = cfg?.store_id || storeId;
         this.doneSelectStore(store_id, cfg?.show_bottom_tab);
       } else {
         ToastShort(err_msg);

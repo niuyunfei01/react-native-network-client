@@ -83,9 +83,9 @@ class OrderSearchScene extends PureComponent {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {store_id, currentUser, accessToken, config} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"

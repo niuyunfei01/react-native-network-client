@@ -35,7 +35,7 @@ class ServiceChargeDesc extends PureComponent {
     const {global} = this.props;
     const url = `/v1/new_api/delivery/service_fee_rule?access_token=${global.accessToken}`;
     HttpUtils.post.bind(this.props)(url, {
-      store_id: global.currStoreId,
+      store_id: global.store_id,
     }).then(res => {
       this.setState({
         list: res.rules_format

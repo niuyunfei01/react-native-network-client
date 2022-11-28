@@ -47,10 +47,10 @@ class OperateIncomeDetailScene extends PureComponent {
   }
 
   async getProfitIncomeOrderList() {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
-    dispatch(fetchProfitIncomeOrderList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
+    dispatch(fetchProfitIncomeOrderList(type, store_id, day, accessToken, async (ok, obj, desc) => {
       let {orders, other, editable} = obj;
       if (ok) {
         this.setState({

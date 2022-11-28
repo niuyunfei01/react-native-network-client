@@ -636,7 +636,7 @@ class OrderItem extends React.PureComponent {
           onClose={this.closeModal}
           onPressClose={this.closeModal}
           onPress={() => this.onOverlookDelivery(item?.id)}
-          title={'订单送达后无法撤回，请确认顾客已收到货物'}
+          title={'忽略配送会影响配送回传，确定要忽略吗？'}
           actionText={'忽略'}
           closeText={'暂不'}/>
       </View>
@@ -837,13 +837,13 @@ const styles = StyleSheet.create({
   ItemContent: {
     flexDirection: "column",
     backgroundColor: colors.white,
-    marginBottom: 10,
+    marginVertical: 5,
     marginHorizontal: 12,
     borderRadius: 6,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.1,
-    elevation: 5,
+    elevation: 3,
     shadowRadius: 8,
   },
   modalBtn: {

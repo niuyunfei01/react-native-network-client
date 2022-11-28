@@ -20,8 +20,7 @@ function mapStateToProps(state) {
   return {global: global}
 }
 
-let height = Dimensions.get("window").height;
-let width = Dimensions.get("window").width;
+let {height, width} = Dimensions.get("window")
 
 class FloatServiceIcon extends React.Component {
 
@@ -50,13 +49,13 @@ class FloatServiceIcon extends React.Component {
 
   openMiniprogarm = async () => {
     const {global, fromComponent} = this.props
-    let {currStoreId, currentUser, currentUserProfile} = global;
+    let {store_id, currentUser, currentUserProfile} = global;
     if (fromComponent)
       this.mixpanel.track(fromComponent + '_联系客服');
     let {currVendorId} = tool.vendor(global)
     let data = {
       v: currVendorId,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'float'
@@ -109,9 +108,7 @@ class FloatServiceIcon extends React.Component {
       return null;
     }
     return (
-      <View style={[Platform.OS === "ios" ? {
-        zIndex: 999
-      } : {}]}>
+      <View style={[Platform.OS === "ios" ? {zIndex: 999} : {}]}>
         <View style={{
           width: 62,
           height: 62,
@@ -145,23 +142,14 @@ class FloatServiceIcon extends React.Component {
                        btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
                        closeBtnTitleStyle={{color: colors.color333}}
                        btnTitleStyle={{color: colors.main_color}} onClose={this.oncloseCallModal}>
-            <View style={{
-              marginHorizontal: 20,
-              marginVertical: 8
-            }}>
-              <Text style={{
-                fontSize: 15,
-                color: colors.color333,
-              }}>您的问题是：</Text>
-              <Text style={{
-                fontSize: 15,
-                color: colors.color333,
-                marginVertical: 4,
-              }}> 配送问题：请点击配送问题，联系客服</Text>
-              <Text style={{
-                fontSize: 15,
-                color: colors.color333,
-              }}> 其他问题：请点击其他问题或通过其他方式联系店铺运营 </Text>
+            <View style={{marginHorizontal: 20, marginVertical: 8}}>
+              <Text style={{fontSize: 15, color: colors.color333}}>您的问题是：</Text>
+              <Text style={{fontSize: 15, color: colors.color333, marginVertical: 4}}>
+                配送问题：请点击配送问题，联系客服
+              </Text>
+              <Text style={{fontSize: 15, color: colors.color333}}>
+                其他问题：请点击其他问题或通过其他方式联系店铺运营
+              </Text>
             </View>
           </BottomModal>
 

@@ -33,7 +33,7 @@ class SearchGoods extends Component {
     const {limit_store} = this.props.route.params;
 
     this.state = {
-      storeId: limit_store ? limit_store : this.props.global.currStoreId,
+      storeId: limit_store ? limit_store : this.props.global.store_id,
       fnPriceControlled: false,
       goods: [],
       page: 1,

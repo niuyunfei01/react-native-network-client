@@ -59,7 +59,7 @@ class BindDelivery extends PureComponent {
       value: this.state.value,
       app_secret: this.state.app_secret,
       shop_id: this.state.shop_id,
-      model_id: this.props.global.currStoreId,
+      model_id: this.props.global.store_id,
     }, (success) => {
       if (success) {
         ToastShort('绑定成功')
@@ -80,9 +80,6 @@ class BindDelivery extends PureComponent {
           marginBottom: pxToDp(22),
           backgroundColor: colors.white
         }}
-        automaticallyAdjustContentInsets={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
       >
         <Text style={{fontSize: 16, color: colors.color333, padding: 10}}>{this.state.storename} </Text>
         <Text style={{

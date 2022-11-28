@@ -54,8 +54,8 @@ class BindPay extends PureComponent {
   bindWechat() {
     ToastLong("正在唤醒微信...")
     wechatLogin().then((jscode) => {
-      let {accessToken, currStoreId} = this.props.global;
-      let url = `/api/create_wx_bind/${currStoreId}/${jscode}?access_token=${accessToken}`;
+      let {accessToken, store_id} = this.props.global;
+      let url = `/api/create_wx_bind/${store_id}/${jscode}?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url).then((res) => {
         ToastShort(res.reason)
         this.getSupplyList()
@@ -67,11 +67,11 @@ class BindPay extends PureComponent {
   }
 
   getSupplyList() {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     showModal('加载中...')
 
-    let url = `/api/get_supply_bill_list_v2/${currVendorId}/${currStoreId}?access_token=${accessToken}`;
+    let url = `/api/get_supply_bill_list_v2/${currVendorId}/${store_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((res) => {
       hideModal()
       let wechat = {};
@@ -99,8 +99,8 @@ class BindPay extends PureComponent {
 
   setDefaultPay(type) {
     tool.debounces(() => {
-      let {accessToken, currStoreId} = this.props.global;
-      let url = `/api/bind_default_account_type/${currStoreId}/${type}?access_token=${accessToken}`;
+      let {accessToken, store_id} = this.props.global;
+      let url = `/api/bind_default_account_type/${store_id}/${type}?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url).then((res) => {
         let wechat = {...this.state.wechat};
         let alipay = {...this.state.alipay};
@@ -132,8 +132,8 @@ class BindPay extends PureComponent {
       ToastShort("请填写支付宝账号");
       return;
     }
-    let {accessToken, currStoreId} = this.props.global;
-    let url = `/api/bind_alipay_account_info/${currStoreId}/${this.state.alipayAccount}?access_token=${accessToken}`;
+    let {accessToken, store_id} = this.props.global;
+    let url = `/api/bind_alipay_account_info/${store_id}/${this.state.alipayAccount}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(() => {
       ToastShort("操作成功")
       this.getSupplyList()

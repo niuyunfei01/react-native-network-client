@@ -34,10 +34,10 @@ function mapStateToProps(state) {
 class ProfitAndLoss extends PureComponent {
   constructor(props) {
     super(props);
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     const params = this.props.route.params?.info
     this.state = {
-      storeId: currStoreId,
+      storeId: store_id,
       ext_store_id: 0,
       selectTipStore: '全部门店',
       head_store: [
@@ -97,10 +97,10 @@ class ProfitAndLoss extends PureComponent {
 
   getExtStoreList = () => {
     const {global} = this.props
-    const {accessToken, currStoreId} = global
+    const {accessToken, store_id} = global
     const {head_store} = this.state
 
-    const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
+    const api = `/v1/new_api/added/ext_store_list/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
       const lists = head_store
       Object.keys(list).map(key => {

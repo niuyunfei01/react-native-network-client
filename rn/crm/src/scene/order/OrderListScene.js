@@ -26,7 +26,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, empty_data, menu, menu_left, search_icon, this_down} from "../../svg/svg";
+import {cross_icon, down, empty_data, menu, menu_left, search_icon} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -75,7 +75,7 @@ const initState = {
   sort_list: [
     {"label": '最新来单', 'value': 'orderTime desc'},
     {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '送达时间', 'value': 'expectTime desc'},
+    {"label": '送达时间', 'value': 'expectTime asc'},
   ],
   ListData: [],
   order_status: 9,
@@ -139,12 +139,12 @@ class OrderListScene extends Component {
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken} = global;
+    const {store_id, currentUser, accessToken} = global;
 
 
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderListScene"
@@ -177,9 +177,9 @@ class OrderListScene extends Component {
   }
 
   getVendor = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    if (currStoreId > 0) {
-      let api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global;
+    if (store_id > 0) {
+      let api = `/api/get_store_business_status/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         this.setState({
           show_bind_button: tool.length(res.business_status) <= 0,
@@ -211,9 +211,9 @@ class OrderListScene extends Component {
 
   // 新订单1  待取货  106   配送中 1
   fetorderNum = () => {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let params = {
-      search: `store:${currStoreId}`,
+      search: `store:${store_id}`,
     }
 
     const url = `/v4/wsb_order/order_counts?access_token=${accessToken}`;
@@ -250,8 +250,8 @@ class OrderListScene extends Component {
     }
     this.fetorderNum();
     let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
-    let {currStoreId, accessToken, order_list_by = 'orderTime asc'} = this.props.global;
-    let search = `store:${currStoreId}`;
+    let {store_id, accessToken, order_list_by = 'expectTime asc'} = this.props.global;
+    let search = `store:${store_id}`;
     let initQueryType = queryType || order_status;
 
     this.setState({
@@ -364,7 +364,7 @@ class OrderListScene extends Component {
   }
 
   render() {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
       order_id,
@@ -386,21 +386,21 @@ class OrderListScene extends Component {
         {this.renderContent()}
         {this.renderSortModal()}
         {this.renderFinishDeliveryModal()}
-        <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
+        <HotUpdateComponent accessToken={accessToken} store_id={store_id}/>
         <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
-                     currStoreId={currStoreId}/>
+                     store_id={store_id}/>
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
           accessToken={accessToken}
           order_id={order_id}
-          currStoreId={currStoreId}
+          store_id={store_id}
           show_goods_list={show_goods_list}/>
 
         <DeliveryStatusModal
           order_id={order_id}
           order_status={order_status}
-          store_id={currStoreId}
+          store_id={store_id}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
@@ -491,7 +491,7 @@ class OrderListScene extends Component {
   }
 
   renderSortModal = () => {
-    let {order_list_by = 'orderTime asc'} = this.props.global;
+    let {order_list_by = 'expectTime asc'} = this.props.global;
     let {show_sort_modal, sort_list} = this.state;
     return (
       <JbbModal visible={show_sort_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
@@ -599,7 +599,7 @@ class OrderListScene extends Component {
             fontWeight: 'bold'
           }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
-            <SvgXml xml={this_down()}/>
+            <SvgXml xml={down(16, 16, colors.color333)}/>
           </If>
         </TouchableOpacity>
 
@@ -817,8 +817,13 @@ const styles = StyleSheet.create({
     color: colors.color333,
     fontSize: 14
   },
-  statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
-  orderListContent: {flex: 1, backgroundColor: colors.f5, marginTop: 10},
+  statusTabRight: {
+    height: 2,
+    width: 48,
+    backgroundColor: colors.main_color,
+    position: 'absolute', bottom: 0
+  },
+  orderListContent: {flex: 1, backgroundColor: colors.f5},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   noOrderContent: {
     alignItems: 'center',

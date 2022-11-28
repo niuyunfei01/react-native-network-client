@@ -18,7 +18,6 @@ import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../../pubilc/styles/colors";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import LinearGradient from "react-native-linear-gradient";
-import {rgbaColor} from "react-native-reanimated/src/reanimated2/Colors";
 import {SvgXml} from "react-native-svg";
 import {
   adjust,
@@ -129,14 +128,14 @@ class Mine extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken, store_info} = this.props.global;
     let {
       currVendorId,
       currVersion,
     } = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
-      currStoreId: currStoreId,
+      store_id: store_id,
       currVendorId: currVendorId,
       currVersion: currVersion,
       access_token: accessToken,
@@ -144,7 +143,7 @@ class Mine extends PureComponent {
       storeStatus: {},
       is_mgr: false,
       storeInfo: {
-        store_name: '',
+        store_name: store_info?.name,
         role_desc: ''
       },
       balanceInfo: {
@@ -196,11 +195,8 @@ class Mine extends PureComponent {
     this.props.navigation.goBack();
   }
 
-  getStoreDataOfMine = (store_id = 0) => {
-    let {access_token, currStoreId} = this.state;
-    if (store_id <= 0) {
-      store_id = currStoreId
-    }
+  getStoreDataOfMine = () => {
+    let {access_token, store_id} = this.state;
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
@@ -212,10 +208,10 @@ class Mine extends PureComponent {
   }
 
   fetchMineData = () => {
-    let {currStoreId} = this.state;
+    let {store_id} = this.state;
     const {accessToken} = this.props.global
     const api = `/v4/wsb_user/personalCenter`;
-    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId, access_token: accessToken}).then(res => {
+    HttpUtils.get.bind(this.props)(api, {store_id: store_id, access_token: accessToken}).then(res => {
       this.setState({
         storeInfo: {
           store_name: res.store_name,
@@ -244,10 +240,10 @@ class Mine extends PureComponent {
   }
 
   getActivitySwiper = () => {
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
-      storeId: currStoreId,
+      storeId: store_id,
       pos: 1
     }
     HttpUtils.post.bind(this.props)(api, data, true).then((res) => {
@@ -260,7 +256,7 @@ class Mine extends PureComponent {
           activity: obj.list ?? [obj]
         })
         this.mixpanel.track("act_user_ref_ad_view", {
-          store_id: currStoreId,
+          store_id: store_id,
           list: obj.list
         });
       } else {
@@ -290,10 +286,10 @@ class Mine extends PureComponent {
   // 联系客服
   JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
-    let {currStoreId} = this.state;
+    let {store_id} = this.state;
     let data = {
       v: vendor_id,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'
@@ -345,12 +341,12 @@ class Mine extends PureComponent {
 
 
   onPressActivity = (info) => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
     this.mixpanel.track("act_user_ref_ad_click", {
       img_name: info.name,
       pos: info.pos_name,
-      store_id: currStoreId,
+      store_id: store_id,
     });
   }
 
@@ -359,17 +355,20 @@ class Mine extends PureComponent {
     this.mixpanel.reset();
     const noLoginInfo = {
       accessToken: '',
-      currentUser: 0,
-      currStoreId: 0,
-      host: '',
-      enabledGoodMgr: '',
-      currVendorId: '',
       refreshToken: '',
+      currentUser: '',
+      store_id: 0,
+      vendor_id: 0,
+      host: Config.defaultHost,
+      enabled_good_mgr: false,
+      autoBluetoothPrint: false,
       expireTs: 0,
+      getTokenTs: 0,
+      order_list_by: 'expectTime asc',
       printer_id: '0',
-      order_list_by: 'orderTime asc'
+      show_bottom_tab: false
     }
-
+    global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
     dispatch(logout(() => {
       tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
@@ -455,7 +454,7 @@ class Mine extends PureComponent {
     this.onPress(Config.ROUTE_STORE_ADD, {
       btn_type: "edit",
       is_mgr: is_mgr,
-      editStoreId: this.props.global.currStoreId
+      editStoreId: this.props.global.store_id
     })
   }
 
@@ -553,11 +552,11 @@ class Mine extends PureComponent {
 
   renderValueAdded = () => {
     const {navigation, global} = this.props
-    const {currStoreId, accessToken, store_info} = global
+    const {store_id, accessToken, store_info} = global
     const {vip_info = {}} = store_info;
     return (
       <If condition={vip_info.show_vip}>
-        <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
+        <GoodsIncrement store_id={store_id} accessToken={accessToken} navigation={navigation}/>
       </If>
     )
   }
@@ -792,7 +791,7 @@ const styles = StyleSheet.create({
   storeType: {
     width: 44,
     height: 18,
-    backgroundColor: rgbaColor(255, 255, 255, 0.9),
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 2,
     alignItems: "center",
     marginLeft: 5
@@ -807,7 +806,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 20,
     borderRadius: 10,
-    backgroundColor: rgbaColor(255, 255, 255, 0.2),
+    backgroundColor: 'rgba(255,255,255,0.2)',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -889,7 +888,7 @@ const headerRightStyles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 10,
     paddingVertical: 10,
-    backgroundColor: rgbaColor(255, 255, 255, 0)
+    backgroundColor: 'rgba(255,255,255,0)'
   },
   text: {
     fontSize: 20,
@@ -898,7 +897,7 @@ const headerRightStyles = StyleSheet.create({
   rightBtn: {
     width: 90,
     height: 32,
-    backgroundColor: rgbaColor(0, 0, 0, 0.15),
+    backgroundColor: 'rgba(0,0,0,0.15)',
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     flexDirection: "row",
