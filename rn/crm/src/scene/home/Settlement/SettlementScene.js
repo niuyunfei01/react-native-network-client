@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Easing, FlatList, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Easing, FlatList, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -22,7 +22,6 @@ import {Button} from "react-native-elements";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
-import Animated from "react-native-reanimated";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -90,8 +89,6 @@ class SettlementScene extends PureComponent {
       this.setState({
         settleProtocolInfo: res
       })
-    }).catch((res) => {
-      ToastShort(res.reason)
     })
   }
 
