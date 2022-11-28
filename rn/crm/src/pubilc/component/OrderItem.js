@@ -90,9 +90,11 @@ class OrderItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('配送已完成')
+        this.closeModal()
+        ToastShort('配送已完成')
         this.props.fetchData();
       }).catch(e => {
+        this.closeModal()
         ToastShort('忽略配送失败' + e?.desc)
       })
     }, 600)
