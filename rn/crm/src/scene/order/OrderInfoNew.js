@@ -664,7 +664,6 @@ class OrderInfoNew extends PureComponent {
               }}
             >
               <View style={{alignItems: 'center'}}>
-                {console.log(1231)}
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
@@ -706,7 +705,6 @@ class OrderInfoNew extends PureComponent {
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
-                  {console.log(1231)}
                   <Text style={{color: colors.color333, fontSize: 12}}>
                     距门店{this.filterDistance(dada_distance)}
                   </Text>
@@ -1617,7 +1615,7 @@ const styles = StyleSheet.create({
     marginLeft: 11
   },
   orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: 2.5},
-  orderCardInfoBottom: {flex: 1, fontSize: 12, fontWeight: '400', color: colors.color999},
+  orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
