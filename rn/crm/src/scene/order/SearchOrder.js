@@ -321,7 +321,7 @@ class SearchOrder extends PureComponent {
                 item_list: arr
               }, () => {
                 tool.debounces(() => {
-                  this.fetchOrderList()
+                  this.onRefresh()
                 })
               })
             }}

@@ -602,15 +602,7 @@ class OrderCallDelivery extends Component {
             </If>
           </If>
           <If condition={loading}>
-            <View style={{
-              paddingVertical: 250,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignContent: 'center'
-            }}>
-              <ActivityIndicator color={colors.color666} size={'large'}/>
-              <Text style={{fontSize: 26, color: colors.color999}}> 加载中… </Text>
-            </View>
+            <View />
           </If>
         </ScrollView>
         <If condition={!loading}>

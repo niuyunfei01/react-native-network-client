@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
@@ -141,6 +142,7 @@ class OrderInfoNew extends PureComponent {
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
       orders_add_tip: true,
+      delivery_loading: false,
     }
   }
 
@@ -334,6 +336,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   fetchShipData = () => {
+    this.setState({delivery_loading: true})
     const api = `/v1/new_api/orders/third_ship_deliverie/${this.state.orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       const {obj} = res
@@ -345,6 +348,7 @@ class OrderInfoNew extends PureComponent {
         }
       });
       this.setState({
+        delivery_loading: false,
         delivery_status: obj.show_status,
         show_no_rider_tips: obj.show_no_rider_tips === 1,
         delivery_desc: obj.desc,
@@ -660,6 +664,7 @@ class OrderInfoNew extends PureComponent {
               }}
             >
               <View style={{alignItems: 'center'}}>
+                {console.log(1231)}
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
                     <Text style={{color: colors.color333, fontSize: 12}}>
@@ -701,6 +706,7 @@ class OrderInfoNew extends PureComponent {
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
+                  {console.log(1231)}
                   <Text style={{color: colors.color333, fontSize: 12}}>
                     距门店{this.filterDistance(dada_distance)}
                   </Text>
@@ -791,7 +797,21 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoHeader = () => {
-    let {delivery_status, delivery_desc, isShowMap, order} = this.state;
+    let {delivery_status, delivery_desc, isShowMap, order, delivery_loading} = this.state;
+    if (delivery_loading) {
+      return (
+        <View style={{
+          backgroundColor: colors.white,
+          height: 139,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <ActivityIndicator color={colors.color666} size={'small'}/>
+          <Text style={{fontSize: 16, color: colors.color666}}> 加载中… </Text>
+        </View>
+      )
+    }
     return (
       <>
         <Animated.View {...this._panResponder.panHandlers}

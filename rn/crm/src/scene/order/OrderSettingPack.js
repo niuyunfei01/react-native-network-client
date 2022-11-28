@@ -334,7 +334,6 @@ class OrderSettingScene extends Component {
   }
 
   onCallThirdShips = (id, store_id) => {
-    showModal('正在保存并发单，请稍等')
     const {address_id, expect_time} = this.state
     this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: id,
@@ -342,7 +341,6 @@ class OrderSettingScene extends Component {
       expect_time: expect_time,
       address_id: address_id,
       onBack: (res) => {
-        hideModal();
         if (res?.count > 0) {
           showSuccess('发配送成功')
           setTimeout(() => {
