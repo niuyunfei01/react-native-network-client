@@ -79,7 +79,6 @@ class Scanner extends React.Component {
   onGoogleVisionBarcodesDetected = (event) => {
 
     const {barcodes = []} = event
-    console.log('barcodes', barcodes)
     if (barcodes[0] && allowPlay) {
       allowPlay = false
       this.props.onScanSuccess && this.props.onScanSuccess(barcodes[0].data)

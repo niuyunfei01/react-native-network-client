@@ -36,6 +36,7 @@ import Config from "../../../pubilc/common/config";
 import {AMapSdk} from "react-native-amap3d/lib/src/index";
 import geolocation from "@react-native-community/geolocation";
 import {mergeMixpanelId} from "../../../pubilc/util/analytics";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const {width, height} = Dimensions.get("window");
 
@@ -67,13 +68,18 @@ class SaveStore extends PureComponent {
   constructor(props) {
     super(props);
     let {store_id = 0, type = 'add', mobile = '', verify_code = ''} = this.props.route.params;
-    if (tool.length(mobile) <= 0) {
-      mobile = this.props.global.store_info?.mobile
+    let {vendor_info = {}} = this.props.global;
+    let show_store_info = false;
+    let {is_service_mgr = false} = tool.vendor(this.props.global);
+    if (type === 'add' && is_service_mgr && vendor_info?.co_type === 'baodi' && Number(vendor_info?.is_agency_operation) === 1) {
+      show_store_info = true
     }
+
     this.state = {
       loading: false,
       store_id,
       type,
+      show_store_info,
       store_name: '',
       store_address: '',
       lng: '',
@@ -233,6 +239,7 @@ class SaveStore extends PureComponent {
       type,
       mobile,
       referrer_id,
+      show_store_info
     } = this.state;
 
     if (loading) {
@@ -254,7 +261,7 @@ class SaveStore extends PureComponent {
       mobile,
       password: verify_code,
       vendor_id,
-      referrer_id
+      referrer_id,
     }
     const validator = new Validator();
     validator.add(store_name, 'required', '请填写门店名称')
@@ -262,7 +269,10 @@ class SaveStore extends PureComponent {
     validator.add(store_address, 'required', '请设置门店地址')
     validator.add(category_id, 'required', '请设置门店品类')
     validator.add(contact_name, 'required', '请填写门店联系人')
-    validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的手机号')
+    validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的门店联系电话')
+    if (show_store_info) {
+      validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的商户手机号')
+    }
     const err_msg = validator.start();
     if (err_msg) {
       this.setState({
@@ -274,6 +284,8 @@ class SaveStore extends PureComponent {
     let api = `/v4/wsb_store/createStore?access_token=${accessToken}`
     if (type === 'edit') {
       api = `/v4/wsb_store/editOfStore?access_token=${accessToken}`
+    } else {
+      params.op_type = show_store_info ? 'add_by_bd' : type
     }
     HttpUtils.post.bind(this.props)(api, params).then((res) => {
       if (type === 'register' && res?.user?.token && res?.user?.user_id) {
@@ -368,7 +380,7 @@ class SaveStore extends PureComponent {
           marginRight: 40,
           flex: 1,
           textAlign: 'center'
-        }}> {type === 'edit' ? '门店管理' : '创建门店'} </Text>
+        }}> {type === 'edit' ? '编辑门店' : type === 'register' ? '创建门店' : '添加门店'} </Text>
       </View>
     )
   }
@@ -383,194 +395,250 @@ class SaveStore extends PureComponent {
       contact_phone,
       show_placeholder,
       type,
-      referrer_id
+      mobile,
+      referrer_id,
+      show_store_info
     } = this.state;
     return (
-      <ScrollView automaticallyAdjustContentInsets={false}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false} style={{
-        flex: 1,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-      }}>
-        <View style={{
-          backgroundColor: colors.white,
-          borderRadius: 6,
+      <KeyboardAwareScrollView
+        automaticallyAdjustContentInsets={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{
+          flex: 1,
           paddingHorizontal: 12,
+          paddingVertical: 10,
         }}>
-
+          <Text style={{color: colors.color999, fontSize: 14, marginBottom: 10, lineHeight: 20}}> 门店信息 </Text>
           <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: 0.5,
-            height: 56
+            backgroundColor: colors.white,
+            borderRadius: 6,
+            paddingHorizontal: 12,
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店名称 </Text>
-            <TextInput placeholder={"请填写门店名称"}
-                       underlineColorAndroid="transparent"
-                       style={{flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
-                       value={store_name}
-                       maxLength={20}
-                       onBlur={() => {
-                         this.setState({
-                           show_placeholder: true
-                         })
-                       }}
-                       onFocus={() => {
-                         this.setState({
-                           show_placeholder: false
-                         })
-                       }}
-                       multiline={true}
-                       numberOfLines={2}
-                       onChangeText={store_name => {
-                         // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
-                         //   this.setState({store_name});
-                         // }
-                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
-                       }}
-            />
-          </View>
-
-          <TouchableOpacity onPress={this.goSelectAddress} style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: 0.5,
-            height: 56
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店地址 </Text>
-            <Text style={{
-              flex: 1,
-              fontSize: 14,
-              color: tool.length(store_address) > 0 ? colors.color333 : colors.color999,
-              textAlign: 'right'
-            }}>
-              {tool.length(store_address) > 0 > 0 ? store_address : '点击设置门店地址'}
-            </Text>
-            <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
-          </TouchableOpacity>
-
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: 0.5,
-            height: 56
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>详细地址 </Text>
-            <TextInput placeholder="填写详细门牌号"
-                       underlineColorAndroid="transparent"
-                       style={{flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={'#999'}
-                       value={street_block}
-                       multiline={true}
-                       numberOfLines={2}
-                       maxLength={20}
-                       onChangeText={street_block => {
-                         this.setState({street_block: tool.filteremoji(street_block)});
-                       }}
-            />
-          </View>
-
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_category_modal: true
-            })
-          }} style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: 0.5,
-            height: 56
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>经营品类 </Text>
-            <Text style={{
-              flex: 1,
-              fontSize: 14,
-              color: tool.length(category_desc) > 0 ? colors.color333 : colors.color999,
-              textAlign: 'right'
-            }}>
-              {tool.length(category_desc) > 0 ? category_desc : '设置门店品类'}
-            </Text>
-            <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
-          </TouchableOpacity>
-
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: 0.5,
-            height: 56
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系人 </Text>
-            <TextInput placeholder="请填写门店联系人"
-                       underlineColorAndroid="transparent"
-                       style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={'#999'}
-                       maxLength={10}
-                       value={contact_name}
-                       onChangeText={contact_name => {
-                         this.setState({contact_name: tool.filtrationInput(contact_name)});
-                       }}
-            />
-          </View>
-
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderColor: colors.e5,
-            borderBottomWidth: type !== 'edit' ? 0.5 : 0,
-            height: 56
-          }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店电话 </Text>
-            <TextInput placeholder="请填写门店联系电话"
-                       underlineColorAndroid="transparent"
-                       style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
-                       placeholderTextColor={'#999'}
-                       maxLength={11}
-                       keyboardType={'numeric'}
-              // editable={type !== 'register'}
-                       value={contact_phone}
-                       onChangeText={value => {
-                         // const newText = value.replace(/[^\d]+/, '');
-                         this.setState({contact_phone: value.replace(/[^0-9]/g, "")});
-                       }}
-            />
-          </View>
-
-          <If condition={type !== 'edit'}>
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
               height: 56
             }}>
-              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>推荐人ID </Text>
-              <TextInput placeholder="请填写推荐人ID(选填)"
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店名称 </Text>
+              <TextInput placeholder={"请填写门店名称"}
                          underlineColorAndroid="transparent"
-                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
-                         placeholderTextColor={'#999'}
-                         keyboardType={'numeric'}
-                         value={referrer_id}
-                         onChangeText={value => {
-                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                         style={{flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={show_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
+                         value={store_name}
+                         maxLength={20}
+                         onBlur={() => {
+                           this.setState({
+                             show_placeholder: true
+                           })
+                         }}
+                         onFocus={() => {
+                           this.setState({
+                             show_placeholder: false
+                           })
+                         }}
+                         multiline={true}
+                         numberOfLines={2}
+                         onChangeText={store_name => {
+                           // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
+                           //   this.setState({store_name});
+                           // }
+                           this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
                          }}
               />
             </View>
+
+            <TouchableOpacity onPress={this.goSelectAddress} style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>门店地址 </Text>
+              <Text style={{
+                flex: 1,
+                fontSize: 14,
+                color: tool.length(store_address) > 0 ? colors.color333 : colors.color999,
+                textAlign: 'right'
+              }}>
+                {tool.length(store_address) > 0 > 0 ? store_address : '点击设置门店地址'}
+              </Text>
+              <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+            </TouchableOpacity>
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>详细地址 </Text>
+              <TextInput placeholder="填写详细门牌号"
+                         underlineColorAndroid="transparent"
+                         style={{flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={'#999'}
+                         value={street_block}
+                         multiline={true}
+                         numberOfLines={2}
+                         maxLength={20}
+                         onChangeText={street_block => {
+                           this.setState({street_block: tool.filteremoji(street_block)});
+                         }}
+              />
+            </View>
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                show_category_modal: true
+              })
+            }} style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>经营品类 </Text>
+              <Text style={{
+                flex: 1,
+                fontSize: 14,
+                color: tool.length(category_desc) > 0 ? colors.color333 : colors.color999,
+                textAlign: 'right'
+              }}>
+                {tool.length(category_desc) > 0 ? category_desc : '设置门店品类'}
+              </Text>
+              <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+            </TouchableOpacity>
+
+
+            <If condition={!show_store_info}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderColor: colors.e5,
+                borderBottomWidth: 0.5,
+                height: 56
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系人 </Text>
+                <TextInput placeholder="请填写门店联系人"
+                           underlineColorAndroid="transparent"
+                           style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                           placeholderTextColor={'#999'}
+                           maxLength={10}
+                           value={contact_name}
+                           onChangeText={contact_name => {
+                             this.setState({contact_name: tool.filtrationInput(contact_name)});
+                           }}
+                />
+              </View>
+            </If>
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: type === 'register' ? 0.5 : 0,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>联系电话 </Text>
+              <TextInput placeholder="请填写门店联系电话"
+                         underlineColorAndroid="transparent"
+                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={'#999'}
+                         maxLength={11}
+                         keyboardType={'numeric'}
+                // editable={type !== 'register'}
+                         value={contact_phone}
+                         onChangeText={value => {
+                           // const newText = value.replace(/[^\d]+/, '');
+                           this.setState({contact_phone: value.replace(/[^0-9]/g, "")});
+                         }}
+              />
+            </View>
+
+            <If condition={type === 'register'}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 56
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>推荐人ID </Text>
+                <TextInput placeholder="请填写推荐人ID(选填)"
+                           underlineColorAndroid="transparent"
+                           style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                           placeholderTextColor={'#999'}
+                           keyboardType={'numeric'}
+                           value={referrer_id}
+                           onChangeText={value => {
+                             this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                           }}
+                />
+              </View>
+            </If>
+          </View>
+
+          <If condition={show_store_info}>
+            <Text style={{color: colors.color999, fontSize: 14, marginVertical: 10, lineHeight: 20}}> 商户信息 </Text>
+            <View style={{
+              backgroundColor: colors.white,
+              borderRadius: 6,
+              paddingHorizontal: 12,
+            }}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderColor: colors.e5,
+                borderBottomWidth: 0.5,
+                height: 56
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商户名称 </Text>
+                <TextInput placeholder="请填写商户名称"
+                           underlineColorAndroid="transparent"
+                           style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                           placeholderTextColor={'#999'}
+                           maxLength={10}
+                           value={contact_name}
+                           onChangeText={contact_name => {
+                             this.setState({contact_name: tool.filtrationInput(contact_name)});
+                           }}
+                />
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 56
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商户账号 </Text>
+                <TextInput placeholder="请填写商户手机号"
+                           underlineColorAndroid="transparent"
+                           style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                           placeholderTextColor={'#999'}
+                           maxLength={11}
+                           keyboardType={'numeric'}
+                           value={mobile}
+                           onChangeText={value => {
+                             this.setState({mobile: value.replace(/[^0-9]/g, "")});
+                           }}
+                />
+              </View>
+
+            </View>
           </If>
-
-        </View>
-
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
 
