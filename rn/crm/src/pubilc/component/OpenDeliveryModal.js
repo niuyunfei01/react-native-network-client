@@ -368,11 +368,14 @@ class OpenDeliveryModal extends PureComponent {
       case Config.MEI_TUAN_PEI_SONG:
       case Config.MEI_TUAN_KUAI_SU_DA://美团快速达
       case Config.MEI_TUAN_FEI_SU_DA://美团飞速达
+        await this.closeModal()
         await this.JumpToServices()
         break
       case Config.SHUN_FENG_TONG_CHENG://顺丰同城
-        if (selectAccountType === 1)
+        if (selectAccountType === 1) {
+          await this.closeModal()
           await this.JumpToServices()
+        }
         if (selectAccountType === 2)
           await this.requestUrl(delivery.type)
         break
@@ -413,13 +416,14 @@ class OpenDeliveryModal extends PureComponent {
 
   closeModal = async () => {
     const {onRequestClose} = this.props
-    onRequestClose && await onRequestClose()
     await this.setState({
       mobile: '',
       verificationCode: '',
       selectGeneralDelivery: true,
       headerText: '开通运力'
     })
+    onRequestClose && await onRequestClose()
+
   }
 
   render() {

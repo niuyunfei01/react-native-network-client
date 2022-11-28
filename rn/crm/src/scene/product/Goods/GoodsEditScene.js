@@ -1805,54 +1805,56 @@ class GoodsEditScene extends PureComponent {
     if (dragPicVisible) {
       return (
         <CommonModal visible={dragPicVisible} onRequestClose={() => this.setState({dragPicVisible: false})}>
-          <SafeAreaView style={styles.modifyPicModal}>
-            <View style={styles.modifyPicHeader}>
-              <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
-                         onPress={() => this.setState({dragPicVisible: false})}/>
-              <Text style={styles.modifyPicHeaderText}>
-                预览（{selectPreviewPic.index + 1}/{tool.length(upload_files)}）
-              </Text>
-              <View/>
-            </View>
-            <View style={styles.modifyMainPic}>
-              <If condition={selectPreviewPic.url}>
-                <FastImage source={{uri: selectPreviewPic.url}}
-                           resizeMode={FastImage.resizeMode.contain}
-                           style={{height: 2.5 * height / 5.2}}/>
-              </If>
-            </View>
-            <GridView data={[...upload_files, '']}
-                      style={styles.modifyPicList}
-                      numColumns={4}
-                      renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
-                      locked={item => '' === item}
-                      onReleaseCell={this.onReleaseCell}
-                      onEndDragging={(item, index) => this.onEndDragging(item, index)}
-                      onPressCell={(item, index) => this.onPressCell(item, index)}
-                      keyExtractor={(item, index) => `${index}`}
-                      delayLongPress={100}
-                      renderItem={(item, index) => this.renderModalItem(item, index)}/>
-            <View style={styles.modifyPicBtnWrap}>
-              <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
-                <TouchableOpacity onPress={this.setMainPic}
-                                  style={[{backgroundColor: colors.main_color}, styles.modifyPicBtn]}>
-                  <Text style={styles.modifyPicBtnText}>
-                    设为主图
-                  </Text>
-                </TouchableOpacity>
-              </If>
-              <If condition={!vendor_has && !store_has && upload_files.length > 0}>
-                <TouchableOpacity style={[{backgroundColor: colors.colorCCC}, styles.modifyPicBtn]}
-                                  onPress={() => this.setState({showImgMenus: true, selectPicType: false})}>
-                  <Text style={styles.modifyPicBtnText}>
-                    替换图片
-                  </Text>
-                </TouchableOpacity>
-              </If>
-            </View>
-          </SafeAreaView>
-          {this.renderActionSheet()}
-          {this.renderSearchPic()}
+          <>
+            <SafeAreaView style={styles.modifyPicModal}>
+              <View style={styles.modifyPicHeader}>
+                <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
+                           onPress={() => this.setState({dragPicVisible: false})}/>
+                <Text style={styles.modifyPicHeaderText}>
+                  预览（{selectPreviewPic.index + 1}/{tool.length(upload_files)}）
+                </Text>
+                <View/>
+              </View>
+              <View style={styles.modifyMainPic}>
+                <If condition={selectPreviewPic.url}>
+                  <FastImage source={{uri: selectPreviewPic.url}}
+                             resizeMode={FastImage.resizeMode.contain}
+                             style={{height: 2.5 * height / 5.2}}/>
+                </If>
+              </View>
+              <GridView data={[...upload_files, '']}
+                        style={styles.modifyPicList}
+                        numColumns={4}
+                        renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
+                        locked={item => '' === item}
+                        onReleaseCell={this.onReleaseCell}
+                        onEndDragging={(item, index) => this.onEndDragging(item, index)}
+                        onPressCell={(item, index) => this.onPressCell(item, index)}
+                        keyExtractor={(item, index) => `${index}`}
+                        delayLongPress={100}
+                        renderItem={(item, index) => this.renderModalItem(item, index)}/>
+              <View style={styles.modifyPicBtnWrap}>
+                <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
+                  <TouchableOpacity onPress={this.setMainPic}
+                                    style={[{backgroundColor: colors.main_color}, styles.modifyPicBtn]}>
+                    <Text style={styles.modifyPicBtnText}>
+                      设为主图
+                    </Text>
+                  </TouchableOpacity>
+                </If>
+                <If condition={!vendor_has && !store_has && upload_files.length > 0}>
+                  <TouchableOpacity style={[{backgroundColor: colors.colorCCC}, styles.modifyPicBtn]}
+                                    onPress={() => this.setState({showImgMenus: true, selectPicType: false})}>
+                    <Text style={styles.modifyPicBtnText}>
+                      替换图片
+                    </Text>
+                  </TouchableOpacity>
+                </If>
+              </View>
+            </SafeAreaView>
+            {this.renderActionSheet()}
+            {this.renderSearchPic()}
+          </>
         </CommonModal>
       )
     }

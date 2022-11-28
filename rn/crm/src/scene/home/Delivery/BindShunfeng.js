@@ -10,7 +10,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Dimensions
 } from "react-native";
 
 import tool, {SFCategory} from "../../../pubilc/util/tool";
@@ -21,7 +22,6 @@ import colors from "../../../pubilc/styles/colors";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import {SvgXml} from "react-native-svg";
 import {closeNew, closeRound, isSelected, right, rightCheck} from "../../../svg/svg";
-import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import HttpUtils from "../../../pubilc/util/http";
 import {BackgroundImage} from "react-native-elements/dist/config";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
@@ -29,6 +29,8 @@ import {ActionSheet} from "../../../weui";
 import ImagePicker from "react-native-image-crop-picker";
 import {imageKey} from "../../../pubilc/util/md5";
 import Config from "../../../pubilc/common/config";
+
+const {width} = Dimensions.get('window')
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/subjectImage.png'}
 const tipContent = [
@@ -141,10 +143,9 @@ class BindShunfeng extends PureComponent {
 
   componentDidMount() {
     this.uploadImageTask()
-    this.findStore()
     this.getStoreList()
     this.getStoreInfo()
-
+    this.findStore()
   }
 
   getStoreList = () => {
@@ -192,28 +193,29 @@ class BindShunfeng extends PureComponent {
         shop_name, shop_address, sale_category, category_desc, shop_contact_name, shop_contact_phone, latitude,
         longitude, account_contact_name, account_id_card, business_license, sf_store_id
       } = shop_info
-      this.setState({
-        store: {
-          ...store,
-          storeName: shop_name,
-          address: shop_address,
-          saleCategory: {
-            value: sale_category,
-            label: category_desc,
+      if (!register_success)
+        this.setState({
+          store: {
+            ...store,
+            storeName: shop_name,
+            address: shop_address,
+            saleCategory: {
+              value: sale_category,
+              label: category_desc,
+            },
+            account_contact_name: shop_contact_name,
+            account_contact_phone: shop_contact_phone,
+            law_name: account_contact_name,
+            account_id_card: account_id_card,
+            business_license: business_license,
+            location: `${latitude},${longitude}`
           },
-          account_contact_name: shop_contact_name,
-          account_contact_phone: shop_contact_phone,
-          law_name: account_contact_name,
-          account_id_card: account_id_card,
-          business_license: business_license,
-          location: `${latitude},${longitude}`
-        },
-        registerShunFengObj: {
-          register_success: register_success,
-          fail_reason: fail_reason,
-          sf_store_id: sf_store_id
-        }
-      })
+          registerShunFengObj: {
+            register_success: register_success,
+            fail_reason: fail_reason,
+            sf_store_id: sf_store_id
+          }
+        })
     }, () => {
     }).catch((error) => ToastShort(error.reason))
   }
@@ -249,17 +251,28 @@ class BindShunfeng extends PureComponent {
   getStoreInfo = () => {
     const {accessToken} = this.props.global
     const {store} = this.state
-    const url = `/api/read_store/${store.store_id}/1?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(url, {}).then(res => {
-      const {name = '', dada_address = '', owner_name = '', tel = '', location_long = '', location_lat = ''} = res
+    const url = `/v4/wsb_store/findStore?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url, {store_id_real: store.store_id}).then(res => {
+      const {
+        store_name = '', store_address = '', contact_name = '', contact_phone = '', lng = '', lat = '',
+        sf_category = -1, law_id_card = '', law_name = ''
+      } = res
+      const sf_category_desc_array = SFCategory.filter(item => item.value == sf_category)
       this.setState({
         store: {
           ...this.state.store,
-          storeName: name,
-          account_contact_name: owner_name,
-          account_contact_phone: tel,
-          address: dada_address,
-          location: `${location_long},${location_lat}`
+          storeName: store_name,
+          account_contact_name: contact_name,
+          account_contact_phone: contact_phone,
+          address: store_address,
+          detailAddress: '',
+          saleCategory: {
+            value: sf_category,
+            label: sf_category_desc_array[0]?.label || '',
+          },
+          location: `${lng},${lat}`,
+          account_id_card: law_id_card,
+          law_name: law_name
         }
       })
 
@@ -460,8 +473,8 @@ class BindShunfeng extends PureComponent {
     const {saleCategory} = store
     return (
       <TouchableOpacity onPress={() => this.setStoreInfo('saleCategory', item)}
-                        style={saleCategory.value === item.value ? styles.activeCategoryItemWrap : styles.categoryItemWrap}>
-        <Text style={saleCategory.value === item.value ? styles.activeCategoryItemText : styles.categoryItemText}>
+                        style={saleCategory.value == item.value ? styles.activeCategoryItemWrap : styles.categoryItemWrap}>
+        <Text style={saleCategory.value == item.value ? styles.activeCategoryItemText : styles.categoryItemText}>
           {item.label}
         </Text>
       </TouchableOpacity>
@@ -547,14 +560,15 @@ class BindShunfeng extends PureComponent {
                      onRequestClose={this.closeModalByRegisterShunFeng}
                      position={'flex-end'}>
           <>
-            <View style={[styles.modalWrap, {height: '85%'}]}>
+            <KeyboardAvoidingView style={[styles.modalWrap, {height: '85%'}]}
+                                  behavior={Platform.select({android: 'height', ios: 'padding'})}>
               <View style={styles.modalHeaderWrap}>
                 <Text style={styles.modalHeaderText}>
                   免费注册顺丰
                 </Text>
                 <SvgXml xml={closeNew()} style={styles.closeModal} onPress={this.closeModalByRegisterShunFeng}/>
               </View>
-              <KeyboardAwareScrollView enableOnAndroid={false}>
+              <ScrollView>
                 <Text style={styles.modalTipText}>
                   门店信息
                 </Text>
@@ -571,7 +585,9 @@ class BindShunfeng extends PureComponent {
                 <View style={styles.modalStoreInfoItemWrap}>
                   <Text style={styles.modalStoreInfoItemLeftText}>门店地址</Text>
                   <View style={styles.rowCenter}>
-                    <Text style={styles.modalStoreInfoItemRightText} onPress={this.setStoreAddress}>
+                    <Text style={[styles.modalStoreInfoItemRightText]}
+                          onPress={this.setStoreAddress}
+                          numberOfLines={1} ellipsizeMode={'head'}>
                       {store.address}
                     </Text>
                     <SvgXml xml={right()} style={styles.rightIcon}/>
@@ -648,7 +664,7 @@ class BindShunfeng extends PureComponent {
                   </View>
                 </View>
                 <Text style={styles.modalTipText}>营业执照</Text>
-                <View style={styles.rowCenter}>
+                <View style={styles.imageWrap}>
                   <BackgroundImage style={styles.uploadImageWrap} source={exampleImg}>
                     <Text style={styles.exampleImageText}>示例图</Text>
                   </BackgroundImage>
@@ -669,14 +685,14 @@ class BindShunfeng extends PureComponent {
                   </TouchableOpacity>
                 </View>
 
-              </KeyboardAwareScrollView>
+              </ScrollView>
               <TouchableOpacity style={[styles.openBtnWrap]} onPress={this.registerShunFeng}>
                 <Text style={styles.openBtnText}>
                   确认信息并注册
                 </Text>
               </TouchableOpacity>
 
-            </View>
+            </KeyboardAvoidingView>
             <ActionSheet visible={showImgMenus}
                          onRequestClose={this.onRequestClose}
                          menus={this.menus}
@@ -767,7 +783,7 @@ class BindShunfeng extends PureComponent {
           <FlatList data={SFCategory}
                     numColumns={3}
                     initialNumToRender={21}
-                    style={{marginLeft: 20, marginRight: 10, height: '45%'}}
+                    style={{marginHorizontal: 20, height: '45%'}}
                     keyExtractor={(item, index) => `${index}`}
                     renderItem={this.renderShunFengCategoryItem}/>
           <TouchableOpacity style={styles.openBtnWrap}
@@ -889,8 +905,8 @@ const styles = StyleSheet.create({
 
   deleteImage: {position: 'absolute', right: -12, top: -12},
   content: {flex: 1, backgroundColor: colors.white},
-  rowCenter: {flexDirection: 'row', alignItems: 'center', flex: 1},
-
+  rowCenter: {flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'flex-end'},
+  imageWrap:{flexDirection: 'row', alignItems: 'center', flex: 1,},
   wsbDeliveryWrap: {borderRadius: 6, borderColor: '#26B942', borderWidth: 1, marginHorizontal: 20, marginTop: 10},
   wsbDeliverHeader: {
     fontSize: 15,
@@ -936,13 +952,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    flex: 1
+    paddingHorizontal: 20,
   },
   modalStoreInfoNotRightItemWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingRight: 20,
+    paddingHorizontal: 20,
     flex: 1
   },
   modalStoreInfoItemLeftText: {
@@ -950,13 +966,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.color333,
     paddingVertical: 18,
-    paddingLeft: 20
   },
   notSelectModalStoreInfoItemRightText: {
     fontSize: 14,
     color: colors.color999,
     paddingVertical: 18,
-    // backgroundColor: 'red',
     textAlign: 'right',
     flex: 1,
   },
@@ -964,11 +978,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.color333,
     paddingVertical: 18,
-    // backgroundColor: 'red',
     textAlign: 'right',
-    flex: 1,
   },
-  rightIcon: {paddingRight: 20, paddingLeft: 2},
+  rightIcon: {paddingLeft: 2, width: 20},
   line: {borderBottomWidth: 0.5, borderBottomColor: '#E5E5E5', marginHorizontal: 12},
   uploadImageWrap: {
     width: 148,
@@ -1013,7 +1025,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginRight: 10,
     marginBottom: 10,
-    width: 105,
+    width: (width - 2 * 20 - 2 * 10) / 3,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center'
@@ -1025,7 +1037,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginRight: 10,
     marginBottom: 10,
-    width: 105,
+    width: (width - 2 * 20 - 2 * 10) / 3,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center'
