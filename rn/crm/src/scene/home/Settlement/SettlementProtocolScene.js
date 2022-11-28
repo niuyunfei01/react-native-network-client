@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
+import Entypo from "react-native-vector-icons/Entypo";
 
 let {width} = Dimensions.get('window');
 
@@ -22,6 +23,12 @@ const Styles = StyleSheet.create({
     backgroundColor: colors.f5,
     width: width,
     padding: 10,
+  },
+  headerLeft: {
+    color: colors.color333,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: 10
   }
 })
 
@@ -35,8 +42,28 @@ class SettlementProtocol extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      ptl_sign: this.props.route.params?.ptl_sign || ''
+      ptl_sign: this.props.route.params?.ptl_sign || '',
+      isShow: this.props.route.params?.showPrompt || false
     };
+  }
+
+  componentDidMount() {
+    let {navigation} = this.props;
+    navigation.setOptions({
+      headerLeft: () => this.renderHeaderLeft()
+    })
+  }
+
+  renderHeaderLeft = () => {
+    return (
+      <Entypo name={"chevron-thin-left"} style={Styles.headerLeft} onPress={() => this.goBack()} />
+    )
+  }
+
+  goBack = () => {
+    let {isShow} = this.state;
+    this.props.route.params.onBack && this.props.route.params.onBack(isShow)
+    this.props.navigation.goBack()
   }
 
   render() {

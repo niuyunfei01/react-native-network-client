@@ -274,13 +274,13 @@ class Mine extends PureComponent {
   }
 
   fetchShowSettleProtocol = () => {
-    let {currStoreId, accessToken} = this.props.global;
-    let url = `/api/show_settle_protocol/20481`;
+    let {store_id, accessToken} = this.props.global;
+    let url = `/api/show_settle_protocol/${store_id}`;
     HttpUtils.get(url, {
-      access_token: '99adfa584158930ddd8bca1f94cf27709a8ee85d'
+      access_token: accessToken
     }).then(res => {
       this.setState({
-        showSettle: res.is_show == 0
+        showSettle: res.is_show == 1
       })
     }).catch((res) => {
       ToastShort(res.reason)

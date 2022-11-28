@@ -29,6 +29,7 @@ let {width} = Dimensions.get("window");
 const Stack = createStackNavigator();
 const screenOptions = ({
   headerShown: true,
+  gestureEnabled: true,
   headerStyle: {
     height: 40,
   },
@@ -327,7 +328,7 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT_PROTOCOL} options={{headerTitle: '结算协议'}}
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT_PROTOCOL} options={{headerTitle: '结算协议', gestureEnabled: false}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementProtocolScene').default}
         />
 
