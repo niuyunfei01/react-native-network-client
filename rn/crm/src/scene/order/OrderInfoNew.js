@@ -1004,7 +1004,7 @@ class OrderInfoNew extends PureComponent {
                   color: '#FF8309'
                 }}>  {order?.friendly_time_info} </Text>
               </View>
-              <Text style={styles.orderCardInfoBottom}>{order?.ext_store_name} #{order?.dayId} </Text>
+              <Text style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name,18)} #{order?.dayId} </Text>
             </View>
           </View>
           <If condition={order?.platform === '6'}>
@@ -1616,7 +1616,7 @@ const styles = StyleSheet.create({
     marginLeft: 11
   },
   orderCardInfoTop: {fontSize: 16, fontWeight: 'bold', color: colors.color333, marginBottom: 2.5},
-  orderCardInfoBottom: {fontSize: 12, fontWeight: '400', color: colors.color999},
+  orderCardInfoBottom: {flex: 1, fontSize: 12, fontWeight: '400', color: colors.color999},
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
