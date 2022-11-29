@@ -34,6 +34,7 @@ const Distribution_Analysis = 'distribution_analysis';
 const Profit_AndLoss_Analysis = 0;
 const timeOptions = [
   {label: '今天', value: 0},
+  {label: '昨天', value: 4},
   {label: '近7天', value: 1},
   {label: '本月', value: 2},
   {label: '自定义', value: 3},
@@ -168,10 +169,18 @@ class DistributionAnalysisScene extends PureComponent {
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
         break
+      case 4:
+        startTime = new Date(Date.now() - oneDay).setHours(0, 0, 0, 0) / 1000
+        break
       default:
         break
     }
-    let endTime = Math.round(new Date().getTime() / 1000)
+    let endTime;
+    if (type === 4) {
+      endTime = Math.round(new Date().getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+    }
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
       dateStatus: type
@@ -205,10 +214,18 @@ class DistributionAnalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
         this.setState({allowChange: false})
         break
+      case 4:
+        startTime = new Date(Date.now() - oneDay).setHours(0, 0, 0, 0) / 1000
+        break
       default:
         break
     }
-    let endTime = Math.round(new Date().getTime() / 1000)
+    let endTime;
+    if (type === 4) {
+      endTime = Math.round(new Date().getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+    }
     this.getProfitAndLossAnalysisData(startTime, endTime)
     this.setState({
       dateStatus: type
