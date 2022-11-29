@@ -306,12 +306,13 @@ class SaveStore extends PureComponent {
             this.mixpanel.identify(res?.user?.user_id);
           }
         })
+      }else {
+        this.setState({
+          loading: false
+        })
+        ToastShort('操作成功');
+        this.props.navigation.goBack();
       }
-      this.setState({
-        loading: false
-      })
-      ToastShort(res?.desc);
-      this.props.navigation.goBack();
     }, (e) => {
       ToastShort(e?.desc);
       this.setState({
