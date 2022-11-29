@@ -82,6 +82,7 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,
+  lastCheckVersion: 0
 };
 
 /**
@@ -137,7 +138,8 @@ export default function globalReducer(state = initialState, action) {
           getTokenTs: action.payload.getTokenTs,
           order_list_by: action.payload.order_list_by,
           show_bottom_tab: action.payload.show_bottom_tab,
-          enabled_good_mgr: action.payload.enabled_good_mgr
+          enabled_good_mgr: action.payload.enabled_good_mgr,
+          lastCheckVersion: action.payload.lastCheckVersion
         }
       }
       break

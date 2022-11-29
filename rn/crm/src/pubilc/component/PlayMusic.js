@@ -13,7 +13,6 @@ export const initMusic = () => {
 
 export const play = (callback = () => {
 }) => {
-  console.log(music_error)
   if (music_error)
     return
   if (order_sound) {
