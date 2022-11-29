@@ -177,9 +177,9 @@ class DistributionAnalysisScene extends PureComponent {
     }
     let endTime;
     if (type === 4) {
-      endTime = Math.round(new Date().getTime() / 1000)
-    } else {
       endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date().getTime() / 1000)
     }
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
@@ -222,9 +222,9 @@ class DistributionAnalysisScene extends PureComponent {
     }
     let endTime;
     if (type === 4) {
-      endTime = Math.round(new Date().getTime() / 1000)
-    } else {
       endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date().getTime() / 1000)
     }
     this.getProfitAndLossAnalysisData(startTime, endTime)
     this.setState({
