@@ -239,6 +239,7 @@ class OrderCallDelivery extends Component {
         mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
         is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
         remark: obj?.remark || '',
+        remark_input_value: obj?.remark || '',
         loading: false,
       })
       this.priceFn();
@@ -1517,7 +1518,7 @@ class OrderCallDelivery extends Component {
               multiline={true}
               numberOfLines={4}
               maxLength={40}
-              value={remark_input_value ? remark_input_value : remark}
+              value={remark_input_value}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}
               placeholder={'请在此填写备注信息，最多不超过40个字符'}

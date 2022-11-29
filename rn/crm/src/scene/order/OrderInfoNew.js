@@ -83,16 +83,6 @@ function mapStateToProps(state) {
   }
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class OrderInfoNew extends PureComponent {
 
   static propTypes = {
@@ -146,10 +136,18 @@ class OrderInfoNew extends PureComponent {
     }
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount = () => {
     const {deviceInfo} = this.props?.device
     const {store_id, currentUser, accessToken} = this.props.global;
-    this.navigationOptions()
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.fetchOrder()
+    })
+
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -266,7 +264,6 @@ class OrderInfoNew extends PureComponent {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    this.fetchShipData()
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       hideModal()
@@ -284,6 +281,7 @@ class OrderInfoNew extends PureComponent {
         isShowMap: res?.loc_lat !== '' && res?.loc_lng !== ''
       }, () => {
         this.navigationOptions()
+        this.fetchShipData()
       })
       dispatch(getRemindForOrderPage(accessToken, orderId, (ok, desc, data) => {
         if (ok) {
@@ -646,15 +644,12 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-            >
-              <View style={{alignItems: 'center'}}>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
-                           style={{width: 30, height: 34,}}
-                           resizeMode={FastImage.resizeMode.contain}
-                />
-              </View>
-
-            </Marker>
+              icon={{
+                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png",
+                width: 30,
+                height: 34,
+              }}
+            />
           </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
@@ -697,6 +692,7 @@ class OrderInfoNew extends PureComponent {
               }}
             />
           </If>
+
           <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
               draggable={false}
@@ -1396,7 +1392,6 @@ class OrderInfoNew extends PureComponent {
     }
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder.bind(this)}/>
 
         <If condition={loadingImg}>
           {this.renderNoInfo()}

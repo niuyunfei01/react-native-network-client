@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {Image, StyleSheet, Text, View} from 'react-native'
+import {Image, Platform, StyleSheet, Text, View} from 'react-native'
 import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker, Polyline} from "react-native-amap3d";
 import HttpUtils from "../../pubilc/util/http";
@@ -31,6 +31,7 @@ class RiderTrajectory extends Component {
     route: PropTypes.object,
   }
 
+
   constructor(props) {
     super(props);
     let {delivery_id, order_id} = this.props.route.params;
@@ -51,7 +52,11 @@ class RiderTrajectory extends Component {
       track_list: [],
       track_store: [],
       zoom: 13,
+      loading: false
     }
+  }
+
+  componentDidMount = () => {
     this.fetchData()
   }
 
@@ -81,6 +86,10 @@ class RiderTrajectory extends Component {
         track_list: list,
         track_store: res?.pos_store,
         zoom,
+      }, () => {
+        setTimeout(() => {
+          this.setState({loading: false})
+        }, Platform.OS === 'ios' ? 300 : 1)
       })
     }, () => {
       ToastLong("操作失败，请刷新后再试");
@@ -98,6 +107,9 @@ class RiderTrajectory extends Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return <View/>
+    }
     return (
       <View style={{
         flex: 1,
