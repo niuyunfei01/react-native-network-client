@@ -134,6 +134,7 @@ class OrderInfoNew extends PureComponent {
       orders_add_tip: true,
       delivery_loading: false,
     }
+    this.marker = null
   }
 
   componentWillUnmount() {
@@ -638,6 +639,9 @@ class OrderInfoNew extends PureComponent {
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
             <Marker
+              ref={(ref) => {
+                this.marker = ref
+              }}
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
             >
@@ -658,6 +662,11 @@ class OrderInfoNew extends PureComponent {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
                            style={{width: 30, height: 34,}}
+                           onLoad={() => {
+                             tool.debounces(() => {
+                               this.marker.update();
+                             }, 1000)
+                           }}
                            resizeMode={FastImage.resizeMode.contain}
                 />
               </View>
@@ -679,6 +688,9 @@ class OrderInfoNew extends PureComponent {
 
           <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
+              ref={(ref) => {
+                this.marker = ref
+              }}
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
             >
@@ -692,6 +704,11 @@ class OrderInfoNew extends PureComponent {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
                            style={{width: 23, height: 48}}
+                           onLoad={() => {
+                             tool.debounces(() => {
+                               this.marker.update();
+                             }, 1000)
+                           }}
                            resizeMode={FastImage.resizeMode.contain}/>
               </View>
             </Marker>

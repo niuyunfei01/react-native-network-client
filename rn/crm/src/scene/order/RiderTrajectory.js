@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {Image, Platform, StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker, Polyline} from "react-native-amap3d";
 import HttpUtils from "../../pubilc/util/http";
@@ -52,8 +52,8 @@ class RiderTrajectory extends Component {
       track_list: [],
       track_store: [],
       zoom: 13,
-      loading: false
     }
+    this.marker = null
   }
 
   componentDidMount = () => {
@@ -86,10 +86,6 @@ class RiderTrajectory extends Component {
         track_list: list,
         track_store: res?.pos_store,
         zoom,
-      }, () => {
-        setTimeout(() => {
-          this.setState({loading: false})
-        }, Platform.OS === 'ios' ? 300 : 1)
       })
     }, () => {
       ToastLong("操作失败，请刷新后再试");
@@ -107,9 +103,6 @@ class RiderTrajectory extends Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return <View/>
-    }
     return (
       <View style={{
         flex: 1,
@@ -155,6 +148,9 @@ class RiderTrajectory extends Component {
         {/*骑手定位*/}
         <If condition={track_horseman_lat && track_horseman_lng}>
           <Marker
+            ref={(ref) => {
+              this.marker = ref
+            }}
             zIndex={99}
             position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
           >
@@ -185,10 +181,15 @@ class RiderTrajectory extends Component {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
 
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}} style={{
-                width: 30,
-                height: 34,
-              }}/>
+              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
+                         style={{width: 30, height: 34,}}
+                         onLoad={() => {
+                           tool.debounces(() => {
+                             this.marker.update();
+                           }, 1000)
+                         }}
+                         resizeMode={FastImage.resizeMode.contain}
+              />
             </View>
           </Marker>
         </If>
@@ -224,6 +225,9 @@ class RiderTrajectory extends Component {
         <If
           condition={distance_store <= 0 && distance_destination <= 0 && track_destination_lat && track_destination_lng}>
           <Marker
+            ref={(ref) => {
+              this.marker = ref
+            }}
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
           >
@@ -246,6 +250,11 @@ class RiderTrajectory extends Component {
 
               <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
                          style={{width: 22, height: 42}}
+                         onLoad={() => {
+                           tool.debounces(() => {
+                             this.marker.update();
+                           }, 1000)
+                         }}
                          resizeMode={FastImage.resizeMode.contain}
               />
             </View>
