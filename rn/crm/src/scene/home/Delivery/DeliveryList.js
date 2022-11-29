@@ -3,7 +3,7 @@ import {Dimensions, InteractionManager, ScrollView, StyleSheet, Text, TouchableO
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
-import {hideModal, showModal,} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FastImage from "react-native-fast-image";
 import Config from "../../../pubilc/common/config";
 import TopSelectModal from "../../../pubilc/component/TopSelectModal";
@@ -41,7 +41,8 @@ class DeliveryList extends PureComponent {
       page_size: 10,
       page: 1,
       is_last_page: false,
-      refreshing: false
+      refreshing: false,
+      isLoading: false,
     }
   }
 
@@ -87,13 +88,16 @@ class DeliveryList extends PureComponent {
   }
 
   fetchData = () => {
-    showModal("请求中...")
+
     const {accessToken} = this.props.global
-    const {store_id} = this.state
+    const {store_id, isLoading} = this.state
+    if (isLoading)
+      return
+    this.setState({isLoading: true})
+    ToastShort('加载中...')
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
     const params = {real_store_id: store_id, choose_v2_type: 0}
     HttpUtils.get(api, params).then((res) => {
-      hideModal()
       const {
         in_review_deliveries = [], store_bind_deliveries = [], wsb_bind_deliveries = [], wsb_unbind_deliveries = []
       } = res
@@ -101,10 +105,11 @@ class DeliveryList extends PureComponent {
         in_review_deliveries: in_review_deliveries,
         store_bind_deliveries: store_bind_deliveries,
         wsb_bind_deliveries: wsb_bind_deliveries,
-        wsb_unbind_deliveries: wsb_unbind_deliveries
+        wsb_unbind_deliveries: wsb_unbind_deliveries,
+        isLoading: false
       })
     }).catch(() => {
-      hideModal()
+      this.setState({isLoading: false})
     })
   }
 

@@ -621,7 +621,8 @@ class AppNavigator extends PureComponent {
       reduxGlobal?.refreshToken == global.noLoginInfo?.refreshToken &&
       reduxGlobal?.expireTs == global.noLoginInfo?.expireTs &&
       reduxGlobal?.getTokenTs == global.noLoginInfo?.getTokenTs &&
-      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by
+      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by &&
+      reduxGlobal?.lastCheckVersion === global.noLoginInfo?.lastCheckVersion
 
     if (flag) {
       return
@@ -640,6 +641,7 @@ class AppNavigator extends PureComponent {
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
       order_list_by: reduxGlobal.order_list_by,
+      lastCheckVersion: reduxGlobal.lastCheckVersion
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
@@ -698,7 +700,7 @@ class AppNavigator extends PureComponent {
     this.unSubscribe = store.subscribe(async () => {
       const {global} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion = 0} = global;
+      const {accessToken, lastCheckVersion} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
@@ -730,7 +732,7 @@ class AppNavigator extends PureComponent {
 
   componentDidMount() {
     this.whiteNoLoginInfo()
-    unInitMusic()
+
   }
 
   componentWillUnmount() {
@@ -738,6 +740,7 @@ class AppNavigator extends PureComponent {
     //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
+    unInitMusic()
   }
 
 
@@ -822,7 +825,7 @@ class AppNavigator extends PureComponent {
                 {desc}
               </Text>
               <View style={styles.btnWrap}>
-                <TouchableOpacity style={styles.cancelWrap} onPress={this.setModalStatus}>
+                <TouchableOpacity style={styles.cancelWrap} onPress={() => this.setModalStatus(false)}>
                   <Text style={styles.cancelText}>
                     暂不更新
                   </Text>

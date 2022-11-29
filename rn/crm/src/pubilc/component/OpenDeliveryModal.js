@@ -243,10 +243,9 @@ class OpenDeliveryModal extends PureComponent {
 
   openWSBDelivery = () => {
     const {refreshDeliveyList, global, store_id, delivery} = this.props
-    const {v2_type} = delivery
+    const {v2_type, id = 0} = delivery
     const {accessToken} = global
-    let data = {store_id: store_id, platform: v2_type}
-
+    let data = {store_id: store_id, platform: v2_type, delivery_id: id}
     const url = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
     HttpUtils.post(url, data).then(async () => {
       await this.closeModal()

@@ -222,7 +222,7 @@ class GoodStoreDetailScene extends PureComponent {
       const retail_price_enabled = vendor?.retail_price_enabled ? vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
       const selectedSpecArray = []
-      if (spec?.sku_name) {
+      if (spec) {
         selectedSpecArray.push({
           value: spec?.product_id || '',
           label: spec?.sku_name ? spec?.sku_name : spec?.name,
