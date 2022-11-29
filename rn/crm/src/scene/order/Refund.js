@@ -3,7 +3,7 @@ import {Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpaci
 import pxToDp from "../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {Line, Yuan} from "../common/component/All";
-import {ToastLong} from "../../pubilc/util/ToastUtils";
+import {showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import colors from "../../pubilc/styles/colors";
 import {Dialog, Input} from "../../weui";
 import HttpUtils from "../../pubilc/util/http";
@@ -148,6 +148,7 @@ class Refund extends Component {
         }
       })
     }
+    showModal('正在处理...')
     let payload = {
       order_id: this.state.orderDetail.id,
       items: refundgoodsList,
@@ -161,6 +162,8 @@ class Refund extends Component {
       ToastLong("退款成功！");
       this.props.navigation.goBack()
     }, (res) => {
+      ToastLong('操作失败：' + res.reason);
+    }).catch( (res) => {
       ToastLong('操作失败：' + res.reason);
     })
   };

@@ -214,6 +214,7 @@ class SearchShop extends Component {
         callback: (item) => {
           this.setState({
             ret_list: [],
+            show_map: false,
             shops: [],
             city_name: item.name,
           })
@@ -455,7 +456,7 @@ class SearchShop extends Component {
                         }}
                         onPress={() => this.onClickItem(item)}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={{color: colors.color333, fontSize: 16}}> {item?.name} </Text>
+          <Text style={{color: colors.color333, fontSize: 16}}> {tool.jbbsubstr(item?.name, 16)} </Text>
           <If condition={item?.default && this.state.show_map}>
             <View style={{
               backgroundColor: colors.main_color,
