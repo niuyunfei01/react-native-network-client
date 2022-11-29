@@ -177,7 +177,9 @@ class DistributionAnalysisScene extends PureComponent {
     }
     let endTime;
     if (type === 4) {
-      endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+      let dt = new Date();
+      dt.setHours(0, 0, 0, 0);
+      endTime = Math.round(dt.getTime() / 1000)
     } else {
       endTime = Math.round(new Date().getTime() / 1000)
     }
@@ -222,7 +224,9 @@ class DistributionAnalysisScene extends PureComponent {
     }
     let endTime;
     if (type === 4) {
-      endTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+      let dt = new Date();
+      dt.setHours(0, 0, 0, 0);
+      endTime = Math.round(dt.getTime() / 1000)
     } else {
       endTime = Math.round(new Date().getTime() / 1000)
     }
@@ -549,7 +553,7 @@ class DistributionAnalysisScene extends PureComponent {
             timeJs = Math.round(new Date(new Date(value).setHours(0, 0, 0, 0)).getTime() / 1000)
             this.setState({startNewDateValue: timeJs, showDateModal: false, startTime: resDate})
           } else if (this.state.timeType === 'end') {
-            timeJs = Math.floor(new Date(new Date(value).setHours(11, 59, 59, 999)).getTime() / 1000)
+            timeJs = Math.floor(new Date(new Date(value).setHours(23, 59, 59, 999)).getTime() / 1000)
             this.setState({endNewDateValue: timeJs, showDateModal: false, endTime: resDate})
           }
         }
