@@ -113,7 +113,7 @@ class OrderInfoNew extends PureComponent {
         orderStatus: ''
       },
       actionSheet: [],
-      isShowMap: false,
+      isShowMap: true,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,
@@ -147,7 +147,7 @@ class OrderInfoNew extends PureComponent {
     this.focus = navigation.addListener('focus', () => {
       this.fetchOrder()
     })
-
+    this.navigationOptions()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
@@ -238,16 +238,16 @@ class OrderInfoNew extends PureComponent {
 
   navigationOptions = () => {
     const {navigation} = this.props
-    const option = {headerRight: () => this.headerRight()}
+    const option = {
+      headerRight: () => {
+        return (
+          <TouchableOpacity style={headerRightStyles.resetBind} onPress={() => this.navigateToOrderOperation()}>
+            <Entypo name={"dots-three-horizontal"} style={headerRightStyles.text}/>
+          </TouchableOpacity>
+        )
+      }
+    }
     navigation.setOptions(option);
-  }
-
-  headerRight = () => {
-    return (
-      <TouchableOpacity style={headerRightStyles.resetBind} onPress={() => this.navigateToOrderOperation()}>
-        <Entypo name={"dots-three-horizontal"} style={headerRightStyles.text}/>
-      </TouchableOpacity>
-    )
   }
 
   fetchOrder = (show_loading = 0) => {
@@ -265,23 +265,19 @@ class OrderInfoNew extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
+    this.fetchShipData()
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       hideModal()
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
-
-      // this.props.dispatch(setDefaultOrderInfo(obj))
       this.setState({
         order: obj,
         isFetching: false,
         loadingImg: false,
         itemsEdited: this._extract_edited_items(obj.items),
         allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
-        isShowMap: res?.loc_lat !== '' && res?.loc_lng !== ''
-      }, () => {
-        this.navigationOptions()
-        this.fetchShipData()
+        isShowMap: res?.loc_lat !== '' && res?.loc_lng !== '' && obj?.orderStatus !== '4' && obj?.orderStatus !== '5'
       })
       dispatch(getRemindForOrderPage(accessToken, orderId, (ok, desc, data) => {
         if (ok) {
@@ -289,7 +285,6 @@ class OrderInfoNew extends PureComponent {
         }
       }));
       this.logOrderViewed();
-      this.fetchThirdWays()
     }, ((res) => {
       hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
@@ -354,18 +349,6 @@ class OrderInfoNew extends PureComponent {
       })
 
     })
-  }
-
-  fetchThirdWays = () => {
-    let {orderId, order} = this.state;
-    if (order?.orderStatus === Cts.ORDER_STATUS_TO_READY || order?.orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      const api = `/api/order_third_logistic_ways/${orderId}?select=1&access_token=${this.props.global.accessToken}`;
-      HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
-        this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchThirdWays', res.endTime - res.startTime)
-      }).catch(error => {
-        this.handleTimeObj(api, error?.executeStatus, error?.startTime, error?.endTime, 'fetchThirdWays', error?.endTime - error?.startTime)
-      })
-    }
   }
 
   dialNumber = (val) => {
@@ -618,13 +601,14 @@ class OrderInfoNew extends PureComponent {
       ship_distance_destination,
       ship_distance_store
     } = this.state.order;
-
+    if (!this.state.isShowMap || tool.length(loc_lat) <= 0 || tool.length(loc_lng) <= 0) {
+      return <View/>
+    }
     let zoom = dada_distance > 2000 ? dada_distance > 2000 ? 12 : 13 : 14;
     let {
       aLon,
       aLat
     } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
-
     return (
       <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: 290}}>
         <MapView
@@ -1384,19 +1368,9 @@ class OrderInfoNew extends PureComponent {
 
   render() {
     let {accessToken} = this.props.global;
-    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal, loadingImg} = this.state
-    if (order?.orderStatus === '4' || order?.orderStatus === '5') {
-      this.setState({
-        isShowMap: false
-      })
-    }
+    const {order, isRefreshing, allowRefresh, show_cancel_delivery_modal, loadingImg} = this.state
     return (
       <View style={{flex: 1}}>
-
-        <If condition={loadingImg}>
-          {this.renderNoInfo()}
-        </If>
-
         <ScrollView ref={ref => this.scrollViewRef = ref}
                     refreshControl={
                       <RefreshControl
@@ -1409,13 +1383,11 @@ class OrderInfoNew extends PureComponent {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
                     style={styles.Content}>
-
-          {this.renderPrinter()}
-
-
-          <If condition={isShowMap}>
-            {this.renderMap()}
+          <If condition={loadingImg}>
+            {this.renderNoInfo()}
           </If>
+          {this.renderPrinter()}
+          {this.renderMap()}
           {this.renderOrderInfo()}
           <If condition={order?.show_ship_info}>
             {this.renderDeliveryInfo()}
