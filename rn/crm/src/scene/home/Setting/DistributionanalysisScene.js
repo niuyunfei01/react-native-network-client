@@ -22,7 +22,7 @@ import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
-import tool from "../../../pubilc/util/tool";
+import tool, {fullDate} from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -105,7 +105,7 @@ class DistributionAnalysisScene extends PureComponent {
   getDistributionAnalysisData = (startTime, endTime) => {
     const {store_id, filterPlatform, accessToken} = this.state;
     ToastShort("查询中");
-    const api = `/v1/new_api/analysis/delivery/${store_id}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/delivery/${store_id}/${filterPlatform}?access_token=${accessToken}&starttime=${fullDate(startTime * 1000)}&endtime=${fullDate(endTime * 1000)}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         DistributionAnalysisData: res?.data?.statistic,
@@ -123,7 +123,7 @@ class DistributionAnalysisScene extends PureComponent {
     ToastShort("查询中");
     this.setParamsTime(startTime, endTime)
     const {store_id, accessToken} = this.state;
-    const api = `/v1/new_api/analysis/profit_data/${store_id}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
+    const api = `/v1/new_api/analysis/profit_data/${store_id}?access_token=${accessToken}&start_time=${fullDate(startTime * 1000)}&end_time=${fullDate(endTime * 1000)}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         profitAndLoss: res?.data,
