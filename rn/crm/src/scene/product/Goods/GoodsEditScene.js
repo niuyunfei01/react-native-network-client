@@ -771,20 +771,20 @@ class GoodsEditScene extends PureComponent {
 
     let {supply_price, sale_status, provided, price} = store_goods_status;
     if ('spec_single' === spec_type) {
-      if (parseInt(supply_price) < 0) {
-        ToastLong('请输入正确的报价')
-        return false
-      }
       if (!supply_price) {
         ToastLong('请输入报价')
         return false
       }
-      if (price_type === 1 && parseInt(price) < 0) {
-        ToastLong('请输入正确的零售价格')
+      if (parseFloat(supply_price) <= 0) {
+        ToastLong('请输入正确的报价')
         return false
       }
       if (price_type === 1 && !price) {
         ToastLong('请输入零售价格')
+        return false
+      }
+      if (price_type === 1 && parseFloat(price) <= 0) {
+        ToastLong('请输入正确的零售价格')
         return false
       }
       if (!inventory.actualNum && fnProviding === '1') {
@@ -818,19 +818,27 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入多规格名称')
           return false
         }
-        if (!spec_list[i].supply_price && type === 'add') {
+        if (!spec_list[i].supply_price) {
           ToastLong('请输入多规格价格')
           return false
         }
-        if (type === 'add' && price_type === 1 && !spec_list[i].price) {
+        if (parseFloat(spec_list[i].supply_price) <= 0) {
+          ToastLong('请输入正确的多规格价格')
+          return false
+        }
+        if (price_type === 1 && !spec_list[i].price) {
           ToastLong('请输入多规格零售价格')
+          return false
+        }
+        if (price_type === 1 && parseFloat(spec_list[i].price) <= 0) {
+          ToastLong('请输入正确的多规格零售价格')
           return false
         }
         if (!spec_list[i].weight) {
           ToastLong('请输入多规格重量')
           return false
         }
-        if (type === 'add' && !spec_list[i].inventory.actualNum && fnProviding === '1') {
+        if (!spec_list[i].inventory.actualNum && fnProviding === '1') {
           ToastLong('请输入多规格库存')
           return false
         }
