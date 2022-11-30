@@ -24,6 +24,14 @@ function mapStateToProps(state) {
 }
 
 const Tab = createBottomTabNavigator();
+const tabBarOptions = {
+  activeTintColor: colors.main_color,
+  inactiveTintColor: colors.color666,
+  style: {backgroundColor: colors.white},
+  animationEnabled: false,
+  lazy: true,
+  labelStyle: {textAlign: 'center', fontSize: 12}
+}
 
 class TabHome extends React.Component {
   static propTypes = {
@@ -36,17 +44,6 @@ class TabHome extends React.Component {
     this.state = {}
   }
 
-  tabBarOptions = () => {
-    return {
-      activeTintColor: colors.main_color,
-      inactiveTintColor: colors.color666,
-      style: {backgroundColor: colors.white},
-      animationEnabled: false,
-      lazy: true,
-      labelStyle: {textAlign: 'center', fontSize: 12}
-    }
-  }
-
   render() {
     let remind = this.props.remind?.remindNum;
     let {route} = this.props
@@ -57,7 +54,7 @@ class TabHome extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName={initTab}
-        tabBarOptions={this.tabBarOptions()}>
+        tabBarOptions={tabBarOptions}>
         <If condition={Number(work) === 1}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}
@@ -117,7 +114,7 @@ class TabHome extends React.Component {
         />
 
         <Tab.Screen
-          name='MineNew'
+          name='Mine'
           getComponent={() => require("../home/Mine/Mine").default}
           options={
             {

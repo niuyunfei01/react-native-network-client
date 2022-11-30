@@ -85,8 +85,6 @@ const styles = StyleSheet.create({
   }
 })
 
-let status = ''
-
 class ChangeDeliveryAccount extends PureComponent {
 
   constructor(props) {
@@ -206,7 +204,7 @@ class ChangeDeliveryAccount extends PureComponent {
         ToastShort(`${deliveryStatus ? '恢复' : '禁用'}成功`)
         navigation.goBack()
       }).catch((error) => {
-        ToastLong(`${deliveryStatus ? '恢复' : '禁用'}失败，原因：${error}`)
+        ToastLong(`${deliveryStatus ? '恢复' : '禁用'}失败，原因：${error.reason}`)
       })
       return
     }
@@ -216,7 +214,7 @@ class ChangeDeliveryAccount extends PureComponent {
       ToastShort(`解绑成功`)
       navigation.goBack()
     }).catch((error) => {
-      ToastLong(`解绑失败，原因：${error}`)
+      ToastLong(`解绑失败，原因：${error.reason}`)
     })
   }
   openDeliveryModal = () => {

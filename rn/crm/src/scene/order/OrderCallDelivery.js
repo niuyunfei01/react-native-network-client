@@ -1012,7 +1012,7 @@ class OrderCallDelivery extends Component {
                   color: '#FF8309',
                   flex: 1,
                   textAlign: 'center'
-                }}>预计送达时间{expect_time_friendly} </Text>
+                }}>{expect_time_friendly} </Text>
             </View>
           </View>
         </If>

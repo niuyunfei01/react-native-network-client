@@ -142,6 +142,7 @@ class Mine extends PureComponent {
       wsb_store_account: 0,
       storeStatus: {},
       is_mgr: false,
+      show_back_icon: props.route.params?.show_back_icon || false,
       storeInfo: {
         store_name: store_info?.name,
         role_desc: ''
@@ -151,7 +152,7 @@ class Mine extends PureComponent {
         disabled_recharge: false,
         disabled_view_bill: false,
         freeze_balance: '',
-        freeze_notice: '冻结金额为待抢单运单最大配送费之和',
+        freeze_notice: '预扣金额为待抢单运单最大配送费',
       },
       menu_list: menu_list,
       activity: [],
@@ -436,11 +437,16 @@ class Mine extends PureComponent {
   }
 
   renderHeader = () => {
+    const {show_back_icon} = this.state
     return (
       <View style={headerRightStyles.resetBind}>
-        <TouchableOpacity style={{width: 90, height: 32}} onPress={() => this.navigateToBack()}>
-          <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
-        </TouchableOpacity>
+        {
+          show_back_icon ?
+            <TouchableOpacity style={{width: 90, height: 32}} onPress={() => this.navigateToBack()}>
+              <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
+            </TouchableOpacity> :
+            <View style={{width: 90, height: 32}}/>
+        }
         <TouchableOpacity onPress={() => this.JumpToServices()} style={headerRightStyles.rightBtn}>
           <SvgXml xml={Service()} width={18} height={18}/>
           <Text style={headerRightStyles.rightText}>联系客服 </Text>
@@ -518,7 +524,7 @@ class Mine extends PureComponent {
 
         <View style={{paddingHorizontal: 14}}>
           <Text style={styles.walletLabel} onPress={() => this.setState({show_freeze_balance_alert: true})}>
-            冻结金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
+            预扣金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <Text style={styles.walletValue}>
             {balanceInfo?.disable_view_bill ? balanceInfo?.freeze_balance : `*****`}
@@ -547,7 +553,7 @@ class Mine extends PureComponent {
         visible={show_freeze_balance_alert}
         onClose={this.closeModal}
         onPress={() => this.closeModal()}
-        title={'冻结金额'}
+        title={'预扣金额'}
         desc={balanceInfo?.freeze_notice}
         actionText={'知道了'}/>
     )
@@ -721,10 +727,15 @@ class Mine extends PureComponent {
   }
 
   renderMineHeader = () => {
-    const {headerOpacity, headerHeight} = this.state
+    const {headerOpacity, headerHeight, show_back_icon} = this.state
     return (
       <Animated.View style={[styles.showHeaderWrap, {opacity: headerOpacity, height: headerHeight}]}>
-        <Entypo name="chevron-thin-left" style={styles.showHeaderBackIcon} onPress={this.navigateToBack}/>
+        {
+          show_back_icon ?
+            <Entypo name="chevron-thin-left" style={styles.showHeaderBackIcon} onPress={this.navigateToBack}/> :
+            <View style={styles.showHeaderBackIcon}/>
+        }
+
         <Text style={styles.showHeaderText}>我的</Text>
         <TouchableOpacity onPress={() => this.JumpToServices()} style={styles.showHeaderRightWrap}>
           <SvgXml xml={Service(18, 18, colors.color333)}/>

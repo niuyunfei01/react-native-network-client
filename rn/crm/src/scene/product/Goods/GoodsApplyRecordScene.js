@@ -202,7 +202,7 @@ class GoodsApplyRecordScene extends Component {
   renderItem = ({item}) => {
     const {
       audit_status, auto_reject_time, product_id, store_id, apply_price, cover_img, product_name, created, before_price,
-      audit_desc, remark, lower, upper, id, act_plat_1, act_plat_3, act_plat_7, is_act
+      audit_desc, remark, lower, upper, id, act_plat_1, act_plat_3, act_plat_7, is_promotion
     } = item
     const {auditStatus, isKf} = this.state
     return (
@@ -216,14 +216,14 @@ class GoodsApplyRecordScene extends Component {
           <View style={{flex: 3, marginLeft: 8}}>
 
             <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
-              <If condition={is_act == 1}>
+              <If condition={is_promotion == 1}>
                 <If condition={act_plat_3}><View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View>
                 </If> <If condition={act_plat_7}><View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text>
               </View></If> <If condition={act_plat_1}><View style={styles.eWrap}><Text style={styles.eText}>饿</Text>
-              </View></If> <If condition={is_act}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
+              </View></If> <If condition={is_promotion}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
               </View> </If>{product_name}
               </If>
-              <If condition={is_act != 1}>
+              <If condition={is_promotion != 1}>
                 {product_name}
               </If>
             </Text>
@@ -327,7 +327,7 @@ class GoodsApplyRecordScene extends Component {
 
   onRefresh = async () => {
     showModal('加载中')
-    this.setState({query: true, refresh: true});
+    await this.setState({query: true, refresh: true});
     this.getApplyList(1);
   }
 

@@ -540,6 +540,11 @@ function filtrationInput(str) {
   return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g, "")
 }
 
+export const mapImage = {
+  location: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
+  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_410.png',
+  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_410.png'
+}
 export default {
   objectMap,
   shortTimeDesc,
