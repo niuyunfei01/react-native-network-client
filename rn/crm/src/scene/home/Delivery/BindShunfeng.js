@@ -60,7 +60,7 @@ class BindShunfeng extends PureComponent {
       business_license: '',//营业执照地址
       name: '',
       address: '',//门店地址
-      detailAddress: '',//详细地址
+      detail_address: '',//详细地址
       location: '',
       saleCategory: {
         value: -1,
@@ -90,15 +90,15 @@ class BindShunfeng extends PureComponent {
       navigation.navigate(route, params, callback);
     });
   }
-  setAddress = (detailAddress) => {
-    const {address = '', city = '', area = '', province = ''} = detailAddress
+  setAddress = (detail_address) => {
+    const {address = '', city = '', area = '', province = ''} = detail_address
     const {store} = this.state
     this.setState({
       registerShunFengVisible: true,
       store: {
         ...store,
         address: province === city ? city + area : province + city + area,
-        detailAddress: address
+        detail_address: address
       }
     })
   }
@@ -265,7 +265,7 @@ class BindShunfeng extends PureComponent {
           account_contact_name: contact_name,
           account_contact_phone: contact_phone,
           address: store_address,
-          detailAddress: '',
+          detail_address: '',
           saleCategory: {
             value: sf_category,
             label: sf_category_desc_array[0]?.label || '',
@@ -600,8 +600,8 @@ class BindShunfeng extends PureComponent {
                     <TextInput style={styles.modalStoreInfoItemRightText}
                                placeholder={'填写详细门牌号'}
                                placeholderTextColor={colors.color999}
-                               onChangeText={text => this.setStoreInfo('detailAddress', text)}
-                               value={store.detailAddress}/>
+                               onChangeText={text => this.setStoreInfo('detail_address', text)}
+                               value={store.detail_address}/>
                   </View>
                 </View>
                 <View style={styles.line}/>
@@ -807,6 +807,7 @@ class BindShunfeng extends PureComponent {
       account_contact_phone: store.account_contact_phone,
       account_id_card: store.account_id_card,
       business_license: store.business_license,
+      detail_address: store.detail_address
     }
     if (store.saleCategory.value === -1) {
       ToastShort('请选择门店品类', 1)
@@ -906,7 +907,7 @@ const styles = StyleSheet.create({
   deleteImage: {position: 'absolute', right: -12, top: -12},
   content: {flex: 1, backgroundColor: colors.white},
   rowCenter: {flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'flex-end'},
-  imageWrap:{flexDirection: 'row', alignItems: 'center', flex: 1,},
+  imageWrap: {flexDirection: 'row', alignItems: 'center', flex: 1,},
   wsbDeliveryWrap: {borderRadius: 6, borderColor: '#26B942', borderWidth: 1, marginHorizontal: 20, marginTop: 10},
   wsbDeliverHeader: {
     fontSize: 15,

@@ -5,7 +5,6 @@ import * as globalActions from "../../reducers/global/globalActions";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   InteractionManager,
   Keyboard,
   StyleSheet,
@@ -14,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import tool from "../util/tool";
+import tool, {mapImage} from "../util/tool";
 import Config from "../common/config";
 import colors from "../styles/colors";
 import {ToastLong, ToastShort} from "../util/ToastUtils";
@@ -24,6 +23,7 @@ import PropTypes from "prop-types";
 import {SvgXml} from "react-native-svg";
 import {cross_circle_icon, empty_order, this_down} from "../../svg/svg";
 import HttpUtils from "../util/http";
+import FastImage from "react-native-fast-image";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -466,7 +466,9 @@ class SearchShop extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              <Text style={{color: colors.white, marginHorizontal: 4, fontSize: 11,}}> 当前定位 </Text>
+              <Text style={{color: colors.white, marginHorizontal: 4, fontSize: 11, fontWeight: 'bold'}}>
+                &nbsp;当前定位&nbsp;
+              </Text>
             </View>
           </If>
         </View>
@@ -511,32 +513,18 @@ class SearchShop extends Component {
             target: {latitude: Number(lat), longitude: Number(lng)},
             zoom: 17
           }}>
-          <Marker
-            position={{latitude: Number(lat), longitude: Number(lng)}}
-          >
+          <Marker position={{latitude: Number(lat), longitude: Number(lng)}}>
             <View style={{alignItems: 'center'}}>
-              <View style={{
-                zIndex: 999,
-                backgroundColor: colors.white,
-                marginBottom: 15,
-                padding: 8,
-                borderRadius: 6,
-                shadowColor: '#000',
-                shadowOffset: {width: 0, height: 0},
-                shadowOpacity: 0.1,
-                elevation: 3,
-                shadowRadius: 8,
-              }}>
-                <Text style={{color: colors.color333, fontSize: 12}}>
+              <View style={styles.markerWrap}>
+                <Text style={styles.markerText}>
                   {tool.jbbsubstr(location_name, 15, 0, '标注点')}
                 </Text>
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}} style={{
-                width: 23,
-                height: 48,
-              }}/>
+              <FastImage source={{uri: mapImage.location}}
+                         style={{width: 26, height: 52}}
+                         resizeMode={FastImage.resizeMode.contain}/>
             </View>
           </Marker>
         </MapView>
@@ -578,6 +566,19 @@ const styles = StyleSheet.create({
     paddingBottom: 286,
   },
   noOrderDesc: {flex: 1, fontSize: 15, color: colors.color999, lineHeight: 21},
+  markerWrap: {
+    zIndex: 999,
+    backgroundColor: colors.white,
+    marginBottom: 15,
+    padding: 8,
+    borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 0.3,
+    elevation: 3,
+    shadowRadius: 8,
+  },
+  markerText: {color: colors.color333, fontSize: 12, fontWeight: 'bold'}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);

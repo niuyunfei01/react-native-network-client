@@ -18,7 +18,7 @@ import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderAct
 import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import {MapType, MapView, Marker} from "react-native-amap3d/lib/src/index";
-import tool from "../../pubilc/util/tool";
+import tool, {mapImage} from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -629,44 +629,34 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-              icon={{
-                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png",
-                width: 30,
-                height: 34,
-              }}
+              icon={{uri: mapImage.location_store, width: 45, height: 52}}
             />
           </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
             <Marker
-              ref={(ref) => {
-                this.marker = ref
-              }}
+              ref={(ref) => this.marker = ref}
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
+                    <Text style={styles.markerText}>
                       骑手距离顾客{this.filterDistance(ship_distance_destination)}
                     </Text>
                   </If>
                   <If condition={ship_distance_store > 0}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
+                    <Text style={styles.markerText}>
                       骑手距离商家{this.filterDistance(ship_distance_store)}
                     </Text>
                   </If>
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
-                           style={{width: 30, height: 34,}}
-                           onLoad={() => {
-                             tool.debounces(() => {
-                               this.marker.update();
-                             }, 1000)
-                           }}
+                <FastImage source={{uri: mapImage.location_ship}}
+                           style={{width: 45, height: 52,}}
+                           onLoad={() => tool.debounces(() => this.marker.update(), 1000)}
                            resizeMode={FastImage.resizeMode.contain}
                 />
               </View>
@@ -678,37 +668,27 @@ class OrderInfoNew extends PureComponent {
             <Marker
               zIndex={93}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-              icon={{
-                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
-                width: 22,
-                height: 42,
-              }}
+              icon={{uri: mapImage.location, width: 26, height: 52}}
             />
           </If>
 
           <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
-              ref={(ref) => {
-                this.marker = ref
-              }}
+              ref={(ref) => this.marker = ref}
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
-                  <Text style={{color: colors.color333, fontSize: 12}}>
+                  <Text style={styles.markerText}>
                     距门店{this.filterDistance(dada_distance)}
                   </Text>
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
-                           style={{width: 23, height: 48}}
-                           onLoad={() => {
-                             tool.debounces(() => {
-                               this.marker.update();
-                             }, 1000)
-                           }}
+                <FastImage source={{uri: mapImage.location}}
+                           style={{width: 26, height: 52}}
+                           onLoad={() => tool.debounces(() => this.marker.update(), 1000)}
                            resizeMode={FastImage.resizeMode.contain}/>
               </View>
             </Marker>
@@ -1450,7 +1430,9 @@ class OrderInfoNew extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-
+  markerText: {
+    color: colors.color333, fontSize: 12, fontWeight: 'bold'
+  },
   refundText: {
     fontSize: 14,
     color: colors.color666,
@@ -1471,6 +1453,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 8,
     borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.1,
+    elevation: 3,
+    shadowRadius: 8,
   },
   copyText: {
     fontSize: 14,

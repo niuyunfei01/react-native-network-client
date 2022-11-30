@@ -242,7 +242,7 @@ class OpenDeliveryModal extends PureComponent {
   }
 
   openWSBDelivery = () => {
-    const {refreshDeliveyList, global, store_id, delivery} = this.props
+    const {refreshDeliveryList, global, store_id, delivery} = this.props
     const {v2_type, id = 0} = delivery
     const {accessToken} = global
     let data = {store_id: store_id, platform: v2_type, delivery_id: id}
@@ -254,7 +254,7 @@ class OpenDeliveryModal extends PureComponent {
         ToastShort('申请成功，审核中')
       else ToastShort('开通成功')
 
-      refreshDeliveyList && refreshDeliveyList()
+      refreshDeliveryList && refreshDeliveryList()
     }, async (ret) => {
       await this.closeModal()
       ToastLong(ret.desc);
@@ -262,7 +262,7 @@ class OpenDeliveryModal extends PureComponent {
     })
   }
   // 联系客服
-  JumpToServices = async () => {
+  jumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
     let {store_id} = this.state;
     let data = {
@@ -312,7 +312,7 @@ class OpenDeliveryModal extends PureComponent {
 
   }
   getGxdAuthorizedToLog = () => {
-    const {global, refreshDeliveyList, store_id} = this.props
+    const {global, refreshDeliveryList, store_id} = this.props
     let {accessToken, vendor_id} = global
     let {mobile, verificationCode} = this.state
 
@@ -325,7 +325,7 @@ class OpenDeliveryModal extends PureComponent {
     const params = {store_id: store_id, phone: mobile, code: verificationCode}
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
-      refreshDeliveyList && refreshDeliveyList()
+      refreshDeliveryList && refreshDeliveryList()
       ToastShort(res.desc, 1)
 
     }).catch(async (reason) => {
@@ -336,7 +336,7 @@ class OpenDeliveryModal extends PureComponent {
 
   getUUPTAuthorizedToLog = () => {
 
-    const {global, refreshDeliveyList, store_id} = this.props
+    const {global, refreshDeliveryList, store_id} = this.props
     let {accessToken, vendor_id} = global
     let {mobile, verificationCode} = this.state
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
@@ -352,7 +352,7 @@ class OpenDeliveryModal extends PureComponent {
     }
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
-      refreshDeliveyList && refreshDeliveyList()
+      refreshDeliveryList && refreshDeliveryList()
 
       ToastShort(res.desc, 1)
     }).catch(async (reason) => {
@@ -365,15 +365,23 @@ class OpenDeliveryModal extends PureComponent {
     const {delivery} = this.props
     switch (parseInt(delivery.type)) {
       case Config.MEI_TUAN_PEI_SONG:
+        // await this.closeModal()
+        // await this.jumpToServices()
+        await this.requestUrl(delivery.type)
+        break
       case Config.MEI_TUAN_KUAI_SU_DA://美团快速达
       case Config.MEI_TUAN_FEI_SU_DA://美团飞速达
-        await this.closeModal()
-        await this.JumpToServices()
+        if (selectAccountType === 1) {
+          this.openWSBDelivery()
+        }
+        if (selectAccountType === 2) {
+          await this.closeModal()
+          await this.jumpToServices()
+        }
         break
       case Config.SHUN_FENG_TONG_CHENG://顺丰同城
         if (selectAccountType === 1) {
-          await this.closeModal()
-          await this.JumpToServices()
+          this.openWSBDelivery()
         }
         if (selectAccountType === 2)
           await this.requestUrl(delivery.type)
@@ -430,12 +438,11 @@ class OpenDeliveryModal extends PureComponent {
     const {selectAccountType, selectGeneralDelivery, headerText} = this.state
     switch (parseInt(deliveryType)) {
       case Config.MEI_TUAN_PEI_SONG:
-        bottomButton = '联系客服'
+        bottomButton = '立即授权'
         break
       case Config.MEI_TUAN_KUAI_SU_DA://美团快速达
       case Config.MEI_TUAN_FEI_SU_DA://美团飞速达
-      case Config.SHUN_FENG_TONG_CHENG://顺丰同城
-        bottomButton = selectAccountType === 2 ? '立即绑定' : '联系客服'
+        bottomButton = selectAccountType === 2 ? '联系客服' : '立即开通'
         break
       case Config.SHUAN_SONG://闪送
       case Config.FENG_NIAO_ZHONG_BAO://蜂鸟众包
@@ -444,6 +451,7 @@ class OpenDeliveryModal extends PureComponent {
       case Config.DA_DA_JI_SONG://达达急送
         bottomButton = selectAccountType === 2 ? '立即授权' : '立即开通'
         break
+      case Config.SHUN_FENG_TONG_CHENG://顺丰同城
       case Config.UU_PAO_TUI://UU跑腿
       case Config.GUO_XIAO_DI://裹小弟
         bottomButton = selectAccountType === 2 ? '立即绑定' : '立即开通'

@@ -43,23 +43,16 @@ class AlertModal extends PureComponent {
             <View style={{padding: 20,}}>
 
               <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: colors.color333,
-                    fontWeight: 'bold',
-                    marginVertical: 10,
-                  }}>{this.props.title} </Text>
+                <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold', marginVertical: 10}}>
+                  {this.props.title}&nbsp;
+                </Text>
               </View>
 
               <If condition={tool.length(this.props.desc) > 0}>
                 <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.color333,
-                      marginBottom: 10,
-                    }}>{this.props.desc} </Text>
+                  <Text style={{fontSize: 15, color: colors.color333, marginBottom: 10}}>
+                    {this.props.desc}&nbsp;
+                  </Text>
                 </View>
               </If>
               <View style={{

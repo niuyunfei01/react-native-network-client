@@ -9,6 +9,7 @@ import Config from "../common/config";
 import pxToDp from "../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import GlobalUtil from "../util/GlobalUtil";
+import tool from "../util/tool";
 
 const width = Dimensions.get("window").width;
 
@@ -40,11 +41,11 @@ class RemindModal extends React.Component {
   getAdvicesInfo = () => {
     const {accessToken, store_id} = this.props;
     const url = '/v1/new_api/advice/showPopAdvice'
-    const params = {store_id: store_id, access_token: accessToken}
+    const params = {store_id: store_id, access_token: accessToken, is_new_version: true}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
         advicesInfoArray: res,
-        showAdvicesVisible: true
+        showAdvicesVisible: tool.length(res) > 0
       })
     }, () => {
     })

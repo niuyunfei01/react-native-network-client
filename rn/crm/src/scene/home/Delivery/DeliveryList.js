@@ -208,7 +208,7 @@ class DeliveryList extends PureComponent {
                              deliveryType={deliveryType}
                              navigation={navigation}
                              store_id={store_id}
-                             refreshDeliveyList={this.fetchData}
+                             refreshDeliveryList={this.fetchData}
                              delivery={selectDelivery}/>
         </If>
         <TopSelectModal visible={selectStoreVisible} marTop={40}
