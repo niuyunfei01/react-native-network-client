@@ -38,7 +38,6 @@ class RootScene extends PureComponent {
 
   constructor() {
     super();
-
     this.state = {
       noLoginInfo: {
         accessToken: '',
@@ -53,7 +52,6 @@ class RootScene extends PureComponent {
         getTokenTs: 0,
         order_list_by: 'expectTime asc',
         printer_id: '0',
-        show_bottom_tab: false
       },
       rehydrated: false,
       onGettingCommonCfg: false,
@@ -116,7 +114,7 @@ class RootScene extends PureComponent {
       initialRouteName = Config.ROUTE_LOGIN;
       initialRouteParams = {next: "", nextParams: {}};
     } else {
-      initialRouteName = noLoginInfo.show_bottom_tab ? Config.ROUTE_ALERT : Config.ROUTE_ORDERS;
+      initialRouteName = Config.ROUTE_ALERT;
     }
 
     nrRecordMetric("restore_redux", {

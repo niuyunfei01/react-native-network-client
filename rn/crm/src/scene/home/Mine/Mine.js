@@ -367,7 +367,6 @@ class Mine extends PureComponent {
       getTokenTs: 0,
       order_list_by: 'expectTime asc',
       printer_id: '0',
-      show_bottom_tab: false
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))

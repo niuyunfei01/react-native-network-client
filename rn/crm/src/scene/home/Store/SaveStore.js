@@ -331,7 +331,7 @@ class SaveStore extends PureComponent {
     dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
         dispatch(setCurrentStore(cfg?.store_id || store_id));
-        tool.resetNavStack(navigation, cfg?.show_bottom_tab ? Config.ROUTE_ORDERS : Config.ROUTE_ALERT, cfg?.show_bottom_tab ? {} : {
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
           initTab: Config.ROUTE_ORDERS,
           initialRouteName: Config.ROUTE_ALERT
         });

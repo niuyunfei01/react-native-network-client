@@ -581,18 +581,18 @@ class OrderListScene extends Component {
         width: width,
         backgroundColor: colors.white,
       }}>
-        <SvgXml style={{height: 44, marginRight: 16, marginLeft: 12}} onPress={() => {
-          this.mixpanel.track('V4订单列表_我的')
-          this.onPress(Config.ROUTE_MINE_NEW)
-        }}
-                xml={menu_left()}/>
+        {/*<SvgXml style={{height: 44, marginRight: 16, marginLeft: 12}} onPress={() => {*/}
+        {/*  this.mixpanel.track('V4订单列表_我的')*/}
+        {/*  this.onPress(Config.ROUTE_MINE_NEW)*/}
+        {/*}}*/}
+        {/*        xml={menu_left()}/>*/}
 
         <TouchableOpacity onPress={() => {
           if (only_one_store) {
             return;
           }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: 12}}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,

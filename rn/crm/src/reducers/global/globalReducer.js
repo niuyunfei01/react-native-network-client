@@ -62,7 +62,6 @@ const initialState = {
   show_float_service_icon: true,
   user_config: {},
   order_list_by: 'expectTime asc',
-  show_bottom_tab: true,
   only_one_store: false,
   is_vendor_admin: false,
   menu_list: {
@@ -137,7 +136,6 @@ export default function globalReducer(state = initialState, action) {
           expireTs: action.payload.expireTs,
           getTokenTs: action.payload.getTokenTs,
           order_list_by: action.payload.order_list_by,
-          show_bottom_tab: action.payload.show_bottom_tab,
           enabled_good_mgr: action.payload.enabled_good_mgr,
           lastCheckVersion: action.payload.lastCheckVersion
         }
@@ -195,7 +193,6 @@ export default function globalReducer(state = initialState, action) {
         expireTs: 0,
         getTokenTs: 0,
         order_list_by: 'expectTime asc',
-        show_bottom_tab: false,
         enabled_good_mgr: false,
         currentUserProfile: {},
         currentNewProductStoreId: 0,
@@ -219,7 +216,6 @@ export default function globalReducer(state = initialState, action) {
         is_record_request_monitor: action.payload.is_record_request_monitor || state.is_record_request_monitor,
         customer_service_auth: action.payload.customer_service_auth || state.customer_service_auth,
         menu_list: action.payload.menu_list || state.menu_list,
-        show_bottom_tab: Boolean(action.payload.show_bottom_tab),
         is_vendor_admin: Boolean(action.payload.is_vendor_admin),
         only_one_store: Boolean(action.payload.only_one_store),
       } : state;

@@ -616,7 +616,6 @@ class AppNavigator extends PureComponent {
       reduxGlobal.vendor_id == global.noLoginInfo?.vendor_id &&
       reduxGlobal?.printer_id == global.noLoginInfo?.printer_id &&
       reduxGlobal?.store_id == global.noLoginInfo?.store_id &&
-      reduxGlobal?.show_bottom_tab == global.noLoginInfo?.show_bottom_tab &&
       reduxGlobal?.autoBluetoothPrint == global.noLoginInfo?.autoBluetoothPrint &&
       reduxGlobal?.refreshToken == global.noLoginInfo?.refreshToken &&
       reduxGlobal?.expireTs == global.noLoginInfo?.expireTs &&
@@ -635,7 +634,6 @@ class AppNavigator extends PureComponent {
       enabled_good_mgr: reduxGlobal.enabled_good_mgr,
       vendor_id: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
-      show_bottom_tab: reduxGlobal.show_bottom_tab || false,
       autoBluetoothPrint: reduxGlobal.autoBluetoothPrint || false,
       refreshToken: reduxGlobal.refreshToken || '',
       expireTs: reduxGlobal.expireTs,
