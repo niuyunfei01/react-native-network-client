@@ -167,6 +167,7 @@ class SaveStore extends PureComponent {
         lat: res?.lat,
         lng: res?.lng,
         city: res?.store_city,
+        street_block: res?.street_block,
         category_id: res?.sale_category,
         category_id_input_vlue: Number(res?.sale_category),
         category_desc: res?.category_desc,
