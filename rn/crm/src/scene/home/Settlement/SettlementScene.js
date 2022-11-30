@@ -65,9 +65,12 @@ class SettlementScene extends PureComponent {
 
   }
 
-  componentDidMount() {
+  UNSAFE_componentWillMount() {
     this.fetchSettleProtocol()
     this.getSupplyList()
+  }
+
+  componentDidMount() {
     let {navigation} = this.props;
     navigation.setOptions({
       headerRight: () => this.renderHeaderRight()
@@ -121,6 +124,7 @@ class SettlementScene extends PureComponent {
     Animated.timing(this.state.fadeOutOpacity, {
       toValue: 0,
       duration: 3000,
+      useNativeDriver: true,
       easing: Easing.linear,
     }).start();
   }
@@ -133,10 +137,22 @@ class SettlementScene extends PureComponent {
         <Animated.View
           style = {{
             opacity: fadeOutOpacity}}>
-          <View style={styles.rightTip}>
-            <Text style={styles.rightTipText}>{settleProtocolInfo.toast_ptl} </Text>
+          <View style={{position: 'relative', top: 0, right: 40}}>
+            <Entypo name={'triangle-up'} style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 60}}/>
+            <View style={{
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              borderRadius: 4,
+              height: 35,
+              width: 108,
+              position: 'absolute',
+              top: 17,
+              left: 0,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Text style={{fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35}}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
+            </View>
           </View>
-          <View style={styles.up}/>
         </Animated.View >
       </TouchableOpacity>
     )
@@ -572,34 +588,6 @@ const styles = StyleSheet.create({
   agreementText: {
     color: colors.main_color,
     fontSize: 15
-  },
-  rightTip: {
-    width: 181,
-    height: 36,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    top: 15,
-    right: 10
-  },
-  rightTipText: {
-    color: colors.white,
-    fontSize: 14
-  },
-  up: {
-    width: 0,
-    height: 0,
-    borderRightWidth: 5,
-    borderRightColor: 'transparent',
-    borderLeftWidth: 5,
-    borderLeftColor: 'transparent',
-    borderBottomWidth: 10,
-    borderBottomColor: 'rgba(0,0,0,0.6)',
-    position: "absolute",
-    right: 40,
-    top: 5
   }
 })
 

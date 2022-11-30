@@ -189,6 +189,7 @@ class Mine extends PureComponent {
   onRefresh = () => {
     this.fetchMineData()
     this.fetchWsbWallet()
+    this.fetchShowSettleProtocol()
   }
 
   navigateToBack = () => {
@@ -450,11 +451,15 @@ class Mine extends PureComponent {
   }
 
   jumpToAddStore = () => {
-    let {is_mgr} = this.state
-    this.onPress(Config.ROUTE_STORE_ADD, {
-      btn_type: "edit",
-      is_mgr: is_mgr,
-      editStoreId: this.props.global.store_id
+    // let {is_mgr} = this.state
+    // this.onPress(Config.ROUTE_STORE_ADD, {
+    //   btn_type: "edit",
+    //   is_mgr: is_mgr,
+    //   editStoreId: this.props.global.store_id
+    // })
+    this.onPress(Config.ROUTE_SAVE_STORE, {
+      type: "edit",
+      store_id: this.props.global.store_id
     })
   }
 

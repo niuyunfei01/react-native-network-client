@@ -116,7 +116,7 @@ class PermissionToIdentify extends PureComponent {
 
   editWorker = (info) => {
     if (info?.role_store == 0) {
-      ToastShort('店长不允许编辑')
+      ToastShort(`${info.role_desc}不允许编辑`)
       return
     }
     this.onPress(config.ROUTE_EDIT_ACCOUNT, {worker: info})
