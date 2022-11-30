@@ -52,8 +52,14 @@ class StoreList extends PureComponent {
     };
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount() {
-    this.fetchData();
+    this.focus = this.props.navigation.addListener('focus', () => {
+      this.fetchData()
+    })
   }
 
   fetchData(set_list = 0) {

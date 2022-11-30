@@ -976,7 +976,7 @@ class OrderInfoNew extends PureComponent {
                   fontWeight: 'bold',
                   fontSize: 12,
                   color: '#FF8309'
-                }}>  {order?.friendly_time_info} </Text>
+                }}>  {order?.expectTimeStrInList} </Text>
               </View>
               <Text
                 style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name, 18)} #{order?.dayId} </Text>

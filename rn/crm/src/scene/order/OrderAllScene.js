@@ -692,13 +692,9 @@ class OrderAllScene extends Component {
 
   onEndReached = () => {
     let {query, is_can_load_more} = this.state;
-    if (is_can_load_more) {
+    if (is_can_load_more && query?.is_add) {
       this.setState({is_can_load_more: false}, () => {
-        if (query?.is_add) {
           this.fetchOrderList(0);
-        } else {
-          ToastShort('已经到底部了')
-        }
       })
     }
   }
