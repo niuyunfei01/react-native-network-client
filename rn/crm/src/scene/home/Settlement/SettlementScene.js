@@ -22,7 +22,6 @@ import {Button} from "react-native-elements";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
-import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -124,7 +123,7 @@ class SettlementScene extends PureComponent {
     this.state.fadeOutOpacity.setValue(1);
     Animated.timing(this.state.fadeOutOpacity, {
       toValue: 0,
-      duration: 3000,
+      duration: 5000,
       useNativeDriver: true,
       easing: Easing.linear,
     }).start();
@@ -432,7 +431,7 @@ class SettlementScene extends PureComponent {
                 flex: 1
               }}
               automaticallyAdjustContentInsets={true}
-              source={{uri: `https://${GlobalUtil.getHostPort()}/SettlePolicy.html`}}
+              source={{uri: `${Config.serverUrl('/SettlePolicy.html')}`}}
               scrollEnabled={true}
             />
           </View>
