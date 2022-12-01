@@ -71,8 +71,13 @@ class SaveStore extends PureComponent {
     let {vendor_info = {}} = this.props.global;
     let show_store_info = false;
     let {is_service_mgr = false} = tool.vendor(this.props.global);
+
     if (type === 'add' && is_service_mgr && vendor_info?.co_type === 'baodi' && Number(vendor_info?.is_agency_operation) === 1) {
       show_store_info = true
+    }
+
+    if (tool.length(mobile) <= 0) {
+      mobile = this.props.global.store_info?.mobile
     }
 
     this.state = {
