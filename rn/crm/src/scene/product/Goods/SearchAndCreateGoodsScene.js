@@ -258,6 +258,14 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
       )
   }
 
+  componentDidMount() {
+    this.focus = this.props.navigation.addListener('focus', () => this.search())
+  }
+
+  componentWillUnmount() {
+    this.focus()
+  }
+
   render() {
     return (
       <>

@@ -5,7 +5,6 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import tool from "../../../pubilc/util/tool";
 import native from "../../../pubilc/util/native";
-import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../../common/component/SearchInputNavigation";
 import color from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
@@ -229,7 +228,7 @@ class SearchGoods extends Component {
                 </View>
                 <TouchableOpacity onPress={() => {
                   self.props.route.params.onBack(product.name, product.is_exist);
-                  this.props.navigation.dispatch(NavigationActions.back())
+                  this.props.navigation.goBack()
                 }}>
                   <View style={styles.toOnlineBtn}>
                     <Text style={styles.toOnlineBtnText}>选择</Text>

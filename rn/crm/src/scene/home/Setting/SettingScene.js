@@ -306,7 +306,7 @@ class SettingScene extends PureComponent {
       <View style={styles.item_body}>
         <Text style={styles.item_title}>提醒 </Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <If condition={currentUser == 4286675}>
+          <If condition={currentUser == 3093374}>
             {this.renderPlayMusic()}
           </If>
           <If condition={Platform.OS !== 'ios'}>

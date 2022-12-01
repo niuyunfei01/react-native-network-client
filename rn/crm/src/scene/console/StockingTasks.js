@@ -33,8 +33,8 @@ class StockingTasks extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {stall, stallArray} = this.state
-    this.navigationSetting(stall, stallArray)
+
+
   }
 
   navigationSetting = (stall, stallArray) => {
@@ -47,8 +47,9 @@ class StockingTasks extends PureComponent {
   componentDidMount() {
 
     this.getStallData()
-    const {page, stall, selectType} = this.state
+    const {page, stall, selectType, stallArray} = this.state
     this.getStallList(page, stall, selectType, false)
+    this.navigationSetting(stall, stallArray)
   }
 
   getStallData = () => {

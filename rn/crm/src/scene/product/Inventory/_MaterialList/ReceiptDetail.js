@@ -8,7 +8,6 @@ import pxToDp from "../../../../pubilc/util/pxToDp";
 import tool from "../../../../pubilc/util/tool";
 import JbbButton from "../../../common/component/JbbButton";
 import config from "../../../../pubilc/common/config";
-import {withNavigation} from '@react-navigation/compat';
 import Mapping from "../../../../pubilc/Mapping";
 import {ToastShort} from "../../../../pubilc/util/ToastUtils";
 
@@ -54,11 +53,10 @@ class ReceiptDetail extends React.Component {
   }
 
   renderContent() {
-    let items = []
-    for (let idx in this.props.item.detail) {
-      const item = this.props.item.detail[idx]
-      items.push(
-        <View key={idx} style={styles.item}>
+
+    return this.props.item.detail && this.props.item.detail.map((item, index) => {
+      return (
+        <View key={index} style={styles.item}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text numberOfLines={1}>
               {item.supplier.name}
@@ -87,18 +85,14 @@ class ReceiptDetail extends React.Component {
           </Text>
         </View>
       )
-    }
-
-    return items
+    })
   }
 
   render() {
     return (
-      <View>
-        <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
-          {this.renderContent()}
-        </Dialog>
-      </View>
+      <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
+        {this.renderContent()}
+      </Dialog>
     )
   }
 }
@@ -113,4 +107,4 @@ const styles = StyleSheet.create({
     color: colors.theme,
   }
 })
-export default withNavigation(connect(mapStateToProps)(ReceiptDetail))
+export default connect(mapStateToProps)(ReceiptDetail)

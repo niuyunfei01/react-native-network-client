@@ -10,7 +10,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../../reducers/mine/mineActions";
 import Cts from "../../../pubilc/common/Cts";
-import {NavigationActions} from '@react-navigation/compat';
 import * as tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
@@ -169,27 +168,22 @@ class UserAddScene extends PureComponent {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
           ToastShort(msg);
           let userData = resp.obj;
-          const setWorkerAction = NavigationActions.setParams({
-            params: {shouldRefresh: true},
-            key: worker_nav_key,
-          });
-          this.props.navigation.dispatch(setWorkerAction);
-          const setUserAction = NavigationActions.setParams({
-            params: {
-              shouldRefresh: true,
-              user_name: user_name,
-              mobile: mobile,
-              store_id: store_id,
-            },
+
+          this.props.navigation.setParams({shouldRefresh: true, key: worker_nav_key,})
+
+          this.props.navigation.setParams({
+            shouldRefresh: true,
+            user_name: user_name,
+            mobile: mobile,
+            store_id: store_id,
             key: user_info_key,
-          });
-          this.props.navigation.dispatch(setUserAction);
+          })
           if (this.state.pageFrom === 'storeAdd' && _this.props.route.params.onBack) {
             _this.props.route.params.onBack(userData.user_id, mobile, user_name);
             _this.props.navigation.goBack();
           } else {
-            const setSelfParamsAction = NavigationActions.back();
-            this.props.navigation.dispatch(setSelfParamsAction);
+
+            this.props.navigation.goBack()
           }
         } else {
           ToastShort(resp.desc);

@@ -1,5 +1,4 @@
 import React from 'react'
-import {withNavigation} from '@react-navigation/compat';
 import ConfirmDialog from "../../common/component/ConfirmDialog";
 import {StyleSheet, TextInput, View} from "react-native";
 import Dialog from "../../common/component/Dialog";
@@ -110,7 +109,7 @@ class ReceiveMoney extends React.Component {
   }
 }
 
-export default withNavigation(connect(mapStateToProps)(ReceiveMoney))
+export default connect(mapStateToProps)(ReceiveMoney)
 
 const styles = StyleSheet.create({
   formContainer: {},

@@ -55,6 +55,8 @@ class HttpUtils {
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
     const report_url = '/util/crm_error_report/1'
+    if (report_url === url)
+      return
     const report_params = {
       APP_VERSION_CODE: DeviceInfo.getVersion(),
       CUSTOM_DATA: {

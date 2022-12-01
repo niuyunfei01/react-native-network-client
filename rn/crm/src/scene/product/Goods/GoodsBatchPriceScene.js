@@ -10,7 +10,6 @@ import ModalSelector from "../../../pubilc/component/ModalSelector";
 import tool from '../../../pubilc/util/tool';
 import Cts from '../../../pubilc/common/Cts';
 import Icon from '../../../weui/Icon/Icon'
-import {NavigationActions} from '@react-navigation/compat';
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../../pubilc/styles/colors";
@@ -187,11 +186,8 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   setBeforeRefresh() {
-    const setRefreshAction = NavigationActions.setParams({
-      params: {isRefreshing: true},
-      nav_key: this.props.route.key
-    });
-    this.props.navigation.dispatch(setRefreshAction);
+
+    this.props.navigation.setParams({isRefreshing: true, nav_key: this.props.route.key});
   }
 
   async upload(s_product) {

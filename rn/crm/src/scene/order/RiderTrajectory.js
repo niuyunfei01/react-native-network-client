@@ -7,7 +7,7 @@ import colors from "../../pubilc/styles/colors";
 import {MapType, MapView, Marker, Polyline} from "react-native-amap3d";
 import HttpUtils from "../../pubilc/util/http";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
-import tool from "../../pubilc/util/tool";
+import tool, {mapImage} from "../../pubilc/util/tool";
 import Entypo from "react-native-vector-icons/Entypo";
 import * as PropTypes from "prop-types";
 import numeral from "numeral";
@@ -23,6 +23,11 @@ const mapDispatchToProps = dispatch => {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
+const styles = StyleSheet.create({
+  markerText: {
+    color: colors.color333, fontSize: 12, fontWeight: 'bold'
+  },
+})
 
 class RiderTrajectory extends Component {
 
@@ -140,17 +145,12 @@ class RiderTrajectory extends Component {
       <MapView
         mapType={MapType.Standard}
         style={StyleSheet.absoluteFill}
-        initialCameraPosition={{
-          target: {latitude: aLat, longitude: aLon},
-          zoom: zoom
-        }}>
+        initialCameraPosition={{target: {latitude: aLat, longitude: aLon}, zoom: zoom}}>
 
         {/*骑手定位*/}
         <If condition={track_horseman_lat && track_horseman_lng}>
           <Marker
-            ref={(ref) => {
-              this.marker = ref
-            }}
+            ref={(ref) => this.marker = ref}
             zIndex={99}
             position={{latitude: track_horseman_lat, longitude: track_horseman_lng}}
           >
@@ -165,24 +165,18 @@ class RiderTrajectory extends Component {
                   borderRadius: 6,
                 }}>
                   <If condition={distance_store > 0}>
-                    <Text style={{
-                      color: colors.color333,
-                      fontSize: 12,
-                    }}>骑手距离商家{this.filterDistance(distance_store)} </Text>
+                    <Text style={styles.markerText}>骑手距离商家{this.filterDistance(distance_store)} </Text>
                   </If>
                   <If condition={distance_destination > 0}>
-                    <Text style={{
-                      color: colors.color333,
-                      fontSize: 12,
-                    }}>骑手距离顾客{this.filterDistance(distance_destination)} </Text>
+                    <Text style={styles.markerText}>骑手距离顾客{this.filterDistance(distance_destination)} </Text>
                   </If>
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
 
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
-                         style={{width: 30, height: 34,}}
+              <FastImage source={{uri: mapImage.location_ship}}
+                         style={{width: 45, height: 52}}
                          onLoad={() => {
                            tool.debounces(() => {
                              this.marker.update();
@@ -199,11 +193,7 @@ class RiderTrajectory extends Component {
           <Marker
             zIndex={91}
             position={{latitude: track_store_lat, longitude: track_store_lng}}
-            icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png",
-              width: 30,
-              height: 34,
-            }}
+            icon={{uri: mapImage.location_store, width: 45, height: 52}}
           />
         </If>
 
@@ -213,11 +203,7 @@ class RiderTrajectory extends Component {
           <Marker
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
-            icon={{
-              uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
-              width: 22,
-              height: 42,
-            }}
+            icon={{uri: mapImage.location, width: 26, height: 52}}
           />
         </If>
 
@@ -225,9 +211,7 @@ class RiderTrajectory extends Component {
         <If
           condition={distance_store <= 0 && distance_destination <= 0 && track_destination_lat && track_destination_lng}>
           <Marker
-            ref={(ref) => {
-              this.marker = ref
-            }}
+            ref={(ref) => this.marker = ref}
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
           >
@@ -240,7 +224,7 @@ class RiderTrajectory extends Component {
                   padding: 8,
                   borderRadius: 6,
                 }}>
-                  <Text style={{color: colors.color333, fontSize: 12}}>
+                  <Text style={styles.markerText}>
                     距门店{this.filterDistance(distance_order)}
                   </Text>
                 </View>
@@ -248,8 +232,8 @@ class RiderTrajectory extends Component {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
 
-              <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
-                         style={{width: 22, height: 42}}
+              <FastImage source={{uri: mapImage.location}}
+                         style={{width: 26, height: 52}}
                          onLoad={() => {
                            tool.debounces(() => {
                              this.marker.update();
