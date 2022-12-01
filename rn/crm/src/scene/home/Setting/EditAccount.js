@@ -33,6 +33,7 @@ class AddAccount extends PureComponent {
       worker_name: '',
       worker_account: '',
       worker_id: 0,
+      role_store: -1,
       worker_password: '',
       showModal: false
     }
@@ -89,6 +90,7 @@ class AddAccount extends PureComponent {
       worker_id: worker?.id,
       worker_account: worker?.mobile,
       worker_role_grade: worker?.role_desc,
+      role_store: worker?.role_store,
       worker_role_grade_value: worker?.role_store,
       worker_store_id_belong_value: Number(worker?.store_id),
       worker_store_id_belong: worker?.store_name
@@ -130,9 +132,10 @@ class AddAccount extends PureComponent {
       worker_name,
       worker_account,
       worker_id,
-      worker_password
+      worker_password,
+      role_store
     } = this.state
-    if (worker_role_grade_value < 1) {
+    if (worker_role_grade_value < 1 && Number(role_store) !== 0) {
       ToastLong('请选择账号权限')
       return
     }
@@ -200,7 +203,8 @@ class AddAccount extends PureComponent {
       worker_name,
       worker_account,
       // storeList,
-      roleStoreList
+      roleStoreList,
+      role_store,
     } = this.state
     return (
       <View style={styles.InfoBox}>
@@ -209,6 +213,7 @@ class AddAccount extends PureComponent {
             <Text style={styles.row_label}>账号权限 </Text>
             <View style={styles.row_fix}>
               <ModalSelector
+                disabled={Number(role_store) === 0}
                 onChange={option => {
                   this.setState({
                     worker_role_grade: option.label,
@@ -234,6 +239,7 @@ class AddAccount extends PureComponent {
             <Text style={styles.row_label}>归属门店 </Text>
             <View style={styles.row_fix}>
               <ModalSelector
+                disabled={Number(role_store) === 0}
                 onChange={option => {
                   this.setState({
                     worker_store_id_belong: option.label,
@@ -267,6 +273,7 @@ class AddAccount extends PureComponent {
           <View style={[styles.item_row, styles.borderTop]}>
             <Text style={styles.row_label}>登录账号 </Text>
             <TextInput
+              editable={Number(role_store) !== 0}
               onChangeText={code => this.setState({worker_account: code})}
               value={worker_account}
               maxLength={11}

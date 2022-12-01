@@ -70,6 +70,7 @@ class SeparatedAccountFill extends PureComponent {
   componentDidMount(): void {
     this.navigationOptions()
     this.fetchBalance();
+    wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
     Alipay.setAlipayScheme("wsbpaycncainiaoshicaicrm");
   }
 

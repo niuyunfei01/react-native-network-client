@@ -61,7 +61,7 @@ class PermissionToIdentify extends PureComponent {
     }).then(worker_info => {
       let workers = this.state.workerList.concat(worker_info?.lists)
       this.setState({
-        workerList: workers,
+        workerList: page === 1 ? worker_info?.lists : workers,
         query: {
           page: worker_info.page,
           pageSize: worker_info.pageSize
@@ -86,7 +86,6 @@ class PermissionToIdentify extends PureComponent {
       this.setState({
         isLastPage: false,
         query: query,
-        workerList: []
       }, () => {
         this.get_wsb_workers()
       })
@@ -115,10 +114,6 @@ class PermissionToIdentify extends PureComponent {
   }
 
   editWorker = (info) => {
-    if (info?.role_store == 0) {
-      ToastShort(`${info.role_desc}不允许编辑`)
-      return
-    }
     this.onPress(config.ROUTE_EDIT_ACCOUNT, {worker: info})
   }
 
