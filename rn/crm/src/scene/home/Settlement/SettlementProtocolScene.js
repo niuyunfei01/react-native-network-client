@@ -5,6 +5,7 @@ import colors from "../../../pubilc/styles/colors";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
 import Entypo from "react-native-vector-icons/Entypo";
+import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 
 let {width} = Dimensions.get('window');
 
@@ -77,7 +78,7 @@ class SettlementProtocol extends PureComponent {
             backgroundColor: 'white'
           }}
           automaticallyAdjustContentInsets={true}
-          source={{uri: 'https://fire7.waisongbang.com/SettlePolicy.html'}}
+          source={{uri: `https://${GlobalUtil.getHostPort()}/SettlePolicy.html`}}
           scrollEnabled={true}
           scalesPageToFit
         />
