@@ -588,7 +588,7 @@ class ProductInfo extends React.Component {
   }
 
   isValid(str) {
-    return '' === str || /[@|#|-|_|+|*]/.test(str) || /^[\w|\s]*$/.test(str);
+    return '' === str || /^[\w|@|#|\-|_|+|*]*$/.test(str);
   }
 
   filterShelfNo = (text) => {

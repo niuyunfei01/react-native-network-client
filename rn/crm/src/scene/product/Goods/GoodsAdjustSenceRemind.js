@@ -9,7 +9,6 @@ import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
 import Constat from "../../../pubilc/common/Constat";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
-import {withNavigation} from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../../reducers/product/productActions";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
@@ -272,5 +271,4 @@ class GoodsAdjustRemind extends PureComponent {
   }
 }
 
-const component = withNavigation(GoodsAdjustRemind);
-export default connect(mapStateToProps, mapDispatchToProps)(component)
+export default connect(mapStateToProps, mapDispatchToProps)(GoodsAdjustRemind)

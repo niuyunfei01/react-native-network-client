@@ -1000,9 +1000,10 @@ class GoodsEditScene extends PureComponent {
       if (parseInt(series_id) !== 0) {
         return ToastShort('不可更改为单规格！')
       } else {
-        let {name, upc, weight, price, supply_price, selectWeight, actualNum} = this.state
+        let {name, upc, weight, price, supply_price, selectWeight, actualNum, id} = this.state
         let {multiSpecsList = []} = this.state
         const multiSpecsInfo = {
+          id: id,
           sku_name: name,
           supply_price: supply_price,
           price: price,

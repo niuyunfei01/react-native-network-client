@@ -24,13 +24,14 @@ function mapStateToProps(state) {
 }
 
 const Tab = createBottomTabNavigator();
-const tabBarOptions = {
-  activeTintColor: colors.main_color,
-  inactiveTintColor: colors.color666,
+const screenOptions = {
+  tabBarActiveTintColor: colors.main_color,
+  tabBarInactiveTintColor: colors.color666,
   style: {backgroundColor: colors.white},
-  animationEnabled: false,
+  animationEnabled: true,
   lazy: true,
-  labelStyle: {textAlign: 'center', fontSize: 12}
+  labelStyle: {textAlign: 'center', fontSize: 12},
+  headerShown: false
 }
 
 class TabHome extends React.Component {
@@ -54,7 +55,7 @@ class TabHome extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName={initTab}
-        tabBarOptions={tabBarOptions}>
+        screenOptions={screenOptions}>
         <If condition={Number(work) === 1}>
           <Tab.Screen name={'Console'}
                       getComponent={() => require("../console/ConsoleScene").default}

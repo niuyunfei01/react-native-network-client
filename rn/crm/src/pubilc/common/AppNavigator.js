@@ -1,7 +1,7 @@
 import React, {PureComponent, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
 import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
@@ -28,7 +28,7 @@ import {initMusic, unInitMusic} from "../component/PlayMusic";
 import CommonModal from "../component/goods/CommonModal";
 
 let {width} = Dimensions.get("window");
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const screenOptions = ({
   headerShown: true,
   gestureEnabled: true,
