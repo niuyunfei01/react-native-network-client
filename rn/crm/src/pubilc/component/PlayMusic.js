@@ -1,45 +1,43 @@
-import Sound from "react-native-sound";
+import React from "react";
+import {StyleSheet, Text, TouchableOpacity} from "react-native";
+import colors from "../styles/colors";
+import TrackPlayer, {State, usePlaybackState} from "react-native-track-player";
 
-Sound.setCategory('Playback', true);
- Sound.setActive(true)
+export const PlayMusicComponent = () => {
 
-let order_sound = null
-let music_error = null
-const music_url = 'http://music.ruoyi.vip/wanyouyinli'
-export const initMusic = () => {
-  order_sound = new Sound(music_url, null, error => music_error = error)
-
-}
-
-export const play = (callback = () => {
-}) => {
-  if (music_error)
-    return
-  if (order_sound) {
-    order_sound.setNumberOfLoops(-1);
-    order_sound.play(() => callback())
+  const playerState = usePlaybackState();
+  const isPlaying = playerState === State.Playing;
+  const playOrStopMusic = async () => {
+    if (isPlaying) {
+      await TrackPlayer.pause();
+      return
+    }
+    await TrackPlayer.play();
   }
-}
-export const pause = (callback = () => {
-}) => {
-  if (music_error)
-    return
-  if (order_sound)
-    order_sound.pause(() => callback())
-}
 
-export const getMusicStatus = () => {
-  if (music_error)
-    return false
-  if (order_sound)
-    return order_sound.isPlaying()
+  return (
+    <TouchableOpacity style={styles.item_row} onPress={playOrStopMusic}>
+      <Text style={styles.row_label}>播放状态 </Text>
+      <Text style={styles.row_footer}>{isPlaying ? '正在播放 ' : '未播放 '}</Text>
+    </TouchableOpacity>
+  )
 }
-
-export const unInitMusic = () => {
-  if (music_error)
-    return
-  if (order_sound) {
-    order_sound.stop()
-    order_sound.release()
-  }
-}
+const styles = StyleSheet.create({
+  item_row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderColor: colors.f5,
+    borderBottomWidth: 0.5,
+  },
+  row_label: {
+    fontSize: 14,
+    color: colors.color333,
+    flex: 1,
+  },
+  row_label_desc: {
+    fontSize: 12,
+    color: colors.color999,
+    marginTop: 2,
+  },
+})

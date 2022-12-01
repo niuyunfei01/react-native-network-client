@@ -36,7 +36,7 @@ import JbbModal from "../../../pubilc/component/JbbModal";
 import PropTypes from "prop-types";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 import DeviceInfo from "react-native-device-info";
-import {getMusicStatus, pause, play} from "../../../pubilc/component/PlayMusic";
+import {PlayMusicComponent} from "../../../pubilc/component/PlayMusic";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const width = Dimensions.get("window").width;
@@ -92,7 +92,6 @@ class SettingScene extends PureComponent {
       owner_mobile: '',
       server_list: [],
       show_version: 0,
-      isPlayMusic: getMusicStatus()
     }
   }
 
@@ -270,25 +269,6 @@ class SettingScene extends PureComponent {
     );
   }
 
-  playOrStopMusic = () => {
-    const {isPlayMusic} = this.state
-    if (isPlayMusic) {
-      pause(() => this.setState({isPlayMusic: false}))
-      return
-    }
-
-    play(() => this.setState({isPlayMusic: false}))
-    this.setState({isPlayMusic: true})
-  }
-  renderPlayMusic = () => {
-    const {isPlayMusic} = this.state
-    return (
-      <TouchableOpacity style={styles.item_row} onPress={this.playOrStopMusic}>
-        <Text style={styles.row_label}>播放状态 </Text>
-        <Text style={styles.row_footer}>{isPlayMusic ? '正在播放 ' : '未播放 '}</Text>
-      </TouchableOpacity>
-    )
-  }
 
   switchNewOrder = async (enable_new_order_notify) => {
     this.setState({enable_new_order_notify: !enable_new_order_notify});
@@ -307,7 +287,7 @@ class SettingScene extends PureComponent {
         <Text style={styles.item_title}>提醒 </Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
           <If condition={currentUser == 3093374}>
-            {this.renderPlayMusic()}
+            <PlayMusicComponent/>
           </If>
           <If condition={Platform.OS !== 'ios'}>
             <TouchableOpacity onPress={() => this.switchNewOrder(enable_new_order_notify)} style={styles.item_row}>

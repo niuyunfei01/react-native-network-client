@@ -89,6 +89,7 @@
     "react-native-swipeout": "^2.3.6",
     "react-native-swiper": "^1.6.0",
     "react-native-tab-view": "^2.16.0",
+    "react-native-track-player": "^2.2.0-rc4",
     "react-native-vector-icons": "^7.0.0",
     "react-native-webview": "^11.4.3",
     "react-native-wechat-lib": "^1.1.26",

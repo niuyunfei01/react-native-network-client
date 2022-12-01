@@ -30,6 +30,7 @@ import androidx.multidex.MultiDex;
 
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.doublesymmetry.trackplayer.TrackPlayer;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
@@ -347,7 +348,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new FastImageViewPackage(),
                     new ReactSliderPackage(),
                     new CameraRollPackage(),
-                    new RNCMaskedViewPackage()
+                    new RNCMaskedViewPackage(),
+                    new TrackPlayer()
             );
         }
     };
@@ -1412,7 +1414,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
             todo_complain_sound = soundPool.load(ctx, R.raw.todo_complain, 1);
 
-            new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
+            new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound, 1);
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
             new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
