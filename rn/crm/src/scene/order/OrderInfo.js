@@ -1087,7 +1087,7 @@ class OrderInfo extends Component {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
     } else {
-      this.setState({itemsAdded: {...this.state.itemsAdded, [item.product_id]: item}});
+      this.setState({itemsAdded: {...this.state.itemsAdded, [item?.product_id]: item}});
     }
   }
 

@@ -43,7 +43,7 @@ export default class MultiSpecsModal extends PureComponent {
       let data = []
       data.push({
         strict_providing: strict_providing && strict_providing || sp && sp.strict_providing && sp.strict_providing || '0',
-        product_id: product_id && product_id || sp.product_id,
+        product_id: product_id && product_id || sp?.product_id,
         supply_price: supply_price && supply_price || sp.supply_price,
         left_since_last_stat: left_since_last_stat && left_since_last_stat || sp.left_since_last_stat,
         sku_name: sku_name && sku_name || sp?.sku_name && sp.sku_name || '',
@@ -168,7 +168,7 @@ export default class MultiSpecsModal extends PureComponent {
       }
       obj.apply_price = parseFloat(obj.apply_price) * 100
       prices.push({
-        product_id: parseInt(obj.product_id),
+        product_id: parseInt(obj?.product_id),
         apply_price: `${obj.apply_price}`,
         before_price: obj.before_price,
         remark: '',
@@ -181,7 +181,7 @@ export default class MultiSpecsModal extends PureComponent {
           return
         }
         inventory.push({
-          productId: obj.product_id,
+          productId: obj?.product_id,
           actualNum: obj.actualNum,
           totalRemain: obj.totalRemain,
           remark: '快速盘点',

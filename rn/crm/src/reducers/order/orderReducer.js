@@ -71,7 +71,7 @@ export default function orderReducer(state = initialState, action) {
       if (item.id) {
         order.edits.edit[item.id] = item;
       } else {
-        order.edits.add[item.product_id] = item;
+        order.edits.add[item?.product_id] = item;
       }
 
       return {...state, order};
