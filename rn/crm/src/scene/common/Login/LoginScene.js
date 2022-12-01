@@ -50,7 +50,8 @@ class LoginScene extends PureComponent {
       mobile: '',
       password: '',
       canAskReqSmsCode: false,
-      reRequestAfterSeconds: 60,
+      reRequestAfterSeconds: 0,
+      diff_time: 0,
       verifyCode: '',
       doingSign: false,
       doingSignKey: '',
@@ -74,10 +75,6 @@ class LoginScene extends PureComponent {
     this.clearTimeouts();
   }
 
-  getCountdown = () => {
-    return this.state.reRequestAfterSeconds;
-  }
-
   clearTimeouts = () => {
     this.timeouts.forEach(clearTimeout);
   }
@@ -95,18 +92,7 @@ class LoginScene extends PureComponent {
       dispatch(sendDverifyCode(mobile, 0, 1, (success, msg) => {
         this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
-          this.interval = setInterval(() => {
-            this.setState({
-              show_repetition_button: true,
-              reRequestAfterSeconds: this.getCountdown() - 1
-            }, () => {
-              if (this.state.reRequestAfterSeconds <= 0) {
-                this.onCounterReReqEnd()
-                clearInterval(this.interval)
-              }
-            })
-          }, 1000)
-          this.setState({canAskReqSmsCode: true});
+          this.startInterval()
         }
         ToastShort(msg, 0)
       }));
@@ -115,8 +101,25 @@ class LoginScene extends PureComponent {
     }
   }
 
-  onCounterReReqEnd = () => {
-    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
+  startInterval = () => {
+    this.interval = setInterval(() => {
+      let diff_time = Math.floor(this.state.reRequestAfterSeconds - (new Date().getTime() / 1000));
+      if (diff_time <= 0) {
+        this.setState({canAskReqSmsCode: false});
+        clearInterval(this.interval)
+      } else {
+        this.setState({
+          diff_time: diff_time
+        })
+      }
+    }, 1000)
+
+    this.setState({
+      canAskReqSmsCode: true,
+      show_repetition_button: true,
+      reRequestAfterSeconds: Math.floor(new Date().getTime() / 1000 + 60),
+      diff_time: 59
+    })
   }
 
   onLogin = () => {
@@ -214,7 +217,7 @@ class LoginScene extends PureComponent {
 
   render() {
     let {
-      mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization, show_repetition_button
+      mobile, verifyCode, canAskReqSmsCode, authorization, show_repetition_button, diff_time
     } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
@@ -271,7 +274,7 @@ class LoginScene extends PureComponent {
               alignItems: 'center',
             }} onPress={this.onRequestSmsCode}>
               <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
-                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
+                {canAskReqSmsCode ? diff_time + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>
