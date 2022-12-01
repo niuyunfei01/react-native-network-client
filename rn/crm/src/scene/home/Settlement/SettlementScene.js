@@ -123,7 +123,7 @@ class SettlementScene extends PureComponent {
     this.state.fadeOutOpacity.setValue(1);
     Animated.timing(this.state.fadeOutOpacity, {
       toValue: 0,
-      duration: 3000,
+      duration: 5000,
       useNativeDriver: true,
       easing: Easing.linear,
     }).start();
@@ -136,22 +136,10 @@ class SettlementScene extends PureComponent {
         <Text style={styles.headerRightText}>结算协议 </Text>
         <Animated.View
           style = {{
-            opacity: fadeOutOpacity}}>
-          <View style={{position: 'relative', top: 0, right: 40}}>
-            <Entypo name={'triangle-up'} style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 60}}/>
-            <View style={{
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              borderRadius: 4,
-              height: 35,
-              width: 108,
-              position: 'absolute',
-              top: 17,
-              left: 0,
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Text style={{fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35}}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
-            </View>
+            opacity: fadeOutOpacity, position: 'absolute', top: 10, right: 50}}>
+          <Entypo name={'triangle-up'} style={styles.upIcon}/>
+          <View style={styles.msgModal}>
+            <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
           </View>
         </Animated.View >
       </TouchableOpacity>
@@ -443,7 +431,7 @@ class SettlementScene extends PureComponent {
                 flex: 1
               }}
               automaticallyAdjustContentInsets={true}
-              source={{uri: 'https://fire7.waisongbang.com/SettlePolicy.html'}}
+              source={{uri: `${Config.serverUrl('/SettlePolicy.html')}`}}
               scrollEnabled={true}
             />
           </View>
@@ -545,7 +533,7 @@ const styles = StyleSheet.create({
   listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 40},
   listItemPayDatetimeText: {fontSize: 12, color: colors.color666},
   listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'},
-  headerRightText: {color: colors.color333, fontSize: 15, marginRight: 10},
+  headerRightText: {color: colors.color333, fontSize: 15},
   Content: {
     backgroundColor: colors.white,
     maxHeight: 300
@@ -588,7 +576,28 @@ const styles = StyleSheet.create({
   agreementText: {
     color: colors.main_color,
     fontSize: 15
-  }
+  },
+  upIcon: {
+    color: "rgba(0,0,0,0.7)",
+    fontSize: 24,
+    marginLeft: 60,
+    position: 'absolute',
+    top: 0,
+    right: -40
+  },
+  msgModal: {
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 4,
+    height: 45,
+    width: 128,
+    position: 'absolute',
+    top: 17,
+    right: -50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 5
+  },
+  tipText: {fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene);
