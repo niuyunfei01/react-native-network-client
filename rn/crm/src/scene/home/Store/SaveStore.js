@@ -79,6 +79,9 @@ class SaveStore extends PureComponent {
     if (tool.length(mobile) <= 0) {
       mobile = this.props.global.store_info?.mobile
     }
+    if(store_id === 0){
+      store_id = this.props.global.store_id
+    }
 
     this.state = {
       loading: false,
@@ -255,6 +258,7 @@ class SaveStore extends PureComponent {
     const {accessToken = '', vendor_id = ''} = this.props.global;
     let params = {
       store_id_real: store_id,
+      store_id,
       store_name,
       store_address,
       lng,
@@ -277,7 +281,7 @@ class SaveStore extends PureComponent {
     validator.add(contact_name, 'required', '请填写门店联系人')
     validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的门店联系电话')
     if (show_store_info) {
-      validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的商户手机号')
+      validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的商户手机号')
     }
     const err_msg = validator.start();
     if (err_msg) {
