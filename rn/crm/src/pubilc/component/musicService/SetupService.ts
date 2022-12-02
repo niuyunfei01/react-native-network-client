@@ -1,21 +1,25 @@
-import TrackPlayer, {Capability} from 'react-native-track-player';
+import TrackPlayer, {AppKilledPlaybackBehavior, Capability} from 'react-native-track-player';
 
 export const SetupService = async (): Promise<boolean> => {
-
+    let isSetup = false;
     try {
         // this method will only reject if player has not been setup yet
         await TrackPlayer.getCurrentTrack();
-        return true;
+        isSetup = true;
     } catch {
         await TrackPlayer.setupPlayer();
         await TrackPlayer.updateOptions({
-            stopWithApp: false,
+            android: {
+                appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
+            },
+            // This flag is now deprecated. Please use the above to define playback mode.
+            // stoppingAppPausesPlayback: true,
             capabilities: [
                 Capability.Play,
                 Capability.Pause,
                 Capability.SkipToNext,
                 Capability.SkipToPrevious,
-                Capability.Stop,
+                Capability.SeekTo,
             ],
             compactCapabilities: [
                 Capability.Play,
@@ -25,6 +29,9 @@ export const SetupService = async (): Promise<boolean> => {
             progressUpdateEventInterval: 2,
         });
 
-        return true;
+        isSetup = true;
+    } finally {
+        // eslint-disable-next-line no-unsafe-finally
+        return isSetup;
     }
 };

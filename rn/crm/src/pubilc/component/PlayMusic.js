@@ -1,18 +1,23 @@
 import React from "react";
-import {StyleSheet, Text, TouchableOpacity} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, Platform, View} from "react-native";
 import colors from "../styles/colors";
-import TrackPlayer, {State, usePlaybackState} from "react-native-track-player";
 
 export const PlayMusicComponent = () => {
+  if (Platform.OS !== 'ios')
+    return <View/>
+  const TrackPlayerDefault = require('react-native-track-player').default
+  const TrackPlayer = require('react-native-track-player')
+  const playerState = TrackPlayer.usePlaybackState();
+  const isPlaying = playerState === TrackPlayer.State.Playing;
 
-  const playerState = usePlaybackState();
-  const isPlaying = playerState === State.Playing;
   const playOrStopMusic = async () => {
     if (isPlaying) {
-      await TrackPlayer.pause();
+      await TrackPlayerDefault.pause();
+
       return
     }
-    await TrackPlayer.play();
+    await TrackPlayerDefault.play();
+
   }
 
   return (

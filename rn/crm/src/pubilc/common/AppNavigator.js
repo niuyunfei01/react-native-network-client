@@ -25,8 +25,7 @@ import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
-import {QueueInitialTracksService, SetupService} from "../component/musicService";
-import TrackPlayer from "react-native-track-player";
+
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -67,17 +66,19 @@ const Page = (props) => {
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
-  useEffect(() => {
-    async function run() {
-      const isSetup = await SetupService();
-      const queue = await TrackPlayer.getQueue();
-      if (isSetup && queue.length <= 0) {
-        await QueueInitialTracksService();
-      }
-    }
+  if (Platform.OS === 'ios')
+    useEffect(() => {
+      async function run() {
+        const isSetup = await require('../component/musicService').SetupService();
 
-    run()
-  }, [])
+        const queue = await require('react-native-track-player').default.getQueue()
+        if (isSetup && queue.length <= 0) {
+          await require('../component/musicService/QueueInitialTracksService').QueueInitialTracksService()
+        }
+      }
+
+      run()
+    }, [])
   return (
     <NavigationContainer ref={navigationRef}
                          onReady={() => routeNameRef.current = navigationRef.current.getCurrentRoute().name}
