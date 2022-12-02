@@ -44,7 +44,7 @@ import {radioSelected, radioUnSelected} from "../../../svg/svg";
 import {imageKey} from "../../../pubilc/util/md5";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import FastImage from "react-native-fast-image";
-import GridView from '../../../pubilc/component/DraggableGridView'
+import {DraggableGrid} from '../../../pubilc/component/react-native-draggable-grid';
 import Config from "../../../pubilc/common/config";
 
 const {height} = Dimensions.get("window");
@@ -239,7 +239,7 @@ class GoodsEditScene extends PureComponent {
         weight: weight,
         sku_unit: sku_unit,
         store_categories: category_id,
-        upload_files: [{id: '0', url: pic, name: pic, path: pic}],
+        upload_files: [{id: '0', url: pic, name: pic, path: pic, key: pic}],
         selectWeight: {value: '1', label: sku_unit},
         vendor_has: Number(vendor_has) === 1,
         store_has: Number(store_has) === 1,
@@ -262,9 +262,13 @@ class GoodsEditScene extends PureComponent {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           let {upload_files, newImageKey, selectPicType, selectPreviewPic} = this.state;
           const uri = res + newImageKey
-          const img = {id: newImageKey, url: uri, name: newImageKey, path: uri, isNewPic: true}
+          const img = {id: newImageKey, url: uri, name: newImageKey, path: uri, isNewPic: true, key: newImageKey}
           if (selectPicType) {
-            upload_files.push(img);
+            const index = upload_files.findIndex(item => item.key === '+')
+            if (index > 0)
+              upload_files.splice(index, 0, img)
+            else
+              upload_files.push(img);
           } else {
             selectPreviewPic = {...selectPreviewPic, url: uri}
             upload_files[selectPreviewPic.index] = img
@@ -343,7 +347,8 @@ class GoodsEditScene extends PureComponent {
                 url: imgUrl,
                 name: name,
                 path: imgPath,
-                mid_thumb: imgPath
+                mid_thumb: imgPath,
+                key: name
               })
             });
           }
@@ -478,7 +483,12 @@ class GoodsEditScene extends PureComponent {
     let upload_files = []
     mid_list_img && Object.keys(mid_list_img).map(img_id => {
       if (mid_list_img[img_id]) {
-        upload_files.push({id: img_id, name: mid_list_img[img_id].name, url: mid_list_img[img_id].url})
+        upload_files.push({
+          id: img_id,
+          name: mid_list_img[img_id].name,
+          url: mid_list_img[img_id].url,
+          key: mid_list_img[img_id].name
+        })
       }
     })
 
@@ -512,7 +522,7 @@ class GoodsEditScene extends PureComponent {
   onReloadUpc = (upc_data) => {
     if (upc_data.pic) {
       this.setState({
-        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic, url: upc_data.pic}]
+        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic, url: upc_data.pic, key: upc_data.pic}]
       })
     }
     if (tool.length(upc_data.basic_category_obj) !== 0) {
@@ -1761,17 +1771,18 @@ class GoodsEditScene extends PureComponent {
 
   }
 
+  closePreviewImage = () => {
+    const {upload_files} = this.state
+    const index = upload_files.findIndex(item => item.key === '+')
+    if (index > 0)
+      upload_files.splice(index, 1)
+    this.setState({dragPicVisible: false, upload_files: [...upload_files]})
+  }
+
   renderModal = () => {
     let {
-      searchValue,
-      visible,
-      buttonDisabled,
-      selectHeaderText,
-      dragPicVisible,
-      upload_files,
-      selectPreviewPic,
-      vendor_has,
-      store_has
+      searchValue, visible, buttonDisabled, selectHeaderText, dragPicVisible, upload_files, selectPreviewPic,
+      vendor_has, store_has
     } = this.state
     if (visible) {
       return (
@@ -1810,17 +1821,20 @@ class GoodsEditScene extends PureComponent {
         </CommonModal>
       )
     }
-
+    let data = [...upload_files]
+    const hasPlus = upload_files.filter(item => item.key === '+')
+    if (hasPlus.length <= 0)
+      data = [...upload_files, {key: '+', disabledDrag: true, disabledReSorted: true}]
     if (dragPicVisible) {
       return (
-        <CommonModal visible={dragPicVisible} onRequestClose={() => this.setState({dragPicVisible: false})}>
+        <CommonModal visible={dragPicVisible} onRequestClose={this.closePreviewImage}>
           <>
             <SafeAreaView style={styles.modifyPicModal}>
               <View style={styles.modifyPicHeader}>
                 <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
-                           onPress={() => this.setState({dragPicVisible: false})}/>
+                           onPress={this.closePreviewImage}/>
                 <Text style={styles.modifyPicHeaderText}>
-                  预览（{selectPreviewPic.index + 1}/{tool.length(upload_files)}）
+                  预览（{selectPreviewPic.index + 1}/{tool.length(hasPlus.length <= 0 ? upload_files.length : upload_files.length - 1)}）
                 </Text>
                 <View/>
               </View>
@@ -1831,17 +1845,14 @@ class GoodsEditScene extends PureComponent {
                              style={{height: 2.5 * height / 5.2}}/>
                 </If>
               </View>
-              <GridView data={[...upload_files, '']}
-                        style={styles.modifyPicList}
-                        numColumns={4}
-                        renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
-                        locked={item => '' === item}
-                        onReleaseCell={this.onReleaseCell}
-                        onEndDragging={(item, index) => this.onEndDragging(item, index)}
-                        onPressCell={(item, index) => this.onPressCell(item, index)}
-                        keyExtractor={(item, index) => `${index}`}
-                        delayLongPress={100}
-                        renderItem={(item, index) => this.renderModalItem(item, index)}/>
+              <DraggableGrid numColumns={4}
+                             style={styles.modifyPicList}
+                             data={data}
+                             delayLongPress={100}
+                             onItemPress={(item) => this.onPressCell(item)}
+                             onDragRelease={(data, item) => this.onDragRelease(data, item)}
+                             renderItem={(item, index) => this.renderModalItem(item, index)}/>
+
               <View style={styles.modifyPicBtnWrap}>
                 <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
                   <TouchableOpacity onPress={this.setMainPic}
@@ -1869,6 +1880,11 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+  onDragRelease = (data, item) => {
+    const index = data.findIndex(datas => datas.key === item.key)
+    this.setState({upload_files: data, selectPreviewPic: {...item, index: index}})
+  }
+
   renderLockedItem(item, index) {
     const {upload_files, vendor_has, store_has} = this.state
     if (!vendor_has && !store_has && tool.length(upload_files) < 8)
@@ -1882,23 +1898,10 @@ class GoodsEditScene extends PureComponent {
       )
   }
 
-  onEndDragging = (item, index) => {
-    if (item)
-      this.setState({
-        selectPreviewPic: {url: item.url, index: index, key: item.id}
-      })
-  }
-
-  onPressCell = (item, index) => {
-    this.setState({selectPreviewPic: {url: item.url, index: index, key: item.id}})
-  }
-  onReleaseCell = (items) => {
+  onPressCell = (item) => {
     const {upload_files} = this.state
-    const list_img1 = items.slice(0, items.length - 1)
-
-    if (!_.isEqual(upload_files, list_img1)) {
-      this.setState({upload_files: list_img1})
-    }
+    const itemIndex = upload_files.findIndex(items => items.key === item.key)
+    this.setState({selectPreviewPic: {url: item.url, index: itemIndex, key: item.id}})
   }
 
   closePicList = () => {
@@ -2044,7 +2047,7 @@ class GoodsEditScene extends PureComponent {
 
   modifyPic = (item) => {
     let {selectPreviewPic, upload_files} = this.state
-    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb}
+    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb, key: item.name}
     selectPreviewPic = {...selectPreviewPic, id: item.id, url: item.thumb}
     this.setState({
       upload_files: upload_files,
@@ -2057,7 +2060,11 @@ class GoodsEditScene extends PureComponent {
 
   addPic = (item) => {
     let {upload_files} = this.state
-    upload_files.push({id: item.id, name: item.name, url: item.thumb})
+    const index = upload_files.findIndex(item => item.key === '+')
+    if (index > 0)
+      upload_files.splice(index, 0, {id: item.id, name: item.name, url: item.thumb, key: item.name})
+    else
+      upload_files.push({id: item.id, name: item.name, url: item.thumb, key: item.name})
     this.setState({
       upload_files: upload_files,
       searchPicVisible: false,
@@ -2097,25 +2104,26 @@ class GoodsEditScene extends PureComponent {
 
   renderModalItem = (item, index) => {
     const {selectPreviewPic, vendor_has, store_has} = this.state
-    if (item.url)
-      return (
-        <View style={styles.hasImageList}>
-          <FastImage style={selectPreviewPic.index === index ? styles.selectImage : styles.img_add}
-                     source={{uri: item.url}}
-                     resizeMode={FastImage.resizeMode.contain}/>
-          <If condition={!vendor_has && !store_has && this.isProdEditable()}>
-            <TouchableOpacity style={styles.deleteUploadImageIcon}
-                              onPress={() => this.deleteUploadImage(index)}>
-              <MaterialIcons name={"clear"} size={pxToDp(40)} color={"#d81e06"} msg={false}/>
-            </TouchableOpacity>
-          </If>
-          <If condition={0 === index}>
-            <Text style={styles.isMainPicFlagText}>
-              主图
-            </Text>
-          </If>
-        </View>
-      )
+    if (item.disabledDrag)
+      return this.renderLockedItem(item, index)
+    return (
+      <View style={styles.hasImageList}>
+        <FastImage style={selectPreviewPic.index === index ? styles.selectImage : styles.img_add}
+                   source={{uri: item.url}}
+                   resizeMode={FastImage.resizeMode.contain}/>
+        <If condition={!vendor_has && !store_has && this.isProdEditable()}>
+          <TouchableOpacity style={styles.deleteUploadImageIcon}
+                            onPress={() => this.deleteUploadImage(index)}>
+            <MaterialIcons name={"clear"} size={pxToDp(40)} color={"#d81e06"} msg={false}/>
+          </TouchableOpacity>
+        </If>
+        <If condition={0 === index}>
+          <Text style={styles.isMainPicFlagText}>
+            主图
+          </Text>
+        </If>
+      </View>
+    )
   }
 
   render() {
