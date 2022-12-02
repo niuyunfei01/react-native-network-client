@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Dimensions, StyleSheet, View, Text} from "react-native";
+import {Dimensions, StyleSheet, View, Text, BackHandler} from "react-native";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import WebView from "react-native-webview";
@@ -53,6 +53,19 @@ class SettlementProtocol extends PureComponent {
     navigation.setOptions({
       headerLeft: () => this.renderHeaderLeft()
     })
+    this.backHandler = BackHandler.addEventListener(
+      "hardwareBackPress", () => this.handlerBackPress());
+  }
+
+  handlerBackPress = () => {
+    let {isShow} = this.state;
+    if (this.props.navigation.isFocused() && isShow) {
+      this.props.route.params.onBack && this.props.route.params.onBack(isShow)
+    }
+  }
+
+  componentWillUnmount() {
+    this.backHandler.remove()
   }
 
   renderHeaderLeft = () => {
