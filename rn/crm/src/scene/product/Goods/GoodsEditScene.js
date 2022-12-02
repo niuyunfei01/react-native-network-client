@@ -1781,15 +1781,8 @@ class GoodsEditScene extends PureComponent {
 
   renderModal = () => {
     let {
-      searchValue,
-      visible,
-      buttonDisabled,
-      selectHeaderText,
-      dragPicVisible,
-      upload_files,
-      selectPreviewPic,
-      vendor_has,
-      store_has
+      searchValue, visible, buttonDisabled, selectHeaderText, dragPicVisible, upload_files, selectPreviewPic,
+      vendor_has, store_has
     } = this.state
     if (visible) {
       return (
@@ -1905,25 +1898,10 @@ class GoodsEditScene extends PureComponent {
       )
   }
 
-  onEndDragging = (item, index) => {
-    if (item)
-      this.setState({
-        selectPreviewPic: {url: item.url, index: index, key: item.id}
-      })
-  }
-
   onPressCell = (item) => {
     const {upload_files} = this.state
     const itemIndex = upload_files.findIndex(items => items.key === item.key)
     this.setState({selectPreviewPic: {url: item.url, index: itemIndex, key: item.id}})
-  }
-  onReleaseCell = (items) => {
-    const {upload_files} = this.state
-    const list_img1 = items.slice(0, items.length - 1)
-
-    if (!_.isEqual(upload_files, list_img1)) {
-      this.setState({upload_files: list_img1})
-    }
   }
 
   closePicList = () => {
