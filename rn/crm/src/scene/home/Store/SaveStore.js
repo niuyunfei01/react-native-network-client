@@ -76,11 +76,12 @@ class SaveStore extends PureComponent {
       show_store_info = true
     }
 
-    if (tool.length(mobile) <= 0) {
+    if (tool.length(mobile) <= 0 && !show_store_info) {
       mobile = this.props.global.store_info?.mobile
     }
+
     if(store_id === 0){
-      store_id = this.props.global.store_id
+      store_id = this.props.global?.store_id
     }
 
     this.state = {
@@ -208,7 +209,7 @@ class SaveStore extends PureComponent {
       states.store_address = res?.name;
     }
     if (res?.address) {
-      states.street_block = res?.address;
+      // states.street_block = res?.address;
     }
     this.setState({...states})
   }
