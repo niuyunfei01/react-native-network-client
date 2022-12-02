@@ -1,4 +1,4 @@
-import React, {PureComponent, useRef} from "react";
+import React, {PureComponent, useEffect, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -24,8 +24,8 @@ import {AMapSdk} from "react-native-amap3d";
 import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
-import {initMusic, unInitMusic} from "../component/PlayMusic";
 import CommonModal from "../component/goods/CommonModal";
+
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -61,10 +61,24 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
 const Page = (props) => {
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
+  if (Platform.OS === 'ios')
+    useEffect(() => {
+      async function run() {
+        const isSetup = await require('../component/musicService').SetupService();
+
+        const queue = await require('react-native-track-player').default.getQueue()
+        if (isSetup && queue.length <= 0) {
+          await require('../component/musicService/QueueInitialTracksService').QueueInitialTracksService()
+        }
+      }
+
+      run()
+    }, [])
   return (
     <NavigationContainer ref={navigationRef}
                          onReady={() => routeNameRef.current = navigationRef.current.getCurrentRoute().name}
@@ -727,7 +741,7 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
-        initMusic()
+
       }
     })
   }
@@ -742,7 +756,6 @@ class AppNavigator extends PureComponent {
     //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
-    unInitMusic()
   }
 
 
