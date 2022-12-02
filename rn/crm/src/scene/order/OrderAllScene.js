@@ -524,10 +524,11 @@ class OrderAllScene extends Component {
       show_condition_modal,
       show_date_modal
     } = this.state;
+    let date_width = (tool.length(date_desc) > 6 ? 0.32 : 0.25) * width
     return (
       <View style={styles.statusTab}>
         <TouchableOpacity
-          style={{width: 0.25 * width, alignItems: "center"}}
+          style={{width: date_width, alignItems: "center"}}
           onPress={() => {
             this.setState({
               show_date_modal: true,
@@ -545,7 +546,7 @@ class OrderAllScene extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{width: 0.25 * width, alignItems: "center"}}
+          style={{flex: 1, alignItems: "center"}}
           onPress={() => {
             this.setState({
               show_condition_modal: show_condition_modal === 2 ? 0 : 2,
@@ -565,7 +566,7 @@ class OrderAllScene extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{width: 0.25 * width, alignItems: "center"}}
+          style={{flex: 1, alignItems: "center"}}
           onPress={() => {
             this.setState({
               show_condition_modal: show_condition_modal === 3 ? 0 : 3,
@@ -585,7 +586,7 @@ class OrderAllScene extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{width: 0.25 * width, alignItems: "center"}}
+          style={{flex: 1, alignItems: "center"}}
           onPress={() => {
             this.setState({
               show_condition_modal: show_condition_modal === 4 ? 0 : 4,
@@ -694,7 +695,7 @@ class OrderAllScene extends Component {
     let {query, is_can_load_more} = this.state;
     if (is_can_load_more && query?.is_add) {
       this.setState({is_can_load_more: false}, () => {
-          this.fetchOrderList(0);
+        this.fetchOrderList(0);
       })
     }
   }
