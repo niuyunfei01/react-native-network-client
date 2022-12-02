@@ -220,9 +220,9 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
 
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderAinSend").default}*/}
-        {/*/>*/}
+        <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
+                      getComponent={() => require("../../scene/order/OrderAinSend").default}
+        />
 
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../../scene/order/OrderEditStoreScene").default}/>
