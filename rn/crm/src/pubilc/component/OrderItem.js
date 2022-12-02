@@ -4,7 +4,6 @@ import PropType from "prop-types";
 import Config from "../common/config";
 import {bindActionCreators} from "redux";
 import {
-  Alert,
   Dimensions,
   InteractionManager,
   StyleSheet,
@@ -24,7 +23,7 @@ import {
   orderCallShip
 } from "../../reducers/order/orderActions";
 
-import {showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {showModal, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import native from "../../pubilc/util/native";
 import tool from "../util/tool";
@@ -66,6 +65,7 @@ class OrderItem extends React.PureComponent {
     verification_modal: false,
     show_close_delivery_modal: false,
     show_call_user_modal: false,
+    show_cancel_deliverys_modal: false,
     pickupCode: '',
     err_msg: '',
   }
@@ -136,17 +136,16 @@ class OrderItem extends React.PureComponent {
   cancelDeliverys = () => {
     let order = this.props.item
     let token = this.props.accessToken
-    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
-      text: '确定', onPress: () => {
-        const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          ToastShort(res.desc);
-          this.props.fetchData();
-        }).catch(() => {
-          ToastShort("此订单已有骑手接单，取消失败")
-        })
-      }
-    }, {'text': '取消'}]);
+    this.closeModal()
+    const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      ToastShort(res.desc);
+      this.props.fetchData();
+    }, (e) => {
+      ToastShort(e?.desc)
+    }).catch(() => {
+      ToastShort("此订单已有骑手接单，取消失败")
+    })
   }
 
 
@@ -161,6 +160,7 @@ class OrderItem extends React.PureComponent {
 
   closeModal = () => {
     this.setState({
+      show_cancel_deliverys_modal: false,
       verification_modal: false,
       show_close_delivery_modal: false,
       show_call_user_modal: false,
@@ -233,6 +233,7 @@ class OrderItem extends React.PureComponent {
           {this.renderPickModal()}
           {this.renderCallUser()}
           {this.renderCloseDeliveryModal()}
+          {this.renderCancelDeliverysModal()}
         </View>
 
       </TouchableWithoutFeedback>
@@ -646,6 +647,22 @@ class OrderItem extends React.PureComponent {
   }
 
 
+  renderCancelDeliverysModal = () => {
+    let {show_cancel_deliverys_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_cancel_deliverys_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.cancelDeliverys()}
+          title={'确定取消此订单全部配送吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
+      </View>
+    )
+  }
+
   renderButton = () => {
     let {item, comesBackBtn, order_status} = this.props;
     let obj_num = 0
@@ -690,7 +707,9 @@ class OrderItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_一键取消')
-                    this.cancelDeliverys(item.id)
+                    this.setState({
+                      show_cancel_deliverys_modal: true
+                    })
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,

@@ -133,6 +133,7 @@ class OrderInfoNew extends PureComponent {
       show_cancel_delivery_modal: false,
       orders_add_tip: true,
       delivery_loading: false,
+      show_cancel_deliverys_modal: false,
     }
     this.marker = null
   }
@@ -453,6 +454,7 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
+      show_cancel_deliverys_modal: false,
       show_delivery_modal: false,
       showQrcode: false,
     })
@@ -535,23 +537,20 @@ class OrderInfoNew extends PureComponent {
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
-  cancelDeliverys = (id) => {
-    const {global} = this.props;
-    const {accessToken} = global;
-    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
-      text: '确定', onPress: () => {
-        const api = `/api/batch_cancel_third_ship/${id}?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          GlobalUtil.setOrderFresh(1)
-          ToastShort(res?.desc);
-          this.fetchOrder()
-        }, (e) => {
-          ToastShort(e?.desc)
-        }).catch(() => {
-          ToastShort("此订单已有骑手接单，取消失败")
-        })
-      }
-    }, {'text': '取消'}]);
+  cancelDeliverys = () => {
+    let {order} = this.state
+    const {accessToken} = this.props.global;
+    this.closeModal()
+    const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      GlobalUtil.setOrderFresh(1)
+      ToastShort(res?.desc);
+      this.fetchOrder()
+    }, (e) => {
+      ToastShort(e?.desc)
+    }).catch(() => {
+      ToastShort("此订单已有骑手接单，取消失败")
+    })
   }
 
   toSetOrderComplete = () => {
@@ -863,7 +862,9 @@ class OrderInfoNew extends PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_取消全部配送')
-                    this.cancelDeliverys(order?.id)
+                    this.setState({
+                      show_cancel_deliverys_modal: true
+                    })
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -1396,6 +1397,7 @@ class OrderInfoNew extends PureComponent {
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
         {this.renderFinishDeliveryModal()}
+        {this.renderCancelDeliverysModal()}
 
         <CancelDeliveryModal
           order_id={order?.id}
@@ -1424,6 +1426,22 @@ class OrderInfoNew extends PureComponent {
           desc={'订单送达后无法撤回，请确认顾客已收到货物'}
           actionText={'确定'}
           closeText={'再想想'}/>
+      </View>
+    )
+  }
+
+  renderCancelDeliverysModal = () => {
+    let {show_cancel_deliverys_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_cancel_deliverys_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.cancelDeliverys()}
+          title={'确定取消此订单全部配送吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
       </View>
     )
   }

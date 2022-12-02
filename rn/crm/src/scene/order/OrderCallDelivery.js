@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import {
-  ActivityIndicator,
   Alert,
   Dimensions,
   Modal,
@@ -123,6 +122,8 @@ class OrderCallDelivery extends Component {
       expect_time_friendly: '',
       show_cancel_delivery_modal: false,
       is_only_show_self_delivery: false,
+      show_est_all_check: false,
+      show_store_est_all_check: false,
       ship_id: 0,
     };
 
@@ -163,7 +164,6 @@ class OrderCallDelivery extends Component {
       order_money,
       params_str,
       loading,
-      logistic_fee_map
     } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
@@ -184,66 +184,70 @@ class OrderCallDelivery extends Component {
       loading: true
     })
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(api, params).then(obj => {
-      let store_est = obj?.store_est || [];
-      let est = obj?.est || [];
-      // this.props.dispatch(setCallDeliveryList(est))
-      if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
-        let check = false
-        for (let i in logistic_fee_map) {
-          if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
-            for (let idx in est) {
-              if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
-                est[idx].ischeck = true
-                check = true
-              }
-            }
-          }
-          if (logistic_fee_map[i]?.paid_partner_id === -1 && tool.length(store_est) > 0) {
-            for (let idx in store_est) {
-              if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+    HttpUtils.post.bind(this.props)(api, params).then(res => {
+      this.setData(res, params_json_str)
+    })
+  }
 
-                store_est[idx].ischeck = true
-                check = true
-              }
+  setData = (obj, params_json_str = '{}') => {
+    let {logistic_fee_map} = this.state;
+    let store_est = obj?.store_est || [];
+    let est = obj?.est || [];
+    if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
+      let check = false
+      for (let i in logistic_fee_map) {
+        if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
+          for (let idx in est) {
+            if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+              est[idx].ischeck = true
+              check = true
             }
-          }
-          if (!check) {
-            logistic_fee_map.splice(i, 1)
           }
         }
-      } else {
-        logistic_fee_map = [];
+        if (logistic_fee_map[i]?.paid_partner_id === -1 && tool.length(store_est) > 0) {
+          for (let idx in store_est) {
+            if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+
+              store_est[idx].ischeck = true
+              check = true
+            }
+          }
+        }
+        if (!check) {
+          logistic_fee_map.splice(i, 1)
+        }
       }
-      this.setState({
-        params_str: params_json_str,
-        is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
-        store_est: store_est,
-        est: est.concat(obj?.in_review_deliveries || []),
-        exist_waiting_delivery: obj?.exist_waiting_delivery,
-        wm_platform: obj?.wm_platform,
-        wm_platform_day_id: obj?.wm_platform_day_id,
-        wm_address: obj?.wm_address,
-        wm_user_name: obj?.wm_user_name,
-        wm_mobile: obj?.wm_mobile,
-        order_expect_time: obj?.expect_time,
-        expect_time_friendly: obj?.expect_time_friendly,
-        order_money: Number(obj?.wm_order_money),
-        order_money_input_value: Number(obj?.wm_order_money),
-        weight: Number(obj?.weight),
-        weight_input_value: Number(obj?.weight),
-        weight_max: Number(obj?.weight_max),
-        weight_min: Number(obj?.weight_min),
-        weight_step: Number(obj?.weight_step),
-        is_right_once: Number(obj?.is_right_once),
-        mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
-        is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
-        remark: obj?.remark || '',
-        remark_input_value: obj?.remark || '',
-        loading: false,
-      })
+    }
+    this.setState({
+      params_str: params_json_str,
+      is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
+      store_est: store_est,
+      est: est.concat(obj?.in_review_deliveries || []),
+      exist_waiting_delivery: obj?.exist_waiting_delivery,
+      wm_platform: obj?.wm_platform,
+      wm_platform_day_id: obj?.wm_platform_day_id,
+      wm_address: obj?.wm_address,
+      wm_user_name: obj?.wm_user_name,
+      wm_mobile: obj?.wm_mobile,
+      order_expect_time: obj?.expect_time,
+      expect_time_friendly: obj?.expect_time_friendly,
+      order_money: Number(obj?.wm_order_money),
+      order_money_input_value: Number(obj?.wm_order_money),
+      weight: Number(obj?.weight),
+      weight_input_value: Number(obj?.weight),
+      weight_max: Number(obj?.weight_max),
+      weight_min: Number(obj?.weight_min),
+      weight_step: Number(obj?.weight_step),
+      is_right_once: Number(obj?.is_right_once),
+      mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
+      is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
+      remark: obj?.remark || '',
+      remark_input_value: obj?.remark || '',
+      loading: false,
+    }, () => {
       this.priceFn();
     })
+
   }
 
 
@@ -254,6 +258,8 @@ class OrderCallDelivery extends Component {
     let wayNums = 0;
     let est_all_check = true;
     let store_est_all_check = true;
+    let show_est_all_check = false;
+    let show_store_est_all_check = false;
 
     for (let info of est) {
       if (info?.ischeck) {
@@ -266,6 +272,9 @@ class OrderCallDelivery extends Component {
         }
       } else {
         est_all_check = false
+      }
+      if (!show_est_all_check && Number(info?.deliveryId) > 0) {
+        show_est_all_check = true
       }
     }
 
@@ -281,6 +290,10 @@ class OrderCallDelivery extends Component {
       } else {
         store_est_all_check = false;
       }
+
+      if (!show_store_est_all_check && Number(info?.deliveryId) > 0) {
+        show_store_est_all_check = true
+      }
     }
     this.setState({
       maxPrice: maxPrice,
@@ -288,6 +301,8 @@ class OrderCallDelivery extends Component {
       wayNums: wayNums,
       est_all_check: est_all_check,
       store_est_all_check: store_est_all_check,
+      show_est_all_check: show_est_all_check,
+      show_store_est_all_check: show_store_est_all_check,
     })
   }
 
@@ -603,7 +618,7 @@ class OrderCallDelivery extends Component {
             </If>
           </If>
           <If condition={loading}>
-            <View />
+            <View/>
           </If>
         </ScrollView>
         <If condition={!loading}>
@@ -785,7 +800,7 @@ class OrderCallDelivery extends Component {
   }
 
   renderWsbDelivery = () => {
-    let {est_all_check, est} = this.state
+    let {est_all_check, est, show_est_all_check} = this.state
     if (tool.length(est) <= 0) {
       return;
     }
@@ -793,24 +808,26 @@ class OrderCallDelivery extends Component {
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
 
         <TouchableOpacity
+          disabled={!show_est_all_check}
           onPress={() => this.onSelectDeliveyAll(1)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
             <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>省钱配送</Text>
           </View>
-
-          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
-            <CheckBox
-              size={18}
-              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={est_all_check}
-              onPress={() => this.onSelectDeliveyAll(1)}
-            />
-          </View>
+          <If condition={show_est_all_check}>
+            <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
+              <CheckBox
+                size={18}
+                checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+                checkedColor={colors.main_color}
+                uncheckedColor={'#DDDDDD'}
+                containerStyle={{margin: 0, padding: 0}}
+                checked={est_all_check}
+                onPress={() => this.onSelectDeliveyAll(1)}
+              />
+            </View>
+          </If>
         </TouchableOpacity>
         {this.renderDeliveryItem(est, 0)}
       </View>
@@ -867,30 +884,33 @@ class OrderCallDelivery extends Component {
 
 
   renderStoreDelivery = () => {
-    let {store_est_all_check, store_est} = this.state
+    let {store_est_all_check, store_est, show_store_est_all_check} = this.state
     if (tool.length(store_est) <= 0) {
       return;
     }
     return (
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
         <TouchableOpacity
+          disabled={!show_store_est_all_check}
           onPress={() => this.onSelectDeliveyAll(2)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
             <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>自有账号</Text>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
-            <CheckBox
-              size={18}
-              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={store_est_all_check}
-              onPress={() => this.onSelectDeliveyAll(2)}
-            />
-          </View>
+          <If condition={show_store_est_all_check}>
+            <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
+              <CheckBox
+                size={18}
+                checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+                checkedColor={colors.main_color}
+                uncheckedColor={'#DDDDDD'}
+                containerStyle={{margin: 0, padding: 0}}
+                checked={store_est_all_check}
+                onPress={() => this.onSelectDeliveyAll(2)}
+              />
+            </View>
+          </If>
         </TouchableOpacity>
         {this.renderDeliveryItem(store_est, 1)}
       </View>
