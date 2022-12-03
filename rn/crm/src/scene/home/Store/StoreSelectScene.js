@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {FlatList, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View} from 'react-native'
+import {FlatList, Keyboard, StyleSheet, Text, TextInput, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions'
@@ -229,20 +229,19 @@ class StoreSelect extends PureComponent {
         refreshing={isLoading}
         keyExtractor={(item, index) => `${index}`}
         ListEmptyComponent={this.listEmptyComponent()}
-        initialNumToRender={5}
+        initialNumToRender={11}
       />
     );
   }
 
   render() {
     return (
-      <KeyboardAvoidingView
+      <View
         style={styles.Container}
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
       >
         {this.renderHeader()}
         {this.renderContent()}
-      </KeyboardAvoidingView>
+      </View>
     );
   }
 
