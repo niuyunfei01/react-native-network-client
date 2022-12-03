@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
   bottomButton: {alignItems: 'center', justifyContent: 'center'},
-  bottomButtonText: {fontSize: 10, paddingTop: 7},
+  bottomButtonText: {fontSize: 10, color: colors.color333, paddingTop: 7},
   HeaderWrap: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, backgroundColor: colors.white
   },

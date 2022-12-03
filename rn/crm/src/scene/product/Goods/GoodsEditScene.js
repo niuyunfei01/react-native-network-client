@@ -2466,6 +2466,7 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: 14,
+    color: colors.color333
   },
   weightUnitWrap: {
     flex: 1, flexDirection: 'row', alignItems: 'center', width: 40, justifyContent: 'center'

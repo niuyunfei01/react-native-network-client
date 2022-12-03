@@ -183,12 +183,13 @@ class MaterialTaskFinish extends React.Component {
         </View>
         <For each='entry' of={item.entries} index='entryIdx'>
           <View style={styles.entryItem} key={entryIdx}>
-            <Text style={{fontSize: 12, flex: 1}}>{entry.product.name} </Text>
-            <Text style={{fontSize: 12, width: 80, textAlign: 'left'}}>
+            <Text style={{fontSize: 12, color: colors.color333, flex: 1}}>{entry.product.name} </Text>
+            <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'left'}}>
               {entry.pack_user.nickname} {entry.num > 0 ? `+${entry.num}` : entry.num}份
             </Text>
             <Text style={[{
               fontSize: 12,
+              color: colors.color333,
               width: 60,
               textAlign: 'right'
             }, item.pack_loss_warning ? {
@@ -226,8 +227,8 @@ class MaterialTaskFinish extends React.Component {
           </View>
           <For each='explain' index='explainIdx' of={item.explains}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}} key={explainIdx}>
-              <Text style={{fontSize: 12}}>{explain.user.nickname}：{explain.label} </Text>
-              <Text style={{fontSize: 12}}>{explain.created} </Text>
+              <Text style={{color: colors.color333, fontSize: 12}}>{explain.user.nickname}：{explain.label} </Text>
+              <Text style={{color: colors.color333, fontSize: 12}}>{explain.created} </Text>
             </View>
           </For>
         </If>

@@ -499,7 +499,7 @@ class OrderListScene extends Component {
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+            <Text style={{color: colors.color333,fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               订单排序
             </Text>
 

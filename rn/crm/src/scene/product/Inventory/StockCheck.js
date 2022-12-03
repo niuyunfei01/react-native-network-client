@@ -269,7 +269,7 @@ class StockCheck extends BaseComponent {
                 <Text style={{color: colors.color333}}>实际库存</Text>
                 <Input
                   containerStyle={{width: 100}}
-                  inputStyle={{fontSize: 14, textAlign: "center"}}
+                  inputStyle={{fontSize: 14, color: colors.color333, textAlign: "center"}}
                   value={String(actualNum)}
                   type='number'
                   placeholder="请输入实际库存"
@@ -391,7 +391,7 @@ class StockCheck extends BaseComponent {
                     <Text style={{color: colors.color333}}>实际库存</Text>
                     <Input
                       containerStyle={{width: 100}}
-                      inputStyle={{fontSize: 14, textAlign: "center"}}
+                      inputStyle={{fontSize: 14, color: colors.color333, textAlign: "center"}}
                       value={info.stockNum !== undefined ? String(info.stockNum) : String(info.left_since_last_stat)}
                       type='number'
                       placeholder="请输入实际库存"
@@ -493,6 +493,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: pxToDp(28),
+    color: colors.color333,
     fontWeight: 'bold'
   },
   historyBtn: {

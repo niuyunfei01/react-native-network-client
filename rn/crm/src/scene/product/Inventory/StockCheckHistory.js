@@ -8,6 +8,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import color from '../../../pubilc/styles/colors'
 import EmptyData from "../../common/component/EmptyData";
 import tool from "../../../pubilc/util/tool";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(10),
   },
   itemRowText: {
-    fontSize: 12
+    fontSize: 12,
+    color: colors.color333,
   }
 })

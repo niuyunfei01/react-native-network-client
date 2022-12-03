@@ -13,6 +13,7 @@ import LoadMore from 'react-native-loadmore'
 import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import Mapping from "../../../pubilc/Mapping";
+import colors from "../../../pubilc/styles/colors";
 
 
 function mapStateToProps(state) {
@@ -211,7 +212,7 @@ class SearchGoods extends Component {
           <View style={styles.productRowBottom}>
             <View>
               <If condition={product.sales}>
-                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
+                <Text style={{color: colors.color333, fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
               </If>
             </View>
             <If condition={self.showSelect(product) && product.is_exist}>

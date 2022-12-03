@@ -124,7 +124,7 @@ class SettlementGatherScene extends PureComponent {
           >
             <Text style={header.time}>
               {date} &nbsp;&nbsp;&nbsp;
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
             </Text>
           </PopPicker>
 

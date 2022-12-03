@@ -548,6 +548,7 @@ class OrderQueryResultScene extends PureComponent {
 
 const styles = StyleSheet.create({
   description: {
+    color: colors.color333,
     fontSize: 14,
     marginTop: pxToDp(3),
     padding: pxToDp(10),
