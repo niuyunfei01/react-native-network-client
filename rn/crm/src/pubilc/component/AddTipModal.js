@@ -115,7 +115,11 @@ class AddTipModal extends React.Component {
           }
         })
       } else {
-        setState && setState(params)
+        setState && setState(params, () => {
+          if (add_money > 0) {
+            fetchData && fetchData()
+          }
+        })
       }
     })
   }
