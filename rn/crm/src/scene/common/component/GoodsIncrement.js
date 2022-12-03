@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import dayjs from "dayjs";
@@ -10,6 +10,8 @@ import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import Entypo from "react-native-vector-icons/Entypo";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
+import AlertModal from "../../../pubilc/component/AlertModal";
+import {getRemindTime, setRemindTime} from "../../../pubilc/common/noLoginInfo";
 
 
 const styles = StyleSheet.create({
@@ -95,31 +97,77 @@ class GoodsIncrement extends PureComponent {
 
   componentDidMount() {
     const {global, navigation} = this.props
-    const {store_info} = global
-    this.focus = navigation.addListener('focus', () => {
-      const currentDate = dayjs().format('YYYY-MM-DD')
-      const calc = (new Date(store_info.vip_info.expire_date) - new Date(currentDate)) / (24 * 60 * 60 * 1000)
+    const {store_info, store_id} = global
+
+    this.focus = navigation.addListener('focus', async () => {
+      const current_date = dayjs().format('YYYY-MM-DD')
+      const remind_time = JSON.parse(await getRemindTime()) || []
+      const has_date = remind_time && remind_time.findIndex(item => item?.store_id === store_id && item?.current_date === current_date)
+      if (has_date > -1)
+        return
+      const calc = (new Date(store_info.vip_info.expire_date) - new Date(current_date)) / (24 * 60 * 60 * 1000)
       if (calc < 5 && calc >= 0)
-        Alert.alert('提醒', `服务将在${store_info.vip_info.expire_date}过期，是否续费？`, [
-          {
-            text: '取消',
-            style: 'cancel'
-          },
-          {
-            text: '确定',
-            style: 'default',
-            onPress: () => this.useIncrementService()
-          }
-        ]);
+        this.setState({showRemind: {visible: true, desc: `服务将在${store_info.vip_info.expire_date}过期，是否续费？`}})
+
     })
   }
 
   useIncrementService = () => {
+    this.closeModal()
     const {navigation} = this.props
     this.mixpanel.track('我的_立即开通')
     navigation.navigate(Config.ROUTE_OPEN_MEMBER)
   }
 
+  state = {
+    showRemind: {
+      visible: false,
+      desc: '',
+    }
+  }
+
+  handleRemindTime = async () => {
+    try {
+      const remind_time = JSON.parse(await getRemindTime()) || []
+      const current_date = dayjs().format('YYYY-MM-DD')
+      const {store_id} = this.props.global
+
+      if (remind_time.length === 0) {
+        remind_time.push({store_id: store_id, current_date: current_date})
+        setRemindTime(remind_time)
+        return
+      }
+
+      const has = remind_time.findIndex(item => item?.store_id === store_id && item?.current_date === current_date)
+
+      if (has === -1) {
+        remind_time.push({store_id: store_id, current_date: current_date})
+        setRemindTime(remind_time)
+      }
+    } catch (e) {
+
+    }
+  }
+
+  closeModal = () => {
+    this.setState({showRemind: {visible: false, desc: ''}})
+    this.handleRemindTime().then()
+  }
+
+  renderRemind = () => {
+    const {showRemind} = this.state
+    return (
+      <AlertModal
+        visible={showRemind.visible}
+        title={'提醒'}
+        desc={showRemind.desc}
+        actionText={'确定'}
+        closeText={'取消'}
+        onPress={this.useIncrementService}
+        onClose={this.closeModal}
+        onPressClose={this.closeModal}/>
+    )
+  }
   notActivate = (vip_info) => {
     const {pay_type_items = []} = vip_info || {}
     const pay_money = pay_type_items.filter(item => item.months === 12)
@@ -222,6 +270,7 @@ class GoodsIncrement extends PureComponent {
       <View style={styles.zoneWrap}>
         {this.renderHeader()}
         {!store_info.vip_info.vip_invalid && store_info.vip_info.exist_vip ? this.renderContent() : null}
+        {this.renderRemind()}
       </View>
     )
   }

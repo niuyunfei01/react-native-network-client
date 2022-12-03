@@ -983,7 +983,7 @@ class OrderCallDelivery extends Component {
       return;
     }
     return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}} key={1}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{
             backgroundColor: '#FF8309',
@@ -1000,7 +1000,9 @@ class OrderCallDelivery extends Component {
             <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold'}}>
               {tool.jbbsubstr(wm_address, 18)}
             </Text>
-            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>{wm_user_name}&nbsp;{wm_mobile} </Text>
+            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>
+              {wm_user_name}&nbsp;{wm_mobile}&nbsp;
+            </Text>
           </View>
         </View>
       </View>
@@ -1011,12 +1013,7 @@ class OrderCallDelivery extends Component {
     let {expect_time_friendly, wm_platform_day_id, wm_platform} = this.state;
     return (
       <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.goBack()}
-          style={{
-            paddingLeft: 12,
-            width: 36
-          }}>
+        <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{paddingLeft: 12, width: 36}}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
         <If condition={wm_platform && wm_platform_day_id && expect_time_friendly}>
@@ -1026,13 +1023,9 @@ class OrderCallDelivery extends Component {
               <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: '#FF8309',
-                  flex: 1,
-                  textAlign: 'center'
-                }}>{expect_time_friendly} </Text>
+              <Text style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>
+                {expect_time_friendly}&nbsp;
+              </Text>
             </View>
           </View>
         </If>
@@ -1046,9 +1039,7 @@ class OrderCallDelivery extends Component {
     return (
       <View style={{padding: 10, backgroundColor: colors.white}}>
         <Button title={'配送下单'}
-                onPress={() => {
-                  this.onWorkerDelivery()
-                }}
+                onPress={() => this.onWorkerDelivery()}
                 buttonStyle={[{
                   backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
                   borderRadius: 21,
@@ -1095,24 +1086,19 @@ class OrderCallDelivery extends Component {
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
             <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{weight}KG </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_date_modal: true,
-            })
-          }} style={{
-            height: iron_width,
-            width: iron_width,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.2,
-            alignItems: 'center'
-          }}>
+          <TouchableOpacity onPress={() => this.setState({show_date_modal: true})}
+                            style={{
+                              height: iron_width,
+                              width: iron_width,
+                              borderRadius: 4,
+                              borderColor: colors.e5,
+                              borderWidth: 0.2,
+                              alignItems: 'center'
+                            }}>
             <SvgXml style={{marginTop: 5}} xml={time()}/>
-            <Text style={{
-              fontSize: 11,
-              color: colors.color333,
-              marginTop: 5
-            }}>{is_right_once === 0 ? mealTime : '立即送达'} </Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+              {is_right_once === 0 ? mealTime : '立即送达'}&nbsp;
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -1127,8 +1113,9 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
-            <Text
-              style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{order_money}元 </Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
+              {order_money}元&nbsp;
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -1234,10 +1221,7 @@ class OrderCallDelivery extends Component {
              maskClosable transparent={true}
              animationType="slide"
              visible={show_worker_delivey_modal}>
-        <View style={[{
-          backgroundColor: 'rgba(0,0,0,0.25)',
-          flex: 1
-        }]}>
+        <View style={[{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}]}>
           <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
           <View style={[{
             backgroundColor: colors.white,
