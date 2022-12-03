@@ -605,7 +605,7 @@ class ProductInfo extends React.Component {
       <JbbModal visible={this.state.showDeliveryModal}
                 onClose={() => this.setState({showDeliveryModal: false})} modal_type={'center'}>
         <KeyboardAwareScrollView enableAutomaticScroll={false}>
-          <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+          <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
             请输入或扫描填入货架码
           </Text>
 
@@ -797,6 +797,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: pxToDp(26),
+    color: colors.color333,
     fontWeight: 'bold'
   },
   formHeader: {

@@ -104,9 +104,9 @@ class BindMeituanSg extends PureComponent {
           }}>
             <Text style={{fontSize: 16, fontWeight: "bold"}}> 如何授权美团闪购 </Text>
             <View style={{marginVertical: 8, marginHorizontal: 4}}>
-              <Text style={{fontSize: 14,}}>1、查询美团店铺门店id </Text>
+              <Text style={{fontSize: 14, color: colors.color333,}}>1、查询美团店铺门店id </Text>
               <View style={{marginVertical: 4}}>
-                <Text style={{fontSize: 12}}>下载“美团外卖商家”版，切换到我的->商家服务中心，咨询客服，输入查询门店id，并复制 </Text>
+                <Text style={{color: colors.color333, fontSize: 12}}>下载“美团外卖商家”版，切换到我的->商家服务中心，咨询客服，输入查询门店id，并复制 </Text>
               </View>
               <View style={{flexDirection: 'row', marginVertical: 16}}>
                 <TouchableOpacity
@@ -126,7 +126,7 @@ class BindMeituanSg extends PureComponent {
                 </TouchableOpacity>
               </View>
 
-              <Text style={{fontSize: 14, marginTop: 3}}>2、输入平台门店id，进行授权绑定 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, marginTop: 3}}>2、输入平台门店id，进行授权绑定 </Text>
               <TouchableOpacity
                 style={{marginVertical: 16, justifyContent: 'center', alignItems: 'center'}}
                 onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindMeituanSg/3.png')}>
@@ -137,7 +137,7 @@ class BindMeituanSg extends PureComponent {
               </TouchableOpacity>
 
 
-              <Text style={{fontSize: 14, marginTop: 3}}>3、登录美团闪购开放平台 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, marginTop: 3}}>3、登录美团闪购开放平台 </Text>
               <View style={{marginVertical: 4}}>
                 <Text style={{fontSize: 12}}>【登录商家账号】该页面为商家账号（单店账号或连锁账号）的登录页面，需要输入商家账号绑定的手机号且以短信验证码的方式登录 </Text>
               </View>
@@ -150,7 +150,7 @@ class BindMeituanSg extends PureComponent {
                 }}/>
               </TouchableOpacity>
 
-              <Text style={{fontSize: 14, marginTop: 3}}>4、手机号查看路径 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, marginTop: 3}}>4、手机号查看路径 </Text>
               <View style={{marginVertical: 4}}>
                 <Text
                   style={{fontSize: 12}}>美团商家中心->登录商家账号->店铺设置->账号设置->绑定手机号。若尚未绑定手机号，或绑定的手机号不是当前可用的，则请绑定/换绑手机号后再操作 </Text>
@@ -199,7 +199,7 @@ class BindMeituanSg extends PureComponent {
                 }}/>
               </TouchableOpacity>
 
-              <Text style={{fontSize: 14, marginTop: 3}}>5、授权店铺给外送帮 </Text>
+              <Text style={{fontSize: 14, color: colors.color333, marginTop: 3}}>5、授权店铺给外送帮 </Text>
 
               <View style={{marginVertical: 4}}>
                 <Text
