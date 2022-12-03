@@ -6,7 +6,7 @@ class SearchStoreItem extends PureComponent {
   render() {
     return <TouchableOpacity onPress={this.props.onPress}>
       <View key={this.props.rowID || this.props.item.searchStr}
-            style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
+            style={{flex: 1, marginLeft: 10, height: this.props.rowHeight, justifyContent: 'center'}}>
         <HighlightableText
           matcher={this.props.item.matcher}
           text={this.props.item.searchStr}
