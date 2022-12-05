@@ -838,46 +838,40 @@ class OrderCallDelivery extends Component {
   renderWorkerDelivery = () => {
     let {worker_list, worker_delivery_id} = this.state
     return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
-        <TouchableOpacity
-          onPress={() => this.onSelectDeliveyAll(1)}
+      <View style={{marginTop: 10, marginBottom: 100, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+        <View
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
             <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}> 自配送 </Text>
           </View>
-        </TouchableOpacity>
-        <ScrollView automaticallyAdjustContentInsets={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                    style={{maxHeight: 350}}>
-          <If condition={tool.length(worker_list) > 0}>
-            <For each='worker' index='idx' of={worker_list}>
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  worker_delivery_id: worker?.id,
-                  worker_name: worker?.nickname,
-                  worker_mobile: worker?.mobile,
-                })
-              }} key={idx} style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingVertical: 14,
-                borderColor: colors.colorDDD,
-                borderBottomWidth: 0.2
-              }}>
-                <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                  <Text
-                    style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.nickname} </Text>
-                  <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
-                </View>
-                <If condition={worker_delivery_id === worker?.id}>
-                  <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
-                </If>
-              </TouchableOpacity>
-            </For>
-          </If>
-        </ScrollView>
+        </View>
+        <If condition={tool.length(worker_list) > 0}>
+          <For each='worker' index='idx' of={worker_list}>
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                worker_delivery_id: worker?.id,
+                worker_name: worker?.nickname,
+                worker_mobile: worker?.mobile,
+              })
+            }} key={idx} style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 14,
+              borderColor: colors.colorDDD,
+              borderBottomWidth: 0.2
+            }}>
+              <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                <Text
+                  style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.nickname} </Text>
+                <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
+              </View>
+              <If condition={worker_delivery_id === worker?.id}>
+                <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+              </If>
+            </TouchableOpacity>
+          </For>
+        </If>
       </View>
     )
   }
