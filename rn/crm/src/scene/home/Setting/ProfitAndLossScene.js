@@ -415,39 +415,40 @@ class ProfitAndLoss extends PureComponent {
   renderModal = () => {
     let {showModal, startDate, endDate} = this.state;
     return (
-      <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}
-      >
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: 50,
-          marginHorizontal: 30
-        }}>
-          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>时间选择</Text>
-          <Text style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}} onPress={() => {
-            this.setState({showModal: false})
-            this.get_profit_list()
-          }}>确定</Text>
-        </View>
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: 70
-        }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({showDateModalStart: true})
+      <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}>
+        <>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: 50,
+            marginHorizontal: 30
           }}>
-            <Text>{startDate !== '' ? startDate : '开始时间'} </Text>
-          </TouchableOpacity>
-          <Text>-</Text>
-          <TouchableOpacity onPress={() => this.setState({showDateModalEnd: true})}>
-            <Text>{endDate !== '' ? endDate : '结束时间'} </Text>
-          </TouchableOpacity>
-          {this.renderDatePickerStart()}
-          {this.renderDatePickerEnd()}
-        </View>
+            <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>时间选择</Text>
+            <Text style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}} onPress={() => {
+              this.setState({showModal: false})
+              this.get_profit_list()
+            }}>确定</Text>
+          </View>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+            height: 70
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.setState({showDateModalStart: true})
+            }}>
+              <Text>{startDate !== '' ? startDate : '开始时间'} </Text>
+            </TouchableOpacity>
+            <Text>-</Text>
+            <TouchableOpacity onPress={() => this.setState({showDateModalEnd: true})}>
+              <Text>{endDate !== '' ? endDate : '结束时间'} </Text>
+            </TouchableOpacity>
+            {this.renderDatePickerStart()}
+            {this.renderDatePickerEnd()}
+          </View>
+        </>
       </JbbModal>
     )
   }

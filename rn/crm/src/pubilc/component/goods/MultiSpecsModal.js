@@ -194,7 +194,7 @@ export default class MultiSpecsModal extends PureComponent {
       checkStatus = true
       return
     }
-    const url = `/api_products/batch_update_store_price_inventory?access_token=${accessToken}&&store_id=${storeId}&&vendor_id=${vendor_id}`
+    const url = `/api_products/batch_update_store_price_inventory?access_token=${accessToken}&store_id=${storeId}&vendor_id=${vendor_id}`
     let params = {prices: prices}
     if (tool.length(inventory) > 0)
       params = {...params, inventorys: inventory}

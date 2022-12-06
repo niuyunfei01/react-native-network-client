@@ -154,6 +154,10 @@ class SearchShop extends Component {
   }
 
   setLatLng = (latitude, longitude) => {
+    if (!latitude || !longitude) {
+      ToastShort('请选择正确的地址')
+      return
+    }
     let {location} = this.state;
     location.location = longitude + ',' + latitude
     this.setState({
