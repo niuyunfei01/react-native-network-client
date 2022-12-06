@@ -247,11 +247,7 @@ class OrderItem extends React.PureComponent {
       <JbbModal visible={show_call_user_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
-        <View style={{
-          backgroundColor: colors.f5,
-          borderTopLeftRadius: 15,
-          borderTopRightRadius: 15,
-        }}>
+        <View style={{backgroundColor: colors.f5, borderTopLeftRadius: 15, borderTopRightRadius: 15}}>
           <View style={{
             height: 153,
             backgroundColor: colors.white,

@@ -2388,14 +2388,20 @@ const styles = StyleSheet.create({
   },
   modifyPicModal: {backgroundColor: colors.color000, flex: 1},
   modifyPicHeader: {
-    flex: 0.2,
+    flex: 0.6,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 11
   },
   modifyPicHeaderText: {fontSize: 18, fontWeight: 'bold', color: colors.white, lineHeight: 25},
-  modifyMainPic: {flex: 2.5, justifyContent: 'center'},
+  modifyMainPic: {
+    flex: 2.5,
+    marginHorizontal: 11,
+    marginTop: height * 0.07,
+    marginBottom: height * 0.167,
+    justifyContent: 'center'
+  },
   modifyPicList: {marginLeft: 11, flex: 2},
   modifyPicBtnWrap: {flex: 0.5, flexDirection: 'row', alignItems: 'center'},
   modifyPicBtn: {flex: 1, marginHorizontal: 10, borderRadius: 2},

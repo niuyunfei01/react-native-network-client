@@ -482,7 +482,8 @@ class GoodStoreDetailScene extends PureComponent {
                               applyingPrice={applyingPrice}
                               storePro={{...product, ...store_prod}}
                               navigation={this.props.navigation}
-                              beforePrice={Number(store_prod.supply_price)}/>
+                              beforePrice={Number(store_prod.supply_price)}
+                              vendor_id={vendorId}/>
         </If>
       </View>
     );
