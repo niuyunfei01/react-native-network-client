@@ -229,22 +229,21 @@ class StoreList extends PureComponent {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingVertical: 12,
+          paddingTop: 12,
         }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{color: colors.color999, fontSize: 13}}> 已开通省钱配送 </Text>
             <If condition={count_of_wsb_delivery > 0}>
+              <Text style={{color: colors.color999, fontSize: 13}}> 已开通省钱配送 </Text>
               <Text style={{color: colors.main_color, fontSize: 13}}> {count_of_wsb_delivery} </Text>
               <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
             </If>
-            <If condition={count_of_wsb_delivery <= 0}>
-              <Text style={{color: colors.main_color, fontSize: 13}}> 暂无开通 </Text>
-            </If>
-
             <If condition={count_of_store_delivery > 0}>
               <Text style={{color: colors.color999, fontSize: 13, marginLeft: 12}}> 自有账号 </Text>
               <Text style={{color: colors.main_color, fontSize: 13}}> {count_of_store_delivery} </Text>
               <Text style={{color: colors.color999, fontSize: 13}}> 个 </Text>
+            </If>
+            <If condition={count_of_wsb_delivery <= 0 && count_of_store_delivery <= 0}>
+              <Text style={{color: colors.color999, fontSize: 13}}> 暂未开通运力 </Text>
             </If>
           </View>
           <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
