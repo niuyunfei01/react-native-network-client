@@ -64,7 +64,7 @@ class SettlementScene extends PureComponent {
       totalPrice: 0,
       status: 0,
       date: date,
-      dates: this.format(date),
+      dates: tool.fullMonth(date),
       store_pay_info: [],
       show_pay_info: false,
       showAgreement: props.route.params?.showSettle || false,
@@ -75,16 +75,13 @@ class SettlementScene extends PureComponent {
 
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.fetchSettleProtocol()
     this.getSupplyList()
-  }
-
-  componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setOptions({
-      headerRight: () => this.renderHeaderRight()
-    })
+    // let {navigation} = this.props;
+    // navigation.setOptions({
+    //   headerRight: () => this.renderHeaderRight()
+    // })
   }
 
   onPress(route, params = {}) {
@@ -183,15 +180,12 @@ class SettlementScene extends PureComponent {
   }
 
   onChange = (date) => {
-    this.setState({date: date, dates: this.format(date)}, () => {
+    this.setState({
+      date: date,
+      dates: tool.fullMonth(date)
+    }, () => {
       this.getSupplyList()
     })
-  }
-
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
   }
 
   closeAgreeModal = () => {
@@ -227,6 +221,7 @@ class SettlementScene extends PureComponent {
     }).then(res => {
       ToastShort('操作成功')
       this.startAnimation()
+      this.fetchSettleProtocol()
     }).catch((res) => {
       ToastShort(res.reason)
     })
@@ -247,19 +242,22 @@ class SettlementScene extends PureComponent {
   render() {
     const {show_pay_info} = this.state
     return (
-      <ScrollView
-        automaticallyAdjustContentInsets={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={styles.page}>
-        <If condition={show_pay_info}>
-          {this.renderPayList()}
-        </If>
-        {this.renderToday()}
-        {this.renderList()}
-        {this.renderAgreementModal()}
-        {this.renderPromptModal()}
-      </ScrollView>
+      <>
+        {this.renderHeaderRight()}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.page}>
+          <If condition={show_pay_info}>
+            {this.renderPayList()}
+          </If>
+          {this.renderToday()}
+          {this.renderList()}
+          {this.renderAgreementModal()}
+          {this.renderPromptModal()}
+        </ScrollView>
+      </>
     );
   }
 
@@ -457,6 +455,8 @@ class SettlementScene extends PureComponent {
                     onPress={() => {
                       this.clickProtocol('ptl_agree')
                       this.setState({showAgreement: false}, () => {
+                        this.startAnimation()
+return
                         this.submitAgree()
                       })
                     }}
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   },
   alreadyOrderText: {color: colors.color333, fontSize: 14, marginTop: 3},
   listWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8, marginTop: 10},
-  listHeaderWrap: {flexDirection: 'row', alignItems: 'center', paddingVertical: 6},
+  listHeaderWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", paddingVertical: 6},
   listDateText: {color: colors.color333, fontWeight: 'bold', fontSize: 14, padding: 5},
   countCurrentMonthText: {color: colors.color333, marginLeft: 10, fontWeight: 'bold', fontSize: 14},
   listItemWrap: {

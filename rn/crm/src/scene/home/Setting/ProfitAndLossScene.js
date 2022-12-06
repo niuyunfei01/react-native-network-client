@@ -363,7 +363,7 @@ class ProfitAndLoss extends PureComponent {
               <View style={styles.flexRow1}>
                 <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台结算：</Text>
                 <Text
-                  style={styles.orderCardItemValue}>{numeral(item?.bill?.total_income_from_platform / 100).format('0.00')}元 </Text>
+                  style={styles.orderCardItemValue}>{numeral(item?.total_income_from_platform).format('0.00')}元 </Text>
               </View>
             </View>
             <View style={{flex: 1}}>
@@ -415,7 +415,8 @@ class ProfitAndLoss extends PureComponent {
   renderModal = () => {
     let {showModal, startDate, endDate} = this.state;
     return (
-      <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}>
+      <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}
+      >
         <>
           <View style={{
             flexDirection: "row",
@@ -439,11 +440,11 @@ class ProfitAndLoss extends PureComponent {
             <TouchableOpacity onPress={() => {
               this.setState({showDateModalStart: true})
             }}>
-              <Text>{startDate !== '' ? startDate : '开始时间'} </Text>
+              <Text style={{color: colors.color333}}>{startDate !== '' ? startDate : '开始时间'} </Text>
             </TouchableOpacity>
-            <Text>-</Text>
+            <Text style={{color: colors.color333}}>-</Text>
             <TouchableOpacity onPress={() => this.setState({showDateModalEnd: true})}>
-              <Text>{endDate !== '' ? endDate : '结束时间'} </Text>
+              <Text style={{color: colors.color333}}>{endDate !== '' ? endDate : '结束时间'} </Text>
             </TouchableOpacity>
             {this.renderDatePickerStart()}
             {this.renderDatePickerEnd()}
