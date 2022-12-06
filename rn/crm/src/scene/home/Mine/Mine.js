@@ -158,8 +158,6 @@ class Mine extends PureComponent {
       activity: [],
       img: '',
       show_freeze_balance_alert: false,
-      headerOpacity: new Animated.Value(0),
-      headerHeight: new Animated.Value(0),
       showSettle: false
     }
   }
@@ -168,6 +166,7 @@ class Mine extends PureComponent {
     this.getActivitySwiper()
     this.getStoreDataOfMine()
     this.fetchShowSettleProtocol()
+    this.viewRef && this.viewRef.setNativeProps({height: 0, opacity: 0})
   }
 
   handleTimeObj = (api = '', executeStatus = 'success', startTime, endTime, methodName = '', executeTime) => {
@@ -722,14 +721,13 @@ class Mine extends PureComponent {
       headerOpacity = 0
     if (headerOpacity >= 1)
       headerOpacity = 1
-    this.setState({headerOpacity: headerOpacity, headerHeight: headerHeight})
-
+    this.viewRef && this.viewRef.setNativeProps({height: headerHeight, opacity: headerOpacity})
   }
 
   renderMineHeader = () => {
-    const {headerOpacity, headerHeight, show_back_icon} = this.state
+    const {show_back_icon} = this.state
     return (
-      <Animated.View style={[styles.showHeaderWrap, {opacity: headerOpacity, height: headerHeight}]}>
+      <Animated.View style={[styles.showHeaderWrap]} ref={ref => this.viewRef = ref}>
         {
           show_back_icon ?
             <Entypo name="chevron-thin-left" style={styles.showHeaderBackIcon} onPress={this.navigateToBack}/> :

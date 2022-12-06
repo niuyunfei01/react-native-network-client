@@ -422,88 +422,90 @@ class StallDetailScene extends PureComponent {
     return (
       <JbbModal visible={modalVisible} onClose={this.closeModal} modalStyle={styles.modalContentWrap}
                 modal_type={'center'}>
-        <View style={styles.modalInputContentWrap}>
-          <Text style={styles.modalTitle}>修改结算</Text>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              门店
-            </Text>
-            <Text style={styles.modalContentRightText}>
-              {this.props.global?.store_info?.name}
-            </Text>
-          </View>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              摊位
-            </Text>
-            <Text style={styles.modalContentRightText}>
-              {this.props.route.params.stall_name}
-            </Text>
-          </View>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              日期
-            </Text>
-            <Text style={styles.modalContentRightText}>
-              {this.props.route.params.selectedDate}
-            </Text>
-          </View>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              类型
-            </Text>
-            <ModalSelector onChange={value => this.onChangeText(value, 'type')}
-                           data={MODAL_DATA}
-                           skin="customer"
-                           style={styles.selectContent}
-                           defaultKey={1}>
-              <View style={styles.modalSelectWrap}>
-                <Text style={modalContentObj.type?.label ? styles.modalSelectText : styles.modalNotSelectText}>
-                  {modalContentObj.type?.label ? modalContentObj.type.label : '请选择类型'}
-                </Text>
-                <Entypo name='chevron-thin-down' style={styles.modalSelectText}/>
-              </View>
-            </ModalSelector>
+        <>
+          <View style={styles.modalInputContentWrap}>
+            <Text style={styles.modalTitle}>修改结算</Text>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                门店
+              </Text>
+              <Text style={styles.modalContentRightText}>
+                {this.props.global?.store_info?.name}
+              </Text>
+            </View>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                摊位
+              </Text>
+              <Text style={styles.modalContentRightText}>
+                {this.props.route.params.stall_name}
+              </Text>
+            </View>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                日期
+              </Text>
+              <Text style={styles.modalContentRightText}>
+                {this.props.route.params.selectedDate}
+              </Text>
+            </View>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                类型
+              </Text>
+              <ModalSelector onChange={value => this.onChangeText(value, 'type')}
+                             data={MODAL_DATA}
+                             skin="customer"
+                             style={styles.selectContent}
+                             defaultKey={1}>
+                <View style={styles.modalSelectWrap}>
+                  <Text style={modalContentObj.type?.label ? styles.modalSelectText : styles.modalNotSelectText}>
+                    {modalContentObj.type?.label ? modalContentObj.type.label : '请选择类型'}
+                  </Text>
+                  <Entypo name='chevron-thin-down' style={styles.modalSelectText}/>
+                </View>
+              </ModalSelector>
 
-          </View>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              金额
-            </Text>
-            <TextInput style={styles.modalContentRightTextInput}
+            </View>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                金额
+              </Text>
+              <TextInput style={styles.modalContentRightTextInput}
 
-                       value={modalContentObj.money}
-                       placeholderTextColor={colors.colorDDD}
-                       onChangeText={text => this.onChangeText(text, 'money')}
-                       placeholder={'请输入金额'}
-                       keyboardType={'numeric'}/>
-          </View>
-          <View style={styles.modalContentRowWrap}>
-            <Text style={styles.modalContentLeftText}>
-              备注
-            </Text>
-            <TextInput style={styles.modalContentRightMultipleTextInput}
+                         value={modalContentObj.money}
+                         placeholderTextColor={colors.colorDDD}
+                         onChangeText={text => this.onChangeText(text, 'money')}
+                         placeholder={'请输入金额'}
+                         keyboardType={'numeric'}/>
+            </View>
+            <View style={styles.modalContentRowWrap}>
+              <Text style={styles.modalContentLeftText}>
+                备注
+              </Text>
+              <TextInput style={styles.modalContentRightMultipleTextInput}
 
-                       placeholderTextColor={colors.colorDDD}
-                       multiline={true}
-                       onChangeText={text => this.onChangeText(text, 'remark')}
-                       value={modalContentObj.remark}
-                       placeholder={'请输入备注'}/>
+                         placeholderTextColor={colors.colorDDD}
+                         multiline={true}
+                         onChangeText={text => this.onChangeText(text, 'remark')}
+                         value={modalContentObj.remark}
+                         placeholder={'请输入备注'}/>
+            </View>
           </View>
-        </View>
-        <View style={styles.modalBtnWrap}>
-          <TouchableOpacity style={styles.modalCloseTitleWrap} onPress={this.closeModal}>
-            <Text style={styles.modalCloseTitleStyle}>
-              取消
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalBtnTitleWrap}
-                            onPress={() => this.submitSettlementInfo(modalContentObj)}>
-            <Text style={styles.modalBtnTitleStyle}>
-              确定
-            </Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.modalBtnWrap}>
+            <TouchableOpacity style={styles.modalCloseTitleWrap} onPress={this.closeModal}>
+              <Text style={styles.modalCloseTitleStyle}>
+                取消
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalBtnTitleWrap}
+                              onPress={() => this.submitSettlementInfo(modalContentObj)}>
+              <Text style={styles.modalBtnTitleStyle}>
+                确定
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
       </JbbModal>
     )
   }
