@@ -423,6 +423,7 @@ class OrderListScene extends Component {
 
         <AddTipModal
           setState={this.setState.bind(this)}
+          fetchData={this.onRefresh.bind(this)}
           accessToken={accessToken}
           id={add_tip_id}
           orders_add_tip={orders_add_tip}
