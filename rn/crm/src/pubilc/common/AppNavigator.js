@@ -335,7 +335,7 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/product/Goods/GoodsMarketExamine").default}
         />
 
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算'}}
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算', headerShown: false}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementScene').default}
         />
         <Stack.Screen name={Config.ROUTE_BIND_PAY} options={{headerTitle: '绑定账号'}}

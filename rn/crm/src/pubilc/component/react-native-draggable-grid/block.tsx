@@ -33,7 +33,9 @@ export const Block: FunctionComponent<BlockProps> = ({
     <Animated.View style={[styles.blockContainer, style, dragStartAnimationStyle]} {...panHandlers}>
       <Animated.View>
         <TouchableWithoutFeedback delayLongPress={delayLongPress} onPress={onPress} onLongPress={onLongPress}>
-          {children}
+          <>
+            {children}
+          </>
         </TouchableWithoutFeedback>
       </Animated.View>
     </Animated.View>

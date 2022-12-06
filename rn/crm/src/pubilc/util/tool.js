@@ -97,6 +97,9 @@ export function fullDay(dt) {
   return dayjs(dt).format("YYYY-MM-DD");
 }
 
+export function fullMonth(dt) {
+  return dayjs(dt).format("YYYY-MM");
+}
 
 export function vendor(global) {
   const {
@@ -581,4 +584,5 @@ export default {
   jbbsubstr,
   filteremoji,
   filtrationInput,
+  fullMonth
 };
