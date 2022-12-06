@@ -140,6 +140,7 @@ class OrderInfoNew extends PureComponent {
 
   componentWillUnmount() {
     this.focus()
+    this.marker = false
   }
 
   componentDidMount = () => {
@@ -655,7 +656,9 @@ class OrderInfoNew extends PureComponent {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: mapImage.location_ship}}
                            style={{width: 45, height: 52,}}
-                           onLoad={() => tool.debounces(() => this.marker.update(), 1000)}
+                           onLoad={() => tool.debounces(() => {
+                             this.marker && this.marker.update()
+                           }, 1000)}
                            resizeMode={FastImage.resizeMode.contain}
                 />
               </View>
@@ -687,7 +690,9 @@ class OrderInfoNew extends PureComponent {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: mapImage.location}}
                            style={{width: 26, height: 52}}
-                           onLoad={() => tool.debounces(() => this.marker.update(), 1000)}
+                           onLoad={() => tool.debounces(() => {
+                             this.marker && this.marker.update()
+                           }, 1000)}
                            resizeMode={FastImage.resizeMode.contain}/>
               </View>
             </Marker>

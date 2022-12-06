@@ -61,6 +61,9 @@ class RiderTrajectory extends Component {
     this.marker = null
   }
 
+  componentWillUnmount() {
+    this.marker = false
+  }
   componentDidMount = () => {
     this.fetchData()
   }
@@ -177,11 +180,9 @@ class RiderTrajectory extends Component {
 
               <FastImage source={{uri: mapImage.location_ship}}
                          style={{width: 45, height: 52}}
-                         onLoad={() => {
-                           tool.debounces(() => {
-                             this.marker.update();
-                           }, 1000)
-                         }}
+                         onLoad={() => tool.debounces(() => {
+                           this.marker && this.marker.update()
+                         }, 1000)}
                          resizeMode={FastImage.resizeMode.contain}
               />
             </View>
@@ -234,11 +235,9 @@ class RiderTrajectory extends Component {
 
               <FastImage source={{uri: mapImage.location}}
                          style={{width: 26, height: 52}}
-                         onLoad={() => {
-                           tool.debounces(() => {
-                             this.marker.update();
-                           }, 1000)
-                         }}
+                         onLoad={() => tool.debounces(() => {
+                           this.marker && this.marker.update()
+                         }, 1000)}
                          resizeMode={FastImage.resizeMode.contain}
               />
             </View>
