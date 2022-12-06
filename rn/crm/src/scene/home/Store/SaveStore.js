@@ -223,7 +223,7 @@ class SaveStore extends PureComponent {
     const params = {
       center: center,
       city_name: city,
-      show_select_city: type !== 'edit',
+      disable_select_city: type !== 'edit',
       keywords: store_address,
       onBack: (res) => {
         this.setAddress.bind(this)(res)

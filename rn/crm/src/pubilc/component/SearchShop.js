@@ -50,13 +50,14 @@ class SearchShop extends Component {
       keywords,
       city_name,
       placeholder_text = '请搜索门店位置信息',
+      disable_select_city = false,
       show_select_city = true
     } = this.props.route.params;
     let map = {};
     let show_map = false;
-    let show_seach_msg = true;
+    let show_search_msg = true;
     let local_city = '北京';
-    let location_name = '北京';
+    let location_name = '';
 
     let {store_info = {}} = this.props.global;
 
@@ -68,7 +69,7 @@ class SearchShop extends Component {
     if (tool.length(keywords) > 0) {
       map.address = keywords
       location_name = keywords
-      show_seach_msg = false
+      show_search_msg = false
     }
 
     if (tool.length(city_name) > 0) {
@@ -85,7 +86,8 @@ class SearchShop extends Component {
     this.state = {
       loading: false,
       show_select_city: show_select_city,
-      show_seach_msg: show_seach_msg,
+      disable_select_city,
+      show_search_msg,
       shops: [],
       ret_list: [],
       keyword: keywords,
@@ -203,8 +205,8 @@ class SearchShop extends Component {
   }
 
   goSelectCity = () => {
-    let {show_select_city, city_name} = this.state;
-    if (!show_select_city) {
+    let {disable_select_city, city_name} = this.state;
+    if (!disable_select_city) {
       return;
     }
     this.props.navigation.navigate(
@@ -224,8 +226,8 @@ class SearchShop extends Component {
   }
 
   onChange = (keyword) => {
-    let show_seach_msg = tool.length(keyword) <= 0
-    this.setState({keyword, show_seach_msg, is_add: true, loading: true, page: 1}, () => {
+    let show_search_msg = tool.length(keyword) <= 0
+    this.setState({keyword, show_search_msg, is_add: true, loading: true, page: 1}, () => {
       this.search()
     });
   }
@@ -267,11 +269,11 @@ class SearchShop extends Component {
   }
 
   renderHeader = () => {
-    let {show_seach_msg, city_name, keyword, placeholderText, show_placeholder} = this.state
+    let {show_select_city, city_name, keyword, placeholderText, show_placeholder} = this.state
     return (
       <View style={{
         backgroundColor: colors.white,
-        // marginBottom: show_seach_msg ? 30 : 0,
+        // marginBottom: show_search_msg ? 30 : 0,
         paddingHorizontal: 12,
         paddingVertical: 6,
         flexDirection: "row",
@@ -286,21 +288,23 @@ class SearchShop extends Component {
           flex: 1,
           paddingLeft: 10,
         }}>
-          <TouchableOpacity
-            style={{
-              width: 66,
-              borderRightWidth: 1,
-              borderRightColor: colors.colorDDD,
-              flexDirection: 'row',
-              justifyContent: 'center'
-            }}
-            onPress={() => this.goSelectCity()}
-          >
-            <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-              {tool.jbbsubstr(city_name, 3)}
-            </Text>
-            <SvgXml xml={this_down()}/>
-          </TouchableOpacity>
+          <If condition={show_select_city}>
+            <TouchableOpacity
+              style={{
+                width: 66,
+                borderRightWidth: 1,
+                borderRightColor: colors.colorDDD,
+                flexDirection: 'row',
+                justifyContent: 'center'
+              }}
+              onPress={() => this.goSelectCity()}
+            >
+              <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
+                {tool.jbbsubstr(city_name, 3)}
+              </Text>
+              <SvgXml xml={this_down()}/>
+            </TouchableOpacity>
+          </If>
           <TextInput
             underlineColorAndroid='transparent'
             placeholder={placeholderText}
@@ -327,7 +331,7 @@ class SearchShop extends Component {
           />
           <If condition={tool.length(keyword) > 0}>
             <SvgXml onPress={() => {
-              this.setState({keyword: '', show_seach_msg: true});
+              this.setState({keyword: '', show_search_msg: true});
             }} xml={cross_circle_icon()}
                     style={{position: 'absolute', top: 6, right: 10, color: colors.color999}}/>
           </If>
@@ -336,7 +340,7 @@ class SearchShop extends Component {
         <Text onPress={() => this.props.navigation.goBack()}
               style={{textAlign: 'right', width: 40, fontSize: 14, color: colors.color333}}>取消</Text>
 
-        {/*<If condition={show_seach_msg}>*/}
+        {/*<If condition={show_search_msg}>*/}
         {/*  <TouchableOpacity style={{position: 'absolute', top: 22, left: 80}}>*/}
         {/*    <Entypo name={'triangle-up'}*/}
         {/*            style={{color: "rgba(0,0,0,0.7)", fontSize: 24, marginLeft: 10}}/>*/}

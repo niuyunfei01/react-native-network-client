@@ -117,6 +117,7 @@ class OrderSettingScene extends Component {
       city_name: city,
       show_select_city: false,
       keywords: address,
+      placeholder_text: '请在此输入收件人地址',
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
@@ -229,6 +230,7 @@ class OrderSettingScene extends Component {
         city_name: city,
         show_select_city: false,
         keywords: res.address,
+        placeholder_text: '请在此输入收件人地址',
         onBack: (res) => {
           this.setAddress.bind(this)(res)
           this.setState({show_smart_modal: true,})
