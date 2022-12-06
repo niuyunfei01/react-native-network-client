@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     height: 45,
   },
-  listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 40},
+  listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 44},
   listItemPayDatetimeText: {fontSize: 12, color: colors.color666},
   listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'},
   headerRightText: {color: colors.color333, fontSize: 15},
