@@ -197,30 +197,31 @@ class StoreList extends PureComponent {
   renderItem = ({item}) => {
     const {id, name, dada_address, category_desc, count_of_wsb_delivery, count_of_store_delivery} = item
     return (
-      <TouchableOpacity style={{padding: 12, marginTop: 10, backgroundColor: 'white', borderRadius: 6}}
-                        onPress={() => {
-                          this.onPress(Config.ROUTE_SAVE_STORE, {type: 'edit', store_id: id})
-                        }}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-          <Text style={{color: colors.color333, fontSize: 16, fontWeight: 'bold', lineHeight: 22}}>
-            {`${name}  `}
-          </Text>
-          <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
-        </View>
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-          <SvgXml xml={local_icon()}/>
-          <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(dada_address, 20)} </Text>
-        </View>
+      <View style={{padding: 12, marginTop: 10, backgroundColor: 'white', borderRadius: 6}}>
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.ROUTE_SAVE_STORE, {type: 'edit', store_id: id})
+        }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Text style={{color: colors.color333, fontSize: 16, fontWeight: 'bold', lineHeight: 22}}>
+              {`${name}  `}
+            </Text>
+            <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+          </View>
+          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            <SvgXml xml={local_icon()}/>
+            <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(dada_address, 20)} </Text>
+          </View>
 
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
-          <SvgXml xml={id_icon()}/>
-          <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(id, 20)} </Text>
-        </View>
+          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
+            <SvgXml xml={id_icon()}/>
+            <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(id, 20)} </Text>
+          </View>
 
-        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 12}}>
-          <SvgXml xml={class_icon()}/>
-          <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(category_desc, 20)} </Text>
-        </View>
+          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 12}}>
+            <SvgXml xml={class_icon()}/>
+            <Text style={{fontSize: 14, color: colors.color999}}> {tool.jbbsubstr(category_desc, 20)} </Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_DELIVERY_LIST, {store_id: id, show_select_store: false, store_name: name})
         }} style={{
@@ -248,7 +249,7 @@ class StoreList extends PureComponent {
           </View>
           <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
         </TouchableOpacity>
-      </TouchableOpacity>
+      </View>
     )
   }
 
