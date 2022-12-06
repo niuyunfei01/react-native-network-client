@@ -8,7 +8,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button} from "react-native-elements";
 import {wechatLogin} from "../../../pubilc/util/WechatUtils";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
@@ -69,11 +69,9 @@ class BindPay extends PureComponent {
   getSupplyList() {
     let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
-    showModal('加载中...')
 
     let url = `/api/get_supply_bill_list_v2/${currVendorId}/${store_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((res) => {
-      hideModal()
       let wechat = {};
       let alipay = {};
       if (res.store_pay_info[0].icon === 'weixin') {
@@ -91,7 +89,6 @@ class BindPay extends PureComponent {
         headImg: wechat.headImg && wechat.headImg !== '' ? wechat.headImg : 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132',
       })
     }).catch((res) => {
-      hideModal()
       ToastShort(res.reason)
     })
   }

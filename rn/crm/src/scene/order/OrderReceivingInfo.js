@@ -8,7 +8,7 @@ import {Button} from 'react-native-elements';
 import Config from "../../pubilc/common/config";
 import HttpUtils from "../../pubilc/util/http";
 import tool from "../../pubilc/util/tool";
-import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import PropTypes from "prop-types";
 import JbbModal from "../../pubilc/component/JbbModal";
@@ -209,7 +209,6 @@ class OrderReceivingInfo extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort('请从粘贴板粘贴地址', 0);
     }
-    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -217,7 +216,6 @@ class OrderReceivingInfo extends Component {
       this.setState({
         smartText: ''
       })
-      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {

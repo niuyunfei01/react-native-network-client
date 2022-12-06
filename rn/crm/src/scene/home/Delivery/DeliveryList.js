@@ -3,7 +3,6 @@ import {Dimensions, InteractionManager, ScrollView, StyleSheet, Text, TouchableO
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FastImage from "react-native-fast-image";
 import Config from "../../../pubilc/common/config";
 import TopSelectModal from "../../../pubilc/component/TopSelectModal";
@@ -94,7 +93,6 @@ class DeliveryList extends PureComponent {
     if (isLoading)
       return
     this.setState({isLoading: true})
-    ToastShort('加载中...')
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
     const params = {real_store_id: store_id, choose_v2_type: 0}
     HttpUtils.get(api, params).then((res) => {
