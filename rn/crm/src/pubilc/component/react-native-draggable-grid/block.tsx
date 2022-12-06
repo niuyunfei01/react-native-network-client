@@ -4,7 +4,7 @@ import * as React from 'react'
 import {
   Animated,
   StyleProp,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   StyleSheet,
   GestureResponderHandlers,
 } from 'react-native'
@@ -32,11 +32,9 @@ export const Block: FunctionComponent<BlockProps> = ({
   return (
     <Animated.View style={[styles.blockContainer, style, dragStartAnimationStyle]} {...panHandlers}>
       <Animated.View>
-        <TouchableWithoutFeedback delayLongPress={delayLongPress} onPress={onPress} onLongPress={onLongPress}>
-          <>
-            {children}
-          </>
-        </TouchableWithoutFeedback>
+        <TouchableOpacity delayLongPress={delayLongPress} onPress={onPress} onLongPress={onLongPress}>
+          {children}
+        </TouchableOpacity>
       </Animated.View>
     </Animated.View>
   )
