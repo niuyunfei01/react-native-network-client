@@ -1,5 +1,15 @@
 import React, {PureComponent} from "react";
-import {Easing, FlatList, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated} from "react-native";
+import {
+  Animated,
+  Easing,
+  FlatList,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -8,7 +18,7 @@ import {get_supply_bill_list} from "../../../reducers/settlement/settlementActio
 import Config from "../../../pubilc/common/config";
 import tool, {dateTime} from "../../../pubilc/util/tool.js";
 import colors from "../../../pubilc/styles/colors";
-import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -97,11 +107,9 @@ class SettlementScene extends PureComponent {
 
   getSupplyList = () => {
     let {store_id, accessToken, vendor_id} = this.props.global;
-    showModal('加载中...')
     const params = {new_format: 1}
     let url = `/api/get_supply_bill_list_v2/${vendor_id}/${store_id}/${this.state.dates}?access_token=${accessToken}`;
     HttpUtils.get(url, params).then(res => {
-      hideModal()
       const {bills = [], store_pay_info = [], support_payment = 0} = res
       const today = bills[0]
       this.setState({
@@ -114,7 +122,6 @@ class SettlementScene extends PureComponent {
         show_pay_info: Number(support_payment) === 1
       })
     }).catch((res) => {
-      hideModal()
       ToastShort(res.reason)
     })
   }
@@ -135,13 +142,14 @@ class SettlementScene extends PureComponent {
       <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
         <Text style={styles.headerRightText}>结算协议 </Text>
         <Animated.View
-          style = {{
-            opacity: fadeOutOpacity, position: 'absolute', top: 10, right: 50}}>
+          style={{
+            opacity: fadeOutOpacity, position: 'absolute', top: 10, right: 50
+          }}>
           <Entypo name={'triangle-up'} style={styles.upIcon}/>
           <View style={styles.msgModal}>
             <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
           </View>
-        </Animated.View >
+        </Animated.View>
       </TouchableOpacity>
     )
   }
@@ -416,7 +424,8 @@ class SettlementScene extends PureComponent {
   renderAgreementModal = () => {
     let {showAgreement, settleProtocolInfo} = this.state;
     return (
-      <CommonModal visible={showAgreement} position={'center'} onRequestClose={this.closeAgreeModal} animationType={'fade'}>
+      <CommonModal visible={showAgreement} position={'center'} onRequestClose={this.closeAgreeModal}
+                   animationType={'fade'}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>
             {settleProtocolInfo.ptl_title}
@@ -463,16 +472,17 @@ class SettlementScene extends PureComponent {
   renderPromptModal = () => {
     let {showPrompt, settleProtocolInfo} = this.state;
     return (
-      <CommonModal visible={showPrompt} position={'center'} onRequestClose={this.closePromptModal} animationType={'fade'}>
+      <CommonModal visible={showPrompt} position={'center'} onRequestClose={this.closePromptModal}
+                   animationType={'fade'}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>
             {settleProtocolInfo.tip_title}
           </Text>
           <Text style={[styles.modalContentDesc, {marginVertical: 10}]}>
             {settleProtocolInfo.tip_desc}<Text style={styles.agreementText} onPress={() => {
-              this.setState({
-                showPrompt
-              }, () => this.toSettleProtocol(true))
+            this.setState({
+              showPrompt
+            }, () => this.toSettleProtocol(true))
           }}>《结算协议》 </Text>。
           </Text>
           <View style={styles.modalBtnBottom}>

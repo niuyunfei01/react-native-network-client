@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -58,7 +58,6 @@ class PrinterRemark extends PureComponent {
   }
 
   get_printer_custom_cfg() {
-    showModal('加载中...')
     const {store_id, accessToken} = this.props.global;
     const api = `api/get_printer_custom_cfg/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
@@ -66,8 +65,6 @@ class PrinterRemark extends PureComponent {
         remark: res.remark,
         img: res.remark_img,
         isRefreshing: false
-      }, () => {
-        hideModal()
       })
     })
   }
@@ -87,24 +84,24 @@ class PrinterRemark extends PureComponent {
       },
       onComplete: () => {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
-          showSuccess('上传成功')
+          ToastShort('上传成功')
           const {newImageKey} = this.state;
           const uri = res + newImageKey
           this.setState({
             img: uri
           });
         }, () => {
-          showError("获取上传图片的地址失败");
+          ToastShort("获取上传图片的地址失败");
 
         })
       },
       onError: (data) => {
         switch (data.code) {
           case '-2':
-            showError('任务已暂停')
+            ToastShort('任务已暂停')
             break;
           default:
-            showError('错误：' + data.msg)
+            ToastShort('错误：' + data.msg)
             break;
         }
       }
@@ -142,7 +139,7 @@ class PrinterRemark extends PureComponent {
         ToastShort('操作成功')
         this.props.navigation.goBack();
       }, () => {
-        ToastLong('操作失败')
+        ToastShort('操作失败')
       })
     }, 1000)
   }

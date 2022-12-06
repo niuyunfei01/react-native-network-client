@@ -109,7 +109,6 @@ class OrderListItem extends React.PureComponent {
 
   fetchShipData = (item) => {
     tool.debounces(() => {
-      showModal('加载中...')
       const api = `/v1/new_api/orders/third_deliverie_record/${this.props.item.id}?access_token=${this.props.accessToken}`;
       HttpUtils.get.bind(this.props)(api).then(res => {
         hideModal()
@@ -196,13 +195,12 @@ class OrderListItem extends React.PureComponent {
 
   onOverlookDelivery = (order_id) => {
     const self = this;
-    showModal("请求中")
     tool.debounces(() => {
       const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('配送已完成')
+        ToastShort('配送已完成')
         this.props.fetchData();
       }).catch(e => {
         ToastShort('忽略配送失败' + e.desc)

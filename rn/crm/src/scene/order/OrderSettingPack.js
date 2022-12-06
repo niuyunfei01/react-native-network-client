@@ -3,7 +3,7 @@ import {bindActionCreators} from "redux";
 import {Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 import Entypo from "react-native-vector-icons/Entypo";
 import {Button, Slider} from 'react-native-elements';
@@ -204,7 +204,6 @@ class OrderSettingScene extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort("请粘贴地址", 0)
     }
-    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -212,7 +211,6 @@ class OrderSettingScene extends Component {
       this.setState({
         smartText: ''
       })
-      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
@@ -293,12 +291,10 @@ class OrderSettingScene extends Component {
         money: goods_price,
       }
 
-      showModal('正在保存订单，请稍等');
       const api = `/api/order_manual_create?access_token=${accessToken}`;
       HttpUtils.post.bind(this.props)(api, params).then(res => {
-        hideModal()
         if (status === 1) {
-          showSuccess("保存成功！")
+          ToastShort("保存成功！")
           this.mixpanel.track("V4手动下单_保存订单");
           this.timeOutBack(300);
         } else {
@@ -308,11 +304,9 @@ class OrderSettingScene extends Component {
               this.onCallThirdShips(res.WaimaiOrder.id, store_id)
             });
           } else {
-            showError('保存失败请重试！')
+            ToastShort('保存失败请重试！')
           }
         }
-      }).catch(() => {
-        hideModal()
       })
     })
   }
@@ -344,12 +338,12 @@ class OrderSettingScene extends Component {
       address_id: address_id,
       onBack: (res) => {
         if (res?.count > 0) {
-          showSuccess('发配送成功')
+          ToastShort('发配送成功')
           setTimeout(() => {
             this.props.navigation.goBack();
           }, 1000)
         } else {
-          showError('发配送失败，请联系运营人员')
+          ToastShort('发配送失败，请联系运营人员')
         }
       }
     });

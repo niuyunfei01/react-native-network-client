@@ -10,7 +10,7 @@ import {Button, List, Radio} from "@ant-design/react-native";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../../weui";
 import JbbText from "../../common/component/JbbText";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from '../../../pubilc/util/tool'
 import Entypo from "react-native-vector-icons/Entypo";
 
@@ -79,7 +79,6 @@ class CloudPrinterScene extends PureComponent {
   }
 
   get_store_print() {
-    showModal('加载中...')
     const {store_id, accessToken} = this.props.global;
     const api = `api/get_store_printers_info/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
@@ -106,7 +105,6 @@ class CloudPrinterScene extends PureComponent {
         submit_add: submit_add,
         check_key: check_key,
       })
-      hideModal()
     })
   }
 
@@ -123,7 +121,7 @@ class CloudPrinterScene extends PureComponent {
               this.startCountDown()
             }
           }])
-          ToastLong('测试打印成功')
+          ToastShort('测试打印成功')
         }, (ok, reason, obj) => {
           Alert.alert('提示', `测试打印失败:${reason}`, [{
             text: '确定'
@@ -163,7 +161,7 @@ class CloudPrinterScene extends PureComponent {
       const {dispatch} = this.props
       let that = this;
       if (!that.state.sn || !that.state.printer) {
-        ToastLong("参数缺失");
+        ToastShort("参数缺失");
         return;
       }
       const {store_id, accessToken} = this.props.global;
@@ -177,7 +175,7 @@ class CloudPrinterScene extends PureComponent {
       let printer_list = that.state.cloud_printer_list;
       for (let i = 0; i < tool.length(printer_list); i++) {
         if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
-          ToastLong("参数缺失");
+          ToastShort("参数缺失");
           return;
         }
       }
@@ -194,7 +192,7 @@ class CloudPrinterScene extends PureComponent {
           onPress: () => that.printTest()
         }])
       }, () => {
-        showError('绑定失败')
+        ToastShort('绑定失败')
       })
     }, 1000)
   }
@@ -204,10 +202,9 @@ class CloudPrinterScene extends PureComponent {
       const {dispatch} = this.props
       let that = this;
       if (!that.state.sn || !that.state.printer) {
-        showError("参数缺失");
+        ToastShort("参数缺失");
         return;
       }
-      showModal('解绑中...')
       const {store_id, accessToken} = this.props.global;
       const api = `api/clear_printers_and_read_store/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(() => {
@@ -223,9 +220,7 @@ class CloudPrinterScene extends PureComponent {
           submit_add: true,
           check_key: true,
         });
-        showSuccess("解绑成功");
-      }, () => {
-        hideModal();
+        ToastShort("解绑成功");
       })
     }, 1000)
   }

@@ -1740,9 +1740,8 @@ const headerRightStyles = StyleSheet.create({
   resetBind: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginRight: 10,
     width: 100,
-    padding: 10
+    paddingVertical: 10
   },
   text: {fontSize: 20, color: colors.color666}
 })

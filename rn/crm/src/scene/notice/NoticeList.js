@@ -18,7 +18,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {connect} from "react-redux";
 import NoticeItem from "./NoticeItem";
-import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 
 const {width} = Dimensions.get("window");
 
@@ -82,7 +81,6 @@ class NoticeList extends React.PureComponent {
 
 
   fetchData = (paramsStatus, setList = 1) => {
-    showModal("加载中...")
     if (setList === 1) this.fetchNum();
     let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -99,14 +97,11 @@ class NoticeList extends React.PureComponent {
         queryParams.isAdd = false;
       }
       queryParams.page++;
-      hideModal();
       this.setState({
         list: setList === 1 ? res.list : list.concat(res.list),
         isLoading: false,
         queryParams,
       })
-    }, () => {
-      hideModal();
     })
   }
 
