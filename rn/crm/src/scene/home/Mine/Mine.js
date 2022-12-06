@@ -277,7 +277,7 @@ class Mine extends PureComponent {
       access_token: accessToken
     }).then(res => {
       this.setState({
-        showSettle: res.is_show == 0
+        showSettle: res.is_show == 1
       })
     }).catch((res) => {
       ToastShort(res.reason)

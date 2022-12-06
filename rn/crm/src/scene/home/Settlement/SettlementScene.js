@@ -32,6 +32,8 @@ import {Button} from "react-native-elements";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
+import {SvgXml} from "react-native-svg";
+import {back} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -78,10 +80,6 @@ class SettlementScene extends PureComponent {
   componentDidMount() {
     this.fetchSettleProtocol()
     this.getSupplyList()
-    // let {navigation} = this.props;
-    // navigation.setOptions({
-    //   headerRight: () => this.renderHeaderRight()
-    // })
   }
 
   onPress(route, params = {}) {
@@ -133,21 +131,15 @@ class SettlementScene extends PureComponent {
     }).start();
   }
 
-  renderHeaderRight = () => {
-    let {settleProtocolInfo, fadeOutOpacity} = this.state;
+  renderHead = () => {
     return (
-      <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
-        <Text style={styles.headerRightText}>结算协议 </Text>
-        <Animated.View
-          style={{
-            opacity: fadeOutOpacity, position: 'absolute', top: 10, right: 50
-          }}>
-          <Entypo name={'triangle-up'} style={styles.upIcon}/>
-          <View style={styles.msgModal}>
-            <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
+      <View style={styles.head}>
+        <SvgXml onPress={() => this.props.navigation.goBack()} xml={back()}/>
+        <Text style={styles.headTitle}>结算 </Text>
+        <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
+          <Text style={styles.headerRightText}>结算协议 </Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -242,8 +234,9 @@ class SettlementScene extends PureComponent {
   render() {
     const {show_pay_info} = this.state
     return (
-      <>
-        {this.renderHeaderRight()}
+      <View style={{flex: 1}}>
+        {this.renderHead()}
+        {this.renderAnimated()}
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
@@ -257,8 +250,23 @@ class SettlementScene extends PureComponent {
           {this.renderAgreementModal()}
           {this.renderPromptModal()}
         </ScrollView>
-      </>
+      </View>
     );
+  }
+
+  renderAnimated = () => {
+    let {settleProtocolInfo, fadeOutOpacity} = this.state;
+    return (
+      <Animated.View
+        style={{
+          opacity: fadeOutOpacity, position: 'absolute', top: 25, right: 60, zIndex: 999
+        }}>
+        <Entypo name={'triangle-up'} style={styles.upIcon}/>
+        <View style={styles.msgModal}>
+          <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
+        </View>
+      </Animated.View>
+    )
   }
 
   renderPayList() {
@@ -455,8 +463,6 @@ class SettlementScene extends PureComponent {
                     onPress={() => {
                       this.clickProtocol('ptl_agree')
                       this.setState({showAgreement: false}, () => {
-                        this.startAnimation()
-return
                         this.submitAgree()
                       })
                     }}
@@ -505,7 +511,7 @@ return
 }
 
 const styles = StyleSheet.create({
-  page: {flex: 1, padding: 10},
+  page: {padding: 10},
   accountZoneWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8},
   accountWrap: {flexDirection: 'row', alignItems: 'center', height: 45},
   accountTipText: {color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 22},
@@ -607,7 +613,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 5
   },
-  tipText: {fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35}
+  tipText: {fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35},
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: "space-between",
+    height: 44,
+    backgroundColor: colors.white,
+    paddingHorizontal: 6
+  },
+  headTitle: {
+    color: colors.color333,
+    fontSize: 17,
+    fontWeight: 'bold',
+    lineHeight: 24
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene);
