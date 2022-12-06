@@ -448,7 +448,7 @@ class SearchOrder extends PureComponent {
           <SvgXml style={{marginBottom: 10}} xml={empty_order()}/>
           <If condition={tool.length(keyword) > 0}>
             <Text style={styles.noOrderDesc}> 未查询到订单 </Text>
-            <Text style={styles.noOrderDesc}> 目前只支持查询近90天内订单查询 </Text>
+            <Text style={styles.noOrderDesc}> 目前只支持查询近90天内订单 </Text>
           </If>
           <If condition={tool.length(keyword) <= 0}>
             <Text style={styles.noOrderDesc}> 搜索支持如下类型关键词 </Text>
