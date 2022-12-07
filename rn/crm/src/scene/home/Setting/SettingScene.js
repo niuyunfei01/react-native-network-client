@@ -407,31 +407,23 @@ class SettingScene extends PureComponent {
         <View style={styles.item_body}>
           <Text style={styles.item_title}>小票设置 </Text>
           <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+
             <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 0)}
-                              style={{
-                                borderBottomWidth: 1,
-                                borderColor: colors.colorEEE,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90),
-                              }}>
-              <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>
-                使用平台店名与平台单号
-              </Text>
+                              style={styles.item_row}>
+              <View style={{flex: 1}}>
+                <Text style={styles.row_label}>使用平台店名与平台单号 </Text>
+                <Text style={styles.row_label_desc}>骑手侧可见外卖门店名称和单号 </Text>
+              </View>
               <If condition={invoice_serial_font === 0}>
                 <Entypo name={'check'} size={22} color={colors.main_color}/>
               </If>
             </TouchableOpacity>
-
             <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 1)}
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 8,
-                                height: pxToDp(90)
-                              }}>
-              <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>使用商家名称与总单号 </Text>
+                              style={styles.item_row}>
+              <View style={{flex: 1}}>
+                <Text style={styles.row_label}>使用商家名称与总单号 </Text>
+                <Text style={styles.row_label_desc}>骑手侧可见外送帮门店名称和单号 </Text>
+              </View>
               <If condition={invoice_serial_font === 1}>
                 <Entypo name={'check'} size={22} color={colors.main_color}/>
               </If>

@@ -265,8 +265,6 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
                       getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
         />
-        <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
-                      getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreList").default}/>
         <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}

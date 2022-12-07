@@ -635,8 +635,8 @@ class OrderItem extends React.PureComponent {
           onClose={this.closeModal}
           onPressClose={this.closeModal}
           onPress={() => this.onOverlookDelivery(item?.id)}
-          title={'忽略配送会影响配送回传，确定要忽略吗？'}
-          actionText={'忽略'}
+          title={'忽略订单将会把该订单置为已完成，请选择“忽略并上传”将会上传配送信息至平台，提升回传率，避免产生回传不达标造成管控'}
+          actionText={'忽略并上传'}
           closeText={'暂不'}/>
       </View>
     )
