@@ -1,10 +1,9 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
-  Dimensions,
   Image,
   InteractionManager,
-  PixelRatio,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,10 +16,8 @@ import {Dialog} from "../../../weui";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../../pubilc/util/analytics';
-import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from "../../../pubilc/styles/colors";
-import Icon from "react-native-vector-icons/Entypo";
 import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
@@ -29,6 +26,8 @@ import {Button} from "react-native-elements";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import {SvgXml} from "react-native-svg";
 import {
+  check_circle_icon,
+  cross_circle_icon,
   empty_data,
   platformLogoEleme,
   platformLogoJD,
@@ -39,8 +38,8 @@ import {
 } from "../../../svg/svg";
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global};
+  const {global} = state;
+  return {global: global};
 }
 
 const mapDispatchToProps = dispatch => {
@@ -49,7 +48,6 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const width = Dimensions.get("window").width;
 
 const timeOptions = [
   {label: '30分钟', value: 30, key: 30},
@@ -71,7 +69,7 @@ class StoreStatusScene extends PureComponent {
     label: '取消',
     sty: {
       borderColor: 'gray',
-      borderWidth: pxToDp(1),
+      borderWidth: 0.5,
     },
     onPress: () => this.setState({dialogVisible: false})
   }, {
@@ -80,7 +78,7 @@ class StoreStatusScene extends PureComponent {
     sty: {
       backgroundColor: colors.b2,
       borderColor: 'gray',
-      borderWidth: pxToDp(1),
+      borderWidth: 0.5,
     },
     textsty: {
       color: colors.white,
@@ -92,15 +90,13 @@ class StoreStatusScene extends PureComponent {
 
   constructor(props) {
     super(props)
-
     let {is_service_mgr} = tool.vendor(this.props.global);
-
-
     this.state = {
       all_close: false,
       all_open: false,
       allow_self_open: false,
       business_status: [],
+      loading: false,
       show_body: false,
       allow_merchants_store_bind: false,
       is_service_mgr: is_service_mgr,
@@ -111,28 +107,26 @@ class StoreStatusScene extends PureComponent {
       modal: false,
       alert_msg: ''
     }
-
     this.mixpanel = MixpanelInstance;
-  }
-
-  componentWillUnmount() {
-    this.focus()
   }
 
   componentDidMount() {
     const {navigation, global} = this.props
-    let {is_service_mgr, currVendorId} = tool.vendor(this.props.global);
+    let {store_id, vendor_id} = global
+    let {is_service_mgr} = tool.vendor(this.props.global);
+    let {total_wm_stores} = this.state;
+    this.mixpanel.track("mine.wm_store_list", {store_id, vendor_id, total_wm_stores});
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => {
                                      this.onPress(Config.PLATFORM_BIND)
-                                     this.mixpanel.track("mine.wm_store_list.click_add", {currStoreId, currVendorId});
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
                                    }}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
-              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
+              <Text style={{fontSize: 15, color: colors.main_color,}}>绑定外卖店铺 </Text>
+              <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
             </View>
           </TouchableOpacity>
         }
@@ -142,14 +136,19 @@ class StoreStatusScene extends PureComponent {
       this.fetchData()
     })
 
-    let {total_wm_stores} = this.state
-    let {currStoreId, vendor_id} = global
-    this.mixpanel.track("mine.wm_store_list", {currStoreId, vendor_id, total_wm_stores});
+  }
+
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   fetchData = () => {
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global
+    this.setState({
+      loading: true,
+    })
+    const api = `/api/get_store_business_status/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       let show_body = false;
       if (tool.length(res.business_status) > 0) {
@@ -157,6 +156,7 @@ class StoreStatusScene extends PureComponent {
       }
 
       this.setState({
+        loading: false,
         all_close: res.all_close,
         all_open: res.all_open,
         allow_self_open: res.allow_self_open,
@@ -167,7 +167,7 @@ class StoreStatusScene extends PureComponent {
         allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0',
         alert_msg: res.alert_msg,
       })
-      const {updateStoreStatusCb} = this.props.route.params;
+      const {updateStoreStatusCb = undefined} = this.props.route.params;
       if (updateStoreStatusCb) {
         updateStoreStatusCb(res)
       }
@@ -189,14 +189,20 @@ class StoreStatusScene extends PureComponent {
 
   openStore() {
     showModal('请求中...')
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/api/open_store/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+    const {accessToken, store_id} = this.props.global
+    const api = `/api/open_store/${store_id}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {}).then(() => {
       hideModal()
       this.fetchData()
       showSuccess('操作成功')
     }).catch(() => {
       showError('操作失败')
+    })
+  }
+
+  closeModal = () => {
+    this.setState({
+      modal: false
     })
   }
 
@@ -210,167 +216,6 @@ class StoreStatusScene extends PureComponent {
         }
       },
     ]);
-  }
-
-  renderBody() {
-    const {business_status} = this.state
-    const {currStoreId, vendor_id} = this.props.global
-
-    return (
-      <ScrollView
-        automaticallyAdjustContentInsets={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={styles.bodyContainer}>
-        {
-          business_status && business_status.map((store, index) => {
-            let suspend_confirm_order = store.suspend_confirm_order === '0'
-            return (
-              <TouchableOpacity key={index} onPress={() => {
-
-                this.mixpanel.track("mine.wm_store_list.click_store", {currStoreId, vendor_id});
-
-                this.onPress(Config.ROUTE_SEETING_DELIVERY, {
-                  ext_store_id: store.id,
-                  store_id: currStoreId,
-                  poi_name: store.poi_name,
-                  showBtn: store.zs_way === '商家自送',
-                })
-              }}>
-                <View style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  paddingTop: pxToDp(14),
-                  paddingBottom: pxToDp(14),
-                  borderTopWidth: 1 / PixelRatio.get(),
-                  borderTopColor: colors.colorDDD,
-                  backgroundColor: colors.white
-                }}>
-
-                  <View style={{
-                    width: pxToDp(120),
-                    height: pxToDp(130),
-                    paddingLeft: pxToDp(20),
-                    paddingRight: pxToDp(20),
-                    marginRight: pxToDp(20),
-                  }}>
-                    <SvgXml xml={this.getPlatIcon(store.icon_name)}/>
-                    {/*<Image style={{*/}
-                    {/*  width: pxToDp(100),*/}
-                    {/*  height: pxToDp(100),*/}
-                    {/*  marginTop: pxToDp(20),*/}
-                    {/*}} source={this.getPlatIcon(store.icon_name)}/>*/}
-
-                    <TouchableOpacity onPress={() => this.setState({
-                      modal: true
-                    })} style={{
-                      position: 'absolute',
-                      left: pxToDp(82),
-                      top: pxToDp(4),
-                      textAlign: 'center',
-                    }}>
-                      <If condition={store.business_id}>
-                        <AntDesign name='earth' style={[styles.right_btn, {fontSize: pxToDp(35)}]}/>
-                      </If>
-                    </TouchableOpacity>
-
-                  </View>
-
-                  <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-                    <View style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      marginRight: pxToDp(20),
-                      position: "relative"
-                    }}>
-                      <Text style={styles.wm_store_name}>
-                        {tool.jbbsubstr(store?.name, 13)}
-                      </Text>
-                      <Text
-                        style={[!store.open ? styles.close_text : styles.open_text, {
-                          fontSize: pxToDp(24),
-                          position: 'absolute',
-                          top: "10%",
-                          right: "3%"
-                        }]}>
-                        {store.status_label}
-                      </Text>
-                    </View>
-                    <View style={[styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-                      <If condition={store.show_open_time}>
-                        <Text style={{color: '#595959', width: pxToDp(300), fontSize: pxToDp(20)}}>
-                          开店时间：{store.next_open_desc || store.next_open_time}
-                        </Text>
-                      </If>
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                      <Text style={{fontSize: pxToDp(20), paddingTop: pxToDp(7),}}>
-                        {store.zs_way}
-                      </Text>
-                      <View style={{flex: 1,}}></View>
-                      {/*<Text style={{*/}
-                      {/*  fontSize: pxToDp(20),*/}
-                      {/*  paddingTop: pxToDp(7),*/}
-                      {/*}}>*/}
-                      {/*  {store.auto_call}*/}
-                      {/*</Text>*/}
-                    </View>
-                    <If condition={store.zs_way === '商家自送'}>
-                      <View style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginTop: pxToDp(10)
-                      }}>
-                        <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                          <Image
-                            source={store.auto_call == '已开启自动呼叫' ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
-                            style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                          <Text style={{color: colors.color333}}>自动呼叫配送</Text>
-                        </View>
-                        <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                          <Image
-                            source={suspend_confirm_order == 1 ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
-                            style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                          <Text style={{color: colors.color333}}>自动接单</Text>
-                        </View>
-                        <View style={{width: pxToDp(70)}}>
-                          <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
-                        </View>
-                      </View>
-                    </If>
-                  </View>
-                </View>
-
-              </TouchableOpacity>
-            )
-          })
-        }
-      </ScrollView>
-    )
-  }
-
-  closeModal = () => {
-    this.setState({
-      modal: false
-    })
-  }
-
-  renderNoBody() {
-    return (
-      <View style={styles.noOrderContent}>
-        <SvgXml xml={empty_data()}/>
-        <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
-          <Text style={styles.noOrderDesc}>暂无绑定外卖店铺</Text>
-          <Button title={'去绑定'}
-                  onPress={() => this.onPress(Config.PLATFORM_BIND)}
-                  buttonStyle={styles.noOrderBtn}
-                  titleStyle={styles.noOrderBtnTitle}
-          />
-        </If>
-      </View>
-    )
   }
 
   getPlatIcon = (icon_name) => {
@@ -390,57 +235,14 @@ class StoreStatusScene extends PureComponent {
     }
   }
 
-  renderFooter() {
-    const {accessToken, currStoreId} = this.props.global
-    let canOpen = !this.state.all_open && this.state.allow_self_open
-    let canClose = !this.state.all_close && this.state.allow_self_open
-    return (
-      <View style={styles.footerContainer}>
-        <If condition={canOpen}>
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
-            <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
-              <Text style={styles.footerBtnText}>开店接单 </Text>
-            </View>
-          </TouchableOpacity>
-        </If>
-        <If condition={!canOpen}>
-          <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
-            <Text style={styles.footerBtnText}>开店接单 </Text>
-          </View>
-        </If>
-
-
-        <If condition={canClose}>
-          <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}
-                            onPress={() => {
-                              this.onPress(Config.ROUTE_STORE_CLOSE, {
-                                data: timeOptions,
-                                access_token: accessToken,
-                                store_id: currStoreId
-                              })
-                            }}>
-            <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-              <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
-            </View>
-          </TouchableOpacity>
-        </If>
-        <If condition={!canClose}>
-          <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
-          </View>
-        </If>
-      </View>
-    )
-  }
-
   getLabelOfCloseBtn() {
     return this.state.all_close ? '已全部关店' : "紧急关店"
   }
 
   setAutoTaskOrder() {
     showModal("修改中");
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/api/set_store_suspend_confirm_order/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global
+    const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       hideModal()
       showSuccess('操作成功');
@@ -449,30 +251,50 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
+
   render() {
-    return (<View style={{flex: 1, backgroundColor: colors.f5}}>
-        <View style={{flex: 1}}>
-          <If condition={!this.state.show_body}>
-            {this.renderNoBody()}
+    let {loading, show_body, dialogVisible, modal} = this.state;
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{
+            flexGrow: 1,
+            backgroundColor: colors.f5
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={() => this.fetchData()}
+              tintColor='gray'
+            />
+          }
+        >
+          <If condition={!loading}>
+            <If condition={!show_body}>
+              {this.renderNoBody()}
+            </If>
+            <If condition={show_body}>
+              {this.renderBody()}
+            </If>
           </If>
-
-          <If condition={this.state.show_body}>
-            {this.renderBody()}
-            {this.renderFooter()}
-          </If>
-        </View>
-
+        </ScrollView>
+        <If condition={!loading && show_body}>
+          {this.renderBtn()}
+        </If>
         <Dialog
           onRequestClose={() => this.setState({dialogVisible: false})}
-          visible={this.state.dialogVisible}
+          visible={dialogVisible}
           buttons={this.buttons}
         >
           <View>
             <Text style={{flexDirection: 'row', textAlign: 'center'}}>
-              <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
-              {/*<Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>*/}
+              <Text style={{fontSize: 15}}>是否允许外送帮自动接单</Text>
+              {/*<Text style={{fontSize: 12.5, color: colors.main_color}}>查看详情</Text>*/}
             </Text>
-            <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
+            <Text style={{fontSize: 12.5, textAlign: 'center'}}>你可以从这里再找到它</Text>
             <View style={{flexDirection: 'row'}}>
               <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder2.png'}}
                      style={styles.image}/>
@@ -483,7 +305,7 @@ class StoreStatusScene extends PureComponent {
         </Dialog>
 
         <BottomModal title={'提示'} actionText={'确定'} closeText={'取消'} onPress={this.closeModal}
-                     visible={this.state.modal} onPressClose={this.closeModal}
+                     visible={modal} onPressClose={this.closeModal}
                      onClose={this.closeModal}
                      btnBottomStyle={{
                        borderTopWidth: 1,
@@ -499,7 +321,7 @@ class StoreStatusScene extends PureComponent {
                      btnStyle={{borderWidth: 0, backgroundColor: colors.white}}
                      closeBtnTitleStyle={{color: colors.color333}}
                      btnTitleStyle={{color: colors.main_color}}>
-          <View style={{paddingVertical: 10, paddingHorizontal: 10}}>
+          <View style={{padding: 10}}>
             <Text style={{color: colors.red, fontSize: 12}}> &nbsp;&nbsp;&nbsp;收银模式有以下特点 </Text>
             <View style={{flexDirection: 'row', marginTop: 4}}>
               <Entypo style={{fontSize: 14, color: colors.color333,}} name={'controller-record'}/>
@@ -521,51 +343,211 @@ class StoreStatusScene extends PureComponent {
       </View>
     )
   }
+
+  renderBtn = () => {
+    const {accessToken, store_id} = this.props.global
+    let {all_open, allow_self_open, all_close} = this.state;
+    let canOpen = !all_open && allow_self_open
+    let canClose = !all_close && allow_self_open
+    return (
+      <View style={{
+        flexDirection: 'row',
+        height: 40,
+      }}>
+        <If condition={canOpen}>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
+            <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+              <Text style={styles.footerBtnText}>开店接单 </Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+
+        <If condition={!canOpen}>
+          <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+            <Text style={styles.footerBtnText}>开店接单 </Text>
+          </View>
+        </If>
+
+        <If condition={canClose}>
+          <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}
+                            onPress={() => {
+                              this.onPress(Config.ROUTE_STORE_CLOSE, {
+                                data: timeOptions,
+                                access_token: accessToken,
+                                store_id: store_id
+                              })
+                            }}>
+            <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+              <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+
+        <If condition={!canClose}>
+          <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
+          </View>
+        </If>
+
+      </View>
+    )
+  }
+
+
+  renderBody = () => {
+    const {business_status} = this.state
+    const {store_id, vendor_id} = this.props.global
+    return (
+      <View style={{
+        flex: 1,
+      }}>
+        {
+          business_status && business_status.map((store, index) => {
+            let suspend_confirm_order = store.suspend_confirm_order === '0'
+            return (
+              <TouchableOpacity key={index} onPress={() => {
+                this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
+                this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+                  ext_store_id: store.id,
+                  store_id: store_id,
+                  poi_name: store.poi_name,
+                  showBtn: store.zs_way === '商家自送',
+                })
+              }}>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingVertical: 7,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.colorDDD,
+                  backgroundColor: colors.white
+                }}>
+
+                  <View style={{
+                    width: 60,
+                    height: 65,
+                    paddingHorizontal: 10,
+                    marginRight: 10,
+                  }}>
+                    <SvgXml xml={this.getPlatIcon(store.icon_name)}/>
+                    <TouchableOpacity onPress={() => this.setState({
+                      modal: true
+                    })} style={{
+                      position: 'absolute',
+                      left: 41,
+                      top: 2,
+                      textAlign: 'center',
+                    }}>
+                      <If condition={store.business_id}>
+                        <AntDesign name='earth' style={[styles.right_btn, {fontSize: 18}]}/>
+                      </If>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+                    <View style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      marginRight: 10,
+                      position: "relative"
+                    }}>
+                      <Text style={styles.wm_store_name}>
+                        {tool.jbbsubstr(store?.name, 13)}
+                      </Text>
+                      <Text
+                        style={[!store.open ? styles.close_text : styles.open_text, {
+                          fontSize: 12,
+                          position: 'absolute',
+                          top: "10%",
+                          right: "3%"
+                        }]}>
+                        {store.status_label}
+                      </Text>
+                    </View>
+                    <View style={[styles.between, {marginTop: 2, marginEnd: 5}]}>
+                      <If condition={store.show_open_time}>
+                        <Text style={{color: '#595959', width: 150, fontSize: 10}}>
+                          开店时间：{store.next_open_desc || store.next_open_time}
+                        </Text>
+                      </If>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={{fontSize: 10, paddingTop: 3,}}>
+                        {store.zs_way}
+                      </Text>
+                      <View style={{flex: 1,}}/>
+                    </View>
+                    <If condition={store.zs_way === '商家自送'}>
+                      <View style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 5
+                      }}>
+                        <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                          <SvgXml width={12} height={12} style={{marginRight: 5}}
+                                  xml={store.auto_call == '已开启自动呼叫' ? check_circle_icon() : cross_circle_icon()}/>
+
+                          <Text style={{color: colors.color333}}>自动呼叫配送</Text>
+                        </View>
+                        <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                          <SvgXml width={12} height={12} style={{marginRight: 5}}
+                                  xml={suspend_confirm_order == 1 ? check_circle_icon() : cross_circle_icon()}/>
+
+                          <Text style={{color: colors.color333}}>自动接单</Text>
+                        </View>
+                        <View style={{width: 35}}>
+                          <Entypo name='chevron-thin-right' style={[styles.right_btns]}/>
+                        </View>
+                      </View>
+                    </If>
+                  </View>
+                </View>
+
+              </TouchableOpacity>
+            )
+          })
+        }
+      </View>
+    )
+  }
+
+
+  renderNoBody = () => {
+    let {allow_merchants_store_bind, is_service_mgr} = this.state;
+    return (
+      <View style={styles.noOrderContent}>
+        <SvgXml xml={empty_data()}/>
+        <If condition={allow_merchants_store_bind || is_service_mgr}>
+          <Text style={styles.noOrderDesc}>暂无绑定外卖店铺</Text>
+          <Button title={'去绑定'}
+                  onPress={() => this.onPress(Config.PLATFORM_BIND)}
+                  buttonStyle={styles.noOrderBtn}
+                  titleStyle={styles.noOrderBtnTitle}
+          />
+        </If>
+      </View>
+    )
+  }
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoreStatusScene)
 
 const styles = StyleSheet.create({
   bodyContainer: {
-    flex: 1
-  },
-  cell_title: {
-    marginTop: pxToDp(30),
-    marginBottom: pxToDp(10),
-    fontSize: pxToDp(26),
-    color: colors.color999
-  },
-  cells: {
-    marginBottom: pxToDp(10),
-    marginTop: 0,
-    paddingLeft: pxToDp(30),
-    borderTopWidth: pxToDp(1),
-    borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999
-  },
-  wmStatusIcon: {
-    width: pxToDp(72),
-    height: pxToDp(72),
-    marginLeft: pxToDp(20),
-    marginRight: pxToDp(20),
-  },
-  cell_height: {
-    height: pxToDp(70)
-  },
-  cell_content: {
-    justifyContent: "center",
-    marginLeft: 0,
-    paddingRight: 0
+    flexGrow: 1
   },
   wm_store_name: {
-    fontSize: pxToDp(30),
+    fontSize: 15,
     fontWeight: "bold",
     color: colors.listTitleColor
   },
   footerContainer: {
+    flex: 1,
     flexDirection: 'row',
-    height: pxToDp(80),
-    width: '100%'
+    height: 40,
   },
   footerItem: {
     width: '50%',
@@ -590,36 +572,21 @@ const styles = StyleSheet.create({
   footerBtnText: {
     color: '#fff'
   },
-  btn_edit: {
-    fontSize: pxToDp(40),
-    width: pxToDp(42),
-    height: pxToDp(36),
-    color: colors.color666,
-    marginRight: pxToDp(30),
-  },
   right_btn: {
     color: colors.main_color,
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(7),
-    marginLeft: pxToDp(10),
+    fontSize: 12.5,
+    paddingTop: 3.5,
+    marginLeft: 5,
   },
   right_btns: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(7),
-    marginLeft: pxToDp(10),
-  },
-  status_err: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(15),
-    padding: pxToDp(3),
-    color: colors.f7,
+    fontSize: 12.5,
+    paddingTop: 3.5,
+    marginLeft: 5,
   },
   image: {
-    width: pxToDp(240),
-    margin: pxToDp(15),
-    height: pxToDp(400),
+    width: 120,
+    margin: 7,
+    height: 200,
   },
   open_text: {
     color: colors.main_color,

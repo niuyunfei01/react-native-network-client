@@ -19,18 +19,21 @@ export default class CommonModal extends PureComponent {
 
   static propTypes = {
     visible: PropTypes.bool,
-    onClose: PropTypes.func,
-    position: PropTypes.string
+    onRequestClose: PropTypes.func,
+    onShow: PropTypes.func,
+    children:PropTypes.element,
+    position: PropTypes.string,
+    animationType: PropTypes.string
   }
 
   render() {
-    const {visible, children, position, onRequestClose, onShow} = this.props
+    const {visible, children, position, onRequestClose, onShow, animationType = 'slide'} = this.props
     const positionStyle = position && position === 'flex-end' ? styles.flexEnd : styles.center
     return (
       <Modal hardwareAccelerated={true}
              transparent={true}
              visible={visible}
-             animationType={'slide'}
+             animationType={animationType}
              onShow={onShow && onShow}
              onRequestClose={onRequestClose}>
         <SafeAreaView style={[styles.page, positionStyle]}>

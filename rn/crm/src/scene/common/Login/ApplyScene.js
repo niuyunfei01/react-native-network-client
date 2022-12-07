@@ -211,25 +211,21 @@ class ApplyScene extends PureComponent {
     }, this.props))
   }
 
-  queryConfig = (accessToken, currStoreId) => {
+  queryConfig = (accessToken, storeId) => {
     const {dispatch} = this.props;
-    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    dispatch(getConfig(accessToken, storeId, (ok, err_msg, cfg) => {
       if (ok) {
-        let store_id = cfg?.store_id || currStoreId;
-        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
+        let store_id = cfg?.store_id || storeId;
+        this.doneSelectStore(store_id);
       } else {
         ToastShort(err_msg);
       }
     }));
   }
 
-  doneSelectStore = (storeId, show_bottom_tab = true) => {
+  doneSelectStore = (storeId) => {
     const {dispatch, navigation} = this.props;
     dispatch(setCurrentStore(storeId));
-    if (show_bottom_tab) {
-      hideModal()
-      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
-    }
     tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
       initTab: Config.ROUTE_ORDERS,
       initialRouteName: Config.ROUTE_ALERT
@@ -400,13 +396,13 @@ class ApplyScene extends PureComponent {
               this.mixpanel.track("nfo_locatestore_click", {});
               const params = {
                 center: center,
-                cityName: this.state.cityname,
+                city_name: this.state.cityname,
                 keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
                 onBack: (res) => {
                   this.setAddress.bind(this)(res)
                 },
               };
-              this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+              this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
             }} buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}
                     titleStyle={{fontSize: 14, color: colors.white}}
                     title={"定位门店"}/>

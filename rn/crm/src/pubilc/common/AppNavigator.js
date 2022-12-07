@@ -1,21 +1,20 @@
-import React, {useRef, PureComponent} from "react";
+import React, {PureComponent, useEffect, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Alert, Dimensions, Platform} from "react-native";
+import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import {setCheckVersionAt} from "../../reducers/global/globalActions";
 import store from "../util/configureStore";
-import tool from "../util/tool";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
-import {setAccessToken, setCheckVersionAt} from "../../reducers/global/globalActions";
 import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
@@ -23,13 +22,16 @@ import GlobalUtil from "../util/GlobalUtil";
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 import {AMapSdk} from "react-native-amap3d";
 import DeviceInfo from "react-native-device-info";
-import {downloadApk} from "rn-app-upgrade";
+import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
+import CommonModal from "../component/goods/CommonModal";
+
 
 let {width} = Dimensions.get("window");
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const screenOptions = ({
   headerShown: true,
+  gestureEnabled: true,
   headerStyle: {
     height: 40,
   },
@@ -59,10 +61,24 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
 const Page = (props) => {
   const {initialRouteName, initialRouteParams} = props;
   const routeNameRef = useRef();
   initialRouteParams.initialRouteName = initialRouteName
+  if (Platform.OS === 'ios')
+    useEffect(() => {
+      async function run() {
+        const isSetup = await require('../component/musicService').SetupService();
+
+        const queue = await require('react-native-track-player').default.getQueue()
+        if (isSetup && queue.length <= 0) {
+          await require('../component/musicService/QueueInitialTracksService').QueueInitialTracksService()
+        }
+      }
+
+      run()
+    }, [])
   return (
     <NavigationContainer ref={navigationRef}
                          onReady={() => routeNameRef.current = navigationRef.current.getCurrentRoute().name}
@@ -89,6 +105,9 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
+        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
+        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -98,6 +117,10 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDERS} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderListScene").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_ORDER_ALL} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/OrderAllScene").default}
+                      initialParams={initialRouteParams}/>
+
         <Stack.Screen name={Config.ROUTE_MINE_NEW} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Mine/Mine").default}
                       initialParams={initialRouteParams}/>
@@ -110,7 +133,7 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../../scene/home/Delivery/DeliveryInfo").default}/>
@@ -198,9 +221,9 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
 
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderAinSend").default}*/}
-        {/*/>*/}
+        <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
+                      getComponent={() => require("../../scene/order/OrderAinSend").default}
+        />
 
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../../scene/order/OrderEditStoreScene").default}/>
@@ -213,6 +236,8 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderSurcharge").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderSearchScene").default}/>
+        <Stack.Screen name={Config.ROUTE_SEARCH_ORDER} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/order/SearchOrder").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN} options={{headerTitle: '订单过机'}}
                       getComponent={() => require("../../scene/order/OrderScan").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} options={{headerTitle: '扫码打包完成'}}
@@ -242,6 +267,10 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/StoreList").default}/>
+        <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/SaveStore").default}/>
 
         <Stack.Screen name={Config.ROUTE_STORE_ADD} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreInfo").default}
@@ -274,14 +303,20 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_GOOD_STORE_DETAIL} options={{headerTitle: '门店商品详情'}}
                       getComponent={() => require("../../scene/product/Goods/GoodStoreDetailScene").default}
         />
-        <Stack.Screen name={Config.ROUTE_VERSION} options={{headerTitle: '版本信息'}}
-                      getComponent={() => require("../../scene/home/Mine/VersionScene").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_VERSION} options={{headerTitle: '版本信息'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Mine/VersionScene").default}/>*/}
         <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} options={{headerTitle: '申请记录'}}
                       getComponent={() => require("../../scene/product/Goods/GoodsApplyRecordScene").default}
                       initialParams={initialRouteParams}/>
 
         <Stack.Screen name={Config.ROUTE_GOODS_EDIT}
                       getComponent={() => require("../../scene/product/Goods/GoodsEditScene").default}
+                      initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_SELECT_SPEC} options={{headerTitle: '选择规格'}}
+                      getComponent={() => require("../../scene/product/Goods/GoodsSelectSpecScene").default}
+                      initialParams={initialRouteParams}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_ADD_SPEC} options={{headerTitle: '新建规格'}}
+                      getComponent={() => require("../../scene/product/Goods/GoodsAddSpecScene").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} options={{headerTitle: '申请工单上新'}}
                       getComponent={() => require("../../scene/product/Goods/GoodsWorkNewProductScene").default}
@@ -300,7 +335,7 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/product/Goods/GoodsMarketExamine").default}
         />
 
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算'}}
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算', headerShown: false}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementScene').default}
         />
         <Stack.Screen name={Config.ROUTE_BIND_PAY} options={{headerTitle: '绑定账号'}}
@@ -308,6 +343,9 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT_PROTOCOL} options={{headerTitle: '结算协议', gestureEnabled: false}}
+                      getComponent={() => require('../../scene/home/Settlement/SettlementProtocolScene').default}
         />
 
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
@@ -450,7 +488,7 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       getComponent={() => require('../../scene/product/Inventory/Detail').default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerShown: false}}
+        <Stack.Screen name={Config.ROUTE_SEARCH_SHOP} options={{headerShown: false}}
                       getComponent={() => require('../component/SearchShop').default}
         />
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
@@ -531,53 +569,77 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_EDIT_ACCOUNT}
                       options={{headerTitle: '编辑账号'}}
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
+                      getComponent={() => require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 let notInit = true
+let ios_info = {}
+const appid = '1587325388'
+const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
 
 class AppNavigator extends PureComponent {
 
-  checkVersion = () => {
-    HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
-      if (res.yes) {
-        Alert.alert('新版本提示', res.desc, [
-          {text: '稍等再说', style: 'cancel'},
-          {
-            text: '现在更新',
-            style: 'default',
-            onPress: async () => {
-              await downloadApk({
-                interval: 250, // listen to upload progress event, emit every 666ms
-                apkUrl: res.download_url,
-                downloadInstall: true
-              })
-            }
-          },
-        ])
-      }
-    })
+  checkVersion = async () => {
+    switch (Platform.OS) {
+      case "ios":
+        ios_info = await checkUpdate(appid, DeviceInfo.getVersion())
+        if (ios_info.code === 1) {
+          this.setModalStatus(true, ios_info.msg, '')
+        }
+        break
+      case "android":
+        HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+          if (res.yes) {
+            this.setModalStatus(true, res.desc, res.download_url)
+          }
+        })
+        break
+    }
+
+  }
+
+  updateAPP = async () => {
+    const {download_url} = this.state
+    switch (Platform.OS) {
+      case "android":
+        await downloadApk({interval: 250, apkUrl: download_url, downloadInstall: true})
+        break
+      case "ios":
+        this.setModalStatus()
+        await Linking.openURL(appUrl)
+        break
+    }
+
   }
 
   handleNoLoginInfo = (reduxGlobal) => {
-    if ((dayjs().valueOf() - reduxGlobal?.getTokenTs) / 1000 >= reduxGlobal?.expireTs * 0.9 && reduxGlobal?.refreshToken)
-      this.refreshAccessToken(reduxGlobal?.refreshToken)
-    if (reduxGlobal.vendor_id === '' || reduxGlobal.vendor_id === undefined || reduxGlobal?.vendor_id === '' || reduxGlobal?.printer_id === '') {
+    if (reduxGlobal?.printer_id === '') {
       return;
     }
-    if (reduxGlobal.store_id === 0)
+    if (!reduxGlobal.store_id)
       return;
-    if (reduxGlobal.vendor_id === 0)
+    if (!reduxGlobal.vendor_id)
       return;
-    const flag = reduxGlobal.accessToken === global.noLoginInfo.accessToken &&
-      reduxGlobal.currentUser === global.noLoginInfo.currentUser &&
-      reduxGlobal.store_id === global.noLoginInfo.store_id &&
-      reduxGlobal.host === global.noLoginInfo.host &&
-      reduxGlobal.vendor_id === global.noLoginInfo.currVendorId &&
-      reduxGlobal?.enabled_good_mgr === global.noLoginInfo.enabledGoodMgr &&
-      reduxGlobal?.printer_id === global.noLoginInfo.printer_id &&
-      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by
+    if (!reduxGlobal.currentUser)
+      return;
+    if (!reduxGlobal.accessToken)
+      return;
+    const flag = reduxGlobal?.accessToken === global.noLoginInfo?.accessToken &&
+      reduxGlobal?.currentUser == global.noLoginInfo?.currentUser &&
+      reduxGlobal?.host === global.noLoginInfo?.host &&
+      reduxGlobal?.enabled_good_mgr == global.noLoginInfo?.enabled_good_mgr &&
+      reduxGlobal.vendor_id == global.noLoginInfo?.vendor_id &&
+      reduxGlobal?.printer_id == global.noLoginInfo?.printer_id &&
+      reduxGlobal?.store_id == global.noLoginInfo?.store_id &&
+      reduxGlobal?.autoBluetoothPrint == global.noLoginInfo?.autoBluetoothPrint &&
+      reduxGlobal?.refreshToken == global.noLoginInfo?.refreshToken &&
+      reduxGlobal?.expireTs == global.noLoginInfo?.expireTs &&
+      reduxGlobal?.getTokenTs == global.noLoginInfo?.getTokenTs &&
+      reduxGlobal?.order_list_by === global.noLoginInfo?.order_list_by &&
+      reduxGlobal?.lastCheckVersion === global.noLoginInfo?.lastCheckVersion
 
     if (flag) {
       return
@@ -585,32 +647,24 @@ class AppNavigator extends PureComponent {
     const noLoginInfo = {
       accessToken: reduxGlobal.accessToken,
       currentUser: reduxGlobal.currentUser,
-      currStoreId: reduxGlobal.store_id,
+      store_id: reduxGlobal.store_id,
       host: reduxGlobal.host || Config.defaultHost,
-      enabledGoodMgr: reduxGlobal.enabled_good_mgr,
-      currVendorId: reduxGlobal.vendor_id,
+      enabled_good_mgr: reduxGlobal.enabled_good_mgr,
+      vendor_id: reduxGlobal.vendor_id,
       printer_id: reduxGlobal.printer_id || '0',
-      show_bottom_tab: reduxGlobal.show_bottom_tab,
-      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint,
-      refreshToken: reduxGlobal.refreshToken,
+      autoBluetoothPrint: reduxGlobal.autoBluetoothPrint || false,
+      refreshToken: reduxGlobal.refreshToken || '',
       expireTs: reduxGlobal.expireTs,
       getTokenTs: reduxGlobal.getTokenTs,
       order_list_by: reduxGlobal.order_list_by,
+      lastCheckVersion: reduxGlobal.lastCheckVersion
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
   }
 
-  refreshAccessToken = (refreshToken) => {
-    const url = `/v4/WsbUser/refreshToken`
-    const params = {refresh_token: refreshToken}
-    const {dispatch} = this.props
-    HttpUtils.post(url, params).then(res => {
-      const {access_token, refresh_token, expires_in: expires_in_ts} = res;
-      dispatch(setAccessToken({access_token, refresh_token, expires_in_ts}))
-    })
-  }
+
   initJPush = () => {
 
     JPush.setLoggerEnable(false)
@@ -625,7 +679,7 @@ class AppNavigator extends PureComponent {
     //     console.log("registerID:" + JSON.stringify(registerID))
     //   }
     // )
-    const {accessToken, autoBluetoothPrint, currentUser, currStoreId} = this.props.global
+    const {accessToken, autoBluetoothPrint, currentUser, store_id} = this.props.global
     //tag alias事件回调
     JPush.addTagAliasListener(({code}) => {
       //console.log("tagAliasListener:" + code)
@@ -643,14 +697,14 @@ class AppNavigator extends PureComponent {
         if (type !== 'new_order') {
           sendDeviceStatus(accessToken, {
             msgId: messageID,
-            listener_stores: currStoreId,
+            listener_stores: store_id,
             orderId: order_id,
             btConnected: '收到极光推送，不是新订单不需要打印',
             auto_print: autoBluetoothPrint
           })
           return
         }
-        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: currStoreId})
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
@@ -662,7 +716,7 @@ class AppNavigator extends PureComponent {
     this.unSubscribe = store.subscribe(async () => {
       const {global} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion = 0} = global;
+      const {accessToken, lastCheckVersion} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
@@ -674,9 +728,9 @@ class AppNavigator extends PureComponent {
         await initBlueTooth(global)
 
         const currentTs = dayjs().valueOf()
-        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+        if (currentTs - lastCheckVersion > 8 * 3600) {
           store.dispatch(setCheckVersionAt(currentTs))
-          this.checkVersion();
+          await this.checkVersion()
         }
 
         GlobalUtil.getDeviceInfo().then(deviceInfo => store.dispatch(setDeviceInfo(deviceInfo)))
@@ -687,12 +741,14 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
+
       }
     })
   }
 
   componentDidMount() {
     this.whiteNoLoginInfo()
+
   }
 
   componentWillUnmount() {
@@ -710,11 +766,11 @@ class AppNavigator extends PureComponent {
         const duration = startAppEndTime - parseInt(startAppTime)
         if (global.isLoginToOrderList)
           return
-        const {currStoreId, currentUser} = this.props.global
+        const {store_id, currentUser} = this.props.global
 
         nrRecordMetric("start_app_end_time", {
           startAppTimeDuration: duration,
-          store_id: currStoreId,
+          store_id: store_id,
           user_id: currentUser
         })
       }
@@ -757,15 +813,73 @@ class AppNavigator extends PureComponent {
   //   }
   // }
 
+  state = {
+    version_visible: false,
+    desc: '',
+    download_url: ''
+  }
+
+  setModalStatus = (version_visible = false, desc = '', download_url = '') => {
+    this.setState({version_visible: version_visible, desc: desc, download_url: download_url})
+  }
 
   render() {
     const {initialRouteName, initialRouteParams} = this.props;
+    const {version_visible, desc} = this.state
     return (
-      <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+      <>
+        <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
+          <>
+            <ImageBackground style={styles.image} source={new_version_background_url}>
+              <Text style={styles.headerText}>
+                新版本提示
+              </Text>
+            </ImageBackground>
+            <View style={styles.content}>
+              <Text style={styles.updateContentText}>
+                {desc}
+              </Text>
+              <View style={styles.btnWrap}>
+                <TouchableOpacity style={styles.cancelWrap} onPress={() => this.setModalStatus(false)}>
+                  <Text style={styles.cancelText}>
+                    暂不更新
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.updateWrap} onPress={this.updateAPP}>
+                  <Text style={styles.updateText}>
+                    立即更新
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        </CommonModal>
+        <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+
+      </>
     );
   }
 
 }
 
+const new_version_background_url = {uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/new_version_background%403x.png'}
+const styles = StyleSheet.create({
+  content: {borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginHorizontal: 27, backgroundColor: 'white'},
+  image: {height: 148, marginHorizontal: 27, alignItems: 'center', justifyContent: 'center'},
+  updateContentText: {fontSize: 14, color: '#333', lineHeight: 20, paddingHorizontal: 20, paddingTop: 10},
+  headerText: {fontWeight: '500', color: 'white', lineHeight: 30, fontSize: 22},
+  btnWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20},
+  cancelWrap: {backgroundColor: '#f5f5f5', borderRadius: 20},
+  cancelText: {fontSize: 16, fontWeight: '500', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
+  updateWrap: {backgroundColor: '#26B942', borderRadius: 20, marginLeft: 10},
+  updateText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingHorizontal: 36,
+    paddingVertical: 9,
+    color: 'white'
+  }
+
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppNavigator);

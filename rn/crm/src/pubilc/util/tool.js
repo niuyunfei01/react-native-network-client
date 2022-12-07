@@ -82,6 +82,13 @@ export function orderExpectTime(dt) {
   return dayjs(dt).format("M/DD HH:mm");
 }
 
+export const fullDateOther = (dt) => {
+  return dayjs(dt).format("YYYY/MM/DD HH:mm:ss")
+}
+export const dateTime = (dt) => {
+  return dayjs(dt).format('MM-DD HH:mm:ss')
+}
+
 export function fullDate(dt) {
   return dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
 }
@@ -90,6 +97,9 @@ export function fullDay(dt) {
   return dayjs(dt).format("YYYY-MM-DD");
 }
 
+export function fullMonth(dt) {
+  return dayjs(dt).format("YYYY-MM");
+}
 
 export function vendor(global) {
   const {
@@ -523,6 +533,21 @@ function jbbsubstr(str = '', height = 0, start = 0, default_str = '') {
   return length(str || default_str) > str_height ? height > 0 ? str.substring(start, height - 1) + '...' : '...' + str.substr(height) : (str || default_str)
 }
 
+function filteremoji(str) {
+  var regStr = /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig;
+  return str.replace(regStr, '')
+}
+
+
+function filtrationInput(str) {
+  return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g, "")
+}
+
+export const mapImage = {
+  location: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
+  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_410.png',
+  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_410.png'
+}
 export default {
   objectMap,
   shortTimeDesc,
@@ -556,5 +581,8 @@ export default {
   debounces,
   throttle,
   getCenterLonLat,
-  jbbsubstr
+  jbbsubstr,
+  filteremoji,
+  filtrationInput,
+  fullMonth
 };

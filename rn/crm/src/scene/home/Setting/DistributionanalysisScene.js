@@ -22,7 +22,7 @@ import Config from "../../../pubilc/common/config";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
-import tool from "../../../pubilc/util/tool";
+import tool, {fullDate, fullDay} from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -34,6 +34,7 @@ const Distribution_Analysis = 'distribution_analysis';
 const Profit_AndLoss_Analysis = 0;
 const timeOptions = [
   {label: '今天', value: 0},
+  {label: '昨天', value: 4},
   {label: '近7天', value: 1},
   {label: '本月', value: 2},
   {label: '自定义', value: 3},
@@ -45,12 +46,12 @@ class DistributionAnalysisScene extends PureComponent {
 
     super(props);
 
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
 
     this.state = {
       timeType: "",
       showDateModal: false,
-      currStoreId: currStoreId,
+      store_id: store_id,
       accessToken: accessToken,
       DistributionAnalysisData: [],
       total_delivery: '',
@@ -102,9 +103,9 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   getDistributionAnalysisData = (startTime, endTime) => {
-    const {currStoreId, filterPlatform, accessToken} = this.state;
+    const {store_id, filterPlatform, accessToken} = this.state;
     ToastShort("查询中");
-    const api = `/v1/new_api/analysis/delivery/${currStoreId}/${filterPlatform}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    const api = `/v1/new_api/analysis/delivery/${store_id}/${filterPlatform}?access_token=${accessToken}&starttime=${fullDate(startTime * 1000)}&endtime=${fullDate(endTime * 1000)}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         DistributionAnalysisData: res?.data?.statistic,
@@ -121,8 +122,8 @@ class DistributionAnalysisScene extends PureComponent {
   getProfitAndLossAnalysisData = (startTime, endTime) => {
     ToastShort("查询中");
     this.setParamsTime(startTime, endTime)
-    const {currStoreId, accessToken} = this.state;
-    const api = `/v1/new_api/analysis/profit_data/${currStoreId}?access_token=${accessToken}&start_time=${startTime}&end_time=${endTime}`
+    const {store_id, accessToken} = this.state;
+    const api = `/v1/new_api/analysis/profit_data/${store_id}?access_token=${accessToken}&start_time=${fullDay(startTime * 1000)}&end_time=${fullDay(endTime * 1000)}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         profitAndLoss: res?.data,
@@ -168,10 +169,20 @@ class DistributionAnalysisScene extends PureComponent {
       case 2:
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
         break
+      case 4:
+        startTime = new Date(Date.now() - oneDay).setHours(0, 0, 0, 0) / 1000
+        break
       default:
         break
     }
-    let endTime = Math.round(new Date().getTime() / 1000)
+    let endTime;
+    if (type === 4) {
+      let dt = new Date();
+      dt.setHours(0, 0, 0, 0);
+      endTime = Math.round(dt.getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date().getTime() / 1000)
+    }
     this.getDistributionAnalysisData(startTime, endTime)
     this.setState({
       dateStatus: type
@@ -205,10 +216,20 @@ class DistributionAnalysisScene extends PureComponent {
         startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
         this.setState({allowChange: false})
         break
+      case 4:
+        startTime = new Date(Date.now() - oneDay).setHours(0, 0, 0, 0) / 1000
+        break
       default:
         break
     }
-    let endTime = Math.round(new Date().getTime() / 1000)
+    let endTime;
+    if (type === 4) {
+      let dt = new Date();
+      dt.setHours(0, 0, 0, 0);
+      endTime = Math.round(dt.getTime() / 1000)
+    } else {
+      endTime = Math.round(new Date().getTime() / 1000)
+    }
     this.getProfitAndLossAnalysisData(startTime, endTime)
     this.setState({
       dateStatus: type
@@ -423,13 +444,16 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.loss_ratio} </Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
+                    <TouchableOpacity style={styles.cardLabelContent}
+                                      onPress={() => this.promptingMessage(true, '平台结算金额', 'plat_income_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
                       <Entypo name="help-with-circle"
                               style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.cardContent} onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
-                      <Text style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
+                    <TouchableOpacity style={styles.cardContent}
+                                      onPress={() => this.navigateToPlatformDetail(item, allowChange)}>
+                      <Text
+                        style={[styles.cell_rowText, {marginRight: pxToDp(10)}]}>{item.sum_of_total_income_from_platform}元</Text>
                       <If condition={allowChange && item?.show_update > 0}>
                         <Text style={{color: colors.main_color}}>修改 </Text>
                         <Entypo name="chevron-thin-right" style={styles.iconShow}/>
@@ -445,7 +469,8 @@ class DistributionAnalysisScene extends PureComponent {
                     <Text style={styles.cell_rowText}>{item.goods_cost}元</Text>
                   </View>
                   <View style={styles.cardContent}>
-                    <TouchableOpacity style={styles.cardLabelContent} onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
+                    <TouchableOpacity style={styles.cardLabelContent}
+                                      onPress={() => this.promptingMessage(true, '三方配送成本', 'ship_fee_txt')}>
                       <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
                       <Entypo name="help-with-circle"
                               style={{fontSize: pxToDp(30), color: colors.colorCCC}}/>
@@ -528,7 +553,7 @@ class DistributionAnalysisScene extends PureComponent {
             timeJs = Math.round(new Date(new Date(value).setHours(0, 0, 0, 0)).getTime() / 1000)
             this.setState({startNewDateValue: timeJs, showDateModal: false, startTime: resDate})
           } else if (this.state.timeType === 'end') {
-            timeJs = Math.floor(new Date(new Date(value).setHours(11, 59, 59, 999)).getTime() / 1000)
+            timeJs = Math.floor(new Date(new Date(value).setHours(23, 59, 59, 999)).getTime() / 1000)
             this.setState({endNewDateValue: timeJs, showDateModal: false, endTime: resDate})
           }
         }
@@ -574,7 +599,11 @@ class DistributionAnalysisScene extends PureComponent {
           <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <Text style={{color: colors.color333, fontSize: 16, fontWeight: "bold"}}>{promptTitle} </Text>
           </View>
-          <Text style={{color: colors.color333, fontSize: 15, marginVertical: 15}}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
+          <Text style={{
+            color: colors.color333,
+            fontSize: 15,
+            marginVertical: 15
+          }}>{promptStatus === 'plat_income_txt' ? plat_income_txt : ship_fee_txt} </Text>
           <Button title={'知道了'}
                   onPress={() => this.promptingMessage(false)}
                   containerStyle={{flex: 1}}

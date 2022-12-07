@@ -80,7 +80,7 @@ class OrderAinSend extends Component {
           style={{flex: 1, padding: pxToDp(20)}}>
           <View style={{backgroundColor: colors.white, borderRadius: pxToDp(15)}}>
             <View style={styles.header}>
-              <Text style={{fontSize: 15, fontWeight: 'bold'}}>配送人员</Text>
+              <Text style={{color: colors.color333, fontSize: 15, fontWeight: 'bold'}}>配送人员</Text>
             </View>
             {this.renderWorkerList()}
           </View>
@@ -111,7 +111,7 @@ class OrderAinSend extends Component {
                 <AntDesign name='checkcircle' size={18} color={colors.main_color}/> :
                 <Ionicons name={'radio-button-off-outline'} size={20} color={colors.fontBlack}/>}
             </View>
-            <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>
+            <Text style={{color: colors.color333, fontSize: 14, lineHeight: pxToDp(42)}}>
               {info.label}-{info.mobile}
             </Text>
           </View>

@@ -21,7 +21,6 @@ import {hideModal, showModal, showSuccess, ToastShort} from "../../../pubilc/uti
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
-import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
@@ -147,12 +146,12 @@ class UserScene extends PureComponent {
     const noLoginInfo = {
       accessToken: '',
       currentUser: 0,
-      currStoreId: 0,
+      store_id: 0,
       host: '',
-      enabledGoodMgr: '',
+      enabled_good_mgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      order_list_by: 'orderTime asc'
+      order_list_by: 'expectTime asc'
     }
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
@@ -220,7 +219,7 @@ class UserScene extends PureComponent {
           <Image
             style={[styles.user_img]}
             source={cover_image ? {uri: cover_image} :
-              require('../../../img/My/touxiang180x180_.png')}
+              require('../../../img/Goods/touxiang180x180_.png')}
           />
           <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
         </View>
@@ -309,11 +308,7 @@ class UserScene extends PureComponent {
         mobile: mobile,
         store_id: store_id,
       });
-      const setParamsAction = NavigationActions.setParams({
-        params: {shouldRefresh: false},
-        key: key,
-      });
-      this.props.navigation.dispatch(setParamsAction);
+      this.props.navigation.setParams({shouldRefresh: false, key: key,});
     }
   }
 
@@ -343,16 +338,9 @@ class UserScene extends PureComponent {
             onSubmitting: false,
           });
 
-          const setParamsAction = NavigationActions.setParams({
-            params: {shouldRefresh: true},
-            key: last_nav_key,
-          });
-          this.props.navigation.dispatch(setParamsAction);
-          const setSelfParamsAction = NavigationActions.setParams({
-            params: {user_status: user_status},
-            key: this.props.route.key,
-          });
-          this.props.navigation.dispatch(setSelfParamsAction);
+          this.props.navigation.setParams({shouldRefresh: true, key: last_nav_key});
+
+          this.props.navigation.setParams({user_status: user_status, key: this.props.route.key,});
         } else {
           ToastShort(resp.desc);
           this.setState({

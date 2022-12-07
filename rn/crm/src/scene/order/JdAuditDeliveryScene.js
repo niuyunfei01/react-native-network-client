@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.color999,
   },
   cellsTitle: {
-    fontSize: 13, marginBottom: 0, marginTop: 20
+    fontSize: 13, marginBottom: 0, color: colors.color333, marginTop: 20
   },
   cells: {
     marginTop: 0,

@@ -22,7 +22,7 @@ class AddAccount extends PureComponent {
     this.state = {
       workerRoles: [],
       // storeList: [
-        // {label: '所有门店', value: 0}
+      // {label: '所有门店', value: 0}
       // ],
       roleStoreList: [],
       worker_role_grade: '',
@@ -62,7 +62,7 @@ class AddAccount extends PureComponent {
   }
 
   addWorker = () => {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     let {
       worker_role_grade_value,
       worker_store_id_belong_value,
@@ -91,7 +91,7 @@ class AddAccount extends PureComponent {
     const api = `/v4/wsb_worker/workerAddOrUpdate`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       worker_role_grade: worker_role_grade_value,
       worker_store_id_belong: Number(worker_store_id_belong_value),

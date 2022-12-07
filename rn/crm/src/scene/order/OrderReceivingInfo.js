@@ -8,11 +8,10 @@ import {Button} from 'react-native-elements';
 import Config from "../../pubilc/common/config";
 import HttpUtils from "../../pubilc/util/http";
 import tool from "../../pubilc/util/tool";
-import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import PropTypes from "prop-types";
 import JbbModal from "../../pubilc/component/JbbModal";
-import Entypo from "react-native-vector-icons/Entypo";
 import {TextArea} from "../../weui";
 import {SvgXml} from "react-native-svg";
 import {cross_icon} from "../../svg/svg";
@@ -120,11 +119,13 @@ class OrderReceivingInfo extends Component {
     const params = {
       center: center,
       keywords: address,
+      show_select_city: false,
+      placeholder_text: '请在此输入收件人地址',
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
     };
-    this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+    this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   setAddress = (res) => {
@@ -208,7 +209,6 @@ class OrderReceivingInfo extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort('请从粘贴板粘贴地址', 0);
     }
-    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -216,7 +216,6 @@ class OrderReceivingInfo extends Component {
       this.setState({
         smartText: ''
       })
-      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
@@ -230,14 +229,15 @@ class OrderReceivingInfo extends Component {
         mobile: res.phone,
       })
       const params = {
-        show_select_city: true,
+        show_select_city: false,
         keywords: res.address,
+        placeholder_text: '请在此输入收件人地址',
         onBack: (res) => {
           this.setAddress.bind(this)(res)
           this.setState({show_smart_modal: true,})
         },
       };
-      this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+      this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
     })
   }
 
@@ -447,7 +447,7 @@ class OrderReceivingInfo extends Component {
   renderSmartModal = () => {
     let {show_smart_modal, address, name, street_block, mobile} = this.state;
     return (
-      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'center'}>
         <View style={{marginBottom: 20}}>

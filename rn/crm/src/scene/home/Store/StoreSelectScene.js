@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Keyboard, SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native'
+import {FlatList, Keyboard, StyleSheet, Text, TextInput, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions'
@@ -7,9 +7,8 @@ import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
 import SearchStoreItem from "../../../pubilc/component/SearchStoreItem";
-import Loadmore from 'react-native-loadmore'
 import tool from "../../../pubilc/util/tool";
-
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -32,22 +31,28 @@ class StoreSelect extends PureComponent {
     this.state = {
       dataSource: [],
       isLoading: false,
-      page: 1,
-      page_size: 20,
+      isCanLoadMore: false,
+      query: {
+        page: 1,
+        page_size: 20
+      },
       searchKeywords: '',
       isLastPage: false,
       focus: false,
       lang: {
-        cancel: '取消'
+        cancel: '清除'
       },
-      access_token: global?.accessToken
+      access_token: global?.accessToken,
     };
     this.clearHandle = this.clearHandle.bind(this)
     this.onCancel = this.onCancel.bind(this)
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.fetchData()
+    tool.debounces(() => {
+      this.searchInput.focus()
+    }, 800)
   }
 
   clearHandle = () => {
@@ -69,13 +74,9 @@ class StoreSelect extends PureComponent {
     Keyboard.dismiss()
   }
 
-  handleFocus = () => {
-    this.setState({focus: true})
-  }
-
-
   fetchData = (options = {}) => {
-    const {page, page_size, access_token} = this.state
+    const {query, access_token} = this.state
+    let {page, page_size} = query
     const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
     let params = {
       keywords: this.state.searchKeywords,
@@ -103,26 +104,62 @@ class StoreSelect extends PureComponent {
       dataSource = obj.page !== 1 ? this.state.dataSource.concat(dataSource) : dataSource
       this.setState({
         dataSource: dataSource,
-        page: obj.page + 1,
-        page_size: obj.pageSize,
+        query: {
+          page: obj.page + 1,
+          page_size: obj.pageSize
+        },
         isLastPage: isLastPage
       })
     }, () => {
     })
   }
 
-  renderList = () => {
-    const {dataSource} = this.state
-    return dataSource.map((item, index) => {
-      if (dataSource[index]) {
-        return (
-          <SearchStoreItem key={index} onPress={() => {
-            this.props.navigation.goBack()
-            this.props.route.params.onBack(item)
-          }} item={item} rowHeight={50}/>
-        )
-      }
+  getStoreGoBack = (item) => {
+    this.props.route.params.onBack && this.props.route.params.onBack(item)
+    this.props.navigation.goBack()
+  }
+
+  onEndReached() {
+    const {query, isLastPage} = this.state;
+    if (isLastPage) {
+      ToastShort('没有更多数据了')
+      return null
+    }
+    query.page += 1
+    this.setState({query}, () => {
+      this.fetchData()
     })
+  }
+
+  onRefresh = () => {
+    tool.debounces(() => {
+      let query = this.state.query;
+      query.page = 1;
+      this.setState({
+        isLastPage: false,
+        query: query,
+        dataSource: []
+      }, () => {
+        this.fetchData()
+      })
+    }, 600)
+  }
+
+  onMomentumScrollBegin = () => {
+    this.setState({
+      isCanLoadMore: true
+    })
+  }
+
+  handleFocus() {
+    this.setState({focus: true})
+  }
+
+  renderList = (info) => {
+    let {item, index} = info
+    return (
+      <SearchStoreItem key={index} onPress={() => this.getStoreGoBack(item)} item={item} rowHeight={50}/>
+    )
   }
 
   listEmptyComponent = () => {
@@ -136,78 +173,74 @@ class StoreSelect extends PureComponent {
   }
 
   renderHeader = () => {
-    let {focus, searchKeywords, lang} = this.state
+    let {searchKeywords, lang} = this.state
     return (
-      <View style={[styles.searchBar]}>
-        <View style={styles.searchOuter}>
-          <View style={styles.searchInner}>
-            <Entypo name="magnifying-glass" size={12} style={{color: colors.color999, marginRight: 10}}/>
-            <TextInput
-              autoFocus={true}
-              returnKeyType="search"
-              eturnKeyLabel="搜索"
-              value={searchKeywords}
-              ref="searchInput"
-              underlineColorAndroid='transparent'
-              placeholder='搜索店铺'
-              placeholderTextColor='#999'
-              selectionColor='#ff4f39'
-              style={styles.inputText}
-              blurOnSubmit={true}
-              onChangeText={(text) => {
-                this.setState({searchKeywords: text}, () => {
-                  tool.debounces(() => {
-                    this.fetchData({page: 1})
-                  }, 800)
-                })
-              }}
-              onSubmitEditing={e => {
-                this.fetchData({keywords: this.state.searchKeywords, page: 1})
-              }}
-              onFocus={this.handleFocus}
-            />
-            <If condition={searchKeywords !== ''}>
-              <Text onPress={this.clearHandle}>
-                <Entypo name="circle-with-cross" size={16} color={colors.color999}/>
-              </Text>
-            </If>
-          </View>
-        </View>
-        {/*<If condition={focus}>*/}
-        {/*  <Text style={styles.searchCancel} onPress={this.onCancel}>*/}
-        {/*    {lang.cancel}*/}
-        {/*  </Text>*/}
-        {/*</If>*/}
+      <View style={styles.searchInner}>
+        <Entypo name="magnifying-glass" size={16} style={{color: colors.color999, marginRight: 10}}/>
+        <TextInput
+          ref={ref => this.searchInput = ref}
+          returnKeyType="search"
+          returnKeyLabel="搜索"
+          value={searchKeywords}
+          underlineColorAndroid='transparent'
+          placeholder='搜索店铺'
+          placeholderTextColor='#999'
+          selectionColor='#ff4f39'
+          style={styles.inputText}
+          blurOnSubmit={true}
+          onChangeText={(text) => {
+            this.setState({searchKeywords: text}, () => {
+              tool.debounces(() => {
+                this.fetchData({page: 1})
+              }, 800)
+            })
+          }}
+          onSubmitEditing={e => {
+            this.fetchData({keywords: this.state.searchKeywords, page: 1})
+          }}
+        />
+        <If condition={searchKeywords !== ''}>
+          <Text onPress={this.clearHandle} style={{color: colors.main_color}}>
+            {lang.cancel}
+          </Text>
+        </If>
       </View>
     )
   }
 
   renderContent = () => {
+    let {isLoading, isCanLoadMore} = this.state;
+    const {dataSource} = this.state
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, paddingTop: 10}}>
-        <Loadmore
-          keyboardShouldPersistTaps="never"
-          renderList={this.renderList()}
-          onLoadMore={() => {
-            this.fetchData()
-          }}
-          isLoading={this.state.isLoading}
-          onRefresh={() => {
-            this.fetchData({page: 1})
-          }}
-          loadMoreType={"scroll"}
-          isLastPage={this.state.isLastPage}
-        />
-      </SafeAreaView>
+      <FlatList
+        data={dataSource}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        renderItem={this.renderList}
+        onRefresh={this.onRefresh}
+        onEndReachedThreshold={0.1}
+        onEndReached={() => {
+          if (isCanLoadMore) {
+            this.onEndReached();
+            this.setState({isCanLoadMore: false})
+          }
+        }}
+        onMomentumScrollBegin={this.onMomentumScrollBegin}
+        refreshing={isLoading}
+        keyExtractor={(item, index) => `${index}`}
+        ListEmptyComponent={this.listEmptyComponent()}
+        initialNumToRender={11}
+      />
     );
   }
 
   render() {
-    let {dataSource} = this.state
     return (
-      <View style={{flex: 1, backgroundColor: colors.white}}>
+      <View
+        style={styles.Container}
+      >
         {this.renderHeader()}
-        {tool.length(dataSource) <= 0 ? this.listEmptyComponent() : this.renderContent()}
+        {this.renderContent()}
       </View>
     );
   }
@@ -215,56 +248,22 @@ class StoreSelect extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.main_color
-  },
-  searchbar: {
-    width: '70%',
-    padding: 0,
-    margin: 0,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 6
-  },
-  searchBar: {
-    position: 'relative',
-    paddingTop: 8,
-    paddingRight: 10,
-    paddingBottom: 8,
-    paddingLeft: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EFEFF4',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderStyle: 'solid',
-    borderColor: '#C7C7C7',
-  },
-  searchOuter: {
-    position: 'relative',
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E6E6EA',
-    borderRadius: 5,
-  },
   searchInner: {
-    position: 'relative',
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 4,
-    paddingBottom: 4,
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#EFEFF4',
+    marginBottom: 10,
+    backgroundColor: colors.white
   },
   inputText: {
     flex: 1,
     padding: 0,
   },
-  searchCancel: {
-    marginLeft: 10,
-    color: '#09BB07',
+  Container: {
+    flex: 1,
+    backgroundColor: colors.fa
   }
 })
 

@@ -25,7 +25,7 @@ class ProductPutIn extends React.Component {
     super(props)
     const {currStoreName} = tool.vendor(this.props.global);
     this.state = {
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       storeName: currStoreName,
       totalPrice: '0',
       number: '0',
@@ -56,7 +56,7 @@ class ProductPutIn extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setParams({
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       userId: this.props.global.currentUserProfile.id,
       date: dayjs().format('YYYY-MM-DD')
     })

@@ -81,8 +81,8 @@ class BadReviewReminderScene extends PureComponent {
   }
 
   getStatus = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    const api = `/v1/new_api/added/bad_notify_info/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global;
+    const api = `/v1/new_api/added/bad_notify_info/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(res => {
       this.setState({settings: res})
     }).catch(error => showError(error.reason))
@@ -242,10 +242,10 @@ class BadReviewReminderScene extends PureComponent {
     } catch (e) {
 
     }
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const api = `/v1/new_api/added/bad_notify?access_token=${accessToken}`
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       sms_notify: settings.sms_notify,
       mobile_notify: settings.mobile_notify,
       notify_start_at: settings.notify_start_at,

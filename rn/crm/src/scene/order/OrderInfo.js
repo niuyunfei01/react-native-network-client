@@ -259,9 +259,9 @@ class OrderInfo extends Component {
     timeObj.method[0].interfaceName = ''
     timeObj.method[0].methodName = 'componentDidUpdate'
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
+    const {store_id, currentUser, accessToken} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderInfo"
@@ -1087,7 +1087,7 @@ class OrderInfo extends Component {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
     } else {
-      this.setState({itemsAdded: {...this.state.itemsAdded, [item.product_id]: item}});
+      this.setState({itemsAdded: {...this.state.itemsAdded, [item?.product_id]: item}});
     }
   }
 

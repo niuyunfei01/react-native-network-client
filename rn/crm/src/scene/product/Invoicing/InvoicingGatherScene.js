@@ -56,9 +56,9 @@ class InvoicingGatherScene extends PureComponent {
   reloadData() {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
-    let currStoreId = global['currStoreId'];
+    let store_id = global['store_id'];
     let _this = this;
-    dispatch(fetchUnlocked(currStoreId, token, function () {
+    dispatch(fetchUnlocked(store_id, token, function () {
       _this.setState({isRefreshing: false});
     }));
   }

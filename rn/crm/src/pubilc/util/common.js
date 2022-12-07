@@ -50,7 +50,7 @@ export function getWithTpl(url, okFn, failFn, dispatch) {
 
 /**
  *
- * @deprecated 请优先使用 jsonWithTpl2
+ *  请优先使用 jsonWithTpl2
  * @param url
  * @param data object (will be json.stringify)
  * @param okFn

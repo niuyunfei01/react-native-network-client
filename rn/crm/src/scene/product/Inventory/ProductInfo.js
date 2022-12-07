@@ -327,12 +327,7 @@ class ProductInfo extends React.Component {
   }
 
   onScanFail = () => {
-    Alert.alert('错误提示', '货架码不合法，请重新扫描', [
-      {
-        text: '确定', onPress: () => {
-        }
-      },
-    ]);
+    Alert.alert('错误提示', '货架码不合法，请重新扫描', [{text: '确定'}]);
   }
 
   renderScanner = () => {
@@ -593,7 +588,7 @@ class ProductInfo extends React.Component {
   }
 
   isValid(str) {
-    return '' === str || /[@|#|-|_|+|*]/.test(str) || /^[\w|\s]*$/.test(str);
+    return '' === str || /^[\w|@|#|\-|_|+|*]*$/.test(str);
   }
 
   filterShelfNo = (text) => {
@@ -610,7 +605,7 @@ class ProductInfo extends React.Component {
       <JbbModal visible={this.state.showDeliveryModal}
                 onClose={() => this.setState({showDeliveryModal: false})} modal_type={'center'}>
         <KeyboardAwareScrollView enableAutomaticScroll={false}>
-          <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+          <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
             请输入或扫描填入货架码
           </Text>
 
@@ -802,6 +797,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: pxToDp(26),
+    color: colors.color333,
     fontWeight: 'bold'
   },
   formHeader: {

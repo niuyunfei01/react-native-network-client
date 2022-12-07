@@ -74,8 +74,8 @@ class MaterialDetailUpdate extends React.Component {
   fetchSkus() {
     const self = this
     const accessToken = this.props.global.accessToken
-    const currStoreId = this.props.global.currStoreId
-    const api = `api_products/material_skus?access_token=${accessToken}&_sid=${currStoreId}&with_code=1`
+    const store_id = this.props.global.store_id
+    const api = `api_products/material_skus?access_token=${accessToken}&_sid=${store_id}&with_code=1`
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({skus: res})
     })

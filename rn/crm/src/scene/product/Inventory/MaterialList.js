@@ -325,6 +325,7 @@ class MaterialList extends React.Component {
         visible={this.state.headerMenu}
         animationType={'fade'}
         transparent={true}
+        hardwareAccelerated={true}
         onRequestClose={() => this.setState({headerMenu: false})}
       >
         <TouchableOpacity style={{flex: 1}} onPress={() => this.setState({headerMenu: false})}>
@@ -394,7 +395,8 @@ class MaterialList extends React.Component {
             <Text style={styles.drawerItemLabel}>日期 </Text>
             <TouchableOpacity onPress={() => this._showDateTimePicker()}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text style={{color: colors.color333}}>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
+                <Text
+                  style={{color: colors.color333}}>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
                 <FontAwesome5 name={'calendar'} style={{fontSize: 15}}/>
               </View>
             </TouchableOpacity>
@@ -539,16 +541,7 @@ class MaterialList extends React.Component {
   }
 
   render() {
-    const drawerStyles = {
-      drawer: {
-        shadowColor: '#000000',
-        shadowOpacity: 0.8,
-        elevation: 10,
-        shadowRadius: 3,
-        borderLeftWidth: 1,
-        borderLeftColor: colors.theme
-      }
-    }
+
 
     return (
       <View style={{flex: 1}}>
@@ -560,7 +553,7 @@ class MaterialList extends React.Component {
           openDrawerOffset={0.4}
           panCloseMask={0.4}
           closedDrawerOffset={-3}
-          styles={drawerStyles}
+          styles={styles.drawer}
           tweenHandler={(ratio) => ({
             main: {opacity: (2 - ratio) / 2}
           })}
@@ -615,6 +608,15 @@ class MaterialList extends React.Component {
 }
 
 const styles = StyleSheet.create({
+
+  drawer: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.8,
+    elevation: 10,
+    shadowRadius: 3,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.theme
+  },
   headerMenuModalBackground: {
     flex: 1
   },

@@ -48,10 +48,10 @@ class OperateExpendScene extends PureComponent {
   }
 
   getProfitOutcomeNormalList() {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
-    dispatch(fetchProfitOutcomeNormalList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
+    dispatch(fetchProfitOutcomeNormalList(type, store_id, day, accessToken, async (ok, obj, desc) => {
       if (ok) {
         this.setState({items: obj.items})
       }

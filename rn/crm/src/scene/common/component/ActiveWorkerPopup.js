@@ -5,7 +5,6 @@ import {Checkbox, List, SearchBar} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -249,4 +248,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default withNavigation(connect(mapStateToProps)(ActiveWorkerPopup))
+export default connect(mapStateToProps)(ActiveWorkerPopup)

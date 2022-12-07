@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import Entypo from "react-native-vector-icons/Entypo";
 import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import Validator from "../../../pubilc/util/Validator";
 
 function mapStateToProps(state) {
   return {
@@ -39,6 +40,7 @@ function mapDispatchToProps(dispatch) {
 class LoginScene extends PureComponent {
   static propTypes = {
     dispatch: PropTypes.func,
+    route: PropTypes.object,
   }
 
   constructor(props) {
@@ -48,7 +50,8 @@ class LoginScene extends PureComponent {
       mobile: '',
       password: '',
       canAskReqSmsCode: false,
-      reRequestAfterSeconds: 60,
+      reRequestAfterSeconds: 0,
+      diff_time: 0,
       verifyCode: '',
       doingSign: false,
       doingSignKey: '',
@@ -72,10 +75,6 @@ class LoginScene extends PureComponent {
     this.clearTimeouts();
   }
 
-  getCountdown = () => {
-    return this.state.reRequestAfterSeconds;
-  }
-
   clearTimeouts = () => {
     this.timeouts.forEach(clearTimeout);
   }
@@ -93,18 +92,7 @@ class LoginScene extends PureComponent {
       dispatch(sendDverifyCode(mobile, 0, 1, (success, msg) => {
         this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
-          this.interval = setInterval(() => {
-            this.setState({
-              show_repetition_button: true,
-              reRequestAfterSeconds: this.getCountdown() - 1
-            }, () => {
-              if (this.state.reRequestAfterSeconds <= 0) {
-                this.onCounterReReqEnd()
-                clearInterval(this.interval)
-              }
-            })
-          }, 1000)
-          this.setState({canAskReqSmsCode: true});
+          this.startInterval()
         }
         ToastShort(msg, 0)
       }));
@@ -113,8 +101,25 @@ class LoginScene extends PureComponent {
     }
   }
 
-  onCounterReReqEnd = () => {
-    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
+  startInterval = () => {
+    this.interval = setInterval(() => {
+      let diff_time = Math.floor(this.state.reRequestAfterSeconds - (new Date().getTime() / 1000));
+      if (diff_time <= 0) {
+        this.setState({canAskReqSmsCode: false});
+        clearInterval(this.interval)
+      } else {
+        this.setState({
+          diff_time: diff_time
+        })
+      }
+    }, 1000)
+
+    this.setState({
+      canAskReqSmsCode: true,
+      show_repetition_button: true,
+      reRequestAfterSeconds: Math.floor(new Date().getTime() / 1000 + 60),
+      diff_time: 59
+    })
   }
 
   onLogin = () => {
@@ -125,11 +130,13 @@ class LoginScene extends PureComponent {
           show_auth_modal: true
         })
       }
-      if (tool.length(mobile) < 10) {
-        return ToastShort("请输入正确的手机号", 0)
-      }
-      if (!verifyCode) {
-        return ToastShort("请填写验证码", 0)
+
+      const validator = new Validator();
+      validator.add(verifyCode, 'required', '请填写验证码')
+      validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的手机号')
+      const err_msg = validator.start();
+      if (err_msg) {
+        return ToastShort(err_msg)
       }
       this._signIn(mobile, verifyCode);
     })
@@ -153,7 +160,11 @@ class LoginScene extends PureComponent {
         })
       } else {
         if (msg === 401) { //未注册
-          return this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
+          return this.props.navigation.navigate(Config.ROUTE_SAVE_STORE, {
+            type: 'register',
+            mobile,
+            verify_code: password
+          })
         }
         ToastShort(msg, 0)
       }
@@ -161,33 +172,20 @@ class LoginScene extends PureComponent {
   }
 
   queryConfig = () => {
-    let {accessToken, currStoreId} = this.props.global;
-    const {dispatch} = this.props;
-    dispatch(getConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+    let {accessToken, store_id} = this.props.global;
+    const {dispatch, navigation} = this.props;
+    dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
-        let store_id = cfg?.store_id || currStoreId;
-        this.doneSelectStore(store_id, cfg?.show_bottom_tab);
+        dispatch(setCurrentStore(cfg?.store_id || store_id));
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+          initTab: Config.ROUTE_ORDERS,
+          initialRouteName: Config.ROUTE_ALERT
+        });
+        hideModal()
       } else {
         ToastShort(err_msg, 0);
       }
     }));
-  }
-
-  doneSelectStore = (storeId, show_bottom_tab = false) => {
-    const {dispatch, navigation} = this.props;
-    dispatch(setCurrentStore(storeId));
-
-    if (!show_bottom_tab) {
-      hideModal()
-      return tool.resetNavStack(navigation, Config.ROUTE_ORDERS, {});
-    }
-
-    tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-      initTab: Config.ROUTE_ORDERS,
-      initialRouteName: Config.ROUTE_ALERT
-    });
-
-    hideModal()
   }
 
   closeModal = () => {
@@ -219,7 +217,7 @@ class LoginScene extends PureComponent {
 
   render() {
     let {
-      mobile, verifyCode, canAskReqSmsCode, reRequestAfterSeconds, authorization, show_repetition_button
+      mobile, verifyCode, canAskReqSmsCode, authorization, show_repetition_button, diff_time
     } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 24, paddingVertical: 30}}>
@@ -276,7 +274,7 @@ class LoginScene extends PureComponent {
               alignItems: 'center',
             }} onPress={this.onRequestSmsCode}>
               <Text style={{fontSize: 16, color: canAskReqSmsCode ? colors.color666 : colors.main_color}}>
-                {canAskReqSmsCode ? reRequestAfterSeconds + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
+                {canAskReqSmsCode ? diff_time + 's获取' : show_repetition_button ? '重新获取' : '获取验证码'}
               </Text>
             </TouchableOpacity>
           </View>

@@ -20,7 +20,7 @@ import {calcMs} from "../../pubilc/util/AppMonitorInfo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import tool from "../../pubilc/util/tool";
-import {hideModal, showError, showModal} from "../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global, device} = state;
@@ -83,9 +83,9 @@ class OrderSearchScene extends PureComponent {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {store_id, currentUser, accessToken, config} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderSearchScene"
@@ -185,7 +185,7 @@ class OrderSearchScene extends PureComponent {
     if (!isCanLoadMore)
       return;
     if (end) {
-      showError('没有更多数据了')
+      ToastShort('没有更多数据了')
       this.setState({isCanLoadMore: false})
       return
     }
@@ -202,7 +202,6 @@ class OrderSearchScene extends PureComponent {
 
     const {term = ''} = this.props.route.params || {}
 
-    showModal('加载中...')
     const params = {
       vendor_id: currVendorId,
       offset: (query.page - 1) * query.limit,
@@ -213,18 +212,15 @@ class OrderSearchScene extends PureComponent {
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get(url, params).then(res => {
-      hideModal()
       const orderList = isChangeType ? res.orders : this.state.orderList.concat(res.orders)
       const end = tool.length(res.orders) < query.limit
       this.setState({orderList: orderList, end: end, isLoading: false})
     }, res => {
-      hideModal()
       this.setState({isLoading: false})
-      showError(res.reason)
+      ToastShort(res.reason)
     }).catch(error => {
-      hideModal()
       this.setState({isLoading: false})
-      showError(error.reason)
+      ToastShort(error.reason)
     })
   }
 
@@ -286,6 +282,8 @@ class OrderSearchScene extends PureComponent {
           </Text>
         </If>
         <FlatList data={orderList}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={(item) => this.renderItem(item, global, navigation)}
                   initialNumToRender={2}
                   onRefresh={this.onRefresh}

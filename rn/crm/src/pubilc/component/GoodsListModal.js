@@ -1,6 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import colors from "../styles/colors";
 import HttpUtils from "../util/http";
 import tool from "../util/tool";
@@ -20,7 +30,7 @@ class GoodsListModal extends React.Component {
       PropTypes.number,
       PropTypes.string
     ]),
-    currStoreId: PropTypes.oneOfType([
+    store_id: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
     ]),
@@ -35,6 +45,7 @@ class GoodsListModal extends React.Component {
     is_fn_price_controlled: false,
     is_fn_show_wm_price: false,
     is_fn_total_price: false,
+    is_loading: false,
     count: '',
   }
 
@@ -48,6 +59,9 @@ class GoodsListModal extends React.Component {
   }
 
   getOrderGoodsList = (accessToken, order_id) => {
+    this.setState({
+      is_loading: true
+    })
     const url = '/v4/wsb_order/order_items/' + order_id
     const params = {access_token: accessToken}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
@@ -56,6 +70,7 @@ class GoodsListModal extends React.Component {
         return this.closeModal();
       }
       this.setState({
+        is_loading: false,
         goods_list: res?.list,
         is_fn_show_wm_price: res?.is_fn_show_wm_price,
         is_fn_price_controlled: res?.is_fn_price_controlled,
@@ -64,11 +79,14 @@ class GoodsListModal extends React.Component {
       })
     }, () => {
       this.closeModal()
+    }).catch(() => {
+      this.closeModal()
     })
   }
 
   closeModal = () => {
     this.setState({
+      is_loading: false,
       show_goods_list_modal: false,
       goods_list: [],
       count: '',
@@ -82,14 +100,15 @@ class GoodsListModal extends React.Component {
 
 
   render(): React.ReactNode {
-    let {currStoreId, onPress} = this.props;
+    let {store_id, onPress} = this.props;
     let {
       show_goods_list_modal,
       goods_list,
       count,
       is_fn_show_wm_price,
       is_fn_price_controlled,
-      is_fn_total_price
+      is_fn_total_price,
+      is_loading
     } = this.state;
     if (!show_goods_list_modal) {
       return null
@@ -98,7 +117,7 @@ class GoodsListModal extends React.Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_goods_list_modal}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
@@ -111,86 +130,97 @@ class GoodsListModal extends React.Component {
             borderTopLeftRadius: 15,
             borderTopRightRadius: 15,
           }]}>
-            <View>
+
+            <If condition={is_loading}>
               <View style={{
-                flexDirection: 'row',
-                padding: 12,
-                paddingBottom: 5,
-                justifyContent: 'space-between',
+                height: 200,
+                justifyContent: 'center',
+                alignItems: 'center'
               }}>
-                <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
-                  商品{count}件
-                </Text>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+                <ActivityIndicator color={colors.color666} size={60}/>
               </View>
+            </If>
+            <If condition={!is_loading}>
+              <View>
+                <View style={{
+                  flexDirection: 'row',
+                  padding: 12,
+                  paddingBottom: 5,
+                  justifyContent: 'space-between',
+                }}>
+                  <Text style={{fontWeight: 'bold', fontSize: 15, lineHeight: 30}}>
+                    商品{count}件
+                  </Text>
+                  <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+                </View>
 
-              <ScrollView automaticallyAdjustContentInsets={false}
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          style={{paddingHorizontal: 12, maxHeight: 380}}>
-                <For index='idx' of={goods_list} each='item'>
-                  <TouchableOpacity key={idx} onPress={() => {
-                    this.closeModal()
-                    onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: currStoreId, item: item})
-                  }} style={Styles.ItemRowContent}>
-                    {tool.length(item.product_img) > 0 ?
-                      <Image
-                        style={{
-                          width: 60,
-                          height: 60,
-                          marginRight: 9,
-                          borderRadius: 5
-                        }}
-                        source={{uri: item.product_img}}
-                      /> :
-                      <FontAwesome5 name={'file-image'} style={Styles.fileImg}/>
-                    }
-                    <View style={{height: 60, flex: 1}}>
-                      <Text style={Styles.ContentText}>
-                        <If condition={item.shelf_no}>{item.shelf_no} </If>
-                        {tool.jbbsubstr(item.name, 21)}
-                      </Text>
-                      <Text style={Styles.productIdText}>
-                        #{item.product_id}
-                      </Text>
+                <ScrollView automaticallyAdjustContentInsets={false}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                            style={{paddingHorizontal: 12, maxHeight: 380}}>
+                  <For index='idx' of={goods_list} each='item'>
+                    <TouchableOpacity key={idx} onPress={() => {
+                      this.closeModal()
+                      onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: store_id, item: item})
+                    }} style={Styles.ItemRowContent}>
+                      {tool.length(item.product_img) > 0 ?
+                        <Image
+                          style={{
+                            width: 60,
+                            height: 60,
+                            marginRight: 9,
+                            borderRadius: 5
+                          }}
+                          source={{uri: item.product_img}}
+                        /> :
+                        <FontAwesome5 name={'file-image'} style={Styles.fileImg}/>
+                      }
+                      <View style={{height: 60, flex: 1}}>
+                        <Text style={Styles.ContentText}>
+                          <If condition={item.shelf_no}>{item.shelf_no} </If>
+                          {tool.jbbsubstr(item.name, 21)}
+                        </Text>
+                        <Text style={Styles.productIdText}>
+                          #{item.product_id}
+                        </Text>
 
-                      <View style={Styles.isMgrContent}>
-                        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-                          <If condition={is_fn_price_controlled}>
-                            <Text style={Styles.priceMode}>保</Text>
-                            <Text style={Styles.color44140}>
-                              {numeral(item?.supply_price / 100).format('0.00')}元
-                            </Text>
-                            <If condition={is_fn_total_price}>
-                              <View style={Styles.ml30}/>
+                        <View style={Styles.isMgrContent}>
+                          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                            <If condition={is_fn_price_controlled}>
+                              <Text style={Styles.priceMode}>保</Text>
                               <Text style={Styles.color44140}>
-                                总价 {numeral(item?.supply_price * item?.num / 100).format('0.00')}元
+                                {numeral(item?.supply_price / 100).format('0.00')}元
                               </Text>
+                              <If condition={is_fn_total_price}>
+                                <View style={Styles.ml30}/>
+                                <Text style={Styles.color44140}>
+                                  总价 {numeral(item?.supply_price * item?.num / 100).format('0.00')}元
+                                </Text>
+                              </If>
                             </If>
-                          </If>
-                          <If condition={is_fn_show_wm_price}>
-                            <Text style={Styles.priceModes}>外</Text>
-                            <Text style={Styles.color44140}>{numeral(item?.price).format('0.00')}元 </Text>
-                            <If condition={is_fn_total_price}>
-                              <View style={Styles.ml30}/>
-                              <Text style={Styles.color44140}>
-                                总价 {numeral(item?.price * item?.num).format('0.00')}元
-                              </Text>
+                            <If condition={is_fn_show_wm_price}>
+                              <Text style={Styles.priceModes}>外</Text>
+                              <Text style={Styles.color44140}>{numeral(item?.price).format('0.00')}元 </Text>
+                              <If condition={is_fn_total_price}>
+                                <View style={Styles.ml30}/>
+                                <Text style={Styles.color44140}>
+                                  总价 {numeral(item?.price * item?.num).format('0.00')}元
+                                </Text>
+                              </If>
                             </If>
-                          </If>
+                          </View>
+                          <Text style={{
+                            fontSize: 12,
+                            color: colors.color666
+                          }}>{item.num > 1 ? `[x${item.num}]` : `x${item.num}`} </Text>
                         </View>
-                        <Text style={{
-                          fontSize: 12,
-                          color: colors.color666
-                        }}>{item.num > 1 ? `[x${item.num}]` : `x${item.num}`} </Text>
                       </View>
-                    </View>
 
-                  </TouchableOpacity>
-                </For>
-              </ScrollView>
-            </View>
-
+                    </TouchableOpacity>
+                  </For>
+                </ScrollView>
+              </View>
+            </If>
           </View>
         </View>
       </Modal>

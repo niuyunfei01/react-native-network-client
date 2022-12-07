@@ -2,12 +2,12 @@ import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
   Alert,
+  Animated,
   Dimensions,
   Image,
   ImageBackground,
   InteractionManager,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,7 +18,6 @@ import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../../pubilc/styles/colors";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import LinearGradient from "react-native-linear-gradient";
-import {rgbaColor} from "react-native-reanimated/src/reanimated2/Colors";
 import {SvgXml} from "react-native-svg";
 import {
   adjust,
@@ -47,7 +46,7 @@ import tool from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
-import {showError} from "../../../pubilc/util/ToastUtils";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
@@ -129,22 +128,23 @@ class Mine extends PureComponent {
   constructor(props) {
     super(props);
     this.mixpanel = MixpanelInstance;
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken, store_info} = this.props.global;
     let {
       currVendorId,
       currVersion,
     } = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
-      currStoreId: currStoreId,
+      store_id: store_id,
       currVendorId: currVendorId,
       currVersion: currVersion,
       access_token: accessToken,
       wsb_store_account: 0,
       storeStatus: {},
       is_mgr: false,
+      show_back_icon: props.route.params?.show_back_icon || false,
       storeInfo: {
-        store_name: '',
+        store_name: store_info?.name,
         role_desc: ''
       },
       balanceInfo: {
@@ -152,18 +152,21 @@ class Mine extends PureComponent {
         disabled_recharge: false,
         disabled_view_bill: false,
         freeze_balance: '',
-        freeze_notice: '冻结金额为待抢单运单最大配送费之和',
+        freeze_notice: '预扣金额为待抢单运单最大配送费',
       },
       menu_list: menu_list,
       activity: [],
       img: '',
-      show_freeze_balance_alert: false
+      show_freeze_balance_alert: false,
+      showSettle: false
     }
   }
 
   componentDidMount = () => {
     this.getActivitySwiper()
     this.getStoreDataOfMine()
+    this.fetchShowSettleProtocol()
+    this.viewRef && this.viewRef.setNativeProps({height: 0, opacity: 0})
   }
 
   handleTimeObj = (api = '', executeStatus = 'success', startTime, endTime, methodName = '', executeTime) => {
@@ -186,17 +189,15 @@ class Mine extends PureComponent {
   onRefresh = () => {
     this.fetchMineData()
     this.fetchWsbWallet()
+    this.fetchShowSettleProtocol()
   }
 
   navigateToBack = () => {
     this.props.navigation.goBack();
   }
 
-  getStoreDataOfMine = (store_id = 0) => {
-    let {access_token, currStoreId} = this.state;
-    if (store_id <= 0) {
-      store_id = currStoreId
-    }
+  getStoreDataOfMine = () => {
+    let {access_token, store_id} = this.state;
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
@@ -208,13 +209,10 @@ class Mine extends PureComponent {
   }
 
   fetchMineData = () => {
-    let {currStoreId} = this.state;
+    let {store_id} = this.state;
     const {accessToken} = this.props.global
     const api = `/v4/wsb_user/personalCenter`;
-    HttpUtils.get.bind(this.props)(api, {
-      store_id: currStoreId,
-      access_token: accessToken
-    }).then(res => {
+    HttpUtils.get.bind(this.props)(api, {store_id: store_id, access_token: accessToken}).then(res => {
       this.setState({
         storeInfo: {
           store_name: res.store_name,
@@ -229,9 +227,7 @@ class Mine extends PureComponent {
   fetchWsbWallet = () => {
     const {accessToken} = this.props.global
     const api = `/v4/wsbWallet/balance`;
-    HttpUtils.get.bind(this.props)(api, {
-      access_token: accessToken
-    }).then(res => {
+    HttpUtils.get.bind(this.props)(api, {access_token: accessToken}).then(res => {
       this.setState({
         balanceInfo: {
           balance: res.balance,
@@ -245,10 +241,10 @@ class Mine extends PureComponent {
   }
 
   getActivitySwiper = () => {
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
-      storeId: currStoreId,
+      storeId: store_id,
       pos: 1
     }
     HttpUtils.post.bind(this.props)(api, data, true).then((res) => {
@@ -261,7 +257,7 @@ class Mine extends PureComponent {
           activity: obj.list ?? [obj]
         })
         this.mixpanel.track("act_user_ref_ad_view", {
-          store_id: currStoreId,
+          store_id: store_id,
           list: obj.list
         });
       } else {
@@ -274,13 +270,27 @@ class Mine extends PureComponent {
     })
   }
 
+  fetchShowSettleProtocol = () => {
+    let {store_id, accessToken} = this.props.global;
+    let url = `/api/show_settle_protocol/${store_id}`;
+    HttpUtils.get(url, {
+      access_token: accessToken
+    }).then(res => {
+      this.setState({
+        showSettle: res.is_show == 1
+      })
+    }).catch((res) => {
+      ToastShort(res.reason)
+    })
+  }
+
   // 联系客服
   JumpToServices = async () => {
     let {currentUser, currentUserProfile, vendor_id} = this.props.global;
-    let {currStoreId} = this.state;
+    let {store_id} = this.state;
     let data = {
       v: vendor_id,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'
@@ -309,23 +319,15 @@ class Mine extends PureComponent {
   }
 
   navigateToDeliverySetting = () => {
-    this.onPress(Config.ROUTE_DELIVERY_LIST, {dispatch: this.props.dispatch})
+    this.onPress(Config.ROUTE_DELIVERY_LIST)
   }
 
   navigateToExpense = () => {
     this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn: this.state.wsb_store_account})
   }
 
-
-  navigateToStoreManager = () => {
-    const {currentUser, vendor_info} = this.props.global;
-    const {is_mgr, currVendorId} = this.state
-    this.onPress(Config.ROUTE_STORE, {
-      currentUser: currentUser,
-      currVendorId: currVendorId,
-      currVendorName: vendor_info?.brand_name,
-      is_mgr: is_mgr
-    });
+  navigateToSettle = () => {
+    this.onPress(Config.ROUTE_SETTLEMENT, {showSettle: this.state.showSettle})
   }
 
   navigateToWorker = () => {
@@ -340,17 +342,40 @@ class Mine extends PureComponent {
 
 
   onPressActivity = (info) => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     this.onPress(Config.ROUTE_WEB, {url: info.url + '?access_token=' + accessToken, title: info.name})
     this.mixpanel.track("act_user_ref_ad_click", {
       img_name: info.name,
       pos: info.pos_name,
-      store_id: currStoreId,
+      store_id: store_id,
     });
   }
 
+  logout = () => {
+    const {dispatch, navigation} = this.props;
+    this.mixpanel.reset();
+    const noLoginInfo = {
+      accessToken: '',
+      refreshToken: '',
+      currentUser: '',
+      store_id: 0,
+      vendor_id: 0,
+      host: Config.defaultHost,
+      enabled_good_mgr: false,
+      autoBluetoothPrint: false,
+      expireTs: 0,
+      getTokenTs: 0,
+      order_list_by: 'expectTime asc',
+      printer_id: '0',
+    }
+    global.noLoginInfo = noLoginInfo
+    setNoLoginInfo(JSON.stringify(noLoginInfo))
+    dispatch(logout(() => {
+      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
+    }));
+  }
   logOutAccount = () => {
-    const {dispatch, navigation, global} = this.props;
+
     Alert.alert('提醒', `确定要退出吗？`, [
       {
         text: '取消',
@@ -359,25 +384,7 @@ class Mine extends PureComponent {
       {
         text: '确定',
         style: 'default',
-        onPress: () => {
-          this.mixpanel.reset();
-          const noLoginInfo = {
-            accessToken: '',
-            currentUser: 0,
-            currStoreId: 0,
-            host: '',
-            enabledGoodMgr: '',
-            currVendorId: '',
-            refreshToken: '',
-            expireTs: 0,
-            printer_id: '0',
-            order_list_by: 'orderTime asc'
-          }
-          setNoLoginInfo(JSON.stringify(noLoginInfo))
-          dispatch(logout(() => {
-            tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
-          }));
-        }
+        onPress: this.logout
       }
     ]);
   }
@@ -394,10 +401,14 @@ class Mine extends PureComponent {
 
   touchBlockNavigate = (info) => {
     this.mixpanel.track(`${info?.name}`)
+
     if (info?.type === 'Router') {
       switch (info?.path) {
         case 'Store':
-          this.navigateToStoreManager()
+          this.onPress(Config.ROUTE_STORE_LIST);
+          break
+        case 'OrderSearchResult':
+          this.onPress(Config.ROUTE_ORDER_ALL);
           break
         case 'Worker':
           this.navigateToWorker()
@@ -411,6 +422,9 @@ class Mine extends PureComponent {
         case 'OldSeparatedExpense':
           this.navigateToExpense()
           break
+        case 'Settlement':
+          this.navigateToSettle()
+          break
         default:
           this.onPress(info?.path)
       }
@@ -422,15 +436,16 @@ class Mine extends PureComponent {
   }
 
   renderHeader = () => {
+    const {show_back_icon} = this.state
     return (
-      <View
-        style={headerRightStyles.resetBind}>
-        <TouchableOpacity style={{
-          width: 90,
-          height: 32,
-        }} onPress={() => this.navigateToBack()}>
-          <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
-        </TouchableOpacity>
+      <View style={headerRightStyles.resetBind}>
+        {
+          show_back_icon ?
+            <TouchableOpacity style={{width: 90, height: 32}} onPress={() => this.navigateToBack()}>
+              <Entypo name="chevron-thin-left" style={headerRightStyles.text}/>
+            </TouchableOpacity> :
+            <View style={{width: 90, height: 32}}/>
+        }
         <TouchableOpacity onPress={() => this.JumpToServices()} style={headerRightStyles.rightBtn}>
           <SvgXml xml={Service()} width={18} height={18}/>
           <Text style={headerRightStyles.rightText}>联系客服 </Text>
@@ -440,11 +455,15 @@ class Mine extends PureComponent {
   }
 
   jumpToAddStore = () => {
-    let {is_mgr} = this.state
-    this.onPress(Config.ROUTE_STORE_ADD, {
-      btn_type: "edit",
-      is_mgr: is_mgr,
-      editStoreId: this.props.global.currStoreId
+    // let {is_mgr} = this.state
+    // this.onPress(Config.ROUTE_STORE_ADD, {
+    //   btn_type: "edit",
+    //   is_mgr: is_mgr,
+    //   editStoreId: this.props.global.store_id
+    // })
+    this.onPress(Config.ROUTE_SAVE_STORE, {
+      type: "edit",
+      store_id: this.props.global.store_id
     })
   }
 
@@ -457,9 +476,7 @@ class Mine extends PureComponent {
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E5%BA%97%E9%93%BA%E5%A4%B4%E5%83%8F%403x.png'}}
           style={{width: 48, height: 48}}/>
         <View style={{flexDirection: "column", marginLeft: 10}}>
-          <TouchableOpacity onPress={() => {
-            this.jumpToAddStore()
-          }} style={styles.storeContent}>
+          <TouchableOpacity onPress={() => this.jumpToAddStore()} style={styles.storeContent}>
             <Text style={styles.storeName}>
               {tool.jbbsubstr(storeInfo?.store_name, 12)}
             </Text>
@@ -495,7 +512,7 @@ class Mine extends PureComponent {
                       start={{x: 0, y: 0}}
                       end={{x: 0, y: 1}}
                       colors={['#E7FFEB', '#FFFFFF']}>
-        <View style={{borderRightColor: colors.e5, borderRightWidth: 0.5, paddingRight: 20}}>
+        <View style={{borderRightColor: colors.e5, borderRightWidth: 0.5, paddingRight: 15}}>
           <Text style={styles.walletLabel}>
             账户余额(元)
           </Text>
@@ -504,13 +521,9 @@ class Mine extends PureComponent {
           </Text>
         </View>
 
-        <View style={{flex: 1, marginLeft: 19}}>
-          <Text style={styles.walletLabel} onPress={() => {
-            this.setState({
-              show_freeze_balance_alert: true
-            })
-          }}>
-            冻结金额(元) <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.colorCCC,}}/>
+        <View style={{paddingHorizontal: 14}}>
+          <Text style={styles.walletLabel} onPress={() => this.setState({show_freeze_balance_alert: true})}>
+            预扣金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <Text style={styles.walletValue}>
             {balanceInfo?.disable_view_bill ? balanceInfo?.freeze_balance : `*****`}
@@ -535,26 +548,24 @@ class Mine extends PureComponent {
   renderFreezeBalanceAlertModal = () => {
     let {show_freeze_balance_alert, balanceInfo} = this.state;
     return (
-      <View>
-        <AlertModal
-          visible={show_freeze_balance_alert}
-          onClose={this.closeModal}
-          onPress={() => this.closeModal()}
-          title={'冻结金额'}
-          desc={balanceInfo?.freeze_notice}
-          actionText={'知道了'}/>
-      </View>
+      <AlertModal
+        visible={show_freeze_balance_alert}
+        onClose={this.closeModal}
+        onPress={() => this.closeModal()}
+        title={'预扣金额'}
+        desc={balanceInfo?.freeze_notice}
+        actionText={'知道了'}/>
     )
   }
 
 
   renderValueAdded = () => {
     const {navigation, global} = this.props
-    const {currStoreId, accessToken, store_info} = global
+    const {store_id, accessToken, store_info} = global
     const {vip_info = {}} = store_info;
     return (
       <If condition={vip_info.show_vip}>
-        <GoodsIncrement currStoreId={currStoreId} accessToken={accessToken} navigation={navigation}/>
+        <GoodsIncrement store_id={store_id} accessToken={accessToken} navigation={navigation}/>
       </If>
     )
   }
@@ -630,7 +641,7 @@ class Mine extends PureComponent {
       <For of={menu_list} each='item' index='index'>
         <View style={[styles.zoneWrap]} key={index}>
           <Text style={styles.zoneWrapTitle}>{item?.title} </Text>
-          <View style={{flexDirection: 'row', justifyContent: 'center', flex: 1}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
             <View style={styles.flexRowWrap}>
               <For of={item?.items} each='info' index='index'>
                 <TouchableOpacity style={[block_styles.block_box]} key={index}
@@ -697,21 +708,58 @@ class Mine extends PureComponent {
   }
 
 
+  onScroll = ({nativeEvent}) => {
+    const {y} = nativeEvent.contentOffset
+    this.contentOffset = y
+    let headerOpacity = y / 130
+    let headerHeight = y / 130 * 100
+    if (headerHeight >= 44)
+      headerHeight = 44
+    if (headerHeight <= 0)
+      headerHeight = 0
+    if (headerOpacity <= 0)
+      headerOpacity = 0
+    if (headerOpacity >= 1)
+      headerOpacity = 1
+    this.viewRef && this.viewRef.setNativeProps({height: headerHeight, opacity: headerOpacity})
+  }
+
+  renderMineHeader = () => {
+    const {show_back_icon} = this.state
+    return (
+      <Animated.View style={[styles.showHeaderWrap]} ref={ref => this.viewRef = ref}>
+        {
+          show_back_icon ?
+            <Entypo name="chevron-thin-left" style={styles.showHeaderBackIcon} onPress={this.navigateToBack}/> :
+            <View style={styles.showHeaderBackIcon}/>
+        }
+
+        <Text style={styles.showHeaderText}>我的</Text>
+        <TouchableOpacity onPress={() => this.JumpToServices()} style={styles.showHeaderRightWrap}>
+          <SvgXml xml={Service(18, 18, colors.color333)}/>
+          <Text style={styles.showHeaderRightText}>联系客服 </Text>
+        </TouchableOpacity>
+      </Animated.View>
+    )
+  }
+
   render() {
     let {isRefreshing} = this.state;
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh}/>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={() => this.onRefresh()}
-              tintColor='gray'
-            />}
-          style={styles.Content}>
+        {this.renderMineHeader()}
+        <Animated.ScrollView onScroll={event => this.onScroll(event)}
+                             scrollEventThrottle={16}
+                             refreshControl={
+                               <RefreshControl
+                                 refreshing={isRefreshing}
+                                 onRefresh={() => this.onRefresh()}
+                                 tintColor='gray'
+                               />}
+                             style={styles.Content}>
           {this.renderStore()}
-          <View style={{position: "relative", top: -53, paddingHorizontal: 12}}>
+          <View style={{top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
             {this.renderFreezeBalanceAlertModal()}
             {this.renderValueAdded()}
@@ -720,13 +768,24 @@ class Mine extends PureComponent {
             {this.renderLoginOut()}
             {this.renderCopyRight()}
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+
+  showHeaderWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+  },
+  showHeaderBackIcon: {fontSize: 20, color: colors.color333, marginHorizontal: 12, width: 80},
+  showHeaderText: {fontSize: 17, fontWeight: 'bold', color: colors.color333,},
+  showHeaderRightWrap: {flexDirection: 'row', alignItems: 'center', marginRight: 12, width: 80},
+  showHeaderRightText: {fontSize: 14, fontWeight: 'bold', color: colors.color333, paddingLeft: 4},
   Content: {backgroundColor: '#F5F5F5'},
   storeInfoBox: {
     flexDirection: "row",
@@ -745,7 +804,7 @@ const styles = StyleSheet.create({
   storeType: {
     width: 44,
     height: 18,
-    backgroundColor: rgbaColor(255, 255, 255, 0.9),
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 2,
     alignItems: "center",
     marginLeft: 5
@@ -760,7 +819,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 20,
     borderRadius: 10,
-    backgroundColor: rgbaColor(255, 255, 255, 0.2),
+    backgroundColor: 'rgba(255,255,255,0.2)',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -778,68 +837,34 @@ const styles = StyleSheet.create({
   walletBox: {
     height: 86,
     borderRadius: 6,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 15,
     flexDirection: "row",
     alignItems: "center",
-    // justifyContent: "space-between"
+    justifyContent: 'space-between'
   },
   walletLabel: {
     fontSize: 12,
     color: colors.color666,
-    marginBottom: 10
+    marginBottom: 4
   },
   walletValue: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 18,
     color: colors.color333
   },
   walletBtn: {
     width: 93,
     height: 36,
     backgroundColor: '#FF8309',
-    borderRadius: 21
+    borderRadius: 21,
   },
   walletBtnTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.white
   },
-  ValueAddBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 15,
-    paddingHorizontal: 11
-  },
-  ValueAddBoxLeft: {flexDirection: "row", alignItems: "center"},
-  ValueAddBtn: {
-    fontWeight: '400',
-    fontSize: 12,
-    color: '#AD6500'
-  },
-  ValueAddIcon: {
-    fontSize: 12,
-    color: '#AD6500'
-  },
-  content: {
-    width: width * 0.92,
-    marginLeft: width * 0.04,
-    height: 250,
-    borderRadius: 6,
-    backgroundColor: colors.white,
-    marginTop: 10
-  },
-  ValueAddLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#985800',
-    marginRight: 5
-  },
-  ValueAddDesc: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#C5852C'
-  },
+
   zoneWrap: {
     backgroundColor: colors.white,
     borderRadius: 6,
@@ -876,7 +901,7 @@ const headerRightStyles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 10,
     paddingVertical: 10,
-    backgroundColor: rgbaColor(255, 255, 255, 0)
+    backgroundColor: 'rgba(255,255,255,0)'
   },
   text: {
     fontSize: 20,
@@ -885,7 +910,7 @@ const headerRightStyles = StyleSheet.create({
   rightBtn: {
     width: 90,
     height: 32,
-    backgroundColor: rgbaColor(0, 0, 0, 0.15),
+    backgroundColor: 'rgba(0,0,0,0.15)',
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     flexDirection: "row",

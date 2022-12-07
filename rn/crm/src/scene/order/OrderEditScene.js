@@ -2,18 +2,14 @@ import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Config from "../../pubilc/common/config";
-import AppConfig from "../../pubilc/common/config";
 import CommonStyle from "../../pubilc/util/CommonStyles";
 
-import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
+import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import tool from "../../pubilc/util/tool";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
-import UserTagPopup from "../common/component/UserTagPopup";
-import FetchEx from "../../pubilc/util/fetchEx";
-import {WhiteSpace} from "@ant-design/react-native"
 
 import {
   Cell,
@@ -104,7 +100,6 @@ class OrderEditScene extends Component {
     this._onChangeTaxId = this._onChangeTaxId.bind(this);
     this._doSendRemind = this._doSendRemind.bind(this);
     this._back = this._back.bind(this);
-    this._storeLoc = this._storeLoc.bind(this);
     this._buildNotifyRemark = this._buildNotifyRemark.bind(this);
 
     this.navigationOptions(this.props)
@@ -155,14 +150,6 @@ class OrderEditScene extends Component {
     }
   }
 
-  _storeLoc() {
-    const {order} = this.props.route.params || {};
-    if (order) {
-      const store = tool.store(this.props.global, order.store_id);
-      return store ? `${store.loc_lng},${store.loc_lat}` : "0,0";
-    }
-    return "0,0"
-  }
 
   _onChangeBackupPhone(backupPhone) {
     const {order} = this.props.route.params;
@@ -187,17 +174,13 @@ class OrderEditScene extends Component {
   _toSetLocation() {
     const {state, navigate} = this.props.navigation;
     const params = {
-      isType: "OrderEdit",
-      action: Config.LOC_PICKER,
-      center:
-        this.state.loc_data === "0,0" || !this.state.loc_data
-          ? this._storeLoc()
-          : this.state.loc_data,
+      show_select_city: false,
+      center: this.state.loc_data,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
     };
-    navigate(Config.ROUTE_SEARC_HSHOP, params);
+    navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   _onChangeDetailAddr(detailAddr) {

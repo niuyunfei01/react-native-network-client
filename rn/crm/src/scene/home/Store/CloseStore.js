@@ -181,9 +181,6 @@ class StoreClose extends PureComponent {
               tintColor='gray'
             />
           }
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
         >
           <For index="index" each="element" of={timeOptions}>
             <Cells style={{

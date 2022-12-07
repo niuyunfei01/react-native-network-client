@@ -34,10 +34,10 @@ function mapStateToProps(state) {
 class ProfitAndLoss extends PureComponent {
   constructor(props) {
     super(props);
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     const params = this.props.route.params?.info
     this.state = {
-      storeId: currStoreId,
+      storeId: store_id,
       ext_store_id: 0,
       selectTipStore: '全部门店',
       head_store: [
@@ -97,10 +97,10 @@ class ProfitAndLoss extends PureComponent {
 
   getExtStoreList = () => {
     const {global} = this.props
-    const {accessToken, currStoreId} = global
+    const {accessToken, store_id} = global
     const {head_store} = this.state
 
-    const api = `/v1/new_api/added/ext_store_list/${currStoreId}?access_token=${accessToken}`
+    const api = `/v1/new_api/added/ext_store_list/${store_id}?access_token=${accessToken}`
     HttpUtils.get(api).then(list => {
       const lists = head_store
       Object.keys(list).map(key => {
@@ -316,6 +316,8 @@ class ProfitAndLoss extends PureComponent {
     return (
       <FlatList
         data={profitList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         renderItem={this.renderProfitItem}
         onRefresh={this.onRefresh}
         onEndReachedThreshold={0.1}
@@ -361,7 +363,7 @@ class ProfitAndLoss extends PureComponent {
               <View style={styles.flexRow1}>
                 <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台结算：</Text>
                 <Text
-                  style={styles.orderCardItemValue}>{numeral(item?.bill?.total_income_from_platform / 100).format('0.00')}元 </Text>
+                  style={styles.orderCardItemValue}>{numeral(item?.total_income_from_platform).format('0.00')}元 </Text>
               </View>
             </View>
             <View style={{flex: 1}}>
@@ -414,39 +416,40 @@ class ProfitAndLoss extends PureComponent {
     let {showModal, startDate, endDate} = this.state;
     return (
       <JbbModal visible={showModal} onClose={() => this.closeModal()} modal_type={'bottom'}
-                modalStyle={{padding: 0}}
       >
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: 50,
-          marginHorizontal: 30
-        }}>
-          <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>时间选择</Text>
-          <Text style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}} onPress={() => {
-            this.setState({showModal: false})
-            this.get_profit_list()
-          }}>确定</Text>
-        </View>
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: 70
-        }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({showDateModalStart: true})
+        <>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: 50,
+            marginHorizontal: 30
           }}>
-            <Text>{startDate !== '' ? startDate : '开始时间'} </Text>
-          </TouchableOpacity>
-          <Text>-</Text>
-          <TouchableOpacity onPress={() => this.setState({showDateModalEnd: true})}>
-            <Text>{endDate !== '' ? endDate : '结束时间'} </Text>
-          </TouchableOpacity>
-          {this.renderDatePickerStart()}
-          {this.renderDatePickerEnd()}
-        </View>
+            <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.color333}}>时间选择</Text>
+            <Text style={{fontSize: 16, fontWeight: '400', color: colors.main_color, padding: 10}} onPress={() => {
+              this.setState({showModal: false})
+              this.get_profit_list()
+            }}>确定</Text>
+          </View>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+            height: 70
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.setState({showDateModalStart: true})
+            }}>
+              <Text style={{color: colors.color333}}>{startDate !== '' ? startDate : '开始时间'} </Text>
+            </TouchableOpacity>
+            <Text style={{color: colors.color333}}>-</Text>
+            <TouchableOpacity onPress={() => this.setState({showDateModalEnd: true})}>
+              <Text style={{color: colors.color333}}>{endDate !== '' ? endDate : '结束时间'} </Text>
+            </TouchableOpacity>
+            {this.renderDatePickerStart()}
+            {this.renderDatePickerEnd()}
+          </View>
+        </>
       </JbbModal>
     )
   }

@@ -23,7 +23,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
-import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
+import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
 import dayjs from "dayjs";
 
@@ -132,12 +132,12 @@ export function setUserProfile(profile) {
 
 /**
  *
- * @param currStoreId
+ * @param store_id
  * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
  * @returns {{payload: {id: *}, type: *}}
  */
-export function setCurrentStore(currStoreId) {
-  const payload = {id: currStoreId};
+export function setCurrentStore(store_id) {
+  const payload = {id: store_id};
   return {
     type: SET_CURR_STORE,
     payload: payload
@@ -157,7 +157,6 @@ export function setPrinterName(printerInfo) {
     printer_info: printerInfo
   }
 }
-
 
 
 export function setFloatSerciceIcon(show) {
@@ -203,6 +202,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout().then();
+    doJPushStop()
     doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();

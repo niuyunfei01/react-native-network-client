@@ -18,7 +18,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {connect} from "react-redux";
 import NoticeItem from "./NoticeItem";
-import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 
 const {width} = Dimensions.get("window");
 
@@ -82,9 +81,8 @@ class NoticeList extends React.PureComponent {
 
 
   fetchData = (paramsStatus, setList = 1) => {
-    showModal("加载中...")
     if (setList === 1) this.fetchNum();
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let {queryParams, checkStatus, list} = this.state;
     let QueryStatus = paramsStatus || checkStatus;
@@ -93,29 +91,26 @@ class NoticeList extends React.PureComponent {
       checkStatus: [100, 101, 102, 103, -1].indexOf(QueryStatus) === -1 ? checkStatus : QueryStatus,
       isLoading: true,
     })
-    const url = `/api/list_notice/${currVendorId}/${currStoreId}/${QueryStatus}/${status}/${queryParams.page}?access_token=${accessToken}`;
+    const url = `/api/list_notice/${currVendorId}/${store_id}/${QueryStatus}/${status}/${queryParams.page}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, {}).then(res => {
       if (tool.length(res.list) < 10) {
         queryParams.isAdd = false;
       }
       queryParams.page++;
-      hideModal();
       this.setState({
         list: setList === 1 ? res.list : list.concat(res.list),
         isLoading: false,
         queryParams,
       })
-    }, () => {
-      hideModal();
     })
   }
 
   fetchNum = () => {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let {categoryLabels, typeLabels} = this.state;
     let that = this;
-    const url = `/api/list_notice_count/${currVendorId}/${currStoreId}?access_token=${accessToken}`;
+    const url = `/api/list_notice_count/${currVendorId}/${store_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, {}).then(res => {
       tool.objectMap(res.result, (item, idx) => {
         categoryLabels.forEach((itm, key) => {
@@ -183,10 +178,6 @@ class NoticeList extends React.PureComponent {
     return {length: 100, offset: 100 * index, index}
   }
 
-  _keyExtractor = (item) => {
-    return item.id.toString();
-  }
-
   onTouchMove = (e) => {
     this.setState({scrollLocking: Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)});
   }
@@ -252,7 +243,7 @@ class NoticeList extends React.PureComponent {
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          horizontal={true} showsHorizontalScrollIndicator={false}>
+          horizontal={true}>
           <For index="i" each='tab' of={typeLabels}>
             <TouchableOpacity
               key={i}
@@ -299,6 +290,8 @@ class NoticeList extends React.PureComponent {
           data={list}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onTouchStart={(e) => {
             this.pageX = e.nativeEvent.pageX;
             this.pageY = e.nativeEvent.pageY;
@@ -316,7 +309,7 @@ class NoticeList extends React.PureComponent {
           renderItem={this.renderItem}
           onRefresh={this.onRefresh.bind(this)}
           refreshing={isLoading}
-          keyExtractor={this._keyExtractor}
+          keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderEmptyData()}

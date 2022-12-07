@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dimensions, Platform, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Dimensions, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import colors from "../styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../util/tool";
@@ -104,6 +104,7 @@ class AddTipModal extends React.Component {
     }, () => {
       let params = {
         show_add_tip_modal: false,
+        orders_add_tip: true,
         add_tip_id: 0,
       }
       if (set_add_tip_money) {
@@ -114,7 +115,9 @@ class AddTipModal extends React.Component {
           }
         })
       } else {
-        setState && setState(params)
+        setState && setState(params, () => {
+          fetchData && fetchData()
+        })
       }
     })
   }
@@ -125,9 +128,11 @@ class AddTipModal extends React.Component {
       return null;
     }
     return (
-      <JbbModal visible={show_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_modal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}
+      >
 
         <View style={{marginBottom: 20}}>
           <View style={{
@@ -141,7 +146,6 @@ class AddTipModal extends React.Component {
               <Text style={{fontWeight: 'normal', fontSize: 12, color: colors.color999, marginLeft: 4}}> 有助更快接起哦 </Text>
             </Text>
             <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
-
 
           </View>
           <View style={{paddingHorizontal: 12,}}>

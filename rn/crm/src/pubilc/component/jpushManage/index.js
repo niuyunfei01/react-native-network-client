@@ -17,6 +17,10 @@ export const doJPushSetAlias = (currentUser) => {
   }
 }
 
+export const doJPushStop = () => {
+  JPush.stopPush()
+}
+
 export const doJPushDeleteAlias = () => {
   JPush.deleteAlias({sequence: dayjs().unix()})
 }

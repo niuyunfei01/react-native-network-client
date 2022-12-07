@@ -35,6 +35,8 @@ import BottomModal from "../../../pubilc/component/BottomModal";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import PropTypes from "prop-types";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
+import DeviceInfo from "react-native-device-info";
+import {PlayMusicComponent} from "../../../pubilc/component/PlayMusic";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const width = Dimensions.get("window").width;
@@ -51,6 +53,7 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+
 
 class SettingScene extends PureComponent {
 
@@ -76,6 +79,7 @@ class SettingScene extends PureComponent {
       showDeleteModal: false,
       shouldShowModal: false,
       order_list_show_product: false,
+      show_remark_in_order_list: false,
       is_alone_pay_vendor: true,
       is_owner: false,
       bd_mobile: '',
@@ -86,42 +90,35 @@ class SettingScene extends PureComponent {
       funds_thresholds: 0,
       threshold_key: 0,
       owner_mobile: '',
+      server_list: [],
+      show_version: 0,
     }
   }
 
-  onHeaderRefresh = () => {
+  onHeaderRefresh = async () => {
     this.setState({isRefreshing: true});
     if (Platform.OS !== 'ios') {
-      native.getDisableSoundNotify((disabled,) => {
-        this.setState({enable_notify: !disabled})
-      })
+      await native.getDisableSoundNotify((disabled) => this.setState({enable_notify: !disabled}))
 
-      native.getNewOrderNotifyDisabled((disabled,) => {
-        this.setState({enable_new_order_notify: !disabled})
-      })
+      await native.getNewOrderNotifyDisabled((disabled) => this.setState({enable_new_order_notify: !disabled}))
 
-      native.isRunInBg((resp) => {
-        let isRun = resp === 1;
-        this.setState({isRun: isRun})
-      })
+      await native.isRunInBg((resp) => this.setState({isRun: resp === 1}))
     }
 
-    JPush.isNotificationEnabled((enabled) => {
-      this.setState({notificationEnabled: enabled})
-    })
+    JPush.isNotificationEnabled((enabled) => this.setState({notificationEnabled: enabled}))
 
     // this.get_store_settings();
     this.getConfig();
   }
 
-  componentDidMount() {
-    this.onHeaderRefresh();
+  async componentDidMount() {
+    await this.onHeaderRefresh();
   }
 
   getConfig = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const api = `/v4/wsb_store/getStoreConfig?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId}).then(res => {
+    HttpUtils.get.bind(this.props)(api, {store_id: store_id}).then(res => {
       let funds_threshold_mapping = [];
       if (res?.funds_threshold_mapping) {
         tool.objectMap(res.funds_threshold_mapping, (item,) => {
@@ -134,10 +131,12 @@ class SettingScene extends PureComponent {
         funds_threshold_mapping,
         show_remark_to_rider: Boolean(res.show_remark_to_rider),
         owner_mobile: res?.owner_mobile,
+        server_list: res?.server_list,
         invoice_serial_font: res?.invoice_serial_font,
         hide_good_titles_to_shipper: Boolean(res.hide_good_titles_to_shipper),
         use_real_weight: Number(res?.use_real_weight) === 1,
         order_list_show_product: Number(res?.order_list_show_product) === 1,
+        show_remark_in_order_list: Number(res?.show_remark_in_order_list) === 1,
         is_alone_pay_vendor: Boolean(res?.is_alone_pay_vendor),
         is_owner: Boolean(res?.is_owner),
         bd_mobile: tool.length(res?.delivery_bd_info) > 0 ? res.delivery_bd_info.mobile : '',
@@ -155,9 +154,9 @@ class SettingScene extends PureComponent {
       value = value ? 1 : 0
     }
     tool.debounces(() => {
-      const {currStoreId, accessToken} = this.props.global;
+      const {store_id, accessToken} = this.props.global;
       const api = `/v4/wsb_store/setStoreConfig?access_token=${accessToken}`
-      const params = {store_id: currStoreId, field, value}
+      const params = {store_id: store_id, field, value}
       HttpUtils.get.bind(this.props)(api, params).then(() => {
         ToastShort("设置成功");
       }).catch(e => ToastShort(e.reason))
@@ -165,9 +164,9 @@ class SettingScene extends PureComponent {
   }
 
   band_bd = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {bd_mobile} = this.state;
-    const api = `api/set_store_delivery_bd/${currStoreId}?access_token=${accessToken}`
+    const api = `api/set_store_delivery_bd/${store_id}?access_token=${accessToken}`
     let data = {
       mobile: bd_mobile
     }
@@ -201,7 +200,7 @@ class SettingScene extends PureComponent {
     let msg = '设置后，将不会对您进行余额电话提醒';
     if (funds_thresholds > 0) {
       msg = `设置后，当余额≤0及≤该阈值时将免费对您的电话：${owner_mobile}进行提醒。`
-    } else if (this.state.funds_thresholds >= 0) {
+    } else if (funds_thresholds >= 0) {
       msg = `设置后，当余额≤0时将免费对您进行电话：${owner_mobile}进行提醒`;
     }
     return msg
@@ -211,9 +210,7 @@ class SettingScene extends PureComponent {
     const {accessToken, store_id} = this.props.global;
     this.closeModal()
     const url = `/v4/wsb_store/destroyStore?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url,{
-      store_id,
-    }).then(() => {
+    HttpUtils.get.bind(this.props)(url, {store_id}).then(() => {
         ToastLong('注销成功,正在退出登录', 0)
         setTimeout(() => {
           this._onLogout()
@@ -232,12 +229,12 @@ class SettingScene extends PureComponent {
     const noLoginInfo = {
       accessToken: '',
       currentUser: 0,
-      currStoreId: 0,
+      store_id: 0,
       host: '',
-      enabledGoodMgr: '',
+      enabled_good_mgr: '',
       currVendorId: '',
       printer_id: global.printer_id || '0',
-      order_list_by: 'orderTime asc'
+      order_list_by: 'expectTime asc'
     }
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
@@ -247,7 +244,7 @@ class SettingScene extends PureComponent {
   }
 
   render() {
-    const {isRefreshing} = this.state
+    const {isRefreshing, show_version} = this.state
     return (
       <ScrollView
         refreshControl={
@@ -265,51 +262,49 @@ class SettingScene extends PureComponent {
         {this.renderPrivacyPolicy()}
         {this.renderBtn()}
         {this.renderModal()}
+        <If condition={show_version >= 5}>
+          {this.renderServer()}
+        </If>
       </ScrollView>
     );
   }
 
 
+  switchNewOrder = async (enable_new_order_notify) => {
+    this.setState({enable_new_order_notify: !enable_new_order_notify});
+    await native.setDisabledNewOrderNotify(enable_new_order_notify)
+  }
+
+  switchVoiceNotify = async (enable_notify) => {
+    this.setState({enable_notify: !enable_notify});
+    await native.setDisableSoundNotify(enable_notify)
+  }
   renderRemind = () => {
     let {enable_new_order_notify, enable_notify, funds_threshold, notificationEnabled, isRun} = this.state
+    const {currentUser} = this.props.global
     return (
       <View style={styles.item_body}>
         <Text style={styles.item_title}>提醒 </Text>
-
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+          <If condition={currentUser == 3093374}>
+            <PlayMusicComponent/>
+          </If>
           <If condition={Platform.OS !== 'ios'}>
-            <TouchableOpacity onPress={() => {
-              let val = !enable_new_order_notify;
-              this.setState({enable_new_order_notify: val});
-              native.setDisabledNewOrderNotify(!val)
-            }}
-                              style={styles.item_row}>
+            <TouchableOpacity onPress={() => this.switchNewOrder(enable_new_order_notify)} style={styles.item_row}>
               <Text style={styles.row_label}>新订单通知 </Text>
-              <Switch onValueChange={(val) => {
-                this.setState({enable_new_order_notify: val});
-                native.setDisabledNewOrderNotify(!val)
-              }} color={colors.main_color} value={enable_new_order_notify}
-              />
+              <Switch onValueChange={() => this.switchNewOrder(enable_new_order_notify)}
+                      color={colors.main_color}
+                      value={enable_new_order_notify}/>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {
-              let val = !enable_notify;
-              native.setDisableSoundNotify(!val)
-              this.setState({enable_notify: val});
-            }}
-                              style={styles.item_row}>
+            <TouchableOpacity onPress={() => this.switchVoiceNotify(enable_notify)} style={styles.item_row}>
               <Text style={styles.row_label}>语音通知 </Text>
-              <Switch onValueChange={(val) => {
-                native.setDisableSoundNotify(!val)
-                this.setState({enable_notify: val});
-              }} color={colors.main_color} value={enable_notify}
-              />
+              <Switch onValueChange={() => this.switchVoiceNotify(enable_notify)}
+                      color={colors.main_color}
+                      value={enable_notify}/>
             </TouchableOpacity>
           </If>
-          <TouchableOpacity onPress={() => {
-            this.setState({showAlertModal: true})
-          }}
-                            style={styles.item_row}>
+          <TouchableOpacity onPress={() => this.setState({showAlertModal: true})} style={styles.item_row}>
             <Text style={styles.row_label}>余额不足通知 </Text>
             <Text style={styles.row_footer}>
               {funds_threshold > 0 ? funds_threshold + '元' : "设置通知"}
@@ -318,25 +313,7 @@ class SettingScene extends PureComponent {
           </TouchableOpacity>
 
           <If condition={Platform.OS !== 'ios'}>
-            <TouchableOpacity onPress={() => {
-              Alert.alert('确认是否已开启', '', [
-                {
-                  text: '去开启', onPress: () => {
-                    native.toOpenNotifySettings(() => {
-
-                    })
-                    this.onHeaderRefresh();
-                  }
-                },
-                {
-                  text: '确认',
-                  onPress: () => {
-                    this.onHeaderRefresh();
-                  }
-                }
-              ])
-              native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
-            }}
+            <TouchableOpacity onPress={this.openAppNotification}
                               style={styles.item_row}>
               <Text style={styles.row_label}>系统通知 </Text>
               <Text style={styles.row_footer}>
@@ -345,26 +322,7 @@ class SettingScene extends PureComponent {
               <Entypo name="chevron-thin-right" style={styles.row_right}/>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {
-              Alert.alert('确认是否已开启', '', [
-                {
-                  text: '去开启', onPress: () => {
-                    native.toRunInBg(() => {
-
-                    })
-                    this.onHeaderRefresh();
-                  }
-                },
-                {
-                  text: '确认',
-                  onPress: () => {
-                    this.onHeaderRefresh();
-                  }
-                }
-              ])
-              native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
-            }}
-                              style={styles.item_row}>
+            <TouchableOpacity onPress={this.openAndroidBackgroundRun} style={styles.item_row}>
               <Text style={styles.row_label}>后台运行 </Text>
               <Text style={styles.row_footer}>
                 {isRun ? "已开启" : '未开启 - 去设置'}
@@ -377,30 +335,66 @@ class SettingScene extends PureComponent {
     )
   }
 
+  openAppNotification = () => {
+    Alert.alert('确认是否已开启', '', [
+      {
+        text: '去开启', onPress: async () => {
+          await native.toOpenNotifySettings()
+          await this.onHeaderRefresh();
+        }
+      },
+      {text: '确认', onPress: this.onHeaderRefresh}
+    ])
+  }
+
+  openAndroidBackgroundRun = () => {
+    Alert.alert('确认是否已开启', '', [
+      {
+        text: '去开启', onPress: async () => {
+          await native.toRunInBg()
+          await this.onHeaderRefresh();
+        }
+      },
+      {text: '确认', onPress: this.onHeaderRefresh}
+    ])
+  }
 
   renderOrderSetting = () => {
-    let {show_remark_to_rider} = this.state
+    let {show_remark_to_rider, show_remark_in_order_list} = this.state
     return (
-      <View>
-        <View style={styles.item_body}>
-          <Text style={styles.item_title}>备注 </Text>
-          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+      <View style={styles.item_body}>
+        <Text style={styles.item_title}>备注 </Text>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
 
-            <TouchableOpacity onPress={() => {
-              let val = !show_remark_to_rider
-              this.setConfig('show_remark_to_rider', val)
-            }}
-                              style={styles.item_row}>
-              <View style={{flex: 1}}>
-                <Text style={styles.row_label}>展示订单备注 </Text>
-                <Text style={styles.row_label_desc}>开启后骑手端可见客户下单备注 </Text>
-              </View>
-              <Switch onValueChange={(val) => this.setConfig('show_remark_to_rider', val)}
-                      color={colors.main_color}
-                      value={show_remark_to_rider}
-              />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => {
+            let val = !show_remark_to_rider
+            this.setConfig('show_remark_to_rider', val)
+          }}
+                            style={styles.item_row}>
+            <View style={{flex: 1}}>
+              <Text style={styles.row_label}>对骑手展示订单备注 </Text>
+              <Text style={styles.row_label_desc}>开启后骑手端可见客户下单备注 </Text>
+            </View>
+            <Switch onValueChange={(val) => this.setConfig('show_remark_to_rider', val)}
+                    color={colors.main_color}
+                    value={show_remark_to_rider}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            let val = !show_remark_in_order_list
+            this.setConfig('show_remark_in_order_list', val)
+          }}
+                            style={styles.item_row}>
+            <View style={{flex: 1}}>
+              <Text style={styles.row_label}>展示订单备注 </Text>
+              <Text style={styles.row_label_desc}>开启后在订单列表展示客户备注 </Text>
+            </View>
+            <Switch onValueChange={(val) => this.setConfig('show_remark_in_order_list', val)}
+                    color={colors.main_color}
+                    value={show_remark_in_order_list}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -450,57 +444,68 @@ class SettingScene extends PureComponent {
 
 
   renderGoods = () => {
-    let {dispatch} = this.props;
-    let {hide_good_titles_to_shipper, use_real_weight, is_alone_pay_vendor, order_list_show_product} = this.state
+    let {
+      hide_good_titles_to_shipper,
+      use_real_weight,
+      is_alone_pay_vendor,
+      order_list_show_product,
+      show_version
+    } = this.state
     return (
-      <View>
-        <View style={styles.item_body}>
-          <Text style={styles.item_title}>商品 </Text>
+      <View style={styles.item_body}>
+        <Text style={styles.item_title} onPress={() => {
+          this.setState({
+            show_version: show_version + 1
+          }, () => {
+            if (show_version === 2) {
+              ToastShort('再点击三次展示服务器信息')
+            }
+          })
+        }}>商品 </Text>
 
-          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+        <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+          <TouchableOpacity onPress={() => {
+            let val = !hide_good_titles_to_shipper;
+            this.setConfig('hide_good_titles_to_shipper', val)
+          }}
+                            style={styles.item_row}>
+            <Text style={styles.row_label}>隐藏商品敏感信息 </Text>
+            <Switch onValueChange={(val) => this.setConfig('hide_good_titles_to_shipper', val)}
+                    color={colors.main_color}
+                    value={hide_good_titles_to_shipper}
+            />
+          </TouchableOpacity>
+
+          <If condition={!is_alone_pay_vendor}>
             <TouchableOpacity onPress={() => {
-              let val = !hide_good_titles_to_shipper;
-              this.setConfig('hide_good_titles_to_shipper', val)
+              let val = !use_real_weight;
+              this.setConfig('use_real_weight', val)
             }}
                               style={styles.item_row}>
-              <Text style={styles.row_label}>隐藏商品敏感信息 </Text>
-              <Switch onValueChange={(val) => this.setConfig('hide_good_titles_to_shipper', val)}
+              <Text style={styles.row_label}>按照商品实际重量上传 </Text>
+              <Switch onValueChange={(val) => this.setConfig('use_real_weight', val)}
                       color={colors.main_color}
-                      value={hide_good_titles_to_shipper}
+                      value={use_real_weight}
               />
             </TouchableOpacity>
-
-            <If condition={!is_alone_pay_vendor}>
-              <TouchableOpacity onPress={() => {
-                let val = !use_real_weight;
-                this.setConfig('use_real_weight', val)
-              }}
-                                style={styles.item_row}>
-                <Text style={styles.row_label}>按照商品实际重量上传 </Text>
-                <Switch onValueChange={(val) => this.setConfig('use_real_weight', val)}
-                        color={colors.main_color}
-                        value={use_real_weight}
-                />
-              </TouchableOpacity>
-            </If>
+          </If>
 
 
-            <TouchableOpacity onPress={() => {
-              let val = !order_list_show_product;
-              this.setConfig('order_list_show_product', val)
-            }}
-                              style={styles.item_row}>
-              <View style={{flex: 1}}>
-                <Text style={styles.row_label}>订单列表页展示商品 </Text>
-                <Text style={styles.row_label_desc}>开启后，订单列表页可见商品信息 </Text>
-              </View>
-              <Switch onValueChange={(val) => this.setConfig('order_list_show_product', val)}
-                      color={colors.main_color}
-                      value={order_list_show_product}
-              />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            let val = !order_list_show_product;
+            this.setConfig('order_list_show_product', val)
+          }}
+                            style={styles.item_row}>
+            <View style={{flex: 1}}>
+              <Text style={styles.row_label}>订单列表页展示商品 </Text>
+              <Text style={styles.row_label_desc}>开启后，订单列表页可见商品信息 </Text>
+            </View>
+            <Switch onValueChange={(val) => this.setConfig('order_list_show_product', val)}
+                    color={colors.main_color}
+                    value={order_list_show_product}
+            />
+          </TouchableOpacity>
 
-          </View>
         </View>
       </View>
     )
@@ -533,15 +538,16 @@ class SettingScene extends PureComponent {
 
   renderServer = () => {
     const host = Config.hostPort()
-    let {servers} = this.state;
+    let {server_list} = this.state;
+    const version_name = DeviceInfo.getVersion();
+    const version_code = DeviceInfo.getBuildNumber();
     return (
-
       <View style={styles.item_body}>
-        <Text style={styles.item_title}>选择服务器 </Text>
+        <Text style={styles.item_title}>选择服务器 {version_name}---{version_code}</Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <For index='idx' each='item' of={servers}>
+          <For index='idx' each='item' of={server_list}>
             <TouchableOpacity key={idx} onPress={() => this.onServerSelected(item.host)} style={styles.item_row}>
-              <Text style={styles.row_label}>{item.name}resp, msg </Text>
+              <Text style={styles.row_label}>{item.name} </Text>
               <If condition={host === item.host}>
                 <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
               </If>

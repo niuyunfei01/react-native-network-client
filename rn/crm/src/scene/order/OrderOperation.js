@@ -362,10 +362,10 @@ class OrderOperation extends Component {
   }
 
   openMiniprogarm = async () => {
-    let {currStoreId, currentUser, currentUserProfile, vendor_id} = this.props.global;
+    let {store_id, currentUser, currentUserProfile, vendor_id} = this.props.global;
     let data = {
       v: vendor_id,
-      s: currStoreId,
+      s: store_id,
       u: currentUser,
       m: currentUserProfile.mobilephone,
       place: 'cancelOrder'

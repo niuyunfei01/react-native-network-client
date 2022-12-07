@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {Dimensions, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 import Entypo from "react-native-vector-icons/Entypo";
 import {Button, Slider} from 'react-native-elements';
@@ -20,6 +20,7 @@ import {TextArea} from "../../weui";
 import DatePicker from 'react-native-date-picker'
 import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
+import Validator from "../../pubilc/util/Validator";
 
 
 let width = Dimensions.get("window").width;
@@ -52,10 +53,10 @@ class OrderSettingScene extends Component {
     super(props);
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("手动发单页");
-    let {currStoreId, accessToken, store_info} = this.props.global
+    let {store_id, accessToken, store_info} = this.props.global
     this.state = {
       accessToken: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       city: store_info?.city,
       store_name: store_info?.name,
       store_address: store_info?.dada_address,
@@ -113,14 +114,15 @@ class OrderSettingScene extends Component {
     }
     const params = {
       center: center,
-      cityName: city,
+      city_name: city,
       show_select_city: false,
       keywords: address,
+      placeholder_text: '请在此输入收件人地址',
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
     };
-    this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+    this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
   }
 
   setAddress = (res) => {
@@ -202,7 +204,6 @@ class OrderSettingScene extends Component {
     if (tool.length(smartText) <= 0) {
       return ToastShort("请粘贴地址", 0)
     }
-    showModal('加载中...')
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
       copy_string: smartText
@@ -210,7 +211,6 @@ class OrderSettingScene extends Component {
       this.setState({
         smartText: ''
       })
-      hideModal()
       if (res.phone === '') {
         return ToastShort('电话号识别失败！')
       } else if (res.name === '') {
@@ -225,15 +225,16 @@ class OrderSettingScene extends Component {
         mobile: res.phone,
       })
       const params = {
-        cityName: city,
+        city_name: city,
         show_select_city: false,
         keywords: res.address,
+        placeholder_text: '请在此输入收件人地址',
         onBack: (res) => {
           this.setAddress.bind(this)(res)
           this.setState({show_smart_modal: true,})
         },
       };
-      this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+      this.props.navigation.navigate(Config.ROUTE_SEARCH_SHOP, params);
     })
   }
 
@@ -259,25 +260,15 @@ class OrderSettingScene extends Component {
         address_id
       } = this.state
 
-      if (!loc_lng && !loc_lng) {
-        ToastShort('请先选择定位', 0);
-        return this.goSelectAddress()
-      }
-
-      if (tool.length(mobile) !== 11) {
-        return ToastShort('请输入正确的手机号');
-      }
-
-      if (tool.length(name) <= 0) {
-        return ToastShort('请输入收件人姓名');
-      }
-
-      if (Number(goods_price) <= 0) {
-        return ToastShort('请选择物品价值');
-      }
-
-      if (Number(weight) <= 0) {
-        return ToastShort('请选择物品重量');
+      const validator = new Validator();
+      validator.add(loc_lng, 'required', '请先选择定位')
+      validator.add(name, 'required', '请输入收件人姓名')
+      validator.add(goods_price, 'required', '请选择物品价值')
+      validator.add(weight, 'required', '请选择物品重量')
+      validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的手机号')
+      const err_msg = validator.start();
+      if (err_msg) {
+        return ToastShort(err_msg)
       }
 
       if (isSaveToBook) {
@@ -300,12 +291,10 @@ class OrderSettingScene extends Component {
         money: goods_price,
       }
 
-      showModal('正在保存订单，请稍等');
       const api = `/api/order_manual_create?access_token=${accessToken}`;
       HttpUtils.post.bind(this.props)(api, params).then(res => {
-        hideModal()
         if (status === 1) {
-          showSuccess("保存成功！")
+          ToastShort("保存成功！")
           this.mixpanel.track("V4手动下单_保存订单");
           this.timeOutBack(300);
         } else {
@@ -315,11 +304,9 @@ class OrderSettingScene extends Component {
               this.onCallThirdShips(res.WaimaiOrder.id, store_id)
             });
           } else {
-            showError('保存失败请重试！')
+            ToastShort('保存失败请重试！')
           }
         }
-      }).catch(() => {
-        hideModal()
       })
     })
   }
@@ -343,7 +330,6 @@ class OrderSettingScene extends Component {
   }
 
   onCallThirdShips = (id, store_id) => {
-    showModal('正在保存并发单，请稍等')
     const {address_id, expect_time} = this.state
     this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: id,
@@ -351,14 +337,13 @@ class OrderSettingScene extends Component {
       expect_time: expect_time,
       address_id: address_id,
       onBack: (res) => {
-        hideModal();
         if (res?.count > 0) {
-          showSuccess('发配送成功')
+          ToastShort('发配送成功')
           setTimeout(() => {
             this.props.navigation.goBack();
           }, 1000)
         } else {
-          showError('发配送失败，请联系运营人员')
+          ToastShort('发配送失败，请联系运营人员')
         }
       }
     });
@@ -731,7 +716,7 @@ class OrderSettingScene extends Component {
   renderWeightModal = () => {
     let {showWeightModal, weight_min, weight_max, weight_input_value} = this.state;
     return (
-      <JbbModal visible={showWeightModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={showWeightModal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View>
@@ -814,17 +799,16 @@ class OrderSettingScene extends Component {
   renderGoodsPriceModal = () => {
     let {showGoodsPriceModal, goods_price_value, goods_price_input_value, goods_price} = this.state;
     return (
-      <JbbModal visible={showGoodsPriceModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={showGoodsPriceModal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               物品价值
             </Text>
-
             <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
-
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <View style={{
@@ -867,7 +851,7 @@ class OrderSettingScene extends Component {
                 placeholder="自定义"
                 keyboardType={'numeric'}
                 style={{
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
+                  width: width * 0.56,
                   height: 36,
                   borderRadius: 4,
                   borderWidth: 0.5,
@@ -908,9 +892,11 @@ class OrderSettingScene extends Component {
   renderSmartModal = () => {
     let {show_smart_modal, address, name, street_block, mobile} = this.state;
     return (
-      <JbbModal visible={show_smart_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_smart_modal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -985,8 +971,11 @@ class OrderSettingScene extends Component {
   renderContentModal = () => {
     let {showContentModal, remark} = this.state;
     return (
-      <JbbModal visible={showContentModal} onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={showContentModal}
+        onClose={this.closeModal}
+        HighlightStyle={{padding: 0}}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -996,8 +985,7 @@ class OrderSettingScene extends Component {
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               备注
             </Text>
-
-            <SvgXml onPress={this.closeModal} xml={cross_icon()} />
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
           </View>
           <View style={{paddingHorizontal: 12, paddingVertical: 5}}>
             <TextArea

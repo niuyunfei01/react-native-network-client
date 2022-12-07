@@ -13,6 +13,7 @@ import Config from "../../common/config";
 import {sendDeviceStatus} from "../../component/jpushManage";
 import {print_order_to_bt} from './OrderPrinter'
 import {ToastShort} from "../ToastUtils";
+import {navigate} from "../../../RootNavigation";
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -273,7 +274,7 @@ export const handlePrintOrder = async (props, obj) => {
         Alert.alert('提示', '无法自动打印: 打印机已断开连接', [
           {
             text: '确定',
-            onPress: () => props.navigation.navigate(Config.ROUTE_PRINTERS)
+            onPress: () => navigate(Config.ROUTE_PRINTERS)
           },
           {text: '取消'}
         ]);

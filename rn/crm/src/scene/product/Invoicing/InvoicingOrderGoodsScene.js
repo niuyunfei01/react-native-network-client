@@ -243,7 +243,7 @@ class InvoicingOrderGoodsScene extends Component {
     this.setState({isRefreshing: true});
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
-    let currStoreId = global['currStoreId'];
+    let store_id = global['store_id'];
     let filterStatus = this.state.filterStatus;
     let _this = this;
 
@@ -254,13 +254,13 @@ class InvoicingOrderGoodsScene extends Component {
 
     switch (filterStatus) {
       case Constant.INVOICING.STATUS_CREATED:
-        dispatch(fetchSupplyWaitOrder(currStoreId, token, callBack));
+        dispatch(fetchSupplyWaitOrder(store_id, token, callBack));
         break;
       case Constant.INVOICING.STATUS_ARRIVED:
-        dispatch(fetchSupplyArrivedOrder(currStoreId, token, callBack));
+        dispatch(fetchSupplyArrivedOrder(store_id, token, callBack));
         break;
       case Constant.INVOICING.STATUS_CONFIRMED:
-        dispatch(fetchSupplyWaitBalanceOrder(currStoreId, token, callBack));
+        dispatch(fetchSupplyWaitBalanceOrder(store_id, token, callBack));
         break;
     }
   }

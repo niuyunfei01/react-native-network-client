@@ -172,8 +172,8 @@ class NewRetailPriceScene extends React.PureComponent {
   getProductDetail = (pid = '') => {
     const {productId} = this.props.route.params
 
-    const {currStoreId, accessToken} = this.props.global
-    const url = `api_products/get_prod_with_store_detail/${currStoreId}/${productId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global
+    const url = `api_products/get_prod_with_store_detail/${store_id}/${productId}?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
       const {sp, p} = res
       let skus = [{
@@ -393,6 +393,8 @@ class NewRetailPriceScene extends React.PureComponent {
         </View>
         <LineView/>
         <FlatList data={skus}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   keyExtractor={(item, index) => `${index}`}
                   initialNumToRender={5}
@@ -427,13 +429,13 @@ class NewRetailPriceScene extends React.PureComponent {
       selectPriceType,
       editAlonePrice
     } = this.state
-    const {currStoreId, accessToken} = this.props.global
+    const {store_id, accessToken} = this.props.global
     let url = `new_api/store_product/set_store_price?access_token=${accessToken}`,
-      params = {pid: selectSku.product_id, store_id: currStoreId, price: editPrice, type: 0, es_id: -1}
+      params = {pid: selectSku.product_id, store_id: store_id, price: editPrice, type: 0, es_id: -1}
     switch (openModalFrom) {
       case 'cost_price':
         url = `/v1/new_api/store_product/save_supply_price?access_token=${accessToken}`
-        params = {pid: selectSku.product_id, store_id: currStoreId, supply_price: editCostPrice}
+        params = {pid: selectSku.product_id, store_id: store_id, supply_price: editCostPrice}
         if (selectSku.strict_providing === '1')
           params.actualNum = editStock
         break

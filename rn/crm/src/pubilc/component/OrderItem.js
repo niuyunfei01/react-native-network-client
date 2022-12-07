@@ -4,7 +4,6 @@ import PropType from "prop-types";
 import Config from "../common/config";
 import {bindActionCreators} from "redux";
 import {
-  Alert,
   Dimensions,
   InteractionManager,
   StyleSheet,
@@ -24,7 +23,7 @@ import {
   orderCallShip
 } from "../../reducers/order/orderActions";
 
-import {showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {showModal, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import native from "../../pubilc/util/native";
 import tool from "../util/tool";
@@ -32,11 +31,13 @@ import colors from "../styles/colors";
 import GlobalUtil from "../util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button} from "react-native-elements";
-import BottomModal from "./BottomModal";
 import {MixpanelInstance} from "../util/analytics";
 import {SvgXml} from "react-native-svg";
-import {call, locationIcon} from "../../svg/svg";
+import {call, cross_icon, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
+import LinearGradient from "react-native-linear-gradient";
+import AlertModal from "./AlertModal";
+import JbbModal from "./JbbModal";
 
 let width = Dimensions.get("window").width;
 
@@ -52,6 +53,7 @@ class OrderItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     accessToken: PropTypes.string,
+    order_status: PropTypes.number,
     showBtn: PropTypes.bool,
     fetchData: PropType.func,
     setState: PropType.func,
@@ -61,7 +63,11 @@ class OrderItem extends React.PureComponent {
   };
   state = {
     verification_modal: false,
+    show_close_delivery_modal: false,
+    show_call_user_modal: false,
+    show_cancel_deliverys_modal: false,
     pickupCode: '',
+    err_msg: '',
   }
 
   constructor(props) {
@@ -84,9 +90,11 @@ class OrderItem extends React.PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api, {
         orderId: this.props.item.id
       }).then(() => {
-        showSuccess('配送已完成')
+        this.closeModal()
+        ToastShort('配送已完成')
         this.props.fetchData();
       }).catch(e => {
+        this.closeModal()
         ToastShort('忽略配送失败' + e?.desc)
       })
     }, 600)
@@ -128,17 +136,16 @@ class OrderItem extends React.PureComponent {
   cancelDeliverys = () => {
     let order = this.props.item
     let token = this.props.accessToken
-    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
-      text: '确定', onPress: () => {
-        const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          ToastShort(res.desc);
-          this.props.fetchData();
-        }).catch(() => {
-          ToastShort("此订单已有骑手接单，取消失败")
-        })
-      }
-    }, {'text': '取消'}]);
+    this.closeModal()
+    const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${token}`;
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      ToastShort(res.desc);
+      this.props.fetchData();
+    }, (e) => {
+      ToastShort(e?.desc)
+    }).catch(() => {
+      ToastShort("此订单已有骑手接单，取消失败")
+    })
   }
 
 
@@ -151,37 +158,41 @@ class OrderItem extends React.PureComponent {
     ToastLong('已复制到剪切板')
   }
 
-  closeDelivery = (val) => {
-    this.mixpanel.track('订单列表页_忽略配送')
-    Alert.alert('提醒', "忽略配送会影响配送回传，确定要忽略吗？", [{text: '暂不'}, {
-      text: '忽略',
-      onPress: () => {
-        this.onOverlookDelivery(val)
-      }
-    }])
-  }
-
   closeModal = () => {
     this.setState({
+      show_cancel_deliverys_modal: false,
       verification_modal: false,
+      show_close_delivery_modal: false,
+      show_call_user_modal: false,
     })
   }
 
   goVeriFicationToShop = () => {
     let {item} = this.props;
-    this.setState({verification_modal: false});
     let {pickupCode} = this.state
     const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(() => {
+      this.closeModal();
       ToastShort(`核销成功，订单已完成`)
-    }).catch((reason) => {
-      ToastShort(`操作失败：${reason?.reason}`)
+    }, (res) => {
+      this.setState({
+        err_msg: res?.desc
+      })
+    }).catch((res) => {
+      this.setState({
+        err_msg: res?.desc
+      })
     })
   }
 
   touchMobile = () => {
     let {item} = this.props;
     this.mixpanel.track('订单列表页_点击手机号')
+    if (tool.length(item?.phone_backup) > 0) {
+      return this.setState({
+        show_call_user_modal: true
+      })
+    }
     this.dialNumber(item.mobile)
   }
 
@@ -208,6 +219,7 @@ class OrderItem extends React.PureComponent {
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
             {this.renderUser()}
+            {this.renderRemark()}
             {this.renderGoods()}
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
@@ -219,45 +231,163 @@ class OrderItem extends React.PureComponent {
             </If>
           </View>
           {this.renderPickModal()}
+          {this.renderCallUser()}
+          {this.renderCloseDeliveryModal()}
+          {this.renderCancelDeliverysModal()}
         </View>
 
       </TouchableWithoutFeedback>
     )
   }
 
-  renderPickModal = () => {
-    let {verification_modal, pickupCode} = this.state;
+  renderCallUser = () => {
+    let {show_call_user_modal} = this.state;
+    let {item} = this.props;
     return (
-      <BottomModal
-        visible={verification_modal}
-        onClose={this.closeModal}
-        onPress={this.goVeriFicationToShop}
-        title={'自提订单核销'}
-        actionText={'确定'}
-        btnStyle={{
-          backgroundColor: colors.main_color,
-          borderRadius: 24,
-          length: 48,
-        }}
-        btnTitleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
-        onPressClose={() => this.closeModal()}>
-        <TextInput placeholder={"请输入核销码"}
-                   onChangeText={(pickupCode) => {
-                     this.setState({pickupCode})
-                   }}
-                   value={pickupCode}
-                   placeholderTextColor={colors.color999}
-                   style={{
-                     color: colors.color333,
-                     borderBottomWidth: 0.5,
-                     borderBottomColor: colors.color999,
-                     fontSize: 16,
-                     height: 45,
-                     borderRadius: 5,
-                     marginVertical: 20,
-                   }}
-                   underlineColorAndroid="transparent"/>
-      </BottomModal>
+      <JbbModal visible={show_call_user_modal} HighlightStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'bottom'}>
+        <View style={{backgroundColor: colors.f5, borderTopLeftRadius: 15, borderTopRightRadius: 15}}>
+          <View style={{
+            height: 153,
+            backgroundColor: colors.white,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            paddingHorizontal: 20,
+            paddingTop: 6
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.dialNumber(item.mobile)
+              this.closeModal()
+            }} style={{
+              paddingVertical: 14,
+              borderBottomWidth: 0.5,
+              borderBottomColor: colors.colorDDD,
+              flexDirection: "row",
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <View>
+                <Text style={{fontSize: 16, color: colors.color666}}> 虚拟号码 </Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.color333,
+                  fontWeight: 'bold',
+                  marginTop: 3,
+                  lineHeight: 22
+                }}> {item?.mobile_readable} </Text>
+              </View>
+              <SvgXml xml={call()}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              this.dialNumber(item?.phone_backup)
+              this.closeModal()
+            }} style={{
+              paddingVertical: 14,
+              flexDirection: "row",
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <View>
+                <Text style={{fontSize: 16, color: colors.color666}}> 备用号码 </Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.color333,
+                  fontWeight: 'bold',
+                  marginTop: 3,
+                  lineHeight: 22
+                }}> {item?.phone_backup_readable} </Text>
+              </View>
+              <SvgXml xml={call()}/>
+            </TouchableOpacity>
+
+          </View>
+          <TouchableOpacity onPress={this.closeModal} style={{
+            backgroundColor: colors.white,
+            height: 53,
+            marginTop: 6,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <Text style={{
+              fontSize: 16,
+              color: colors.color666,
+              lineHeight: 22
+            }}> 取消 </Text>
+          </TouchableOpacity>
+        </View>
+      </JbbModal>
+    )
+  }
+  renderPickModal = () => {
+    let {verification_modal, pickupCode, err_msg} = this.state;
+    return (
+      <JbbModal visible={verification_modal} HighlightStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'center'}>
+        <View style={{paddingHorizontal: 12, paddingVertical: 15}}>
+          <View style={{
+            flexDirection: 'row',
+            paddingHorizontal: 8,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333, lineHeight: 30}}>
+              自提订单核销
+            </Text>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+          </View>
+          <View style={{paddingHorizontal: 8, paddingBottom: 5}}>
+            <View style={{
+              backgroundColor: colors.f5,
+              borderRadius: 4,
+              height: 48,
+              marginTop: 20,
+              marginBottom: tool.length(err_msg) > 0 ? 0 : 30
+            }}>
+              <TextInput placeholder={"请输入核销码"}
+                         onChangeText={(pickupCode) => {
+                           this.setState({
+                             pickupCode: pickupCode.replace(/[^\a-\z\A-\Z0-9]/g, ""),
+                             err_msg: /[^\a-\z\A-\Z0-9]+?$/g.test(pickupCode) ? '请输入正确的英文字符' : ''
+                           })
+                         }}
+                         maxLength={7}
+                         value={pickupCode}
+                         placeholderTextColor={colors.color999}
+                         style={{
+                           paddingHorizontal: 4,
+                           color: colors.color333,
+                           fontSize: 16,
+                           height: 48,
+                           borderRadius: 5,
+                         }}
+                         underlineColorAndroid="transparent"/>
+            </View>
+            <If condition={tool.length(err_msg) > 0}>
+              <View style={{
+                flexDirection: "row", alignItems: "center", height: 30
+              }}>
+                <Text style={{
+                  color: colors.warn_red,
+                  fontSize: 12,
+                  fontWeight: 'bold'
+                }}>{err_msg} </Text>
+              </View>
+            </If>
+            <Button title={'确 定'}
+                    onPress={this.goVeriFicationToShop}
+                    buttonStyle={[{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 21,
+                      length: 42,
+                    }]}
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
+          </View>
+
+        </View>
+      </JbbModal>
     )
   }
 
@@ -281,7 +411,11 @@ class OrderItem extends React.PureComponent {
             left: 0,
             top: 0,
           }}>
-            <View style={styles.ItemHeader}/>
+            <LinearGradient style={{width: 28, height: 26, borderTopLeftRadius: 6}}
+                            start={{x: 0, y: 0.5}}
+                            end={{x: 0.5, y: 1}}
+                            locations={[0.5, 0.5]}
+                            colors={['#FF8309', 'transparent']}/>
             <Text style={styles.ItemHeaderTitle}>预 </Text>
           </View>
         </If>
@@ -299,7 +433,7 @@ class OrderItem extends React.PureComponent {
             }}>#{item.platform_dayId} </Text>
             <If condition={Number(item?.pickType) === 1}>
               <Text style={{
-                borderWidth: 0.2,
+                borderWidth: 0.5,
                 borderColor: colors.main_color,
                 borderRadius: 2,
                 color: colors.main_color,
@@ -323,7 +457,7 @@ class OrderItem extends React.PureComponent {
             fontSize: 12,
             lineHeight: 17,
             marginTop: 2
-          }}> {item.store_name}&nbsp; #{item.dayId} </Text>
+          }}> {tool.jbbsubstr(item?.ext_store_name, 16)}&nbsp; #{item.dayId} </Text>
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 
@@ -388,6 +522,27 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  renderRemark = () => {
+    let {item} = this.props;
+    if (tool.length(item?.remark) <= 0) {
+      return null;
+    }
+    return (
+      <View style={[styles.contentHeader, {paddingTop: 12}]}>
+        <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-start'}}>
+          <Text
+            style={{fontWeight: 'bold', fontSize: 14, color: '#FF8309'}}>备注：</Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color666,
+            lineHeight: 20,
+            flex: 1
+          }}>{item?.remark} </Text>
+        </View>
+      </View>
+    )
+  }
+
   renderGoods = () => {
     let {item} = this.props;
     if (tool.length(item?.goods_info) <= 0 || item?.goods_info?.count <= 0) {
@@ -428,7 +583,20 @@ class OrderItem extends React.PureComponent {
     }
     return (
       <TouchableOpacity onPress={this.setDeliveryModal} style={[styles.contentHeader, {paddingTop: 12}]}>
-        <Text style={{flex: 1, fontSize: 14, color: colors.color666}}>{item?.ship_status_desc} </Text>
+        <View style={{flex: 1,}}>
+          <If condition={item?.is_show_ship_status}>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: colors.color333,
+                fontWeight: 'bold',
+                lineHeight: 20,
+                marginBottom: 4
+              }}>{item?.ship_status} </Text>
+          </If>
+          <Text style={{flex: 1, fontSize: 14, color: colors.color666, lineHeight: 20}}>{item?.ship_status_desc} </Text>
+        </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
     )
@@ -456,8 +624,43 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+
+  renderCloseDeliveryModal = () => {
+    let {item} = this.props;
+    let {show_close_delivery_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_close_delivery_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.onOverlookDelivery(item?.id)}
+          title={'忽略配送会影响配送回传，确定要忽略吗？'}
+          actionText={'忽略'}
+          closeText={'暂不'}/>
+      </View>
+    )
+  }
+
+
+  renderCancelDeliverysModal = () => {
+    let {show_cancel_deliverys_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_cancel_deliverys_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.cancelDeliverys()}
+          title={'确定取消此订单全部配送吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
+      </View>
+    )
+  }
+
   renderButton = () => {
-    let {item, comesBackBtn} = this.props;
+    let {item, comesBackBtn, order_status} = this.props;
     let obj_num = 0
     if (comesBackBtn) {
       obj_num = 1
@@ -480,7 +683,12 @@ class OrderItem extends React.PureComponent {
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
           <Button title={'忽略配送'}
-                  onPress={() => this.closeDelivery(item.id)}
+                  onPress={() => {
+                    this.mixpanel.track('订单列表页_忽略配送')
+                    this.setState({
+                      show_close_delivery_modal: true
+                    })
+                  }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
                     borderColor: colors.colorCCC,
@@ -495,7 +703,9 @@ class OrderItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_一键取消')
-                    this.cancelDeliverys(item.id)
+                    this.setState({
+                      show_cancel_deliverys_modal: true
+                    })
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -524,7 +734,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.batch_add_delivery_tips}>
-          <Button title={'加小费'}
+          <Button title={Number(item?.have_add_tips) > 0 ? '加小费' + item?.have_add_tips + '元' : '加小费'}
                   onPress={() => {
                     this.props.setState && this.props.setState({
                       add_tip_id: item?.id,
@@ -543,7 +753,7 @@ class OrderItem extends React.PureComponent {
         </If>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
-          <Button title={'下配送单'}
+          <Button title={order_status === 8 ? '重新下单' : '下配送单'}
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('V4订单列表_下配送单')
@@ -619,15 +829,6 @@ class OrderItem extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-  ItemHeader: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 25,
-    borderTopColor: "#FF8309",
-    borderTopLeftRadius: 6,
-    borderRightWidth: 31,
-    borderRightColor: 'transparent',
-  },
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,
@@ -653,13 +854,13 @@ const styles = StyleSheet.create({
   ItemContent: {
     flexDirection: "column",
     backgroundColor: colors.white,
-    marginTop: 10,
+    marginVertical: 5,
     marginHorizontal: 12,
     borderRadius: 6,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.1,
-    elevation: 5,
+    elevation: 3,
     shadowRadius: 8,
   },
   modalBtn: {

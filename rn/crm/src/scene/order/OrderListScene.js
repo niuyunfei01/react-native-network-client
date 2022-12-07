@@ -15,7 +15,6 @@ import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
 import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
-import Entypo from 'react-native-vector-icons/Entypo';
 import * as globalActions from '../../reducers/global/globalActions'
 import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
 
@@ -27,7 +26,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, empty_data, menu_left, search_icon, this_down} from "../../svg/svg";
+import {cross_icon, down, empty_data, menu, menu_left, search_icon} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -71,19 +70,19 @@ const initState = {
     page: 1,
     limit: 10,
     maxPastDays: 100,
-    isAdd: true,
+    is_add: true,
   },
   sort_list: [
     {"label": '最新来单', 'value': 'orderTime desc'},
     {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '送达时间', 'value': 'expectTime desc'},
+    {"label": '送达时间', 'value': 'expectTime asc'},
   ],
   ListData: [],
-  orderStatus: 9,
-  showSortModal: false,
+  order_status: 9,
+  show_sort_modal: false,
   show_bind_button: false,
   orderNum: {},
-  isCanLoadMore: false,
+  is_can_load_more: false,
   scanBoolean: false,
   order_id: 0,
   show_goods_list: false,
@@ -121,6 +120,7 @@ class OrderListScene extends Component {
 
     this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
+    this.list_ref = undefined;
   }
 
 
@@ -139,12 +139,12 @@ class OrderListScene extends Component {
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {currStoreId, currentUser, accessToken} = global;
+    const {store_id, currentUser, accessToken} = global;
 
 
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderListScene"
@@ -177,9 +177,9 @@ class OrderListScene extends Component {
   }
 
   getVendor = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    if (currStoreId > 0) {
-      let api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global;
+    if (store_id > 0) {
+      let api = `/api/get_store_business_status/${store_id}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         this.setState({
           show_bind_button: tool.length(res.business_status) <= 0,
@@ -198,8 +198,12 @@ class OrderListScene extends Component {
         this.setState({isLoading: true})
       return;
     }
+
+    if (status && this.list_ref) {
+      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
+    }
     this.setState({
-        query: {...query, page: 1, isAdd: true, offset: 0}
+        query: {...query, page: 1, is_add: true, offset: 0}
       },
       () => this.fetchOrders(status))
     // }, 500)
@@ -207,9 +211,9 @@ class OrderListScene extends Component {
 
   // 新订单1  待取货  106   配送中 1
   fetorderNum = () => {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let params = {
-      search: `store:${currStoreId}`,
+      search: `store:${store_id}`,
     }
 
     const url = `/v4/wsb_order/order_counts?access_token=${accessToken}`;
@@ -240,19 +244,18 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType, setList = 1) => {
-    let {isLoading, query, orderStatus} = this.state;
-    if (isLoading || !query.isAdd) {
+    let {isLoading, query, order_status} = this.state;
+    if (isLoading || !query.is_add) {
       return null;
     }
     this.fetorderNum();
     let vendor_id = this.props.global?.vendor_id || global.noLoginInfo.currVendorId
-    let {currStoreId, accessToken, order_list_by = 'orderTime asc'} = this.props.global;
-    let search = `store:${currStoreId}`;
-    let initQueryType = queryType || orderStatus;
-    const order_by = order_list_by
+    let {store_id, accessToken, order_list_by = 'expectTime asc'} = this.props.global;
+    let search = `store:${store_id}`;
+    let initQueryType = queryType || order_status;
 
     this.setState({
-      orderStatus: initQueryType,
+      order_status: initQueryType,
       isLoading: true,
     })
 
@@ -265,15 +268,14 @@ class OrderListScene extends Component {
       search: search,
       use_v2: 1,
       is_right_once: 1, //预订单类型
-      order_by: order_by
+      order_by: order_list_by
     }
-
     if (vendor_id && accessToken) {
       const url = `/v4/wsb_order/order_list?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
-          query.isAdd = false;
+          query.is_add = false;
         }
         query.page++;
         query.listType = initQueryType
@@ -303,13 +305,13 @@ class OrderListScene extends Component {
   }
 
   onSelect = (e) => {
-    let {showSortModal} = this.state;
+    let {show_sort_modal} = this.state;
     if (e === 1) {
       this.mixpanel.track('V4订单列表_手动下单')
       this.onPress(Config.ROUTE_ORDER_SETTING)
     } else if (e === 0) {
       this.mixpanel.track('V4订单列表_订单排序')
-      this.setState({showSortModal: !showSortModal})
+      this.setState({show_sort_modal: !show_sort_modal})
     } else {
       this.mixpanel.track('订单列表扫描')
       this.setState({
@@ -362,17 +364,16 @@ class OrderListScene extends Component {
   }
 
   render() {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     let {dispatch} = this.props;
     const {
-      ListData,
       order_id,
       show_goods_list,
       show_delivery_modal,
       show_add_tip_modal,
       show_cancel_delivery_modal,
       add_tip_id,
-      orderStatus,
+      order_status,
       orders_add_tip,
     } = this.state
 
@@ -382,24 +383,24 @@ class OrderListScene extends Component {
         {/*<FloatServiceIcon fromComponent={'订单列表'}/>*/}
         {this.renderHead()}
         {this.renderStatusTabs()}
-        {this.renderContent(ListData)}
+        {this.renderContent()}
         {this.renderSortModal()}
         {this.renderFinishDeliveryModal()}
-        <HotUpdateComponent accessToken={accessToken} currStoreId={currStoreId}/>
+        <HotUpdateComponent accessToken={accessToken} store_id={store_id}/>
         <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
-                     currStoreId={currStoreId}/>
+                     store_id={store_id}/>
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
           accessToken={accessToken}
           order_id={order_id}
-          currStoreId={currStoreId}
+          store_id={store_id}
           show_goods_list={show_goods_list}/>
 
         <DeliveryStatusModal
           order_id={order_id}
-          order_status={orderStatus}
-          store_id={currStoreId}
+          order_status={order_status}
+          store_id={store_id}
           fetchData={this.onRefresh.bind(this)}
           onPress={this.onPress.bind(this)}
           openAddTipModal={this.openAddTipModal.bind(this)}
@@ -422,6 +423,7 @@ class OrderListScene extends Component {
 
         <AddTipModal
           setState={this.setState.bind(this)}
+          fetchData={this.onRefresh.bind(this)}
           accessToken={accessToken}
           id={add_tip_id}
           orders_add_tip={orders_add_tip}
@@ -441,7 +443,7 @@ class OrderListScene extends Component {
       order_id: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      showSortModal: false,
+      show_sort_modal: false,
       show_finish_delivery_modal: false,
     })
   }
@@ -490,15 +492,15 @@ class OrderListScene extends Component {
   }
 
   renderSortModal = () => {
-    let {order_list_by = 'orderTime asc'} = this.props.global;
-    let {showSortModal, sort_list} = this.state;
+    let {order_list_by = 'expectTime asc'} = this.props.global;
+    let {show_sort_modal, sort_list} = this.state;
     return (
-      <JbbModal visible={showSortModal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_sort_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
-            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+            <Text style={{color: colors.color333,fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               订单排序
             </Text>
 
@@ -557,11 +559,8 @@ class OrderListScene extends Component {
       const {accessToken} = global;
       dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
         if (ok) {
-          tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-            initTab: Config.ROUTE_ORDERS,
-            initialRouteName: Config.ROUTE_ALERT
-          });
           hideModal()
+          this.onRefresh(9)
         } else {
           ToastLong(msg);
           hideModal()
@@ -582,7 +581,7 @@ class OrderListScene extends Component {
       }}>
         <SvgXml style={{height: 44, marginRight: 16, marginLeft: 12}} onPress={() => {
           this.mixpanel.track('V4订单列表_我的')
-          this.onPress(Config.ROUTE_MINE_NEW)
+          this.onPress(Config.ROUTE_MINE_NEW, {show_back_icon: true})
         }}
                 xml={menu_left()}/>
 
@@ -591,22 +590,21 @@ class OrderListScene extends Component {
             return;
           }
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }}
-                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{
             fontSize: 15,
             color: colors.color333,
             fontWeight: 'bold'
           }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
           <If condition={!only_one_store}>
-            <SvgXml xml={this_down()}/>
+            <SvgXml xml={down(16, 16, colors.color333)}/>
           </If>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => {
             this.mixpanel.track('V4订单列表_搜索')
-            this.onPress(Config.ROUTE_ORDER_SEARCH)
+            this.onPress(Config.ROUTE_SEARCH_ORDER, {search_store_id: store_info?.id})
           }}
           style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
           <SvgXml xml={search_icon()}/>
@@ -622,7 +620,7 @@ class OrderListScene extends Component {
           onSelect={(e) => this.onSelect(e)}
         >
           <View style={{height: 44, width: 40, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-            <Entypo name={"dots-three-horizontal"} style={{fontSize: 20, color: colors.color333}}/>
+            <SvgXml xml={menu()}/>
           </View>
         </ModalDropdown>
 
@@ -631,7 +629,7 @@ class OrderListScene extends Component {
   }
 
   renderStatusTabs = () => {
-    let {orderStatus, orderNum, categoryLabels} = this.state;
+    let {order_status, orderNum, categoryLabels} = this.state;
     const tab_width = 1 / tool.length(categoryLabels);
     if (!tool.length(categoryLabels) > 0) {
       return;
@@ -649,8 +647,8 @@ class OrderListScene extends Component {
               paddingTop: 10,
             }}>
               <Text style={[styles.f14c33, {
-                fontWeight: orderStatus === tab.status ? "bold" : "normal",
-                color: orderStatus === tab.status ? colors.main_color : colors.color333
+                fontWeight: order_status === tab.status ? "bold" : "normal",
+                color: order_status === tab.status ? colors.main_color : colors.color333
               }]}>
                 {orderNum[tab.status] > 0 ? orderNum[tab.status] > 999 ? '999+' : orderNum[tab.status] : '-'}
               </Text>
@@ -661,13 +659,13 @@ class OrderListScene extends Component {
               paddingBottom: 10,
             }}>
               <Text style={[styles.f14c33, {
-                fontWeight: orderStatus === tab.status ? "bold" : "normal",
-                color: orderStatus === tab.status ? colors.main_color : colors.color333
+                fontWeight: order_status === tab.status ? "bold" : "normal",
+                color: order_status === tab.status ? colors.main_color : colors.color333
               }]}>
                 {tab.tabname}
               </Text>
             </View>
-            <If condition={orderStatus === tab.status}>
+            <If condition={order_status === tab.status}>
               <View style={styles.statusTabRight}/>
             </If>
           </TouchableOpacity>
@@ -676,73 +674,74 @@ class OrderListScene extends Component {
     )
   }
 
-  onTouchStart = (e) => {
-    this.pageX = e.nativeEvent.pageX;
-    this.pageY = e.nativeEvent.pageY;
-  }
   onEndReached = () => {
-    if (this.state.isCanLoadMore) {
-      this.setState({isCanLoadMore: false}, () => this.listmore())
+    if (this.state.is_can_load_more && this.state.query.is_add) {
+      this.setState({is_can_load_more: false}, () => {
+        this.fetchOrders(this.state.order_status, 0);
+      })
     }
   }
   onMomentumScrollBegin = () => {
-    this.setState({isCanLoadMore: true})
-  }
-  onTouchMove = (e) => {
-    if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-      this.setState({scrollLocking: true});
-    } else {
-      this.setState({scrollLocking: false});
+    if (this.state.query.is_add) {
+      this.setState({is_can_load_more: true})
     }
   }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
-  _getItemLayout = (data, index) => {
-    return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
   _keyExtractor = (item) => {
     return item.id.toString();
   }
 
+  _getItemLayout = (data, index) => {
+    return {length: 340, offset: 340 * index, index}
+  }
 
-  renderContent = (orders) => {
-    let {isLoading} = this.state;
+  renderContent = () => {
+    let {isLoading, ListData} = this.state;
     return (
       <View style={styles.orderListContent}>
         <FlatList
-          contentContainerStyle={{flexGrow: 1}}
-          data={orders}
+          data={ListData}
           legacyImplementation={false}
           directionalLockEnabled={true}
-          onTouchStart={(e) => this.onTouchStart(e)}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onEndReachedThreshold={0.3}
           onEndReached={this.onEndReached}
           onMomentumScrollBegin={this.onMomentumScrollBegin}
-          onTouchMove={(e) => this.onTouchMove(e)}
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
+          ref={(ref) => {
+            this.list_ref = ref
+          }}
           refreshing={isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
           ListEmptyComponent={this.renderNoOrder()}
-          initialNumToRender={5}
+          ListFooterComponent={this.renderBottomView()}
+          getItemLayout={this._getItemLayout}
+          initialNumToRender={3}
         />
       </View>
     );
   }
 
-  listmore = () => {
-    if (this.state.query.isAdd) {
-      this.fetchOrders(this.state.orderStatus, 0);
+  renderBottomView = () => {
+    let {query, ListData} = this.state;
+    if (query?.is_add || tool.length(ListData) < 3) {
+      return <View/>
     }
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10}}>
+        <Text style={{fontSize: 14, color: colors.color999}}> 已经到底了～ </Text>
+      </View>
+    )
   }
-
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {orderStatus} = this.state;
+    let {order_status} = this.state;
     let {accessToken} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
@@ -754,7 +753,7 @@ class OrderListScene extends Component {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
-                 orderStatus={orderStatus}
+                 order_status={order_status}
       />
     );
   }
@@ -816,8 +815,13 @@ const styles = StyleSheet.create({
     color: colors.color333,
     fontSize: 14
   },
-  statusTabRight: {height: 2, width: 48, backgroundColor: colors.main_color},
-  orderListContent: {flex: 1, backgroundColor: colors.f5,},
+  statusTabRight: {
+    height: 2,
+    width: 48,
+    backgroundColor: colors.main_color,
+    position: 'absolute', bottom: 0
+  },
+  orderListContent: {flex: 1, backgroundColor: colors.f5},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   noOrderContent: {
     alignItems: 'center',

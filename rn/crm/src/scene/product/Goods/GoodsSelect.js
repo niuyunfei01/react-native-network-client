@@ -65,6 +65,7 @@ const select = StyleSheet.create({
     justifyContent: 'center'
   },
   item_text: {
+    color: colors.color333,
     // fontSize: pxToDp(24)
   },
   items_wrapper: {

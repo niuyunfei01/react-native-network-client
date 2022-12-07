@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   FlatList,
+  InteractionManager,
   Keyboard,
   SafeAreaView,
   StyleSheet,
@@ -23,7 +24,7 @@ import ModalSelector from "../../../pubilc/component/ModalSelector";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../../pubilc/util/tool";
 import Cts from "../../../pubilc/common/Cts";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 //组件
 import _ from 'lodash';
@@ -43,7 +44,8 @@ import {radioSelected, radioUnSelected} from "../../../svg/svg";
 import {imageKey} from "../../../pubilc/util/md5";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import FastImage from "react-native-fast-image";
-import GridView from '../../../pubilc/component/DraggableGridView'
+import {DraggableGrid} from '../../../pubilc/component/react-native-draggable-grid';
+import Config from "../../../pubilc/common/config";
 
 const {height} = Dimensions.get("window");
 
@@ -93,7 +95,7 @@ class GoodsEditScene extends PureComponent {
     this.mixpanel = MixpanelInstance;
     const {currVendorId} = tool.vendor(props.global);
     const {scan, product_detail} = (props.route.params || {});
-    const {currStoreId, store_info} = this.props.global;
+    const {store_id, store_info} = this.props.global;
     this.isCanLoadMore = false
     this.state = {
       isSelectCategory: true,
@@ -178,7 +180,7 @@ class GoodsEditScene extends PureComponent {
           differenceType: 2,
           totalRemain: '',
           remark: '',
-          store_id: currStoreId,
+          store_id: store_id,
           skipCheckChange: 1
         }
       }],
@@ -187,7 +189,8 @@ class GoodsEditScene extends PureComponent {
       allow_multi_spec: 0,
       searchCategoriesKey: '',
       searchCategoriesList: [],
-      allow_switch_multi: true
+      allow_switch_multi: true,
+      selected_pids: []
     };
 
   }
@@ -210,6 +213,12 @@ class GoodsEditScene extends PureComponent {
     this.uploadImageFile()
   }
 
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
+  }
+
   searchGoodsByUpcCode = ({route}) => {
     const {upcCode} = route.params || {}
     if (upcCode)
@@ -220,16 +229,17 @@ class GoodsEditScene extends PureComponent {
     const {goodsInfo} = route.params || {}
     if (goodsInfo) {
       const {
-        barcode, name, sg_tag_id, weight, sku_unit, category_id, pic, vendor_has, store_has, series_id, spec_list
+        barcode, name, sg_tag_id, weight, sku_unit, category_id, pic, vendor_has, store_has, series_id, spec_list, id
       } = goodsInfo
       this.setState({
+        id: id,
         upc: barcode,
         name: name,
         sg_tag_id: sg_tag_id,
         weight: weight,
         sku_unit: sku_unit,
         store_categories: category_id,
-        upload_files: [{id: '0', url: pic, name: pic, path: pic}],
+        upload_files: [{id: '0', url: pic, name: pic, path: pic, key: pic}],
         selectWeight: {value: '1', label: sku_unit},
         vendor_has: Number(vendor_has) === 1,
         store_has: Number(store_has) === 1,
@@ -252,9 +262,13 @@ class GoodsEditScene extends PureComponent {
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           let {upload_files, newImageKey, selectPicType, selectPreviewPic} = this.state;
           const uri = res + newImageKey
-          const img = {id: newImageKey, url: uri, name: newImageKey, path: uri, isNewPic: true}
+          const img = {id: newImageKey, url: uri, name: newImageKey, path: uri, isNewPic: true, key: newImageKey}
           if (selectPicType) {
-            upload_files.push(img);
+            const index = upload_files.findIndex(item => item.key === '+')
+            if (index > 0)
+              upload_files.splice(index, 0, img)
+            else
+              upload_files.push(img);
           } else {
             selectPreviewPic = {...selectPreviewPic, url: uri}
             upload_files[selectPreviewPic.index] = img
@@ -333,7 +347,8 @@ class GoodsEditScene extends PureComponent {
                 url: imgUrl,
                 name: name,
                 path: imgPath,
-                mid_thumb: imgPath
+                mid_thumb: imgPath,
+                key: name
               })
             });
           }
@@ -394,7 +409,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   initEmptyState(appendState) {
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     this.setState({
       provided: 1,
       name: "",
@@ -437,7 +452,7 @@ class GoodsEditScene extends PureComponent {
           differenceType: 2,
           totalRemain: '',
           remark: '',
-          store_id: currStoreId,
+          store_id: store_id,
           skipCheckChange: 1
         }
       }],
@@ -468,7 +483,12 @@ class GoodsEditScene extends PureComponent {
     let upload_files = []
     mid_list_img && Object.keys(mid_list_img).map(img_id => {
       if (mid_list_img[img_id]) {
-        upload_files.push({id: img_id, name: mid_list_img[img_id].name, url: mid_list_img[img_id].url})
+        upload_files.push({
+          id: img_id,
+          name: mid_list_img[img_id].name,
+          url: mid_list_img[img_id].url,
+          key: mid_list_img[img_id].name
+        })
       }
     })
 
@@ -496,12 +516,13 @@ class GoodsEditScene extends PureComponent {
       price: price || '',
       supply_price: supply_price || ''
     });
+    this.getBasicCategory(sg_tag_id)
   }
 
   onReloadUpc = (upc_data) => {
     if (upc_data.pic) {
       this.setState({
-        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic, url: upc_data.pic}]
+        upload_files: [{id: '0', name: upc_data.pic, path: upc_data.pic, url: upc_data.pic, key: upc_data.pic}]
       })
     }
     if (tool.length(upc_data.basic_category_obj) !== 0) {
@@ -533,12 +554,12 @@ class GoodsEditScene extends PureComponent {
     if (!name) {
       return
     }
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     const url = `/api_products/get_sg_tags_by_name?access_token=${accessToken}`
 
     const params = {
       vendor_id: vendor_id,
-      store_id: currStoreId,
+      store_id: store_id,
       name: name
     }
     HttpUtils.get(url, params).then(res => {
@@ -669,7 +690,7 @@ class GoodsEditScene extends PureComponent {
     if (!fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
-    const {accessToken, currStoreId, vendor_info} = this.props.global;
+    const {accessToken, store_id, vendor_info} = this.props.global;
 
     let formData = {
       id,
@@ -684,30 +705,32 @@ class GoodsEditScene extends PureComponent {
       task_id,
       upc: upc,
       sku_tag_id: 0,
-      limit_stores: [currStoreId],
+      limit_stores: [store_id],
     };
     formData.spec_type = spec_type
     if (spec_type === 'spec_multi') {
+      Object.keys(multiSpecsList).map(key => {
+        delete multiSpecsList[key]?.checked
+      })
       formData.spec_list = multiSpecsList
     }
-    if (type === "add") {
-      formData.store_goods_status = {
-        sale_status: sale_status,
-        provided: provided
-      };
 
-      if (spec_type === 'spec_single') {
-        if (vendor_info.price_type === 1)
-          formData.store_goods_status.price = price
-        formData.store_goods_status.supply_price = supply_price
-        formData.inventory = {
-          actualNum: actualNum,
-          differenceType: 2,
-          totalRemain: actualNum,
-          remark: '',
-          store_id: currStoreId,
-          skipCheckChange: 1
-        }
+    formData.store_goods_status = {
+      sale_status: sale_status,
+      provided: provided
+    };
+
+    if (spec_type === 'spec_single') {
+      if (vendor_info.price_type === 1)
+        formData.store_goods_status.price = price
+      formData.store_goods_status.supply_price = supply_price
+      formData.inventory = {
+        actualNum: actualNum,
+        differenceType: 2,
+        totalRemain: actualNum,
+        remark: '',
+        store_id: store_id,
+        skipCheckChange: 1
       }
     }
 
@@ -748,52 +771,51 @@ class GoodsEditScene extends PureComponent {
     let {type = 'add'} = this.props.route.params;
     const {fnProviding} = this.state
     const {
-      id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type, inventory
+      id, name, vendor_id, weight, store_categories, store_goods_status, spec_list, spec_type, inventory, sg_tag_id,
+      upload_files
     } = formData;
     if (type === "edit" && id <= 0) {
       ToastLong('数据异常, 无法保存')
       return false
     }
-    if (type === "add") {
-      //增加商品
-      let {supply_price, sale_status, provided, price} = store_goods_status;
-      if ('spec_single' === spec_type) {
-        if (parseInt(supply_price) < 0) {
-          ToastLong('请输入正确的报价')
-          return false
-        }
-        if (!supply_price) {
-          ToastLong('请输入报价')
-          return false
-        }
-        if (price_type === 1 && parseInt(price) < 0) {
-          ToastLong('请输入正确的零售价格')
-          return false
-        }
-        if (price_type === 1 && !price) {
-          ToastLong('请输入零售价格')
-          return false
-        }
-        if (!inventory.actualNum && fnProviding === '1') {
-          ToastLong('请输入商品库存')
-          return false
-        }
-        if (Number(inventory.actualNum) < 0 && fnProviding === '1') {
-          ToastLong('请输入正确的商品库存')
-          return false
-        }
-      }
 
-      if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
-        ToastLong('请选择上架状态')
+    let {supply_price, sale_status, provided, price} = store_goods_status;
+    if ('spec_single' === spec_type) {
+      if (!supply_price) {
+        ToastLong('请输入报价')
         return false
       }
-      if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
-        ToastLong('选择供货方式')
+      if (parseFloat(supply_price) <= 0) {
+        ToastLong('请输入正确的报价')
         return false
       }
-
+      if (price_type === 1 && !price) {
+        ToastLong('请输入零售价格')
+        return false
+      }
+      if (price_type === 1 && parseFloat(price) <= 0) {
+        ToastLong('请输入正确的零售价格')
+        return false
+      }
+      if (!inventory.actualNum && fnProviding === '1') {
+        ToastLong('请输入商品库存')
+        return false
+      }
+      if (Number(inventory.actualNum) < 0 && fnProviding === '1') {
+        ToastLong('请输入正确的商品库存')
+        return false
+      }
     }
+
+    if (!(sale_status === Cts.STORE_PROD_ON_SALE || sale_status === Cts.STORE_PROD_OFF_SALE)) {
+      ToastLong('请选择上架状态')
+      return false
+    }
+    if (!(provided === Cts.STORE_SELF_PROVIDED || provided === Cts.STORE_COMMON_PROVIDED)) {
+      ToastLong('选择供货方式')
+      return false
+    }
+
 
     if ('spec_multi' === spec_type) {
       if (!Array.isArray(spec_list) || spec_list.length <= 0) {
@@ -806,19 +828,27 @@ class GoodsEditScene extends PureComponent {
           ToastLong('请输入多规格名称')
           return false
         }
-        if (!spec_list[i].supply_price && type === 'add') {
+        if (!spec_list[i].supply_price) {
           ToastLong('请输入多规格价格')
           return false
         }
-        if (type === 'add' && price_type === 1 && !spec_list[i].price) {
+        if (parseFloat(spec_list[i].supply_price) <= 0) {
+          ToastLong('请输入正确的多规格价格')
+          return false
+        }
+        if (price_type === 1 && !spec_list[i].price) {
           ToastLong('请输入多规格零售价格')
+          return false
+        }
+        if (price_type === 1 && parseFloat(spec_list[i].price) <= 0) {
+          ToastLong('请输入正确的多规格零售价格')
           return false
         }
         if (!spec_list[i].weight) {
           ToastLong('请输入多规格重量')
           return false
         }
-        if (type === 'add' && !spec_list[i].inventory.actualNum && fnProviding === '1') {
+        if (!spec_list[i].inventory.actualNum && fnProviding === '1') {
           ToastLong('请输入多规格库存')
           return false
         }
@@ -829,6 +859,10 @@ class GoodsEditScene extends PureComponent {
         ToastLong('请输入商品名称')
         return false
       }
+      if (upload_files.length <= 0) {
+        ToastLong('请添加商品图片')
+        return false
+      }
       if (!(vendor_id > 0)) {
         ToastLong('无效的品牌商')
         return false
@@ -837,6 +871,10 @@ class GoodsEditScene extends PureComponent {
       if (!(weight > 0) && 'spec_single' === spec_type) {
 
         ToastLong('请输入正确的重量')
+        return false
+      }
+      if (sg_tag_id == 0) {
+        ToastLong('请选择闪购类目')
         return false
       }
       if (tool.length(store_categories) <= 0) {
@@ -867,8 +905,8 @@ class GoodsEditScene extends PureComponent {
   getProdDetailByUpc = (upc) => {
     showModal("加载商品中...", 'loading', 20000)
     const {dispatch} = this.props;
-    const {accessToken, currStoreId} = this.props.global;
-    dispatch(getProdDetailByUpc(accessToken, currStoreId, upc, this.state.vendor_id, async (ok, desc, p) => {
+    const {accessToken, store_id} = this.props.global;
+    dispatch(getProdDetailByUpc(accessToken, store_id, upc, this.state.vendor_id, async (ok, desc, p) => {
       if (ok) {
         hideModal()
         const {id, upc_data} = p
@@ -937,6 +975,72 @@ class GoodsEditScene extends PureComponent {
       isSelectCategory: isSelectCategory
     })
   }
+
+  setPushSpec = (resp) => {
+    let {multiSpecsList, selected_pids} = this.state
+    let multiSpecsListCopy = []
+    resp.map(item => {
+      item = {
+        ...item,
+        inventory: {actualNum: ''},
+        selectWeight: item?.unit_info,
+        price: '',
+        supply_price: '',
+        actualNum: ''
+      }
+      delete item?.unit_info
+      multiSpecsListCopy.push(item)
+      selected_pids.push(item.id)
+    })
+    this.setState({
+      multiSpecsList: multiSpecsList.concat(multiSpecsListCopy)
+    }, () => {
+      this.renderMultiSpecs()
+    })
+  }
+
+  changeProductSpec = (status) => {
+    let {type, product_detail = {}} = this.props.route.params;
+    const {series_id = ''} = product_detail
+    if ('add' === type) {
+      this.setState({
+        spec_type: status
+      })
+    } else {
+      if (parseInt(series_id) !== 0) {
+        return ToastShort('不可更改为单规格！')
+      } else {
+        let {name, upc, weight, price, supply_price, selectWeight, actualNum, id} = this.state
+        let {multiSpecsList = []} = this.state
+        const multiSpecsInfo = {
+          id: id,
+          sku_name: name,
+          supply_price: supply_price,
+          price: price,
+          weight: weight,
+          sku_unit: selectWeight.label,
+          selectWeight: selectWeight,
+          upc: upc,
+          inventory: {
+            actualNum: actualNum,
+            differenceType: 2,
+            totalRemain: '',
+            remark: '',
+            skipCheckChange: 1
+          },
+          checked: false
+        }
+        if (multiSpecsList.length < 1) {
+          multiSpecsList = [...multiSpecsList, multiSpecsInfo]
+        }
+        this.setState({
+          multiSpecsList: multiSpecsList,
+          spec_type: status
+        })
+      }
+    }
+  }
+
   renderBaseInfo = () => {
     let {
       basic_category_obj, name, upc, weightList, weight, sale_status, fnProviding, price, store_tags, supply_price,
@@ -963,6 +1067,7 @@ class GoodsEditScene extends PureComponent {
             style={styles.textInputStyle}
             onChangeText={text => this.onNameChanged(text)}
             placeholderTextColor={colors.color999}
+            maxLength={40}
             placeholder={'不超过40个字符'}/>
           <If condition={name}>
             <Text style={styles.clearBtn} onPress={this.onNameClear}>
@@ -992,7 +1097,7 @@ class GoodsEditScene extends PureComponent {
           }
         </View>
         <LineView/>
-        <If condition={this.isStoreProdEditable() && spec_type === 'spec_single'}>
+        <If condition={spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               报价
@@ -1011,7 +1116,7 @@ class GoodsEditScene extends PureComponent {
           </View>
           <LineView/>
         </If>
-        <If condition={type === 'add' && price_type && spec_type === 'spec_single'}>
+        <If condition={price_type && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               零售价格
@@ -1056,21 +1161,22 @@ class GoodsEditScene extends PureComponent {
                              defaultKey={-999}>
                 <View style={styles.weightUnitWrap}>
                   <Text style={styles.weightUnit}>
-                    {`${selectWeight.label}>`}
+                    {`${selectWeight.label}`}
                   </Text>
+                  <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.color999} size={14}/>
                 </View>
               </ModalSelector>
             </View>
             <LineView/>
           </If>
-          <If condition={!vendor_has && !store_has && this.isStoreProdEditable() && spec_type === 'spec_single'}>
+          <If condition={!vendor_has && !store_has && spec_type === 'spec_single'}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品条码
               </Text>
               <TextInput
                 value={upc}
-                editable={this.isStoreProdEditable()}
+                // editable={this.isStoreProdEditable()}
                 onChangeText={upc => this.setState({upc: upc})}
                 style={styles.textInputStyle}
                 placeholderTextColor={colors.color999}
@@ -1082,7 +1188,7 @@ class GoodsEditScene extends PureComponent {
           </If>
 
         </If>
-        <If condition={fnProviding === '1' && this.isStoreProdEditable() && spec_type === 'spec_single'}>
+        <If condition={fnProviding === '1' && spec_type === 'spec_single'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               库存
@@ -1102,7 +1208,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <If condition={!this.isAddProdToStore()}>
-          <If condition={this.isStoreProdEditable() && !vendor_has && !store_has}>
+          <If condition={!vendor_has && !store_has}>
             <TouchableOpacity style={styles.baseRowCenterWrap}
                               onPress={() => this.setSelectHeaderText('闪购类目', true)}>
               <Text style={styles.leftText}>
@@ -1160,14 +1266,14 @@ class GoodsEditScene extends PureComponent {
             </View>
             <LineView/>
           </If>
-          <If condition={allow_multi_spec === 1 && 'add' === type && allow_switch_multi}>
+          <If condition={allow_multi_spec === 1}>
             <View style={styles.baseRowCenterWrap}>
               <Text style={styles.leftText}>
                 商品规格
               </Text>
               <View style={styles.saleStatusWrap}>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({spec_type: 'spec_single'})}>
+                                  onPress={() => this.changeProductSpec('spec_single')}>
                   <If condition={spec_type === 'spec_single'}>
                     <SvgXml xml={radioSelected(18, 18)}/>
                   </If>
@@ -1179,7 +1285,7 @@ class GoodsEditScene extends PureComponent {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saleStatusItemWrap}
-                                  onPress={() => this.setState({spec_type: 'spec_multi'})}>
+                                  onPress={() => this.changeProductSpec('spec_multi')}>
                   <If condition={spec_type === 'spec_multi'}>
                     <SvgXml xml={radioSelected(18, 18)}/>
                   </If>
@@ -1195,44 +1301,42 @@ class GoodsEditScene extends PureComponent {
             </View>
           </If>
         </If>
-        <If condition={store_has || this.isStoreProdEditable()}>
-          <View style={styles.baseRowCenterWrap}>
-            <Text style={styles.leftText}>
-              上架状态
-              <Text style={styles.leftFlag}>
-                *
-              </Text>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            上架状态
+            <Text style={styles.leftFlag}>
+              *
             </Text>
-            <View style={styles.saleStatusWrap}>
-              <TouchableOpacity style={styles.saleStatusItemWrap}
-                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
-                <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
-                  <SvgXml xml={radioSelected(18, 18)}/>
-                </If>
-                <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
-                  <SvgXml xml={radioUnSelected(18, 18)}/>
-                </If>
-                <Text style={styles.saleStatusText}>
-                  上架
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saleStatusItemWrap}
-                                onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
-                <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
-                  <SvgXml xml={radioSelected(18, 18)}/>
-                </If>
-                <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
-                  <SvgXml xml={radioUnSelected(18, 18)}/>
-                </If>
-                <Text style={styles.saleStatusText}>
-                  下架
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.rightEmptyView}/>
+          </Text>
+          <View style={styles.saleStatusWrap}>
+            <TouchableOpacity style={styles.saleStatusItemWrap}
+                              onPress={() => this.setState({sale_status: Cts.STORE_PROD_ON_SALE})}>
+              <If condition={sale_status === Cts.STORE_PROD_ON_SALE}>
+                <SvgXml xml={radioSelected(18, 18)}/>
+              </If>
+              <If condition={sale_status !== Cts.STORE_PROD_ON_SALE}>
+                <SvgXml xml={radioUnSelected(18, 18)}/>
+              </If>
+              <Text style={styles.saleStatusText}>
+                上架
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saleStatusItemWrap}
+                              onPress={() => this.setState({sale_status: Cts.STORE_PROD_OFF_SALE})}>
+              <If condition={sale_status === Cts.STORE_PROD_OFF_SALE}>
+                <SvgXml xml={radioSelected(18, 18)}/>
+              </If>
+              <If condition={sale_status !== Cts.STORE_PROD_OFF_SALE}>
+                <SvgXml xml={radioUnSelected(18, 18)}/>
+              </If>
+              <Text style={styles.saleStatusText}>
+                下架
+              </Text>
+            </TouchableOpacity>
           </View>
-          <LineView/>
-        </If>
+          <View style={styles.rightEmptyView}/>
+        </View>
+        <LineView/>
       </View>
     )
   }
@@ -1255,7 +1359,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   setMultiSpecsInfo = (index, key, value) => {
-    const {currStoreId, vendor_info} = this.props.global;
+    const {store_id, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
 
     const multiSpecsInfo = multiSpecsList[index]
@@ -1269,7 +1373,7 @@ class GoodsEditScene extends PureComponent {
         differenceType: 2,
         totalRemain: value,
         remark: '',
-        store_id: currStoreId,
+        store_id: store_id,
         skipCheckChange: 1
       }
     this.setState({
@@ -1279,14 +1383,42 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type, vendor_has, store_has) => {
-    const {inventory = {}, upc, weight, supply_price, price, sku_name} = multiSpecsList[index]
+    const {inventory = {}, upc, weight, supply_price, price, sku_name, checked = false} = multiSpecsList[index]
     const {actualNum = ''} = inventory
     const {price_type} = this.props.global.vendor_info;
+    let {product_detail = {}} = this.props.route.params;
+    const {series_id = '', sku_max_num = 0} = product_detail;
+    const {store_id} = this.props.global;
+    const {selected_pids} = this.state;
     return (
       <View style={Styles.zoneWrap} key={index}>
-        <Text style={Styles.headerTitleText}>
-          规格信息
-        </Text>
+        <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+          <Text style={Styles.headerTitleText}>
+            规格信息
+          </Text>
+          <If condition={index === 0 && 'add' !== type && parseInt(series_id) > 0}>
+            <TouchableOpacity
+              style={{flexDirection: "row", alignItems: "center", marginRight: 12}}
+              onPress={() =>
+                this.onPress(
+                  Config.ROUTE_GOODS_SELECT_SPEC,
+                  {
+                    series_id: series_id,
+                    store_id: store_id,
+                    selected_pids: selected_pids,
+                    sku_max_num: sku_max_num,
+                    onBack: resp => {
+                      this.setPushSpec(resp)
+                    }
+                  }
+                )
+              }
+            >
+              <Text style={{color: colors.main_color, fontSize: 14}}>选择规格 </Text>
+              <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.main_color} size={14}/>
+            </TouchableOpacity>
+          </If>
+        </View>
         <LineView/>
         <View style={styles.baseRowCenterWrap}>
           <Text style={styles.leftText}>
@@ -1296,7 +1428,7 @@ class GoodsEditScene extends PureComponent {
             </Text>
           </Text>
           <TextInput
-            maxLength={40}
+            maxLength={20}
             value={sku_name}
             editable={!vendor_has && !store_has}
             //editable={this.isStoreProdEditable()}
@@ -1307,46 +1439,44 @@ class GoodsEditScene extends PureComponent {
           <View style={styles.rightEmptyView}/>
         </View>
         <LineView/>
-        <If condition={'add' === type}>
+        <View style={styles.baseRowCenterWrap}>
+          <Text style={styles.leftText}>
+            报价
+            <Text style={styles.leftFlag}>
+              *
+            </Text>
+          </Text>
+          <TextInput
+            keyboardType={'numeric'}
+            value={supply_price}
+            //editable={this.isStoreProdEditable()}
+            onChangeText={value => this.setMultiSpecsInfo(index, 'supply_price', value)}
+            style={styles.textInputStyle}
+            placeholderTextColor={colors.color999}
+            placeholder={'请输入商品报价'}/>
+          <View style={styles.rightEmptyView}/>
+        </View>
+        <LineView/>
+        <If condition={price_type === 1}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
-              报价
+              零售价格
               <Text style={styles.leftFlag}>
                 *
               </Text>
             </Text>
             <TextInput
               keyboardType={'numeric'}
-              value={supply_price}
-              //editable={this.isStoreProdEditable()}
-              onChangeText={value => this.setMultiSpecsInfo(index, 'supply_price', value)}
+              value={price}
+              onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
               style={styles.textInputStyle}
               placeholderTextColor={colors.color999}
-              placeholder={'请输入商品报价'}/>
+              placeholder={'请输入商品零售价格'}/>
             <View style={styles.rightEmptyView}/>
           </View>
           <LineView/>
-          <If condition={price_type === 1}>
-            <View style={styles.baseRowCenterWrap}>
-              <Text style={styles.leftText}>
-                零售价格
-                <Text style={styles.leftFlag}>
-                  *
-                </Text>
-              </Text>
-              <TextInput
-                keyboardType={'numeric'}
-                value={price}
-                onChangeText={value => this.setMultiSpecsInfo(index, 'price', value)}
-                style={styles.textInputStyle}
-                placeholderTextColor={colors.color999}
-                placeholder={'请输入商品零售价格'}/>
-              <View style={styles.rightEmptyView}/>
-            </View>
-            <LineView/>
-          </If>
-
         </If>
+
         <If condition={!vendor_has && !store_has || 'add' !== type}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
@@ -1356,7 +1486,6 @@ class GoodsEditScene extends PureComponent {
               </Text>
             </Text>
             <TextInput
-
               style={styles.textInputStyle}
               value={weight}
               keyboardType={'numeric'}
@@ -1371,8 +1500,9 @@ class GoodsEditScene extends PureComponent {
                            defaultKey={-999}>
               <View style={styles.weightUnitWrap}>
                 <Text style={styles.weightUnit}>
-                  {`${item.selectWeight.label}>`}
+                  {`${item.selectWeight.label}`}
                 </Text>
+                <AntDesign name={'right'} style={{textAlign: 'center'}} color={colors.color999} size={14}/>
               </View>
             </ModalSelector>
           </View>
@@ -1394,7 +1524,7 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
 
-        <If condition={fnProviding === '1' && 'add' === type}>
+        <If condition={fnProviding === '1'}>
           <View style={styles.baseRowCenterWrap}>
             <Text style={styles.leftText}>
               库存
@@ -1415,7 +1545,8 @@ class GoodsEditScene extends PureComponent {
           <LineView/>
         </If>
         <View style={multiSpecsList.length > 1 ? styles.operationSpecsBtnWrap : {}}>
-          <If condition={multiSpecsList.length === index + 1 && 'add' === type && !vendor_has && !store_has}>
+          <If
+            condition={multiSpecsList.length === index + 1 && !vendor_has && !store_has && (parseInt(series_id) <= 0 || 'add' === type)}>
             <TouchableOpacity style={styles.addSpecsWrap} onPress={this.addSpecs}>
               <AntDesign name={'plus'} size={12} color={colors.main_color}/>
               <Text style={styles.addSpecsText}>
@@ -1424,7 +1555,7 @@ class GoodsEditScene extends PureComponent {
             </TouchableOpacity>
           </If>
           <If condition={multiSpecsList.length > 1 && index !== 0 && !vendor_has && !store_has}>
-            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index)}>
+            <TouchableOpacity style={styles.deleteSpecsWrap} onPress={() => this.deleteSpecs(index, checked, item.id)}>
               <AntDesign name={'delete'} size={22} color={colors.main_color}/>
             </TouchableOpacity>
           </If>
@@ -1433,7 +1564,7 @@ class GoodsEditScene extends PureComponent {
     )
   }
   addSpecs = () => {
-    const {currStoreId, vendor_info} = this.props.global;
+    const {store_id, vendor_info} = this.props.global;
     const {multiSpecsList} = this.state
     const multiSpecsInfo = {
       sku_name: '',//规格
@@ -1442,12 +1573,13 @@ class GoodsEditScene extends PureComponent {
       sku_unit: '克',
       selectWeight: {value: 1, label: '克'},//选择重量
       upc: '',//条形码
+      checked: true,
       inventory: {
         actualNum: '',//库存
         differenceType: 2,
         totalRemain: '',
         remark: '',
-        store_id: currStoreId,
+        store_id: store_id,
         skipCheckChange: 1
 
       }
@@ -1460,9 +1592,9 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
-  deleteSpecs = (index) => {
+  deleteSpecs = (index, checked, id = '') => {
     const {type} = this.props.route.params;
-    if ('edit' === type) {
+    if ('edit' === type && !checked) {
       Alert.alert('删除规格', '将从商品库中删除规格信息，会从关联的门店中消失，确定是否要删除？',
         [
           {
@@ -1478,18 +1610,21 @@ class GoodsEditScene extends PureComponent {
         ])
       return
     }
+    if (id) {
+      this.state.selected_pids.splice(this.state.selected_pids.findIndex(item => item == id), 1)
+    }
     this.deletedSpecsInfo(index)
   }
 
   deleteSpecsInfoToServer = (index) => {
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     const {multiSpecsList} = this.state
     const {id} = multiSpecsList[index]
     if (!id) {
       showError('规格信息不完整，不可删除')
       return
     }
-    const url = `/v1/new_api/store_product/del_store_pro/${currStoreId}/${id}`
+    const url = `/v1/new_api/store_product/del_store_pro/${store_id}/${id}`
     HttpUtils.get(url, {}, false, true).then((res) => {
       showSuccess(`${res.reason}`)
     }, error => {
@@ -1636,17 +1771,18 @@ class GoodsEditScene extends PureComponent {
 
   }
 
+  closePreviewImage = () => {
+    const {upload_files} = this.state
+    const index = upload_files.findIndex(item => item.key === '+')
+    if (index > 0)
+      upload_files.splice(index, 1)
+    this.setState({dragPicVisible: false, upload_files: [...upload_files]})
+  }
+
   renderModal = () => {
     let {
-      searchValue,
-      visible,
-      buttonDisabled,
-      selectHeaderText,
-      dragPicVisible,
-      upload_files,
-      selectPreviewPic,
-      vendor_has,
-      store_has
+      searchValue, visible, buttonDisabled, selectHeaderText, dragPicVisible, upload_files, selectPreviewPic,
+      vendor_has, store_has
     } = this.state
     if (visible) {
       return (
@@ -1685,61 +1821,68 @@ class GoodsEditScene extends PureComponent {
         </CommonModal>
       )
     }
-
+    let data = [...upload_files]
+    const hasPlus = upload_files.filter(item => item.key === '+')
+    if (hasPlus.length <= 0)
+      data = [...upload_files, {key: '+', disabledDrag: true, disabledReSorted: true}]
     if (dragPicVisible) {
       return (
-        <CommonModal visible={dragPicVisible} onRequestClose={() => this.setState({dragPicVisible: false})}>
-          <SafeAreaView style={styles.modifyPicModal}>
-            <View style={styles.modifyPicHeader}>
-              <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
-                         onPress={() => this.setState({dragPicVisible: false})}/>
-              <Text style={styles.modifyPicHeaderText}>
-                预览（{selectPreviewPic.index + 1}/{tool.length(upload_files)}）
-              </Text>
-              <View/>
-            </View>
-            <View style={styles.modifyMainPic}>
-              <If condition={selectPreviewPic.url}>
-                <FastImage source={{uri: selectPreviewPic.url}}
-                           resizeMode={FastImage.resizeMode.contain}
-                           style={{height: 2.5 * height / 5.2}}/>
-              </If>
-            </View>
-            <GridView data={[...upload_files, '']}
-                      style={styles.modifyPicList}
-                      numColumns={4}
-                      renderLockedItem={(item, index) => this.renderLockedItem(item, index)}
-                      locked={item => '' === item}
-                      onReleaseCell={this.onReleaseCell}
-                      onEndDragging={(item, index) => this.onEndDragging(item, index)}
-                      onPressCell={(item, index) => this.onPressCell(item, index)}
-                      keyExtractor={(item) => item.id}
-                      delayLongPress={100}
-                      renderItem={(item, index) => this.renderModalItem(item, index)}/>
-            <View style={styles.modifyPicBtnWrap}>
-              <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
-                <TouchableOpacity onPress={this.setMainPic}
-                                  style={[{backgroundColor: colors.main_color}, styles.modifyPicBtn]}>
-                  <Text style={styles.modifyPicBtnText}>
-                    设为主图
-                  </Text>
-                </TouchableOpacity>
-              </If>
-              <If condition={!vendor_has && !store_has && upload_files.length > 0}>
-                <TouchableOpacity style={[{backgroundColor: colors.colorCCC}, styles.modifyPicBtn]}
-                                  onPress={() => this.setState({showImgMenus: true, selectPicType: false})}>
-                  <Text style={styles.modifyPicBtnText}>
-                    替换图片
-                  </Text>
-                </TouchableOpacity>
-              </If>
-            </View>
-          </SafeAreaView>
-          {this.renderActionSheet()}
-          {this.renderSearchPic()}
+        <CommonModal visible={dragPicVisible} onRequestClose={this.closePreviewImage}>
+          <>
+            <SafeAreaView style={styles.modifyPicModal}>
+              <View style={styles.modifyPicHeader}>
+                <AntDesign name={'left'} color={colors.white} size={20} style={{padding: 8}}
+                           onPress={this.closePreviewImage}/>
+                <Text style={styles.modifyPicHeaderText}>
+                  预览（{selectPreviewPic.index + 1}/{tool.length(hasPlus.length <= 0 ? upload_files.length : upload_files.length - 1)}）
+                </Text>
+                <View/>
+              </View>
+              <View style={styles.modifyMainPic}>
+                <If condition={selectPreviewPic.url}>
+                  <FastImage source={{uri: selectPreviewPic.url}}
+                             resizeMode={FastImage.resizeMode.contain}
+                             style={{height: 2.5 * height / 5.2}}/>
+                </If>
+              </View>
+              <DraggableGrid numColumns={4}
+                             style={styles.modifyPicList}
+                             data={data}
+                             delayLongPress={100}
+                             onItemPress={(item) => this.onPressCell(item)}
+                             onDragRelease={(data, item) => this.onDragRelease(data, item)}
+                             renderItem={(item, index) => this.renderModalItem(item, index)}/>
+
+              <View style={styles.modifyPicBtnWrap}>
+                <If condition={selectPreviewPic.index !== 0 && upload_files.length > 0}>
+                  <TouchableOpacity onPress={this.setMainPic}
+                                    style={[{backgroundColor: colors.main_color}, styles.modifyPicBtn]}>
+                    <Text style={styles.modifyPicBtnText}>
+                      设为主图
+                    </Text>
+                  </TouchableOpacity>
+                </If>
+                <If condition={!vendor_has && !store_has && upload_files.length > 0}>
+                  <TouchableOpacity style={[{backgroundColor: colors.colorCCC}, styles.modifyPicBtn]}
+                                    onPress={() => this.setState({showImgMenus: true, selectPicType: false})}>
+                    <Text style={styles.modifyPicBtnText}>
+                      替换图片
+                    </Text>
+                  </TouchableOpacity>
+                </If>
+              </View>
+            </SafeAreaView>
+            {this.renderActionSheet()}
+            {this.renderSearchPic()}
+          </>
         </CommonModal>
       )
     }
+  }
+
+  onDragRelease = (data, item) => {
+    const index = data.findIndex(datas => datas.key === item.key)
+    this.setState({upload_files: data, selectPreviewPic: {...item, index: index}})
   }
 
   renderLockedItem(item, index) {
@@ -1755,23 +1898,10 @@ class GoodsEditScene extends PureComponent {
       )
   }
 
-  onEndDragging = (item, index) => {
-    if (item)
-      this.setState({
-        selectPreviewPic: {url: item.url, index: index, key: item.id}
-      })
-  }
-
-  onPressCell = (item, index) => {
-    this.setState({selectPreviewPic: {url: item.url, index: index, key: item.id}})
-  }
-  onReleaseCell = (items) => {
+  onPressCell = (item) => {
     const {upload_files} = this.state
-    const list_img1 = items.slice(0, items.length - 1)
-
-    if (!_.isEqual(upload_files, list_img1)) {
-      this.setState({upload_files: list_img1})
-    }
+    const itemIndex = upload_files.findIndex(items => items.key === item.key)
+    this.setState({selectPreviewPic: {url: item.url, index: itemIndex, key: item.id}})
   }
 
   closePicList = () => {
@@ -1814,6 +1944,8 @@ class GoodsEditScene extends PureComponent {
               </View>
             </View>
             <FlatList data={picList}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       style={{flex: 1}}
                       numColumns={3}
                       getItemLayout={this._getItemLayout}
@@ -1915,7 +2047,7 @@ class GoodsEditScene extends PureComponent {
 
   modifyPic = (item) => {
     let {selectPreviewPic, upload_files} = this.state
-    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb}
+    upload_files[selectPreviewPic.index] = {id: item.id, name: item.name, url: item.thumb, key: item.name}
     selectPreviewPic = {...selectPreviewPic, id: item.id, url: item.thumb}
     this.setState({
       upload_files: upload_files,
@@ -1928,7 +2060,11 @@ class GoodsEditScene extends PureComponent {
 
   addPic = (item) => {
     let {upload_files} = this.state
-    upload_files.push({id: item.id, name: item.name, url: item.thumb})
+    const index = upload_files.findIndex(item => item.key === '+')
+    if (index > 0)
+      upload_files.splice(index, 0, {id: item.id, name: item.name, url: item.thumb, key: item.name})
+    else
+      upload_files.push({id: item.id, name: item.name, url: item.thumb, key: item.name})
     this.setState({
       upload_files: upload_files,
       searchPicVisible: false,
@@ -1968,25 +2104,26 @@ class GoodsEditScene extends PureComponent {
 
   renderModalItem = (item, index) => {
     const {selectPreviewPic, vendor_has, store_has} = this.state
-    if (item.url)
-      return (
-        <View style={styles.hasImageList}>
-          <FastImage style={selectPreviewPic.index === index ? styles.selectImage : styles.img_add}
-                     source={{uri: item.url}}
-                     resizeMode={FastImage.resizeMode.contain}/>
-          <If condition={!vendor_has && !store_has && this.isProdEditable()}>
-            <TouchableOpacity style={styles.deleteUploadImageIcon}
-                              onPress={() => this.deleteUploadImage(index)}>
-              <MaterialIcons name={"clear"} size={pxToDp(40)} color={"#d81e06"} msg={false}/>
-            </TouchableOpacity>
-          </If>
-          <If condition={0 === index}>
-            <Text style={styles.isMainPicFlagText}>
-              主图
-            </Text>
-          </If>
-        </View>
-      )
+    if (item.disabledDrag)
+      return this.renderLockedItem(item, index)
+    return (
+      <View style={styles.hasImageList}>
+        <FastImage style={selectPreviewPic.index === index ? styles.selectImage : styles.img_add}
+                   source={{uri: item.url}}
+                   resizeMode={FastImage.resizeMode.contain}/>
+        <If condition={!vendor_has && !store_has && this.isProdEditable()}>
+          <TouchableOpacity style={styles.deleteUploadImageIcon}
+                            onPress={() => this.deleteUploadImage(index)}>
+            <MaterialIcons name={"clear"} size={pxToDp(40)} color={"#d81e06"} msg={false}/>
+          </TouchableOpacity>
+        </If>
+        <If condition={0 === index}>
+          <Text style={styles.isMainPicFlagText}>
+            主图
+          </Text>
+        </If>
+      </View>
+    )
   }
 
   render() {
@@ -2017,11 +2154,11 @@ class GoodsEditScene extends PureComponent {
   })
 
   getCategoryIdBySGId = (sg_tag_id) => {
-    const {accessToken, vendor_id, currStoreId} = this.props.global
+    const {accessToken, vendor_id, store_id} = this.props.global
     const url = `/api_products/get_self_tags_by_sg?access_token=${accessToken}`
     const params = {
       vendor_id: vendor_id,
-      store_id: currStoreId,
+      store_id: store_id,
       sg_id: sg_tag_id
     }
     HttpUtils.get(url, params).then(res => {
@@ -2092,6 +2229,8 @@ class GoodsEditScene extends PureComponent {
       return (
         <View style={styles.modalStyle}>
           <FlatList data={searchCategoriesList}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
                     style={{flex: 1}}
                     initialNumToRender={10}
                     getItemLayout={(data, index) => this.getItemLayout(data, index)}
@@ -2102,18 +2241,24 @@ class GoodsEditScene extends PureComponent {
     return (
       <View style={styles.modalStyle}>
         <FlatList data={basic_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
                   keyExtractor={(item, index) => `${index}`}
                   renderItem={(item) => this.renderBasicCategories(item, 1)}/>
         <FlatList data={secondary_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
                   keyExtractor={(item, index) => `${index}`}
                   renderItem={(item) => this.renderBasicCategories(item, 2)}/>
         <FlatList data={three_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   style={{flex: 1}}
                   initialNumToRender={10}
                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
@@ -2243,14 +2388,20 @@ const styles = StyleSheet.create({
   },
   modifyPicModal: {backgroundColor: colors.color000, flex: 1},
   modifyPicHeader: {
-    flex: 0.2,
+    flex: 0.6,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 11
   },
   modifyPicHeaderText: {fontSize: 18, fontWeight: 'bold', color: colors.white, lineHeight: 25},
-  modifyMainPic: {flex: 2.5, justifyContent: 'center'},
+  modifyMainPic: {
+    flex: 2.5,
+    marginHorizontal: 11,
+    marginTop: height * 0.07,
+    marginBottom: height * 0.167,
+    justifyContent: 'center'
+  },
   modifyPicList: {marginLeft: 11, flex: 2},
   modifyPicBtnWrap: {flex: 0.5, flexDirection: 'row', alignItems: 'center'},
   modifyPicBtn: {flex: 1, marginHorizontal: 10, borderRadius: 2},
@@ -2298,7 +2449,7 @@ const styles = StyleSheet.create({
   },
   plusIcon: {
     fontSize: 48,
-    color: "#bfbfbf",
+    color: colors.color999,
     textAlign: "center"
   },
   itemWrap: {
@@ -2321,12 +2472,13 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: 14,
+    color: colors.color333
   },
   weightUnitWrap: {
     flex: 1, flexDirection: 'row', alignItems: 'center', width: 40, justifyContent: 'center'
   },
   weightUnit: {
-    fontSize: 12, fontWeight: '400', color: colors.color333, lineHeight: 17,
+    fontSize: 14, fontWeight: '400', color: colors.color333, lineHeight: 17,
   },
   modalSearchIcon: {width: 40, textAlign: 'center'},
   modalSearch: {color: colors.main_color, fontSize: 14},
@@ -2478,12 +2630,9 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: colors.color777,
-    fontSize: 12,
-    color: colors.white,
-    padding: pxToDp(6),
-    borderRadius: pxToDp(12),
-    marginLeft: pxToDp(6)
+    fontSize: 14,
+    color: colors.main_color,
+    marginRight: pxToDp(22)
   },
   bottomBtn: {
     height: pxToDp(70), flex: 0.8, alignItems: 'center', justifyContent: 'center'

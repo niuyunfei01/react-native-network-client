@@ -79,7 +79,7 @@ class OperateDetailScene extends PureComponent {
   }
 
   profitOtherAdd() {
-    let {accessToken, currStoreId} = this.props.global;
+    let {accessToken, store_id} = this.props.global;
     let {day} = this.props.route.params;
     let {type, remark, name, money} = this.state;
     if (!(type > 0 && money > 0 && tool.length(name) > 0)) {
@@ -96,7 +96,7 @@ class OperateDetailScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(
       fetchProfitOtherAdd(
-        currStoreId,
+        store_id,
         day,
         data,
         accessToken,
@@ -121,10 +121,10 @@ class OperateDetailScene extends PureComponent {
   }
 
   getProfitDaily = () => {
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     let {day} = this.props.route.params;
     showModal('加载中')
-    const url = `api/profit_daily/${currStoreId}/${day}.json?access_token=${accessToken}`;
+    const url = `api/profit_daily/${store_id}/${day}.json?access_token=${accessToken}`;
     HttpUtils.get(url).then(res => {
       let {sum, editable, check_detail, income, outcome_normal, outcome_other} = res;
       this.setState({

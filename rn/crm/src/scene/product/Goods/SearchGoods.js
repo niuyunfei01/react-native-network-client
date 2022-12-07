@@ -5,7 +5,6 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import tool from "../../../pubilc/util/tool";
 import native from "../../../pubilc/util/native";
-import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../../common/component/SearchInputNavigation";
 import color from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
@@ -14,6 +13,7 @@ import LoadMore from 'react-native-loadmore'
 import FastImage from 'react-native-fast-image'
 import BigImage from "../../common/component/BigImage";
 import Mapping from "../../../pubilc/Mapping";
+import colors from "../../../pubilc/styles/colors";
 
 
 function mapStateToProps(state) {
@@ -33,7 +33,7 @@ class SearchGoods extends Component {
     const {limit_store} = this.props.route.params;
 
     this.state = {
-      storeId: limit_store ? limit_store : this.props.global.currStoreId,
+      storeId: limit_store ? limit_store : this.props.global.store_id,
       fnPriceControlled: false,
       goods: [],
       page: 1,
@@ -212,7 +212,7 @@ class SearchGoods extends Component {
           <View style={styles.productRowBottom}>
             <View>
               <If condition={product.sales}>
-                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
+                <Text style={{color: colors.color333, fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
               </If>
             </View>
             <If condition={self.showSelect(product) && product.is_exist}>
@@ -229,7 +229,7 @@ class SearchGoods extends Component {
                 </View>
                 <TouchableOpacity onPress={() => {
                   self.props.route.params.onBack(product.name, product.is_exist);
-                  this.props.navigation.dispatch(NavigationActions.back())
+                  this.props.navigation.goBack()
                 }}>
                   <View style={styles.toOnlineBtn}>
                     <Text style={styles.toOnlineBtnText}>选择</Text>

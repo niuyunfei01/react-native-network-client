@@ -6,7 +6,6 @@ import {StyleSheet, Text, View} from "react-native";
 import colors from "../../../../pubilc/styles/colors"
 import pxToDp from "../../../../pubilc/util/pxToDp";
 import tool from "../../../../pubilc/util/tool";
-import {withNavigation} from '@react-navigation/compat';
 
 function mapStateToProps(state) {
   const {global, mine} = state;
@@ -77,4 +76,4 @@ const styles = StyleSheet.create({
     color: colors.theme,
   }
 })
-export default withNavigation(connect(mapStateToProps)(ReceiptOpLog))
+export default connect(mapStateToProps)(ReceiptOpLog)

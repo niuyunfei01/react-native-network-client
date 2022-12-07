@@ -29,7 +29,7 @@ class InventoryItems extends Component {
     super(props);
 
     this.state = {
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       till: '', //到某一秒的库存
       fnPriceControlled: false,
       goods: [],
@@ -179,25 +179,18 @@ class InventoryItems extends Component {
     return items
   }
 
-  renderCategory(category) {
-    const selectCategoryId = this.state.selectTagId
-    let active = selectCategoryId === category.id
-    return (
-      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-        <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name} </Text>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   renderCategories() {
-    const categories = this.state.categories
-    let item = []
-    for (let i in categories) {
-      item.push(this.renderCategory(categories[i]))
-    }
-    return item
+    const {categories} = this.state
+    const selectTagId = this.state.selectTagId
+    return categories && categories.map((category, index) => {
+      return (
+        <TouchableOpacity key={index} onPress={() => this.onSelectCategory(category)}>
+          <View style={[selectTagId === category.id ? styles.categoryItemActive : styles.categoryItem]}>
+            <Text style={styles.categoryText}>{category.name} </Text>
+          </View>
+        </TouchableOpacity>
+      )
+    })
   }
 
   render() {
