@@ -157,16 +157,16 @@ class SignInScene extends PureComponent {
   }
 
   getLogList = (start_day) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/api/sign_status_with_record/${currStoreId}/${start_day}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `/api/sign_status_with_record/${store_id}/${start_day}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({sigInInfo: res})
     })
   }
 
   getShippingStatus = () => {
-    const {currStoreId, accessToken} = this.props.global;
-    const url = `/api/shipping_accept_status/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const url = `/api/shipping_accept_status/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
       this.setState({shippingAcceptStatus: res.status})
     })
@@ -201,15 +201,15 @@ class SignInScene extends PureComponent {
   }
   touchSignIn = () => {
     const {sigInInfo, start_day} = this.state
-    const {accessToken, currStoreId} = this.props.global;
-    let url = `/api/sign_in/${currStoreId}?access_token=${accessToken}`
+    const {accessToken, store_id} = this.props.global;
+    let url = `/api/sign_in/${store_id}?access_token=${accessToken}`
     switch (sigInInfo.sign_status) {
       case 0:
       case 2:
         this.signIn(url, start_day)
         break
       case 1:
-        url = `/api/sign_off/${currStoreId}?access_token=${accessToken}`
+        url = `/api/sign_off/${store_id}?access_token=${accessToken}`
         this.signOff(url, start_day)
         break
     }
@@ -260,8 +260,8 @@ class SignInScene extends PureComponent {
   }
 
   shippingStart = () => {
-    const {currStoreId, accessToken} = this.props.global;
-    const url = `/api/shipping_start_accept/${currStoreId}/?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const url = `/api/shipping_start_accept/${store_id}/?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
       showSuccess('开始接单')
       this.setState({shippingAcceptStatus: res.status})
@@ -269,8 +269,8 @@ class SignInScene extends PureComponent {
   }
 
   shippingStop = () => {
-    const {currStoreId, accessToken} = this.props.global;
-    const url = `/api/shipping_stop_accept/${currStoreId}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const url = `/api/shipping_stop_accept/${store_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
       showSuccess('停止接单')
       this.setState({shippingAcceptStatus: res.status})
@@ -342,6 +342,8 @@ class SignInScene extends PureComponent {
           </Text>
         </View>
         <FlatList data={sigInInfo.records}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   initialNumToRender={5}
                   style={styles.flex1}

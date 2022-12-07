@@ -16,7 +16,7 @@ import {
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
 import Config from "./config";
-import {showError, showSuccess, ToastShort} from "../util/ToastUtils";
+import {showError, showSuccess} from "../util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 import native from "../util/native";
 import tool from "../util/tool";
@@ -266,13 +266,20 @@ class WebScene extends PureComponent {
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
   }
 
-  onLoadEnd(e: any) {
-    if (tool.length(e.nativeEvent.title) > 0 && tool.length(e.nativeEvent.title) < 10) {
-      this.props.navigation.setOptions({
-        headerTitle: <Text style={{color: colors.color333}}>{e.nativeEvent.title} </Text>
-      })
-      this.setState({title: e.nativeEvent.title})
+  onLoadEnd = (e) => {
+    let {title = ''} = e.nativeEvent
+    const {navigation} = this.props
+    if (tool.length(title) > 0) {
+      title = tool.length(title) < 13 ? title : title.substring(0, 12) + '...'
+      this.setState({title: title})
+      navigation.setOptions({headerTitle: () => this.renderTitle(title)})
     }
+  }
+
+  renderTitle = (title) => {
+    return (
+      <Text style={{color: colors.color333}}>{title} </Text>
+    )
   }
 
   render() {

@@ -89,6 +89,7 @@ class Complain extends React.Component {
       items.push(
         <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
           <Text key={i} style={{
+            color: colors.color333,
             fontSize: pxToDp(28),
             marginTop: pxToDp(25)
           }}>
@@ -143,9 +144,10 @@ class Complain extends React.Component {
             borderBottomWidth: pxToDp(1),
             borderBottomColor: colors.color999
           }}>
-            <Text style={{fontSize: pxToDp(35)}}>店铺名称：{this.state.store_name} </Text>
+            <Text style={{color: colors.color333, fontSize: pxToDp(35)}}>店铺名称：{this.state.store_name} </Text>
             <View style={{flexDirection: "row"}}>
               <Text style={{
+                color: colors.color333,
                 fontSize: pxToDp(28),
                 marginTop: pxToDp(25)
               }}>店铺ID：</Text>
@@ -164,8 +166,8 @@ class Complain extends React.Component {
             borderBottomWidth: pxToDp(1),
             borderBottomColor: colors.color999
           }}>
-            <Text style={{fontSize: pxToDp(35)}}>赔付标准:</Text>
-            <Text style={{fontSize: pxToDp(25), marginTop: pxToDp(25)}}>{this.state.content} </Text>
+            <Text style={{color: colors.color333, fontSize: pxToDp(35)}}>赔付标准:</Text>
+            <Text style={{color: colors.color333, fontSize: pxToDp(25), marginTop: pxToDp(25)}}>{this.state.content} </Text>
 
             <TouchableOpacity onPress={() => {
               native.dialNumber(this.state.mobile);

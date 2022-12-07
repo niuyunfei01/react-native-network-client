@@ -35,6 +35,7 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -221,7 +222,7 @@ class GoodStoreDetailScene extends PureComponent {
       const retail_price_enabled = vendor?.retail_price_enabled ? vendor.retail_price_enabled : '0'
       this.handleAuthItem('retail_price_enabled', retail_price_enabled)
       const selectedSpecArray = []
-      if (spec?.sku_name) {
+      if (spec) {
         selectedSpecArray.push({
           value: spec?.product_id || '',
           label: spec?.sku_name ? spec?.sku_name : spec?.name,
@@ -481,7 +482,8 @@ class GoodStoreDetailScene extends PureComponent {
                               applyingPrice={applyingPrice}
                               storePro={{...product, ...store_prod}}
                               navigation={this.props.navigation}
-                              beforePrice={Number(store_prod.supply_price)}/>
+                              beforePrice={Number(store_prod.supply_price)}
+                              vendor_id={vendorId}/>
         </If>
       </View>
     );
@@ -491,30 +493,31 @@ class GoodStoreDetailScene extends PureComponent {
     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {productId: id})
   }
   renderStall = () => {
-    const {selectedSpecArray} = this.state
+    const {selectedSpecArray = []} = this.state
     return (
-      <If condition={tool.length(selectedSpecArray) > 0}>
-        <View style={styles.stallWrap}>
-          <View style={styles.stallTopWrap}>
-            <Text style={styles.stallTopText}>
-              关联摊位
-            </Text>
+      <View style={styles.stallWrap} key={1}>
+        <View style={styles.stallTopWrap}>
+          <Text style={styles.stallTopText}>
+            关联摊位
+          </Text>
 
-          </View>
-          <For each="info" index="i" of={selectedSpecArray}>
-            <If condition={tool.length(info?.stallName) > 0}>
-              <View style={styles.modalRowWrap} key={i}>
-                <Text style={styles.stallBottomText}>
-                  {info.stallName}
-                </Text>
-                <Text style={styles.stallBottomText}>
-                  {info?.label}
-                </Text>
-              </View>
-            </If>
-          </For>
         </View>
-      </If>
+        {
+          selectedSpecArray && selectedSpecArray.map((info, index) => {
+            if (info?.stallName)
+              return (
+                <View style={styles.modalRowWrap} key={index}>
+                  <Text style={styles.stallBottomText}>
+                    {info.stallName}
+                  </Text>
+                  <Text style={styles.stallBottomText}>
+                    {info?.label}
+                  </Text>
+                </View>
+              )
+          })
+        }
+      </View>
 
     )
   }
@@ -523,9 +526,9 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStallData()
   }
   getStallData = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const url = `/api_products/get_stall_by_store_id?access_token=${accessToken}`
-    const params = {store_id: currStoreId}
+    const params = {store_id: store_id}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const stallArray = []
       res && res.map(item => {
@@ -548,8 +551,8 @@ class GoodStoreDetailScene extends PureComponent {
       showError('请先选择摊位或者规格')
       return
     }
-    const {currStoreId, accessToken} = this.props.global;
-    const params = {store_id: currStoreId, product_id: product_id, stall_id: stall_id}
+    const {store_id, accessToken} = this.props.global;
+    const params = {store_id: store_id, product_id: product_id, stall_id: stall_id}
     const url = `/api_products/save_prod_stall?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(url, params).then(() => {
       showSuccess('绑定成功', 3)
@@ -561,8 +564,11 @@ class GoodStoreDetailScene extends PureComponent {
     const {stallArray, selectStall, selectedSpec, selectedSpecArray, stallVisible} = this.state
     const flag = selectStall.value && tool.length(selectedSpecArray) > 0 ? selectedSpec.value : selectedSpec?.label
     return (
-      <Modal visible={stallVisible} transparent={true} hardwareAccelerated={true} animationType={'fade'}
-             onShow={this.onShowStall}>
+      <CommonModal visible={stallVisible}
+                   onShow={this.onShowStall}
+                   onRequestClose={this.closeModal}
+                   position={'flex-end'}
+                   key={1}>
         <View style={styles.modalWrap}>
           <View style={styles.modalVisibleAreaWrap}>
             <View style={styles.modalTitleWrap}>
@@ -611,7 +617,7 @@ class GoodStoreDetailScene extends PureComponent {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </CommonModal>
     )
   }
 

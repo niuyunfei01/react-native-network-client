@@ -57,7 +57,7 @@ class WorkerScene extends PureComponent {
         <CellHeader>
           <Image
             style={[styles.worker_img]}
-            source={user.image !== '' ? {uri: user.image.split("cai.cn")[1]} : require('../../../img/My/touxiang50x50_.png')}
+            source={user.image !== '' ? {uri: user.image.split("cai.cn")[1]} : require('../../../img/Goods/touxiang50x50_.png')}
           />
         </CellHeader>
         <CellBody>

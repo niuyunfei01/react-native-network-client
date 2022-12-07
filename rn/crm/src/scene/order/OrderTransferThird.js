@@ -148,13 +148,13 @@ class OrderTransferThird extends Component {
           if (is_push) deliverys.push(obj.exist[i])
         }
       }
-      const {currStoreId} = this.props.global;
+      const {store_id} = this.props.global;
       let {currVendorId} = tool.vendor(this.props.global);
       this.setState({
         logistics: deliverys,
         not_exist: obj.not_exist,
         allow_edit_ship_rule: obj.allow_edit_ship_rule,
-        store_id: currStoreId,
+        store_id: store_id,
         vendor_id: currVendorId,
         weight: obj.weight,
         weight_max: obj.weight_max,
@@ -169,7 +169,7 @@ class OrderTransferThird extends Component {
 
 
       let params = {
-        store_id: currStoreId,
+        store_id: store_id,
         vendor_id: currVendorId,
         total_available_ship: tool.length(obj),
 
@@ -199,9 +199,9 @@ class OrderTransferThird extends Component {
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
+    const {store_id, currentUser, accessToken} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderTransferThird"
@@ -267,7 +267,7 @@ class OrderTransferThird extends Component {
 
   onCallThirdShipRule = () => {
     let total_selected_ship = tool.length(this.state.newSelected);
-    let store_id = this.props.global.currStoreId;
+    let store_id = this.props.global.store_id;
     let {currVendorId} = tool.vendor(this.props.global);
 
     let total_ok_ship = this.state.total_ok_ship;
@@ -504,9 +504,9 @@ class OrderTransferThird extends Component {
   }
   update_default_product_weight = () => {
     if (!this.state.set_default_product_weight) return null;
-    let {currStoreId, accessToken} = this.props.global;
+    let {store_id, accessToken} = this.props.global;
     const api = `/v1/new_api/stores/update_default_product_weight?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(api, {store_id: currStoreId, weight: this.state.weight}, true).then(res => {
+    HttpUtils.get.bind(this.props)(api, {store_id: store_id, weight: this.state.weight}, true).then(res => {
       ToastLong("设置默认重量成功");
     })
   }
@@ -1182,7 +1182,7 @@ class OrderTransferThird extends Component {
                 商品重量
               </Text>
 
-              <SvgXml onPress={this.closeModal} xml={cross_icon()} />
+              <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
 
             </View>
             <View style={{paddingHorizontal: 12, paddingVertical: 5}}>

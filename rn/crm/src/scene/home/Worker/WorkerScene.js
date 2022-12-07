@@ -20,7 +20,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
-import {NavigationActions} from '@react-navigation/compat';
 import CallBtn from "../../order/CallBtn";
 import * as tool from "../../../pubilc/util/tool";
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
@@ -220,11 +219,7 @@ class WorkerScene extends PureComponent {
     let {shouldRefresh} = (params || {});
     if (shouldRefresh === true) {
       this.onSearchWorkers();
-      const setParamsAction = NavigationActions.setParams({
-        params: {shouldRefresh: false},
-        key: key,
-      });
-      this.props.navigation.dispatch(setParamsAction);
+      this.props.navigation.setParams({shouldRefresh: false, key: key,})
     }
   }
 

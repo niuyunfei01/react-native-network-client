@@ -18,6 +18,7 @@ import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBott
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import HttpUtils from "../../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -67,7 +68,7 @@ class GoodsApplyRecordScene extends Component {
 
   initData() {
     let {viewStoreId} = this.props.route.params;
-    let storeId = this.props.global.currStoreId;
+    let storeId = this.props.global.store_id;
     if (viewStoreId) {
       storeId = viewStoreId;
     }
@@ -98,21 +99,24 @@ class GoodsApplyRecordScene extends Component {
     }
     showModal('加载中')
     let {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-    dispatch(
-      fetchApplyRocordList(viewStoreId, auditStatus, page, accessToken, async resp => {
-        if (resp.ok) {
-          let {total_page, audit_list = []} = resp.obj;
-          this.setState({
-            list: refresh ? audit_list : list.concat(audit_list),
-            total_page: total_page,
-            curr_page: page
-          });
-        }
-        hideModal()
-        this.setState({pullLoading: false, refresh: false, query: false});
-      })
-    );
+    const url = `api/store_audit_list/${viewStoreId}/${auditStatus}/${page}.json?access_token=${accessToken}`
+    HttpUtils.get(url).then(res => {
+      hideModal()
+      let {total_page, audit_list = []} = res;
+      this.setState({
+        list: refresh ? audit_list : list.concat(audit_list),
+        total_page: total_page,
+        curr_page: page,
+        pullLoading: false,
+        refresh: false,
+        query: false
+      });
+
+    }).catch(error => {
+      hideModal()
+      this.setState({pullLoading: false, refresh: false, query: false});
+    })
+
   }
 
   renderTitle() {
@@ -120,7 +124,7 @@ class GoodsApplyRecordScene extends Component {
       return (
         <View style={styles.title}>
           <Text style={[styles.title_text, {flex: 1}]}>图片</Text>
-          <Text style={[styles.title_text, {flex: 3}]}>商品名称</Text>
+          <Text style={[styles.title_text, {flex: 3, marginLeft: 8}]}>商品名称</Text>
           <Text style={[styles.title_text, {flex: 1}]}>原价</Text>
           <Text style={[styles.title_text, {flex: 1}]}>调价</Text>
         </View>
@@ -198,7 +202,7 @@ class GoodsApplyRecordScene extends Component {
   renderItem = ({item}) => {
     const {
       audit_status, auto_reject_time, product_id, store_id, apply_price, cover_img, product_name, created, before_price,
-      audit_desc, remark, lower, upper, id
+      audit_desc, remark, lower, upper, id, act_plat_1, act_plat_3, act_plat_7, is_promotion
     } = item
     const {auditStatus, isKf} = this.state
     return (
@@ -209,12 +213,22 @@ class GoodsApplyRecordScene extends Component {
                      source={{uri: cover_img}}
                      resizeMode={FastImage.resizeMode.contain}
           />
-          <View style={{flex: 3}}>
+          <View style={{flex: 3, marginLeft: 8}}>
+
             <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.name_text}>
-              {/*<Text style={styles.shan}>闪</Text> <Text style={styles.huo}>活</Text> */}{product_name}
+              <If condition={is_promotion == 1}>
+                <If condition={act_plat_3}><View style={styles.shanWrap}><Text style={styles.shanText}>美</Text></View>
+                </If> <If condition={act_plat_7}><View style={styles.shanWrap}><Text style={styles.shanText}>闪</Text>
+              </View></If> <If condition={act_plat_1}><View style={styles.eWrap}><Text style={styles.eText}>饿</Text>
+              </View></If> <If condition={is_promotion}><View style={styles.huoWrap}><Text style={styles.huoText}>活</Text>
+              </View> </If>{product_name}
+              </If>
+              <If condition={is_promotion != 1}>
+                {product_name}
+              </If>
             </Text>
             <Text style={styles.name_time}>
-              #{product_id} {tool.orderExpectTime(created)}
+              #{product_id} {tool.fullDateOther(created)}
             </Text>
           </View>
           <View style={[styles.center, {flex: 1}]}>
@@ -286,6 +300,8 @@ class GoodsApplyRecordScene extends Component {
       <FlatList
         keyExtractor={(item, index) => `${index}`}
         style={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         data={this.state.list}
         renderItem={this.renderItem}
         onEndReachedThreshold={0.2}
@@ -311,7 +327,7 @@ class GoodsApplyRecordScene extends Component {
 
   onRefresh = async () => {
     showModal('加载中')
-    this.setState({query: true, refresh: true});
+    await this.setState({query: true, refresh: true});
     this.getApplyList(1);
   }
 
@@ -430,7 +446,7 @@ const styles = StyleSheet.create({
   active: {
     color: '#58C587',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     paddingVertical: 10
   },
   title: {
@@ -438,43 +454,71 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  title_text: {
-    paddingVertical: 8,
-    fontSize: 12,
-    color: colors.color999,
-    textAlign: "center"
+  title_text: {paddingVertical: 8, fontSize: 12, color: colors.color999, textAlign: "center"},
+  titleGoodsName: {paddingVertical: 8, fontSize: 12, color: colors.color999,},
+  item: {flexDirection: "row", justifyContent: "space-between", alignItems: "center"},
+  center: {justifyContent: "center", alignItems: "center",},
+  image: {width: pxToDp(90), height: "100%", flexDirection: "row", alignItems: "center"},
+
+  price_text: {fontWeight: 'bold', color: colors.color333, fontSize: 13},
+  shanWrap: {
+    backgroundColor: '#FFD225',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+  shanText: {
+    // width: 14,
+    // height: 14,
+    fontSize: 11,
+    color: colors.color333,
+    // backgroundColor: '#FFD225',
+    // paddingTop: 2,
+    // paddingLeft: 2,
+    // paddingBottom: 1,
+    // paddingRight: 1
   },
-  center: {
-    justifyContent: "center",
-    alignItems: "center",
+  eWrap: {
+    backgroundColor: '#0292FE',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  image: {
-    width: pxToDp(90),
-    height: "100%",
-    flexDirection: "row",
-    alignItems: "center"
+  eText: {
+    // width: 14,
+    // height: 14,
+    fontSize: 11,
+    color: colors.white,
+    // backgroundColor: '#0292FE',
+    // paddingTop: 2,
+    // paddingRight: 2,
+    // paddingLeft: 1,
+    // paddingBottom: 1
+  },
+  huoWrap: {
+    backgroundColor: '#FF8309',
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  huoText: {
+
+    fontSize: 11,
+    color: colors.white,
+    // backgroundColor: '#FF8309',
+    // paddingLeft: 1,
+    // paddingBottom: 1,
+    // paddingTop: 2,
+    // paddingRight: 2
   },
 
-  price_text: {
-    fontWeight: '500',
-    color: colors.color333,
-    fontSize: 13
-  },
-  shan: {fontSize: 11, color: colors.color333, backgroundColor: '#FFD225', borderRadius: 2, padding: 2},
-  huo: {fontSize: 11, color: colors.white, backgroundColor: '#FF8309', borderRadius: 2, padding: 2},
-  name_text: {
-    height: 36,
-    fontSize: 13,
-    color: '#1A1614',
-  },
-  name_time: {
-    fontSize: 11,
-    color: colors.color999
-  }
+  name_text: {height: 36, fontSize: 13, color: '#1A1614', lineHeight: 18},
+  name_time: {fontSize: 11, color: colors.color999}
 });
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsApplyRecordScene)

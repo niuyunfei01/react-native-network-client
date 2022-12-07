@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../../pubilc/styles/colors";
 import FastImage from "react-native-fast-image";
-import {hideModal, showError, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import {SvgXml} from "react-native-svg";
@@ -163,13 +163,13 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
   }
   search = () => {
     const {searchKeywords, goodsList, page, pageSize} = this.state
-    const {accessToken, currStoreId, vendor_id} = this.props.global
+    const {accessToken, store_id, vendor_id} = this.props.global
     if (!searchKeywords)
       return
     const url = `/api/get_product_by_name`
     const params = {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       name: searchKeywords,
       page: page,
@@ -216,6 +216,8 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
     if (goodsList.length > 0)
       return (
         <FlatList data={goodsList}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   renderItem={this.renderItem}
                   getItemLayout={this.getItemLayout}
                   initialNumToRender={10}
@@ -254,6 +256,14 @@ class SearchAndCreateGoodsScene extends React.PureComponent {
           </Text>
         </View>
       )
+  }
+
+  componentDidMount() {
+    this.focus = this.props.navigation.addListener('focus', () => this.search())
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   render() {

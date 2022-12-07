@@ -5,7 +5,6 @@ import {Checkbox, List, SearchBar} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -138,35 +137,29 @@ class UserTagPopup extends React.Component {
   }
 
   renderCheckboxItem = () => {
-    const self = this
     const tagList = this.state.tagList
-    let elements = []
-    for (let item of tagList) {
-      elements.push(
+    return tagList && tagList.map((item, index) => {
+      return (
         <CheckboxItem
-          key={`checkbox_${item.id}`}
-          onChange={() => self.onSelectTag(item)}
+          key={index}
+          onChange={() => this.onSelectTag(item)}
           defaultChecked={this.props.selectTagIds.includes(item.id)}
         >
           {item.name}
         </CheckboxItem>
       )
-    }
-    return elements
+    })
   }
 
   renderListItem() {
-    const self = this
     const tagList = this.state.tagList
-    let elements = []
-    for (let item of tagList) {
-      elements.push(
-        <ListItem key={`radio_${item.id}`} onClick={() => self.onClickTag(item)}>
+    return tagList && tagList.map((item, index) => {
+      return (
+        <ListItem key={index} onClick={() => this.onClickTag(item)}>
           {item.name}
         </ListItem>
       )
-    }
-    return elements
+    })
   }
 
   renderHeaderCompleteBtn() {
@@ -206,7 +199,8 @@ class UserTagPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入名称" onChange={(value) => this.onSearch(value)}/>
-          {tool.length(this.state.tagList) > 0 ? <ScrollView
+          {tool.length(this.state.tagList) > 0 ?
+            <ScrollView
               automaticallyAdjustContentInsets={false}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -214,8 +208,12 @@ class UserTagPopup extends React.Component {
                 {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
               </List>
             </ScrollView> :
-            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text
-              style={{color: colors.color333}}>无数据！</Text></View>}
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+              <Text style={{color: colors.color333}}>
+                无数据！
+              </Text>
+            </View>
+          }
         </View>
       </Modal>
     )
@@ -253,4 +251,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default withNavigation(connect(mapStateToProps)(UserTagPopup))
+export default connect(mapStateToProps)(UserTagPopup)

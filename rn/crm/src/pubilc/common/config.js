@@ -70,6 +70,7 @@ const C = {
   ROUTE_OPERATION_LOG: 'OrderOperationLog',
   ROUTE_ALERT: 'Tab', //home for reminds
   ROUTE_ORDERS: 'Orders',
+  ROUTE_ORDER_ALL: 'OrderAll',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
@@ -124,6 +125,8 @@ const C = {
   ROUTE_Member_Agreement: 'ROUTE_Member_Agreement',//会员协议
 
   ROUTE_STORE: 'Store',
+  ROUTE_STORE_LIST: 'StoreList',
+  ROUTE_SAVE_STORE: 'SaveStore',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
   ROUTE_STORE_RULE: 'StoreRule',
@@ -140,6 +143,7 @@ const C = {
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
+  ROUTE_SEARCH_ORDER: 'SearchOrder',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
   ROUTE_ORDER_PEND_PAYMENT: 'OrderPendingPayment',
@@ -147,6 +151,8 @@ const C = {
   ROUTE_GOODS: 'goods',
   ROUTE_SELECT_STORE: 'SelectStore',
   ROUTE_GOODS_EDIT: 'GoodsEdit',
+  ROUTE_GOODS_SELECT_SPEC: 'GoodsSelectSpecScene',
+  ROUTE_GOODS_ADD_SPEC: 'GoodsAddSpecScene',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',
@@ -158,6 +164,7 @@ const C = {
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
+  ROUTE_SETTLEMENT_PROTOCOL: 'SettlementProtocol',
   ROUTE_SETTLEMENT_PLATFORM: 'SettlementPlatform',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',
@@ -264,7 +271,7 @@ const C = {
   ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
 
   //  店铺搜索地图
-  ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
+  ROUTE_SEARCH_SHOP: 'Searchshop',//店铺-搜索
   ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
   // 店铺修改
   ROUTE_SHOP_ORDER: 'StoreOrderMsg',//店铺 - 订单信息选填
@@ -278,7 +285,7 @@ const C = {
   ROUTE_DELIVERY_LIST: 'DeliveryList',
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
   ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
-
+  ROUTE_CHANGE_DELIVERY_ACCOUNT: 'ChangeDeliveryAccount',
 
   RIDER_TRSJECTORY: 'RiderTrajectory',
 
@@ -290,7 +297,20 @@ const C = {
   serverUrl,
   apiUrl,
   staticUrl,
-  hostPort
+  hostPort,
+  //配送类型
+  SHUN_FENG_TONG_CHENG: 12,
+  GUO_XIAO_DI: 17,
+  DA_DA_JING_JI: 2,
+  DA_DA_JI_SONG: 70,
+  DA_DA_YOU_ZHI: 18,
+  SHUAN_SONG: 13,
+  UU_PAO_TUI: 15,
+
+  MEI_TUAN_KUAI_SU_DA: 7,
+  MEI_TUAN_FEI_SU_DA: 10,
+  MEI_TUAN_PEI_SONG: 16,
+  FENG_NIAO_ZHONG_BAO: 14,
 };
 
 C.Listener = {

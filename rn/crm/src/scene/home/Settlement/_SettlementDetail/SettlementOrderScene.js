@@ -206,6 +206,8 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.props.refundList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           let {orderTime, dayId, refundNum, refundAmount, id} = item
@@ -239,6 +241,8 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.props.otherList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           return (
@@ -260,6 +264,8 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.state.merchant_reship_tip}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           let {orderTime, dayId, id, items} = item

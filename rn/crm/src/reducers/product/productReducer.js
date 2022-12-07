@@ -81,7 +81,7 @@ export default function productReducer(state = initialState, action) {
 }
 
 function product_detail(state, action) {
-  state.product_detail[action.product_id] = action.product_detail;
+  state.product_detail[action?.product_id] = action.product_detail;
   return state.product_detail;
 }
 

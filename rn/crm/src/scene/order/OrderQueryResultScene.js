@@ -183,9 +183,9 @@ class OrderQueryResultScene extends PureComponent {
     timeObj.method[0].methodName = "componentDidMount"
     timeObj.method[0].interfaceName = ''
     const {deviceInfo} = this.props.device
-    const {currStoreId, currentUser, accessToken, config} = this.props.global;
+    const {store_id, currentUser, accessToken, config} = this.props.global;
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderQueryResultScene"
@@ -206,7 +206,7 @@ class OrderQueryResultScene extends PureComponent {
       return null;
     }
     this.setState({isLoading: true})
-    const {accessToken, currStoreId} = this.props.global;
+    const {accessToken, store_id} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
     const params = {
       vendor_id: currVendorId,
@@ -222,9 +222,9 @@ class OrderQueryResultScene extends PureComponent {
         params.status = Cts.ORDER_STATUS_INVALID
       }
     } else if (this.state.type === 'additional') {
-      params.store_id = currStoreId;
+      params.store_id = store_id;
     } else {
-      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
+      params.search = encodeURIComponent(`store:${store_id}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
     let url = `/api/orders.json?access_token=${accessToken}`;
@@ -489,6 +489,8 @@ class OrderQueryResultScene extends PureComponent {
       <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.b2}}>
         <FlatList
           data={orders}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           renderItem={this.renderItem}
           onRefresh={() => this.onRefresh()}
           onEndReachedThreshold={0.1}
@@ -546,6 +548,7 @@ class OrderQueryResultScene extends PureComponent {
 
 const styles = StyleSheet.create({
   description: {
+    color: colors.color333,
     fontSize: 14,
     marginTop: pxToDp(3),
     padding: pxToDp(10),

@@ -2,9 +2,7 @@ import React, {Component} from 'react'
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -17,13 +15,13 @@ import {connect} from "react-redux";
 import dayjs from "dayjs";
 import {Button, CheckBox, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-
+import FastImage from "react-native-fast-image";
 import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
-import {add_tip, check_icon, cost, cross_icon, remarkIcon, time, weighticon} from "../../svg/svg";
+import {add_tip, check_icon, cost, cross_icon, empty_delivery_data, remarkIcon, time, weighticon} from "../../svg/svg";
 import PropTypes from "prop-types";
 import tool from "../../pubilc/util/tool";
 import JbbModal from "../../pubilc/component/JbbModal";
@@ -68,7 +66,7 @@ class OrderCallDelivery extends Component {
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
     // let {call_delivery_list} = this.props.global
     this.state = {
-      isLoading: false,
+      loading: false,
       order_id: order_id,
       store_id: store_id,
       if_reship: if_reship,
@@ -121,7 +119,11 @@ class OrderCallDelivery extends Component {
       store_est_all_check: false,
       logistic_fee_map: [],
       params_str: '',
+      expect_time_friendly: '',
       show_cancel_delivery_modal: false,
+      is_only_show_self_delivery: false,
+      show_est_all_check: false,
+      show_store_est_all_check: false,
       ship_id: 0,
     };
 
@@ -161,8 +163,7 @@ class OrderCallDelivery extends Component {
       add_tips,
       order_money,
       params_str,
-      isLoading,
-      logistic_fee_map
+      loading,
     } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
@@ -176,70 +177,77 @@ class OrderCallDelivery extends Component {
     }
 
     let params_json_str = JSON.stringify(params);
-    if (params_str === params_json_str || isLoading) {
+    if (params_str === params_json_str || loading) {
       return;
     }
     this.setState({
-      isLoading: true
+      loading: true
     })
     const api = `/v4/wsb_delivery/pre_call_delivery/${order_id}?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(api, params).then(obj => {
-      let store_est = obj?.store_est || [];
-      let est = obj?.est || [];
-      // this.props.dispatch(setCallDeliveryList(est))
-      if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
-        let check = false
-        for (let i in logistic_fee_map) {
-          if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
-            for (let idx in est) {
-              if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
-                est[idx].ischeck = true
-                check = true
-              }
-            }
-          }
-          if (logistic_fee_map[i]?.paid_partner_id === -1 && tool.length(store_est) > 0) {
-            for (let idx in store_est) {
-              if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+    HttpUtils.post.bind(this.props)(api, params).then(res => {
+      this.setData(res, params_json_str)
+    })
+  }
 
-                store_est[idx].ischeck = true
-                check = true
-              }
+  setData = (obj, params_json_str = '{}') => {
+    let {logistic_fee_map} = this.state;
+    let store_est = obj?.store_est || [];
+    let est = obj?.est || [];
+    if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
+      let check = false
+      for (let i in logistic_fee_map) {
+        if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
+          for (let idx in est) {
+            if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+              est[idx].ischeck = true
+              check = true
             }
-          }
-          if (!check) {
-            logistic_fee_map.splice(i, 1)
           }
         }
-      } else {
-        logistic_fee_map = [];
+        if (logistic_fee_map[i]?.paid_partner_id === -1 && tool.length(store_est) > 0) {
+          for (let idx in store_est) {
+            if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
+
+              store_est[idx].ischeck = true
+              check = true
+            }
+          }
+        }
+        if (!check) {
+          logistic_fee_map.splice(i, 1)
+        }
       }
-      this.setState({
-        params_str: params_json_str,
-        store_est: store_est,
-        est: est,
-        exist_waiting_delivery: obj?.exist_waiting_delivery,
-        wm_platform: obj?.wm_platform,
-        wm_platform_day_id: obj?.wm_platform_day_id,
-        wm_address: obj?.wm_address,
-        wm_user_name: obj?.wm_user_name,
-        wm_mobile: obj?.wm_mobile,
-        order_expect_time: obj?.expect_time,
-        order_money: Number(obj?.wm_order_money),
-        order_money_input_value: Number(obj?.wm_order_money),
-        weight: Number(obj?.weight),
-        weight_input_value: Number(obj?.weight),
-        weight_max: Number(obj?.weight_max),
-        weight_min: Number(obj?.weight_min),
-        weight_step: Number(obj?.weight_step),
-        is_right_once: Number(obj?.is_right_once),
-        mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
-        is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
-        remark: obj?.remark || '',
-        isLoading: false,
-      })
+    }
+    this.setState({
+      params_str: params_json_str,
+      is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
+      store_est: store_est,
+      est: est.concat(obj?.in_review_deliveries || []),
+      exist_waiting_delivery: obj?.exist_waiting_delivery,
+      wm_platform: obj?.wm_platform,
+      wm_platform_day_id: obj?.wm_platform_day_id,
+      wm_address: obj?.wm_address,
+      wm_user_name: obj?.wm_user_name,
+      wm_mobile: obj?.wm_mobile,
+      order_expect_time: obj?.expect_time,
+      expect_time_friendly: obj?.expect_time_friendly,
+      order_money: Number(obj?.wm_order_money),
+      order_money_input_value: Number(obj?.wm_order_money),
+      weight: Number(obj?.weight),
+      weight_input_value: Number(obj?.weight),
+      weight_max: Number(obj?.weight_max),
+      weight_min: Number(obj?.weight_min),
+      weight_step: Number(obj?.weight_step),
+      is_right_once: Number(obj?.is_right_once),
+      mealTime: obj?.expect_time ? dayjs(obj?.expect_time).format('HH:mm') : '',
+      is_alone_pay_vendor: Boolean(obj?.is_alone_pay_vendor),
+      remark: obj?.remark || '',
+      remark_input_value: obj?.remark || '',
+      loading: false,
+    }, () => {
       this.priceFn();
     })
+
   }
 
 
@@ -250,6 +258,8 @@ class OrderCallDelivery extends Component {
     let wayNums = 0;
     let est_all_check = true;
     let store_est_all_check = true;
+    let show_est_all_check = false;
+    let show_store_est_all_check = false;
 
     for (let info of est) {
       if (info?.ischeck) {
@@ -257,11 +267,14 @@ class OrderCallDelivery extends Component {
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
         } else {
-          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
-          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+          maxPrice = Number(info?.delivery_fee) > Number(maxPrice) ? Number(info?.delivery_fee) : Number(maxPrice)
+          minPrice = Number(info?.delivery_fee) < Number(minPrice) ? Number(info?.delivery_fee) : Number(minPrice)
         }
       } else {
         est_all_check = false
+      }
+      if (!show_est_all_check && Number(info?.deliveryId) > 0) {
+        show_est_all_check = true
       }
     }
 
@@ -271,20 +284,25 @@ class OrderCallDelivery extends Component {
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
         } else {
-          maxPrice = info?.delivery_fee > maxPrice ? info?.delivery_fee : maxPrice
-          minPrice = info?.delivery_fee < minPrice ? info?.delivery_fee : minPrice
+          maxPrice = Number(info?.delivery_fee) > Number(maxPrice) ? Number(info?.delivery_fee) : Number(maxPrice)
+          minPrice = Number(info?.delivery_fee) < Number(minPrice) ? Number(info?.delivery_fee) : Number(minPrice)
         }
       } else {
         store_est_all_check = false;
       }
-    }
 
+      if (!show_store_est_all_check && Number(info?.deliveryId) > 0) {
+        show_store_est_all_check = true
+      }
+    }
     this.setState({
       maxPrice: maxPrice,
       minPrice: minPrice,
       wayNums: wayNums,
       est_all_check: est_all_check,
       store_est_all_check: store_est_all_check,
+      show_est_all_check: show_est_all_check,
+      show_store_est_all_check: show_store_est_all_check,
     })
   }
 
@@ -325,12 +343,12 @@ class OrderCallDelivery extends Component {
       add_tips,
       remark,
       worker_delivery_id,
-      isLoading
+      loading
     } = this.state;
 
     this.mixpanel.track("V4配送下单_立即发单")
 
-    if (isLoading) {
+    if (loading) {
       return ToastShort("请刷新页面重试")
     }
 
@@ -360,6 +378,8 @@ class OrderCallDelivery extends Component {
         hideModal();
         this.props.route.params.onBack && this.props.route.params.onBack(res);
         this.props.navigation.goBack()
+      }, (e) => {
+        ToastShort(e?.desc)
       }).catch((res) => {
         hideModal();
         if (res.obj.mobile && res.obj.mobile !== '') {
@@ -445,9 +465,9 @@ class OrderCallDelivery extends Component {
   }
 
   onSelectDeliveyAll = (type, cancel = 0) => {
-    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, isLoading} = this.state;
+    let {est, store_est, store_est_all_check, est_all_check, logistic_fee_map, loading} = this.state;
 
-    if (isLoading) {
+    if (loading) {
       return ToastShort('请刷新页面重试')
     }
 
@@ -501,8 +521,8 @@ class OrderCallDelivery extends Component {
       })
   }
   onSelectDelivey = (item, key, type) => {
-    let {est, store_est, logistic_fee_map, isLoading} = this.state;
-    if (isLoading) {
+    let {est, store_est, logistic_fee_map, loading} = this.state;
+    if (loading) {
       return ToastShort('请刷新页面重试')
     }
     let list = type === 0 ? est : store_est;
@@ -561,13 +581,14 @@ class OrderCallDelivery extends Component {
   render() {
     let {accessToken} = this.props.global;
     let {
-      isLoading,
+      loading,
       order_id,
       add_tips,
       show_add_tip_modal,
       show_date_modal,
       ship_id,
-      show_cancel_delivery_modal
+      show_cancel_delivery_modal,
+      is_only_show_self_delivery
     } = this.state
     return (
       <View style={{flexGrow: 1}}>
@@ -578,18 +599,31 @@ class OrderCallDelivery extends Component {
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              refreshing={isLoading}
-              onRefresh={() => this.fetchData()}
+              refreshing={loading}
+              onRefresh={this.fetchData}
               tintColor='gray'
             />
           } style={{flex: 1, paddingHorizontal: 12, backgroundColor: colors.f5}}>
-          {this.renderCollect()}
-          {this.renderCancelDelivery()}
-          {this.renderWsbDelivery()}
-          {this.renderStoreDelivery()}
-          {this.renderOwnDelivery()}
+          <If condition={!loading}>
+            {this.renderCollect()}
+            <If condition={is_only_show_self_delivery}>
+              {this.renderWorkerDelivery()}
+            </If>
+            <If condition={!is_only_show_self_delivery}>
+              {this.renderCancelDelivery()}
+              {this.renderWsbDelivery()}
+              {this.renderNoDelivery()}
+              {this.renderStoreDelivery()}
+              {this.renderOwnDelivery()}
+            </If>
+          </If>
+          <If condition={loading}>
+            <View/>
+          </If>
         </ScrollView>
-        {this.renderBtn()}
+        <If condition={!loading}>
+          {is_only_show_self_delivery ? this.renderWorkerDeliveryBtn() : this.renderBtn()}
+        </If>
         {this.renderWorkerDeliveryModal()}
         {this.renderWeightModal()}
         {this.renderGoodsPriceModal()}
@@ -671,9 +705,10 @@ class OrderCallDelivery extends Component {
             show_worker_delivey_modal: true
           })
         }} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
+          <FastImage
             source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E8%87%AA%E9%85%8D%E9%80%81%403x.png'}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+            resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>自配送 </Text>
@@ -697,9 +732,9 @@ class OrderCallDelivery extends Component {
     return (
       <For index='key' each='item' of={exist_waiting_delivery}>
         <View key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image
-            source={{uri: item?.icon}}
-            style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <FastImage source={{uri: item?.icon}}
+                     style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                     resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.platform_name} </Text>
@@ -720,7 +755,7 @@ class OrderCallDelivery extends Component {
                     borderRadius: 20,
                     backgroundColor: colors.white,
                     borderColor: colors.colorDDD,
-                    borderWidth: 0.2
+                    borderWidth: 0.5
                   }}
                   titleStyle={{color: colors.color666, fontSize: 14, lineHeight: 20}}
           />
@@ -729,8 +764,43 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  renderNoDelivery = () => {
+    let {store_est, est} = this.state
+    if (tool.length(est) > 0 || tool.length(store_est) > 0) {
+      return;
+    }
+    return (
+      <View style={{marginTop: 10, backgroundColor: colors.white, borderRadius: 4, height: 320}}>
+        <View style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 320
+        }}>
+          <SvgXml xml={empty_delivery_data()}/>
+          <Text style={{
+            fontSize: 15,
+            marginTop: 9,
+            marginBottom: 20,
+            color: colors.color999
+          }}> 暂未开通任何配送 </Text>
+          <Button title={'去开通'}
+                  onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+                  containerStyle={{marginTop: 20}}
+                  buttonStyle={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: 21,
+                    width: 140,
+                    length: 42,
+                  }}
+                  titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}
+          />
+        </View>
+      </View>
+    )
+  }
+
   renderWsbDelivery = () => {
-    let {est_all_check, est} = this.state
+    let {est_all_check, est, show_est_all_check} = this.state
     if (tool.length(est) <= 0) {
       return;
     }
@@ -738,61 +808,108 @@ class OrderCallDelivery extends Component {
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
 
         <TouchableOpacity
+          disabled={!show_est_all_check}
           onPress={() => this.onSelectDeliveyAll(1)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
             <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>省钱配送</Text>
           </View>
-
-          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
-            <CheckBox
-              size={18}
-              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={est_all_check}
-              onPress={() => this.onSelectDeliveyAll(1)}
-            />
-          </View>
+          <If condition={show_est_all_check}>
+            <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
+              <CheckBox
+                size={18}
+                checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+                checkedColor={colors.main_color}
+                uncheckedColor={'#DDDDDD'}
+                containerStyle={{margin: 0, padding: 0}}
+                checked={est_all_check}
+                onPress={() => this.onSelectDeliveyAll(1)}
+              />
+            </View>
+          </If>
         </TouchableOpacity>
         {this.renderDeliveryItem(est, 0)}
       </View>
     )
   }
 
+
+  renderWorkerDelivery = () => {
+    let {worker_list, worker_delivery_id} = this.state
+    return (
+      <View style={{marginTop: 10, marginBottom: 100, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+        <View
+          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
+          <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
+            <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}> 自配送 </Text>
+          </View>
+        </View>
+        <If condition={tool.length(worker_list) > 0}>
+          <For each='worker' index='idx' of={worker_list}>
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                worker_delivery_id: worker?.id,
+                worker_name: worker?.nickname,
+                worker_mobile: worker?.mobile,
+              })
+            }} key={idx} style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 14,
+              borderColor: colors.colorDDD,
+              borderBottomWidth: 0.2
+            }}>
+              <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                <Text
+                  style={{fontSize: 14, fontWeight: 'bold', color: colors.color333}}>{worker?.nickname} </Text>
+                <Text style={{fontSize: 14, color: colors.color666}}>{worker?.mobile} </Text>
+              </View>
+              <If condition={worker_delivery_id === worker?.id}>
+                <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+              </If>
+            </TouchableOpacity>
+          </For>
+        </If>
+      </View>
+    )
+  }
+
+
   renderStoreDelivery = () => {
-    let {store_est_all_check, store_est} = this.state
+    let {store_est_all_check, store_est, show_store_est_all_check} = this.state
     if (tool.length(store_est) <= 0) {
       return;
     }
     return (
       <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
         <TouchableOpacity
+          disabled={!show_store_est_all_check}
           onPress={() => this.onSelectDeliveyAll(2)}
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12}}>
           <View style={{borderBottomWidth: 4, borderColor: 'rgba(38,185,66,0.2)'}}>
             <Text style={{fontWeight: 'bold', fontSize: 17, color: colors.color333}}>自有账号</Text>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
-            <CheckBox
-              size={18}
-              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-              checkedColor={colors.main_color}
-              uncheckedColor={'#DDDDDD'}
-              containerStyle={{margin: 0, padding: 0}}
-              checked={store_est_all_check}
-              onPress={() => this.onSelectDeliveyAll(2)}
-            />
-          </View>
+          <If condition={show_store_est_all_check}>
+            <View style={{flexDirection: 'row', alignItems: 'center', right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333}}>全选</Text>
+              <CheckBox
+                size={18}
+                checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+                checkedColor={colors.main_color}
+                uncheckedColor={'#DDDDDD'}
+                containerStyle={{margin: 0, padding: 0}}
+                checked={store_est_all_check}
+                onPress={() => this.onSelectDeliveyAll(2)}
+              />
+            </View>
+          </If>
         </TouchableOpacity>
         {this.renderDeliveryItem(store_est, 1)}
       </View>
     )
   }
-
 
   renderDeliveryItem = (list = [], type = 0) => {
     if (tool.length(list) <= 0) {
@@ -800,10 +917,12 @@ class OrderCallDelivery extends Component {
     }
     return (
       <For index='key' each='item' of={list}>
-        <TouchableOpacity onPress={() => {
+        <TouchableOpacity disabled={Number(item?.deliveryId) <= 0} onPress={() => {
           this.onSelectDelivey(item, key, type)
         }} key={key} style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 12}}>
-          <Image source={{uri: item?.icon}} style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}/>
+          <FastImage source={{uri: item?.icon}}
+                     style={{width: 36, height: 36, borderRadius: 18, marginRight: 8}}
+                     resizeMode={FastImage.resizeMode.contain}/>
           <View style={{flex: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 14, color: colors.color333, fontWeight: 'bold'}}>{item?.logisticName} </Text>
@@ -818,34 +937,35 @@ class OrderCallDelivery extends Component {
             </View>
             <Text style={{fontSize: 12, color: colors.color666}}>{item?.logisticDesc} </Text>
           </View>
-
-          <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
-            <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
-              <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
-            </Text>
-            <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
-              <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
-                优惠{item?.coupons_amount}元
+          <If condition={Number(item?.delivery_fee) > 0}>
+            <View style={{marginRight: 1, right: -10, top: 0, position: 'relative'}}>
+              <Text style={{fontSize: 12, color: colors.color333, width: 80, textAlign: 'right'}}>
+                <Text style={{fontWeight: 'bold', fontSize: 18, color: colors.color333}}>{item?.delivery_fee} </Text>元
               </Text>
-            </If>
-          </View>
-          <CheckBox
-            size={18}
-            checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
-            checkedColor={colors.main_color}
-            uncheckedColor={'#DDDDDD'}
-            containerStyle={{
-              margin: 0,
-              padding: 0,
-              right: -10,
-              top: 0,
-              position: 'relative',
-            }}
-            checked={item?.ischeck}
-            onPress={() => {
-              this.onSelectDelivey(item, key, type)
-            }}
-          />
+              <If condition={tool.length(item?.coupons_amount) > 0 && Number(item?.coupons_amount) > 0}>
+                <Text style={{fontSize: 12, color: '#FF8309', width: 80, textAlign: 'right'}}>
+                  优惠{item?.coupons_amount}元
+                </Text>
+              </If>
+            </View>
+            <CheckBox
+              size={18}
+              checkedIcon={<SvgXml xml={check_icon()} width={18} height={18}/>}
+              checkedColor={colors.main_color}
+              uncheckedColor={'#DDDDDD'}
+              containerStyle={{
+                margin: 0,
+                padding: 0,
+                right: -10,
+                top: 0,
+                position: 'relative',
+              }}
+              checked={item?.ischeck}
+              onPress={() => {
+                this.onSelectDelivey(item, key, type)
+              }}
+            />
+          </If>
         </TouchableOpacity>
       </For>
     )
@@ -853,11 +973,11 @@ class OrderCallDelivery extends Component {
 
   renderCollect = () => {
     let {wm_address, wm_user_name, wm_mobile, exist_waiting_delivery} = this.state;
-    if (tool.length(exist_waiting_delivery) > 0 || tool.length(wm_address) <= 0) {
+    if (tool.length(exist_waiting_delivery) > 0) {
       return;
     }
     return (
-      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}}>
+      <View style={{marginTop: 10, backgroundColor: colors.white, padding: 12, borderRadius: 4}} key={1}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{
             backgroundColor: '#FF8309',
@@ -874,7 +994,9 @@ class OrderCallDelivery extends Component {
             <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold'}}>
               {tool.jbbsubstr(wm_address, 18)}
             </Text>
-            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>{wm_user_name}&nbsp;{wm_mobile} </Text>
+            <Text style={{color: colors.color666, fontSize: 12, marginTop: 4}}>
+              {wm_user_name}&nbsp;{wm_mobile}&nbsp;
+            </Text>
           </View>
         </View>
       </View>
@@ -882,26 +1004,22 @@ class OrderCallDelivery extends Component {
   }
 
   renderHead = () => {
-    let {order_expect_time, wm_platform_day_id, wm_platform} = this.state;
+    let {expect_time_friendly, wm_platform_day_id, wm_platform} = this.state;
     return (
       <View style={{height: 44, backgroundColor: colors.white, flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.goBack()}
-          style={{
-            paddingLeft: 12,
-            width: 36
-          }}>
+        <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{paddingLeft: 12, width: 36}}>
           <Entypo name='chevron-thin-left' style={{fontSize: 24}}/>
         </TouchableOpacity>
-        <If condition={wm_platform && wm_platform_day_id && order_expect_time}>
+        <If condition={wm_platform && wm_platform_day_id && expect_time_friendly}>
           <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333}}>{wm_platform} </Text>
               <Text style={{color: colors.color666, fontSize: 14}}>#{wm_platform_day_id} </Text>
             </View>
             <View style={{flex: 1, flexDirection: "row", justifyContent: 'center'}}>
-              <Text
-                style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>预计送达时间{order_expect_time} </Text>
+              <Text style={{fontSize: 12, color: '#FF8309', flex: 1, textAlign: 'center'}}>
+                {expect_time_friendly}&nbsp;
+              </Text>
             </View>
           </View>
         </If>
@@ -910,6 +1028,21 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  renderWorkerDeliveryBtn = () => {
+    let {worker_delivery_id} = this.state
+    return (
+      <View style={{padding: 10, backgroundColor: colors.white}}>
+        <Button title={'配送下单'}
+                onPress={() => this.onWorkerDelivery()}
+                buttonStyle={[{
+                  backgroundColor: worker_delivery_id > 0 ? colors.main_color : colors.fontGray,
+                  borderRadius: 21,
+                  length: 42,
+                }]}
+                titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
+      </View>
+    )
+  }
 
   renderBtn = () => {
     let {
@@ -947,24 +1080,19 @@ class OrderCallDelivery extends Component {
             <SvgXml style={{marginTop: 5}} xml={weighticon()}/>
             <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{weight}KG </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_date_modal: true,
-            })
-          }} style={{
-            height: iron_width,
-            width: iron_width,
-            borderRadius: 4,
-            borderColor: colors.e5,
-            borderWidth: 0.2,
-            alignItems: 'center'
-          }}>
+          <TouchableOpacity onPress={() => this.setState({show_date_modal: true})}
+                            style={{
+                              height: iron_width,
+                              width: iron_width,
+                              borderRadius: 4,
+                              borderColor: colors.e5,
+                              borderWidth: 0.2,
+                              alignItems: 'center'
+                            }}>
             <SvgXml style={{marginTop: 5}} xml={time()}/>
-            <Text style={{
-              fontSize: 11,
-              color: colors.color333,
-              marginTop: 5
-            }}>{is_right_once === 0 ? mealTime : '立即送达'} </Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5}}>
+              {is_right_once === 0 ? mealTime : '立即送达'}&nbsp;
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -979,8 +1107,9 @@ class OrderCallDelivery extends Component {
             alignItems: 'center'
           }}>
             <SvgXml style={{marginTop: 5}} xml={cost()}/>
-            <Text
-              style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>{order_money}元 </Text>
+            <Text style={{fontSize: 11, color: colors.color333, marginTop: 5, textAlign: 'center'}}>
+              {order_money}元&nbsp;
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             this.setState({
@@ -1084,12 +1213,9 @@ class OrderCallDelivery extends Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_worker_delivey_modal}>
-        <View style={[{
-          backgroundColor: 'rgba(0,0,0,0.25)',
-          flex: 1
-        }]}>
+        <View style={[{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}]}>
           <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
           <View style={[{
             backgroundColor: colors.white,
@@ -1169,7 +1295,7 @@ class OrderCallDelivery extends Component {
   renderWeightModal = () => {
     let {show_weight_modal, weight_min, weight_max, weight_input_value, weight_step} = this.state;
     return (
-      <JbbModal visible={show_weight_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
+      <JbbModal visible={show_weight_modal} HighlightStyle={{padding: 0}}
                 onClose={this.closeModal}
                 modal_type={'bottom'}>
         <View>
@@ -1262,9 +1388,11 @@ class OrderCallDelivery extends Component {
   renderGoodsPriceModal = () => {
     let {show_goods_price_modal, order_money_value, order_money, order_money_input_value} = this.state;
     return (
-      <JbbModal visible={show_goods_price_modal} HighlightStyle={{padding: 0}} modalStyle={{padding: 0}}
-                onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_goods_price_modal}
+        HighlightStyle={{padding: 0}}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1324,7 +1452,7 @@ class OrderCallDelivery extends Component {
                   fontSize: 14,
                   height: 36,
                   borderRadius: 4,
-                  width: width * (Platform.OS !== 'ios' ? 0.56 : 0.52),
+                  width: width * 0.56,
                   borderWidth: 0.5,
                   color: colors.color333,
                   borderColor: colors.colorDDD,
@@ -1366,8 +1494,10 @@ class OrderCallDelivery extends Component {
   renderRemarkModal = () => {
     let {show_remark_modal, remark_input_value, remark} = this.state;
     return (
-      <JbbModal visible={show_remark_modal} onClose={this.closeModal}
-                modal_type={Platform.OS !== 'ios' ? 'bottom' : 'center'}>
+      <JbbModal
+        visible={show_remark_modal}
+        onClose={this.closeModal}
+      >
         <View style={{marginBottom: 20}}>
           <View style={{
             flexDirection: 'row',
@@ -1386,7 +1516,7 @@ class OrderCallDelivery extends Component {
               multiline={true}
               numberOfLines={4}
               maxLength={40}
-              value={remark_input_value ? remark_input_value : remark}
+              value={remark_input_value}
               onChange={(remark_input_value) => this.setState({remark_input_value})}
               showCounter={false}
               placeholder={'请在此填写备注信息，最多不超过40个字符'}

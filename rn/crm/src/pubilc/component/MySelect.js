@@ -112,6 +112,8 @@ export default class Select extends Component {
               <View style={[styles.scrollView, {width: selectWidth}]}>
                 <FlatList
                   renderItem={this._renderItem}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
                   data={itemArray}
                   extraData={this.state}
                   removeClippedSubviews={false}

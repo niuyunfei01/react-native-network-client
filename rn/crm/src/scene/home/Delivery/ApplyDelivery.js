@@ -11,7 +11,7 @@ import {Icon} from "../../../weui";
 import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import tool from "../../../pubilc/util/tool";
-import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import {MapType, MapView, Marker} from "react-native-amap3d";
 import Entypo from "react-native-vector-icons/Entypo";
 
@@ -33,7 +33,7 @@ class ApplyDelivery extends PureComponent {
   constructor(props) {
     super(props);
     let delivery_id = this.props.route.params.delivery_id;
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     this.state = {
       status: 0,
       source: {},
@@ -48,18 +48,16 @@ class ApplyDelivery extends PureComponent {
       err_msg: "当前城市无运力",
       service_mobile: "15507992268",
       can_call_worker: false,
-      currStoreId,
+      store_id,
       accessToken
     }
     this.get_platform();
   }
 
   get_platform() {
-    showModal('加载中...')
-    const {currStoreId, accessToken, delivery_id} = this.state;
-    const api = `/v1/new_api/delivery/get_delivery_status/${currStoreId}/${delivery_id}?access_token=${accessToken}`
+    const {store_id, accessToken, delivery_id} = this.state;
+    const api = `/v1/new_api/delivery/get_delivery_status/${store_id}/${delivery_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
-      hideModal()
       if (tool.length(res.work_order) > 0) {
         this.setState({
           err_msg: res.work_order.content,
@@ -87,16 +85,13 @@ class ApplyDelivery extends PureComponent {
       return;
     }
     tool.debounces(() => {
-      showModal('申请开通中...')
-      const {currStoreId, accessToken, delivery_id} = this.state;
+      const {store_id, accessToken, delivery_id} = this.state;
       let data = {
-        store_id: currStoreId,
+        store_id: store_id,
         platform: delivery_id,
       }
       const api = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, data).then((res) => {
-        hideModal()
-        // ToastShort('操作成功');
         if (tool.length(res) > 0) {
           this.setState({
             status: res.apply_status,
@@ -105,7 +100,6 @@ class ApplyDelivery extends PureComponent {
           })
         }
       }, (ret) => {
-        hideModal()
         ToastLong('操作失败' + ret.desc);
       })
     }, 1000)
@@ -274,7 +268,7 @@ class ApplyDelivery extends PureComponent {
               onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_STORE_ADD, {
                   btn_type: "edit",
-                  editStoreId: this.props.global.currStoreId,
+                  editStoreId: this.props.global.store_id,
                   actionBeforeBack: resp => {
                   }
                 });

@@ -183,15 +183,14 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async (resp) => {
+
+          hideModal()
           if (resp.ok) {
-            hideModal()
             let store_product = resp.obj.goods;
             await _this.setState({
               store_product: store_product,
               batch_edit_supply: resp.obj.batch_edit_supply_price
             });
-          } else {
-            hideModal()
           }
 
         }));

@@ -8,7 +8,7 @@ import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import PropTypes from "prop-types";
@@ -96,8 +96,7 @@ class StoreGoodsList extends Component {
 
   getSGCategory() {
     const {dispatch} = this.props
-    const {accessToken} = this.props.global;
-    let {vendor_id} = this.state;
+    const {accessToken, vendor_id} = this.props.global;
     const url = `/data_dictionary/get_app_sg_tags/${vendor_id}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((obj) => {
       dispatch(setSGCategory(obj))
@@ -118,9 +117,9 @@ class StoreGoodsList extends Component {
   }
 
   fetchGoodsCount() {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${store_id}?access_token=${accessToken}`,).then(res => {
       let newStatusList
       if (res.strict_providing === '1') {
         newStatusList = [
@@ -157,7 +156,7 @@ class StoreGoodsList extends Component {
         inventorySummary: res,
         onStrict: res.strict_providing === '1'
       }, () => {
-        this.fetchCategories(currStoreId, prod_status, accessToken)
+        this.fetchCategories(store_id, prod_status, accessToken)
       })
     }, (res) => {
       ToastLong('加载数量错误' + res.reason)
@@ -204,7 +203,7 @@ class StoreGoodsList extends Component {
     if (isLoading) {
       return;
     }
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     const {prod_status} = this.props.route.params || {};
     this.setState({
       isLoading: true,
@@ -215,9 +214,9 @@ class StoreGoodsList extends Component {
       tagId: selectedChildTagId ? selectedChildTagId : selectedTagId,
       page: page,
       pageSize: pageNum,
-      storeId: currStoreId,
+      storeId: store_id,
     }
-    if (currStoreId) {
+    if (store_id) {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
@@ -300,8 +299,8 @@ class StoreGoodsList extends Component {
   gotoGoodDetail = (pid) => {
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: pid,
-      storeId: this.props.global.currStoreId,
-      updatedCallback: this.doneProdUpdate
+      storeId: this.props.global.store_id,
+      // updatedCallback: this.doneProdUpdate
     })
   }
 
@@ -373,15 +372,15 @@ class StoreGoodsList extends Component {
       isSelectedCategory: '',
       selectedChildTagId: '',
     }, () => {
-      const {accessToken, currStoreId} = this.props.global;
+      const {accessToken, store_id} = this.props.global;
       const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-      this.fetchCategories(currStoreId, prod_status, accessToken)
+      this.fetchCategories(store_id, prod_status, accessToken)
     })
   }
 
   readNotification = () => {
-    const {accessToken, currStoreId} = this.props.global;
-    HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${currStoreId}/?access_token=${accessToken}`).then(res => {
+    const {accessToken, store_id} = this.props.global;
+    HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${store_id}/?access_token=${accessToken}`).then(res => {
       // ToastShort("设置为已读");
     })
     this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
@@ -444,7 +443,7 @@ class StoreGoodsList extends Component {
 
   render() {
 
-    const {accessToken, currStoreId, vendor_id} = this.props.global;
+    const {accessToken, store_id, vendor_id} = this.props.global;
     let {selectedProduct, goods, isLoading} = this.state;
     const {sp} = selectedProduct;
     return (
@@ -464,6 +463,8 @@ class StoreGoodsList extends Component {
               style={{flex: 1}}
               legacyImplementation={false}
               directionalLockEnabled={true}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
               onEndReachedThreshold={0.5}
               onEndReached={this.onEndReached}
               onMomentumScrollBegin={this.onMomentumScrollBegin}
@@ -486,7 +487,7 @@ class StoreGoodsList extends Component {
                                 skuName={selectedProduct.sku_name}
                                 productName={selectedProduct.name}
                                 strictProviding={false} accessToken={accessToken}
-                                storeId={Number(currStoreId)}
+                                storeId={Number(store_id)}
                                 currStatus={Number(sp.status)}
                                 vendor_id={vendor_id}
                                 doneProdUpdate={this.doneProdUpdate}
@@ -779,7 +780,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white
   },
   bottomButton: {alignItems: 'center', justifyContent: 'center'},
-  bottomButtonText: {fontSize: 10, paddingTop: 7},
+  bottomButtonText: {fontSize: 10, color: colors.color333, paddingTop: 7},
   HeaderWrap: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, backgroundColor: colors.white
   },

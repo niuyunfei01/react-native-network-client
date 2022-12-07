@@ -140,9 +140,6 @@ class PreferenceBillingSetting extends PureComponent {
               tintColor='gray'
             />
           }
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
         >
           <View style={styles.row}>
             <Text style={styles.descriptionText}>

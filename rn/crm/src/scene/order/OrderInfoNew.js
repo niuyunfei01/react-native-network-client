@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
@@ -17,7 +18,7 @@ import {getRemindForOrderPage, printInCloud} from "../../reducers/order/orderAct
 import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import {MapType, MapView, Marker} from "react-native-amap3d/lib/src/index";
-import tool from "../../pubilc/util/tool";
+import tool, {mapImage} from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -48,6 +49,7 @@ import AddTipModal from "../../pubilc/component/AddTipModal";
 import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
+import LinearGradient from "react-native-linear-gradient";
 
 const {width, height} = Dimensions.get("window")
 
@@ -81,16 +83,6 @@ function mapStateToProps(state) {
   }
 }
 
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
 class OrderInfoNew extends PureComponent {
 
   static propTypes = {
@@ -121,7 +113,7 @@ class OrderInfoNew extends PureComponent {
         orderStatus: ''
       },
       actionSheet: [],
-      isShowMap: false,
+      isShowMap: true,
       logistics: [],
       delivery_desc: '',
       show_no_rider_tips: false,
@@ -140,12 +132,24 @@ class OrderInfoNew extends PureComponent {
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
       orders_add_tip: true,
+      delivery_loading: false,
+      show_cancel_deliverys_modal: false,
     }
+    this.marker = null
+  }
+
+  componentWillUnmount() {
+    this.focus()
+    this.marker = false
   }
 
   componentDidMount = () => {
     const {deviceInfo} = this.props?.device
-    const {currStoreId, currentUser, accessToken} = this.props.global;
+    const {store_id, currentUser, accessToken} = this.props.global;
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.fetchOrder()
+    })
     this.navigationOptions()
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
@@ -153,7 +157,7 @@ class OrderInfoNew extends PureComponent {
     timeObj.method[0].interfaceName = ''
     timeObj.method[0].methodName = 'componentDidUpdate'
     timeObj['deviceInfo'] = deviceInfo
-    timeObj.currentStoreId = currStoreId
+    timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderInfo"
@@ -237,16 +241,16 @@ class OrderInfoNew extends PureComponent {
 
   navigationOptions = () => {
     const {navigation} = this.props
-    const option = {headerRight: () => this.headerRight()}
+    const option = {
+      headerRight: () => {
+        return (
+          <TouchableOpacity style={headerRightStyles.resetBind} onPress={() => this.navigateToOrderOperation()}>
+            <Entypo name={"dots-three-horizontal"} style={headerRightStyles.text}/>
+          </TouchableOpacity>
+        )
+      }
+    }
     navigation.setOptions(option);
-  }
-
-  headerRight = () => {
-    return (
-      <TouchableOpacity style={headerRightStyles.resetBind} onPress={() => this.navigateToOrderOperation()}>
-        <Entypo name={"dots-three-horizontal"} style={headerRightStyles.text}/>
-      </TouchableOpacity>
-    )
   }
 
   fetchOrder = (show_loading = 0) => {
@@ -263,24 +267,20 @@ class OrderInfoNew extends PureComponent {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    this.fetchShipData()
     const api = `/v4/wsb_order/order_detail/${orderId}?access_token=${accessToken}`
+    this.fetchShipData()
     HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
       hideModal()
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
-
-      // this.props.dispatch(setDefaultOrderInfo(obj))
       this.setState({
         order: obj,
         isFetching: false,
         loadingImg: false,
         itemsEdited: this._extract_edited_items(obj.items),
         allow_merchants_cancel_order: parseInt(obj.allow_merchants_cancel_order) === 1,
-        isShowMap: res?.loc_lat !== '' && res?.loc_lng !== ''
-      }, () => {
-        this.navigationOptions()
+        isShowMap: res?.loc_lat !== '' && res?.loc_lng !== '' && obj?.orderStatus !== '4' && obj?.orderStatus !== '5'
       })
       dispatch(getRemindForOrderPage(accessToken, orderId, (ok, desc, data) => {
         if (ok) {
@@ -288,7 +288,6 @@ class OrderInfoNew extends PureComponent {
         }
       }));
       this.logOrderViewed();
-      this.fetchThirdWays()
     }, ((res) => {
       hideModal()
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
@@ -333,6 +332,7 @@ class OrderInfoNew extends PureComponent {
   }
 
   fetchShipData = () => {
+    this.setState({delivery_loading: true})
     const api = `/v1/new_api/orders/third_ship_deliverie/${this.state.orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api, {}, true).then(res => {
       const {obj} = res
@@ -344,6 +344,7 @@ class OrderInfoNew extends PureComponent {
         }
       });
       this.setState({
+        delivery_loading: false,
         delivery_status: obj.show_status,
         show_no_rider_tips: obj.show_no_rider_tips === 1,
         delivery_desc: obj.desc,
@@ -351,18 +352,6 @@ class OrderInfoNew extends PureComponent {
       })
 
     })
-  }
-
-  fetchThirdWays = () => {
-    let {orderId, order} = this.state;
-    if (order?.orderStatus === Cts.ORDER_STATUS_TO_READY || order?.orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      const api = `/api/order_third_logistic_ways/${orderId}?select=1&access_token=${this.props.global.accessToken}`;
-      HttpUtils.get.bind(this.props)(api, {}, true).then((res) => {
-        this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchThirdWays', res.endTime - res.startTime)
-      }).catch(error => {
-        this.handleTimeObj(api, error?.executeStatus, error?.startTime, error?.endTime, 'fetchThirdWays', error?.endTime - error?.startTime)
-      })
-    }
   }
 
   dialNumber = (val) => {
@@ -466,6 +455,7 @@ class OrderInfoNew extends PureComponent {
       modalTip: false,
       show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
+      show_cancel_deliverys_modal: false,
       show_delivery_modal: false,
       showQrcode: false,
     })
@@ -548,23 +538,20 @@ class OrderInfoNew extends PureComponent {
     this.onCallThirdShips(order?.id, order?.store_id, 0)
   }
 
-  cancelDeliverys = (id) => {
-    const {global} = this.props;
-    const {accessToken} = global;
-    Alert.alert('提示', `确定取消此订单全部配送吗?`, [{
-      text: '确定', onPress: () => {
-        const api = `/api/batch_cancel_third_ship/${id}?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-          GlobalUtil.setOrderFresh(1)
-          ToastShort(res?.desc);
-          this.fetchOrder()
-        }, (e) => {
-          ToastShort(e?.desc)
-        }).catch(() => {
-          ToastShort("此订单已有骑手接单，取消失败")
-        })
-      }
-    }, {'text': '取消'}]);
+  cancelDeliverys = () => {
+    let {order} = this.state
+    const {accessToken} = this.props.global;
+    this.closeModal()
+    const api = `/api/batch_cancel_third_ship/${order?.id}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      GlobalUtil.setOrderFresh(1)
+      ToastShort(res?.desc);
+      this.fetchOrder()
+    }, (e) => {
+      ToastShort(e?.desc)
+    }).catch(() => {
+      ToastShort("此订单已有骑手接单，取消失败")
+    })
   }
 
   toSetOrderComplete = () => {
@@ -615,12 +602,14 @@ class OrderInfoNew extends PureComponent {
       ship_distance_destination,
       ship_distance_store
     } = this.state.order;
-
+    if (!this.state.isShowMap || tool.length(loc_lat) <= 0 || tool.length(loc_lng) <= 0) {
+      return <View/>
+    }
+    let zoom = dada_distance > 2000 ? dada_distance > 2000 ? 12 : 13 : 14;
     let {
       aLon,
       aLat
     } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
-
     return (
       <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: 290}}>
         <MapView
@@ -629,52 +618,47 @@ class OrderInfoNew extends PureComponent {
           zoomControlsEnabled={false}
           mapType={MapType.Standard}
           style={StyleSheet.absoluteFill}
-          minZoom={12}
+          minZoom={10}
           maxZoom={20}
           initialCameraPosition={{
             target: {latitude: Number(aLat), longitude: Number(aLon)},
-            zoom: dada_distance > 2000 ? 13 : 14
+            zoom: zoom
           }}>
           {/*门店定位*/}
           <If condition={ship_distance_destination <= 0}>
             <Marker
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-            >
-              <View style={{alignItems: 'center'}}>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store.png'}}
-                           style={{width: 30, height: 34,}}
-                           resizeMode={FastImage.resizeMode.contain}
-                />
-              </View>
-
-            </Marker>
+              icon={{uri: mapImage.location_store, width: 45, height: 52}}
+            />
           </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
             <Marker
+              ref={(ref) => this.marker = ref}
               draggable={false}
               position={{latitude: Number(ship_worker_lat), longitude: Number(ship_worker_lng)}}
-              onPress={() => {
-              }}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
                   <If condition={ship_distance_destination > 0}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
+                    <Text style={styles.markerText}>
                       骑手距离顾客{this.filterDistance(ship_distance_destination)}
                     </Text>
                   </If>
                   <If condition={ship_distance_store > 0}>
-                    <Text style={{color: colors.color333, fontSize: 12}}>
+                    <Text style={styles.markerText}>
                       骑手距离商家{this.filterDistance(ship_distance_store)}
                     </Text>
                   </If>
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship.png'}}
-                           style={{width: 30, height: 34,}}
+                <FastImage source={{uri: mapImage.location_ship}}
+                           style={{width: 45, height: 52,}}
+                           onLoad={() => tool.debounces(() => {
+                             this.marker && this.marker.update()
+                           }, 1000)}
                            resizeMode={FastImage.resizeMode.contain}
                 />
               </View>
@@ -686,28 +670,29 @@ class OrderInfoNew extends PureComponent {
             <Marker
               zIndex={93}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-              icon={{
-                uri: "https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png",
-                width: 22,
-                height: 42,
-              }}
+              icon={{uri: mapImage.location, width: 26, height: 52}}
             />
           </If>
+
           <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
+              ref={(ref) => this.marker = ref}
               draggable={false}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
             >
               <View style={{alignItems: 'center'}}>
                 <View style={styles.mapBox}>
-                  <Text style={{color: colors.color333, fontSize: 12}}>
+                  <Text style={styles.markerText}>
                     距门店{this.filterDistance(dada_distance)}
                   </Text>
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <FastImage source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location.png'}}
-                           style={{width: 23, height: 48}}
+                <FastImage source={{uri: mapImage.location}}
+                           style={{width: 26, height: 52}}
+                           onLoad={() => tool.debounces(() => {
+                             this.marker && this.marker.update()
+                           }, 1000)}
                            resizeMode={FastImage.resizeMode.contain}/>
               </View>
             </Marker>
@@ -790,7 +775,21 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderOrderInfoHeader = () => {
-    let {delivery_status, delivery_desc, isShowMap, order} = this.state;
+    let {delivery_status, delivery_desc, isShowMap, order, delivery_loading} = this.state;
+    if (delivery_loading) {
+      return (
+        <View style={{
+          backgroundColor: colors.white,
+          height: 139,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <ActivityIndicator color={colors.color666} size={'small'}/>
+          <Text style={{fontSize: 16, color: colors.color666}}> 加载中… </Text>
+        </View>
+      )
+    }
     return (
       <>
         <Animated.View {...this._panResponder.panHandlers}
@@ -868,7 +867,9 @@ class OrderInfoNew extends PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_取消全部配送')
-                    this.cancelDeliverys(order?.id)
+                    this.setState({
+                      show_cancel_deliverys_modal: true
+                    })
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -953,7 +954,7 @@ class OrderInfoNew extends PureComponent {
   }
   renderOrderInfoCard = () => {
     let {order = {}} = this.state;
-    const {currStoreId} = this.props.global;
+    const {store_id} = this.props.global;
     return (
       <View style={[styles.orderInfoCard, {marginTop: 10}]}>
         <View style={styles.orderCardHeader}>
@@ -963,7 +964,11 @@ class OrderInfoNew extends PureComponent {
               left: 0,
               top: 0,
             }}>
-              <View style={styles.ItemHeader}/>
+              <LinearGradient style={{width: 28, height: 26, borderTopLeftRadius: 6}}
+                              start={{x: 0, y: 0.5}}
+                              end={{x: 0.5, y: 1}}
+                              locations={[0.5, 0.5]}
+                              colors={['#FF8309', 'transparent']}/>
               <Text style={styles.ItemHeaderTitle}>预 </Text>
             </View>
           </If>
@@ -971,8 +976,16 @@ class OrderInfoNew extends PureComponent {
             <FastImage source={{uri: order?.platform_icon}} style={styles.orderCardIcon}
                        resizeMode={FastImage.resizeMode.contain}/>
             <View style={styles.orderCardInfo}>
-              <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
-              <Text style={styles.orderCardInfoBottom}>{order?.store_name} #{order?.dayId} </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.orderCardInfoTop}># {order?.platform_dayId} </Text>
+                <Text style={{
+                  fontWeight: 'bold',
+                  fontSize: 12,
+                  color: '#FF8309'
+                }}>  {order?.friendly_time_info} </Text>
+              </View>
+              <Text
+                style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name, 18)} #{order?.dayId} </Text>
             </View>
           </View>
           <If condition={order?.platform === '6'}>
@@ -999,15 +1012,15 @@ class OrderInfoNew extends PureComponent {
         <View style={styles.line}/>
         <If condition={order?.remark}>
           <View style={[styles.orderCardContainer, {flexDirection: "row"}]}>
-            <Text style={styles.remarkLabel}>备注 </Text>
+            <Text style={[styles.remarkLabel, {color: '#FF8309'}]}>备注: </Text>
             <Text style={[styles.remarkValue, {width: width * 0.8}]}>{order?.remark} </Text>
           </View>
         </If>
         <View style={styles.line}/>
         <If condition={order?.product_total_count > 0}>
           <View style={[styles.orderCardContainer, {flexDirection: "column"}]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-              <Text style={styles.cardTitle}>
+            <View style={styles.cardTitleGoodsWrap}>
+              <Text style={styles.cardTitleGoods}>
                 商品{order?.product_total_count}件
               </Text>
               <TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>
@@ -1021,7 +1034,7 @@ class OrderInfoNew extends PureComponent {
                 <TouchableOpacity style={styles.productInfo} key={index}
                                   onPress={() => this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
                                     pid: info?.product_id,
-                                    storeId: currStoreId,
+                                    storeId: store_id,
                                     item: info
                                   })}>
                   <FastImage
@@ -1126,7 +1139,7 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>配送信息</Text>
 
           <If condition={order?.show_store_name}>
-            <View style={styles.productItemRow}>
+            <View style={[styles.productItemRow]}>
               <Text style={styles.remarkLabel}>配送门店</Text>
               <Text style={styles.remarkValue}>{order?.store_name} </Text>
             </View>
@@ -1168,8 +1181,11 @@ class OrderInfoNew extends PureComponent {
             <Text style={styles.remarkLabel}>配送费用</Text>
             <Text style={styles.remarkValue}>{numeral(order?.ship_fee).format('0.00')}元</Text>
           </View>
-          <View style={styles.line}/>
+          <If condition={tool.length(order.greeting) > 0 || tool.length(order?.giver_phone) > 0}>
+            <View style={styles.cuttingLine1}/>
+          </If>
           <If condition={tool.length(order.greeting) > 0}>
+            <View style={styles.line}/>
             <View style={styles.productItemRow}>
               <Text style={styles.remarkLabel}>祝福语</Text>
               <Text style={styles.remarkValue}>{order?.greeting}</Text>
@@ -1195,7 +1211,8 @@ class OrderInfoNew extends PureComponent {
       <View style={styles.orderInfoCard}>
         <View style={[styles.orderCardContainer, {flexDirection: "column", borderRadius: 6}]}>
           <Text style={styles.cardTitle}>订单信息</Text>
-          <TouchableOpacity style={styles.productItemRow} onPress={() => this.copyToClipboard(order?.id)}>
+          <TouchableOpacity style={[styles.productItemRow]}
+                            onPress={() => this.copyToClipboard(order?.id)}>
             <Text style={styles.remarkLabel}>订单编号</Text>
             <View style={{flexDirection: "row"}}>
               <Text style={styles.remarkValue}>{order?.id}</Text>
@@ -1210,8 +1227,12 @@ class OrderInfoNew extends PureComponent {
             </View>
           </TouchableOpacity>
           <View style={styles.productItemRow}>
-            <Text style={styles.remarkLabel}>预计送达时间</Text>
-            <Text style={styles.remarkValue}>{order?.expectTime}</Text>
+            <Text style={styles.remarkLabel}>预计送达时间 </Text>
+            <Text style={styles.remarkValue}>{order?.expectTime} </Text>
+          </View>
+          <View style={styles.productItemRow}>
+            <Text style={styles.remarkLabel}>下单时间 </Text>
+            <Text style={styles.remarkValue}>{order?.orderTime} </Text>
           </View>
         </View>
       </View>
@@ -1303,13 +1324,13 @@ class OrderInfoNew extends PureComponent {
   }
 
   renderDeliveryModal = () => {
-    let {show_delivery_modal, orderId, currStoreId} = this.state;
+    let {show_delivery_modal, orderId, store_id} = this.state;
     const {global} = this.props;
     const {accessToken} = global;
     return (
       <DeliveryStatusModal
         order_id={orderId}
-        store_id={currStoreId}
+        store_id={store_id}
         order_status={0}
         onPress={this.onPress.bind(this)}
         openAddTipModal={this.openAddTipModal.bind(this)}
@@ -1329,6 +1350,7 @@ class OrderInfoNew extends PureComponent {
     return (
       <AddTipModal
         setState={this.setState.bind(this)}
+        fetchData={this.fetchOrder.bind(this)}
         accessToken={accessToken}
         id={add_tip_id}
         orders_add_tip={orders_add_tip}
@@ -1350,20 +1372,9 @@ class OrderInfoNew extends PureComponent {
 
   render() {
     let {accessToken} = this.props.global;
-    const {isShowMap, order, isRefreshing, allowRefresh, show_cancel_delivery_modal, loadingImg} = this.state
-    if (order?.orderStatus === '4' || order?.orderStatus === '5') {
-      this.setState({
-        isShowMap: false
-      })
-    }
+    const {order, isRefreshing, allowRefresh, show_cancel_delivery_modal, loadingImg} = this.state
     return (
       <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchOrder.bind(this)}/>
-
-        <If condition={loadingImg}>
-          {this.renderNoInfo()}
-        </If>
-
         <ScrollView ref={ref => this.scrollViewRef = ref}
                     refreshControl={
                       <RefreshControl
@@ -1376,13 +1387,11 @@ class OrderInfoNew extends PureComponent {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
                     style={styles.Content}>
-
-          {this.renderPrinter()}
-
-
-          <If condition={isShowMap}>
-            {this.renderMap()}
+          <If condition={loadingImg}>
+            {this.renderNoInfo()}
           </If>
+          {this.renderPrinter()}
+          {this.renderMap()}
           {this.renderOrderInfo()}
           <If condition={order?.show_ship_info}>
             {this.renderDeliveryInfo()}
@@ -1394,6 +1403,7 @@ class OrderInfoNew extends PureComponent {
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
         {this.renderFinishDeliveryModal()}
+        {this.renderCancelDeliverysModal()}
 
         <CancelDeliveryModal
           order_id={order?.id}
@@ -1425,10 +1435,28 @@ class OrderInfoNew extends PureComponent {
       </View>
     )
   }
+
+  renderCancelDeliverysModal = () => {
+    let {show_cancel_deliverys_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_cancel_deliverys_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.cancelDeliverys()}
+          title={'确定取消此订单全部配送吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
-
+  markerText: {
+    color: colors.color333, fontSize: 12, fontWeight: 'bold'
+  },
   refundText: {
     fontSize: 14,
     color: colors.color666,
@@ -1449,6 +1477,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 8,
     borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.1,
+    elevation: 3,
+    shadowRadius: 8,
   },
   copyText: {
     fontSize: 14,
@@ -1583,21 +1616,27 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingRight: 6
   },
-  cardTitle: {
+  cardTitleGoodsWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15},
+  cardTitleGoods: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.color333,
   },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.color333,
+    marginBottom: 15
+  },
   logLabel: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '500',
     color: colors.color333
   },
   cardTitleInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 15
   },
   cardTitleInfoLeft: {
     flexDirection: "column",
@@ -1619,10 +1658,10 @@ const styles = StyleSheet.create({
   },
   line: {
     borderBottomColor: colors.e5,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     marginHorizontal: 12
   },
-  productInfo: {flexDirection: "row", marginVertical: 7.5},
+  productInfo: {flexDirection: "row", marginBottom: 7.5},
   productImage: {
     width: 60,
     height: 60,
@@ -1674,7 +1713,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 5,
+    marginBottom: 5,
   },
   qrCodeBtn: {
     backgroundColor: colors.white,
@@ -1693,15 +1732,6 @@ const styles = StyleSheet.create({
   QrClose: {backgroundColor: "#fff", fontSize: 22, color: colors.fontGray},
   QrImg: {flexDirection: 'column', justifyContent: "center", alignItems: "center", marginTop: 10},
   QrCode: {fontSize: 18, fontWeight: 'bold', color: colors.color333, marginTop: 20},
-  ItemHeader: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 25,
-    borderTopColor: "#FF8309",
-    borderTopLeftRadius: 6,
-    borderRightWidth: 31,
-    borderRightColor: 'transparent',
-  },
   ItemHeaderTitle: {
     color: colors.white,
     fontSize: 11,
@@ -1716,9 +1746,8 @@ const headerRightStyles = StyleSheet.create({
   resetBind: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginRight: 10,
     width: 100,
-    padding: 10
+    paddingVertical: 10
   },
   text: {fontSize: 20, color: colors.color666}
 })

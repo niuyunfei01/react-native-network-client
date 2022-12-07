@@ -33,8 +33,8 @@ class StockingTasks extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {stall, stallArray} = this.state
-    this.navigationSetting(stall, stallArray)
+
+
   }
 
   navigationSetting = (stall, stallArray) => {
@@ -47,15 +47,16 @@ class StockingTasks extends PureComponent {
   componentDidMount() {
 
     this.getStallData()
-    const {page, stall, selectType} = this.state
+    const {page, stall, selectType, stallArray} = this.state
     this.getStallList(page, stall, selectType, false)
+    this.navigationSetting(stall, stallArray)
   }
 
   getStallData = () => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const url = `/api_products/get_stall_by_store_id?access_token=${accessToken}`
     const {stall} = this.state
-    const params = {store_id: currStoreId}
+    const params = {store_id: store_id}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const stallArray = []
       stallArray.push({id: '', value: '', label: '全部摊位'})
@@ -68,13 +69,13 @@ class StockingTasks extends PureComponent {
   }
 
   getStallList = (page, stall, selectType, isGetMore) => {
-    const {currStoreId, accessToken} = this.props.global;
+    const {store_id, accessToken} = this.props.global;
     const {pageSize, isLoading, stockList} = this.state
     if (isLoading)
       return
     this.setState({isLoading: true})
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       stall_id: stall.id,
       status: selectType,
       page: page,
@@ -295,6 +296,8 @@ class StockingTasks extends PureComponent {
   renderList = (isLoading, stockList) => {
     return (
       <FlatList data={stockList}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 style={{marginBottom: 10}}
                 onEndReachedThreshold={0.1}
                 onEndReached={this.onEndReached}

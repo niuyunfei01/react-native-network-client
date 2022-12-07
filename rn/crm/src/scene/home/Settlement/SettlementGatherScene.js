@@ -60,8 +60,8 @@ class SettlementGatherScene extends PureComponent {
   getDateilsList() {
     let {date} = this.state
     const {dispatch, global} = this.props;
-    let {currStoreId, accessToken} = global;
-    dispatch(get_supply_items(currStoreId, date, 'month', accessToken, async (resp) => {
+    let {store_id, accessToken} = global;
+    dispatch(get_supply_items(store_id, date, 'month', accessToken, async (resp) => {
       if (resp.ok) {
         this.setState({
           list: resp.obj.goods_list,
@@ -124,7 +124,7 @@ class SettlementGatherScene extends PureComponent {
           >
             <Text style={header.time}>
               {date} &nbsp;&nbsp;&nbsp;
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
             </Text>
           </PopPicker>
 
@@ -165,10 +165,16 @@ class SettlementGatherScene extends PureComponent {
                 style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
               >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontSize: pxToDp(32), color: colors.main_color, fontWeight: '900', marginRight: pxToDp(10)}}>
+                  <Text style={{
+                    fontSize: pxToDp(32),
+                    color: colors.main_color,
+                    fontWeight: '900',
+                    marginRight: pxToDp(10)
+                  }}>
                     {key}
                   </Text>
-                  <Text style={{color: colors.color666, fontSize: pxToDp(28), fontWeight: '100', marginLeft: pxToDp(20)}}>
+                  <Text
+                    style={{color: colors.color666, fontSize: pxToDp(28), fontWeight: '100', marginLeft: pxToDp(20)}}>
                     共{tool.toFixed(this.arraySum(item))}
                   </Text>
 

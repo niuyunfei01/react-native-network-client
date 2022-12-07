@@ -32,6 +32,9 @@ const barCodeTypes = [
   RNCamera.Constants.BarCodeType.datamatrix,
 ]
 const googleVisionBarcodeType = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX
+const googleVisionBarcodeMode = RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeMode.ALTERNATE
+
+let allowPlay = true
 
 class Scanner extends React.Component {
   static propTypes = {
@@ -50,7 +53,7 @@ class Scanner extends React.Component {
     super(props);
     this.state = {
       moveAnim: new Animated.Value(0),
-      code: ''
+
     };
   }
 
@@ -72,12 +75,15 @@ class Scanner extends React.Component {
   };
 
   //  识别二维码
-  onBarCodeRead = (result) => {
-    const {data} = result;
-    if (data && !this.state.code) {
-      this.setState({code: data})
+
+  onGoogleVisionBarcodesDetected = (event) => {
+
+    const {barcodes = []} = event
+    if (barcodes[0] && allowPlay) {
+      allowPlay = false
+      this.props.onScanSuccess && this.props.onScanSuccess(barcodes[0].data)
       // 扫码提示音
-      var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
+      const whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
           return;
         }
@@ -88,49 +94,100 @@ class Scanner extends React.Component {
         whoosh.play((success) => {
           if (success) {
             whoosh.pause()
-            if (tool.length(data) > 0) {
-              this.props.onScanSuccess && this.props.onScanSuccess(data)
-            } else {
-              this.props.onScanFail && this.props.onScanFail(data)
+            whoosh.setNumberOfLoops(1);
+            whoosh.release();
+
+            //手机振动
+            switch (Platform.OS) {
+              case "android":
+                Vibration.vibrate([0, 100], false)
+                break
+              case "ios":
+                Vibration.vibrate(100, false)
+                break
             }
             this.props.onClose()
-            this.setState({code: ''})
+
           }
+          allowPlay = true
         });
       });
 
-      whoosh.setNumberOfLoops(1);
-      whoosh.release();
-
-      //手机振动
-      if (Platform.OS === 'ios') {
-        Vibration.vibrate(100, false)
-      } else {
-        Vibration.vibrate([0, 100], false)
-      }
+      return
     }
-  };
+    if (tool.length(barcodes) <= 0) {
+      this.props.onScanFail && this.props.onScanFail('')
+      this.props.onClose()
+
+    }
+  }
+
+  onBarCodeRead = (result) => {
+    const {data} = result;
+    if (data && allowPlay) {
+      allowPlay = false
+      this.props.onScanSuccess && this.props.onScanSuccess(data)
+      // 扫码提示音
+      const whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+          whoosh.pause()
+          whoosh.release();
+          allowPlay = true
+          this.props.onClose && this.props.onClose()
+          return;
+        }
+        //  loaded successfully
+        // console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+
+        // Play the sound with an onEnd callback
+        whoosh.play((success) => {
+          if (success) {
+            whoosh.pause()
+            whoosh.setNumberOfLoops(0);
+            whoosh.release();
+
+            //手机振动
+            switch (Platform.OS) {
+              case "android":
+                Vibration.vibrate([0, 100], false)
+                break
+              case "ios":
+                Vibration.vibrate(100, false)
+                break
+            }
+          }
+          allowPlay = true
+          this.props.onClose && this.props.onClose()
+        });
+      });
+
+    }
+  }
 
   render() {
+    const {visible, onClose, title} = this.props
     return (
 
-      <Modal visible={this.props.visible} onRequestClose={this.props.onClose}>
+      <Modal visible={visible} onRequestClose={onClose} hardwareAccelerated={true} transparent={true}>
         <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
           <View style={styles.container}>
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => this.props.onClose()}>
-                <Text style={styles.title}>{this.props.title} </Text>
+              <TouchableOpacity onPress={onClose}>
+                <Text style={styles.title}>{title} </Text>
               </TouchableOpacity>
             </View>
             <RNCamera
               ref={ref => this.camera = ref}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              flashMode={RNCamera.Constants.FlashMode.auto}
+              flashMode={RNCamera.Constants.FlashMode.on}
               barCodeTypes={barCodeTypes}
+              detectedImageInEvent={false}
               onBarCodeRead={this.onBarCodeRead}
               googleVisionBarcodeType={googleVisionBarcodeType}
+              googleVisionBarcodeMode={googleVisionBarcodeMode}
               captureAudio={false}
+
             >
               <View style={styles.rectangleContainer}>
                 <View style={styles.rectangle}/>

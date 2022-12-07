@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -173,6 +173,7 @@ class deliveryStatusModal extends React.Component {
   }
   state = {
     show_modal: false,
+    is_loading: false,
     order_platform_desc: '',
     platform_dayId: '',
     expect_time_desc: '',
@@ -200,9 +201,13 @@ class deliveryStatusModal extends React.Component {
 
   getInfo = (accessToken, order_id, order_status) => {
     const url = '/v4/wsb_delivery/deliveryRecord'
+    this.setState({
+      is_loading: true
+    })
     const params = {access_token: accessToken, order_id: order_id, order_status: order_status}
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
+        is_loading: false,
         delivery_list: res?.do_list,
         order_platform_desc: res?.order_platform_desc,
         platform_dayId: res?.platform_dayId,
@@ -221,7 +226,9 @@ class deliveryStatusModal extends React.Component {
   closeModal = () => {
     this.setState({
       show_modal: false,
+      is_loading: false,
       delivery_list: [],
+      btn_list: {},
       order_platform_desc: '',
       platform_dayId: '',
       expect_time_desc: '',
@@ -276,7 +283,7 @@ class deliveryStatusModal extends React.Component {
   }
 
   render = () => {
-    let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc} = this.state;
+    let {show_modal, delivery_list, expect_time_desc, platform_dayId, order_platform_desc, is_loading} = this.state;
     if (!show_modal) {
       return null;
     }
@@ -285,7 +292,7 @@ class deliveryStatusModal extends React.Component {
       <Modal hardwareAccelerated={true}
              onRequestClose={this.closeModal}
              maskClosable transparent={true}
-             animationType="fade"
+             animationType="slide"
              visible={show_modal}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
@@ -299,89 +306,62 @@ class deliveryStatusModal extends React.Component {
             borderTopRightRadius: 15,
             padding: 20,
           }]}>
-            <View style={styles.flexC}>
-
-              <View style={styles.QrTitle}>
-                <View style={styles.flexC}>
-                  <View style={styles.flexR}>
-                    <Text style={styles.f16}>{order_platform_desc} </Text>
-                    <Text style={styles.f14}>#{platform_dayId} </Text>
-                  </View>
-                  <View style={[styles.flexR, {marginTop: 5}]}>
-                    <Text style={styles.expectTime}>{expect_time_desc} </Text>
-                  </View>
-                </View>
-                <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+            <If condition={is_loading}>
+              <View style={{
+                height: 200,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <ActivityIndicator color={colors.color666} size={60}/>
               </View>
-
-              <ScrollView automaticallyAdjustContentInsets={false}
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          style={{maxHeight: 350}}>
-                <For index='index' each='info' of={delivery_list}>
-                  <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
-                    <View style={styles.flexC}>
-                      <View style={styles.flexR}>
-                        <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
-                        <Text style={styles.f14}>第<Text style={styles.orderNum}> {info?.call_rank} </Text>次下单 </Text>
-                      </View>
-                      <View style={[styles.flexR, {marginTop: 10}]}>
-                        <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
-                        <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
-                        <If condition={info?.tip > 0}>
-                          <Text style={styles.f12}>小费：{info?.tip}元 </Text>
-                        </If>
-                      </View>
+            </If>
+            <If condition={!is_loading}>
+              <View style={styles.flexC}>
+                <View style={styles.QrTitle}>
+                  <View style={styles.flexC}>
+                    <View style={styles.flexR}>
+                      <Text style={styles.f16}>{order_platform_desc} </Text>
+                      <Text style={styles.f14}>#{platform_dayId} </Text>
                     </View>
-                    <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
-                            style={styles.IconShow}/>
-                  </TouchableOpacity>
-                  <If condition={info?.default_show}>
-                    {this.renderDeliveryStatus(info)}
-
-                    <If condition={info?.do_btn_list?.add_tip}>
-                      <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        position: 'absolute',
-                        bottom: 1,
-                        right: 1
-                      }}>
-                        <Button title={'加小费'}
-                                onPress={() => {
-                                  this.mixpanel.track('V4配送调度页_加小费')
-                                  this.setState({
-                                    show_modal: false,
-                                    delivery_list: [],
-                                    order_platform_desc: '',
-                                    platform_dayId: '',
-                                    expect_time_desc: '',
-                                    driver_phone: '',
-                                  }, () => {
-                                    this.props.openAddTipModal(info?.id, false)
-                                  })
-                                }}
-                                buttonStyle={{
-                                  borderRadius: 20,
-                                  height: 32,
-                                  width: 80,
-                                  backgroundColor: colors.white,
-                                  borderColor: colors.colorCCC,
-                                  borderWidth: 0.5,
-                                }}
-                                titleStyle={{color: colors.color666, fontSize: 14}}
-                        />
+                    <View style={[styles.flexR, {marginTop: 5}]}>
+                      <Text style={styles.expectTime}>{expect_time_desc} </Text>
+                    </View>
+                  </View>
+                  <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+                </View>
+                <ScrollView automaticallyAdjustContentInsets={false}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                            style={{maxHeight: 350}}>
+                  <For index='index' each='info' of={delivery_list}>
+                    <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
+                      <View style={styles.flexC}>
+                        <View style={styles.flexR}>
+                          <Text style={[styles.platform, {marginRight: 10}]}>{info?.platform_desc} </Text>
+                          <Text style={styles.f14}>第<Text style={styles.orderNum}> {info?.call_rank} </Text>次下单 </Text>
+                        </View>
+                        <View style={[styles.flexR, {marginTop: 10}]}>
+                          <Text style={[styles.f12, {marginRight: 4}]}>状态： </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_status} </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.call_time} </Text>
+                          <Text style={[styles.f12, {marginRight: 6}]}>{info?.fee}元 </Text>
+                          <If condition={info?.tip > 0}>
+                            <Text style={styles.f12}>小费：{info?.tip}元 </Text>
+                          </If>
+                        </View>
                       </View>
+                      <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
+                              style={styles.IconShow}/>
+                    </TouchableOpacity>
+                    <If condition={info?.default_show}>
+                      {this.renderDeliveryStatus(info)}
+                      <View style={{height: 15}}/>
                     </If>
-
-                  </If>
-                </For>
-              </ScrollView>
-              {this.renderButton()}
-            </View>
-
+                  </For>
+                </ScrollView>
+                {this.renderButton()}
+              </View>
+            </If>
           </View>
         </View>
       </Modal>
@@ -417,7 +397,39 @@ class deliveryStatusModal extends React.Component {
                 </If>
               </View>
               <Text style={[styles.platform, {marginTop: 4}]}>{log?.log_call_time} </Text>
+              <If condition={index === (tool.length(info?.log_list) - 1) && info?.do_btn_list?.add_tip}>
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                }}>
+                  <Button title={'加小费'}
+                          onPress={() => {
+                            this.mixpanel.track('V4配送调度页_加小费')
+                            this.setState({
+                              show_modal: false,
+                              delivery_list: [],
+                              order_platform_desc: '',
+                              platform_dayId: '',
+                              expect_time_desc: '',
+                              driver_phone: '',
+                            }, () => {
+                              this.props.openAddTipModal(info?.id, false)
+                            })
+                          }}
+                          buttonStyle={{
+                            borderRadius: 20,
+                            height: 32,
+                            width: 80,
+                            backgroundColor: colors.white,
+                            borderColor: colors.colorCCC,
+                            borderWidth: 0.5,
+                          }}
+                          titleStyle={{color: colors.color666, fontSize: 14}}
+                  />
+                </View>
+              </If>
             </View>
+
           </View>
         </View>
       </For>
@@ -429,7 +441,9 @@ class deliveryStatusModal extends React.Component {
     let {openAddTipModal, order_id} = this.props;
     let obj_num = 0
     tool.objectMap(btn_list, (item, idx) => {
-      obj_num += Number(item)
+      if (idx !== 'add_tip') {
+        obj_num += Number(item)
+      }
     })
     let btn_width = 0.83 / Number(obj_num)
     return (
@@ -438,7 +452,7 @@ class deliveryStatusModal extends React.Component {
           padding: 12,
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
         }}>
         <If condition={btn_list?.btn_cancel_delivery}>
           <Button title={'取消配送'}

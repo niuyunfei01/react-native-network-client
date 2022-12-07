@@ -69,8 +69,8 @@ class EbBindScene extends PureComponent {
   }
 
   ebAccreditUrl = () => {
-    let {accessToken, currStoreId} = this.props.global
-    HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shop_id}/${currStoreId}/${this.state.applicationType}?access_token=${accessToken}`).then(res => {
+    let {accessToken, store_id} = this.props.global
+    HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shop_id}/${store_id}/${this.state.applicationType}?access_token=${accessToken}`).then(res => {
       if (res) {
         this.props.navigation.navigate(Config.ROUTE_WEB, {
           url: res

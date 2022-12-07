@@ -45,7 +45,7 @@ class OrderSurcharge extends PureComponent {
   fetchData() {
     const self = this
     const {global} = self.props
-    const url = `api/list_store_surcharge/${global.currStoreId}?access_token=${global.accessToken}`
+    const url = `api/list_store_surcharge/${global.store_id}?access_token=${global.accessToken}`
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {

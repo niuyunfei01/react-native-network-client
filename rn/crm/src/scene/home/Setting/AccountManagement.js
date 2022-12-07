@@ -1,18 +1,9 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  InteractionManager,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Button} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
-import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
@@ -55,7 +46,7 @@ class PermissionToIdentify extends PureComponent {
   }
 
   get_wsb_workers = () => {
-    const {currStoreId, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id} = this.props.global;
     let {page, pageSize} = this.state.query
     if (this.state.isLoading)
       return
@@ -63,14 +54,14 @@ class PermissionToIdentify extends PureComponent {
     const api = `/v4/wsb_worker/workerList?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
       access_token: accessToken,
-      store_id: currStoreId,
+      store_id: store_id,
       vendor_id: vendor_id,
       page: page,
       page_size: pageSize
     }).then(worker_info => {
       let workers = this.state.workerList.concat(worker_info?.lists)
       this.setState({
-        workerList: workers,
+        workerList: page === 1 ? worker_info?.lists : workers,
         query: {
           page: worker_info.page,
           pageSize: worker_info.pageSize
@@ -95,7 +86,6 @@ class PermissionToIdentify extends PureComponent {
       this.setState({
         isLastPage: false,
         query: query,
-        workerList: []
       }, () => {
         this.get_wsb_workers()
       })
@@ -124,10 +114,6 @@ class PermissionToIdentify extends PureComponent {
   }
 
   editWorker = (info) => {
-    if (info?.role_store == 0) {
-      ToastShort('店长不允许编辑')
-      return
-    }
     this.onPress(config.ROUTE_EDIT_ACCOUNT, {worker: info})
   }
 
@@ -136,6 +122,8 @@ class PermissionToIdentify extends PureComponent {
     return (
       <FlatList
         data={workerList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         renderItem={this.renderWorkerItem}
         onRefresh={this.onRefresh}
         onEndReachedThreshold={0.1}

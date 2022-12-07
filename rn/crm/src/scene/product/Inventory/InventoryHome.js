@@ -23,8 +23,8 @@ class InventoryHome extends React.Component {
   }
 
   UNSAFE_componentWillMount() {
-    let {accessToken, currStoreId} = this.props.global;
-    HttpUtils.get.bind(this.props)(`/api_products/inventory_summary/${currStoreId}`, {access_token: accessToken}).then((obj) => {
+    let {accessToken, store_id} = this.props.global;
+    HttpUtils.get.bind(this.props)(`/api_products/inventory_summary/${store_id}`, {access_token: accessToken}).then((obj) => {
       this.setState({sum_cost: obj.sum_cost})
     })
   }
@@ -35,9 +35,7 @@ class InventoryHome extends React.Component {
         <View style={styles.container}>
           <TouchableOpacity
             style={[styles.item, {backgroundColor: '#f37b1d'}]}
-            onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)
-            }}>
+            onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>原料入库</Text>
               <Text style={styles.itemText}/>
@@ -45,9 +43,7 @@ class InventoryHome extends React.Component {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.item, {backgroundColor: '#39b54a'}]}
-            onPress={() => {
-              this.props.navigation.navigate('InventoryItems', {})
-            }}>
+            onPress={() => this.props.navigation.navigate('InventoryItems', {})}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>实时库存</Text>
               <Text style={styles.itemText}>{this._getSumCostText()} </Text>

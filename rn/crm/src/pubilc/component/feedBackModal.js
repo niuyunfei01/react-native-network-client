@@ -39,10 +39,10 @@ class FeedBackModal extends React.Component {
   }
 
   commitFeedback = () => {
-    const {accessToken, currStoreId, checked, suggest} = this.props;
+    const {accessToken, store_id, checked, suggest} = this.props;
     const url = '/v1/new_api/user/commit_feedback'
     const params = {
-      store_id: currStoreId,
+      store_id: store_id,
       access_token: accessToken,
       is_legible: checked,
       feedback: suggest

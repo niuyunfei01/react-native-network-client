@@ -78,10 +78,9 @@ class PackDetail extends React.Component {
   }
 
   renderContent() {
-    let items = []
-    for (let idx in this.props.details) {
-      const item = this.props.details[idx]
-      items.push(
+
+    return this.props.details && this.props.details.map((item, idx) => {
+      return (
         <View key={idx} style={styles.item}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text numberOfLines={2} style={{width: 250}}>
@@ -111,9 +110,7 @@ class PackDetail extends React.Component {
           </For>
         </View>
       )
-    }
-
-    return items
+    })
   }
 
   render() {

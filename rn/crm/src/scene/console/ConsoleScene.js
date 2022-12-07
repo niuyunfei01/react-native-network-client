@@ -48,8 +48,8 @@ class ConsoleScene extends PureComponent {
   }
 
   getLogList = (start_day) => {
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `/api/sign_status_with_record/${currStoreId}/${start_day}?access_token=${accessToken}`
+    const {store_id, accessToken} = this.props.global;
+    const api = `/api/sign_status_with_record/${store_id}/${start_day}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({sigInInfo: res})
     })

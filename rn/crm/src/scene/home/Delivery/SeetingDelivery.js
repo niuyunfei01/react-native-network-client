@@ -219,9 +219,6 @@ class SeetingDelivery extends PureComponent {
               tintColor='gray'
             />
           }
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
         >
 
           {this.state.showBind ?

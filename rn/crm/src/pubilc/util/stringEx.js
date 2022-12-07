@@ -7,10 +7,13 @@ export default {
   formatException(msg) {
     let result = msg;
     if (msg.indexOf('JSON Parse error') > -1) {
-      result = 'JSON处理失败';
-    } else if (msg.indexOf('Network request failed') > -1) {
-      result = '网络请求失败，请检查网络！';
+      return '服务器返回数据JSON错误';
     }
+    if (msg.indexOf('Network request failed') > -1) {
+      return '网络请求失败，请检查网络！';
+    }
+    if (msg.indexOf('Cannot read property ok of undefined') > -1)
+      return '服务器返回数据出错'
     return result;
   },
   strMapToObj(strMap) {

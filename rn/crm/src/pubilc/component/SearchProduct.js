@@ -30,7 +30,7 @@ class SearchProduct extends Component {
     super(props);
 
     this.state = {
-      storeId: this.props.global.currStoreId,
+      storeId: this.props.global.store_id,
       goods: [],
       page: 1,
       pageNum: 15,
