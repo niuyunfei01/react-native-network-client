@@ -4,6 +4,7 @@ import {bindActionCreators} from "redux";
 import {
   Alert,
   Dimensions,
+  Linking,
   Platform,
   RefreshControl,
   ScrollView,
@@ -37,6 +38,7 @@ import PropTypes from "prop-types";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 import DeviceInfo from "react-native-device-info";
 import {PlayMusicComponent} from "../../../pubilc/component/PlayMusic";
+import {downloadApk} from "rn-app-upgrade";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const width = Dimensions.get("window").width;
@@ -260,6 +262,7 @@ class SettingScene extends PureComponent {
         {this.renderGoods()}
         {this.renderMarket()}
         {this.renderPrivacyPolicy()}
+        {this.renderVersion()}
         {this.renderBtn()}
         {this.renderModal()}
         <If condition={show_version >= 5}>
@@ -556,6 +559,35 @@ class SettingScene extends PureComponent {
         <TouchableOpacity onPress={this.onReadProtocol}
                           style={styles.item_row}>
           <Text style={styles.row_label}>外送帮隐私政策 </Text>
+          <Entypo name="chevron-thin-right" style={styles.row_right}/>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  updateVersion = async () => {
+    const appid = '1587325388'
+    const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
+    const {download_url} = this.state
+    switch (Platform.OS) {
+      case "android":
+        await downloadApk({interval: 250, apkUrl: download_url, downloadInstall: true})
+        break
+      case "ios":
+        await Linking.openURL(appUrl)
+        break
+    }
+  }
+
+  renderVersion = () => {
+    const version_name = DeviceInfo.getVersion();
+    return (
+      <View style={{backgroundColor: colors.white, borderRadius: 8, marginBottom: 10, paddingHorizontal: 12}}>
+        <TouchableOpacity onPress={this.updateVersion}
+                          style={styles.item_row}>
+          <Text style={styles.row_label}>版本号 </Text>
+
+          <Text style={{fontSize: 14, color: colors.color333,}}>V{version_name} </Text>
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
         </TouchableOpacity>
       </View>
