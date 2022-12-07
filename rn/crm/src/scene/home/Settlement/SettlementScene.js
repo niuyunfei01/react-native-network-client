@@ -32,6 +32,8 @@ import {Button} from "react-native-elements";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import WebView from "react-native-webview";
 import 'react-native-get-random-values';
+import {SvgXml} from "react-native-svg";
+import {back} from "../../../svg/svg";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -64,7 +66,7 @@ class SettlementScene extends PureComponent {
       totalPrice: 0,
       status: 0,
       date: date,
-      dates: this.format(date),
+      dates: tool.fullMonth(date),
       store_pay_info: [],
       show_pay_info: false,
       showAgreement: props.route.params?.showSettle || false,
@@ -75,16 +77,9 @@ class SettlementScene extends PureComponent {
 
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.fetchSettleProtocol()
     this.getSupplyList()
-  }
-
-  componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setOptions({
-      headerRight: () => this.renderHeaderRight()
-    })
   }
 
   onPress(route, params = {}) {
@@ -136,21 +131,15 @@ class SettlementScene extends PureComponent {
     }).start();
   }
 
-  renderHeaderRight = () => {
-    let {settleProtocolInfo, fadeOutOpacity} = this.state;
+  renderHead = () => {
     return (
-      <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
-        <Text style={styles.headerRightText}>结算协议 </Text>
-        <Animated.View
-          style={{
-            opacity: fadeOutOpacity, position: 'absolute', top: 10, right: 50
-          }}>
-          <Entypo name={'triangle-up'} style={styles.upIcon}/>
-          <View style={styles.msgModal}>
-            <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
+      <View style={styles.head}>
+        <SvgXml onPress={() => this.props.navigation.goBack()} xml={back()}/>
+        <Text style={styles.headTitle}>结算 </Text>
+        <TouchableOpacity onPress={() => this.toSettleProtocol(false)}>
+          <Text style={styles.headerRightText}>结算协议 </Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -183,15 +172,12 @@ class SettlementScene extends PureComponent {
   }
 
   onChange = (date) => {
-    this.setState({date: date, dates: this.format(date)}, () => {
+    this.setState({
+      date: date,
+      dates: tool.fullMonth(date)
+    }, () => {
       this.getSupplyList()
     })
-  }
-
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
   }
 
   closeAgreeModal = () => {
@@ -227,6 +213,7 @@ class SettlementScene extends PureComponent {
     }).then(res => {
       ToastShort('操作成功')
       this.startAnimation()
+      this.fetchSettleProtocol()
     }).catch((res) => {
       ToastShort(res.reason)
     })
@@ -247,20 +234,39 @@ class SettlementScene extends PureComponent {
   render() {
     const {show_pay_info} = this.state
     return (
-      <ScrollView
-        automaticallyAdjustContentInsets={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={styles.page}>
-        <If condition={show_pay_info}>
-          {this.renderPayList()}
-        </If>
-        {this.renderToday()}
-        {this.renderList()}
-        {this.renderAgreementModal()}
-        {this.renderPromptModal()}
-      </ScrollView>
+      <View style={{flex: 1}}>
+        {this.renderHead()}
+        {this.renderAnimated()}
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={styles.page}>
+          <If condition={show_pay_info}>
+            {this.renderPayList()}
+          </If>
+          {this.renderToday()}
+          {this.renderList()}
+          {this.renderAgreementModal()}
+          {this.renderPromptModal()}
+        </ScrollView>
+      </View>
     );
+  }
+
+  renderAnimated = () => {
+    let {settleProtocolInfo, fadeOutOpacity} = this.state;
+    return (
+      <Animated.View
+        style={{
+          opacity: fadeOutOpacity, position: 'absolute', top: 25, right: 60, zIndex: 999
+        }}>
+        <Entypo name={'triangle-up'} style={styles.upIcon}/>
+        <View style={styles.msgModal}>
+          <Text style={styles.tipText}>{settleProtocolInfo?.toast_ptl || `您可以在这里查看签署的协议。`} </Text>
+        </View>
+      </Animated.View>
+    )
   }
 
   renderPayList() {
@@ -505,7 +511,7 @@ class SettlementScene extends PureComponent {
 }
 
 const styles = StyleSheet.create({
-  page: {flex: 1, padding: 10},
+  page: {padding: 10},
   accountZoneWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8},
   accountWrap: {flexDirection: 'row', alignItems: 'center', height: 45},
   accountTipText: {color: colors.color333, fontWeight: 'bold', fontSize: 16, lineHeight: 22},
@@ -530,7 +536,7 @@ const styles = StyleSheet.create({
   },
   alreadyOrderText: {color: colors.color333, fontSize: 14, marginTop: 3},
   listWrap: {backgroundColor: colors.white, padding: 10, borderRadius: 8, marginTop: 10},
-  listHeaderWrap: {flexDirection: 'row', alignItems: 'center', paddingVertical: 6},
+  listHeaderWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", paddingVertical: 6},
   listDateText: {color: colors.color333, fontWeight: 'bold', fontSize: 14, padding: 5},
   countCurrentMonthText: {color: colors.color333, marginLeft: 10, fontWeight: 'bold', fontSize: 14},
   listItemWrap: {
@@ -540,7 +546,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     height: 45,
   },
-  listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 40},
+  listItemDateText: {color: colors.color333, fontSize: 14, fontWeight: 'bold', width: 44},
   listItemPayDatetimeText: {fontSize: 12, color: colors.color666},
   listItemPriceText: {color: colors.color333, fontSize: 16, fontWeight: 'bold'},
   headerRightText: {color: colors.color333, fontSize: 15},
@@ -607,7 +613,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 5
   },
-  tipText: {fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35}
+  tipText: {fontSize: 14, color: colors.white, lineHeight: 17, flex: 1, width: 108, height: 35},
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: "space-between",
+    height: 44,
+    backgroundColor: colors.white,
+    paddingHorizontal: 6
+  },
+  headTitle: {
+    color: colors.color333,
+    fontSize: 17,
+    fontWeight: 'bold',
+    lineHeight: 24
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene);
