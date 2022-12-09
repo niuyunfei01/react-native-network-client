@@ -194,6 +194,7 @@ class OrderCallDelivery extends Component {
     let store_est = obj?.store_est || [];
     let est = obj?.est || [];
     if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
+
       let check = false
       for (let i in logistic_fee_map) {
         if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
@@ -217,8 +218,44 @@ class OrderCallDelivery extends Component {
           logistic_fee_map.splice(i, 1)
         }
       }
+    } else {
+      logistic_fee_map = [];
+
+      for (let idx in est) {
+        // est[idx].ischeck = true
+        if (est[idx]?.ischeck) {
+          let check_logistic = {
+            logistic_code: est[idx]?.logisticCode,
+            paid_partner_id: est[idx]?.fee_by
+          }
+          logistic_fee_map.push(check_logistic)
+        }
+      }
+
+      for (let idx in store_est) {
+        // store_est[idx].ischeck = true
+        if (store_est[idx]?.ischeck) {
+          for (let key in logistic_fee_map) {
+            if (logistic_fee_map[key]?.logistic_code === store_est[idx]?.logisticCode) {
+              for (let i in est) {
+                if (est[i]?.logisticCode === logistic_fee_map[key]?.logistic_code) {
+                  est[i].ischeck = false;
+                }
+              }
+              logistic_fee_map.splice(key, 1)
+            }
+          }
+
+          let check_logistic = {
+            logistic_code: store_est[idx]?.logisticCode,
+            paid_partner_id: store_est[idx]?.fee_by
+          }
+          logistic_fee_map.push(check_logistic)
+        }
+      }
     }
     this.setState({
+      logistic_fee_map: logistic_fee_map,
       params_str: params_json_str,
       is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
       store_est: store_est,
