@@ -578,7 +578,6 @@ class SettingScene extends PureComponent {
           <Entypo name="chevron-thin-right" style={styles.row_right}/>
         </TouchableOpacity>
         <TouchableOpacity
-          disabled={!show_update_version}
           onPress={this.updateVersion}
           style={styles.item_row}>
           <Text style={styles.row_label}>版本号 </Text>
@@ -593,7 +592,10 @@ class SettingScene extends PureComponent {
   }
 
   updateVersion = async () => {
-    const {android_download_url} = this.state
+    const {android_download_url, show_update_version} = this.state
+    if (!show_update_version) {
+      return ToastShort('当前已是最新版本')
+    }
     switch (Platform.OS) {
       case "android":
         await downloadApk({interval: 250, apkUrl: android_download_url, downloadInstall: true})
