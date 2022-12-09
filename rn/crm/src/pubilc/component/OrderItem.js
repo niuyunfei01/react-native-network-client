@@ -548,7 +548,7 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
       }}>
         <View style={{flex: 1}}>
-          <Text style={styles.userNameText}> {item?.userName} &nbsp;&nbsp;尾号{item?.mobile_suffix} </Text>
+          <Text style={styles.userNameText}> {item?.userName} &nbsp;&nbsp;(尾号{item?.mobile_suffix}) </Text>
           <Text style={{
             fontSize: 14,
             color: colors.color666,
