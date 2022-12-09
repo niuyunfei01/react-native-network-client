@@ -119,7 +119,6 @@ class ChangeDeliveryAccount extends PureComponent {
 
   headerRight = () => {
     let {show_head_create_text} = this.props.route.params;
-    console.log(show_head_create_text, 'show_head_create_text')
     return (
       <TouchableOpacity style={styles.headerRightWrap} onPress={this.openDeliveryModal}>
         <If condition={!show_head_create_text}>

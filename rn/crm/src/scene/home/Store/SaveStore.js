@@ -27,7 +27,7 @@ import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {back, cross_icon, empty_order, head_cross_icon} from "../../../svg/svg";
+import {back, cross_icon, empty_delivery, empty_order, head_cross_icon} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
@@ -832,7 +832,7 @@ class SaveStore extends PureComponent {
   renderRegisterSuccess = () => {
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml style={{marginVertical: 30}} xml={empty_order()}/>
+        <SvgXml style={{marginVertical: 30}} xml={empty_delivery()}/>
 
         <Text style={styles.noOrderDesc}>已为您开通外送帮支持的聚合运力，您可以根据门店实际配送场景和诉求选择合适的配送商～ </Text>
         <Text style={styles.noOrderDesc}>同时在您也可以绑定自有账号，自有账号同步使用账号余额和优惠券，接单更快，免收服务费～ </Text>

@@ -134,6 +134,9 @@ class DeliveryList extends PureComponent {
       }
     } else {
       store_delivery = true
+      if (touchDelivery === 1 || touchDelivery === 2) {
+        store_delivery = false
+      }
     }
     const params = {
       delivery: {...item, touchDelivery: touchDelivery},
