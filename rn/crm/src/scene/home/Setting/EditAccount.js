@@ -228,7 +228,8 @@ class AddAccount extends PureComponent {
                 skin="customer"
                 defaultKey={-999}
               >
-                <Text style={[styles.row_desc, {color: worker_role_grade === '' ? colors.color999 : colors.color333}]}>
+                <Text
+                  style={[styles.row_desc, {color: worker_role_grade === '' || Number(role_store) === 0 ? colors.color999 : colors.color333}]}>
                   {worker_role_grade || '请选择权限'}
                 </Text>
               </ModalSelector>
@@ -251,7 +252,7 @@ class AddAccount extends PureComponent {
                 defaultKey={-999}
               >
                 <Text
-                  style={[styles.row_desc, {color: worker_store_id_belong === '' ? colors.color999 : colors.color333}]}>
+                  style={[styles.row_desc, {color: worker_store_id_belong === '' || Number(role_store) === 0 ? colors.color999 : colors.color333}]}>
                   {worker_store_id_belong || '请选择归属门店'}
                 </Text>
               </ModalSelector>
@@ -278,7 +279,12 @@ class AddAccount extends PureComponent {
               value={worker_account}
               maxLength={11}
               keyboardType={'numeric'}
-              style={{textAlign: 'right', fontSize: 14, marginRight: pxToDp(5)}}
+              style={{
+                textAlign: 'right',
+                fontSize: 14,
+                marginRight: pxToDp(5),
+                color: Number(role_store) === 0 ? colors.color999 : colors.color333
+              }}
               placeholder="请填写登录账号"
               placeholderTextColor={colors.color999}
               underlineColorAndroid="transparent"
