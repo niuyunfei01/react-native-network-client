@@ -9,10 +9,11 @@ import Config from "../../../pubilc/common/config";
 import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 
 import OpenDeliveryModal from "../../../pubilc/component/OpenDeliveryModal";
+import PropTypes from "prop-types";
 
 const styles = StyleSheet.create({
   pageHeader: {color: colors.color333, fontSize: 16, fontWeight: 'bold'},
-  headerRightWrap: {marginRight: 12, flexDirection: 'row', alignItems: 'center'},
+  headerRightWrap: {flexDirection: 'row', alignItems: 'center'},
   headerRightText: {fontSize: 15, color: colors.color333, marginLeft: 2},
   tipText: {paddingLeft: 18, paddingVertical: 10, fontSize: 14, color: colors.color999},
   deliveryStatusWrap: {marginHorizontal: 12, marginBottom: 10, borderRadius: 6, backgroundColor: colors.white},
@@ -87,13 +88,18 @@ const styles = StyleSheet.create({
 
 class ChangeDeliveryAccount extends PureComponent {
 
+  static propTypes = {
+    dispatch: PropTypes.func,
+    route: PropTypes.object,
+  }
+
   constructor(props) {
     super(props);
     const {delivery, store_id} = props.route.params
     this.state = {
 
       openDeliveryVisible: false,//开通运力
-      deliveryType: delivery.type,//运力类型
+      deliveryType: delivery?.type,//运力类型
       deliveryName: '',//运力名称
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
@@ -112,12 +118,21 @@ class ChangeDeliveryAccount extends PureComponent {
   }
 
   headerRight = () => {
+    let {show_head_create_text} = this.props.route.params;
+    console.log(show_head_create_text, 'show_head_create_text')
     return (
       <TouchableOpacity style={styles.headerRightWrap} onPress={this.openDeliveryModal}>
-        <SvgXml xml={convert()}/>
-        <Text style={styles.headerRightText}>
-          更换账号
-        </Text>
+        <If condition={!show_head_create_text}>
+          <SvgXml xml={convert()}/>
+          <Text style={styles.headerRightText}>
+            更换账号
+          </Text></If>
+
+        <If condition={show_head_create_text}>
+          <Text style={styles.headerRightText}>
+            开通自有账号
+          </Text>
+        </If>
       </TouchableOpacity>
     )
   }

@@ -63,6 +63,7 @@ const initState = {
     {tabname: '待取货', num: 0, status: 2},
     {tabname: '配送中', num: 0, status: 3},
     {tabname: '异常', num: 0, status: 8},
+    {tabname: '退款', num: 0, status: 18},
   ],
   query: {
     listType: null,
@@ -125,23 +126,17 @@ class OrderListScene extends Component {
 
 
   componentWillUnmount() {
-
     this.focus()
   }
 
   componentDidMount() {
-
-    this.getVendor()
     const {global, navigation, device} = this.props
-
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
     const {store_id, currentUser, accessToken} = global;
-
-
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = store_id
@@ -153,6 +148,7 @@ class OrderListScene extends Component {
 
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
+      this.getVendor()
     })
     //防止退出登录，重新登录不推送的问题
     doJPushSetAlias(currentUser)
@@ -333,10 +329,6 @@ class OrderListScene extends Component {
     }
   }
 
-  onScanFail = () => {
-    ToastLong('编码不合法，请重新扫描')
-  }
-
   openAddTipModal = (add_tip_id, orders_add_tip = true) => {
     this.setState({
       add_tip_id: add_tip_id,
@@ -351,7 +343,9 @@ class OrderListScene extends Component {
     this.setState({
       order_id: order_id,
       show_cancel_delivery_modal: true,
-      show_delivery_modal: false
+      show_finish_delivery_modal: false,
+      show_delivery_modal: false,
+      show_fulfil_order_modal: false,
     })
   }
 
@@ -359,7 +353,19 @@ class OrderListScene extends Component {
     this.setState({
       order_id: order_id,
       show_finish_delivery_modal: true,
-      show_delivery_modal: false
+      show_delivery_modal: false,
+      show_fulfil_order_modal: false,
+      show_cancel_delivery_modal: false,
+    })
+  }
+
+  openFulfilOrderModal = (order_id) => {
+    this.setState({
+      order_id: order_id,
+      show_fulfil_order_modal: true,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
     })
   }
 
@@ -445,6 +451,7 @@ class OrderListScene extends Component {
       show_cancel_delivery_modal: false,
       show_sort_modal: false,
       show_finish_delivery_modal: false,
+      show_fulfil_order_modal: false,
     })
   }
 
@@ -479,6 +486,36 @@ class OrderListScene extends Component {
     )
   }
 
+
+  toFulfilOrder = () => {
+    this.closeModal();
+    let {accessToken} = this.props.global;
+    let {order_id} = this.state;
+    const api = `/api/complete_order/${order_id}?access_token=${accessToken}`
+    HttpUtils.get(api).then(() => {
+      ToastLong('订单已送达')
+      this.fetchOrders()
+    }).catch(() => {
+      ToastShort('“配送完成失败，请稍后重试”')
+    })
+  }
+
+  renderFulfilOrderModal = () => {
+    let {show_fulfil_order_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_fulfil_order_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={() => this.toFulfilOrder()}
+          title={'确认完成当前订单吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
+      </View>
+    )
+  }
+
   setOrderBy = (order_by) => {
     if (order_by === 'orderTime desc') {
       this.mixpanel.track('V4订单列表_最新来单')
@@ -500,7 +537,7 @@ class OrderListScene extends Component {
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
-            <Text style={{color: colors.color333,fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+            <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               订单排序
             </Text>
 
@@ -554,19 +591,18 @@ class OrderListScene extends Component {
 
   onCanChangeStore = (item) => {
     showModal("切换店铺中...")
-    tool.debounces(() => {
-      const {dispatch, global, navigation} = this.props;
-      const {accessToken} = global;
-      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
-        if (ok) {
-          hideModal()
-          this.onRefresh(9)
-        } else {
-          ToastLong(msg);
-          hideModal()
-        }
-      }));
-    })
+    const {dispatch, global} = this.props;
+    const {accessToken} = global;
+    dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
+      if (ok) {
+        hideModal()
+        this.onRefresh(9)
+        this.getVendor()
+      } else {
+        ToastLong(msg);
+        hideModal()
+      }
+    }));
   }
 
   renderHead = () => {
@@ -753,6 +789,7 @@ class OrderListScene extends Component {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
+                 openFulfilOrderModal={this.openFulfilOrderModal.bind(this)}
                  order_status={order_status}
       />
     );
@@ -817,7 +854,7 @@ const styles = StyleSheet.create({
   },
   statusTabRight: {
     height: 2,
-    width: 48,
+    width: 42,
     backgroundColor: colors.main_color,
     position: 'absolute', bottom: 0
   },

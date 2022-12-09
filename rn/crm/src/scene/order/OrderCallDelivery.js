@@ -611,9 +611,9 @@ class OrderCallDelivery extends Component {
             </If>
             <If condition={!is_only_show_self_delivery}>
               {this.renderCancelDelivery()}
+              {this.renderStoreDelivery()}
               {this.renderWsbDelivery()}
               {this.renderNoDelivery()}
-              {this.renderStoreDelivery()}
               {this.renderOwnDelivery()}
             </If>
           </If>

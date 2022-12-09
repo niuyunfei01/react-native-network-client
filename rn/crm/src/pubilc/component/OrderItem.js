@@ -59,6 +59,7 @@ class OrderItem extends React.PureComponent {
     setState: PropType.func,
     openCancelDeliveryModal: PropType.func,
     openFinishDeliveryModal: PropType.func,
+    openFulfilOrderModal: PropType.func,
     comesBackBtn: PropType.bool,
   };
   state = {
@@ -218,6 +219,22 @@ class OrderItem extends React.PureComponent {
         <View style={styles.ItemContent}>
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
+            <If condition={Number(item.pickType) === 1}>
+              <View style={{
+                borderRadius: 4,
+                marginBottom: 12,
+                backgroundColor: '#FFF1E3',
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#FF8309',
+                  marginVertical: 7,
+                  paddingLeft: 10
+                }}> 当前为自提订单，核销码为订单编号，请注意 </Text>
+              </View>
+            </If>
             {this.renderUser()}
             {this.renderRemark()}
             {this.renderGoods()}
@@ -225,6 +242,9 @@ class OrderItem extends React.PureComponent {
             {this.renderDelivery()}
             <If condition={item?.btn_list && item?.btn_list?.write_off}>
               {this.renderVerificationBtn()}
+            </If>
+            <If condition={item?.btn_list && item?.btn_list?.meituan_write_off}>
+              {this.renderFulfilBtn()}
             </If>
             <If condition={Number(item.pickType) !== 1 && showBtn}>
               {this.renderButton()}
@@ -465,6 +485,32 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  renderFulfilBtn = () => {
+    let {openFulfilOrderModal} = this.props;
+    return (
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderTopWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
+        <Button title={'自提完成'}
+                onPress={() => {
+                  this.mixpanel.track('V4订单列表_到店核销')
+                  openFulfilOrderModal && openFulfilOrderModal()
+                }}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.main_color,
+                  width: width * 0.8,
+                }]}
+                titleStyle={{color: colors.white, fontSize: 14}}
+        />
+      </View>
+    )
+  }
+
 
   renderVerificationBtn = () => {
     return (
@@ -502,12 +548,17 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
       }}>
         <View style={{flex: 1}}>
-          <Text style={styles.userNameText}> {item.userName} &nbsp;&nbsp;{item.mobile_readable} </Text>
+          <Text style={styles.userNameText}> {item?.userName} &nbsp;&nbsp;尾号{item?.mobile_suffix} </Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color666,
+            marginVertical: 2
+          }}> {item?.mobile_readable} </Text>
           <Text style={{
             color: colors.color333,
             fontSize: 14,
             fontWeight: 'bold'
-          }}> {tool.jbbsubstr(item.address, 16)} </Text>
+          }}> {tool.jbbsubstr(item?.address, 16)} </Text>
         </View>
 
         <TouchableOpacity style={{paddingHorizontal: 10}}
@@ -849,7 +900,6 @@ const styles = StyleSheet.create({
   userNameText: {
     fontSize: 14,
     color: colors.color666,
-    marginBottom: 4
   },
   ItemContent: {
     flexDirection: "column",

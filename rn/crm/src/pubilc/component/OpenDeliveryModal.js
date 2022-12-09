@@ -467,8 +467,8 @@ class OpenDeliveryModal extends PureComponent {
             <SvgXml xml={closeNew()} style={{marginRight: 12}} onPress={this.closeModal}/>
           </View>
           <If condition={selectGeneralDelivery}>
-            {this.renderWSBDelivery()}
             {this.renderStoreDelivery()}
+            {this.renderWSBDelivery()}
           </If>
           <If condition={!selectGeneralDelivery}>
             {this.renderUUOrGuoXiaoDi()}

@@ -10,6 +10,7 @@ import OpenDeliveryModal from "../../../pubilc/component/OpenDeliveryModal";
 import {SvgXml} from "react-native-svg";
 import {back, down, head_cross_icon} from "../../../svg/svg";
 import PropTypes from "prop-types";
+import tool from "../../../pubilc/util/tool";
 
 const {width} = Dimensions.get('window')
 
@@ -25,6 +26,7 @@ class DeliveryList extends PureComponent {
     const {show_select_store, store_id, store_name} = props.route.params || {}
     this.state = {
       show_select_store: show_select_store !== undefined ? show_select_store : true,
+      show: show_select_store !== undefined ? show_select_store : true,
       in_review_deliveries: [],
       store_bind_deliveries: [],
       wsb_bind_deliveries: [],
@@ -113,7 +115,7 @@ class DeliveryList extends PureComponent {
 
   openDeliveryModal = (item, touchDelivery) => {
     const {type, v2_type} = item
-    const {store_id} = this.state
+    const {store_id, store_bind_deliveries} = this.state
     this.setState({selectDelivery: item})
     if (touchDelivery === 4) {
       this.setState({
@@ -123,9 +125,20 @@ class DeliveryList extends PureComponent {
       })
       return
     }
+    let store_delivery = false;
+    if (Array.isArray(store_bind_deliveries) && tool.length(store_bind_deliveries) > 0 && (touchDelivery === 1 || touchDelivery === 2)) {
+      for (let delivery of store_bind_deliveries) {
+        if (delivery?.type === item?.type) {
+          store_delivery = true
+        }
+      }
+    } else {
+      store_delivery = true
+    }
     const params = {
       delivery: {...item, touchDelivery: touchDelivery},
-      store_id: store_id
+      store_id: store_id,
+      show_head_create_text: !store_delivery
     }
     this.navigateRoute(Config.ROUTE_CHANGE_DELIVERY_ACCOUNT, params)
   }
@@ -196,8 +209,8 @@ class DeliveryList extends PureComponent {
         {this.getTip()}
         <ScrollView>
           {this.getDeliveries(in_review_deliveries, '审核中的省钱配送', 1)}
-          {this.getDeliveries(wsb_bind_deliveries, '正在使用的省钱配送', 2)}
           {this.getDeliveries(store_bind_deliveries, '正在使用的自有账号', 3)}
+          {this.getDeliveries(wsb_bind_deliveries, '正在使用的省钱配送', 2)}
           {this.getDeliveries(wsb_unbind_deliveries, '当前城市支持的其他配送', 4)}
         </ScrollView>
         <If condition={openDeliveryVisible}>
@@ -232,14 +245,25 @@ class DeliveryList extends PureComponent {
       })
     }
   }
+
   renderHeader = () => {
     let {store_name, show_select_store} = this.state;
-    const {only_one_store} = this.props.global;
+    let {navigation, global, route} = this.props;
+    const {only_one_store} = global;
+    let into_type = route.params?.into_type;
     return (
       <View style={styles.headerWrap}>
         <SvgXml height={32}
                 width={32}
-                onPress={() => this.props.navigation.goBack()}
+                onPress={() => {
+                  if (into_type === 'register') {
+                    return tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+                      initTab: Config.ROUTE_ORDERS,
+                      initialRouteName: Config.ROUTE_ALERT
+                    });
+                  }
+                  this.props.navigation.goBack()
+                }}
                 xml={show_select_store ? back() : head_cross_icon()}/>
         <If condition={!only_one_store}>
           <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
