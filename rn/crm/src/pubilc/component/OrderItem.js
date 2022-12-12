@@ -38,6 +38,7 @@ import FastImage from "react-native-fast-image";
 import LinearGradient from "react-native-linear-gradient";
 import AlertModal from "./AlertModal";
 import JbbModal from "./JbbModal";
+import {getDeliveryList} from "../services/delivery";
 
 let width = Dimensions.get("window").width;
 
@@ -53,6 +54,7 @@ class OrderItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     accessToken: PropTypes.string,
+    vendor_id: PropTypes.number,
     order_status: PropTypes.number,
     showBtn: PropTypes.bool,
     fetchData: PropType.func,
@@ -102,18 +104,24 @@ class OrderItem extends React.PureComponent {
   }
 
   onCallThirdShips = (order_id, store_id, if_reship = 0) => {
-    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
-      order_id: order_id,
-      store_id: store_id,
-      if_reship: if_reship,
-      onBack: (res) => {
-        if (res && res?.count >= 0) {
-          ToastShort('发配送成功')
-        } else {
-          ToastShort('发配送失败，请联系运营人员')
+    let {accessToken, vendor_id} = this.props;
+    getDeliveryList(accessToken, order_id, store_id, vendor_id).then(res => {
+      this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+        order_id: order_id,
+        store_id: store_id,
+        if_reship: if_reship,
+        delivery_obj: res,
+        onBack: (res) => {
+          if (res && res?.count >= 0) {
+            ToastShort('发配送成功')
+          } else {
+            ToastShort('发配送失败，请联系运营人员')
+          }
         }
-      }
-    });
+      });
+    }).catch(() => {
+      ToastShort('获取失败，请重试')
+    })
   }
 
   onAinSend = (order_id, store_id, sync_order = 0) => {

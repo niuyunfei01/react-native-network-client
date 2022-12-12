@@ -50,6 +50,7 @@ import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
 import LinearGradient from "react-native-linear-gradient";
+import {getDeliveryList} from "../../pubilc/services/delivery";
 
 const {width, height} = Dimensions.get("window")
 
@@ -518,18 +519,26 @@ class OrderInfoNew extends PureComponent {
 
 
   onCallThirdShips = (order_id, store_id, if_reship) => {
-    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
-      order_id: order_id,
-      store_id: store_id,
-      if_reship: if_reship,
-      onBack: (res) => {
-        if (res && res?.count >= 0) {
-          ToastShort('发配送成功')
-        } else {
-          ToastShort('发配送失败，请联系运营人员')
+    let {accessToken, vendor_id} = this.props.global
+    showModal('计价中')
+    getDeliveryList(accessToken, order_id, store_id, vendor_id).then(res => {
+      this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+        order_id: order_id,
+        store_id: store_id,
+        if_reship: if_reship,
+        delivery_obj: res,
+        onBack: (res) => {
+          if (res && res?.count >= 0) {
+            ToastShort('发配送成功')
+          } else {
+            ToastShort('发配送失败，请联系运营人员')
+          }
         }
-      }
-    });
+      });
+    }).catch(()=>{
+      ToastShort('获取失败，请重试')
+    })
+
   }
 
   callSelfAgain = () => {
@@ -1293,7 +1302,8 @@ class OrderInfoNew extends PureComponent {
           menus={menus}
           actions={this.printAction}
         />
-      </View>)
+      </View>
+    )
   }
 
   renderQrCode = () => {

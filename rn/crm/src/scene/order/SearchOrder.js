@@ -425,10 +425,11 @@ class SearchOrder extends PureComponent {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}

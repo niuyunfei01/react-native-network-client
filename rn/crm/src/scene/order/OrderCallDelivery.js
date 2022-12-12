@@ -131,16 +131,31 @@ class OrderCallDelivery extends Component {
 
   }
 
+  componentDidMount() {
+    this.onCreate().then()
+  }
+
   componentWillUnmount() {
     this.focus()
   }
 
-  componentDidMount() {
+  onCreate = async () => {
     this.fetchWorker();
+    let {delivery_obj} = this.props.route.params;
+    console.log(delivery_obj, 'delivery_obj');
+    if (tool.length(delivery_obj) > 0) {
+      await this.setState({
+        loading: true
+      }, () => {
+        this.setData(delivery_obj)
+      })
+    }
+    console.log(1)
     this.focus = this.props.navigation.addListener('focus', () => {
       this.fetchData()
     })
   }
+
 
   fetchWorker() {
     const {store_id, accessToken} = this.props.global;
@@ -340,7 +355,7 @@ class OrderCallDelivery extends Component {
       store_est_all_check: store_est_all_check,
       show_est_all_check: show_est_all_check,
       show_store_est_all_check: show_store_est_all_check,
-    })
+    }, () => hideModal())
   }
 
   onPress = (route, params = {}) => {

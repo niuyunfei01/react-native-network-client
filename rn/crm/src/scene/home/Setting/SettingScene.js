@@ -153,7 +153,7 @@ class SettingScene extends PureComponent {
         order_list_show_product: Number(res?.order_list_show_product) === 1,
         show_remark_in_order_list: Number(res?.show_remark_in_order_list) === 1,
         is_alone_pay_vendor: Boolean(res?.is_alone_pay_vendor),
-        is_owner: Boolean(res?.is_owner),
+        is_owner: Boolean(res?.is_show_destroy_store_btn),
         bd_mobile: tool.length(res?.delivery_bd_info) > 0 ? res.delivery_bd_info.mobile : '',
         show_bd: res?.show_delivery_bd_set !== undefined && res.show_delivery_bd_set === 1,
         show_update_version: show_update_version || Number(res?.android) > version_buile_number,

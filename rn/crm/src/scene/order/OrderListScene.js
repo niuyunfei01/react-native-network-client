@@ -778,10 +778,11 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {order_status} = this.state;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}
