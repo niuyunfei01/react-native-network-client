@@ -210,10 +210,23 @@ class AddTipModal extends React.Component {
                 }}
               />
             </View>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 6,
+              marginLeft: 10,
+            }}>
+              <Text style={{
+                color: '#FF8309',
+                fontSize: 12,
+              }}> 注：美团快速达不支持加小费 </Text>
+            </View>
+
             <If condition={tool.length(respReason) > 0}>
               <View style={{
                 flexDirection: "row",
                 alignItems: "center",
+                marginLeft: 12,
                 marginBottom: 5,
               }}>
                 <Entypo name={"help-with-circle"}

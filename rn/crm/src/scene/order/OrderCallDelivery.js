@@ -1081,6 +1081,16 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  openAddTipModal = () => {
+    let {logistic_fee_map} = this.state;
+    if (tool.length(logistic_fee_map) === 1 && Number(logistic_fee_map[0]?.logistic_code) === 3) {
+      return ToastShort('美团快速达不支持加小费');
+    }
+
+    this.setState({
+      show_add_tip_modal: true
+    })
+  }
   renderBtn = () => {
     let {
       is_alone_pay_vendor,
@@ -1148,11 +1158,7 @@ class OrderCallDelivery extends Component {
               {order_money}元&nbsp;
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_add_tip_modal: true
-            })
-          }} style={{
+          <TouchableOpacity onPress={this.openAddTipModal} style={{
             height: iron_width,
             width: iron_width,
             borderRadius: 4,
