@@ -76,7 +76,7 @@ class AddTipModal extends React.Component {
         if (tool.length(resp?.obj?.error_msg) > 0) {
           this.setState({respReason: resp?.obj?.error_msg})
         } else {
-          this.closeModal()
+          this.closeModal(1)
           ToastShort("加小费成功")
         }
       }));
@@ -85,7 +85,7 @@ class AddTipModal extends React.Component {
     //单独加小费
     dispatch(addTipMoneyNew(id, add_money, accessToken, (resp) => {
       if (resp.ok) {
-        this.closeModal()
+        this.closeModal(1)
         ToastShort(resp.desc)
       } else {
         this.setState({respReason: resp.desc})
@@ -116,7 +116,9 @@ class AddTipModal extends React.Component {
         })
       } else {
         setState && setState(params, () => {
-          fetchData && fetchData()
+          if (add_money > 0) {
+            fetchData && fetchData()
+          }
         })
       }
     })
