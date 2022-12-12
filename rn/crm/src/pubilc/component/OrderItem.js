@@ -61,7 +61,6 @@ class OrderItem extends React.PureComponent {
     setState: PropType.func,
     openCancelDeliveryModal: PropType.func,
     openFinishDeliveryModal: PropType.func,
-    openFulfilOrderModal: PropType.func,
     comesBackBtn: PropType.bool,
   };
   state = {
@@ -69,6 +68,7 @@ class OrderItem extends React.PureComponent {
     show_close_delivery_modal: false,
     show_call_user_modal: false,
     show_cancel_deliverys_modal: false,
+    show_fulfil_order_modal: false,
     pickupCode: '',
     err_msg: '',
   }
@@ -84,14 +84,14 @@ class OrderItem extends React.PureComponent {
     });
   }
 
-  onOverlookDelivery = (order_id) => {
+  onOverlookDelivery = () => {
     this.mixpanel.track('V4订单列表_忽略配送')
-    const self = this;
+    let {item, accessToken} = this.props;
     showModal("请求中")
     tool.debounces(() => {
-      const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
-      HttpUtils.get.bind(self.props.navigation)(api, {
-        orderId: this.props.item.id
+      const api = `/api/transfer_arrived/${item?.id}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        orderId: item?.id
       }).then(() => {
         this.closeModal()
         ToastShort('配送已完成')
@@ -173,6 +173,7 @@ class OrderItem extends React.PureComponent {
       verification_modal: false,
       show_close_delivery_modal: false,
       show_call_user_modal: false,
+      show_fulfil_order_modal: false,
     })
   }
 
@@ -262,6 +263,7 @@ class OrderItem extends React.PureComponent {
           {this.renderCallUser()}
           {this.renderCloseDeliveryModal()}
           {this.renderCancelDeliverysModal()}
+          {this.renderFulfilOrderModal()}
         </View>
 
       </TouchableWithoutFeedback>
@@ -494,20 +496,19 @@ class OrderItem extends React.PureComponent {
   }
 
   renderFulfilBtn = () => {
-    let {openFulfilOrderModal} = this.props;
     return (
       <View style={{
         paddingVertical: 10,
         marginHorizontal: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
         borderTopWidth: 1,
         borderColor: colors.colorEEE
       }}>
         <Button title={'自提完成'}
                 onPress={() => {
-                  this.mixpanel.track('V4订单列表_到店核销')
-                  openFulfilOrderModal && openFulfilOrderModal()
+                  this.mixpanel.track('V4订单列表_自提完成')
+                  this.setState({
+                    show_fulfil_order_modal: true
+                  })
                 }}
                 buttonStyle={[styles.modalBtn, {
                   backgroundColor: colors.main_color,
@@ -525,8 +526,6 @@ class OrderItem extends React.PureComponent {
       <View style={{
         paddingVertical: 10,
         marginHorizontal: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
         borderTopWidth: 1,
         borderColor: colors.colorEEE
       }}>
@@ -685,7 +684,6 @@ class OrderItem extends React.PureComponent {
 
 
   renderCloseDeliveryModal = () => {
-    let {item} = this.props;
     let {show_close_delivery_modal} = this.state;
     return (
       <View>
@@ -693,7 +691,7 @@ class OrderItem extends React.PureComponent {
           visible={show_close_delivery_modal}
           onClose={this.closeModal}
           onPressClose={this.closeModal}
-          onPress={() => this.onOverlookDelivery(item?.id)}
+          onPress={this.onOverlookDelivery}
           title={'忽略订单将会把该订单置为已完成，请选择“忽略并上传”将会上传配送信息至平台，提升回传率，避免产生回传不达标造成管控'}
           actionText={'忽略并上传'}
           closeText={'暂不'}/>
@@ -712,6 +710,40 @@ class OrderItem extends React.PureComponent {
           onPressClose={this.closeModal}
           onPress={() => this.cancelDeliverys()}
           title={'确定取消此订单全部配送吗?'}
+          actionText={'确定'}
+          closeText={'取消'}/>
+      </View>
+    )
+  }
+
+  onFulfilOrder = () => {
+    let {item, accessToken} = this.props;
+    showModal("请求中")
+    tool.debounces(() => {
+      const api = `/api/transfer_arrived1/${item?.id}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        orderId: item?.id
+      }).then(() => {
+        this.closeModal()
+        ToastShort('已完成订单')
+        this.props.fetchData();
+      }).catch(e => {
+        this.closeModal()
+        ToastShort('完成失败' + e?.desc)
+      })
+    }, 600)
+  }
+
+  renderFulfilOrderModal = () => {
+    let {show_fulfil_order_modal} = this.state;
+    return (
+      <View>
+        <AlertModal
+          visible={show_fulfil_order_modal}
+          onClose={this.closeModal}
+          onPressClose={this.closeModal}
+          onPress={this.onFulfilOrder}
+          title={'确认完成当前订单吗？'}
           actionText={'确定'}
           closeText={'取消'}/>
       </View>

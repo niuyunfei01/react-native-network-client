@@ -345,7 +345,6 @@ class OrderListScene extends Component {
       show_cancel_delivery_modal: true,
       show_finish_delivery_modal: false,
       show_delivery_modal: false,
-      show_fulfil_order_modal: false,
     })
   }
 
@@ -354,20 +353,10 @@ class OrderListScene extends Component {
       order_id: order_id,
       show_finish_delivery_modal: true,
       show_delivery_modal: false,
-      show_fulfil_order_modal: false,
       show_cancel_delivery_modal: false,
     })
   }
 
-  openFulfilOrderModal = (order_id) => {
-    this.setState({
-      order_id: order_id,
-      show_fulfil_order_modal: true,
-      show_delivery_modal: false,
-      show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
-    })
-  }
 
   render() {
     const {store_id, accessToken} = this.props.global;
@@ -451,7 +440,6 @@ class OrderListScene extends Component {
       show_cancel_delivery_modal: false,
       show_sort_modal: false,
       show_finish_delivery_modal: false,
-      show_fulfil_order_modal: false,
     })
   }
 
@@ -498,22 +486,6 @@ class OrderListScene extends Component {
     }).catch(() => {
       ToastShort('“配送完成失败，请稍后重试”')
     })
-  }
-
-  renderFulfilOrderModal = () => {
-    let {show_fulfil_order_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_fulfil_order_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toFulfilOrder()}
-          title={'确认完成当前订单吗?'}
-          actionText={'确定'}
-          closeText={'取消'}/>
-      </View>
-    )
   }
 
   setOrderBy = (order_by) => {
@@ -790,7 +762,6 @@ class OrderListScene extends Component {
                  setState={this.setState.bind(this)}
                  openCancelDeliveryModal={this.openCancelDeliveryModal.bind(this)}
                  openFinishDeliveryModal={this.openFinishDeliveryModal.bind(this)}
-                 openFulfilOrderModal={this.openFulfilOrderModal.bind(this)}
                  order_status={order_status}
       />
     );

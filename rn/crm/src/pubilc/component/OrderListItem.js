@@ -156,7 +156,7 @@ class OrderListItem extends React.PureComponent {
   onStopScheduling = () => {
     const self = this;
     const api = `/api/stop_auto_ship?access_token=${this.props.accessToken}`
-    HttpUtils.get.bind(self.props.navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       orderId: this.props.item.id
     }).then(() => {
       ToastShort('操作成功');
@@ -197,7 +197,7 @@ class OrderListItem extends React.PureComponent {
     const self = this;
     tool.debounces(() => {
       const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
-      HttpUtils.get.bind(self.props.navigation)(api, {
+      HttpUtils.get.bind(self.props)(api, {
         orderId: this.props.item.id
       }).then(() => {
         ToastShort('配送已完成')
