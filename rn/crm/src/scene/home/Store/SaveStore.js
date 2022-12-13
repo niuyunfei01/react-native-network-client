@@ -104,7 +104,7 @@ class SaveStore extends PureComponent {
       contact_phone: '',
       mobile,
       verify_code: verify_code,
-      city: '',
+      city: '北京',
       show_back_modal: false,
       show_category_modal: false,
       show_placeholder: true,
