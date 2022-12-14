@@ -33,7 +33,7 @@ import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-// import {setCallDeliveryList} from "../../reducers/global/globalActions";
+import store from "../../pubilc/util/configureStore";
 
 let {height, width} = Dimensions.get("window");
 
@@ -132,25 +132,35 @@ class OrderCallDelivery extends Component {
   }
 
   componentDidMount() {
+    hideModal()
+    console.log(new Date().getTime(), '完成跳转页面')
+    this.unSubscribe = store.subscribe(() => {
+      console.log(new Date().getTime(), '完成数据写入，开始渲染')
+      this.setData(store.getState()?.global?.call_delivery_obj || [])
+    })
     this.onCreate().then()
   }
 
   componentWillUnmount() {
     this.focus()
+    this.unSubscribe()
   }
 
   onCreate = async () => {
     this.fetchWorker();
-    let {delivery_obj} = this.props.route.params;
-    console.log(delivery_obj, 'delivery_obj');
-    if (tool.length(delivery_obj) > 0) {
+    let type = this.props.route.params?.type;
+    if (type === 'redux') {
       await this.setState({
         loading: true
-      }, () => {
-        this.setData(delivery_obj)
       })
     }
-    console.log(1)
+    // if (tool.length(delivery_obj) > 0) {
+    //   await this.setState({
+    //     loading: true
+    //   }, () => {
+    //     this.setData(delivery_obj)
+    //   })
+    // }
     this.focus = this.props.navigation.addListener('focus', () => {
       this.fetchData()
     })
@@ -169,7 +179,7 @@ class OrderCallDelivery extends Component {
     })
   }
 
-  fetchData = () => {
+  fetchData = (refresh = false) => {
     let {
       order_id,
       weight,
@@ -192,7 +202,7 @@ class OrderCallDelivery extends Component {
     }
 
     let params_json_str = JSON.stringify(params);
-    if (params_str === params_json_str || loading) {
+    if ((params_str === params_json_str || loading) && !refresh) {
       return;
     }
     this.setState({
@@ -205,6 +215,9 @@ class OrderCallDelivery extends Component {
   }
 
   setData = (obj, params_json_str = '{}') => {
+    if (tool.length(obj) <= 0) {
+      return this.fetchData(1);
+    }
     let {logistic_fee_map} = this.state;
     let store_est = obj?.store_est || [];
     let est = obj?.est || [];

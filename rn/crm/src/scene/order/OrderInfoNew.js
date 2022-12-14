@@ -51,6 +51,7 @@ import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
 import LinearGradient from "react-native-linear-gradient";
 import {getDeliveryList} from "../../pubilc/services/delivery";
+import {setCallDeliveryObj} from "../../reducers/global/globalActions";
 
 const {width, height} = Dimensions.get("window")
 
@@ -521,23 +522,28 @@ class OrderInfoNew extends PureComponent {
   onCallThirdShips = (order_id, store_id, if_reship) => {
     let {accessToken, vendor_id} = this.props.global
     showModal('计价中')
-    getDeliveryList(accessToken, order_id, store_id, vendor_id).then(res => {
-      this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
-        order_id: order_id,
-        store_id: store_id,
-        if_reship: if_reship,
-        delivery_obj: res,
-        onBack: (res) => {
-          if (res && res?.count >= 0) {
-            ToastShort('发配送成功')
-          } else {
-            ToastShort('发配送失败，请联系运营人员')
-          }
-        }
-      });
-    }).catch(()=>{
-      ToastShort('获取失败，请重试')
+    console.log(new Date().getTime(), '开始获取数据')
+    getDeliveryList(accessToken, order_id, store_id, vendor_id).then(async res => {
+      console.log(new Date().getTime(), '获取数据结束，开始写入')
+      await this.props.dispatch(setCallDeliveryObj(res))
+      console.log(new Date().getTime(), '完成渲染')
+    }).catch(() => {
+      ToastShort('获取失败，请稍后重试')
     })
+    console.log(new Date().getTime(), '开始跳转页面')
+    this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
+      order_id: order_id,
+      store_id: store_id,
+      if_reship: if_reship,
+      type: 'redux',
+      onBack: (res) => {
+        if (res && res?.count >= 0) {
+          ToastShort('发配送成功')
+        } else {
+          ToastShort('发配送失败，请联系运营人员')
+        }
+      }
+    });
 
   }
 

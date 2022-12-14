@@ -47,6 +47,7 @@ const {
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
   SET_ORLDER_LIST_BY,
+  SET_CALL_DELIVERY_OBJ,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
@@ -197,6 +198,13 @@ export function updateConfig(config) {
   }
 }
 
+
+export function setCallDeliveryObj(obj) {
+  return {
+    type: SET_CALL_DELIVERY_OBJ,
+    obj: obj
+  }
+}
 
 export function logout(callback) {
   return dispatch => {

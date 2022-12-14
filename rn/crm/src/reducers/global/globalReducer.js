@@ -22,8 +22,7 @@ const {
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
   SET_ORLDER_LIST_BY,
-  // SET_CALL_DELIVERY_LIST,
-  SET_DEFAULT_ORDER_INFO,
+  SET_CALL_DELIVERY_OBJ,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
   SET_NO_LOGIN_INFO,
@@ -81,7 +80,8 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,
-  lastCheckVersion: 0
+  lastCheckVersion: 0,
+  call_delivery_obj: {}
 };
 
 /**
@@ -250,6 +250,10 @@ export default function globalReducer(state = initialState, action) {
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}
+
+    case SET_CALL_DELIVERY_OBJ:
+      return {...state, call_delivery_obj: action.obj}
+
   }
   return state
 }
