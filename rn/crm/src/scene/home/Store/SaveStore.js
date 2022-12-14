@@ -618,10 +618,9 @@ class SaveStore extends PureComponent {
                          underlineColorAndroid="transparent"
                          style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                          placeholderTextColor={'#999'}
-                         keyboardType={'numeric'}
                          value={referrer_id}
                          onChangeText={value => {
-                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                           this.setState({referrer_id: value.replace(/[^\a-\z\A-\Z0-9]/g, "")});
                          }}
               />
             </View>
