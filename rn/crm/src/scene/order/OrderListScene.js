@@ -567,9 +567,11 @@ class OrderListScene extends Component {
     const {accessToken} = global;
     dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
       if (ok) {
-        hideModal()
-        this.onRefresh(9)
-        this.getVendor()
+        tool.debounces(()=>{
+          hideModal()
+          this.onRefresh(9)
+          this.getVendor()
+        })
       } else {
         ToastLong(msg);
         hideModal()
@@ -597,6 +599,7 @@ class OrderListScene extends Component {
           if (only_one_store) {
             return;
           }
+          GlobalUtil.setOrderFresh(2)
           this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
         }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <Text style={{
