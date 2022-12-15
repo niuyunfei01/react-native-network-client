@@ -104,11 +104,11 @@ class OrderItem extends React.PureComponent {
     }, 600)
   }
 
-  onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+  onCallThirdShips = (order_id, store_id, is_addition = 0) => {
     let {accessToken, vendor_id} = this.props;
     showModal('计价中')
     console.log(new Date().getTime(), '开始获取数据')
-    getDeliveryList(accessToken, order_id, store_id, vendor_id).then(async res => {
+    getDeliveryList(accessToken, order_id, store_id, vendor_id, is_addition).then(async res => {
       console.log(new Date().getTime(), '获取数据结束，开始写入')
       await this.props.dispatch(setCallDeliveryObj(res))
       console.log(new Date().getTime(), '完成渲染')
@@ -120,7 +120,7 @@ class OrderItem extends React.PureComponent {
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
-      if_reship: if_reship,
+      is_addition: is_addition,
       type: 'redux',
       // delivery_obj: res,
       onBack: (res) => {
@@ -870,7 +870,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'追加配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_追加配送')
-                    this.onCallThirdShips(item.id, item.store_id)
+                    this.onCallThirdShips(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,

@@ -64,6 +64,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
+    let is_addition = this.props.route.params?.is_addition || 0;
     // let {call_delivery_list} = this.props.global
     this.state = {
       loading: false,
@@ -71,6 +72,7 @@ class OrderCallDelivery extends Component {
       store_id: store_id,
       if_reship: if_reship,
       address_id: address_id,
+      is_addition: is_addition,
       store_est: [],
       est: [],
       exist_waiting_delivery: [],
@@ -189,6 +191,7 @@ class OrderCallDelivery extends Component {
       order_money,
       params_str,
       loading,
+      is_addition
     } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
@@ -199,6 +202,7 @@ class OrderCallDelivery extends Component {
       order_money,
       vendor_id,
       store_id,
+      is_addition
     }
 
     let params_json_str = JSON.stringify(params);
