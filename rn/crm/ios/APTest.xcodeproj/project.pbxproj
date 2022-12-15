@@ -1168,7 +1168,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.1.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1281,7 +1281,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1318,7 +1318,7 @@
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
 				INFOPLIST_FILE = APTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
