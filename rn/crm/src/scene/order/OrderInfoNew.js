@@ -519,7 +519,7 @@ class OrderInfoNew extends PureComponent {
   }
 
 
-  onCallThirdShips = (order_id, store_id, is_addition = 0) => {
+  onCallThirdShips = (order_id, store_id, if_reship = 0, is_addition = 0) => {
     let {accessToken, vendor_id} = this.props.global
     showModal('计价中')
     console.log(new Date().getTime(), '开始获取数据')
@@ -534,6 +534,7 @@ class OrderInfoNew extends PureComponent {
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
+      if_reship: if_reship,
       is_addition: is_addition,
       type: 'redux',
       onBack: (res) => {
@@ -550,7 +551,7 @@ class OrderInfoNew extends PureComponent {
   callSelfAgain = () => {
     let {order} = this.state
     this.closeModal()
-    this.onCallThirdShips(order?.id, order?.store_id, 1)
+    this.onCallThirdShips(order?.id, order?.store_id, 0, 1)
   }
 
   cancelDeliverys = () => {
@@ -906,7 +907,7 @@ class OrderInfoNew extends PureComponent {
           <Button title={'再次配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_再次配送')
-                    this.onCallThirdShips(order?.id, order?.store_id)
+                    this.onCallThirdShips(order?.id, order?.store_id, 1)
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonRight}
                   titleStyle={styles.orderInfoHeaderButtonTitleRight}

@@ -232,7 +232,7 @@ class OrderCallDelivery extends Component {
         if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
           for (let idx in est) {
             if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
-              est[idx].ischeck = true
+              est[idx].checked = true
               check = true
             }
           }
@@ -241,7 +241,7 @@ class OrderCallDelivery extends Component {
           for (let idx in store_est) {
             if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
 
-              store_est[idx].ischeck = true
+              store_est[idx].checked = true
               check = true
             }
           }
@@ -254,8 +254,8 @@ class OrderCallDelivery extends Component {
       logistic_fee_map = [];
 
       for (let idx in est) {
-        // est[idx].ischeck = true
-        if (est[idx]?.ischeck) {
+        // est[idx].checked = true
+        if (est[idx]?.checked) {
           let check_logistic = {
             logistic_code: est[idx]?.logisticCode,
             paid_partner_id: est[idx]?.fee_by
@@ -265,13 +265,13 @@ class OrderCallDelivery extends Component {
       }
 
       for (let idx in store_est) {
-        // store_est[idx].ischeck = true
-        if (store_est[idx]?.ischeck) {
+        // store_est[idx].checked = true
+        if (store_est[idx]?.checked) {
           for (let key in logistic_fee_map) {
             if (logistic_fee_map[key]?.logistic_code === store_est[idx]?.logisticCode) {
               for (let i in est) {
                 if (est[i]?.logisticCode === logistic_fee_map[key]?.logistic_code) {
-                  est[i].ischeck = false;
+                  est[i].checked = false;
                 }
               }
               logistic_fee_map.splice(key, 1)
@@ -331,7 +331,7 @@ class OrderCallDelivery extends Component {
     let show_store_est_all_check = false;
 
     for (let info of est) {
-      if (info?.ischeck) {
+      if (info?.checked) {
         wayNums += 1;
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
@@ -348,7 +348,7 @@ class OrderCallDelivery extends Component {
     }
 
     for (let info of store_est) {
-      if (info?.ischeck) {
+      if (info?.checked) {
         wayNums += 1;
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
@@ -545,7 +545,7 @@ class OrderCallDelivery extends Component {
     let bool = type === 1 ? !est_all_check : !store_est_all_check;
     if (cancel === 1) bool = false;
     for (let i in list) {
-      list[i].ischeck = bool;
+      list[i].checked = bool;
     }
 
     let check = false
@@ -553,7 +553,7 @@ class OrderCallDelivery extends Component {
     for (let idx in list) {
       for (let i in lists) {
         if (lists[i]?.logisticCode === list[idx]?.logisticCode) {
-          lists[i].ischeck = false;
+          lists[i].checked = false;
         }
       }
       check = false
@@ -596,17 +596,17 @@ class OrderCallDelivery extends Component {
     }
     let list = type === 0 ? est : store_est;
     let lists = type === 0 ? store_est : est
-    item.ischeck = item?.ischeck !== undefined ? !item?.ischeck : true;
+    item.checked = item?.checked !== undefined ? !item?.checked : true;
     list[key] = item;
     let check = false
     for (let idx in logistic_fee_map) {
       if (logistic_fee_map[idx]?.logistic_code === item?.logisticCode) {
         check = true;
-        if (item.ischeck) {
+        if (item.checked) {
 
           for (let i in lists) {
             if (lists[i]?.logisticCode === item?.logisticCode) {
-              lists[i].ischeck = false;
+              lists[i].checked = false;
             }
           }
           logistic_fee_map[idx].paid_partner_id = item?.fee_by
@@ -1029,7 +1029,7 @@ class OrderCallDelivery extends Component {
                 top: 0,
                 position: 'relative',
               }}
-              checked={item?.ischeck}
+              checked={item?.checked}
               onPress={() => {
                 this.onSelectDelivey(item, key, type)
               }}
