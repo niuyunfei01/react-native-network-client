@@ -834,8 +834,8 @@ class OrderCallDelivery extends Component {
   }
 
   renderNoDelivery = () => {
-    let {store_est, est} = this.state
-    if (tool.length(est) > 0 || tool.length(store_est) > 0) {
+    let {store_est, est, exist_waiting_delivery} = this.state
+    if (tool.length(est) > 0 || tool.length(store_est) > 0 || tool.length(exist_waiting_delivery) > 0) {
       return;
     }
     return (
