@@ -486,7 +486,7 @@ class SaveStore extends PureComponent {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
                          // }
-                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
+                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s\\(\\)\\（\\）]/g, "")});
                        }}
             />
           </View>
