@@ -82,9 +82,7 @@ class LoginScene extends PureComponent {
   onRequestSmsCode = () => {
     let {mobile, canAskReqSmsCode, authorization} = this.state
     if (!authorization) {
-      return this.setState({
-        show_auth_modal: true
-      })
+      return ToastShort('请您阅读并勾选协议')
     }
     if (canAskReqSmsCode) return;
     if (tool.length(mobile) > 10) {
@@ -126,9 +124,7 @@ class LoginScene extends PureComponent {
     tool.debounces(() => {
       let {authorization, mobile, verifyCode} = this.state;
       if (!authorization) {
-        return this.setState({
-          show_auth_modal: true
-        })
+        return ToastShort('请您阅读并勾选协议')
       }
 
       const validator = new Validator();

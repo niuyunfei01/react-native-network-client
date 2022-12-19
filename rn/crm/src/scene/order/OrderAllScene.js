@@ -109,19 +109,18 @@ class OrderAllScene extends Component {
       fetch_store_page_size: 10,
       is_last_page: false
     }
+
+    this.list_ref = undefined;
   }
 
 
   componentWillUnmount() {
-    this.focus()
     this.blur()
   }
 
   componentDidMount() {
     const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-      this.onRefresh()
-    })
+    this.onRefresh()
     this.blur = navigation.addListener('blur', () => {
       this.closeModal()
     })
@@ -151,6 +150,11 @@ class OrderAllScene extends Component {
 
   onRefresh = () => {
     const {query} = this.state
+
+    if (this.list_ref) {
+      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
+    }
+
     this.setState({
         query: {...query, page: 1, is_add: true, page_size: 10},
       },
@@ -730,6 +734,9 @@ class OrderAllScene extends Component {
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
           refreshing={is_loading}
+          ref={(ref) => {
+            this.list_ref = ref
+          }}
           keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           ListEmptyComponent={this.renderNoOrder()}
@@ -742,10 +749,11 @@ class OrderAllScene extends Component {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}

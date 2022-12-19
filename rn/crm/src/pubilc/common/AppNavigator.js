@@ -105,9 +105,6 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
-        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -129,8 +126,8 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
-                      getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
+        {/*<Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}*/}
+        {/*              getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>*/}
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerShown: false}}
@@ -148,9 +145,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
-        <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
-                      getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../../scene/home/Delivery/SettingDeliveryInfo").default}
         />
@@ -213,14 +210,10 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} options={{headerTitle: '置为无效'}}
                       getComponent={() => require("../../scene/order/OrderToInvalidScene").default}
         />
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderTransferThird").default}*/}
-        {/*/>*/}
 
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
-
         <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
                       getComponent={() => require("../../scene/order/OrderAinSend").default}
         />
@@ -232,8 +225,8 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} options={{headerTitle: '发红包'}}
                       getComponent={() => require("../../scene/order/OrderSendMoney").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}
-                      getComponent={() => require("../../scene/order/OrderSurcharge").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderSurcharge").default}/>*/}
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderSearchScene").default}/>
         <Stack.Screen name={Config.ROUTE_SEARCH_ORDER} options={{headerShown: false}}
@@ -247,26 +240,24 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} options={{headerTitle: '退单商品入库'}}
                       getComponent={() => require("../../scene/order/OrderCancelToEntry").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}
-                      getComponent={() => require("../../scene/order/OrderExitLog").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderExitLog").default}/>*/}
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../../scene/order/_OrderScene/Complain").default}/>
 
 
-        <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
-                      getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
-        />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
-                      getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}*/}
+        {/*              getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}*/}
+        {/*/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderQueryResultScene").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
                       getComponent={() => require("../../scene/order/OrderAddressBook").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
                       getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
         />
-        <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
-                      getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreList").default}/>
         <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}
@@ -364,20 +355,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/product/Goods/GoodsRelateScene').default}/>
         <Stack.Screen name={Config.ROUTE_HELP} options={{headerTitle: '帮助'}}
                       getComponent={() => require('../../scene/home/Help/HelpScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} options={{headerTitle: '运营收益'}}
-                      getComponent={() => require('../../scene/operation/OperateProfitScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_DETAIL} options={{headerTitle: '运营明细'}}
-                      getComponent={() => require('../../scene/operation/OperateDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_INCOME_DETAIL} options={{headerTitle: '收入详情'}}
-                      getComponent={() => require('../../scene/operation/OperateIncomeDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_EXPEND_DETAIL}
-                      getComponent={() => require('../../scene/operation/OperateExpendDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL} options={{headerTitle: '其他支出流水'}}
-                      getComponent={() => require('../../scene/operation/OperateOtherExpendDetailScene').default}
-        />
         <Stack.Screen name={Config.ROUTE_GOODS_COMMODITY_PRICING} options={{headerTitle: '商品调价信息'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsCommodityPricingScene').default}
         />
@@ -504,8 +481,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Worker/WorkerListScene').default}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}}
                       getComponent={() => require('../../scene/home/Worker/WorkerSchedule').default}/>
-        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
-                      getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
                       getComponent={() => require('../../scene/console/StockingTasks').default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle: '零售价格'}}

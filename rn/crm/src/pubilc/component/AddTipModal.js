@@ -76,7 +76,7 @@ class AddTipModal extends React.Component {
         if (tool.length(resp?.obj?.error_msg) > 0) {
           this.setState({respReason: resp?.obj?.error_msg})
         } else {
-          this.closeModal()
+          this.closeModal(1)
           ToastShort("加小费成功")
         }
       }));
@@ -85,7 +85,7 @@ class AddTipModal extends React.Component {
     //单独加小费
     dispatch(addTipMoneyNew(id, add_money, accessToken, (resp) => {
       if (resp.ok) {
-        this.closeModal()
+        this.closeModal(1)
         ToastShort(resp.desc)
       } else {
         this.setState({respReason: resp.desc})
@@ -116,7 +116,9 @@ class AddTipModal extends React.Component {
         })
       } else {
         setState && setState(params, () => {
-          fetchData && fetchData()
+          if (add_money > 0) {
+            fetchData && fetchData()
+          }
         })
       }
     })
@@ -208,10 +210,23 @@ class AddTipModal extends React.Component {
                 }}
               />
             </View>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 6,
+              marginLeft: 10,
+            }}>
+              <Text style={{
+                color: '#FF8309',
+                fontSize: 12,
+              }}> 注：美团快速达不支持加小费 </Text>
+            </View>
+
             <If condition={tool.length(respReason) > 0}>
               <View style={{
                 flexDirection: "row",
                 alignItems: "center",
+                marginLeft: 12,
                 marginBottom: 5,
               }}>
                 <Entypo name={"help-with-circle"}

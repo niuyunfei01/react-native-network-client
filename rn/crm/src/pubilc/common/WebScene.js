@@ -110,28 +110,6 @@ class WebScene extends PureComponent {
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      } else if (msg.indexOf('value') !== -1) {
-        InteractionManager.runAfterInteractions(() => {
-          showSuccess('绑定成功，请核对信息。')
-          const {currentUser,} = this.props.global;
-          let {currVendorName, currVendorId} = tool.vendor(this.props.global);
-          this.props.navigation.navigate(Config.ROUTE_STORE, {
-            currentUser: currentUser,
-            currVendorId: currVendorId,
-            currVendorName: currVendorName
-          });
-        });
-      } else if (msg.indexOf('canGoBack') == true) {
-        InteractionManager.runAfterInteractions(() => {
-          showSuccess('绑定新闪送成功，请核对信息。')
-          const {currentUser,} = this.props.global;
-          let {currVendorName, currVendorId} = tool.vendor(this.props.global);
-          this.props.navigation.navigate(Config.ROUTE_STORE, {
-            currentUser: currentUser,
-            currVendorId: currVendorId,
-            currVendorName: currVendorName
-          });
-        });
       } else {
         try {
           let data = JSON.parse(msg);
