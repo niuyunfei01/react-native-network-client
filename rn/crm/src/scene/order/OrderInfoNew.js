@@ -1019,7 +1019,8 @@ class OrderInfoNew extends PureComponent {
           <Text style={styles.cardTitle}>收件信息 </Text>
           <View style={styles.cardTitleInfo}>
             <View style={styles.cardTitleInfoLeft}>
-              <Text style={styles.cardTitleUser}>{order?.userName} {order?.mobile} </Text>
+              <Text style={styles.userNameText}>{order?.userName} &nbsp;&nbsp;(尾号{order?.mobile_suffix}) </Text>
+              <Text style={styles.userNameText}>{order?.mobile} </Text>
               <Text style={styles.cardTitleAddress}>{order?.address} </Text>
             </View>
             <SvgXml xml={call()} width={24} height={24} onPress={() => this.dialNumber(order?.mobile)}/>
