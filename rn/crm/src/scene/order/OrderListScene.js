@@ -63,7 +63,7 @@ const initState = {
     {tabname: '待取货', num: 0, status: 2},
     {tabname: '配送中', num: 0, status: 3},
     {tabname: '异常', num: 0, status: 8},
-    {tabname: '退款', num: 0, status: 18},
+    // {tabname: '退款', num: 0, status: 18},
   ],
   query: {
     listType: null,
@@ -148,7 +148,6 @@ class OrderListScene extends Component {
 
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
-      this.getVendor()
     })
     //防止退出登录，重新登录不推送的问题
     doJPushSetAlias(currentUser)
