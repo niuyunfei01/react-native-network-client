@@ -2,6 +2,7 @@
 import React, {PureComponent} from "react";
 import {
   Dimensions,
+  Image,
   InteractionManager,
   Modal,
   Platform,
@@ -27,7 +28,7 @@ import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {back, cross_icon, empty_delivery, empty_order, head_cross_icon} from "../../../svg/svg";
+import {back, cross_icon, head_cross_icon} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
@@ -831,10 +832,13 @@ class SaveStore extends PureComponent {
   renderRegisterSuccess = () => {
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml style={{marginVertical: 30}} xml={empty_delivery()}/>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/create_delivery.png'}}
+          style={{width: 160, height: 138, marginVertical: 30}}/>
 
         <Text style={styles.noOrderDesc}>已为您开通外送帮支持的聚合运力，您可以根据门店实际配送场景和诉求选择合适的配送商～ </Text>
-        <Text style={styles.noOrderDesc}>同时在您也可以绑定自有账号，自有账号同步使用账号余额和优惠券，接单更快，免收服务费～ </Text>
+        <Text style={styles.noOrderDesc}>同时您也可以绑定自有账号，自有账号同步使用账号余额和优惠券，接单更快，免收服务费～ </Text>
         <Button title={'去绑定自有账号'}
                 onPress={() => {
                   this.onPress(Config.ROUTE_DELIVERY_LIST, {into_type: 'register', show_select_store: false})
@@ -859,7 +863,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     backgroundColor: colors.white,
-    paddingHorizontal: 26,
+    paddingHorizontal: 20,
   },
   noOrderDesc: {marginTop: 10, fontSize: 15, color: colors.color333, lineHeight: 21},
 });
