@@ -171,7 +171,7 @@ class SearchShop extends Component {
   }
 
   searchLngLat = () => {
-    let {location, page, page_size, is_add, shops, ret_list, location_name} = this.state;
+    let {location, page, page_size, is_add, shops, ret_list, location_name, keyword} = this.state;
     if (!is_add) {
       return;
     }
@@ -180,6 +180,7 @@ class SearchShop extends Component {
       const api = `/v4/wsb_map/getNearbyLocation`
       let params = {
         location: location?.location,
+        keyword: keyword,
         page,
         page_size
       }
@@ -195,8 +196,8 @@ class SearchShop extends Component {
         }
         this.setState({
           location_name,
-          keyword: '',
           page: page + 1,
+          keyword: '',
           shops: page === 1 ? res : shops.concat(res),
           ret_list: page === 1 ? res : ret_list.concat(res),
           loading: false,
