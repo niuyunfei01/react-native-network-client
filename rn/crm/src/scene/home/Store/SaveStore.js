@@ -80,7 +80,7 @@ class SaveStore extends PureComponent {
       mobile = this.props.global.store_info?.mobile
     }
 
-    if(store_id === 0){
+    if (store_id === 0) {
       store_id = this.props.global?.store_id
     }
 
@@ -103,7 +103,7 @@ class SaveStore extends PureComponent {
       contact_phone: '',
       mobile,
       verify_code: verify_code,
-      city: '',
+      city: '选择城市',
       show_back_modal: false,
       show_category_modal: false,
       show_placeholder: true,
@@ -458,7 +458,7 @@ class SaveStore extends PureComponent {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
                          // }
-                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
+                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s\\(\\)\\（\\）]/g, "")});
                        }}
             />
           </View>
@@ -590,10 +590,9 @@ class SaveStore extends PureComponent {
                          underlineColorAndroid="transparent"
                          style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                          placeholderTextColor={'#999'}
-                         keyboardType={'numeric'}
                          value={referrer_id}
                          onChangeText={value => {
-                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                           this.setState({referrer_id: value.replace(/[^\a-\z\A-\Z0-9]/g, "")});
                          }}
               />
             </View>
