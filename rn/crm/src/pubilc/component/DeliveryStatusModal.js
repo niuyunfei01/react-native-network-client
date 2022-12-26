@@ -251,7 +251,7 @@ class deliveryStatusModal extends React.Component {
       this.closeModal()
       this.props.onPress(Config.RIDER_TRSJECTORY, {delivery_id: info?.id, order_id: order_id})
     } else {
-      Clipboard.setString(info?.delivery_id)
+      Clipboard.setString(info?.delivery_uuid)
       ToastLong('已复制到剪切板', 0)
     }
   }

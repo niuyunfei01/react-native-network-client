@@ -30,13 +30,13 @@ import {back, cross_icon} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
-import AlertModal from "../../../pubilc/component/AlertModal";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import {AMapSdk} from "react-native-amap3d/lib/src/index";
 import geolocation from "@react-native-community/geolocation";
 import {mergeMixpanelId} from "../../../pubilc/util/analytics";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 const {width, height} = Dimensions.get("window");
 
@@ -80,7 +80,7 @@ class SaveStore extends PureComponent {
       mobile = this.props.global.store_info?.mobile
     }
 
-    if(store_id === 0){
+    if (store_id === 0) {
       store_id = this.props.global?.store_id
     }
 
@@ -103,8 +103,7 @@ class SaveStore extends PureComponent {
       contact_phone: '',
       mobile,
       verify_code: verify_code,
-      city: '',
-      show_back_modal: false,
+      city: '选择城市',
       show_category_modal: false,
       show_placeholder: true,
       referrer_id: ''
@@ -194,7 +193,6 @@ class SaveStore extends PureComponent {
   }
   closeModal = () => {
     this.setState({
-      show_back_modal: false,
       show_category_modal: false,
     })
   }
@@ -360,7 +358,6 @@ class SaveStore extends PureComponent {
         {this.renderHead()}
         {this.renderBody()}
         {this.renderBtn()}
-        {this.renderBackModal()}
         {this.renderCategoriesModal()}
       </View>
     )
@@ -378,9 +375,16 @@ class SaveStore extends PureComponent {
       }}>
         <SvgXml style={{marginRight: 4}} onPress={() => {
           if (type === 'register') {
-            return this.setState({
-              show_back_modal: true,
+
+            return JbbAlert.show({
+              title: '确定要退出吗?',
+              actionText: '确定',
+              closeText: '暂不',
+              onPress: () => {
+                this.props.navigation.goBack()
+              },
             })
+
           }
           this.props.navigation.goBack()
         }} xml={back()}/>
@@ -458,7 +462,7 @@ class SaveStore extends PureComponent {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
                          // }
-                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
+                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s\\(\\)\\（\\）]/g, "")});
                        }}
             />
           </View>
@@ -590,10 +594,9 @@ class SaveStore extends PureComponent {
                          underlineColorAndroid="transparent"
                          style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                          placeholderTextColor={'#999'}
-                         keyboardType={'numeric'}
                          value={referrer_id}
                          onChangeText={value => {
-                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                           this.setState({referrer_id: value.replace(/[^\a-\z\A-\Z0-9]/g, "")});
                          }}
               />
             </View>
@@ -672,25 +675,6 @@ class SaveStore extends PureComponent {
     )
   }
 
-  renderBackModal = () => {
-    let {show_back_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_back_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => {
-            this.closeModal()
-            this.props.navigation.goBack()
-          }}
-          title={'确定要退出吗?'}
-          desc={''}
-          actionText={'确定'}
-          closeText={'暂不'}/>
-      </View>
-    )
-  }
 
   renderCategoriesModal = () => {
     let {category_list, show_category_modal, category_id_input_vlue, category_id_input_vlue_desc} = this.state;

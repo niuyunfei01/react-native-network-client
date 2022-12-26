@@ -33,6 +33,7 @@ import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 // import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
 let {height, width} = Dimensions.get("window");
@@ -396,19 +397,29 @@ class OrderCallDelivery extends Component {
             is_mobile_visiable: true
           })
         }
+
         if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance") {
-          Alert.alert('发单余额不足，请及时充值', ``, [
-            {
-              text: '去充值',
-              onPress: () => {
-                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-                  onBack: (res) => {
-                    this.showAlert(res)
-                  }
-                });
-              }
+          JbbAlert.show({
+            title: '温馨提示',
+            desc: '您当前账号余额不足，请充值',
+            actionText: '去充值',
+            closeText: '取消',
+            onPress: () => {
+              this.onPress(Config.ROUTE_ACCOUNT_FILL, {
+                onBack: (res) => {
+                  this.showAlert(res)
+                }
+              });
             }
-          ])
+          })
+        }
+        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance1") {
+          JbbAlert.show({
+            title: '价格变更',
+            desc: '价格有变更，点击查询最新计价',
+            actionText: '确定',
+            onPress: this.fetchData
+          })
         }
       })
     }, 1000)
@@ -420,15 +431,7 @@ class OrderCallDelivery extends Component {
         {text: '取消发单'},
         {
           text: '立即发单',
-          onPress: () => {
-            this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-              onBack: (res) => {
-                if (res) {
-                  this.onCallDelivery();
-                }
-              }
-            });
-          }
+          onPress: this.onCallDelivery
         }
       ])
     } else {
@@ -438,13 +441,7 @@ class OrderCallDelivery extends Component {
           text: '再次充值',
           onPress: () => {
             this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-              onBack: () => {
-                this.onPress(Config.ROUTE_ACCOUNT_FILL, {
-                  onBack: (res) => {
-                    this.showAlert(res)
-                  }
-                });
-              }
+              onBack: (res) => this.showAlert(res)
             })
           }
         }

@@ -18,11 +18,11 @@ import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import AlertModal from "../../pubilc/component/AlertModal";
 import DatePicker from "react-native-date-picker";
 import dayjs from "dayjs";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import JbbModal from "../../pubilc/component/JbbModal";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get("window");
 
@@ -99,7 +99,6 @@ class OrderAllScene extends Component {
       show_add_tip_modal: false,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_select_store_modal: false,
       show_condition_modal: 0,
       show_date_modal: false,
@@ -234,8 +233,15 @@ class OrderAllScene extends Component {
   openFinishDeliveryModal = (order_id) => {
     this.setState({
       order_id: order_id,
-      show_finish_delivery_modal: true,
       show_delivery_modal: false
+    }, () => {
+      JbbAlert.show({
+        title: '当前配送确认完成吗?',
+        desc: '订单送达后无法撤回，请确认顾客已收到货物',
+        actionText: '确定',
+        closeText: '再想想',
+        onPress: this.toSetOrderComplete,
+      })
     })
   }
 
@@ -245,7 +251,6 @@ class OrderAllScene extends Component {
       show_condition_modal: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_select_store_modal: false,
       show_date_modal: false,
     })
@@ -344,7 +349,6 @@ class OrderAllScene extends Component {
         {this.renderConditionTabs()}
         {this.renderContent()}
         {this.renderDateModal()}
-        {this.renderFinishDeliveryModal()}
 
         <TopSelectModal list={show_condition_modal > 0 ? check_list : store_list}
                         label_field={show_condition_modal > 0 ? undefined : 'name'}
@@ -605,23 +609,6 @@ class OrderAllScene extends Component {
             <SvgXml xml={show_condition_modal === 4 ? this_up() : this_down()}/>
           </View>
         </TouchableOpacity>
-      </View>
-    )
-  }
-
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
       </View>
     )
   }

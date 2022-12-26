@@ -51,7 +51,7 @@ import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 import {logout} from "../../../reducers/global/globalActions";
-import AlertModal from "../../../pubilc/component/AlertModal";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 const width = Dimensions.get("window").width;
 
@@ -157,7 +157,6 @@ class Mine extends PureComponent {
       menu_list: menu_list,
       activity: [],
       img: '',
-      show_freeze_balance_alert: false,
       showSettle: false
     }
   }
@@ -522,7 +521,14 @@ class Mine extends PureComponent {
         </View>
 
         <View style={{paddingHorizontal: 14}}>
-          <Text style={styles.walletLabel} onPress={() => this.setState({show_freeze_balance_alert: true})}>
+
+          <Text style={styles.walletLabel} onPress={() => {
+            JbbAlert.show({
+              title: '预扣金额',
+              desc: balanceInfo?.freeze_notice,
+              actionText: '知道了',
+            })
+          }}>
             预扣金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <Text style={styles.walletValue}>
@@ -538,26 +544,6 @@ class Mine extends PureComponent {
       </LinearGradient>
     )
   }
-
-  closeModal = () => {
-    this.setState({
-      show_freeze_balance_alert: false,
-    })
-  }
-
-  renderFreezeBalanceAlertModal = () => {
-    let {show_freeze_balance_alert, balanceInfo} = this.state;
-    return (
-      <AlertModal
-        visible={show_freeze_balance_alert}
-        onClose={this.closeModal}
-        onPress={() => this.closeModal()}
-        title={'预扣金额'}
-        desc={balanceInfo?.freeze_notice}
-        actionText={'知道了'}/>
-    )
-  }
-
 
   renderValueAdded = () => {
     const {navigation, global} = this.props
@@ -761,7 +747,6 @@ class Mine extends PureComponent {
           {this.renderStore()}
           <View style={{top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
-            {this.renderFreezeBalanceAlertModal()}
             {this.renderValueAdded()}
             {this.renderBlock()}
             {this.renderSwiper()}

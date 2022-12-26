@@ -76,10 +76,6 @@ class SeetingDelivery extends PureComponent {
     this.onBindDelivery = this.onBindDelivery.bind(this)
   }
 
-  componentDidMount() {
-    this.getDeliveryConf();
-  }
-
   onHeaderRefresh = () => {
     this.getDeliveryConf();
   }
@@ -92,6 +88,12 @@ class SeetingDelivery extends PureComponent {
   }
 
   getDeliveryConf = () => {
+
+    if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+      ToastLong('操作失败，请稍后重试')
+      return this.props.navigation.goBack();
+    }
+
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let showBtn = this.props.route.params.showBtn;
       if (tool.length(response.bind_info) > 0) {
@@ -334,6 +336,12 @@ class SeetingDelivery extends PureComponent {
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
               this.mixpanel.track('自动呼叫设置页')
+
+              if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+                ToastLong('操作失败，请刷新重试')
+                return this.props.navigation.goBack();
+              }
+
               navigation.navigate(config.ROUTE_SEETING_DELIVERY_INFO, {
                 auto_call: this.state.auto_call,
                 ext_store_id: this.props.route.params.ext_store_id,
@@ -352,6 +360,10 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+                ToastLong('操作失败，请刷新重试')
+                return this.props.navigation.goBack();
+              }
               this.mixpanel.track('就近分配订单')
               navigation.navigate(config.ROUTE_SEETING_DELIVERY_ORDER, {
                 auto_call: this.state.auto_call,
@@ -370,6 +382,10 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+                ToastLong('操作失败，请刷新重试')
+                return this.props.navigation.goBack();
+              }
               this.mixpanel.track('偏好发单设置页')
               navigation.navigate(config.ROUTE_SEETING_PREFERENCE_DELIVERY, {
                 auto_call: this.state.auto_call,
@@ -393,6 +409,10 @@ class SeetingDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
+              if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+                ToastLong('操作失败，请刷新重试')
+                return this.props.navigation.goBack();
+              }
               this.mixpanel.track('保底配送页')
               navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY, {
                 ext_store_id: this.props.route.params.ext_store_id,
@@ -409,13 +429,13 @@ class SeetingDelivery extends PureComponent {
 
         </ScrollView>
 
-        {this.state.showSetMeituanBtn ? this.rendenBtn() : false}
+        {this.state.showSetMeituanBtn ? this.renderBtn() : false}
       </View>
 
     );
   }
 
-  rendenBtn = () => {
+  renderBtn = () => {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
         <Button title={'更换绑定'}

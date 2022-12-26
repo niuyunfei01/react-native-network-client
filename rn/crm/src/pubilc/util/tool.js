@@ -540,7 +540,7 @@ function filteremoji(str) {
 
 
 function filtrationInput(str) {
-  return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]/g, "")
+  return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]\s/g, "")
 }
 
 export const mapImage = {

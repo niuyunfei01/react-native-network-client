@@ -46,10 +46,10 @@ import {markTaskDone} from "../../reducers/remind/remindActions";
 import JbbModal from "../../pubilc/component/JbbModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal"
 import AddTipModal from "../../pubilc/component/AddTipModal";
-import AlertModal from "../../pubilc/component/AlertModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import PropTypes from "prop-types";
 import LinearGradient from "react-native-linear-gradient";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width, height} = Dimensions.get("window")
 
@@ -129,11 +129,9 @@ class OrderInfoNew extends PureComponent {
       add_tip_id: 0,
       show_add_tip_modal: false,
       allowRefresh: true,
-      show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
       orders_add_tip: true,
       delivery_loading: false,
-      show_cancel_deliverys_modal: false,
     }
     this.marker = null
   }
@@ -453,9 +451,7 @@ class OrderInfoNew extends PureComponent {
   closeModal = () => {
     this.setState({
       modalTip: false,
-      show_finish_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_cancel_deliverys_modal: false,
       show_delivery_modal: false,
       showQrcode: false,
     })
@@ -814,8 +810,15 @@ class OrderInfoNew extends PureComponent {
 
   openFinishDeliveryModal = () => {
     this.setState({
-      show_finish_delivery_modal: true,
       show_delivery_modal: false,
+    },()=>{
+      JbbAlert.show({
+        title: '当前配送确认完成吗?',
+        desc: '订单送达后无法撤回，请确认顾客已收到货物',
+        actionText: '确定',
+        closeText: '再想想',
+        onPress: this.toSetOrderComplete,
+      })
     })
   }
 
@@ -867,9 +870,14 @@ class OrderInfoNew extends PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单详情_取消全部配送')
-                    this.setState({
-                      show_cancel_deliverys_modal: true
+
+                    JbbAlert.show({
+                      title: '确定取消此订单全部配送吗?',
+                      actionText: '确定',
+                      closeText: '取消',
+                      onPress: this.cancelDeliverys,
                     })
+
                   }}
                   buttonStyle={styles.orderInfoHeaderButtonLeft}
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
@@ -988,7 +996,7 @@ class OrderInfoNew extends PureComponent {
                 style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name, 18)} #{order?.dayId} </Text>
             </View>
           </View>
-          <If condition={order?.platform === '6'}>
+          <If condition={Number(order?.pickType) === 1}>
             <Button title={'查看取货码'}
                     onPress={() => {
                       this.mixpanel.track('V4订单详情_查看取货码')
@@ -1402,8 +1410,6 @@ class OrderInfoNew extends PureComponent {
         </ScrollView>
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
-        {this.renderFinishDeliveryModal()}
-        {this.renderCancelDeliverysModal()}
 
         <CancelDeliveryModal
           order_id={order?.id}
@@ -1419,38 +1425,7 @@ class OrderInfoNew extends PureComponent {
     );
   }
 
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
-      </View>
-    )
-  }
 
-  renderCancelDeliverysModal = () => {
-    let {show_cancel_deliverys_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_cancel_deliverys_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.cancelDeliverys()}
-          title={'确定取消此订单全部配送吗?'}
-          actionText={'确定'}
-          closeText={'取消'}/>
-      </View>
-    )
-  }
 }
 
 const styles = StyleSheet.create({
