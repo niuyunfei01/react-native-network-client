@@ -52,9 +52,7 @@ const handleDiscoverPeripheral = (peripheral) => {
 const handleStopScan = () => {
   store.dispatch(setIsScanningBlueTooth(false))
 }
-const handleConnectPeripheral = () => {
 
-}
 export const handleDisconnectedPeripheral = async (id) => {
   let peripheral = peripherals.get(id)
   if (peripheral) {
@@ -129,14 +127,17 @@ export const connectBluetoothDevice = async (peripheral) => {
   }
 
 }
+let bleManagerCentralManagerWillRestoreState = null, bleManagerDiscoverPeripheral = null, bleManagerStopScan = null
+let bleManagerDisconnectPeripheral = null, bleManagerDidUpdateState = null
 export const initBlueTooth = async (reduxGlobal) => {
+  if (Platform.OS === 'ios') {
+    bleManagerCentralManagerWillRestoreState = bleManagerEmitter.addListener('BleManagerCentralManagerWillRestoreState', handleCentralManagerWillRestoreState)
+    bleManagerDisconnectPeripheral = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral);
+  }
+  bleManagerDiscoverPeripheral = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
+  bleManagerStopScan = bleManagerEmitter.addListener('BleManagerStopScan', handleStopScan);
 
-  bleManagerEmitter.addListener('BleManagerCentralManagerWillRestoreState', handleCentralManagerWillRestoreState)
-  bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
-  bleManagerEmitter.addListener('BleManagerStopScan', handleStopScan);
-  bleManagerEmitter.addListener('BleManagerConnectPeripheral', handleConnectPeripheral);
-  bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral);
-  bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => handleDidUpdateState(args, reduxGlobal.printer_id))
+  bleManagerDidUpdateState = bleManagerEmitter.addListener("BleManagerDidUpdateState", (args) => handleDidUpdateState(args, reduxGlobal.printer_id))
 
 
   try {
@@ -163,12 +164,11 @@ export const initBlueTooth = async (reduxGlobal) => {
 }
 
 export const unInitBlueTooth = () => {
-  bleManagerEmitter.removeListener('BleManagerDiscoverPeripheral', handleDiscoverPeripheral);
-  bleManagerEmitter.removeListener('BleManagerStopScan', handleStopScan);
-  bleManagerEmitter.removeListener('BleManagerConnectPeripheral', handleConnectPeripheral);
-  bleManagerEmitter.removeListener('BleManagerDisconnectPeripheral', handleDisconnectedPeripheral);
-  bleManagerEmitter.removeListener("BleManagerDidUpdateState", handleDidUpdateState)
-  bleManagerEmitter.removeListener('BleManagerCentralManagerWillRestoreState', handleCentralManagerWillRestoreState)
+  bleManagerDiscoverPeripheral && bleManagerDiscoverPeripheral.remove()
+  bleManagerStopScan && bleManagerStopScan.remove()
+  bleManagerDisconnectPeripheral && bleManagerDisconnectPeripheral.remove()
+  bleManagerDidUpdateState && bleManagerDidUpdateState.remove()
+  bleManagerCentralManagerWillRestoreState && bleManagerCentralManagerWillRestoreState.remove()
 
 }
 

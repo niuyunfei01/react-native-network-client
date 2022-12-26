@@ -137,9 +137,7 @@ class OrderCallDelivery extends Component {
 
   componentDidMount() {
     hideModal()
-    console.log(new Date().getTime(), '完成跳转页面')
     this.unSubscribe = store.subscribe(() => {
-      console.log(new Date().getTime(), '完成数据写入，开始渲染')
       this.setData(store.getState()?.global?.call_delivery_obj || [])
     })
     this.onCreate().then()

@@ -43,7 +43,8 @@ export default class TopSelectModal extends React.Component {
     onEndReachedThreshold: PropTypes.number,
     onEndReached: PropTypes.func,
     refreshing: PropTypes.bool,
-    initialNumToRender: PropTypes.number
+    initialNumToRender: PropTypes.number,
+    numColumns: PropTypes.number,
   }
   static defaultProps = {
     visible: true
@@ -61,20 +62,35 @@ export default class TopSelectModal extends React.Component {
     )
   }
 
+  otherItem = ({item, index}) => {
+
+    const {default_val, onPress, selectWrap, warp, selectTextStyle, textStyle, value_field = 'value'} = this.props
+    const isSelect = default_val === item[value_field]
+    return (
+      <TouchableOpacity style={isSelect ? selectWrap : warp}
+                        onPress={() => onPress(item, index)}>
+        <Text style={isSelect ? selectTextStyle : textStyle}>
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
   render() {
     const {
       marTop = 42, visible = false, modalStyle = {}, list = [], onEndReachedThreshold, onEndReached, refreshing,
-      initialNumToRender
+      initialNumToRender, numColumns = 1, selectWrap = null
     } = this.props
     if (visible)
       return (
         <TouchableOpacity onPress={this.props.onClose} style={[styles.modalWrap, {top: marTop}]}>
           <TouchableHighlight>
             <FlatList data={list}
+                      numColumns={numColumns}
                       showsVerticalScrollIndicator={false}
                       showsHorizontalScrollIndicator={false}
                       style={[{maxHeight: height * 0.6, backgroundColor: colors.white}, modalStyle]}
-                      renderItem={this.renderItem}
+                      renderItem={selectWrap ? this.otherItem : this.renderItem}
                       keyExtractor={(item, index) => `${index}`}
                       onEndReachedThreshold={onEndReachedThreshold}
                       onEndReached={onEndReached}

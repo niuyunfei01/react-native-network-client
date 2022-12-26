@@ -4,7 +4,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
+import {
+  Dimensions,
+  Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+  ImageBackground,
+  NativeEventEmitter
+} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
@@ -26,7 +36,7 @@ import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
 import JbbAlert from "../component/JbbAlert";
-
+import {Synthesizer} from "../component/react-native-speech-iflytek";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -343,6 +353,8 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_BUSINESS_DATA} options={{headerTitle: '经营数据'}}
+                      getComponent={() => require('../../scene/home/Setting/BusinessDataScene').default}/>
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
                       getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
         />
@@ -547,6 +559,9 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
         <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
                       getComponent={() => require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_NOTIFICATION_SETTING}
+                      options={{headerTitle: '通知设置'}}
+                      getComponent={() => require('../../scene/home/Setting/NotificationSetting').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -555,6 +570,8 @@ let notInit = true
 let ios_info = {}
 const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
+let isSunmiDevice = false
+let isHanlderTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
 
 class AppNavigator extends PureComponent {
 
@@ -642,11 +659,11 @@ class AppNavigator extends PureComponent {
 
 
   initJPush = () => {
-
+    const {currentUser} = this.props.global
     JPush.setLoggerEnable(false)
     JPush.init()
     JPush.addConnectEventListener(({connectEnable}) => {
-      //console.log("connectEnable:" + connectEnable)
+      JTCPStatus = connectEnable
       if (connectEnable)
         doJPushSetAlias(currentUser);
     })
@@ -655,12 +672,19 @@ class AppNavigator extends PureComponent {
     //     console.log("registerID:" + JSON.stringify(registerID))
     //   }
     // )
-    const {accessToken, autoBluetoothPrint, currentUser, store_id} = this.props.global
+
     //tag alias事件回调
     JPush.addTagAliasListener(({code}) => {
-      //console.log("tagAliasListener:" + code)
-      if (code) {
-        doJPushSetAlias(currentUser)
+      if (0 == code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = null
+        setAliasStatus = true
+        return
+      }
+      if (code && !setAliasStatus && JTCPStatus) {
+        setAliasInterval = setTimeout(() => {
+          doJPushSetAlias(currentUser)
+        }, 21 * 1000)
       }
     });
     //通知回调
@@ -668,25 +692,78 @@ class AppNavigator extends PureComponent {
     JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
       // console.log("notificationListener,extras:" + JSON.stringify(extras))
       // console.log("notificationListener,notificationEventType:" + notificationEventType)
-      const {type, order_id} = extras
+      const {type, order_id, speak_word, store_id} = extras
       if ('notificationArrived' === notificationEventType) {
-        if (type !== 'new_order') {
-          sendDeviceStatus(accessToken, {
-            msgId: messageID,
-            listener_stores: store_id,
-            orderId: order_id,
-            btConnected: '收到极光推送，不是新订单不需要打印',
-            auto_print: autoBluetoothPrint
-          })
+        if (!isHanlderTask) {
+          await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
           return
         }
-        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
+        if (speak_word) {
+          messageQueue.push({
+            type: type,
+            order_id: order_id,
+            speak_word: speak_word,
+            store_id: store_id,
+            messageID: messageID
+          })
+          await this.onSynthesizerResult()
+        }
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
+        Synthesizer.start(speak_word)
       }
     });
   }
+
+  handlerMessage = async (type, order_id, speak_word, store_id, messageID) => {
+    isHanlderTask = true
+    const {accessToken, autoBluetoothPrint} = this.props.global
+    if (speak_word) {
+      Synthesizer.start(speak_word);
+    }
+    if (type !== 'new_order') {
+      sendDeviceStatus(accessToken, {
+        msgId: messageID,
+        listener_stores: store_id,
+        orderId: order_id,
+        btConnected: '收到极光推送，不是新订单不需要打印',
+        auto_print: autoBluetoothPrint
+      })
+
+    } else {
+      if (isSunmiDevice) {
+        const api = `/v4/wsb_order/order_detail/${order_id}?access_token=${accessToken}`
+        const order = await HttpUtils.get(api, {})
+        await native.printSmPrinter(order)
+
+      } else {
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
+      }
+    }
+
+    if (messageQueue.length > 0) {
+      messageQueue.splice(0, 1)
+      await this.onSynthesizerResult()
+    }
+
+  }
+
+  onSynthesizerResult = async () => {
+
+    if (messageQueue.length === 0) {
+      isHanlderTask = false
+      return
+    }
+    const {type, order_id, speak_word, store_id, messageID} = messageQueue[0]
+    await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
+  }
+
+  handleSpeechIflytek = () => {
+    Synthesizer.init("58b571b2")
+    // const synthesizer = new NativeEventEmitter(Synthesizer);
+    // this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
+  };
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
@@ -697,9 +774,13 @@ class AppNavigator extends PureComponent {
       if (accessToken && notInit) {
         notInit = false
         this.initJPush()
+        this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
           await this.calcAppStartTime()
+          await native.isSunmiDevice((flag, isSunmi) => {
+            isSunmiDevice = isSunmi
+          })
         }
         await initBlueTooth(global)
 
@@ -728,10 +809,13 @@ class AppNavigator extends PureComponent {
   }
 
   componentWillUnmount() {
+    setAliasInterval && clearTimeout(setAliasInterval)
+    setAliasInterval = null
     this.unSubscribe()
     //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
+    // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
   }
 
 
@@ -752,42 +836,6 @@ class AppNavigator extends PureComponent {
       }
     })
   }
-
-  // printByBluetoothIOS = () => {
-  //   const {global} = this.props
-  //   let {accessToken, autoBluetoothPrint} = global;
-  //   //const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-  //   // this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //   //   if (obj.order_type !== 'new_order') {
-  //   //     sendDeviceStatus(accessToken, {
-  //   //       ...obj,
-  //   //       btConnected: '收到极光推送，不是新订单不需要打印',
-  //   //       auto_print: autoBluetoothPrint
-  //   //     })
-  //   //     return
-  //   //   }
-  //   //   await handlePrintOrder(this.props, obj)
-  //   // })
-  // }
-
-
-  // printByBluetoothAndroid = () => {
-  //   this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //     await handlePrintOrder(this.props, obj)
-  //
-  //   })
-  // }
-
-  // printByBluetooth = () => {
-  //   switch (Platform.OS) {
-  //     case "ios":
-  //       this.printByBluetoothIOS()
-  //       break
-  //     case "android":
-  //       this.printByBluetoothAndroid()
-  //       break
-  //   }
-  // }
 
   state = {
     version_visible: false,

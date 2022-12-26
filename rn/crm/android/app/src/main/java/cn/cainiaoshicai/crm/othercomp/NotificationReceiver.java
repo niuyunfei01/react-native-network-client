@@ -60,9 +60,9 @@ public class NotificationReceiver extends BroadcastReceiver {
             String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
             Log.d(TAG, "[NotificationReceiver] 接收Registration Id : " + regId);
             //send the Registration Id to your server...
-        } else if(JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
+        } else if (JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
             boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
-            Log.e(TAG, "[NotificationReceiver]" + intent.getAction() +" connected:"+connected);
+            Log.e(TAG, "[NotificationReceiver]" + intent.getAction() + " connected:" + connected);
         } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 //            processCustomMessage(context, bundle);
@@ -95,60 +95,51 @@ public class NotificationReceiver extends BroadcastReceiver {
                 GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
 
                 if (!SettingUtility.isDisableSoundNotify()) {
-                    if (!TextUtils.isEmpty(notify.getSpeak_word())) {
-                        //TODO play new order sound
-                        int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
-                        for (int x = 0; x < repeatTimes; x++) {
-                            //String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
-                            soundManager.play_by_xunfei(notify.getSpeak_word());
+                    //仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
+                    if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+                        if (GlobalCtx.app().acceptTechNotify()) {
+                            soundManager.play_sync_not_work_sound();
                         }
-                    } else {
-                        //仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
-                      if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-                            if (GlobalCtx.app().acceptTechNotify()) {
-                                soundManager.play_sync_not_work_sound();
+                    } else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
+                        soundManager.play_serious_timeout(notify.getNotify_workers());
+                    } else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
+                        int store_id = notify.getStore_id();
+                        if (store_id > 0) {
+                            if ("sold_out".equals(notify.getSound())) {
+                                soundManager.play_item_sold_out_sound(store_id);
+                            } else if ("check_storage".equals(notify.getSound())) {
+                                soundManager.play_storage_check(store_id);
                             }
-                        } else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
-                            soundManager.play_serious_timeout(notify.getNotify_workers());
-                        } else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
-                            int store_id = notify.getStore_id();
-                            if (store_id > 0) {
-                                if ("sold_out".equals(notify.getSound())) {
-                                    soundManager.play_item_sold_out_sound(store_id);
-                                } else if ("check_storage".equals(notify.getSound())) {
-                                    soundManager.play_storage_check(store_id);
-                                }
-                            }
-                        } else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
-                            String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
-                            Gson gson = new GsonBuilder().create();
-                            HashMap<String, String> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, String>>() {
-                            }.getType());
+                        }
+                    } else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
+                        String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+                        Gson gson = new GsonBuilder().create();
+                        HashMap<String, String> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, String>>() {
+                        }.getType());
 
-                            if (params != null && "eleme".equals(params.get("notify_sound"))) {
-                                String storeIdS = params.get("store_id");
-                                if (storeIdS != null && Integer.parseInt(storeIdS) > 0)
-                                    soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
-                            }
-                        } else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
-                            soundManager.play_customer_new_msg();
-                        } else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
-                            soundManager.play_order_cancelled();
-                        } else if (Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
-                            soundManager.play_remind_deliver();
-                        } else if (Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())) {
-                            soundManager.play_order_ask_cancel();
-                        } else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
-                            soundManager.play_dada_manual_timeout();
-                        } else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
-                        } else if (Cts.PUSH_TYPE_TASK_REMIND.equals(notify.getType())) {
-                            String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
-                            Gson gson = new GsonBuilder().create();
-                            HashMap<String, Object> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, Object>>() {
-                            }.getType());
-                            if (params != null && "all_refund_order".equals(params.get("notify_sound"))) {
-                                soundManager.play_refund_sound();
-                            }
+                        if (params != null && "eleme".equals(params.get("notify_sound"))) {
+                            String storeIdS = params.get("store_id");
+                            if (storeIdS != null && Integer.parseInt(storeIdS) > 0)
+                                soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
+                        }
+                    } else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
+                        soundManager.play_customer_new_msg();
+                    } else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+                        soundManager.play_order_cancelled();
+                    } else if (Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
+                        soundManager.play_remind_deliver();
+                    } else if (Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())) {
+                        soundManager.play_order_ask_cancel();
+                    } else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
+                        soundManager.play_dada_manual_timeout();
+                    } else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
+                    } else if (Cts.PUSH_TYPE_TASK_REMIND.equals(notify.getType())) {
+                        String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+                        Gson gson = new GsonBuilder().create();
+                        HashMap<String, Object> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if (params != null && "all_refund_order".equals(params.get("notify_sound"))) {
+                            soundManager.play_refund_sound();
                         }
                     }
                 }
@@ -189,7 +180,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                         || Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())
                         || Cts.PUSH_TYPE_ORDER_UPDATE.equals(notify.getType())
                         || Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())
-                        ) {
+                ) {
 
                     if (notify.getOrder_id() > 0) {
                         i = new Intent(context, MyReactActivity.class);

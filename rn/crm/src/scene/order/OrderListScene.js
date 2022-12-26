@@ -55,44 +55,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const initState = {
-  isLoading: false,
-  categoryLabels: [
-    {tabname: '新订单', num: 0, status: 9},
-    {tabname: '待接单', num: 0, status: 10},
-    {tabname: '待取货', num: 0, status: 2},
-    {tabname: '配送中', num: 0, status: 3},
-    {tabname: '异常', num: 0, status: 8},
-    // {tabname: '退款', num: 0, status: 18},
-  ],
-  query: {
-    listType: null,
-    offset: 0,
-    page: 1,
-    limit: 10,
-    maxPastDays: 100,
-    is_add: true,
-  },
-  sort_list: [
-    {"label": '最新来单', 'value': 'orderTime desc'},
-    {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '送达时间', 'value': 'expectTime asc'},
-  ],
-  ListData: [],
-  order_status: 9,
-  show_sort_modal: false,
-  show_bind_button: false,
-  orderNum: {},
-  is_can_load_more: false,
-  scanBoolean: false,
-  order_id: 0,
-  show_goods_list: false,
-  add_tip_id: 0,
-  show_add_tip_modal: false,
-  show_delivery_modal: false,
-  show_cancel_delivery_modal: false,
-  orders_add_tip: true,
-};
 const timeObj = {
   deviceInfo: {},
   currentStoreId: '',
@@ -107,7 +69,6 @@ class OrderListScene extends Component {
     dispatch: PropTypes.func,
     device: PropTypes.object,
   }
-  state = initState;
 
   constructor(props) {
     super(props);
@@ -121,6 +82,46 @@ class OrderListScene extends Component {
     this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
     this.list_ref = undefined;
+    const {order_status} = props.route.params || {}
+    this.state = {
+      isLoading: false,
+      categoryLabels: [
+        {tabname: '新订单', num: 0, status: 9},
+        {tabname: '待接单', num: 0, status: 10},
+        {tabname: '待取货', num: 0, status: 2},
+        {tabname: '配送中', num: 0, status: 3},
+        {tabname: '异常', num: 0, status: 8},
+        // {tabname: '退款', num: 0, status: 18},
+      ],
+      query: {
+        listType: null,
+        offset: 0,
+        page: 1,
+        limit: 10,
+        maxPastDays: 100,
+        is_add: true,
+      },
+      sort_list: [
+        {"label": '最新来单', 'value': 'orderTime desc'},
+        {"label": '最早来单', 'value': 'orderTime asc'},
+        {"label": '送达时间', 'value': 'expectTime asc'},
+      ],
+      ListData: [],
+      order_status: order_status ?? 9,
+      show_sort_modal: false,
+      show_bind_button: false,
+      orderNum: {},
+      is_can_load_more: false,
+      scanBoolean: false,
+      order_id: 0,
+      show_goods_list: false,
+      add_tip_id: 0,
+      show_add_tip_modal: false,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
+      orders_add_tip: true,
+    };
   }
 
 
@@ -539,7 +540,7 @@ class OrderListScene extends Component {
     const {accessToken} = global;
     dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
       if (ok) {
-        tool.debounces(()=>{
+        tool.debounces(() => {
           hideModal()
           this.onRefresh(9)
         })
@@ -548,6 +549,15 @@ class OrderListScene extends Component {
         hideModal()
       }
     }));
+  }
+
+  navigationToChangeStore = () => {
+    let {only_one_store} = this.props.global;
+    if (only_one_store) {
+      return;
+    }
+    GlobalUtil.setOrderFresh(2)
+    this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
   }
 
   renderHead = () => {
@@ -566,18 +576,11 @@ class OrderListScene extends Component {
         }}
                 xml={menu_left()}/>
 
-        <TouchableOpacity onPress={() => {
-          if (only_one_store) {
-            return;
-          }
-          GlobalUtil.setOrderFresh(2)
-          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{
-            fontSize: 15,
-            color: colors.color333,
-            fontWeight: 'bold'
-          }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+        <TouchableOpacity onPress={() => this.navigationToChangeStore()}
+                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={{fontSize: 15, color: colors.color333, fontWeight: 'bold'}}>
+            {tool.jbbsubstr(store_info?.name, 12)}&nbsp;
+          </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={down(16, 16, colors.color333)}/>
           </If>

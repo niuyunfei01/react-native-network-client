@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import PropType from "prop-types";
 import Config from "../common/config";
 import {bindActionCreators} from "redux";
 import {
@@ -58,11 +57,11 @@ class OrderItem extends React.PureComponent {
     vendor_id: PropTypes.number,
     order_status: PropTypes.number,
     showBtn: PropTypes.bool,
-    fetchData: PropType.func,
-    setState: PropType.func,
-    openCancelDeliveryModal: PropType.func,
-    openFinishDeliveryModal: PropType.func,
-    comesBackBtn: PropType.bool,
+    fetchData: PropTypes.func,
+    setState: PropTypes.func,
+    openCancelDeliveryModal: PropTypes.func,
+    openFinishDeliveryModal: PropTypes.func,
+    comesBackBtn: PropTypes.bool,
   };
   state = {
     verification_modal: false,
@@ -104,15 +103,14 @@ class OrderItem extends React.PureComponent {
   onCallThirdShips = (order_id, store_id, is_addition = 0) => {
     let {accessToken, vendor_id} = this.props;
     showModal('计价中')
-    console.log(new Date().getTime(), '开始获取数据')
+
     getDeliveryList(accessToken, order_id, store_id, vendor_id, is_addition).then(async res => {
-      console.log(new Date().getTime(), '获取数据结束，开始写入')
+
       await this.props.dispatch(setCallDeliveryObj(res))
-      console.log(new Date().getTime(), '完成渲染')
+
     }).catch(() => {
       ToastShort('获取失败，请重试')
     })
-    console.log(new Date().getTime(), '开始跳转页面')
 
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
