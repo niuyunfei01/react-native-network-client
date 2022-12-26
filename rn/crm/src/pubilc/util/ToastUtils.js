@@ -1,77 +1,87 @@
 'use strict';
 import React from 'react';
-import {WModal, WToast} from 'react-native-smart-tip'
-import {ActivityIndicator, StyleSheet} from 'react-native'
+import Toast from "react-native-root-toast";
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native'
 import {Icon} from "../../weui/Icon";
-import tool from "./tool";
 
-export function ToastShort(content, position = WToast.position.BOTTOM, icon = undefined) {
-  WModal.hide()
-  WToast.show({
-    data: content,
-    duration: WToast.duration.SHORT,
+let show_toast = null;
+
+export function ToastShort(content, position = -100) {
+  Toast.hide(show_toast)
+  show_toast = Toast.show(content, {
+    duration: Toast.durations.SHORT,
     position: position,
-    icon: icon
-  })
+    shadow: true,
+    animation: true,
+    hideOnPress: true,
+    delay: 0,
+  });
 }
 
-export function ToastLong(content, position = WToast.position.BOTTOM) {
-  WModal.hide()
-  WToast.show({data: content, duration: WToast.duration.LONG, position: position})
+export function ToastLong(content, position = -100) {
+  Toast.hide(show_toast)
+  show_toast = Toast.show(content, {
+    duration: Toast.durations.LONG,
+    position: position,
+    shadow: true,
+    animation: true,
+    hideOnPress: true,
+    delay: 0,
+  });
 }
 
-export function showModal(content, icon = 'loading', timeOut = 6000, positon = WModal.position.CENTER) {
+export function showModal(content, icon = 'loading', timeOut = 6000, position = 0) {
 
-  WModal.hide()
-  const modalOpts = {
-    data: content,
-    textColor: '#fff',
-    backgroundColor: '#444444',
-    position: positon,
-    icon: icon === 'loading' ? <ActivityIndicator color='#fff' size={'large'}/> :
-      <Icon name={icon} style={[styles.toastIcon]}/>
-  }
-
-  WModal.show(modalOpts)
-  tool.debounces(() => {
-    WModal.hide()
-  }, timeOut);
+  Toast.hide(show_toast)
+  show_toast = Toast.show(
+    <View style={{alignItems: 'center', justifyContent: 'center', minWidth: 150, paddingVertical: 10}}>
+      {icon === 'loading' ? <ActivityIndicator color='#fff' size={'large'}/> :
+        <Icon name={icon} style={[styles.toastIcon]}/>}
+      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+    </View>, {
+      duration: timeOut,
+      position: position,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0,
+    });
 }
 
 export function hideModal() {
-  WModal.hide()
+  Toast.hide(show_toast)
 }
 
-export function showSuccess(content, position = WToast.position.CENTER) {
-  WModal.hide()
-  const toastOpts = {
-    data: content,
-    textColor: '#ffffff',
-    backgroundColor: '#444444',
-    duration: WToast.duration.SHORT, //1.SHORT 2.LONG
-    position: position, // 1.TOP 2.CENTER 3.BOTTOM
-    icon: <Icon name={'success'} style={[styles.toastIcon]}/>
-  }
-  WToast.show(toastOpts)
-  tool.debounces(() => {
-    WToast.hide()
-  }, WToast.duration.LONG);
+export function showSuccess(content, position = 0) {
+  Toast.hide(show_toast)
+  show_toast = Toast.show(
+    <View style={{alignItems: 'center', justifyContent: 'center', minWidth: 150, paddingVertical: 10}}>
+      <Icon name={'success'} style={[styles.toastIcon]}/>
+      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+    </View>, {
+      duration: Toast.durations.SHORT,
+      position: position,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0,
+    });
 }
 
-export function showError(content, position = WToast.position.CENTER) {
-  WModal.hide()
-  const toastOpts = {
-    data: content,
-    textColor: '#ffffff',
-    backgroundColor: '#444444',
-    duration: WToast.duration.LONG, //1.SHORT 2.LONG
-    position: position, // 1.TOP 2.CENTER 3.BOTTOM
-    icon: <Icon name={'warn'} style={[styles.toastIcon]}/>
-  }
-  WToast.show(toastOpts)
-  tool.debounces(() => {
-    WToast.hide()
-  }, WToast.duration.LONG);
+export function showError(content, position = 0) {
+  Toast.hide(show_toast)
+  show_toast = Toast.show(
+    <View style={{alignItems: 'center', justifyContent: 'center', minWidth: 150, paddingVertical: 10}}>
+      <Icon name={'warn'} style={[styles.toastIcon]}/>
+      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+    </View>, {
+      duration: Toast.durations.SHORT,
+      position: position,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0,
+    });
 }
 
 const styles = StyleSheet.create({

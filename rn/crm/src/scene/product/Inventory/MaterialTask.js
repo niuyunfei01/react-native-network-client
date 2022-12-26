@@ -65,7 +65,7 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
-    ToastShort('请求中', 3)
+    ToastShort('请求中')
     HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
