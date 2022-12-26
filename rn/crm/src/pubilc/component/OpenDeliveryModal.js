@@ -78,7 +78,7 @@ class OpenDeliveryModal extends PureComponent {
       verificationCode: '',//验证码
       count_down: '',//倒计时
       selectGeneralDelivery: true,
-      selectAccountType: open_type === 3 || open_type === 1 ? 1 : open_type === 2 ? 2 : 0,//1-选择外送帮 2-选择自有
+      selectAccountType: open_type === 1 ? 1 : open_type === 3 || open_type === 2 ? 2 : 0,//1-选择外送帮 2-选择自有
       headerText: '开通运力'
     }
   }

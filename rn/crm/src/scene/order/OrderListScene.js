@@ -145,7 +145,7 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
     calcMs(timeObj, accessToken)
-
+    this.getVendor()
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
@@ -569,7 +569,6 @@ class OrderListScene extends Component {
         tool.debounces(()=>{
           hideModal()
           this.onRefresh(9)
-          this.getVendor()
         })
       } else {
         ToastLong(msg);

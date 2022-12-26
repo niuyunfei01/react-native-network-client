@@ -180,9 +180,8 @@ class OrderSettingScene extends Component {
 
   timeOutBack = (time, callback) => {
     this.cancelData()
-    let _this = this;
+    this.props.navigation.goBack()
     setTimeout(() => {
-      _this.props.navigation.goBack()
       callback && callback()
     }, time)
   }

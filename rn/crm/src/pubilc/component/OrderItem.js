@@ -237,7 +237,7 @@ class OrderItem extends React.PureComponent {
         <View style={styles.ItemContent}>
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
-            <If condition={Number(item.pickType) === 1}>
+            <If condition={tool.length(item.mt_pick_type_desc) > 0}>
               <View style={{
                 borderRadius: 4,
                 marginBottom: 12,
@@ -250,7 +250,7 @@ class OrderItem extends React.PureComponent {
                   color: '#FF8309',
                   marginVertical: 7,
                   paddingLeft: 10
-                }}> 当前为自提订单，核销码为订单编号，请注意 </Text>
+                }}>{item?.mt_pick_type_desc} </Text>
               </View>
             </If>
             {this.renderUser()}
@@ -261,7 +261,7 @@ class OrderItem extends React.PureComponent {
             <If condition={item?.btn_list && item?.btn_list?.write_off}>
               {this.renderVerificationBtn()}
             </If>
-            <If condition={item?.btn_list && item?.btn_list?.meituan_write_off}>
+            <If condition={item?.btn_list && item?.btn_list?.btn_pick_type_complete_mt}>
               {this.renderFulfilBtn()}
             </If>
             <If condition={Number(item.pickType) !== 1 && showBtn}>
@@ -729,9 +729,10 @@ class OrderItem extends React.PureComponent {
     let {item, accessToken} = this.props;
     showModal("请求中")
     tool.debounces(() => {
-      const api = `/api/transfer_arrived1/${item?.id}?access_token=${accessToken}`
+      const api = `/v4/wsb_order/order_complete_pick_type_mt?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api, {
-        orderId: item?.id
+        order_id: item?.id,
+        store_id: item?.store_id,
       }).then(() => {
         this.closeModal()
         ToastShort('已完成订单')
