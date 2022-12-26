@@ -88,6 +88,9 @@ export const fullDateOther = (dt) => {
 export const dateTime = (dt) => {
   return dayjs(dt).format('MM-DD HH:mm:ss')
 }
+export const dateTimeShort = (dt) => {
+  return dayjs(dt).format('MM-DD HH:mm')
+}
 
 export function fullDate(dt) {
   return dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
@@ -99,6 +102,10 @@ export function fullDay(dt) {
 
 export function fullMonth(dt) {
   return dayjs(dt).format("YYYY-MM");
+}
+
+export const simpleTime = (dt) => {
+  return dayjs(dt).format('HH:mm')
 }
 
 export function vendor(global) {
@@ -584,5 +591,7 @@ export default {
   jbbsubstr,
   filteremoji,
   filtrationInput,
-  fullMonth
+  fullMonth,
+  simpleTime,
+  dateTimeShort
 };

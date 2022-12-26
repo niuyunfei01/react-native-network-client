@@ -50,8 +50,9 @@ import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout} from "../../../reducers/global/globalActions";
+import {logout, setVolume} from "../../../reducers/global/globalActions";
 import JbbAlert from "../../../pubilc/component/JbbAlert";
+import SystemSetting from "react-native-system-setting";
 
 const width = Dimensions.get("window").width;
 
@@ -186,6 +187,10 @@ class Mine extends PureComponent {
   }
 
   onRefresh = () => {
+    const {dispatch} = this.props
+    SystemSetting.getVolume('system').then(volume => {
+      dispatch(setVolume(volume))
+    })
     this.fetchMineData()
     this.fetchWsbWallet()
     this.fetchShowSettleProtocol()
@@ -353,6 +358,7 @@ class Mine extends PureComponent {
   logout = () => {
     const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
+    this.logoutAccount()
     const noLoginInfo = {
       accessToken: '',
       refreshToken: '',
@@ -372,6 +378,13 @@ class Mine extends PureComponent {
     dispatch(logout(() => {
       tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
     }));
+  }
+  logoutAccount = () => {
+    const {accessToken, store_id} = this.props.global
+    const url = `/v4/wsb_user/logout?access_token=${accessToken}`
+    const params = {store_id: store_id}
+    HttpUtils.get(url, params).then(() => {
+    })
   }
   logOutAccount = () => {
 
@@ -423,6 +436,12 @@ class Mine extends PureComponent {
           break
         case 'Settlement':
           this.navigateToSettle()
+          break
+        case 'PushSetting':
+          this.onPress(Config.ROUTE_NOTIFICATION_SETTING)
+          break
+        case 'DistributionAnalysis':
+          this.onPress(Config.ROUTE_BUSINESS_DATA)
           break
         default:
           this.onPress(info?.path)

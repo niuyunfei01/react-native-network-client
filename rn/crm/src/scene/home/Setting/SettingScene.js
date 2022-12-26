@@ -17,7 +17,6 @@ import {
 import * as globalActions from '../../../reducers/global/globalActions';
 import {logout} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
-import JPush from "jpush-react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
@@ -76,8 +75,6 @@ class SettingScene extends PureComponent {
       show_remark_to_rider: true,
       invoice_serial_font: '',
       use_real_weight: false,
-      enable_notify: true,
-      enable_new_order_notify: true,
       notificationEnabled: 1,
       isRun: true,
       showAlertModal: false,
@@ -104,18 +101,10 @@ class SettingScene extends PureComponent {
 
   onHeaderRefresh = async () => {
     this.setState({isRefreshing: true});
-    if (Platform.OS !== 'ios') {
-      await native.getDisableSoundNotify((disabled) => this.setState({enable_notify: !disabled}))
-
-      await native.getNewOrderNotifyDisabled((disabled) => this.setState({enable_new_order_notify: !disabled}))
-
-      await native.isRunInBg((resp) => this.setState({isRun: resp === 1}))
-    }
-
-    JPush.isNotificationEnabled((enabled) => this.setState({notificationEnabled: enabled}))
-
     // this.get_store_settings();
-    this.getConfig();
+    if (Platform.OS === 'android')
+      await native.isRunInBg((resp) => this.setState({isRun: resp === 1}))
+    await this.getConfig();
   }
 
   async componentDidMount() {
@@ -286,82 +275,34 @@ class SettingScene extends PureComponent {
     );
   }
 
-
-  switchNewOrder = async (enable_new_order_notify) => {
-    this.setState({enable_new_order_notify: !enable_new_order_notify});
-    await native.setDisabledNewOrderNotify(enable_new_order_notify)
-  }
-
-  switchVoiceNotify = async (enable_notify) => {
-    this.setState({enable_notify: !enable_notify});
-    await native.setDisableSoundNotify(enable_notify)
-  }
   renderRemind = () => {
-    let {enable_new_order_notify, enable_notify, funds_threshold, notificationEnabled, isRun} = this.state
+    let {isRun} = this.state
     const {currentUserProfile} = this.props.global
     return (
-      <View style={styles.item_body}>
-        <Text style={styles.item_title}>提醒 </Text>
-        <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <If condition={currentUserProfile.mobilephone === '13010241740'}>
-            <PlayMusicComponent/>
-          </If>
-          <If condition={Platform.OS !== 'ios'}>
-            <TouchableOpacity onPress={() => this.switchNewOrder(enable_new_order_notify)} style={styles.item_row}>
-              <Text style={styles.row_label}>新订单通知 </Text>
-              <Switch onValueChange={() => this.switchNewOrder(enable_new_order_notify)}
-                      color={colors.main_color}
-                      value={enable_new_order_notify}/>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => this.switchVoiceNotify(enable_notify)} style={styles.item_row}>
-              <Text style={styles.row_label}>语音通知 </Text>
-              <Switch onValueChange={() => this.switchVoiceNotify(enable_notify)}
-                      color={colors.main_color}
-                      value={enable_notify}/>
-            </TouchableOpacity>
-          </If>
-          <TouchableOpacity onPress={() => this.setState({showAlertModal: true})} style={styles.item_row}>
-            <Text style={styles.row_label}>余额不足通知 </Text>
-            <Text style={styles.row_footer}>
-              {funds_threshold > 0 ? funds_threshold + '元' : "设置通知"}
-            </Text>
-            <Entypo name="chevron-thin-right" style={styles.row_right}/>
-          </TouchableOpacity>
-
-          <If condition={Platform.OS !== 'ios'}>
-            <TouchableOpacity onPress={this.openAppNotification}
-                              style={styles.item_row}>
-              <Text style={styles.row_label}>系统通知 </Text>
-              <Text style={styles.row_footer}>
-                {notificationEnabled ? "已开启" : "去系统设置中开启"}
-              </Text>
-              <Entypo name="chevron-thin-right" style={styles.row_right}/>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={this.openAndroidBackgroundRun} style={styles.item_row}>
-              <Text style={styles.row_label}>后台运行 </Text>
-              <Text style={styles.row_footer}>
-                {isRun ? "已开启" : '未开启 - 去设置'}
-              </Text>
-              <Entypo name="chevron-thin-right" style={styles.row_right}/>
-            </TouchableOpacity>
-          </If>
+      <If condition={currentUserProfile.mobilephone === '13010241740' || Platform.OS === 'android'}>
+        <View style={styles.item_body}>
+          <Text style={styles.item_title}>提醒 </Text>
+          <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+            <If condition={currentUserProfile.mobilephone === '13010241740'}>
+              <View style={styles.item_body}>
+                <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
+                  <PlayMusicComponent/>
+                </View>
+              </View>
+            </If>
+            <If condition={Platform.OS === 'android'}>
+              <TouchableOpacity onPress={this.openAndroidBackgroundRun} style={styles.item_row}>
+                <Text style={styles.row_label}>后台运行 </Text>
+                <Text style={styles.row_footer}>
+                  {isRun ? "已开启" : '未开启 - 去设置'}
+                </Text>
+                <Entypo name="chevron-thin-right" style={styles.row_right}/>
+              </TouchableOpacity>
+            </If>
+          </View>
         </View>
-      </View>
+      </If>
     )
-  }
-
-  openAppNotification = () => {
-    Alert.alert('确认是否已开启', '', [
-      {
-        text: '去开启', onPress: async () => {
-          await native.toOpenNotifySettings()
-          await this.onHeaderRefresh();
-        }
-      },
-      {text: '确认', onPress: this.onHeaderRefresh}
-    ])
   }
 
   openAndroidBackgroundRun = () => {
@@ -383,10 +324,7 @@ class SettingScene extends PureComponent {
         <Text style={styles.item_title}>备注 </Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
 
-          <TouchableOpacity onPress={() => {
-            let val = !show_remark_to_rider
-            this.setConfig('show_remark_to_rider', val)
-          }}
+          <TouchableOpacity onPress={() => this.setConfig('show_remark_to_rider', !show_remark_to_rider)}
                             style={styles.item_row}>
             <View style={{flex: 1}}>
               <Text style={styles.row_label}>对骑手展示订单备注 </Text>

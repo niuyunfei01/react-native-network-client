@@ -159,6 +159,7 @@ const C = {
   ROUTE_SETTLEMENT: 'Settlement',
   ROUTE_BIND_PAY: 'BindPay',
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
+  ROUTE_BUSINESS_DATA: 'BusinessData',
   ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_PROTOCOL: 'SettlementProtocol',
@@ -188,7 +189,9 @@ const C = {
   ROUTE_REGISTER_SHUNFENG: 'RegisterShunfeng',
   ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
-  ROUTE_INFORM: 'InfromSetting',              //通知设置
+  ROUTE_GOODS_AUDIT: 'GoodsAudit',
+  ROUTE_NOTIFICATION_SETTING: 'NotificationSetting',//通知设置
+  ROUTE_INFORM: 'InfromSetting',
   ROUTE_PUSH: 'PushSetting',                  //推送设置
   ROUTE_HISTORY_NOTICE: 'HistoryNoticeScene', //  历史公告
   ROUTE_DETAIL_NOTICE: 'DetailNoticeScene', // 公告详情
@@ -288,6 +291,7 @@ const C = {
   hostPort,
   //配送类型
   SHUN_FENG_TONG_CHENG: 12,
+  SHUN_FENG_QI_YE_C: 71,
   GUO_XIAO_DI: 17,
   DA_DA_JING_JI: 2,
   DA_DA_JI_SONG: 70,

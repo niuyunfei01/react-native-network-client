@@ -8,6 +8,7 @@ import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
 import store from "./configureStore";
 import dayjs from "dayjs";
+import {nrRecordMetric} from "./NewRelicRN";
 
 const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
@@ -54,9 +55,10 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    const report_url = '/util/crm_error_report/1'
-    if (report_url === url)
-      return
+    if(global.noLoginInfo.accessToken)
+      global.noLoginInfo.accessToken='存在token'
+    if(global.noLoginInfo.refreshToken)
+      global.noLoginInfo.refreshToken='存在refreshToken'
     const report_params = {
       APP_VERSION_CODE: DeviceInfo.getVersion(),
       CUSTOM_DATA: {
@@ -67,7 +69,6 @@ class HttpUtils {
       PHONE_MODEL: DeviceInfo.getModel(),
       STACK_TRACE: {
         error: error,
-        uri: uri,
         options: options,
         url: url,
         params: params,
@@ -76,7 +77,7 @@ class HttpUtils {
         currentRouteName: global.currentRouteName
       }
     };
-    HttpUtils.post(report_url, report_params).then()
+    nrRecordMetric('app_url_request',report_params)
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
@@ -95,7 +96,7 @@ class HttpUtils {
       }
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const startTime = getTime()
       fetch(uri, options)
         .then((response) => {
@@ -125,6 +126,7 @@ class HttpUtils {
             return;
           }
           hideModal()
+
           this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
             this.error(response, method, url, params);
@@ -136,7 +138,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-          this.upLoadData(error.message, uri, url, options, params, method)
+           this.upLoadData(error.message, uri, url, options, params, method)
           hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {

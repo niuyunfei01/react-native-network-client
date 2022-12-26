@@ -31,11 +31,11 @@ function mapStateToProps(state) {
 class SettlementPlatform extends PureComponent {
   constructor(props) {
     super(props);
-    const params = this.props.route.params?.date
+    const {start_date, store_name} = this.props.route.params
     this.state = {
       showModal: false,
-      date: tool.fullDay(params.start_time * 1000),
-      settlementInfo: this.props.route.params?.info || {},
+      date: start_date,
+      store_name: store_name,
       platformMoney: '',
       remark_input_value: '',
       logList: [],
@@ -138,10 +138,10 @@ class SettlementPlatform extends PureComponent {
   }
 
   renderSettlement = () => {
-    let {settlementInfo, platformMoney, remark_input_value} = this.state;
+    let {store_name, platformMoney, remark_input_value} = this.state;
     return (
       <View style={styles.InfoBox}>
-        <Text style={styles.infoLabel}>{settlementInfo?.store_name} </Text>
+        <Text style={styles.infoLabel}>{store_name} </Text>
         <View style={styles.platformBox}>
           <Text style={styles.infoLabel}>平台结算金额 </Text>
           <View style={{backgroundColor: colors.f5, borderRadius: 6}}>
@@ -237,7 +237,8 @@ class SettlementPlatform extends PureComponent {
           }
           style={styles.Content}>
           {this.renderSettlement()}
-          <Text style={{fontSize: 14, color: colors.color999, marginTop: 10, marginLeft: width * 0.04}}>历史变更记录 </Text>
+          <Text
+            style={{fontSize: 14, color: colors.color999, marginTop: 10, marginLeft: width * 0.04}}>历史变更记录 </Text>
           {this.renderLog()}
         </ScrollView>
         {this.renderDatePicker()}

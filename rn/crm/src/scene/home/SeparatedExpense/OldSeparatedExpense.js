@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -9,11 +8,11 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
+import MonthPicker from 'react-native-month-year-picker';
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,42 +30,46 @@ function mapDispatchToProps(dispatch) {
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    const {navigation} = props;
-    let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
-    if (wsbShowBtn) {
-      navigation.setOptions(
-        {
-          headerRight: (() => (
-              <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                <View style={{
-                  width: pxToDp(96),
-                  height: pxToDp(46),
-                  backgroundColor: colors.main_color,
-                  marginRight: 8,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}>
-                  <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-                </View>
-              </TouchableOpacity>
-            )
-          )
-        }
-      );
-    }
+
+
     let date = new Date();
     this.state = {
       records: [],
       by_labels: [],
       data_labels: [],
       date: date,
-      start_day: this.format(date)
+      start_day: tool.fullMonth(date),
+      visible: false
     }
   }
 
-  UNSAFE_componentWillMount() {
+  headerRight = () => {
+    const {navigation} = this.props;
+    return (
+      <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+        <View style={{
+          width: pxToDp(96),
+          height: pxToDp(46),
+          backgroundColor: colors.main_color,
+          marginRight: 8,
+          borderRadius: 10,
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
+          <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  componentDidMount() {
     this.fetchExpenses()
+    const {navigation, route} = this.props;
+    let wsbShowBtn = route.params.showBtn && route.params.showBtn === 1
+    if (wsbShowBtn) {
+      navigation.setOptions({headerRight: this.headerRight}
+      );
+    }
   }
 
   fetchExpenses() {
@@ -87,21 +90,15 @@ class SeparatedExpense extends PureComponent {
     return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
   }
 
-  onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
+  onChange = (event, date) => {
+    if (event === 'dismissedAction') {
+      this.setState({visible: false})
+      return
+    }
+    this.setState({date: date, start_day: tool.fullMonth(date)}, function () {
       this.fetchExpenses();
     })
 
-  }
-
-  format = (date) => {
-    let mday = date.getDate();
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
-  }
-
-  onDismiss() {
   }
 
   onItemClicked(item) {
@@ -117,22 +114,9 @@ class SeparatedExpense extends PureComponent {
   }
 
   render() {
-    const props = this.props;
-    const {date, records} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+    const {date, records, visible, start_day} = this.state;
     return (
-      <ScrollView
-        style={{flex: 1, backgroundColor: '#f5f5f9'}}
-      >
+      <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List
           style={{width: "100%"}}
           renderHeader={() => {
@@ -147,36 +131,18 @@ class SeparatedExpense extends PureComponent {
               paddingHorizontal: pxToDp(30),
               zIndex: 999,
             }}>
+              <Text style={{color: colors.color111, flex: 1, fontSize: 16, fontWeight: "bold"}}> 请选择月份 </Text>
               <Text style={{
                 color: colors.color111,
-                flex: 1,
                 fontSize: 16,
-                fontWeight: "bold",
-              }}> 请选择月份 </Text>
-              <PopPicker
-                datePicker={datePicker}
-                transitionName="rmc-picker-popup-slide-fade"
-                maskTransitionName="rmc-picker-popup-fade"
-                styles={styles}
-                title={'选择日期'}
-                okText={'确认'}
-                dismissText={'取消'}
-                date={date}
-                onDismiss={this.onDismiss}
-                onChange={this.onChange}
-              >
-                <Text style={{
-                  color: colors.color111,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  padding: 5,
-                  width: 200,
-                  textAlign: 'right'
-                }}>
-                  {this.state.start_day} &nbsp;&nbsp;&nbsp;
-                  <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
-                </Text>
-              </PopPicker>
+                fontWeight: 'bold',
+                padding: 5,
+                width: 200,
+                textAlign: 'right'
+              }}>
+                {start_day} &nbsp;&nbsp;&nbsp;
+                <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
+              </Text>
             </View>
           }}>
           {records && records.map((item, id) => {
@@ -184,24 +150,31 @@ class SeparatedExpense extends PureComponent {
               arrow="horizontal"
               key={id}
               onClick={() => this.onItemClicked(item)}
-              extra={<Text
-                style={{
-                  fontSize: pxToDp(36),
-                  fontWeight: 'bold'
-                }}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
+              extra={<Text style={{fontSize: pxToDp(36), fontWeight: 'bold'}}>
+                {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
+              </Text>}
 
             >
               <Text style={{color: colors.color333}}> {item.day} </Text>
             </List.Item>
           })}
         </List>
+        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
+          <MonthPicker value={date}
+                       cancelButton={'取消'}
+                       okButton={'确定'}
+                       autoTheme={true}
+                       mode={'number'}
+                       onChange={(event, newDate) => this.onChange(event, newDate)}
+                       maximumDate={new Date()}
+                       minimumDate={new Date(2015, 8, 15)}/>
+        </CommonModal>
       </ScrollView>
     )
   }
 }
 
 const style = StyleSheet.create({
-  popPicker: {},
   saAmountStyle: {
     color: colors.orange,
   },

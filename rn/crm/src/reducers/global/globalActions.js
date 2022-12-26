@@ -54,11 +54,19 @@ const {
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT
+  SET_AUTO_PRINT,
+  SET_VOLUME
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
+}
+
+export const setVolume = (value) => {
+  return {
+    type: SET_VOLUME,
+    payload: value
+  }
 }
 
 export const setAutoPrint = (autoBluetoothPrint) => {

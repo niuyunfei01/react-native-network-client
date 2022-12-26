@@ -29,7 +29,8 @@ const {
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT
+  SET_AUTO_PRINT,
+  SET_VOLUME
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -81,7 +82,8 @@ const initialState = {
   refreshToken: '',
   getTokenTs: 0,
   lastCheckVersion: 0,
-  call_delivery_obj: {}
+  call_delivery_obj: {},
+  volume: 0
 };
 
 /**
@@ -92,6 +94,11 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_VOLUME:
+      return {
+        ...state,
+        volume: action.payload
+      }
     case SET_AUTO_PRINT:
       return {
         ...state,

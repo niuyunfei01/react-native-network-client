@@ -226,7 +226,7 @@ class BindShunfeng extends PureComponent {
     const {shunFengInfo} = this.props.route.params
     const params = {
       name: shunFengInfo.name,
-      type: this.props.route.params.id,
+      type: shunFengInfo.type,
       app_key: '',
       app_secret: '',
       shop_id: sfStoreID,

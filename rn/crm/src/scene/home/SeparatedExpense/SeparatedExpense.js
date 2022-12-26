@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import ReactNative, {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -8,15 +7,14 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import tool from "../../../pubilc/util/tool";
+import MonthPicker from 'react-native-month-year-picker';
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
 
 const {StyleSheet} = ReactNative
 
@@ -70,9 +68,10 @@ class SeparatedExpense extends PureComponent {
       data_labels: [],
       date: date,
       choseTab: 1,
-      start_day: this.format(date),
+      start_day: tool.fullMonth(date),
       service_msg: "",
-      show_service_msg: false
+      show_service_msg: false,
+      visible: false
     }
   }
 
@@ -209,21 +208,18 @@ class SeparatedExpense extends PureComponent {
   }
 
   // 切换费用账单 充值记录tab
-  onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
+  onChange = (event, date) => {
+    if (event === 'dismissedAction') {
+      this.setState({visible: false})
+      return
+    }
+    this.setState({date: date, start_day: tool.fullMonth(date)}, function () {
       if (this.state.choseTab === 1) {
         this.fetchExpenses();
       } else {
         this.fetchRechargeRecord();
       }
     })
-  }
-
-  // 处理月份函数
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
   }
 
   onDismiss() {
@@ -251,6 +247,7 @@ class SeparatedExpense extends PureComponent {
   }
 
   render() {
+    const {visible, date} = this.state
     return (
       <View style={Styles.containerContent}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
@@ -265,6 +262,16 @@ class SeparatedExpense extends PureComponent {
           {this.renderWSBType()}
           {this.renderWSBContent()}
         </ScrollView>
+        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
+          <MonthPicker value={date}
+                       cancelButton={'取消'}
+                       okButton={'确定'}
+                       autoTheme={true}
+                       mode={'number'}
+                       onChange={(event, newDate) => this.onChange(event, newDate)}
+                       maximumDate={new Date()}
+                       minimumDate={new Date(2015, 8, 15)}/>
+        </CommonModal>
       </View>
     )
   }
@@ -328,53 +335,31 @@ class SeparatedExpense extends PureComponent {
   }
 
   renderWSBContent = () => {
-    const {date, records, records3, records2, choseTab} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
-
+    const {records, records3, records2, choseTab, start_day} = this.state;
     return (
       <View>
 
         <View style={Styles.expensesHeader}>
-          <Text style={Styles.selectMonthLabel}> 请选择月份 </Text>
-          <PopPicker
-            datePicker={datePicker}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={styles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={date}
-            onDismiss={this.onDismiss}
-            onChange={this.onChange}
-          >
-            <Text style={Styles.selectMonthText}> {this.state.start_day} &nbsp; <Entypo
-              name='chevron-thin-down' style={Styles.selectMonthIcon}/></Text>
-          </PopPicker>
+          <Text style={Styles.selectMonthLabel}>请选择月份 </Text>
+          <Text style={Styles.selectMonthText}>
+            {start_day} &nbsp; <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+          </Text>
         </View>
 
         <If condition={choseTab === 1}>
           {records && records.map((item, id) => {
-            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
-              <Text style={Styles.recordsItemTime}>{item.day} </Text>
-              <View style={Styles.flex1}/>
-              <View>
-                <Text
-                  style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-                </Text>
-                <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
-              </View>
-              <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-            </TouchableOpacity>
+            return (
+              <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
+                <Text style={Styles.recordsItemTime}>{item.day} </Text>
+                <View style={Styles.flex1}/>
+                <View>
+                  <Text
+                    style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}</Text>
+                  <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
+                </View>
+                <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+              </TouchableOpacity>
+            )
           })}
         </If>
         <If condition={choseTab === 3}>

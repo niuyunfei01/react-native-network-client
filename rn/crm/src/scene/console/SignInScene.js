@@ -2,14 +2,12 @@ import React, {PureComponent} from "react";
 import {FlatList, StyleSheet, Switch, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import {format, getSimpleTime} from "../../pubilc/util/TimeUtil";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
-import DatePicker from "rmc-date-picker/lib/DatePicker";
-import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
-import PopPicker from "rmc-date-picker/lib/Popup";
-import PopupStyles from 'rmc-picker/lib/PopupStyles';
+import MonthPicker from 'react-native-month-year-picker';
+import tool from "../../pubilc/util/tool";
+import CommonModal from "../../pubilc/component/goods/CommonModal";
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
@@ -134,10 +132,11 @@ class SignInScene extends PureComponent {
     const {sigInInfo} = props.route.params
     this.state = {
       selectDate: today,
-      start_day: format(today),
+      start_day: tool.fullMonth(today),
       sigInInfo: sigInInfo,
-      currentDatetime: getSimpleTime(),
-      shippingAcceptStatus: 1
+      currentDatetime: tool.simpleTime(today),
+      shippingAcceptStatus: 1,
+      visible: false
     }
   }
 
@@ -145,7 +144,7 @@ class SignInScene extends PureComponent {
     const {navigation} = this.props
     this.focus = navigation.addListener('focus', async () => {
       this.getTime = setInterval(() => {
-        this.setState({currentDatetime: getSimpleTime()})
+        this.setState({currentDatetime: tool.simpleTime(new Date())})
       }, 1000)
     })
     this.blur = navigation.addListener('blur', () => {
@@ -300,36 +299,21 @@ class SignInScene extends PureComponent {
       </View>
     )
   }
+
+  setVisible = (value) => {
+    this.setState({visible: value})
+  }
   renderList = () => {
-    const {start_day, selectDate, sigInInfo} = this.state
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={selectDate}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+    const {start_day, sigInInfo} = this.state
     return (
       <View style={styles.bottomWrap}>
         <View style={styles.currentDateWrap}>
-          <PopPicker datePicker={datePicker}
-                     transitionName="rmc-picker-popup-slide-fade"
-                     maskTransitionName="rmc-picker-popup-fade"
-                     styles={PopupStyles}
-                     title={'选择日期'}
-                     okText={'确认'}
-                     dismissText={'取消'}
-                     date={selectDate}
-                     onChange={this.onChange}>
-            <Text style={styles.currentDate}>
-              {start_day}
-              <AntDesign name={'caretdown'} size={15}/>
-            </Text>
-          </PopPicker>
+          <Text style={styles.currentDate} onPress={() => this.setVisible(true)}>
+            {start_day}
+            <AntDesign name={'caretdown'} size={15}/>
+          </Text>
         </View>
+
         <View style={styles.listHeadWrap}>
           <Text style={styles.listHeadDateText}>
             日期
@@ -352,17 +336,32 @@ class SignInScene extends PureComponent {
     )
   }
 
-  onChange = (date) => {
-    const start_day = format(date)
+  onChange = (event, date) => {
+    if (event === 'dismissedAction') {
+      this.setVisible(false)
+      return
+    }
+    const start_day = tool.fullMonth(date)
     this.getLogList(start_day)
-    this.setState({start_day: start_day, selectDate: date})
+    this.setState({start_day: start_day, selectDate: date, visible: false})
   }
 
   render() {
+    const {visible, selectDate} = this.state
     return (
       <>
         {this.renderMainZone()}
         {this.renderList()}
+        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
+          <MonthPicker value={selectDate}
+                       cancelButton={'取消'}
+                       okButton={'确定'}
+                       autoTheme={true}
+                       mode={'number'}
+                       onChange={(event, newDate) => this.onChange(event, newDate)}
+                       maximumDate={new Date()}
+                       minimumDate={new Date(2015, 8, 15)}/>
+        </CommonModal>
       </>
     )
   }
