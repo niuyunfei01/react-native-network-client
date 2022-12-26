@@ -149,9 +149,9 @@ class OpenDeliveryModal extends PureComponent {
         store_id: store_id,
         phone: phone
       }).then(res => {
-        ToastShort(res.desc, 1)
+        ToastShort(res.desc, 100)
       }).catch((reason) => {
-        ToastShort(reason.desc, 1)
+        ToastShort(reason.desc, 100)
       })
     }
   }
@@ -161,23 +161,23 @@ class OpenDeliveryModal extends PureComponent {
     if (count_down <= 0) {
       const params = {access_token: accessToken, vendorId: vendor_id}
       HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(res => {
-        ToastShort(res.desc, 1)
+        ToastShort(res.desc, 100)
       }).catch((reason) => {
-        ToastShort(reason.desc, 1)
+        ToastShort(reason.desc, 100)
       })
     }
   }
   getVerificationCode = () => {
     const {mobile, deliveryType, count_down} = this.state
     if (!mobile) {
-      ToastShort('请输入手机号', 1)
+      ToastShort('请输入手机号', 100)
       return
     }
     if (count_down > 0) {
-      ToastShort('请稍后重试', 1)
+      ToastShort('请稍后重试', 100)
       return
     }
-    showSuccess('验证码发送成功！', 1)
+    showSuccess('验证码发送成功！', 100)
     if (deliveryType === Config.UU_PAO_TUI)
       this.getUUPTPhoneCode()
     if (deliveryType === Config.GUO_XIAO_DI)
@@ -318,7 +318,7 @@ class OpenDeliveryModal extends PureComponent {
 
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
       this.setState({selectGeneralDelivery: false})
-      ToastShort('请输入手机号或者验证码', 1)
+      ToastShort('请输入手机号或者验证码', 100)
       return;
     }
     const api = `/v1/new_api/Delivery/get_bind_user?access_token=${accessToken}&vendorId=${vendor_id}`
@@ -326,11 +326,11 @@ class OpenDeliveryModal extends PureComponent {
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
-      ToastShort(res.desc, 1)
+      ToastShort(res.desc, 100)
 
     }).catch(async (reason) => {
       await this.closeModal()
-      ToastShort(reason.desc, 1)
+      ToastShort(reason.desc, 100)
     })
   }
 
@@ -341,7 +341,7 @@ class OpenDeliveryModal extends PureComponent {
     let {mobile, verificationCode} = this.state
     if (!tool.length(mobile) > 0 || !tool.length(verificationCode) > 0) {
       this.setState({selectGeneralDelivery: false})
-      ToastShort('请输入手机号或者验证码', 1)
+      ToastShort('请输入手机号或者验证码', 100)
       return;
     }
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${vendor_id}`
@@ -354,10 +354,10 @@ class OpenDeliveryModal extends PureComponent {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
 
-      ToastShort(res.desc, 1)
+      ToastShort(res.desc, 100)
     }).catch(async (reason) => {
       await this.closeModal()
-      ToastShort(reason.desc, 1)
+      ToastShort(reason.desc, 100)
     })
   }
   handlerOpenDelivery = async () => {

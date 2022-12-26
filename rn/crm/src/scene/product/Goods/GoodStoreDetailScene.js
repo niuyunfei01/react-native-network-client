@@ -555,7 +555,7 @@ class GoodStoreDetailScene extends PureComponent {
     const params = {store_id: store_id, product_id: product_id, stall_id: stall_id}
     const url = `/api_products/save_prod_stall?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(url, params).then(() => {
-      showSuccess('绑定成功', 3)
+      showSuccess('绑定成功', 100)
       this.getStoreProdWithProd()
       this.closeModal()
     })

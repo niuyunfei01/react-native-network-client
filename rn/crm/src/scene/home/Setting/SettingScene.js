@@ -298,12 +298,12 @@ class SettingScene extends PureComponent {
   }
   renderRemind = () => {
     let {enable_new_order_notify, enable_notify, funds_threshold, notificationEnabled, isRun} = this.state
-    const {currentUser} = this.props.global
+    const {currentUserProfile} = this.props.global
     return (
       <View style={styles.item_body}>
         <Text style={styles.item_title}>提醒 </Text>
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <If condition={currentUser == 3093374}>
+          <If condition={currentUserProfile.mobilephone === '13010241740'}>
             <PlayMusicComponent/>
           </If>
           <If condition={Platform.OS !== 'ios'}>
