@@ -40,7 +40,6 @@ import JbbModal from "./JbbModal";
 import {getDeliveryList} from "../services/delivery";
 import {setCallDeliveryObj} from "../../reducers/global/globalActions";
 import JbbAlert from "./JbbAlert";
-import AlertModal from "./AlertModal";
 
 let width = Dimensions.get("window").width;
 
@@ -68,7 +67,6 @@ class OrderItem extends React.PureComponent {
   state = {
     verification_modal: false,
     show_call_user_modal: false,
-    show_fulfil_order_modal: false,
     pickupCode: '',
     err_msg: '',
   }
@@ -179,14 +177,13 @@ class OrderItem extends React.PureComponent {
     this.setState({
       verification_modal: false,
       show_call_user_modal: false,
-      show_fulfil_order_modal: false,
     })
   }
 
   goVeriFicationToShop = () => {
-    let {item} = this.props;
+    let {item, accessToken} = this.props;
     let {pickupCode} = this.state
-    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
+    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(() => {
       this.closeModal();
       ToastShort(`核销成功，订单已完成`)
@@ -215,10 +212,6 @@ class OrderItem extends React.PureComponent {
   touchLocation = () => {
     let {item} = this.props;
     this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: 0, order_id: item?.id})
-
-    // this.mixpanel.track('订单列表页_点击位置')
-    // const path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
-    // this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
   }
 
   routeOrder = () => {
@@ -267,7 +260,6 @@ class OrderItem extends React.PureComponent {
           </View>
           {this.renderPickModal()}
           {this.renderCallUser()}
-          {this.renderFulfilOrderModal()}
         </View>
 
       </TouchableWithoutFeedback>
@@ -499,6 +491,25 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  onFulfilOrder = () => {
+    let {item, accessToken} = this.props;
+    showModal("请求中")
+    tool.debounces(() => {
+      const api = `/v4/wsb_order/order_complete_pick_type_mt?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        order_id: item?.id,
+        store_id: item?.store_id,
+      }).then(() => {
+        this.closeModal()
+        ToastShort('已完成订单')
+        this.props.fetchData();
+      }).catch(e => {
+        this.closeModal()
+        ToastShort('完成失败' + e?.desc)
+      })
+    }, 600)
+  }
+
   renderFulfilBtn = () => {
     return (
       <View style={{
@@ -510,8 +521,11 @@ class OrderItem extends React.PureComponent {
         <Button title={'自提完成'}
                 onPress={() => {
                   this.mixpanel.track('V4订单列表_自提完成')
-                  this.setState({
-                    show_fulfil_order_modal: true
+                  JbbAlert.show({
+                    title: '确认完成当前订单吗？',
+                    actionText: '确定',
+                    closeText: '取消',
+                    onPress: this.onFulfilOrder
                   })
                 }}
                 buttonStyle={[styles.modalBtn, {
@@ -683,22 +697,6 @@ class OrderItem extends React.PureComponent {
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
       </TouchableOpacity>
-    )
-  }
-
-  renderFulfilOrderModal = () => {
-    let {show_fulfil_order_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_fulfil_order_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={this.onFulfilOrder}
-          title={'确认完成当前订单吗？'}
-          actionText={'确定'}
-          closeText={'取消'}/>
-      </View>
     )
   }
 
