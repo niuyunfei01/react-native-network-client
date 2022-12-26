@@ -202,7 +202,7 @@ class OrderSettingScene extends Component {
   intelligentIdentification = () => {
     const {smartText, accessToken, city} = this.state
     if (tool.length(smartText) <= 0) {
-      return ToastShort("请粘贴地址", 0)
+      return ToastShort("请粘贴地址")
     }
     const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(api, {
