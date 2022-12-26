@@ -25,6 +25,7 @@ import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
+import JbbAlert from "../component/JbbAlert";
 
 
 let {width} = Dimensions.get("window");
@@ -803,6 +804,7 @@ class AppNavigator extends PureComponent {
     const {version_visible, desc} = this.state
     return (
       <>
+        <JbbAlert/>
         <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
           <>
             <ImageBackground style={styles.image} source={new_version_background_url}>

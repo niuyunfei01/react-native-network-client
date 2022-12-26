@@ -36,10 +36,11 @@ import {SvgXml} from "react-native-svg";
 import {call, cross_icon, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
 import LinearGradient from "react-native-linear-gradient";
-import AlertModal from "./AlertModal";
 import JbbModal from "./JbbModal";
 import {getDeliveryList} from "../services/delivery";
 import {setCallDeliveryObj} from "../../reducers/global/globalActions";
+import JbbAlert from "./JbbAlert";
+import AlertModal from "./AlertModal";
 
 let width = Dimensions.get("window").width;
 
@@ -66,9 +67,7 @@ class OrderItem extends React.PureComponent {
   };
   state = {
     verification_modal: false,
-    show_close_delivery_modal: false,
     show_call_user_modal: false,
-    show_cancel_deliverys_modal: false,
     show_fulfil_order_modal: false,
     pickupCode: '',
     err_msg: '',
@@ -178,9 +177,7 @@ class OrderItem extends React.PureComponent {
 
   closeModal = () => {
     this.setState({
-      show_cancel_deliverys_modal: false,
       verification_modal: false,
-      show_close_delivery_modal: false,
       show_call_user_modal: false,
       show_fulfil_order_modal: false,
     })
@@ -270,8 +267,6 @@ class OrderItem extends React.PureComponent {
           </View>
           {this.renderPickModal()}
           {this.renderCallUser()}
-          {this.renderCloseDeliveryModal()}
-          {this.renderCancelDeliverysModal()}
           {this.renderFulfilOrderModal()}
         </View>
 
@@ -691,59 +686,6 @@ class OrderItem extends React.PureComponent {
     )
   }
 
-
-  renderCloseDeliveryModal = () => {
-    let {show_close_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_close_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={this.onOverlookDelivery}
-          title={'忽略订单将会把该订单置为已完成，请选择“忽略并上传”将会上传配送信息至平台，提升回传率，避免产生回传不达标造成管控'}
-          actionText={'忽略并上传'}
-          closeText={'暂不'}/>
-      </View>
-    )
-  }
-
-
-  renderCancelDeliverysModal = () => {
-    let {show_cancel_deliverys_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_cancel_deliverys_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.cancelDeliverys()}
-          title={'确定取消此订单全部配送吗?'}
-          actionText={'确定'}
-          closeText={'取消'}/>
-      </View>
-    )
-  }
-
-  onFulfilOrder = () => {
-    let {item, accessToken} = this.props;
-    showModal("请求中")
-    tool.debounces(() => {
-      const api = `/v4/wsb_order/order_complete_pick_type_mt?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(api, {
-        order_id: item?.id,
-        store_id: item?.store_id,
-      }).then(() => {
-        this.closeModal()
-        ToastShort('已完成订单')
-        this.props.fetchData();
-      }).catch(e => {
-        this.closeModal()
-        ToastShort('完成失败' + e?.desc)
-      })
-    }, 600)
-  }
-
   renderFulfilOrderModal = () => {
     let {show_fulfil_order_modal} = this.state;
     return (
@@ -783,12 +725,18 @@ class OrderItem extends React.PureComponent {
         }}>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
+
           <Button title={'忽略配送'}
                   onPress={() => {
                     this.mixpanel.track('订单列表页_忽略配送')
-                    this.setState({
-                      show_close_delivery_modal: true
+
+                    JbbAlert.show({
+                      title: '忽略配送会影响配送回传，确定要忽略吗？',
+                      actionText: '暂不',
+                      closeText: '忽略',
+                      onPressClose: this.onOverlookDelivery,
                     })
+
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -804,9 +752,15 @@ class OrderItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_一键取消')
-                    this.setState({
-                      show_cancel_deliverys_modal: true
+
+
+                    JbbAlert.show({
+                      title: '确定取消此订单全部配送吗?',
+                      actionText: '确定',
+                      closeText: '取消',
+                      onPress: this.cancelDeliverys,
                     })
+
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
