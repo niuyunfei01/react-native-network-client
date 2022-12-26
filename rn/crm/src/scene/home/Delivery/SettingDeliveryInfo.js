@@ -48,9 +48,6 @@ class SettingDeliveryInfo extends PureComponent {
     };
   }
 
-  componentDidMount() {
-    this.getDeliveryConf()
-  }
 
   onHeaderRefresh = () => {
     this.getDeliveryConf();
@@ -63,6 +60,10 @@ class SettingDeliveryInfo extends PureComponent {
   }
 
   getDeliveryConf = () => {
+    if(tool.length(this.props.route.params.ext_store_id) <= 0){
+      ToastLong('操作失败，请稍后重试')
+      return this.props.navigation.goBack();
+    }
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
       let showBtn = this.props.route.params.showBtn;
       if (tool.length(response.bind_info) > 0) {

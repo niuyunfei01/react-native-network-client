@@ -37,8 +37,8 @@ import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import AlertModal from "../../pubilc/component/AlertModal";
 import {doJPushSetAlias} from "../../pubilc/component/jpushManage";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get("window");
 
@@ -90,7 +90,6 @@ const initState = {
   show_add_tip_modal: false,
   show_delivery_modal: false,
   show_cancel_delivery_modal: false,
-  show_finish_delivery_modal: false,
   orders_add_tip: true,
 };
 const timeObj = {
@@ -190,6 +189,7 @@ class OrderListScene extends Component {
   }
 
   onRefresh = (status) => {
+
     // tool.debounces(() => {
     const {isLoading, query} = this.state
     if (GlobalUtil.getOrderFresh() === 2 || isLoading) {
@@ -358,8 +358,15 @@ class OrderListScene extends Component {
   openFinishDeliveryModal = (order_id) => {
     this.setState({
       order_id: order_id,
-      show_finish_delivery_modal: true,
       show_delivery_modal: false
+    }, () => {
+      JbbAlert.show({
+        title: '当前配送确认完成吗?',
+        desc: '订单送达后无法撤回，请确认顾客已收到货物',
+        actionText: '确定',
+        closeText: '再想想',
+        onPress: this.toSetOrderComplete,
+      })
     })
   }
 
@@ -379,13 +386,11 @@ class OrderListScene extends Component {
 
     return (
       <View style={styles.flex1}>
-
         {/*<FloatServiceIcon fromComponent={'订单列表'}/>*/}
         {this.renderHead()}
         {this.renderStatusTabs()}
         {this.renderContent()}
         {this.renderSortModal()}
-        {this.renderFinishDeliveryModal()}
         <HotUpdateComponent accessToken={accessToken} store_id={store_id}/>
         <RemindModal dispatch={dispatch} onPress={this.onPress.bind(this)} accessToken={accessToken}
                      store_id={store_id}/>
@@ -444,7 +449,6 @@ class OrderListScene extends Component {
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
       show_sort_modal: false,
-      show_finish_delivery_modal: false,
     })
   }
 
@@ -461,23 +465,6 @@ class OrderListScene extends Component {
     })
   }
 
-
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
-      </View>
-    )
-  }
 
   setOrderBy = (order_by) => {
     if (order_by === 'orderTime desc') {
@@ -500,7 +487,7 @@ class OrderListScene extends Component {
                 modal_type={'bottom'}>
         <View style={{marginBottom: 20}}>
           <View style={{flexDirection: 'row', padding: 12, justifyContent: 'space-between'}}>
-            <Text style={{color: colors.color333,fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+            <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
               订单排序
             </Text>
 
