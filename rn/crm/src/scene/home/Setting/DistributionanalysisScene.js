@@ -253,6 +253,7 @@ class DistributionAnalysisScene extends PureComponent {
   }
 
   navigateToProfitDetail = () => {
+
     let {params} = this.state;
     this.onPress(Config.ROUTE_PROFITANDLOSS, {
       info: params
@@ -499,7 +500,8 @@ class DistributionAnalysisScene extends PureComponent {
               >
                 <View/>
                 <View style={styles.cardContent}>
-                  <Text style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`} </Text>
+                  <Text
+                    style={{color: colors.main_color, marginRight: 4}}>{item?.default_show ? `收起` : `展开`} </Text>
                   {item?.default_show ?
                     <Entypo name='chevron-thin-up' style={styles.iconShow}/> :
                     <Entypo name='chevron-thin-down' style={styles.iconShow}/>
@@ -518,13 +520,14 @@ class DistributionAnalysisScene extends PureComponent {
 
   showDatePicker = () => {
     return <View>
-      <TouchableOpacity style={styles.modalCancel} onPress={() => {
-        let self = this
-        self.state.timeType = "start";
-        this.setState({
-          showDateModal: true
-        })
-      }}>
+      <TouchableOpacity style={styles.modalCancel}
+                        onPress={() => {
+                          let self = this
+                          self.state.timeType = "start";
+                          this.setState({
+                            showDateModal: true
+                          })
+                        }}>
         <Text style={styles.modalCancelText}>{this.state.startTime ? this.state.startTime : '开始时间'} </Text>
       </TouchableOpacity>
       <View style={styles.modalCancel}><Text style={styles.modalCancelText}>——</Text></View>

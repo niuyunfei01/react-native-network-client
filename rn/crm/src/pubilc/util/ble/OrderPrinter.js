@@ -137,26 +137,24 @@ function hexToBytes(hexStr) {
 }
 
 const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceId, accessToken, okFn, errorFn, auto = 0) => {
-  setTimeout(() => {
-    BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
+  BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
 
-      HttpUtils.post(`/api/order_log_print/${wmId}?access_token=${accessToken}`, {deviceId})
-        .then(res => {
-        }, (res) => {
-        });
-      if (typeof okFn == 'function') {
-        okFn("ok")
-      }
-    }).catch((error) => {
-      HttpUtils.post(`/api/bluetooth_print_error_log/${wmId}/${auto}?error=${error}&access_token=${accessToken}`, {deviceId})
-        .then(res => {
-        }, (res) => {
-        });
-      if (typeof errorFn == 'function') {
-        errorFn("打印错误", error)
-      }
-    });
-  }, 300);
+    HttpUtils.post(`/api/order_log_print/${wmId}?access_token=${accessToken}`, {deviceId})
+      .then(res => {
+      }, (res) => {
+      });
+    if (typeof okFn == 'function') {
+      okFn("ok")
+    }
+  }).catch((error) => {
+    HttpUtils.post(`/api/bluetooth_print_error_log/${wmId}/${auto}?error=${error}&access_token=${accessToken}`, {deviceId})
+      .then(res => {
+      }, (res) => {
+      });
+    if (typeof errorFn == 'function') {
+      errorFn("打印错误", error)
+    }
+  });
 }
 
 
@@ -164,22 +162,21 @@ function printOrderToBt(accessToken, peripheral, clb, wmId, order, auto = 0) {
   const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
   const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
   const deviceId = getDeviceUUID();
-  setTimeout(() => {
-    BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-      fetchPrintHexStr(wmId, (ok, hex) => {
-        if (ok) {
-          sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex), wmId, deviceId, accessToken, clb, clb, auto)
-        } else {
-          if (order) {
-            const btData = printOrder(order);
-            sendToBt(peripheral, service, bakeCharacteristic, btData, wmId, deviceId, accessToken, clb, clb, auto)
-          }
+  BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
+    fetchPrintHexStr(wmId, (ok, hex) => {
+
+      if (ok) {
+        sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex), wmId, deviceId, accessToken, clb, clb, auto)
+      } else {
+        if (order) {
+          const btData = printOrder(order);
+          sendToBt(peripheral, service, bakeCharacteristic, btData, wmId, deviceId, accessToken, clb, clb, auto)
         }
-      }, accessToken)
-    }).catch((error) => {
-      clb("通知打印机错误", error)
-    });
-  }, 200);
+      }
+    }, accessToken)
+  }).catch((error) => {
+    clb("通知打印机错误", error)
+  });
 }
 
 const OrderPrinter = {

@@ -1,6 +1,7 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_VOLUME: null,
   SET_AUTO_PRINT: null,
   SET_SCANNING_BLUETOOTH_DEVICE: null,
   SET_NO_LOGIN_INFO: null,
@@ -124,5 +125,7 @@ export default keyMirror({
   ACTIVITY_MANAGER_REFRESH: null,
 
   SET_IM_CONFIG: null,
-  SET_IM_REMIND_COUNT: null
+  SET_IM_REMIND_COUNT: null,
+
+  SET_CALL_DELIVERY_OBJ: null,
 })

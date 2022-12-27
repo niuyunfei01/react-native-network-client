@@ -226,14 +226,14 @@ class BindShunfeng extends PureComponent {
     const {shunFengInfo} = this.props.route.params
     const params = {
       name: shunFengInfo.name,
-      type: this.props.route.params.id,
+      type: shunFengInfo.type,
       app_key: '',
       app_secret: '',
       shop_id: sfStoreID,
       model_id: this.props.global.store_id,
     }
     if (!sfStoreID) {
-      ToastShort('请输入顺丰店铺id', 1)
+      ToastShort('请输入顺丰店铺id', 100)
       return
     }
     HttpUtils.post.bind(this.props)(`/v1/new_api/Delivery/store`, params).then(() => {
@@ -426,7 +426,7 @@ class BindShunfeng extends PureComponent {
       this.setState({sfStoreID: value})
       return
     }
-    showError('请输入正确的顺丰店铺ID', 1)
+    showError('请输入正确的顺丰店铺ID', 100)
   }
 
   setStoreInfo = (key, value) => {
@@ -434,28 +434,28 @@ class BindShunfeng extends PureComponent {
       case 'account_contact_name':
         checkInput = value === '' || /[\u4e00-\u9fa5]/.test(value)
         if (!checkInput) {
-          ToastShort('请输入联系人', 1)
+          ToastShort('请输入联系人', 100)
           return
         }
         break
       case 'law_name':
         checkInput = value === '' || /[\u4e00-\u9fa5]/.test(value)
         if (!checkInput) {
-          ToastShort('请输入法人姓名', 1)
+          ToastShort('请输入法人姓名', 100)
           return
         }
         break
       case 'account_contact_phone':
         checkInput = value === '' || /\d/.test(value)
         if (!checkInput) {
-          ToastShort('请输入联系电话', 1)
+          ToastShort('请输入联系电话', 100)
           return
         }
         break
       case 'account_id_card':
         checkInput = value === '' || /^[\d|x|X]*$/.test(value)
         if (!checkInput) {
-          ToastShort('请输入法人身份证号', 1)
+          ToastShort('请输入法人身份证号', 100)
           return
         }
         break
@@ -810,29 +810,29 @@ class BindShunfeng extends PureComponent {
       detail_address: store.detail_address
     }
     if (store.saleCategory.value === -1) {
-      ToastShort('请选择门店品类', 1)
+      ToastShort('请选择门店品类', 100)
       return;
     }
     if (!store.account_contact_name) {
-      ToastShort('请输入联系人', 1)
+      ToastShort('请输入联系人', 100)
       return
     }
     checkInput = /0?(13|14|15|16|17|18|19)[0-9]{9}/.test(store.account_contact_phone)
     if (!checkInput) {
-      ToastShort('请输入正确的手机号', 1)
+      ToastShort('请输入正确的手机号', 100)
       return
     }
     if (!store.law_name) {
-      ToastShort('请输入法人姓名', 1)
+      ToastShort('请输入法人姓名', 100)
       return
     }
     checkInput = /\d{17}[\d|x]|\d{15}/.test(store.account_id_card)
     if (!checkInput) {
-      ToastShort('请输入正确的法人身份证号', 1)
+      ToastShort('请输入正确的法人身份证号', 100)
       return
     }
     if (!store.business_license) {
-      ToastShort('请上传先营业执照', 1)
+      ToastShort('请上传先营业执照', 100)
       return
     }
     HttpUtils.post.bind(this.props)(url, params).then(() => {

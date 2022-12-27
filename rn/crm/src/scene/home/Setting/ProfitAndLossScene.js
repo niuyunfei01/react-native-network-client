@@ -35,7 +35,7 @@ class ProfitAndLoss extends PureComponent {
   constructor(props) {
     super(props);
     const {store_id} = this.props.global;
-    const params = this.props.route.params?.info
+    const {start_date, end_date} = this.props.route.params
     this.state = {
       storeId: store_id,
       ext_store_id: 0,
@@ -59,8 +59,8 @@ class ProfitAndLoss extends PureComponent {
       isLastPage: false,
       isCanLoadMore: false,
       isLoading: false,
-      startDate: tool.fullDay(params.start_time * 1000),
-      endDate: tool.fullDay(params.end_time * 1000),
+      startDate: start_date,
+      endDate: end_date,
       showDateModalStart: false,
       showDateModalEnd: false,
       showModal: false

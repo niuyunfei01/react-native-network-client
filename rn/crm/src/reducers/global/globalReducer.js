@@ -22,8 +22,7 @@ const {
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
   SET_ORLDER_LIST_BY,
-  // SET_CALL_DELIVERY_LIST,
-  SET_DEFAULT_ORDER_INFO,
+  SET_CALL_DELIVERY_OBJ,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
   SET_NO_LOGIN_INFO,
@@ -32,7 +31,8 @@ const {
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_AUTO_PRINT,
   SET_IM_CONFIG,
-  SET_IM_REMIND_COUNT
+  SET_IM_REMIND_COUNT,
+  SET_VOLUME
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -84,6 +84,8 @@ const initialState = {
   refreshToken: '',
   getTokenTs: 0,
   lastCheckVersion: 0,
+  call_delivery_obj: {},
+  volume: 0,
   im_config: {
     im_auto_content: '',
     im_auto_reply_status: 0,
@@ -101,6 +103,11 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_VOLUME:
+      return {
+        ...state,
+        volume: action.payload
+      }
     case SET_IM_CONFIG:
       return {
         ...state,
@@ -269,6 +276,10 @@ export default function globalReducer(state = initialState, action) {
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}
+
+    case SET_CALL_DELIVERY_OBJ:
+      return {...state, call_delivery_obj: action.obj}
+
   }
   return state
 }

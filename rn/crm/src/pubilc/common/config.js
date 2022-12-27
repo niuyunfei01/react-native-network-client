@@ -85,12 +85,9 @@ const C = {
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_ORDER_SETTING: 'SettingOrders',       // 新建订单
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
-  ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
-  ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
   ROUTE_ORDER_CALL_DELIVERY: 'OrderCallDelivery',
   ROUTE_ORDER_AIN_SEND: 'orderAinSend',
   ROUTE_ORDER_PACK: 'OrderSetPack',
-  ROUTE_ORDER_START_SHIP: 'OrderStartShip',
   ROUTE_ORDER_CANCEL_SHIP: 'OrderCancelShip',
   ROUTE_ORDER_SHIP_DETAIL: 'OrderShipDetail',
   ROUTE_ORDER_TODO: 'OrderTodo',
@@ -164,12 +161,12 @@ const C = {
   ROUTE_SETTLEMENT: 'Settlement',
   ROUTE_BIND_PAY: 'BindPay',
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
+  ROUTE_BUSINESS_DATA: 'BusinessData',
   ROUTE_PROFITANDLOSS: 'ProfitAndLoss',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_PROTOCOL: 'SettlementProtocol',
   ROUTE_SETTLEMENT_PLATFORM: 'SettlementPlatform',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
-  ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',
   ROUTE_GOODS_WORK_NEW_PRODUCT: 'GoodsWorkNewProduct',
   ROUTE_OPERATE_PROFIT: 'OperateProfit',
@@ -189,13 +186,14 @@ const C = {
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_TRIPARTITE_RECHARGE: 'TripartiteRecharge',             //独立帐户充值
-  // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
   ROUTE_BIND_SHUNFENG: 'BindShunfeng',
   ROUTE_REGISTER_SHUNFENG: 'RegisterShunfeng',
   ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
-  ROUTE_INFORM: 'InfromSetting',              //通知设置
+  ROUTE_GOODS_AUDIT: 'GoodsAudit',
+  ROUTE_NOTIFICATION_SETTING: 'NotificationSetting',//通知设置
+  ROUTE_INFORM: 'InfromSetting',
   ROUTE_PUSH: 'PushSetting',                  //推送设置
   ROUTE_HISTORY_NOTICE: 'HistoryNoticeScene', //  历史公告
   ROUTE_DETAIL_NOTICE: 'DetailNoticeScene', // 公告详情
@@ -215,17 +213,10 @@ const C = {
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_COMMODITY_PRICING: 'GoodsCommodityPricing',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
-  ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
-  ROUTE_ACTIVITY_RULE: 'ActivityRule',
-  ROUTE_ACTIVITY_EDIT_RULE: 'ActivityEditRule',
-  ROUTE_ACTIVITY_SELECT_STORE: 'ActivitySelectStore',
-  ROUTE_ACTIVITY_MANAGE: 'ActivityManage',
-  ROUTE_ACTIVITY_SELECT_GOOD: 'ActivitySelectGood',
-  ROUTE_ACTIVITY_CLASSIFY: 'ActivitySelectClassify',
-  ROUTE_ACTIVITY_LIST: 'ActivityList',
   ROUTE_JD_AUDIT_DELIVERY: 'JdAuditDelivery',
   ROUTE_SCAN: 'Scan',
   ROUTE_CREATE_NEW_GOOD_REMIND: 'CreateApplyNewProductRemind',
+  ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
   ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
@@ -302,6 +293,7 @@ const C = {
   hostPort,
   //配送类型
   SHUN_FENG_TONG_CHENG: 12,
+  SHUN_FENG_QI_YE_C: 71,
   GUO_XIAO_DI: 17,
   DA_DA_JING_JI: 2,
   DA_DA_JI_SONG: 70,

@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import PropType from "prop-types";
 import Config from "../common/config";
 import {bindActionCreators} from "redux";
 import {
@@ -36,8 +35,10 @@ import {SvgXml} from "react-native-svg";
 import {call, cross_icon, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
 import LinearGradient from "react-native-linear-gradient";
-import AlertModal from "./AlertModal";
 import JbbModal from "./JbbModal";
+import {getDeliveryList} from "../services/delivery";
+import {setCallDeliveryObj} from "../../reducers/global/globalActions";
+import JbbAlert from "./JbbAlert";
 
 let width = Dimensions.get("window").width;
 
@@ -53,19 +54,18 @@ class OrderItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     accessToken: PropTypes.string,
+    vendor_id: PropTypes.number,
     order_status: PropTypes.number,
     showBtn: PropTypes.bool,
-    fetchData: PropType.func,
-    setState: PropType.func,
-    openCancelDeliveryModal: PropType.func,
-    openFinishDeliveryModal: PropType.func,
-    comesBackBtn: PropType.bool,
+    fetchData: PropTypes.func,
+    setState: PropTypes.func,
+    openCancelDeliveryModal: PropTypes.func,
+    openFinishDeliveryModal: PropTypes.func,
+    comesBackBtn: PropTypes.bool,
   };
   state = {
     verification_modal: false,
-    show_close_delivery_modal: false,
     show_call_user_modal: false,
-    show_cancel_deliverys_modal: false,
     pickupCode: '',
     err_msg: '',
   }
@@ -81,14 +81,14 @@ class OrderItem extends React.PureComponent {
     });
   }
 
-  onOverlookDelivery = (order_id) => {
+  onOverlookDelivery = () => {
     this.mixpanel.track('V4订单列表_忽略配送')
-    const self = this;
+    let {item, accessToken} = this.props;
     showModal("请求中")
     tool.debounces(() => {
-      const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
-      HttpUtils.get.bind(self.props.navigation)(api, {
-        orderId: this.props.item.id
+      const api = `/api/transfer_arrived/${item?.id}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        orderId: item?.id
       }).then(() => {
         this.closeModal()
         ToastShort('配送已完成')
@@ -100,11 +100,24 @@ class OrderItem extends React.PureComponent {
     }, 600)
   }
 
-  onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+  onCallThirdShips = (order_id, store_id, is_addition = 0) => {
+    let {accessToken, vendor_id} = this.props;
+    showModal('计价中')
+
+    getDeliveryList(accessToken, order_id, store_id, vendor_id, is_addition).then(async res => {
+
+      await this.props.dispatch(setCallDeliveryObj(res))
+
+    }).catch(() => {
+      ToastShort('获取失败，请重试')
+    })
+
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
-      if_reship: if_reship,
+      is_addition: is_addition,
+      type: 'redux',
+      // delivery_obj: res,
       onBack: (res) => {
         if (res && res?.count >= 0) {
           ToastShort('发配送成功')
@@ -160,17 +173,15 @@ class OrderItem extends React.PureComponent {
 
   closeModal = () => {
     this.setState({
-      show_cancel_deliverys_modal: false,
       verification_modal: false,
-      show_close_delivery_modal: false,
       show_call_user_modal: false,
     })
   }
 
   goVeriFicationToShop = () => {
-    let {item} = this.props;
+    let {item, accessToken} = this.props;
     let {pickupCode} = this.state
-    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
+    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(() => {
       this.closeModal();
       ToastShort(`核销成功，订单已完成`)
@@ -199,10 +210,6 @@ class OrderItem extends React.PureComponent {
   touchLocation = () => {
     let {item} = this.props;
     this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: 0, order_id: item?.id})
-
-    // this.mixpanel.track('订单列表页_点击位置')
-    // const path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
-    // this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
   }
 
   routeOrder = () => {
@@ -218,6 +225,22 @@ class OrderItem extends React.PureComponent {
         <View style={styles.ItemContent}>
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
+            <If condition={tool.length(item.mt_pick_type_desc) > 0}>
+              <View style={{
+                borderRadius: 4,
+                marginBottom: 12,
+                backgroundColor: '#FFF1E3',
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#FF8309',
+                  marginVertical: 7,
+                  paddingLeft: 10
+                }}>{item?.mt_pick_type_desc} </Text>
+              </View>
+            </If>
             {this.renderUser()}
             {this.renderRemark()}
             {this.renderGoods()}
@@ -226,14 +249,15 @@ class OrderItem extends React.PureComponent {
             <If condition={item?.btn_list && item?.btn_list?.write_off}>
               {this.renderVerificationBtn()}
             </If>
+            <If condition={item?.btn_list && item?.btn_list?.btn_pick_type_complete_mt}>
+              {this.renderFulfilBtn()}
+            </If>
             <If condition={Number(item.pickType) !== 1 && showBtn}>
               {this.renderButton()}
             </If>
           </View>
           {this.renderPickModal()}
           {this.renderCallUser()}
-          {this.renderCloseDeliveryModal()}
-          {this.renderCancelDeliverysModal()}
         </View>
 
       </TouchableWithoutFeedback>
@@ -465,14 +489,59 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  onFulfilOrder = () => {
+    let {item, accessToken} = this.props;
+    showModal("请求中")
+    tool.debounces(() => {
+      const api = `/v4/wsb_order/order_complete_pick_type_mt?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        order_id: item?.id,
+        store_id: item?.store_id,
+      }).then(() => {
+        this.closeModal()
+        ToastShort('已完成订单')
+        this.props.fetchData();
+      }).catch(e => {
+        this.closeModal()
+        ToastShort('完成失败' + e?.desc)
+      })
+    }, 600)
+  }
+
+  renderFulfilBtn = () => {
+    return (
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        borderTopWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
+        <Button title={'自提完成'}
+                onPress={() => {
+                  this.mixpanel.track('V4订单列表_自提完成')
+                  JbbAlert.show({
+                    title: '确认完成当前订单吗？',
+                    actionText: '确定',
+                    closeText: '取消',
+                    onPress: this.onFulfilOrder
+                  })
+                }}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.main_color,
+                  width: width * 0.8,
+                }]}
+                titleStyle={{color: colors.white, fontSize: 14}}
+        />
+      </View>
+    )
+  }
+
 
   renderVerificationBtn = () => {
     return (
       <View style={{
         paddingVertical: 10,
         marginHorizontal: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
         borderTopWidth: 1,
         borderColor: colors.colorEEE
       }}>
@@ -502,12 +571,17 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
       }}>
         <View style={{flex: 1}}>
-          <Text style={styles.userNameText}> {item.userName} &nbsp;&nbsp;{item.mobile_readable} </Text>
+          <Text style={styles.userNameText}> {item?.userName} &nbsp;&nbsp;(尾号{item?.mobile_suffix}) </Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color666,
+            marginVertical: 2
+          }}> {item?.mobile_readable} </Text>
           <Text style={{
             color: colors.color333,
             fontSize: 14,
             fontWeight: 'bold'
-          }}> {tool.jbbsubstr(item.address, 16)} </Text>
+          }}> {tool.jbbsubstr(item?.address, 16)} </Text>
         </View>
 
         <TouchableOpacity style={{paddingHorizontal: 10}}
@@ -624,41 +698,6 @@ class OrderItem extends React.PureComponent {
     )
   }
 
-
-  renderCloseDeliveryModal = () => {
-    let {item} = this.props;
-    let {show_close_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_close_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.onOverlookDelivery(item?.id)}
-          title={'忽略配送会影响配送回传，确定要忽略吗？'}
-          actionText={'忽略'}
-          closeText={'暂不'}/>
-      </View>
-    )
-  }
-
-
-  renderCancelDeliverysModal = () => {
-    let {show_cancel_deliverys_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_cancel_deliverys_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.cancelDeliverys()}
-          title={'确定取消此订单全部配送吗?'}
-          actionText={'确定'}
-          closeText={'取消'}/>
-      </View>
-    )
-  }
-
   renderButton = () => {
     let {item, comesBackBtn, order_status} = this.props;
     let obj_num = 0
@@ -682,12 +721,18 @@ class OrderItem extends React.PureComponent {
         }}>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
+
           <Button title={'忽略配送'}
                   onPress={() => {
                     this.mixpanel.track('订单列表页_忽略配送')
-                    this.setState({
-                      show_close_delivery_modal: true
+
+                    JbbAlert.show({
+                      title: '忽略配送会影响配送回传，确定要忽略吗？',
+                      actionText: '暂不',
+                      closeText: '忽略',
+                      onPressClose: this.onOverlookDelivery,
                     })
+
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -703,9 +748,15 @@ class OrderItem extends React.PureComponent {
           <Button title={'取消配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_一键取消')
-                    this.setState({
-                      show_cancel_deliverys_modal: true
+
+
+                    JbbAlert.show({
+                      title: '确定取消此订单全部配送吗?',
+                      actionText: '确定',
+                      closeText: '取消',
+                      onPress: this.cancelDeliverys,
                     })
+
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.white,
@@ -770,7 +821,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'追加配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_追加配送')
-                    this.onCallThirdShips(item.id, item.store_id)
+                    this.onCallThirdShips(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
@@ -849,7 +900,6 @@ const styles = StyleSheet.create({
   userNameText: {
     fontSize: 14,
     color: colors.color666,
-    marginBottom: 4
   },
   ItemContent: {
     flexDirection: "column",

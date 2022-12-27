@@ -4,7 +4,6 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -27,20 +26,15 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechUtility;
 import com.xdandroid.hellodaemon.IntentWrapperReImpl;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.AppCache;
 import cn.cainiaoshicai.crm.AppInfo;
-import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.SupplierOrder;
 import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
@@ -51,8 +45,6 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
-import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.jiguang.plugins.push.JPushModule;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -180,11 +172,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 //初始化蓝牙管理
                 AppInfo.init(this.getReactApplicationContext());
                 JPushModule.registerActivityLifecycle(GlobalCtx.app());
-
-                // 初始化合成对象
-                SpeechUtility.createUtility(activity, SpeechConstant.APPID + "=58b571b2");
-//                SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
-                AudioUtils.getInstance().init(activity);
                 ok = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -279,19 +266,24 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             callback.invoke(ok, currentMusicVolume, ok ? "ok" : "设置错误");
         }
     }
-    
+
 
     @ReactMethod
     void dialNumber(@Nonnull String number) {
         Context activity = getCurrentActivity();
         //商米设备不支持拨打电话
-        boolean supportSunMi = OrderPrinter.supportSunMiPrinter();
+        boolean supportSunMi = AppCache.isIsConnectedSunmi();
+
         if (activity != null && !supportSunMi) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
         }
     }
-
+    @ReactMethod
+    void isSunmiDevice(final Callback callback) {
+        boolean supportSunMi = AppCache.isIsConnectedSunmi();
+        callback.invoke(true, supportSunMi);
+    }
     @ReactMethod
     void getSettings(@Nonnull Callback callback) {
         Context activity = getCurrentActivity();
@@ -332,13 +324,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
-
-    @ReactMethod
-    void speakText(@Nonnull final String text, @Nonnull final Callback clb) {
-        GlobalCtx.app().getSoundManager().play_by_xunfei(text);
-        clb.invoke(true, "");
-    }
-
     @ReactMethod
     void reportRoute(@Nonnull final String routeName) {
         GlobalCtx.app().logRouteTrace(routeName);
@@ -362,49 +347,23 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void printSmPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
-        }.getType());
-        int tryTimes = 3;
-        boolean success = false;
-        while (tryTimes > 0) {
-            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
-            AidlUtil.getInstance().initPrinter();
-            boolean isEnable = GlobalCtx.smPrintIsEnable();
-            if (isEnable) {
-                AidlUtil.getInstance().initPrinter();
-                OrderPrinter.smPrintOrder(o);
-                success = true;
-                break;
-            }
-            tryTimes--;
-        }
-        if (!success) {
+        try {
+            Gson gson = new Gson();
+            Order order = gson.fromJson(orderJson, Order.class);
+            OrderPrinter.smPrintOrder(order);
+        } catch (Exception e) {
             callback.invoke(false, "不支持该设备");
         }
     }
 
     @ReactMethod
     void printInventoryOrder(@Nonnull String orderJson, @Nonnull final Callback callback) {
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        final SupplierOrder order = gson.fromJson(orderJson, new TypeToken<SupplierOrder>() {
-        }.getType());
-        int tryTimes = 3;
-        boolean success = false;
-
-        while (tryTimes > 0) {
-            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
-            AidlUtil.getInstance().initPrinter();
-            boolean isEnable = GlobalCtx.smPrintIsEnable();
-            if (isEnable) {
-                AidlUtil.getInstance().initPrinter();
-                OrderPrinter.smPrintSupplierOrder(order);
-                success = true;
-                break;
-            }
-            tryTimes--;
-        }
-        if (!success) {
+        try {
+            Gson gson = new Gson();
+            final SupplierOrder order = gson.fromJson(orderJson, SupplierOrder.class);
+            OrderPrinter.smPrintSupplierOrder(order);
+            callback.invoke(true, "");
+        }catch (Exception e){
             callback.invoke(false, "打印失败！");
         }
     }
@@ -415,16 +374,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (nowTime - mLastClickTime > TIME_INTERVAL) {
             mLastClickTime = nowTime;
             try {
-                int tryTimes = 3;
-                while (tryTimes > 0) {
-                    AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
-                    AidlUtil.getInstance().initPrinter();
-                    boolean isEnable = GlobalCtx.smPrintIsEnable();
-                    if (isEnable) {
-                        AidlUtil.getInstance().initPrinter();
-                    }
-                    tryTimes--;
-                }
+
                 Call<ResultBean<List<SupplierSummaryOrder>>> rbCall = GlobalCtx.app().dao.getSupplierOrderSummary();
                 rbCall.enqueue(new retrofit2.Callback<ResultBean<List<SupplierSummaryOrder>>>() {
                     @Override
@@ -441,7 +391,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                     }
                 });
             } catch (Exception e) {
-                android.util.Log.e("Error", e.getMessage());
             }
         } else {
             try {
@@ -500,19 +449,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         boolean disabled = SettingUtility.isDisableNewOrderSoundNotify();
         Log.i("getNewOrderNotifyDisabled:" + disabled);
         callback.invoke(disabled, "");
-    }
-
-    @ReactMethod
-    public void setAutoBluePrint(boolean autoPrint, @Nonnull final Callback callback) {
-        Log.i("setAutoBluePrint:" + autoPrint);
-        SettingUtility.setAutoPrint(autoPrint);
-    }
-
-    @ReactMethod
-    public void getAutoBluePrint(@Nonnull final Callback callback) {
-        boolean auto = SettingUtility.getAutoPrintSetting();
-        Log.i("getAutoBluePrint:" + auto);
-        callback.invoke(auto, "");
     }
 
     @ReactMethod

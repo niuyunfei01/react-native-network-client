@@ -49,6 +49,7 @@ const {
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
   SET_ORLDER_LIST_BY,
+  SET_CALL_DELIVERY_OBJ,
   SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
@@ -56,12 +57,21 @@ const {
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_AUTO_PRINT,
+  SET_VOLUME,
+  SET_AUTO_PRINT,
   SET_IM_CONFIG,
   SET_IM_REMIND_COUNT
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
+}
+
+export const setVolume = (value) => {
+  return {
+    type: SET_VOLUME,
+    payload: value
+  }
 }
 
 export const setImConfig = (im_config = {}) => {
@@ -236,6 +246,13 @@ export function updateConfig(config) {
   }
 }
 
+
+export function setCallDeliveryObj(obj) {
+  return {
+    type: SET_CALL_DELIVERY_OBJ,
+    obj: obj
+  }
+}
 
 export function logout(callback) {
   return dispatch => {

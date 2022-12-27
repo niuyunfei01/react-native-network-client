@@ -17,6 +17,7 @@ import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import AlertModal from "../../pubilc/component/AlertModal";
 import PropTypes from "prop-types";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -60,7 +61,6 @@ class SearchOrder extends PureComponent {
       show_add_tip_modal: false,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_placeholder: true,
     };
   }
@@ -142,8 +142,15 @@ class SearchOrder extends PureComponent {
   openFinishDeliveryModal = (order_id) => {
     this.setState({
       order_id: order_id,
-      show_finish_delivery_modal: true,
       show_delivery_modal: false
+    }, () => {
+      JbbAlert.show({
+        title: '当前配送确认完成吗?',
+        desc: '订单送达后无法撤回，请确认顾客已收到货物',
+        actionText: '确定',
+        closeText: '再想想',
+        onPress: this.toSetOrderComplete,
+      })
     })
   }
 
@@ -153,7 +160,6 @@ class SearchOrder extends PureComponent {
       show_condition_modal: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_select_store_modal: false,
       show_date_modal: false,
     })
@@ -213,7 +219,6 @@ class SearchOrder extends PureComponent {
           ListFooterComponent={this.renderBottomView()}
           initialNumToRender={3}
         />
-        {this.renderFinishDeliveryModal()}
         <GoodsListModal
           setState={this.setState.bind(this)}
           onPress={this.onPress.bind(this)}
@@ -373,24 +378,6 @@ class SearchOrder extends PureComponent {
     )
   }
 
-
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
-      </View>
-    )
-  }
-
   onEndReached = () => {
     let {query, is_can_load_more} = this.state;
     if (is_can_load_more) {
@@ -425,10 +412,11 @@ class SearchOrder extends PureComponent {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}

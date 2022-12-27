@@ -1,15 +1,14 @@
 package cn.cainiaoshicai.crm.support.print;
 
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.text.TextUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 
+import android.bluetooth.BluetoothDevice;
+import android.text.TextUtils;
+import cn.cainiaoshicai.crm.AppCache;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -21,7 +20,6 @@ import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.print.PrinterWriter;
@@ -30,7 +28,6 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
 
 /**
@@ -275,8 +272,8 @@ public class OrderPrinter {
     }
 
     public static void smPrintSupplierSummaryOrder(SupplierSummaryOrder order) {
-        int state = AidlUtil.getInstance().printerState();
-        if (state == 1) {
+        boolean state = AppCache.isIsConnectedSunmi();
+        if (state) {
             try {
                 ArrayList<byte[]> data = new ArrayList<>();
                 PrinterWriter printer = new PrinterWriter58mm();
@@ -325,7 +322,7 @@ public class OrderPrinter {
 
                 data.add(printer.getDataAndClose());
                 for (byte[] bs : data) {
-                    AidlUtil.getInstance().sendRawData(bs);
+                    AppCache.getSunmiPrinterService().sendRAWData(bs, null);
                 }
             } catch (Exception e) {
 
@@ -334,8 +331,8 @@ public class OrderPrinter {
     }
 
     public static void smPrintSupplierOrder(SupplierOrder order) {
-        int state = AidlUtil.getInstance().printerState();
-        if (state == 1) {
+        boolean state = AppCache.isIsConnectedSunmi();
+        if (state) {
             try {
                 ArrayList<byte[]> data = new ArrayList<>();
                 PrinterWriter printer = new PrinterWriter58mm();
@@ -391,7 +388,7 @@ public class OrderPrinter {
                 data.add(printer.getDataAndClose());
 
                 for (byte[] bs : data) {
-                    AidlUtil.getInstance().sendRawData(bs);
+                    AppCache.getSunmiPrinterService().sendRAWData(bs, null);
                 }
 
             } catch (Exception e) {
@@ -401,8 +398,8 @@ public class OrderPrinter {
     }
 
     public static void smPrintOrder(Order order) {
-        int state = AidlUtil.getInstance().printerState();
-        if (state == 1) {
+        boolean state = AppCache.isIsConnectedSunmi();
+        if (state) {
             String mobile = order.getMobile();
             mobile = mobile.replace("_", "转").replace(",", "转");
             try {
@@ -411,7 +408,7 @@ public class OrderPrinter {
                 btos.write(new byte[]{0x1B, 0x21, 0});
                 btos.write(GPrinterCommand.left);
 
-                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                printer.starLine().highBigText(" " + order.getStore_name()).newLine()
                         .newLine().highBigText("  #" + order.getDayId());
 
                 printer.normalText(order.platformWithId()).newLine();
@@ -429,7 +426,7 @@ public class OrderPrinter {
 
                 String expectedStr = order.getExpectTimeStr();
                 if (expectedStr == null) {
-                    expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+                    expectedStr = order.getExpectTime();
                 }
                 printer.starLine().highText("期望送达：" + expectedStr).newLine();
                 if (!TextUtils.isEmpty(order.getRemark())) {
@@ -440,7 +437,7 @@ public class OrderPrinter {
                 printer.starLine()
                         .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
                         .newLine()
-                        .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                        .normalText("下单时间：" + order.getOrderTime())
                         .newLine();
 
                 printer.starLine().normalText(String.format("食材名称%22s", "数量")).newLine().splitLine();
@@ -480,29 +477,16 @@ public class OrderPrinter {
                 if (!TextUtils.isEmpty(order.getLine_additional())) {
                     printer.starLine().normalText(order.getLine_additional());
                 }
-                printer.starLine().highText(order.getLine_money_total()).newLine();
 
-                printer.starLine().normalText(order.getPrintFooter1())
-                        .newLine().normalText(order.getPrintFooter2());
-
-                String printFooter3 = order.getPrintFooter3();
-                if (!TextUtils.isEmpty(printFooter3)) {
-                    printer.newLine().normalText(printFooter3);
-                }
                 printer.newLine();
                 printer.starLine();
                 btos.write(0x0D);
                 btos.write(0x0D);
                 btos.write(0x0D);
-                AidlUtil.getInstance().sendRawData(btos.toByteArray());
-                AidlUtil.getInstance().printBarCode("WO" + order.getId(), 8, 81, 2, 2);
-                AidlUtil.getInstance().print3Line();
-                try {
-                    final String access_token = GlobalCtx.app().token();
-                    new OrderActionDao(access_token).logOrderPrinted(order.getId());
-                } catch (ServiceException e) {
-                    AppLogger.e("error Service Exception:" + e.getMessage());
-                }
+                AppCache.getSunmiPrinterService().sendRAWData(btos.toByteArray(), null);
+                AppCache.getSunmiPrinterService().printBarCode("WO" + order.getId(), 8, 81, 2, 2, null);
+                AppCache.getSunmiPrinterService().lineWrap(3, null);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -550,7 +534,7 @@ public class OrderPrinter {
 
             String expectedStr = order.getExpectTimeStr();
             if (expectedStr == null) {
-                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+                expectedStr = order.getExpectTime();
             }
             printer.starLine().highText("期望送达：" + expectedStr).newLine();
             if (!TextUtils.isEmpty(order.getRemark())) {
@@ -561,7 +545,7 @@ public class OrderPrinter {
             printer.starLine()
                     .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
                     .newLine()
-                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                    .normalText("下单时间：" + order.getOrderTime())
                     .newLine();
 
             printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
@@ -646,23 +630,7 @@ public class OrderPrinter {
 
 
     public static boolean supportSunMiPrinter() {
-        int tryTimes = 3;
-        boolean enable = false;
-        Context context = GlobalCtx.app();
-        try {
-            while (tryTimes > 0) {
-                AidlUtil.getInstance().connectPrinterService(context);
-                boolean isEnable = GlobalCtx.smPrintIsEnable();
-                if (isEnable) {
-                    enable = isEnable;
-                    break;
-                }
-                tryTimes--;
-            }
-        } catch (Exception e) {
-            AppLogger.e("error check support sun mi", e);
-        }
-        return enable;
+        return AppCache.isIsConnectedSunmi();
     }
 
     public static void logOrderPrint(Order order) {
@@ -735,10 +703,7 @@ public class OrderPrinter {
                         if (ex != null) {
                             CrashReportHelper.handleUncaughtException(Thread.currentThread(), ex);
                         }
-                        if (!TextUtils.isEmpty(speak)) {
-                            GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-                            soundManager.play_by_xunfei(speak);
-                        }
+
                     }
                 } else {
                     reason = "订单已经打印过啦";

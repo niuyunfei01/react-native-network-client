@@ -81,7 +81,7 @@ class PushSetting extends PureComponent {
       const itemTypes = arr[i]
       let type = itemTypes.notify_type;
       items.push(
-        <Cell customStyle={[styles.cell_row]}>
+        <Cell customStyle={[styles.cell_row]} key={i}>
           <CellBody style={styles.cell_body}>
             <Text style={[styles.cell_body_text]}>{itemTypes.name} </Text>
             <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro} </Text>
@@ -117,15 +117,17 @@ class PushSetting extends PureComponent {
         style={{backgroundColor: colors.f2}}
       >
         {
-          groupedArr.map(item => {
-            return <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_rowTitle]}>
-                <CellBody>
-                  <Text style={[styles.cell_rowTitleText]}>{item.name} </Text>
-                </CellBody>
-              </Cell>
-              {this.renderCellItems(item.types)}
-            </Cells>
+          groupedArr.map((item, index) => {
+            return (
+              <Cells style={[styles.cell_box]} key={index}>
+                <Cell customStyle={[styles.cell_rowTitle]}>
+                  <CellBody>
+                    <Text style={[styles.cell_rowTitleText]}>{item.name} </Text>
+                  </CellBody>
+                </Cell>
+                {this.renderCellItems(item.types)}
+              </Cells>
+            )
           })
         }
       </ScrollView>

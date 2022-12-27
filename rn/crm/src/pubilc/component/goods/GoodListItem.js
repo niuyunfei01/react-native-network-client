@@ -10,6 +10,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../util/tool";
 import {SvgXml} from "react-native-svg";
 import {noImage} from "../../../svg/svg";
+import {BackgroundImage} from "react-native-elements/dist/config";
 
 class GoodListItem extends React.PureComponent {
   static propTypes = {
@@ -42,9 +43,10 @@ class GoodListItem extends React.PureComponent {
 
   right = () => {
     const {product, fnProviding, price_type} = this.props;
-    const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    let {skus = [], sp = {}} = product
+    const onSale = sp.status === `${Cts.STORE_PROD_ON_SALE}`;
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-    let skus = product.skus || []
+
     const {showMore} = this.state
     return (
       <ScrollView
@@ -56,7 +58,7 @@ class GoodListItem extends React.PureComponent {
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
 
-        <If condition={typeof product.sp.applying_price !== "undefined"}>
+        <If condition={typeof sp.applying_price !== "undefined"}>
           <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
             审核中：{this.applyingPriceInYuan(product)}
           </Text>
@@ -66,10 +68,10 @@ class GoodListItem extends React.PureComponent {
         </If>
         <View style={{flexDirection: "row", alignItems: 'center'}}>
           <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
-            {price_type ? '零售价格' : '报价'}：
+            {price_type ? '零售价' : '报价'}：
           </Text>
           <Text style={[styles.priceText, offSaleTxtStyle]}>
-            ￥{price_type ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
+            ￥{price_type ? sp?.show_price : parseFloat(sp?.supply_price / 100).toFixed(2)}
           </Text>
         </View>
         <If condition={tool.length(skus) > 0}>
@@ -104,9 +106,9 @@ class GoodListItem extends React.PureComponent {
               </If>
               <View style={{flexDirection: "row", alignItems: 'center'}}>
                 <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
-                  {price_type ? '零售价格' : '报价'}：
+                  {price_type ? '零售价' : '报价'}：
                 </Text>
-                <Text style={[styles.priceText, offSaleTxtStyle, {color: colors.warn_red}]}>
+                <Text style={[styles.priceText, offSaleTxtStyle, {color: '#FF2200'}]}>
                   ￥{price_type ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
                 </Text>
               </View>
@@ -119,7 +121,8 @@ class GoodListItem extends React.PureComponent {
 
   render() {
     const {product, onPressImg, onPressRight, opBar} = this.props;
-    const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    let {sp = {}, audit_status = '', coverimg = ''} = product
+    const onSale = sp.status === `${Cts.STORE_PROD_ON_SALE}`;
     const bg = onSale ? colors.white : colors.colorDDD;
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
@@ -127,12 +130,19 @@ class GoodListItem extends React.PureComponent {
                              onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <View>
-          <If condition={product.coverimg}>
-            <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+          <If condition={coverimg}>
+            <FastImage source={{uri: Config.staticUrl(coverimg)}}
                        style={[styles.listImageSize, offSaleImg]}
                        resizeMode={FastImage.resizeMode.contain}/>
+            <If condition={audit_status}>
+              <View style={[styles.center, styles.listImageSize, styles.goodsStatus, {position: 'absolute'}]}>
+                <Text style={{fontSize: 14, color: colors.white, opacity: 1}}>
+                  {audit_status}
+                </Text>
+              </View>
+            </If>
           </If>
-          <If condition={!product.coverimg}>
+          <If condition={!coverimg}>
             <SvgXml xml={noImage()} style={[styles.listImageSize, offSaleImg]}/>
           </If>
 
@@ -160,15 +170,13 @@ class GoodListItem extends React.PureComponent {
 export default GoodListItem
 
 const styles = StyleSheet.create({
-  priceTextFlag: {fontSize: 16, color: colors.color333},
+  priceTextFlag: {fontSize: 12, color: colors.color333},
   priceText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#EE2626',
     lineHeight: 22
   },
   productRow: {
-    borderTopWidth: 1,
-    borderTopColor: colors.colorCCC,
     padding: 5,
     paddingLeft: 0,
     marginLeft: 2,
@@ -176,8 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   listImageSize: {
-    width: pxToDp(150),
-    height: pxToDp(150)
+    width: 80,
+    height: 80,
+    borderRadius: 4
   },
   center: {
     justifyContent: "center",
@@ -194,7 +203,10 @@ const styles = StyleSheet.create({
   },
   n2b: {
     color: colors.color333,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold"
   },
+  goodsStatus: {
+    backgroundColor: colors.color000, opacity: 0.5
+  }
 })

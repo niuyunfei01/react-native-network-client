@@ -10,8 +10,8 @@ import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import Entypo from "react-native-vector-icons/Entypo";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import AlertModal from "../../../pubilc/component/AlertModal";
 import {getRemindTime, setRemindTime} from "../../../pubilc/common/noLoginInfo";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 
 const styles = StyleSheet.create({
@@ -107,23 +107,22 @@ class GoodsIncrement extends PureComponent {
         return
       const calc = (new Date(store_info.vip_info.expire_date) - new Date(current_date)) / (24 * 60 * 60 * 1000)
       if (calc < 5 && calc >= 0)
-        this.setState({showRemind: {visible: true, desc: `服务将在${store_info.vip_info.expire_date}过期，是否续费？`}})
-
+        JbbAlert.show({
+          title: '提醒',
+          desc: `服务将在${store_info.vip_info.expire_date}过期，是否续费？`,
+          actionText: '确定',
+          closeText: '取消',
+          onPress: this.useIncrementService,
+          onPressClose: this.handleRemindTime().then(),
+        })
     })
   }
 
   useIncrementService = () => {
-    this.closeModal()
+    this.handleRemindTime().then()
     const {navigation} = this.props
     this.mixpanel.track('我的_立即开通')
     navigation.navigate(Config.ROUTE_OPEN_MEMBER)
-  }
-
-  state = {
-    showRemind: {
-      visible: false,
-      desc: '',
-    }
   }
 
   handleRemindTime = async () => {
@@ -149,25 +148,6 @@ class GoodsIncrement extends PureComponent {
     }
   }
 
-  closeModal = () => {
-    this.setState({showRemind: {visible: false, desc: ''}})
-    this.handleRemindTime().then()
-  }
-
-  renderRemind = () => {
-    const {showRemind} = this.state
-    return (
-      <AlertModal
-        visible={showRemind.visible}
-        title={'提醒'}
-        desc={showRemind.desc}
-        actionText={'确定'}
-        closeText={'取消'}
-        onPress={this.useIncrementService}
-        onClose={this.closeModal}
-        onPressClose={this.closeModal}/>
-    )
-  }
   notActivate = (vip_info) => {
     const {pay_type_items = []} = vip_info || {}
     const pay_money = pay_type_items.filter(item => item.months === 12)
@@ -270,7 +250,6 @@ class GoodsIncrement extends PureComponent {
       <View style={styles.zoneWrap}>
         {this.renderHeader()}
         {!store_info.vip_info.vip_invalid && store_info.vip_info.exist_vip ? this.renderContent() : null}
-        {this.renderRemind()}
       </View>
     )
   }

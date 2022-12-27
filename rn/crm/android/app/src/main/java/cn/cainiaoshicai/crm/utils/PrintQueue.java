@@ -214,17 +214,9 @@ public class PrintQueue {
                         removeDuplicates(queue);
                     }
                 }
-            } else {
-                if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                    GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-                    soundManager.play_by_xunfei(SPEAK_WORD);
-                }
             }
         } catch (Exception e) {
-            if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-                soundManager.play_by_xunfei(SPEAK_WORD);
-            }
+
             if (pOrder != null) {
                 queue.add(pOrder);
                 removeDuplicates(queue);
@@ -308,17 +300,9 @@ public class PrintQueue {
             }
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
                 mBtService.write(bytes);
-            } else {
-                if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                    GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-                    soundManager.play_by_xunfei(SPEAK_WORD);
-                }
             }
         } catch (Exception e) {
-            if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-                soundManager.play_by_xunfei(SPEAK_WORD);
-            }
+
             CrashReportHelper.handleUncaughtException(null, e);
         }
     }

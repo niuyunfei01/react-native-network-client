@@ -1,4 +1,5 @@
 import {Linking, NativeModules, Platform} from 'react-native'
+import JPush from "jpush-react-native";
 
 const {ActivityStarter} = NativeModules
 
@@ -146,12 +147,6 @@ export default {
       ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
-  speakText: async function (text, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.speakText(text, callback))
-  },
-
   setDisableSoundNotify: async function (disabled, callback = function (ok, msg) {
   }) {
     await (ActivityStarter &&
@@ -174,18 +169,6 @@ export default {
   }) {
     await (ActivityStarter &&
       ActivityStarter.getNewOrderNotifyDisabled(callback))
-  },
-
-  setAutoBluePrint: async function (auto, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setAutoBluePrint(auto, callback))
-  },
-
-  getAutoBluePrint: async function (callback = function (auto, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getAutoBluePrint(callback))
   },
 
   /**
@@ -226,5 +209,23 @@ export default {
   }) => {
     await (ActivityStarter &&
       ActivityStarter.checkCanRunInBg(callback))
+  },
+  getNotificationStatus: async function () {
+
+    switch (Platform.OS) {
+      case "ios":
+        return await ActivityStarter.getNotificationStatus()
+      case "android":
+        JPush.isNotificationEnabled((enabled) => {
+          return enabled
+        })
+        break
+    }
+
+  },
+  isSunmiDevice: async (callback = function () {
+  }) => {
+    if (ActivityStarter)
+      await ActivityStarter.isSunmiDevice(callback)
   }
 }

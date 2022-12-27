@@ -23,10 +23,6 @@ import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import HttpUtils from "../../../pubilc/util/http";
-import popupStyles from 'rmc-picker/lib/PopupStyles';
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {Button} from "react-native-elements";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
@@ -34,6 +30,7 @@ import WebView from "react-native-webview";
 import 'react-native-get-random-values';
 import {SvgXml} from "react-native-svg";
 import {back} from "../../../svg/svg";
+import MonthPicker from "react-native-month-year-picker";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -72,7 +69,8 @@ class SettlementScene extends PureComponent {
       showAgreement: props.route.params?.showSettle || false,
       showPrompt: false,
       settleProtocolInfo: {},
-      fadeOutOpacity: new Animated.Value(0)
+      fadeOutOpacity: new Animated.Value(0),
+      visible: false
     };
 
   }
@@ -171,7 +169,11 @@ class SettlementScene extends PureComponent {
     })
   }
 
-  onChange = (date) => {
+  onChange = (event, date) => {
+    if (event === 'dismissedAction') {
+      this.setState({visible: false})
+      return
+    }
     this.setState({
       date: date,
       dates: tool.fullMonth(date)
@@ -232,7 +234,7 @@ class SettlementScene extends PureComponent {
   }
 
   render() {
-    const {show_pay_info} = this.state
+    const {show_pay_info, visible, date} = this.state
     return (
       <View style={{flex: 1}}>
         {this.renderHead()}
@@ -250,6 +252,16 @@ class SettlementScene extends PureComponent {
           {this.renderAgreementModal()}
           {this.renderPromptModal()}
         </ScrollView>
+        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
+          <MonthPicker value={date}
+                       cancelButton={'取消'}
+                       okButton={'确定'}
+                       autoTheme={true}
+                       mode={'number'}
+                       onChange={(event, newDate) => this.onChange(event, newDate)}
+                       maximumDate={new Date()}
+                       minimumDate={new Date(2015, 8, 15)}/>
+        </CommonModal>
       </View>
     );
   }
@@ -331,42 +343,16 @@ class SettlementScene extends PureComponent {
     navigation.navigate(Config.ROUTE_SETTLEMENT_GATHER, {date: dates});
   }
 
-  datePicker = () => {
-    const {date} = this.state
-    return (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    )
-  }
-
   renderList() {
-    const {list, date, dates} = this.state
+    const {list, dates} = this.state
 
     return (
       <View style={styles.listWrap}>
         <View style={styles.listHeaderWrap}>
-          <PopPicker
-            datePicker={this.datePicker()}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={popupStyles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={date}
-            onChange={this.onChange}
-          >
-            <Text style={styles.listDateText}>
-              {dates}&nbsp;
-              <Entypo name={"triangle-down"} color={colors.color999} size={20}/>
-            </Text>
-          </PopPicker>
+          <Text style={styles.listDateText}>
+            {dates}&nbsp;
+            <Entypo name={"triangle-down"} color={colors.color999} size={20}/>
+          </Text>
           <View style={{flex: 1}}/>
           <Text onPress={this.toMonthGather} style={styles.countCurrentMonthText}>
             本月销量汇总

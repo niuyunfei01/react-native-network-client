@@ -11,10 +11,8 @@ import tool from '../../../pubilc/util/tool.js'
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
-import DatePicker from "rmc-date-picker/lib/DatePicker";
-import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
-import PopPicker from "rmc-date-picker/lib/Popup";
-import styles from 'rmc-picker/lib/PopupStyles';
+import MonthPicker from "react-native-month-year-picker";
+import CommonModal from "../../../pubilc/component/goods/CommonModal";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -46,12 +44,13 @@ class SettlementGatherScene extends PureComponent {
       query: true,
       dataPicker: false,
       dateList: [],
+      visible: false
     }
-    this.renderList = this.renderList.bind(this)
+
     showModal('加载中')
   }
 
-  async UNSAFE_componentWillMount() {
+  async componentDidMount() {
     let {date} = this.props.route.params || {};
     await this.setState({date: date});
     this.getDateilsList();
@@ -84,7 +83,11 @@ class SettlementGatherScene extends PureComponent {
     return num;
   }
 
-  onChange = (date) => {
+  onChange = (event, date) => {
+    if (event === 'dismissedAction') {
+      this.setState({visible: false})
+      return
+    }
     this.setState({dates: date, date: this.format(date)}, () => {
       this.getDateilsList();
     })
@@ -97,37 +100,14 @@ class SettlementGatherScene extends PureComponent {
   }
 
   renderHeader() {
-    let {date, dates, total_price, order_num} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={dates}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+    let {date, total_price, order_num} = this.state;
     return (
       <View style={header.box}>
         <View style={header.title}>
-          <PopPicker
-            datePicker={datePicker}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={styles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={dates}
-            onChange={this.onChange}
-          >
-            <Text style={header.time}>
-              {date} &nbsp;&nbsp;&nbsp;
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
-            </Text>
-          </PopPicker>
-
+          <Text style={header.time}>
+            {date} &nbsp;&nbsp;&nbsp;
+            <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
+          </Text>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
@@ -146,7 +126,7 @@ class SettlementGatherScene extends PureComponent {
     if (tool.length(list) > 0) {
       return (tool.objectMap(list, (item, key) => {
         return (
-          <View key={key} style={{}}>
+          <View key={key}>
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
@@ -232,6 +212,7 @@ class SettlementGatherScene extends PureComponent {
   }
 
   render() {
+    const {dates, visible} = this.state
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
@@ -253,7 +234,16 @@ class SettlementGatherScene extends PureComponent {
             this.renderList()
           }
         </ScrollView>
-
+        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
+          <MonthPicker value={dates}
+                       cancelButton={'取消'}
+                       okButton={'确定'}
+                       autoTheme={true}
+                       mode={'number'}
+                       onChange={(event, newDate) => this.onChange(event, newDate)}
+                       maximumDate={new Date()}
+                       minimumDate={new Date(2015, 8, 15)}/>
+        </CommonModal>
       </View>
     )
   }

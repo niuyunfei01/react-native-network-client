@@ -4,7 +4,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
+import {
+  Dimensions,
+  Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+  ImageBackground,
+  NativeEventEmitter
+} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
@@ -32,6 +42,8 @@ import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
 import {hideModal, ToastLong} from "../util/ToastUtils";
 
+import JbbAlert from "../component/JbbAlert";
+import {Synthesizer} from "../component/react-native-speech-iflytek";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -111,9 +123,6 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
-        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -135,8 +144,8 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
-                      getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
+        {/*<Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}*/}
+        {/*              getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>*/}
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerShown: false}}
@@ -154,9 +163,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
-        <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
-                      getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../../scene/home/Delivery/SettingDeliveryInfo").default}
         />
@@ -225,14 +234,10 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} options={{headerTitle: '置为无效'}}
                       getComponent={() => require("../../scene/order/OrderToInvalidScene").default}
         />
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderTransferThird").default}*/}
-        {/*/>*/}
 
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
-
         <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
                       getComponent={() => require("../../scene/order/OrderAinSend").default}
         />
@@ -244,8 +249,8 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} options={{headerTitle: '发红包'}}
                       getComponent={() => require("../../scene/order/OrderSendMoney").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}
-                      getComponent={() => require("../../scene/order/OrderSurcharge").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderSurcharge").default}/>*/}
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderSearchScene").default}/>
         <Stack.Screen name={Config.ROUTE_SEARCH_ORDER} options={{headerShown: false}}
@@ -259,26 +264,24 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} options={{headerTitle: '退单商品入库'}}
                       getComponent={() => require("../../scene/order/OrderCancelToEntry").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}
-                      getComponent={() => require("../../scene/order/OrderExitLog").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderExitLog").default}/>*/}
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../../scene/order/_OrderScene/Complain").default}/>
 
 
-        <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
-                      getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
-        />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
-                      getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}*/}
+        {/*              getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}*/}
+        {/*/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderQueryResultScene").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
                       getComponent={() => require("../../scene/order/OrderAddressBook").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
                       getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
         />
-        <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
-                      getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreList").default}/>
         <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}
@@ -363,6 +366,8 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_BUSINESS_DATA} options={{headerTitle: '经营数据'}}
+                      getComponent={() => require('../../scene/home/Setting/BusinessDataScene').default}/>
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
                       getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
         />
@@ -376,20 +381,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/product/Goods/GoodsRelateScene').default}/>
         <Stack.Screen name={Config.ROUTE_HELP} options={{headerTitle: '帮助'}}
                       getComponent={() => require('../../scene/home/Help/HelpScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} options={{headerTitle: '运营收益'}}
-                      getComponent={() => require('../../scene/operation/OperateProfitScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_DETAIL} options={{headerTitle: '运营明细'}}
-                      getComponent={() => require('../../scene/operation/OperateDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_INCOME_DETAIL} options={{headerTitle: '收入详情'}}
-                      getComponent={() => require('../../scene/operation/OperateIncomeDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_EXPEND_DETAIL}
-                      getComponent={() => require('../../scene/operation/OperateExpendDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL} options={{headerTitle: '其他支出流水'}}
-                      getComponent={() => require('../../scene/operation/OperateOtherExpendDetailScene').default}
-        />
         <Stack.Screen name={Config.ROUTE_GOODS_COMMODITY_PRICING} options={{headerTitle: '商品调价信息'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsCommodityPricingScene').default}
         />
@@ -516,8 +507,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Worker/WorkerListScene').default}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}}
                       getComponent={() => require('../../scene/home/Worker/WorkerSchedule').default}/>
-        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
-                      getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
                       getComponent={() => require('../../scene/console/StockingTasks').default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle: '零售价格'}}
@@ -583,6 +572,9 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
         <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
                       getComponent={() => require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_NOTIFICATION_SETTING}
+                      options={{headerTitle: '通知设置'}}
+                      getComponent={() => require('../../scene/home/Setting/NotificationSetting').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -591,6 +583,8 @@ let notInit = true
 let ios_info = {}
 const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
+let isSunmiDevice = false
+let isHanlderTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
 
 class AppNavigator extends PureComponent {
 
@@ -678,11 +672,11 @@ class AppNavigator extends PureComponent {
 
 
   initJPush = () => {
-
+    const {currentUser} = this.props.global
     JPush.setLoggerEnable(false)
     JPush.init()
     JPush.addConnectEventListener(({connectEnable}) => {
-      //console.log("connectEnable:" + connectEnable)
+      JTCPStatus = connectEnable
       if (connectEnable)
         doJPushSetAlias(currentUser);
     })
@@ -691,12 +685,19 @@ class AppNavigator extends PureComponent {
     //     console.log("registerID:" + JSON.stringify(registerID))
     //   }
     // )
-    const {accessToken, autoBluetoothPrint, currentUser, store_id} = this.props.global
+
     //tag alias事件回调
     JPush.addTagAliasListener(({code}) => {
-      //console.log("tagAliasListener:" + code)
-      if (code) {
-        doJPushSetAlias(currentUser)
+      if (0 == code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = null
+        setAliasStatus = true
+        return
+      }
+      if (code && !setAliasStatus && JTCPStatus) {
+        setAliasInterval = setTimeout(() => {
+          doJPushSetAlias(currentUser)
+        }, 21 * 1000)
       }
     });
     //通知回调
@@ -704,25 +705,78 @@ class AppNavigator extends PureComponent {
     JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
       // console.log("notificationListener,extras:" + JSON.stringify(extras))
       // console.log("notificationListener,notificationEventType:" + notificationEventType)
-      const {type, order_id} = extras
+      const {type, order_id, speak_word, store_id} = extras
       if ('notificationArrived' === notificationEventType) {
-        if (type !== 'new_order') {
-          sendDeviceStatus(accessToken, {
-            msgId: messageID,
-            listener_stores: store_id,
-            orderId: order_id,
-            btConnected: '收到极光推送，不是新订单不需要打印',
-            auto_print: autoBluetoothPrint
-          })
+        if (!isHanlderTask) {
+          await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
           return
         }
-        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
+        if (speak_word) {
+          messageQueue.push({
+            type: type,
+            order_id: order_id,
+            speak_word: speak_word,
+            store_id: store_id,
+            messageID: messageID
+          })
+          await this.onSynthesizerResult()
+        }
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
+        Synthesizer.start(speak_word)
       }
     });
   }
+
+  handlerMessage = async (type, order_id, speak_word, store_id, messageID) => {
+    isHanlderTask = true
+    const {accessToken, autoBluetoothPrint} = this.props.global
+    if (speak_word) {
+      Synthesizer.start(speak_word);
+    }
+    if (type !== 'new_order') {
+      sendDeviceStatus(accessToken, {
+        msgId: messageID,
+        listener_stores: store_id,
+        orderId: order_id,
+        btConnected: '收到极光推送，不是新订单不需要打印',
+        auto_print: autoBluetoothPrint
+      })
+
+    } else {
+      if (isSunmiDevice) {
+        const api = `/v4/wsb_order/order_detail/${order_id}?access_token=${accessToken}`
+        const order = await HttpUtils.get(api, {})
+        await native.printSmPrinter(order)
+
+      } else {
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
+      }
+    }
+
+    if (messageQueue.length > 0) {
+      messageQueue.splice(0, 1)
+      await this.onSynthesizerResult()
+    }
+
+  }
+
+  onSynthesizerResult = async () => {
+
+    if (messageQueue.length === 0) {
+      isHanlderTask = false
+      return
+    }
+    const {type, order_id, speak_word, store_id, messageID} = messageQueue[0]
+    await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
+  }
+
+  handleSpeechIflytek = () => {
+    Synthesizer.init("58b571b2")
+    // const synthesizer = new NativeEventEmitter(Synthesizer);
+    // this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
+  };
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
@@ -733,9 +787,13 @@ class AppNavigator extends PureComponent {
       if (accessToken && notInit) {
         notInit = false
         this.initJPush()
+        this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
           await this.calcAppStartTime()
+          await native.isSunmiDevice((flag, isSunmi) => {
+            isSunmiDevice = isSunmi
+          })
         }
         await initBlueTooth(global)
 
@@ -773,10 +831,13 @@ class AppNavigator extends PureComponent {
   }
 
   componentWillUnmount() {
+    setAliasInterval && clearTimeout(setAliasInterval)
+    setAliasInterval = null
     this.unSubscribe()
     //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
+    // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
   }
 
 
@@ -798,42 +859,6 @@ class AppNavigator extends PureComponent {
     })
   }
 
-  // printByBluetoothIOS = () => {
-  //   const {global} = this.props
-  //   let {accessToken, autoBluetoothPrint} = global;
-  //   //const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-  //   // this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //   //   if (obj.order_type !== 'new_order') {
-  //   //     sendDeviceStatus(accessToken, {
-  //   //       ...obj,
-  //   //       btConnected: '收到极光推送，不是新订单不需要打印',
-  //   //       auto_print: autoBluetoothPrint
-  //   //     })
-  //   //     return
-  //   //   }
-  //   //   await handlePrintOrder(this.props, obj)
-  //   // })
-  // }
-
-
-  // printByBluetoothAndroid = () => {
-  //   this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //     await handlePrintOrder(this.props, obj)
-  //
-  //   })
-  // }
-
-  // printByBluetooth = () => {
-  //   switch (Platform.OS) {
-  //     case "ios":
-  //       this.printByBluetoothIOS()
-  //       break
-  //     case "android":
-  //       this.printByBluetoothAndroid()
-  //       break
-  //   }
-  // }
-
   state = {
     version_visible: false,
     desc: '',
@@ -849,6 +874,7 @@ class AppNavigator extends PureComponent {
     const {version_visible, desc} = this.state
     return (
       <>
+        <JbbAlert/>
         <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
           <>
             <ImageBackground style={styles.image} source={new_version_background_url}>

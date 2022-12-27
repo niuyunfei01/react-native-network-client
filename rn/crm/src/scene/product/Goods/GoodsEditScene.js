@@ -1757,7 +1757,7 @@ class GoodsEditScene extends PureComponent {
 
   getSearchCategoriesByName = (value) => {
     if (!value) {
-      showError('搜索的类目不能为空', 1)
+      showError('搜索的类目不能为空', 100)
       return
     }
     const {accessToken} = this.props.global
@@ -1984,7 +1984,7 @@ class GoodsEditScene extends PureComponent {
 
     let {page, isLastPage, isLoadingPic, searchPicText} = this.state
     if (isLastPage) {
-      showError('没有更多图片', 1)
+      showError('没有更多图片', 100)
       this.isCanLoadMore = false
       return
     }
@@ -2008,7 +2008,7 @@ class GoodsEditScene extends PureComponent {
 
   searchPicList = (searchPicText) => {
     Keyboard.dismiss()
-    showModal('加载中', 'loading', 6000, 1)
+    showModal('加载中', 'loading', 6000, 100)
     const {vendor_id, accessToken} = this.props.global
     const {page, pageSize, picList} = this.state
     if (!searchPicText) {
@@ -2035,11 +2035,11 @@ class GoodsEditScene extends PureComponent {
           isLoadingPic: false
         })
       else {
-        showError('返回的结果有问题', 1)
+        showError('返回的结果有问题', 100)
         this.setState({isSearchPicList: true, isLoadingPic: false})
       }
     }).catch(() => {
-      showError('返回的结果有问题', 1)
+      showError('返回的结果有问题', 100)
       this.setState({isSearchPicList: true, isLoadingPic: false})
     })
 

@@ -22,8 +22,8 @@ public class AppInfo {
     public static float density;
     public static int densityDpi;
 
-    public static String btAddress;
-    public static String btName;
+//    public static String btAddress;
+//    public static String btName;
 
     public static void init(Context mContext) {
         dType = Build.MODEL;
@@ -43,8 +43,8 @@ public class AppInfo {
         }
 
         initDisplay(mContext);
-        btAddress = PrintUtil.getDefaultBluethoothDeviceAddress(mContext);
-        btName = PrintUtil.getDefaultBluetoothDeviceName(mContext);
+//        btAddress = PrintUtil.getDefaultBluethoothDeviceAddress(mContext);
+//        btName = PrintUtil.getDefaultBluetoothDeviceName(mContext);
     }
 
     public static void initDisplay(Context context) {
