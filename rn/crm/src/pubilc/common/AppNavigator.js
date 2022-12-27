@@ -10,7 +10,12 @@ import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setCheckVersionAt} from "../../reducers/global/globalActions";
+import {
+  getImRemindCount,
+  getStoreImConfig,
+  setCheckVersionAt,
+  setImRemindCount
+} from "../../reducers/global/globalActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
@@ -25,6 +30,7 @@ import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
+import {hideModal, ToastLong} from "../util/ToastUtils";
 
 
 let {width} = Dimensions.get("window");
@@ -177,6 +183,12 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
         <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
                       getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
+        <Stack.Screen name={'Home'} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/NoticeList").default}/>
+        <Stack.Screen name={Config.ROUTE_CHAT_ROOM} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ChatRoom").default}/>
+        <Stack.Screen name={Config.ROUTE_IM_SETTING} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ImSetting").default}/>
 
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
@@ -741,7 +753,16 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
-
+        store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
+        store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
+          if (ok) {
+            hideModal()
+            store.dispatch(setImRemindCount(obj.message_count))
+          } else {
+            ToastLong(msg);
+            hideModal()
+          }
+        }))
       }
     })
   }

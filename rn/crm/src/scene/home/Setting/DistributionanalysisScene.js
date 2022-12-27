@@ -224,7 +224,7 @@ class DistributionAnalysisScene extends PureComponent {
     }
     let endTime;
     if (type === 4) {
-      let dt = new Date();
+      let dt = new Date(Date.now() - oneDay);
       dt.setHours(0, 0, 0, 0);
       endTime = Math.round(dt.getTime() / 1000)
     } else {

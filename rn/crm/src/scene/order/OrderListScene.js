@@ -16,7 +16,12 @@ import {SvgXml} from "react-native-svg";
 import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
 import * as globalActions from '../../reducers/global/globalActions'
-import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
+import {
+  getConfig,
+  getImRemindCount, getStoreImConfig,
+  setImRemindCount,
+  setOrderListBy
+} from '../../reducers/global/globalActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -566,6 +571,16 @@ class OrderListScene extends Component {
           hideModal()
         }
       }));
+      dispatch(getStoreImConfig(accessToken, item?.id));
+      dispatch(getImRemindCount(accessToken, item?.id, (ok, msg, obj) => {
+        if (ok) {
+          hideModal()
+          dispatch(setImRemindCount(obj.message_count))
+        } else {
+          ToastLong(msg);
+          hideModal()
+        }
+      }))
     })
   }
 

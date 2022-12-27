@@ -122,4 +122,7 @@ export default keyMirror({
   ACTIVITY_GOODS_LIST: null,
   GET_MANAGE_SELECT: null,
   ACTIVITY_MANAGER_REFRESH: null,
+
+  SET_IM_CONFIG: null,
+  SET_IM_REMIND_COUNT: null
 })

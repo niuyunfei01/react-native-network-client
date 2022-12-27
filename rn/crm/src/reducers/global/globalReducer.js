@@ -30,7 +30,9 @@ const {
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT
+  SET_AUTO_PRINT,
+  SET_IM_CONFIG,
+  SET_IM_REMIND_COUNT
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -81,7 +83,14 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,
-  lastCheckVersion: 0
+  lastCheckVersion: 0,
+  im_config: {
+    im_auto_content: '',
+    im_auto_reply_status: 0,
+    im_polling_second: 0,
+    im_store_status: 0
+  },
+  im_remind_count: 0
 };
 
 /**
@@ -92,6 +101,16 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_IM_CONFIG:
+      return {
+        ...state,
+        im_config: action.payload
+      }
+    case SET_IM_REMIND_COUNT:
+      return {
+        ...state,
+        im_remind_count: action.payload
+      }
     case SET_AUTO_PRINT:
       return {
         ...state,
