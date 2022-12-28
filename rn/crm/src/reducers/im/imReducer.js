@@ -20,7 +20,7 @@ const initialState = {
   im_remind_count: 0
 }
 
-export default function setImConfig(state = initialState, action) {
+export default function imReducer(state = initialState, action) {
   switch (action.type) {
     case SET_IM_CONFIG:
       return {

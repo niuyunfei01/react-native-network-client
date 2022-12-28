@@ -18,10 +18,12 @@ import ModalDropdown from "react-native-modal-dropdown";
 import * as globalActions from '../../reducers/global/globalActions'
 import {
   getConfig,
-  getImRemindCount, getStoreImConfig,
-  setImRemindCount,
   setOrderListBy
 } from '../../reducers/global/globalActions'
+import {
+  getImRemindCount, getStoreImConfig,
+  setImRemindCount
+} from '../../reducers/im/imActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";

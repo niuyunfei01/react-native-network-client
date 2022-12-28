@@ -13,7 +13,8 @@ import {
   StyleSheet,
   Linking,
   ImageBackground,
-  NativeEventEmitter
+  NativeEventEmitter,
+  AppState
 } from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
@@ -21,11 +22,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {
+  setCheckVersionAt
+} from "../../reducers/global/globalActions";
+import {
   getImRemindCount,
   getStoreImConfig,
-  setCheckVersionAt,
   setImRemindCount
-} from "../../reducers/global/globalActions";
+} from "../../reducers/im/imActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
@@ -780,7 +783,7 @@ class AppNavigator extends PureComponent {
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
-      const {global} = store.getState()
+      const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
       const {accessToken, lastCheckVersion} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
@@ -812,15 +815,15 @@ class AppNavigator extends PureComponent {
           })
         );
         store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
-        if (global.im_config.im_store_status == 1)
-          this.startPolling(global)
+        if (im.im_config.im_store_status == 1 && this.state.appState === 'active')
+          this.startPolling(global, im)
       }
     })
   }
 
   componentDidMount() {
     this.whiteNoLoginInfo()
-
+    this.getAppState()
   }
 
   componentWillUnmount() {
@@ -832,9 +835,23 @@ class AppNavigator extends PureComponent {
     unInitBlueTooth()
     // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
     this.dataPolling !== null && clearInterval(this.dataPolling);
+    AppState.removeEventListener("change", this._handleAppStateChange);
   }
 
-  startPolling = (global) => {
+  getAppState = () => {
+    AppState.addEventListener("change", this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = nextAppState => {
+    this.setState({
+      appState: nextAppState
+    })
+    if (nextAppState === "background") {
+      this.dataPolling !== null && clearInterval(this.dataPolling);
+    }
+  };
+
+  startPolling = (global, im) => {
     this.dataPolling = setInterval(
       () => {
         store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
@@ -847,7 +864,7 @@ class AppNavigator extends PureComponent {
           }
         }))
       },
-      global.im_config.im_count_second * 1000);
+      im.im_config.im_count_second * 1000);
   }
 
   calcAppStartTime = async () => {
@@ -871,7 +888,8 @@ class AppNavigator extends PureComponent {
   state = {
     version_visible: false,
     desc: '',
-    download_url: ''
+    download_url: '',
+    appState: AppState.currentState
   }
 
   setModalStatus = (version_visible = false, desc = '', download_url = '') => {

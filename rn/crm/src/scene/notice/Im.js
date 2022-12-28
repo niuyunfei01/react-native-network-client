@@ -18,7 +18,7 @@ import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
 
-const mapStateToProps = ({global}) => ({global: global})
+const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
 function Fetch({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -64,7 +64,7 @@ class NoticeList extends React.PureComponent {
   }
 
   componentDidMount() {
-    let {im_config} = this.props.global
+    let {im_config} = this.props.im
     this.fetchData()
     this.getStoreList()
     NetInfo.fetch().then(state => {
@@ -76,7 +76,7 @@ class NoticeList extends React.PureComponent {
       this.handleFirstConnectivityChange.bind(this)
     );
     if (im_config.im_store_status == 1)
-      this.startPollingList()
+      this.startPollingList(im_config)
   }
 
   componentWillUnmount() {
@@ -84,8 +84,7 @@ class NoticeList extends React.PureComponent {
       clearInterval(this.dataPolling);
   }
 
-  startPollingList = () => {
-    const {im_config} = this.props.global
+  startPollingList = (im_config) => {
     this.dataPolling = setInterval(
       () => {
         this.fetchData(true)

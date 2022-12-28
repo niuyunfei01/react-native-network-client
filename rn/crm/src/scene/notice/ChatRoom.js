@@ -17,7 +17,7 @@ import BigImage from "../common/component/BigImage";
 import {im_message_refresh} from "../../reducers/im/imActions";
 import tool from "../../pubilc/util/tool";
 
-const mapStateToProps = ({global}) => ({global: global})
+const mapStateToProps = ({global, im}) => ({global: global, im: im})
 const {width, height} = Dimensions.get("window");
 
 class ChatRoom extends React.PureComponent {
@@ -42,11 +42,11 @@ class ChatRoom extends React.PureComponent {
   }
 
   componentDidMount = () => {
-    let {im_config} = this.props.global
+    let {im_config} = this.props.im
     this.fetchData()
     this.readMessage()
     if (im_config.im_store_status == 1)
-      this.startPolling()
+      this.startPolling(im_config)
     tool.debounces(() => {
       this.msgInput.focus()
     }, 800)
@@ -63,8 +63,8 @@ class ChatRoom extends React.PureComponent {
     });
   }
 
-  startPolling = () => {
-    const {im_config, accessToken, store_id} = this.props.global
+  startPolling = (im_config) => {
+    const {accessToken, store_id} = this.props.global
     const {dispatch} = this.props;
     this.dataPolling = setInterval(
       () => {
