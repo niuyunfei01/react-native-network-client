@@ -26,7 +26,6 @@ import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import Validator from "../../../pubilc/util/Validator";
 import {doJPushSetAlias, initJPush} from "../../../pubilc/component/jpushManage";
-import store from "../../../pubilc/util/configureStore";
 
 
 function mapStateToProps(state) {
@@ -80,10 +79,11 @@ class LoginScene extends PureComponent {
 
   componentDidMount() {
     global.isLoginToOrderList = true
+    const {dispatch} = this.props
     const {not_init_jpush} = this.props.global
     if (not_init_jpush) {
       initJPush()
-      store.dispatch(setInitJpush(false))
+      dispatch(setInitJpush(false))
     }
   }
 
