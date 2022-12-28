@@ -1,6 +1,7 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_INIT_JPUSH: null,
   SET_VOLUME: null,
   SET_AUTO_PRINT: null,
   SET_SCANNING_BLUETOOTH_DEVICE: null,

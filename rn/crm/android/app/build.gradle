@@ -116,6 +116,7 @@ dependencies {
         exclude(group: 'com.squareup.okhttp3', module: 'okhttp')
         exclude(group: 'com.squareup.okio', module: 'okio')
     }
+    implementation project(':@react-native-community_netinfo')
     implementation project(':@react-native-community_geolocation')
     implementation project(':@react-native-community_clipboard')
     implementation project(':@react-native-community_slider')
@@ -149,7 +150,7 @@ dependencies {
     implementation fileTree(dir: "../../node_modules/jcore-react-native/android/libs", include: ["*.jar"])
     implementation project(':jpush-react-native')  // 添加 jpush 依赖
     implementation project(':jcore-react-native')  // 添加 jcore 依赖
-    implementation project(':react-native-system-setting')
+    implementation project(':react-native-volume-manager')
 
     if (enableHermes) {
         // for RN 0.61+

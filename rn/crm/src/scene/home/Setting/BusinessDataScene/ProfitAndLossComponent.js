@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   selectBtnText: {fontSize: 14, fontWeight: '500', color: colors.white, lineHeight: 20},
   notSelectBtnText: {fontSize: 14, fontWeight: '400', color: colors.color666, lineHeight: 20},
   zoneWrap: {paddingHorizontal: 12, backgroundColor: colors.white, borderRadius: 6, marginBottom: 10},
-  detailWrap: {flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center'},
+  detailWrap: {flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center', width: width - 12 * 4},
   detailItemValue: {paddingBottom: 15, fontSize: 16, fontWeight: '500', color: colors.color333, lineHeight: 22},
   storeNameText: {
     paddingBottom: 15,
@@ -62,7 +62,8 @@ const styles = StyleSheet.create({
   },
   detailItemAllowModify: {fontSize: 12, color: colors.main_color, lineHeight: 17, paddingLeft: 4, paddingBottom: 15},
   viewProfitDetail: {fontSize: 14, color: colors.main_color, lineHeight: 20},
-  notHasMoreInfo: {marginBottom: 10, textAlign: 'center', fontSize: 14, color: colors.color999}
+  notHasMoreInfo: {marginBottom: 10, textAlign: 'center', fontSize: 14, color: colors.color999},
+  itemWrap: {width: (width - 12 * 4) / 3,}
 })
 
 export default class ProfitAndLossComponent extends PureComponent {
@@ -145,11 +146,11 @@ export default class ProfitAndLossComponent extends PureComponent {
     const {
       valid_order_num_name, valid_order_num, good_profit_name, good_profit, good_profit_rate_name, good_profit_rate,
       platform_income_modify = 0, avg_gmv_name, avg_gmv, supply_cost_name, supply_cost, platform_income_name,
-      platform_income, ship_outcome_name, ship_outcome, loss_rate_name, loss_rate,platform_income_tip
+      platform_income, ship_outcome_name, ship_outcome, loss_rate_name, loss_rate, platform_income_tip
     } = item
     return (
       <View style={styles.detailWrap}>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {valid_order_num_name}
           </Text>
@@ -159,7 +160,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {good_profit_name}
           </Text>
@@ -169,7 +170,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {good_profit_rate_name}
           </Text>
@@ -179,7 +180,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {avg_gmv_name}
           </Text>
@@ -189,7 +190,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {supply_cost_name}
           </Text>
@@ -199,16 +200,16 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <View style={styles.rowCenter}>
-           <Text style={styles.notSelectBtnText}>
-             {platform_income_name}
-           </Text>
+            <Text style={styles.notSelectBtnText}>
+              {platform_income_name}
+            </Text>
             <If condition={platform_income_modify == 1}>
-             <AntDesign name={'questioncircle'} color={colors.color999}
-                        onPress={() => this.setModal(true, platform_income_name, platform_income_tip)}/>
-           </If>
-         </View>
+              <AntDesign name={'questioncircle'} color={colors.color999}
+                         onPress={() => this.setModal(true, platform_income_name, platform_income_tip)}/>
+            </If>
+          </View>
           <View style={styles.rowCenter}>
             <Text style={styles.detailItemValue}>
               {platform_income}
@@ -220,7 +221,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </If>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {ship_outcome_name}
           </Text>
@@ -230,7 +231,7 @@ export default class ProfitAndLossComponent extends PureComponent {
             </Text>
           </View>
         </View>
-        <View style={{width: 0.2906 * width}}>
+        <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {loss_rate_name}
           </Text>
