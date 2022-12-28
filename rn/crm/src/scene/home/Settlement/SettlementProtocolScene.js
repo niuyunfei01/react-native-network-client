@@ -82,6 +82,7 @@ class SettlementProtocol extends PureComponent {
 
   render() {
     let {ptl_sign} = this.state;
+    let {store_id, accessToken} = this.props.global;
     return (
       <View style={Styles.Content}>
         <WebView
@@ -91,7 +92,7 @@ class SettlementProtocol extends PureComponent {
             backgroundColor: 'white'
           }}
           automaticallyAdjustContentInsets={true}
-          source={{uri: `${Config.serverUrl('/SettlePolicy.html')}`}}
+          source={{uri: `${Config.serverUrl('/api/settle_protocol_page')}/${store_id}?access_token=${accessToken}`}}
           scrollEnabled={true}
           scalesPageToFit
         />

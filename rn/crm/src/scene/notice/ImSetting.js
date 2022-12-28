@@ -3,7 +3,7 @@ import {
   Dimensions,
   InteractionManager, ScrollView,
   StyleSheet,
-  Text, TextInput, TouchableOpacity,
+  Text, TouchableOpacity,
   View
 } from "react-native";
 import colors from "../../pubilc/styles/colors";
@@ -29,7 +29,7 @@ class ImSetting extends React.PureComponent {
       im_flag: true,
       auto_response_flag: true,
       autoInputVal: '',
-      nickName: '',
+      // nickName: '',
       confirmModal: false,
       store_im_config: im_config
     }
@@ -44,12 +44,6 @@ class ImSetting extends React.PureComponent {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
-  }
-
-  onRefresh = () => {
-    tool.debounces(() => {
-
-    }, 600)
   }
 
   setConfig = (field, value) => {
@@ -80,10 +74,10 @@ class ImSetting extends React.PureComponent {
       }).catch(e => ToastShort(e.reason))
     })
   }
-
-  submitNickName = () => {
-
-  }
+  //
+  // submitNickName = () => {
+  //
+  // }
 
   closeModal = () => {
     this.setState({
@@ -104,7 +98,7 @@ class ImSetting extends React.PureComponent {
   }
 
   renderImSetting = () => {
-    let {nickName, store_im_config} = this.state;
+    let {store_im_config} = this.state;
     return (
       <View style={styles.content}>
         <TouchableOpacity style={[styles.itemRow, {borderColor: colors.f5, borderBottomWidth: 0.5}]}>
@@ -146,19 +140,19 @@ class ImSetting extends React.PureComponent {
                   buttonStyle={{backgroundColor: colors.main_color}}
                   titleStyle={styles.autoBtnTitle}/>
         </View>
-        <View style={{paddingVertical: 15}}>
-          <Text style={styles.row_label}>显示客服昵称 </Text>
-          <TextInput
-            returnKeyType={'done'}
-            underlineColorAndroid="transparent"
-            style={styles.input}
-            placeholderTextColor={colors.color999}
-            placeholder={"请填写客服昵称"}
-            value={nickName}
-            onChangeText={text => this.setState({nickName: text})}
-          />
-          <Text style={styles.changeBtn} onPress={() => this.submitNickName()}>修改 </Text>
-        </View>
+        {/*<View style={{paddingVertical: 15}}>*/}
+        {/*  <Text style={styles.row_label}>显示客服昵称 </Text>*/}
+        {/*  <TextInput*/}
+        {/*    returnKeyType={'done'}*/}
+        {/*    underlineColorAndroid="transparent"*/}
+        {/*    style={styles.input}*/}
+        {/*    placeholderTextColor={colors.color999}*/}
+        {/*    placeholder={"请填写客服昵称"}*/}
+        {/*    value={nickName}*/}
+        {/*    onChangeText={text => this.setState({nickName: text})}*/}
+        {/*  />*/}
+        {/*  <Text style={styles.changeBtn} onPress={() => this.submitNickName()}>修改 </Text>*/}
+        {/*</View>*/}
       </View>
     )
   }

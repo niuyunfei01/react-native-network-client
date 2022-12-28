@@ -1,25 +1,7 @@
 'use strict';
 import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../pubilc/util/fetchEx";
-
-const {
-  SET_IM_CONFIG,
-  SET_IM_REMIND_COUNT
-} = require('../../pubilc/common/constants').default;
-
-export const setImConfig = (im_config = {}) => {
-  return {
-    type: SET_IM_CONFIG,
-    payload: im_config
-  }
-}
-
-export const setImRemindCount = (im_remind_count = 0) => {
-  return {
-    type: SET_IM_REMIND_COUNT,
-    payload: im_remind_count
-  }
-}
+import {getWithTpl} from "../../pubilc/util/common";
 
 /**
  * 获取新版IM消息数角标
@@ -40,6 +22,25 @@ export function getImRemindCount(access_token, storeId, callback) {
       }).catch((error) => {
       callback(false, "网络错误, 请稍后重试")
     });
+  }
+}
+
+/*
+ * 轮询请求聊天室是否有新消息
+ */
+export function im_message_refresh(access_token, storeId, last_msg_id, group_id, callback) {
+  return dispatch => {
+    const api = `api/im_message_detail_refresh?access_token=${access_token}&store_id=${storeId}&last_msg_id=${last_msg_id}&group_id=${group_id}`;
+    return getWithTpl(api, (response) => {
+      if (response.ok && response.obj?.length > 0) {
+        callback && callback(true, '获取新消息成功', response.obj)
+      } else {
+        callback && callback(false)
+      }
+    }, (error) => {
+      let msg = "暂无新消息: " + error;
+      callback && callback(false, msg)
+    })
   }
 }
 

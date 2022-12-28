@@ -20,6 +20,16 @@ import Config from "../../pubilc/common/config";
 
 const mapStateToProps = ({global}) => ({global: global})
 
+function Fetch({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 const {width} = Dimensions.get("window");
 const tabOption = [
   {label: '全部', key: 'all'},
@@ -36,7 +46,7 @@ class NoticeList extends React.PureComponent {
       isLoading: false,
       isCanLoadMore: false,
       query: {
-        page: 0,
+        page: 1,
         page_size: 20
       },
       isLastPage: false,
@@ -54,10 +64,9 @@ class NoticeList extends React.PureComponent {
   }
 
   componentDidMount() {
+    let {im_config} = this.props.global
+    this.fetchData()
     this.getStoreList()
-    this.focus = this.props.navigation.addListener('focus', () => {
-      this.fetchData()
-    })
     NetInfo.fetch().then(state => {
       this.setState({
         netWorkStatus: state.isConnected
@@ -66,10 +75,22 @@ class NoticeList extends React.PureComponent {
     NetInfo.addEventListener(
       this.handleFirstConnectivityChange.bind(this)
     );
+    if (im_config.im_store_status == 1)
+      this.startPollingList()
   }
 
   componentWillUnmount() {
-    this.focus()
+    if (this.dataPolling !== null)
+      clearInterval(this.dataPolling);
+  }
+
+  startPollingList = () => {
+    const {im_config} = this.props.global
+    this.dataPolling = setInterval(
+      () => {
+        this.fetchData(true)
+      },
+      im_config.im_list_second * 1000);
   }
 
   handleFirstConnectivityChange(netWorkStatus) {
@@ -110,9 +131,10 @@ class NoticeList extends React.PureComponent {
     })
   }
 
-  fetchData = () => {
+  fetchData = (is_polling = false) => {
     const {accessToken, store_id} = this.props.global;
     const {query, isLastPage, selected, message} = this.state
+    if (is_polling) this.setState({isLastPage: false})
     if (isLastPage)
       return
     let params = {
@@ -138,7 +160,7 @@ class NoticeList extends React.PureComponent {
   onRefresh = () => {
     tool.debounces(() => {
       let query = this.state.query;
-      query.page = 0;
+      query.page = 1;
       this.setState({
         isLastPage: false,
         query: query,
@@ -343,6 +365,7 @@ class NoticeList extends React.PureComponent {
     let {netWorkStatus, isLastPage} = this.state;
     return (
       <View style={styles.mainContainer}>
+        <Fetch navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         {this.renderHead()}
         {this.renderTab()}
         {netWorkStatus ?

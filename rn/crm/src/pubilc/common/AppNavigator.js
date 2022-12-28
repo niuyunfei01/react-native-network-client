@@ -812,15 +812,8 @@ class AppNavigator extends PureComponent {
           })
         );
         store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
-        store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
-          if (ok) {
-            hideModal()
-            store.dispatch(setImRemindCount(obj.message_count))
-          } else {
-            ToastLong(msg);
-            hideModal()
-          }
-        }))
+        if (global.im_config.im_store_status == 1)
+          this.startPolling(global)
       }
     })
   }
@@ -838,8 +831,24 @@ class AppNavigator extends PureComponent {
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
     // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
+    this.dataPolling !== null && clearInterval(this.dataPolling);
   }
 
+  startPolling = (global) => {
+    this.dataPolling = setInterval(
+      () => {
+        store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
+          if (ok) {
+            hideModal()
+            store.dispatch(setImRemindCount(obj.message_count))
+          } else {
+            ToastLong(msg);
+            hideModal()
+          }
+        }))
+      },
+      global.im_config.im_count_second * 1000);
+  }
 
   calcAppStartTime = async () => {
     await native.getStartAppTime((flag, startAppTime) => {

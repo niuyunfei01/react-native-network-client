@@ -12,11 +12,13 @@ const initialState = {
   im_config: {
     im_auto_content: '',
     im_auto_reply_status: 0,
-    im_polling_second: 0,
-    im_store_status: 0
+    im_store_status: 0,
+    im_count_second: 0,
+    im_detail_second: 0,
+    im_list_second: 0
   },
   im_remind_count: 0
-};
+}
 
 export default function setImConfig(state = initialState, action) {
   switch (action.type) {

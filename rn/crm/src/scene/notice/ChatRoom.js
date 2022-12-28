@@ -14,6 +14,8 @@ import {ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 import EmojiSelector, { Categories } from 'react-native-emoji-selector'
 import BigImage from "../common/component/BigImage";
+import {im_message_refresh} from "../../reducers/im/imActions";
+import tool from "../../pubilc/util/tool";
 
 const mapStateToProps = ({global}) => ({global: global})
 const {width, height} = Dimensions.get("window");
@@ -34,14 +36,25 @@ class ChatRoom extends React.PureComponent {
       send_msg: '',
       showEmoji: false,
       modalImg: false,
-      img_url: ''
+      img_url: '',
+      new_message_id: ''
     }
   }
 
-  componentDidMount() {
-    this.focus = this.props.navigation.addListener('focus', () => {
-      this.fetchData()
-    })
+  componentDidMount = () => {
+    let {im_config} = this.props.global
+    this.fetchData()
+    this.readMessage()
+    if (im_config.im_store_status == 1)
+      this.startPolling()
+    tool.debounces(() => {
+      this.msgInput.focus()
+    }, 800)
+  }
+
+  componentWillUnmount() {
+    if (this.dataPolling !== null)
+      clearInterval(this.dataPolling);
   }
 
   onPress = (route, params) => {
@@ -50,15 +63,43 @@ class ChatRoom extends React.PureComponent {
     });
   }
 
+  startPolling = () => {
+    const {im_config, accessToken, store_id} = this.props.global
+    const {dispatch} = this.props;
+    this.dataPolling = setInterval(
+      () => {
+        const {new_message_id, messageInfo} = this.state;
+        const {group_id} = messageInfo
+        dispatch(im_message_refresh(accessToken, store_id, new_message_id, group_id, (ok, msg, obj) => {
+          if (ok) {
+            this.addInitMessage(obj[0])
+          }
+        }))
+      },
+      im_config.im_detail_second * 1000);
+  }
+
+  readMessage = () => {
+    let {messageInfo} = this.state;
+    const {accessToken} = this.props.global;
+    let params = {
+      es_id: messageInfo.es_id,
+      group_id: messageInfo.group_id
+    }
+    const api = `/api/im_message_read?access_token=${accessToken}`
+    HttpUtils.post(api, params).then(res => {
+    }).catch((error) => {
+      ToastShort(error.reason)
+    })
+  }
+
   addInitMessage = (res) => {
-    console.log('res', res)
     let {messages} = this.state;
     messages.unshift(res)
     this.setState({
       messages,
-      send_msg: ''
-    }, () => {
-      console.log('messages', messages)
+      send_msg: '',
+      new_message_id: res.id
     })
   }
 
@@ -77,9 +118,9 @@ class ChatRoom extends React.PureComponent {
     HttpUtils.get(api, params).then(res => {
       let {lists, page, isLastPage} = res
       let list = page > 1 ? messages.concat(lists) : lists
-      console.log('list', list.reverse())
+      if (page == 1) this.setState({new_message_id: list[0].id})
       this.setState({
-        messages: list.reverse(),
+        messages: list,
         refreshing: false,
         isLastPage: isLastPage
       })

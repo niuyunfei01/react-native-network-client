@@ -56,7 +56,6 @@ const {
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT,
   SET_VOLUME,
   SET_AUTO_PRINT,
   SET_IM_CONFIG,
@@ -487,7 +486,7 @@ export function customerApply(params, callback, props) {
 
 export function getStoreImConfig(token, storeId, callback) {
   return dispatch => {
-    const url = `/api/im_store_config?access_token=${token}&store_id=${storeId}`;
+    const url = `api/im_store_config?access_token=${token}&store_id=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
         dispatch(setImConfig(json.obj));
