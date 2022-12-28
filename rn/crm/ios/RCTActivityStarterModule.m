@@ -542,6 +542,9 @@ RCT_EXPORT_METHOD(showInputMethod) {
 //    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
   RCTLogInfo(@"showInputMethod");
 }
-
+RCT_EXPORT_METHOD(openAppSystemSettings){
+  NSURL * url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+  [[UIApplication sharedApplication]openURL:url options:@{} completionHandler:nil];
+}
 
 @end

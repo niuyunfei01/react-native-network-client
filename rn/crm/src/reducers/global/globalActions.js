@@ -25,9 +25,6 @@ import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
-import dayjs from "dayjs";
-import FetchEx from "../../pubilc/util/fetchEx";
-import AppConfig from "../../pubilc/common/config";
 
 /**
  * ## Imports
@@ -57,13 +54,20 @@ const {
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_VOLUME,
-  SET_AUTO_PRINT
+  SET_AUTO_PRINT,
+  SET_INIT_JPUSH
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
 }
 
+export const setInitJpush = (value) => {
+  return {
+    type: SET_INIT_JPUSH,
+    payload: value
+  }
+}
 export const setVolume = (value) => {
   return {
     type: SET_VOLUME,
@@ -98,25 +102,17 @@ export const setSGCategory = (basic_categories) => {
   }
 }
 
-export function setAccessToken(obj) {
+export function setAccessToken(obj = {}) {
   return {
     type: SESSION_TOKEN_SUCCESS,
-    payload: {
-      access_token: obj.access_token,
-      refresh_token: obj.refresh_token,
-      expires_in_ts: obj.expires_in_ts,
-      getTokenTs: dayjs().valueOf()
-    }
+    payload: obj
   }
 }
 
 export function setNoLoginInfo(info) {
   return {
     type: SET_NO_LOGIN_INFO,
-    payload: {
-      ...info,
-      getTokenTs: dayjs().valueOf()
-    }
+    payload: info
   }
 }
 

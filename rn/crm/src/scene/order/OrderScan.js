@@ -15,6 +15,7 @@ import tool from "../../pubilc/util/tool";
 import ModalSelector from "react-native-modal-selector";
 import dayjs from "dayjs";
 import colors from "../../pubilc/styles/colors";
+import Synthesizer from "../../pubilc/component/react-native-speech-iflytek";
 
 let footerHeight = pxToDp(80);
 
@@ -111,7 +112,7 @@ class OrderScan extends BaseComponent {
     let {currentOrder} = this.state
     if (!currentOrder || tool.length(Object.keys(currentOrder)) === 0) {
       ToastShort('无订单数据！')
-      native.speakText('无订单数据！')
+      Synthesizer.start('无订单数据！')
       return
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
@@ -146,7 +147,7 @@ class OrderScan extends BaseComponent {
             msg = `${msg}${shortTime}打包`
           }
           ToastShort(msg)
-          native.speakText(msg)
+          Synthesizer.start(msg)
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }
@@ -155,10 +156,10 @@ class OrderScan extends BaseComponent {
     }
     if (prodExist === 1) {
       ToastShort('该商品已经拣够了！')
-      native.speakText('该商品已经拣够了！')
+      Synthesizer.start('该商品已经拣够了！')
     } else if (prodExist === 0) {
       ToastShort('该订单不存在此商品！')
-      native.speakText('该订单不存在此商品！')
+      Synthesizer.start('该订单不存在此商品！')
     }
   }
 
@@ -173,7 +174,7 @@ class OrderScan extends BaseComponent {
       self.checkScanNum()
     }).catch(e => {
       native.playWarningSound()
-      native.speakText(e.reason)
+      Synthesizer.start(e.reason)
     })
   }
 
@@ -200,7 +201,7 @@ class OrderScan extends BaseComponent {
     currentOrder = {}
     self.setState({currentOrder})
     ToastShort('打包完成操作成功')
-    native.speakText('打包完成操作成功')
+    Synthesizer.start('打包完成操作成功')
   }
 
   onChgProdNum(prodIdx, number) {

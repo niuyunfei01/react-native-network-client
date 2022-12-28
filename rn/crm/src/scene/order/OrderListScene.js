@@ -16,14 +16,8 @@ import {SvgXml} from "react-native-svg";
 import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
 import * as globalActions from '../../reducers/global/globalActions'
-import {
-  getConfig,
-  setOrderListBy
-} from '../../reducers/global/globalActions'
-import {
-  getImRemindCount, getStoreImConfig,
-  setImRemindCount
-} from '../../reducers/im/imActions'
+import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
+import {getImRemindCount, getStoreImConfig, setImRemindCount} from '../../reducers/im/imActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -44,7 +38,6 @@ import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {doJPushSetAlias} from "../../pubilc/component/jpushManage";
 import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get("window");
@@ -156,8 +149,6 @@ class OrderListScene extends Component {
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
-    //防止退出登录，重新登录不推送的问题
-    doJPushSetAlias(currentUser)
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

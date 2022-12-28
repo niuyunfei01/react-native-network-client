@@ -7548,9 +7548,9 @@ react-native-reanimated@^2.1.0:
     mockdate "^3.0.2"
     string-hash-64 "^1.0.3"
 
-react-native-root-siblings@^4.0.0:
+react-native-root-siblings@^4.0.0, react-native-root-siblings@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-root-siblings/-/react-native-root-siblings-4.1.1.tgz#b7742db7634a87f507eb99a5fd699c4f10c46ab0"
+  resolved "https://registry.npmmirror.com/react-native-root-siblings/-/react-native-root-siblings-4.1.1.tgz#b7742db7634a87f507eb99a5fd699c4f10c46ab0"
   integrity sha512-sdmLElNs5PDWqmZmj4/aNH4anyxreaPm61c4ZkRiR8SO/GzLg6KjAbb0e17RmMdnBdD0AIQbS38h/l55YKN4ZA==
 
 react-native-root-toast@^3.3.1:
@@ -7652,11 +7652,6 @@ react-native-swiper@^1.6.0:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-system-setting@^1.7.6:
-  version "1.7.6"
-  resolved "https://registry.npmmirror.com/react-native-system-setting/-/react-native-system-setting-1.7.6.tgz#43633604ac1bd5fd906acdbffa627a1998d2345a"
-  integrity sha512-nBnIK5Xnyu8XRRA3BMzRI54oYlSBKc0oOTQdZOCEeOvn4ltS1nk2shj/vtMQe6khXvuhai3vIc+g7DcsOcr5+w==
-
 react-native-tab-view@^2.16.0:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-2.16.0.tgz#cae72c7084394bd328fac5fefb86cd966df37a86"
@@ -7680,6 +7675,11 @@ react-native-vector-icons@^7.0.0:
     lodash.template "^4.5.0"
     prop-types "^15.7.2"
     yargs "^15.0.2"
+
+react-native-volume-manager@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.npmmirror.com/react-native-volume-manager/-/react-native-volume-manager-1.2.1.tgz#9eaa9f10c47f992726854ab9df657ce41a6d1af6"
+  integrity sha512-Jm+00q/1BmuYJGT3xHnP9V0HccXpuEkoD75dU1f6cRygQtRH6cl26RqoYq+O2p3x3v1IUFoT2eIlS47+yI1OUw==
 
 react-native-webview@^11.4.3:
   version "11.6.5"

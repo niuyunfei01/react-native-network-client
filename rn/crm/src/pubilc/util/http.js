@@ -9,6 +9,7 @@ import {getTime} from "./TimeUtil";
 import store from "./configureStore";
 import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
+import {navigate} from "../../RootNavigation";
 
 const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
@@ -21,6 +22,7 @@ const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
+let isRefrshToken = false
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -55,10 +57,10 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    if(global.noLoginInfo.accessToken)
-      global.noLoginInfo.accessToken='存在token'
-    if(global.noLoginInfo.refreshToken)
-      global.noLoginInfo.refreshToken='存在refreshToken'
+    if (global.noLoginInfo.accessToken)
+      global.noLoginInfo.accessToken = '存在token'
+    if (global.noLoginInfo.refreshToken)
+      global.noLoginInfo.refreshToken = '存在refreshToken'
     const report_params = {
       APP_VERSION_CODE: DeviceInfo.getVersion(),
       CUSTOM_DATA: {
@@ -77,7 +79,7 @@ class HttpUtils {
         currentRouteName: global.currentRouteName
       }
     };
-    nrRecordMetric('app_url_request',report_params)
+    nrRecordMetric('app_url_request', report_params)
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
@@ -96,7 +98,10 @@ class HttpUtils {
       }
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
-    return new Promise(async (resolve, reject) => {
+    if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
+      this.refreshAccessToken()
+    }
+    return new Promise((resolve, reject) => {
       const startTime = getTime()
       fetch(uri, options)
         .then((response) => {
@@ -129,7 +134,7 @@ class HttpUtils {
 
           this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
-            this.error(response, method, url, params);
+            this.error(response);
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -138,7 +143,7 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-           this.upLoadData(error.message, uri, url, options, params, method)
+          this.upLoadData(error.message, uri, url, options, params, method)
           hideModal()
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           if (getNetworkDelay) {
@@ -151,61 +156,37 @@ class HttpUtils {
     })
   }
 
-  static requestUrl = (method, request_url, request_params, accessToken) => {
-    const tokenIndex = request_url.indexOf('access_token=')
-    if (tokenIndex !== -1) {
-      request_url = request_url.substring(0, tokenIndex + 14) + accessToken
-    }
-    if (request_params && request_params.accessToken) {
-      request_params.accessToken = accessToken
-    }
-    if (request_params && request_params.access_token) {
-      request_params.access_token = accessToken
-    }
-    if (method === 'GET') {
-      this.get(request_url, request_params)
-        .then(res => {
-        })
-        .catch(error => {
-        })
-      return
-    }
-    if (method === 'POST') {
-      this.post(request_url, request_params)
-        .then(res => {
-        })
-        .catch(error => {
-        })
-    }
-  }
+  static refreshAccessToken = () => {
 
-  static refreshAccessToken = (method, request_url, request_params) => {
-    const url = `/v4/WsbUser/refreshToken`
     if (global.noLoginInfo.refreshToken) {
+      const url = `/v4/WsbUser/refreshToken`
       const params = {refresh_token: global.noLoginInfo.refreshToken}
+      isRefrshToken = true
       this.post(url, params).then(res => {
-        const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+        const {access_token, refresh_token, expires_in} = res;
+        const getTokenTs = dayjs().valueOf()
         store.dispatch({
           type: SESSION_TOKEN_SUCCESS,
           payload: {
             access_token: access_token,
             refresh_token: refresh_token,
-            expires_in_ts: expires_in_ts,
-            getTokenTs: dayjs().valueOf()
+            expires_in_ts: expires_in,
+            getTokenTs: getTokenTs
           }
         })
-        this.requestUrl(method, request_url, request_params, access_token)
+        global.noLoginInfo.getTokenTs = getTokenTs
+        isRefrshToken = false
       })
     }
   }
 
-  static error(response, method, url, params) {
+  static error(response) {
     switch (response.error_code) {
       case 10001:
       case 21327:
-        ToastLong('请确认信息是否正确，若不正确请重新操作')
+        isRefrshToken = true
         // this.logout(navigation)
-        this.refreshAccessToken(method, url, params)
+        this.refreshAccessToken()
         break
       case 30001:
         ToastShort('客户端版本过低')
@@ -219,6 +200,7 @@ class HttpUtils {
 
   static logout(navigation) {
     native.logout().then()
+
     if (navigation !== HttpUtils) {
       if (navigation != null) {
         const resetAction = CommonActions.reset({

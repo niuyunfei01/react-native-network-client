@@ -141,7 +141,6 @@ export default class DeliveryDataComponent extends PureComponent {
     const {store_id, accessToken} = this.props
     const url = `/v1/new_api/analysis/delivery_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start_date, end_date: end_date}
-    console.log('params', params)
     HttpUtils.get(url, params).then((res = []) => {
       this.setState({delivery_Data: res, custom_date_visible: false})
     })

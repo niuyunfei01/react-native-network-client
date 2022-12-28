@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Dimensions,
   TextInput,
-  KeyboardAvoidingView, Platform
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import {connect} from "react-redux";
-import SystemSetting from 'react-native-system-setting'
 import {Switch} from "react-native-elements";
 import colors from "../../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
@@ -22,6 +22,8 @@ import AlertModal from "../../../pubilc/component/AlertModal";
 import native from "../../../pubilc/util/native";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import JPush from "jpush-react-native";
+import {VolumeManager} from 'react-native-volume-manager';
 
 const {width} = Dimensions.get('window')
 const styles = StyleSheet.create({
@@ -152,6 +154,7 @@ class NotificationSetting extends PureComponent {
 
   state = {
     volume: this.props.global.volume,
+    isInitVolume: true,
     close_voice_visible: false,
     visible: false,
     show_type: 1,
@@ -174,21 +177,48 @@ class NotificationSetting extends PureComponent {
 
   async componentDidMount() {
 
-    await this.getNotificationSettingList()
-
+    this.getNotificationSettingList()
+    await VolumeManager.showNativeVolumeUI({enabled: true})
+    this.volumeListener = VolumeManager.addVolumeListener((result) => {
+      this.volumeRef.setNativeProps({value: result.volume})
+    })
   }
 
-  getNotificationSettingList = async () => {
-    const notification_status = await native.getNotificationStatus()
+  componentWillUnmount() {
+    this.volumeListener && this.volumeListener.remove()
+  }
+
+  getNotificationSettingList = () => {
+
     const {store_id, vendor_id, accessToken} = this.props.global
     const url = `/v4/wsb_notify/getNotifySettingList?access_token=${accessToken}`
     const params = {store_id: store_id, vendor_id: vendor_id}
-    HttpUtils.get(url, params).then((res) => {
+    HttpUtils.get(url, params).then(async (res) => {
       const {
         menu_settings_head = {}, menu_settings_body = {}, menu_settings_tail = {},
         menu_settings_child_delivery_cancel = {}, menu_settings_child_balance_defect = {}
       } = res
 
+      if (Platform.OS === 'android') {
+        JPush.isNotificationEnabled((enabled) => {
+          const notify_accept = {notify_type: 'v4_notify_accept', name: '接收消息通知', value: enabled ? 1 : 0}
+          menu_settings_head.types = [notify_accept].concat(menu_settings_head.types)
+          this.setState({
+            menu_settings_head: menu_settings_head,
+            menu_settings_body: menu_settings_body,
+            menu_settings_tail: menu_settings_tail,
+            menu_settings_child_delivery_cancel: menu_settings_child_delivery_cancel,
+            menu_settings_child_balance_defect: menu_settings_child_balance_defect,
+            select_balance: {
+              ...this.state.select_balance,
+              index: menu_settings_child_balance_defect.checked_index,
+              value: menu_settings_child_balance_defect.types[menu_settings_child_balance_defect.checked_index].value
+            }
+          })
+        })
+        return
+      }
+      const notification_status = await native.getNotificationStatus()
       const notify_accept = {notify_type: 'v4_notify_accept', name: '接收消息通知', value: notification_status ? 1 : 0}
       menu_settings_head.types = [notify_accept].concat(menu_settings_head.types)
 
@@ -208,15 +238,20 @@ class NotificationSetting extends PureComponent {
 
   }
 
-  setVolume = (value) => {
-
-    const {volume} = this.state
-    if (value === volume)
+  setVolume = async (value) => {
+    const {volume, isInitVolume} = this.state
+    if (volume === value)
       return
     this.volumeRef.setNativeProps({value: value})
-    SystemSetting.setVolume(value, {showUI: true, type: "system"})
+    if (isInitVolume)
+      this.setState({isInitVolume: false})
+    else {
+      Platform.select({
+        ios: await VolumeManager.setVolume(value, {type: 'system', showUI: true}),
+        android: await VolumeManager.setVolume(value, {type: 'music', showUI: true})
+      })
 
-
+    }
   }
 
   setStatus = async (notify_type, value) => {
@@ -228,7 +263,7 @@ class NotificationSetting extends PureComponent {
           this.setState({close_voice_visible: true})
         break
       case 'v4_notify_accept':
-        await SystemSetting.openAppSystemSettings()
+        await native.openAppSystemSettings()
         break
       default:
         this.setStatusRequestServer(notify_type, value)
@@ -254,10 +289,10 @@ class NotificationSetting extends PureComponent {
         params.setting_status = value
         break
     }
-    HttpUtils.get(url, params).then(async () => {
+    HttpUtils.get(url, params).then(() => {
       this.closeVoiceModal()
       this.closeModal()
-      await this.getNotificationSettingList()
+      this.getNotificationSettingList()
       if (notify_type === 'v4_strong_delivery_order_cancel' || notify_type === 'v4_strong_balance_defect') {
         ToastShort('设置成功', 1)
       }
@@ -467,9 +502,9 @@ class NotificationSetting extends PureComponent {
     const {store_id, accessToken} = this.props.global;
     const url = `/v4/wsb_store/setStoreConfig?access_token=${accessToken}`
     const params = {store_id: store_id, field: 'funds_threshold', value: select_balance.value}
-    HttpUtils.get(url, params).then(async () => {
+    HttpUtils.get(url, params).then(() => {
       this.closeModal()
-      await this.getNotificationSettingList()
+      this.getNotificationSettingList()
       ToastShort('设置成功', 2)
     })
   }
@@ -482,9 +517,9 @@ class NotificationSetting extends PureComponent {
     }
     const url = `/v4/wsb_notify/setNotifyMobile?access_token=${accessToken}`
     const params = {store_id: store_id, notify_mobile: notification_phone}
-    HttpUtils.get(url, params).then(async () => {
+    HttpUtils.get(url, params).then(() => {
       this.closeModal()
-      await this.getNotificationSettingList()
+      this.getNotificationSettingList()
     })
   }
   selectItemAndCloseModal = () => {

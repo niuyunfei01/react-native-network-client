@@ -1,7 +1,14 @@
 import React, {PureComponent} from 'react'
 import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {getConfig, logout, sendDverifyCode, setCurrentStore, signIn,} from '../../../reducers/global/globalActions'
+import {
+  getConfig,
+  logout,
+  sendDverifyCode,
+  setCurrentStore,
+  setInitJpush,
+  signIn,
+} from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -18,6 +25,8 @@ import Entypo from "react-native-vector-icons/Entypo";
 import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import Validator from "../../../pubilc/util/Validator";
+import {doJPushSetAlias, initJPush} from "../../../pubilc/component/jpushManage";
+
 
 function mapStateToProps(state) {
   return {
@@ -67,8 +76,15 @@ class LoginScene extends PureComponent {
     this.mixpanel.track("openApp_page_view", {});
   }
 
+
   componentDidMount() {
     global.isLoginToOrderList = true
+    const {dispatch} = this.props
+    const {not_init_jpush} = this.props.global
+    if (not_init_jpush) {
+      initJPush()
+      dispatch(setInitJpush(false))
+    }
   }
 
   componentWillUnmount = () => {
@@ -145,8 +161,10 @@ class LoginScene extends PureComponent {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
-    dispatch(signIn(mobile, password, this.props, (ok, msg, uid) => {
+    dispatch(signIn(mobile, password, this.props, (ok, msg, uid, id) => {
       if (ok && uid) {
+        //防止退出登录，重新登录不推送的问题
+        doJPushSetAlias(id)
         this.queryConfig()
         this.mixpanel.getDistinctId().then(res => {
           if (res !== uid) {

@@ -1,5 +1,4 @@
 import {Linking, NativeModules, Platform} from 'react-native'
-import JPush from "jpush-react-native";
 
 const {ActivityStarter} = NativeModules
 
@@ -20,29 +19,6 @@ export default {
   }) {
     if (ActivityStarter) {
       await ActivityStarter.toRunInBg(callback)
-    }
-  },
-
-  /**
-   *  volume: int 音量
-   */
-  setSoundVolume: async function (volume, callback = function (ok, msg) {
-  }) {
-    if (ActivityStarter) {
-      await ActivityStarter.setSoundVolume(volume, callback)
-    }
-  },
-
-  /**
-   *  currentVolume: int 音量; -1 未知
-   *  isRinger: -1 未知, 1 响铃, 0, 静音
-   *  maxVolume: 取不到为 -1
-   *  minVolume: Android 28以后才有，取不到则返回 -1
-   */
-  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {
-  }) {
-    if (ActivityStarter) {
-      await ActivityStarter.getSoundVolume(callback)
     }
   },
 
@@ -147,30 +123,6 @@ export default {
       ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
-  setDisableSoundNotify: async function (disabled, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setDisableSoundNotify(disabled, callback))
-  },
-
-  getDisableSoundNotify: async function (callback = function (disabled, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getDisableSoundNotify(callback))
-  },
-
-  setDisabledNewOrderNotify: async function (disabled, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
-  },
-
-  getNewOrderNotifyDisabled: async function (callback = function (disabled, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getNewOrderNotifyDisabled(callback))
-  },
-
   /**
    acceptNotifyNew
    host
@@ -215,11 +167,6 @@ export default {
     switch (Platform.OS) {
       case "ios":
         return await ActivityStarter.getNotificationStatus()
-      case "android":
-        JPush.isNotificationEnabled((enabled) => {
-          return enabled
-        })
-        break
     }
 
   },
@@ -227,5 +174,8 @@ export default {
   }) => {
     if (ActivityStarter)
       await ActivityStarter.isSunmiDevice(callback)
+  },
+  openAppSystemSettings: async () => {
+    ActivityStarter && await ActivityStarter.openAppSystemSettings()
   }
 }

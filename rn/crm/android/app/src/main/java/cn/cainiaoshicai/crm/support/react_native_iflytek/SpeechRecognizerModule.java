@@ -34,7 +34,8 @@ import javax.annotation.Nullable;
  */
 
 public class SpeechRecognizerModule extends ReactContextBaseJavaModule {
-    private Context context;
+    private final String path = getReactApplicationContext().getFilesDir().getAbsolutePath() + "/";
+    private final Context context;
 
     private static SpeechRecognizer mIat;
     private static RecognizerListener mIatListener;
@@ -138,7 +139,7 @@ public class SpeechRecognizerModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setParameter(String parameter, String value) {
         if (parameter.equals(SpeechConstant.ASR_AUDIO_PATH)) {
-            value = Environment.getExternalStorageDirectory() + value;
+            value = path + value;
         }
         mIat.setParameter(parameter, value);
     }
@@ -153,7 +154,7 @@ public class SpeechRecognizerModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private static void setIatParam() {
+    private void setIatParam() {
         // 清空参数
 //        mIat.setParameter(SpeechConstantModule.PARAMS, null);
 
@@ -180,7 +181,7 @@ public class SpeechRecognizerModule extends ReactContextBaseJavaModule {
         // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mIat.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-        mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/App/SpeechRecognizer");
+        mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, path + "SpeechRecognizer");
     }
 
     private static String parseIatResult(String json) {

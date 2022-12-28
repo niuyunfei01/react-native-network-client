@@ -4,6 +4,13 @@ import native from "../../util/native";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
 
+export const initJPush = () => {
+
+  JPush.setLoggerEnable(false)
+  JPush.init()
+
+}
+
 export const doJPushSetAlias = (currentUser) => {
   if (currentUser) {
     const alias = `uid_${currentUser}`;

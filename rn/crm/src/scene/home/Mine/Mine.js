@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   InteractionManager,
+  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -52,7 +53,7 @@ import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 import {logout, setVolume} from "../../../reducers/global/globalActions";
 import JbbAlert from "../../../pubilc/component/JbbAlert";
-import SystemSetting from "react-native-system-setting";
+import {VolumeManager} from 'react-native-volume-manager';
 
 const width = Dimensions.get("window").width;
 
@@ -188,9 +189,20 @@ class Mine extends PureComponent {
 
   onRefresh = () => {
     const {dispatch} = this.props
-    SystemSetting.getVolume('system').then(volume => {
-      dispatch(setVolume(volume))
-    })
+    switch (Platform.OS) {
+      case "ios":
+        VolumeManager.getVolume('system').then((result) => {
+          dispatch(setVolume(result))
+        })
+        break
+      case "android":
+        VolumeManager.getVolume('music').then((result) => {
+          dispatch(setVolume(result))
+        })
+        break
+    }
+
+
     this.fetchMineData()
     this.fetchWsbWallet()
     this.fetchShowSettleProtocol()

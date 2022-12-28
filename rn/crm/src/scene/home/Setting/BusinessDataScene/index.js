@@ -75,6 +75,7 @@ const CATEGORY_LIST = [
     name: '盈亏'
   },
 ]
+
 class BusinessDataScene extends PureComponent {
 
   state = {
