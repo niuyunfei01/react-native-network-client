@@ -415,6 +415,7 @@ class SettlementScene extends PureComponent {
 
   renderAgreementModal = () => {
     let {showAgreement, settleProtocolInfo} = this.state;
+    let {store_id, accessToken} = this.props.global;
     return (
       <CommonModal visible={showAgreement} position={'center'} onRequestClose={this.closeAgreeModal}
                    animationType={'fade'}>
@@ -432,7 +433,7 @@ class SettlementScene extends PureComponent {
                 flex: 1
               }}
               automaticallyAdjustContentInsets={true}
-              source={{uri: `${Config.serverUrl('/SettlePolicy.html')}`}}
+              source={{uri: `${Config.serverUrl('/api/settle_protocol_page')}/${store_id}?access_token=${accessToken}`}}
               scrollEnabled={true}
             />
           </View>

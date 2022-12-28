@@ -19,8 +19,8 @@ import {
 import {SvgXml} from "react-native-svg";
 
 function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global};
+  const {global, im} = state;
+  return {global: global, im: im};
 }
 
 const Tab = createBottomTabNavigator();
@@ -51,6 +51,7 @@ class TabHome extends React.Component {
     const initialRouteName = route.params?.initialRouteName ?? 'Login'
     const initTab = initialRouteName === "Tab" && (route.params?.initTab || "Orders") || initialRouteName
     let {menu_list} = this.props.global;
+    let {im_remind_count} = this.props.im;
     let {news, product, work} = menu_list;
     return (
       <Tab.Navigator
@@ -99,12 +100,27 @@ class TabHome extends React.Component {
           />
         </If>
 
+        {/*<Tab.Screen*/}
+        {/*  name="Home"*/}
+        {/*  getComponent={() => require("../notice/NoticeList").default}*/}
+        {/*  options={*/}
+        {/*    {*/}
+        {/*      tabBarBadge: remind > 99 ? '99+' : remind,*/}
+        {/*      tabBarLabel: "消息",*/}
+        {/*      tabBarIcon: ({focused}) => (*/}
+        {/*        focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :*/}
+        {/*          <SvgXml xml={bottom_tab_message()} width={24} height={24}/>*/}
+        {/*      )*/}
+        {/*    }*/}
+        {/*  }*/}
+        {/*/>*/}
+
         <Tab.Screen
-          name="Home"
-          getComponent={() => require("../notice/NoticeList").default}
+          name="IM"
+          getComponent={() => require("../notice/Im").default}
           options={
             {
-              tabBarBadge: remind > 99 ? '99+' : remind,
+              tabBarBadge: im_remind_count > 99 ? '99+' : im_remind_count,
               tabBarLabel: "消息",
               tabBarIcon: ({focused}) => (
                 focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :

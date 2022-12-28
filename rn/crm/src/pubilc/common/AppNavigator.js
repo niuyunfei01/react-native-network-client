@@ -13,14 +13,22 @@ import {
   StyleSheet,
   Linking,
   ImageBackground,
-  NativeEventEmitter
+  NativeEventEmitter,
+  AppState
 } from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setCheckVersionAt} from "../../reducers/global/globalActions";
+import {
+  setCheckVersionAt
+} from "../../reducers/global/globalActions";
+import {
+  getImRemindCount,
+  getStoreImConfig,
+  setImRemindCount
+} from "../../reducers/im/imActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
@@ -35,6 +43,8 @@ import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
+import {hideModal, ToastLong} from "../util/ToastUtils";
+
 import JbbAlert from "../component/JbbAlert";
 import {Synthesizer} from "../component/react-native-speech-iflytek";
 
@@ -185,6 +195,12 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
         <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
                       getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
+        <Stack.Screen name={'Home'} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/NoticeList").default}/>
+        <Stack.Screen name={Config.ROUTE_CHAT_ROOM} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ChatRoom").default}/>
+        <Stack.Screen name={Config.ROUTE_IM_SETTING} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ImSetting").default}/>
 
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
@@ -767,7 +783,7 @@ class AppNavigator extends PureComponent {
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
-      const {global} = store.getState()
+      const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
       const {accessToken, lastCheckVersion} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
@@ -798,14 +814,16 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
-
+        store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
+        if (im.im_config.im_store_status == 1 && this.state.appState === 'active')
+          this.startPolling(global, im)
       }
     })
   }
 
   componentDidMount() {
     this.whiteNoLoginInfo()
-
+    this.getAppState()
   }
 
   componentWillUnmount() {
@@ -816,8 +834,38 @@ class AppNavigator extends PureComponent {
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
     // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
+    this.dataPolling !== null && clearInterval(this.dataPolling);
+    AppState.removeEventListener("change", this._handleAppStateChange);
   }
 
+  getAppState = () => {
+    AppState.addEventListener("change", this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = nextAppState => {
+    this.setState({
+      appState: nextAppState
+    })
+    if (nextAppState === "background") {
+      this.dataPolling !== null && clearInterval(this.dataPolling);
+    }
+  };
+
+  startPolling = (global, im) => {
+    this.dataPolling = setInterval(
+      () => {
+        store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
+          if (ok) {
+            hideModal()
+            store.dispatch(setImRemindCount(obj.message_count))
+          } else {
+            ToastLong(msg);
+            hideModal()
+          }
+        }))
+      },
+      im.im_config.im_count_second * 1000);
+  }
 
   calcAppStartTime = async () => {
     await native.getStartAppTime((flag, startAppTime) => {
@@ -840,7 +888,8 @@ class AppNavigator extends PureComponent {
   state = {
     version_visible: false,
     desc: '',
-    download_url: ''
+    download_url: '',
+    appState: AppState.currentState
   }
 
   setModalStatus = (version_visible = false, desc = '', download_url = '') => {

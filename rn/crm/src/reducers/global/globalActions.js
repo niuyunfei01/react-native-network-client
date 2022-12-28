@@ -26,6 +26,8 @@ import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
 import dayjs from "dayjs";
+import FetchEx from "../../pubilc/util/fetchEx";
+import AppConfig from "../../pubilc/common/config";
 
 /**
  * ## Imports
@@ -54,8 +56,8 @@ const {
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT,
-  SET_VOLUME
+  SET_VOLUME,
+  SET_AUTO_PRINT
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
