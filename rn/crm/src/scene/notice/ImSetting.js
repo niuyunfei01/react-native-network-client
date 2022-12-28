@@ -17,27 +17,21 @@ import AlertModal from "../../pubilc/component/AlertModal";
 import HttpUtils from "../../pubilc/util/http";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 
-const mapStateToProps = ({global}) => ({global: global})
+const mapStateToProps = ({global, im}) => ({global: global, im: im})
 const {width} = Dimensions.get("window");
 
 class ImSetting extends React.PureComponent {
   constructor(props) {
     super(props)
-    let {im_config} = props.global
+    let {im_config} = props.im
     this.state = {
       isLoading: false,
       im_flag: true,
       auto_response_flag: true,
       autoInputVal: '',
-      // nickName: '',
       confirmModal: false,
       store_im_config: im_config
     }
-  }
-
-  componentDidMount() {
-    this.focus = this.props.navigation.addListener('focus', () => {
-    })
   }
 
   onPress = (route, params) => {
@@ -74,10 +68,6 @@ class ImSetting extends React.PureComponent {
       }).catch(e => ToastShort(e.reason))
     })
   }
-  //
-  // submitNickName = () => {
-  //
-  // }
 
   closeModal = () => {
     this.setState({
@@ -140,19 +130,6 @@ class ImSetting extends React.PureComponent {
                   buttonStyle={{backgroundColor: colors.main_color}}
                   titleStyle={styles.autoBtnTitle}/>
         </View>
-        {/*<View style={{paddingVertical: 15}}>*/}
-        {/*  <Text style={styles.row_label}>显示客服昵称 </Text>*/}
-        {/*  <TextInput*/}
-        {/*    returnKeyType={'done'}*/}
-        {/*    underlineColorAndroid="transparent"*/}
-        {/*    style={styles.input}*/}
-        {/*    placeholderTextColor={colors.color999}*/}
-        {/*    placeholder={"请填写客服昵称"}*/}
-        {/*    value={nickName}*/}
-        {/*    onChangeText={text => this.setState({nickName: text})}*/}
-        {/*  />*/}
-        {/*  <Text style={styles.changeBtn} onPress={() => this.submitNickName()}>修改 </Text>*/}
-        {/*</View>*/}
       </View>
     )
   }

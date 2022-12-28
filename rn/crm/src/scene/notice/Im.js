@@ -72,9 +72,9 @@ class NoticeList extends React.PureComponent {
         netWorkStatus: state.isConnected
       })
     });
-    NetInfo.addEventListener(
-      this.handleFirstConnectivityChange.bind(this)
-    );
+    this.unsubscribe = NetInfo.addEventListener (state => {
+      this.handleFirstConnectivityChange(state)
+    })
     if (im_config.im_store_status == 1)
       this.startPollingList(im_config)
   }
@@ -82,6 +82,7 @@ class NoticeList extends React.PureComponent {
   componentWillUnmount() {
     if (this.dataPolling !== null)
       clearInterval(this.dataPolling);
+    this.unsubscribe()
   }
 
   startPollingList = (im_config) => {

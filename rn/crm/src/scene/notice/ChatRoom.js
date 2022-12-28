@@ -337,25 +337,23 @@ class ChatRoom extends React.PureComponent {
   renderMsgCard = () => {
     let {send_msg} = this.state;
     return (
-      <>
-        <View style={styles.msgCard}>
-          <TextInput
-            value={send_msg}
-            ref={ref => this.msgInput = ref}
-            returnKeyType={"send"}
-            blurOnSubmit={true}
-            style={styles.msgCardInput}
-            onChangeText={text => this.setState({send_msg: text})}
-            onFocus={() => this.setState({showEmoji: false})}
-            placeholderTextColor={colors.color999}
-            placeholder={'请在此输入内容回复客户'}
-            onSubmitEditing={e => this.sendMessage()}
-          />
-          <TouchableOpacity onPress={this.touchEmoji} style={{ flex: 1}}>
-            <SvgXml xml={emoji(32, 32)} style={{marginLeft: 10}}/>
-          </TouchableOpacity>
-        </View>
-      </>
+      <View style={styles.msgCard}>
+        <TextInput
+          value={send_msg}
+          ref={ref => this.msgInput = ref}
+          returnKeyType={"send"}
+          blurOnSubmit={true}
+          style={styles.msgCardInput}
+          onChangeText={text => this.setState({send_msg: text})}
+          onFocus={() => this.setState({showEmoji: false})}
+          placeholderTextColor={colors.color999}
+          placeholder={'请在此输入内容回复客户'}
+          onSubmitEditing={e => this.sendMessage()}
+        />
+        <TouchableOpacity onPress={this.touchEmoji} style={{ flex: 1}}>
+          <SvgXml xml={emoji(32, 32)} style={{marginLeft: 10}}/>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -476,7 +474,7 @@ const styles = StyleSheet.create({
     color: colors.color333,
     fontSize: 16
   },
-  msgCard: {height: 48, backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 6, flexDirection: "row", alignItems: "center"},
+  msgCard: {backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 6, flexDirection: "row", alignItems: "center"},
   msgCardInput: {flex: 5, padding: 8, backgroundColor: colors.f5, borderRadius: 18, fontSize: 16, paddingLeft: 20},
   modalWrap: {
     flexGrow: 1,
