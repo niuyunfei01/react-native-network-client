@@ -137,7 +137,7 @@ export default class DeliveryDataComponent extends PureComponent {
 
 
   componentWillUnmount() {
-    this.focus && this.focus()
+    this.focus()
   }
 
   getData = (start_date, end_date) => {
@@ -160,7 +160,6 @@ export default class DeliveryDataComponent extends PureComponent {
     const {navigation} = this.props
     this.getInitData()
     this.focus = navigation.addListener('focus', () => {
-      console.log('focus')
       this.getInitData()
     })
   }
