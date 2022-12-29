@@ -639,7 +639,7 @@ class OrderInfoNew extends PureComponent {
             <Marker
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
-              icon={{uri: mapImage.location_store, width: 45, height: 52}}
+              icon={{uri: mapImage.location_store, width: 65, height: 40}}
             />
           </If>
           {/*骑手位置*/}
@@ -665,7 +665,7 @@ class OrderInfoNew extends PureComponent {
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
                 <FastImage source={{uri: mapImage.location_ship}}
-                           style={{width: 45, height: 52,}}
+                           style={{width: 65, height: 40,}}
                            onLoad={() => tool.debounces(() => {
                              this.marker && this.marker.update()
                            }, 1000)}
@@ -680,7 +680,7 @@ class OrderInfoNew extends PureComponent {
             <Marker
               zIndex={93}
               position={{latitude: Number(loc_lat), longitude: Number(loc_lng)}}
-              icon={{uri: mapImage.location, width: 26, height: 52}}
+              icon={{uri: mapImage.location_customer, width: 65, height: 40}}
             />
           </If>
 
@@ -698,8 +698,8 @@ class OrderInfoNew extends PureComponent {
                 </View>
                 <Entypo name={'triangle-down'}
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
-                <FastImage source={{uri: mapImage.location}}
-                           style={{width: 26, height: 52}}
+                <FastImage source={{uri: mapImage.location_customer}}
+                           style={{width: 65, height: 40}}
                            onLoad={() => tool.debounces(() => {
                              this.marker && this.marker.update()
                            }, 1000)}

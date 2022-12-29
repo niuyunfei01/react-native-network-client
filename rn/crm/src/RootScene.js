@@ -14,7 +14,7 @@ import store from "./pubilc/util/configureStore";
 import PropTypes from "prop-types";
 import HttpUtils from "./pubilc/util/http";
 import dayjs from "dayjs";
-import RootSiblingParent from 'react-native-root-siblings'
+import {RootSiblingParent} from 'react-native-root-siblings'
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -124,16 +124,18 @@ class RootScene extends PureComponent {
       login_user: noLoginInfo.currentUser ?? '未登录'
     })
     return (
-      <Provider store={store}>
-        <ErrorBoundary>
-          <SafeAreaView style={styles.container}>
-            <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
-            </View>
-            <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
-          </SafeAreaView>
-        </ErrorBoundary>
-      </Provider>
+      <RootSiblingParent>
+        <Provider store={store}>
+          <ErrorBoundary>
+            <SafeAreaView style={styles.container}>
+              <View style={styles.statusBar}>
+                <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
+              </View>
+              <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+            </SafeAreaView>
+          </ErrorBoundary>
+        </Provider>
+      </RootSiblingParent>
     )
   }
 }

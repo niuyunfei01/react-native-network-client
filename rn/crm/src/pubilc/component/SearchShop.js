@@ -531,7 +531,7 @@ class SearchShop extends Component {
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>
-              <FastImage source={{uri: mapImage.location}}
+              <FastImage source={{uri: mapImage.locations}}
                          style={{width: 26, height: 52}}
                          resizeMode={FastImage.resizeMode.contain}/>
             </View>

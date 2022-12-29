@@ -122,7 +122,15 @@ export default class RevenueDataComponent extends PureComponent {
   componentDidMount() {
 
     const {current_datetime, yesterday_datetime,} = this.state
-    this.getDate(yesterday_datetime, current_datetime)
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getDate(yesterday_datetime, current_datetime)
+    })
+
+  }
+
+  componentWillUnmount() {
+    this.focus()
   }
 
   getDate = (start_date, end_date, selectHistory = 1, key = 'gmv') => {
@@ -132,7 +140,6 @@ export default class RevenueDataComponent extends PureComponent {
     const url = `/v1/new_api/analysis/revenue_stat?access_token=${accessToken}`
 
     const params = {store_id: store_id, start_date: tool.fullDay(start_date), end_date: tool.fullDay(end_date)}
-
     HttpUtils.get(url, params).then(({summary = [], history = []}) => {
       const history_data = {show: {}, line_data: {label: [], value: [], touch_label: []}}
       let sum = 0
@@ -214,6 +221,7 @@ export default class RevenueDataComponent extends PureComponent {
                     </Text>
                     <AntDesign name={'questioncircle'}
                                color={colors.color999}
+                               style={{paddingLeft: 4}}
                                onPress={() => this.setModal(true, item.label, item.tip)}/>
                   </View>
                   <Text style={today_styles.detailDataText}>
@@ -380,6 +388,7 @@ export default class RevenueDataComponent extends PureComponent {
               datasets: [
                 {
                   data: line_data.value,
+                  color: () => `rgba(38, 185, 66, 1)`,
                 }
               ]
             }}
@@ -391,7 +400,7 @@ export default class RevenueDataComponent extends PureComponent {
               backgroundGradientTo: "#fff",
               fillShadowGradientFrom: colors.main_color,
               fillShadowGradientTo: colors.white,
-              color: () => 'rgba(38, 185, 66, 1)',
+              color: () => 'rgba(102, 102, 102, 1)',
               strokeWidth: 1, // optional, default 3
               // barPercentage: 0.5,
               decimalPlaces: decimalPlaces,
@@ -401,7 +410,6 @@ export default class RevenueDataComponent extends PureComponent {
                 strokeWidth: "2",
                 stroke: colors.main_color
               },
-              propsForLabels: {fontSize: 11, stroke: colors.color666, fontWeight: '400'},
               propsForBackgroundLines: {stroke: colors.colorEEE, strokeDasharray: ''},
 
             }}

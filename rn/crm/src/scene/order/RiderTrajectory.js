@@ -204,7 +204,7 @@ class RiderTrajectory extends Component {
           <Marker
             zIndex={93}
             position={{latitude: track_destination_lat, longitude: track_destination_lng}}
-            icon={{uri: mapImage.location, width: 26, height: 52}}
+            icon={{uri: mapImage.locations, width: 26, height: 52}}
           />
         </If>
 
@@ -233,7 +233,7 @@ class RiderTrajectory extends Component {
                         style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
               </View>
 
-              <FastImage source={{uri: mapImage.location}}
+              <FastImage source={{uri: mapImage.locations}}
                          style={{width: 26, height: 52}}
                          onLoad={() => tool.debounces(() => {
                            this.marker && this.marker.update()
