@@ -108,6 +108,8 @@ export default class RevenueDataComponent extends PureComponent {
           value: []
         }
       },
+      start_date: time - 24 * 3600 * 1000,
+      end_date: time,
       current_datetime: time,
       yesterday_datetime: time - 24 * 3600 * 1000,
       week_datetime: time - 24 * 3600 * 1000 * 7,
@@ -119,12 +121,18 @@ export default class RevenueDataComponent extends PureComponent {
     }
   }
 
-  componentDidMount() {
+  getInitData = () => {
+    const {end_date, start_date, selectHistory, selectHistoryItem} = this.state
+    this.getData(start_date, end_date, selectHistory, selectHistoryItem)
+  }
 
-    const {current_datetime, yesterday_datetime,} = this.state
+  componentDidMount() {
+    this.getInitData()
+
     const {navigation} = this.props
     this.focus = navigation.addListener('focus', () => {
-      this.getDate(yesterday_datetime, current_datetime)
+
+      this.getInitData()
     })
 
   }
@@ -133,13 +141,14 @@ export default class RevenueDataComponent extends PureComponent {
     this.focus()
   }
 
-  getDate = (start_date, end_date, selectHistory = 1, key = 'gmv') => {
+  getData = (start_date, end_date, selectHistory = 1, key = 'gmv') => {
     const {store_id, accessToken} = this.props
 
     const time = end_date - start_date
     const url = `/v1/new_api/analysis/revenue_stat?access_token=${accessToken}`
 
     const params = {store_id: store_id, start_date: tool.fullDay(start_date), end_date: tool.fullDay(end_date)}
+
     HttpUtils.get(url, params).then(({summary = [], history = []}) => {
       const history_data = {show: {}, line_data: {label: [], value: [], touch_label: []}}
       let sum = 0
@@ -280,8 +289,8 @@ export default class RevenueDataComponent extends PureComponent {
 
   getHistoryData = (selectHistory, start_date, end_date) => {
     const {selectHistoryItem} = this.state
-    this.getDate(start_date, end_date, selectHistory, selectHistoryItem)
-    this.setState({selectHistory: selectHistory})
+    this.getData(start_date, end_date, selectHistory, selectHistoryItem)
+    this.setState({selectHistory: selectHistory, start_date: start_date, end_date: end_date})
   }
   renderHistoryData = () => {
     const {
