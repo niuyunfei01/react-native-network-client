@@ -44,12 +44,11 @@ PODS:
   - MixpanelReactNative (1.3.4):
     - Mixpanel-swift (= 3.0.0.beta.5)
     - React
+  - Mute (0.6.1)
   - NewRelicAgent (7.4.0)
   - Qiniu (8.3.2):
     - HappyDNS (~> 0.3.17)
   - RCTRequired (0.63.4)
-  - RCTSystemSetting (1.7.6):
-    - React
   - RCTTypeSafety (0.63.4):
     - FBLazyVector (= 0.63.4)
     - Folly (= 2020.01.13.00)
@@ -257,6 +256,9 @@ PODS:
   - react-native-track-player (3.2.0):
     - React-Core
     - SwiftAudioEx (= 0.15.3)
+  - react-native-volume-manager (1.2.1):
+    - Mute
+    - React-Core
   - react-native-webview (11.6.5):
     - React-Core
   - React-RCTActionSheet (0.63.4):
@@ -416,7 +418,6 @@ DEPENDENCIES:
   - NewRelicAgent
   - Qiniu (~> 8.3.2)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
-  - RCTSystemSetting (from `../node_modules/react-native-system-setting`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - RCTWeChat (from `../node_modules/react-native-wechat-lib`)
   - React (from `../node_modules/react-native/`)
@@ -445,6 +446,7 @@ DEPENDENCIES:
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
+  - react-native-volume-manager (from `../node_modules/react-native-volume-manager`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -484,6 +486,7 @@ SPEC REPOS:
     - HappyDNS
     - libwebp
     - Mixpanel-swift
+    - Mute
     - NewRelicAgent
     - Qiniu
     - SDWebImage
@@ -514,8 +517,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/mixpanel-react-native"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
-  RCTSystemSetting:
-    :path: "../node_modules/react-native-system-setting"
   RCTTypeSafety:
     :path: "../node_modules/react-native/Libraries/TypeSafety"
   RCTWeChat:
@@ -568,6 +569,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-splash-screen"
   react-native-track-player:
     :path: "../node_modules/react-native-track-player"
+  react-native-volume-manager:
+    :path: "../node_modules/react-native-volume-manager"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -641,10 +644,10 @@ SPEC CHECKSUMS:
   libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
   Mixpanel-swift: 4e367aaff204bf7262e9ed665e7b380580cc06c1
   MixpanelReactNative: 01bb2866a68ed5debdda9377e53dee4b24946f21
+  Mute: 20135a96076f140cc82bfc8b810e2d6150d8ec7e
   NewRelicAgent: 9e134fe0b7b868bb54f68890dcfd8112b28d18b4
   Qiniu: 61f1e2fdfb35b37f98c8f03a718faf12652f9994
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
-  RCTSystemSetting: 5107b7350d63b3f7b42a1277d07e4e5d9df879be
   RCTTypeSafety: 8c9c544ecbf20337d069e4ae7fd9a377aadf504b
   RCTWeChat: 289c92186c1f55716a6378af55388292d94b2d9e
   React: b0a957a2c44da4113b0c4c9853d8387f8e64e615
@@ -671,6 +674,7 @@ SPEC CHECKSUMS:
   react-native-slider: cecabb58ecffad671d2ad3ccc58c7f4d2d029e95
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-track-player: 0c26d981b5097910486cbbeb6d8f5352d41be069
+  react-native-volume-manager: 3c58b64125fd42438fb8b95776566910dce54a46
   react-native-webview: 2e8fe70dc32b50d3231c23043f8e8b5a5525d346
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
   React-RCTAnimation: 1bde3ecc0c104c55df246eda516e0deb03c4e49b

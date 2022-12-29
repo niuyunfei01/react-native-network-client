@@ -52,7 +52,6 @@ import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.newrelic.agent.android.NewRelic;
-import com.ninty.system.setting.SystemSettingPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
@@ -60,11 +59,13 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.reactnativerestart.RestartPackage;
+import com.reactnativevolumemanager.VolumeManagerPackage;
 import com.rnnewrelic.NewRelicPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.songlcy.rnupgrade.UpgradePackage;
@@ -353,8 +354,9 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new ReactSliderPackage(),
                     new CameraRollPackage(),
                     new RNCMaskedViewPackage(),
-                    new SystemSettingPackage(),
-                    new SpeechPackage()
+                    new SpeechPackage(),
+                    new VolumeManagerPackage(),
+                    new NetInfoPackage()
             );
         }
     };

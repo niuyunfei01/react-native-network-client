@@ -2,7 +2,7 @@ import React, {PureComponent, useEffect, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {navigationRef} from '../../RootNavigation';
+import {navigate, navigationRef} from '../../RootNavigation';
 import Config from "./config";
 import {
   Dimensions,
@@ -21,9 +21,7 @@ import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {
-  setCheckVersionAt
-} from "../../reducers/global/globalActions";
+import {setCheckVersionAt, setInitJpush} from "../../reducers/global/globalActions";
 import {
   getImRemindCount,
   getStoreImConfig,
@@ -33,7 +31,7 @@ import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
-import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
+import {doJPushSetAlias, initJPush, sendDeviceStatus,} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
 import GlobalUtil from "../util/GlobalUtil";
@@ -204,12 +202,12 @@ const Page = (props) => {
 
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}
-                      getComponent={() => require("../../scene/home/Setting/InfromSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_PUSH} options={{headerTitle: '推送通知'}}
-                      getComponent={() => require("../../scene/home/Setting/PushSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_MSG_VOICE} options={{headerTitle: '消息铃声检测'}}
-                      getComponent={() => require("../../scene/home/Setting/MsgVoiceScene").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/InfromSetting").default}/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_PUSH} options={{headerTitle: '推送通知'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/PushSetting").default}/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_MSG_VOICE} options={{headerTitle: '消息铃声检测'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/MsgVoiceScene").default}/>*/}
         <Stack.Screen name={Config.ROUTE_GUIDE} options={{headerTitle: '设置提醒教程'}}
                       getComponent={() => require("../../scene/home/Setting/GuideScene").default}/>
         <Stack.Screen name={Config.DIY_PRINTER} options={{headerTitle: '小票设置'}}
@@ -369,7 +367,7 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_BUSINESS_DATA} options={{headerTitle: '经营数据'}}
+        <Stack.Screen name={Config.ROUTE_BUSINESS_DATA} options={{headerTitle: '经营数据', headerShown: false}}
                       getComponent={() => require('../../scene/home/Setting/BusinessDataScene').default}/>
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
                       getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
@@ -673,71 +671,37 @@ class AppNavigator extends PureComponent {
 
   }
 
+  handleTouchNotification = (type, order_id) => {
+    switch (type) {
+      case 'v4_order_new'://新订单
+      case 'v4_delivery_order_created'://配送下单
+      case 'v4_delivery_order_accept'://配送接单
+        navigate(Config.ROUTE_ORDERS)
+        break
+      case 'v4_cancel_order'://订单取消
+        navigate(Config.ROUTE_ORDER_NEW, {orderId: order_id})
+        break
+      case 'v4_order_refund'://用户申请退款
+        navigate(Config.ROUTE_ORDERS, {})
+        break
+      case 'v4_order_reminder'://顾客催单
+        navigate(Config.ROUTE_ORDERS, {})
+        break
 
-  initJPush = () => {
-    const {currentUser} = this.props.global
-    JPush.setLoggerEnable(false)
-    JPush.init()
-    JPush.addConnectEventListener(({connectEnable}) => {
-      JTCPStatus = connectEnable
-      if (connectEnable)
-        doJPushSetAlias(currentUser);
-    })
+      case 'v4_delivery_order_exception'://配送异常
+      case 'v4_order_cancel'://配送取消
+        navigate(Config.ROUTE_ORDERS, {order_status: 8})
+        break
+      case 'v4_delivery_order_auto_send_fail'://自动发单失败
+        break
 
-    // JPush.getRegistrationID(({registerID}) => {
-    //     console.log("registerID:" + JSON.stringify(registerID))
-    //   }
-    // )
-
-    //tag alias事件回调
-    JPush.addTagAliasListener(({code}) => {
-      if (0 == code) {
-        setAliasInterval && clearTimeout(setAliasInterval)
-        setAliasInterval = null
-        setAliasStatus = true
-        return
-      }
-      if (code && !setAliasStatus && JTCPStatus) {
-        setAliasInterval = setTimeout(() => {
-          doJPushSetAlias(currentUser)
-        }, 21 * 1000)
-      }
-    });
-    //通知回调
-
-    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
-      // console.log("notificationListener,extras:" + JSON.stringify(extras))
-      // console.log("notificationListener,notificationEventType:" + notificationEventType)
-      const {type, order_id, speak_word, store_id} = extras
-      if ('notificationArrived' === notificationEventType) {
-        if (!isHanlderTask) {
-          await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
-          return
-        }
-        if (speak_word) {
-          messageQueue.push({
-            type: type,
-            order_id: order_id,
-            speak_word: speak_word,
-            store_id: store_id,
-            messageID: messageID
-          })
-          await this.onSynthesizerResult()
-        }
-      }
-      if ('notificationOpened' === notificationEventType) {
-        JPush.setBadge({appBadge: 0, badge: 0})
-        Synthesizer.start(speak_word)
-      }
-    });
+    }
   }
 
   handlerMessage = async (type, order_id, speak_word, store_id, messageID) => {
     isHanlderTask = true
     const {accessToken, autoBluetoothPrint} = this.props.global
-    if (speak_word) {
-      Synthesizer.start(speak_word);
-    }
+
     if (type !== 'new_order') {
       sendDeviceStatus(accessToken, {
         msgId: messageID,
@@ -757,16 +721,20 @@ class AppNavigator extends PureComponent {
         await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
       }
     }
-
+    if (speak_word) {
+      // console.log('开始播放语音:', speak_word)
+      Synthesizer.start(speak_word);
+    }
     if (messageQueue.length > 0) {
       messageQueue.splice(0, 1)
+      // console.log('handlerMessage messageQueue', JSON.stringify(messageQueue))
       await this.onSynthesizerResult()
     }
 
   }
 
   onSynthesizerResult = async () => {
-
+    // console.log('onSynthesizerResult,messageQueue', JSON.stringify(messageQueue))
     if (messageQueue.length === 0) {
       isHanlderTask = false
       return
@@ -777,19 +745,88 @@ class AppNavigator extends PureComponent {
 
   handleSpeechIflytek = () => {
     Synthesizer.init("58b571b2")
-    // const synthesizer = new NativeEventEmitter(Synthesizer);
-    // this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
+    const synthesizer = new NativeEventEmitter(Synthesizer);
+    this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
   };
 
+  jpushListener = () => {
+    const {currentUser} = this.props.global
+    JPush.addConnectEventListener(({connectEnable}) => {
+      JTCPStatus = connectEnable
+      // console.log("connectEnable:" + connectEnable)
+      if (connectEnable)
+        doJPushSetAlias(currentUser);
+    })
+
+    // JPush.getRegistrationID(({registerID}) => {
+    //     console.log("registerID:" + JSON.stringify(registerID))
+    //   }
+    // )
+
+    //tag alias事件回调
+    JPush.addTagAliasListener(({code}) => {
+      // console.log("tagAliasListener:" + code)
+      if (0 == code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = null
+        setAliasStatus = true
+        return
+      }
+      if (code && !setAliasStatus && JTCPStatus) {
+        setAliasInterval = setTimeout(() => {
+          // console.log("setAliasInterval:" + code)
+          doJPushSetAlias(currentUser)
+        }, 21 * 1000)
+      }
+    });
+    //通知回调
+
+    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
+      // console.log("notificationListener,extras:" + JSON.stringify(extras))
+      // console.log("notificationListener,notificationEventType:" + notificationEventType)
+      const {type, order_id, speak_word, store_id} = extras
+      if ('notificationArrived' === notificationEventType) {
+        if (!speak_word) {
+          return
+        }
+        // console.log('收到极光消息,是否正在处理任务：', isHanlderTask)
+        if (!isHanlderTask) {
+          await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
+          return
+        }
+        messageQueue.push({
+          type: type,
+          order_id: order_id,
+          speak_word: speak_word,
+          store_id: store_id,
+          messageID: messageID
+        })
+        // console.log('notificationArrived,messageQueue', JSON.stringify(messageQueue))
+        const isSpeaking = await Synthesizer.isSpeaking()
+        // console.log('isSpeaking', isSpeaking)
+        if (!isSpeaking)
+          await this.onSynthesizerResult()
+      }
+      if ('notificationOpened' === notificationEventType) {
+        JPush.setBadge({appBadge: 0, badge: 0})
+        Synthesizer.start(speak_word)
+        this.handleTouchNotification(type, order_id)
+      }
+    });
+  }
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
       const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion} = global;
+      const {accessToken, lastCheckVersion, not_init_jpush} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
-        this.initJPush()
+        if (not_init_jpush) {
+          initJPush()
+          store.dispatch(setInitJpush(false))
+        }
+        this.jpushListener()
         this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
@@ -833,7 +870,7 @@ class AppNavigator extends PureComponent {
     //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
     //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
-    // this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
+    this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
     this.dataPolling !== null && clearInterval(this.dataPolling);
     AppState.removeEventListener("change", this._handleAppStateChange);
   }

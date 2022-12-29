@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.support.react_native_iflytek;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
@@ -14,6 +15,8 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.IllegalViewOperationException;
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
@@ -28,7 +31,10 @@ import javax.annotation.Nullable;
  */
 
 public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
-    private Context context;
+
+    private final String TAG = SpeechSynthesizerModule.class.getSimpleName();
+    private final String path = getReactApplicationContext().getFilesDir().getAbsolutePath() + "/";
+    private final Context context;
 
     private SpeechSynthesizer mTts;
     private SynthesizerListener mTtsListener;
@@ -49,6 +55,21 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
         return "SpeechSynthesizerModule";
     }
 
+    private final InitListener myInitListener = new InitListener() {
+        @Override
+        public void onInit(int code) {
+            Log.d("mySynthesiezer:", "InitListener init() code = " + code);
+            if (code != ErrorCode.SUCCESS) {
+                Log.e(TAG, "初始化失败,错误码：" + code);
+            } else {
+                // 初始化成功，之后可以调用startSpeaking方法
+                // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
+                // 正确的做法是将onCreate中的startSpeaking调用移至这里
+            }
+        }
+    };
+
+
     @ReactMethod
     public void init(String AppId) {
         if (mTts != null) {
@@ -57,7 +78,7 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
 
         SpeechUtility.createUtility(this.context, SpeechConstant.APPID + "=" + AppId);
 
-        mTts = SpeechSynthesizer.createSynthesizer(this.context, null);
+        mTts = SpeechSynthesizer.createSynthesizer(this.context, myInitListener);
         mTtsListener = new SynthesizerListener() {
 
             @Override
@@ -68,12 +89,12 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
             @Override
             public void onBufferProgress(int i, int i1, int i2, String s) {
                 // 合成进度
-                if(i == 100) {
-                    WritableMap params = Arguments.createMap();
-                    params.putString("content", content);
-                    params.putString("filename", filename);
-                    onJSEvent(getReactApplicationContext(), "onSynthesizerBufferCompletedEvent", params);
-                }
+//                if (i == 100) {
+//                    WritableMap params = Arguments.createMap();
+//                    params.putString("content", content);
+//                    params.putString("filename", filename);
+//                    onJSEvent(getReactApplicationContext(), "onSynthesizerBufferCompletedEvent", params);
+//                }
             }
 
             @Override
@@ -126,8 +147,8 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
         this.filename = filename;
 
         setTtsParam();
-        int result = mTts.synthesizeToUri(content, Environment.getExternalStorageDirectory() + filename, mTtsListener);
-        try{
+        int result = mTts.synthesizeToUri(content, path + filename, mTtsListener);
+        try {
             promise.resolve(result);
         } catch (IllegalViewOperationException e) {
             promise.reject("Error: synthesizeToFile()", e);
@@ -167,7 +188,7 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setParameter(String parameter, String value) {
         if (parameter.equals(SpeechConstant.TTS_AUDIO_PATH)) {
-            value = Environment.getExternalStorageDirectory() + value;
+            value = path + value;
         }
         mTts.setParameter(parameter, value);
     }
@@ -194,7 +215,7 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
         // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/App/Synthesizer");
+        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, path + "Synthesizer");
     }
 
     private void onTtsCompleted() {
@@ -212,8 +233,8 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
     }
 
     private void onJSEvent(ReactContext reactContext,
-                         String eventName,
-                         @Nullable WritableMap params) {
+                           String eventName,
+                           @Nullable WritableMap params) {
         reactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);

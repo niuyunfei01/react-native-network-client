@@ -12,6 +12,7 @@ import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
+import Synthesizer from "../../../pubilc/component/react-native-speech-iflytek";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -73,7 +74,7 @@ class MaterialTask extends React.Component {
       ToastShort('提交成功')
       self.fetchData()
     }).catch(e => {
-      native.speakText(e.reason)
+      Synthesizer.start(e.reason)
     })
   }
 

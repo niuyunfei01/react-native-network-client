@@ -478,7 +478,7 @@ class GoodsEditScene extends PureComponent {
   onReloadProd = (product_detail) => {
     const {
       basic_category, sg_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
-      promote_name, mid_list_img, upc, store_has, spec_list, series_id, actualNum, price, supply_price
+      promote_name, mid_list_img, upc, store_has, spec_list, series_id, actualNum, price, supply_price, vendor_has
     } = product_detail;
     let upload_files = []
     mid_list_img && Object.keys(mid_list_img).map(img_id => {
@@ -510,7 +510,8 @@ class GoodsEditScene extends PureComponent {
       tag_list: tag_list,
       spec_type: parseInt(series_id) > 0 ? 'spec_multi' : 'spec_single',
       multiSpecsList: spec_list,
-      store_has: store_has === 1 && this.props.route.params.type === 'add',
+      store_has: store_has == 1 && this.props.route.params.type === 'add',
+      vendor_has: vendor_has == 1 && this.props.route.params.type === 'add',
       allow_switch_multi: false,
       actualNum: actualNum || '',
       price: price || '',

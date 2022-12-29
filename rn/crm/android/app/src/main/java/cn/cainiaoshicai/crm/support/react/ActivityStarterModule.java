@@ -54,14 +54,15 @@ import retrofit2.Response;
  */
 class ActivityStarterModule extends ReactContextBaseJavaModule {
 
-    private static DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = null;
 
+    private final ReactApplicationContext reactContext;
 
     private long mLastClickTime = 0;
     public static final long TIME_INTERVAL = 5000L;
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        this.reactContext = reactContext;
     }
 
     /**
@@ -103,8 +104,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toOpenNotifySettings(final Callback callback) {
-        Context activity = this.getReactApplicationContext().getCurrentActivity();
-        String packageName = GlobalCtx.app().getPackageName();
+        Context activity = reactContext.getCurrentActivity();
+        String packageName = reactContext.getPackageName();
 
         boolean ok = false;
         if (activity != null) {
@@ -142,7 +143,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toRunInBg(final Callback callback) {
-        Activity activity = this.getReactApplicationContext().getCurrentActivity();
+        Activity activity = reactContext.getCurrentActivity();
         boolean ok = false;
         String msg = "";
         if (activity != null) {
@@ -162,7 +163,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void xunfeiIdentily(final Callback callback) {
-        Activity activity = this.getReactApplicationContext().getCurrentActivity();
+        Activity activity = reactContext.getCurrentActivity();
 
         boolean ok = false;
         String msg = "";
@@ -170,7 +171,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             try {
 
                 //初始化蓝牙管理
-                AppInfo.init(this.getReactApplicationContext());
+                AppInfo.init(reactContext);
                 JPushModule.registerActivityLifecycle(GlobalCtx.app());
                 ok = true;
             } catch (Exception e) {
@@ -204,7 +205,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
                 if (powerManager != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
+                        boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(reactContext.getPackageName());
                         isRun = isIgnoring ? 1 : -1;
                         msg = "ok";
                     } else {
@@ -221,49 +222,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         if (callback != null) {
             callback.invoke(isRun, TextUtils.isEmpty(msg) ? "无法判断" : msg);
-        }
-    }
-
-    @ReactMethod
-    void getSoundVolume(final Callback callback) {
-        Activity activity = getCurrentActivity();
-        boolean ok = false;
-        if (callback != null) {
-            int currentMusicVolume = -1;
-            int isRinger = -1;
-            int minVolume = -1;
-            int maxVolume = -1;
-            if (activity != null) {
-                AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
-                currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                isRinger = Utility.isSystemRinger(activity) ? 1 : 0;
-
-                maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    minVolume = mAudioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC);
-                }
-
-                ok = true;
-            }
-            callback.invoke(ok, currentMusicVolume, isRinger, maxVolume, minVolume, ok ? "ok" : "无法判断");
-        }
-    }
-
-
-    @ReactMethod
-    void setSoundVolume(int volume, final Callback callback) {
-
-        Activity activity = getCurrentActivity();
-        boolean ok = false;
-        if (callback != null) {
-            int currentMusicVolume = -1;
-            if (activity != null) {
-                AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-                ok = true;
-            }
-            callback.invoke(ok, currentMusicVolume, ok ? "ok" : "设置错误");
         }
     }
 
@@ -363,7 +321,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             final SupplierOrder order = gson.fromJson(orderJson, SupplierOrder.class);
             OrderPrinter.smPrintSupplierOrder(order);
             callback.invoke(true, "");
-        }catch (Exception e){
+        } catch (Exception e) {
             callback.invoke(false, "打印失败！");
         }
     }
@@ -394,7 +352,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             }
         } else {
             try {
-                Toast.makeText(getReactApplicationContext(), "稍后重试", Toast.LENGTH_SHORT).show();
+                Toast.makeText(reactContext, "稍后重试", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
             }
         }
@@ -405,7 +363,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     void gotoLoginWithNoHistory(String mobile) {
-        Context act = this.getReactApplicationContext().getCurrentActivity();
+        Context act = reactContext.getCurrentActivity();
         if (act != null) {
             Intent intent = new Intent(act, LoginActivity.class);
             if (!TextUtils.isEmpty(mobile)) {
@@ -418,37 +376,10 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoActByUrl(@Nonnull String url) {
-        Context act = this.getReactApplicationContext().getCurrentActivity();
+        Context act = reactContext.getCurrentActivity();
         if (act != null) {
             Utility.handleUrlJump(act, null, url);
         }
-    }
-
-
-    @ReactMethod
-    public void setDisableSoundNotify(boolean disabled, @Nonnull final Callback callback) {
-        Log.i("setDisableSoundNotify:" + disabled);
-        SettingUtility.setDisableSoundNotify(disabled);
-    }
-
-    @ReactMethod
-    public void getDisableSoundNotify(@Nonnull final Callback callback) {
-        boolean disabled = SettingUtility.isDisableSoundNotify();
-        Log.i("getDisableSoundNotify:" + disabled);
-        callback.invoke(disabled, "");
-    }
-
-    @ReactMethod
-    public void setDisabledNewOrderNotify(boolean disabled, @Nonnull final Callback callback) {
-        Log.i("setNewOrderNotifyDisabled:" + disabled);
-        SettingUtility.setDisableNewOrderSoundNotify(disabled);
-    }
-
-    @ReactMethod
-    public void getNewOrderNotifyDisabled(@Nonnull final Callback callback) {
-        boolean disabled = SettingUtility.isDisableNewOrderSoundNotify();
-        Log.i("getNewOrderNotifyDisabled:" + disabled);
-        callback.invoke(disabled, "");
     }
 
     @ReactMethod
@@ -471,4 +402,14 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void openAppSystemSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.setData(Uri.parse("package:" + reactContext.getPackageName()));
+        if (intent.resolveActivity(reactContext.getPackageManager()) != null) {
+            reactContext.startActivity(intent);
+        }
+    }
 }

@@ -14,6 +14,7 @@ import store from "./pubilc/util/configureStore";
 import PropTypes from "prop-types";
 import HttpUtils from "./pubilc/util/http";
 import dayjs from "dayjs";
+import RootSiblingParent from 'react-native-root-siblings'
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -106,7 +107,7 @@ class RootScene extends PureComponent {
   getRootView = () => {
     global.isLoginToOrderList = false
     let initialRouteName;
-    let initialRouteParams =  {};
+    let initialRouteParams = {};
     const {noLoginInfo} = this.state;
     global.noLoginInfo = noLoginInfo
 

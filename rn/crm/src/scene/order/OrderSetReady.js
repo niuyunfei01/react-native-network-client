@@ -7,6 +7,7 @@ import config from '../../pubilc/common/config'
 import EmptyData from "../common/component/EmptyData";
 import HttpUtils from "../../pubilc/util/http";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
+import Synthesizer from "../../pubilc/component/react-native-speech-iflytek";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -34,11 +35,11 @@ class OrderSetReady extends BaseComponent {
       HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then((res) => {
         let text = res.msg
         ToastLong(text)
-        native.speakText(text)
+        Synthesizer.start(text)
       }).catch((resp) => {
-        let text = `打包失败, ${reason.reason}`
+        let text = `打包失败, ${resp.reason}`
         ToastLong(text)
-        native.speakText(text)
+        Synthesizer.start(text)
       })
     });
   }
