@@ -105,9 +105,16 @@ export default class PlatformDataComponent extends PureComponent {
     custom_date_visible: false
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount() {
     const {yesterday_datetime} = this.state
-    this.getData(yesterday_datetime, yesterday_datetime)
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getDate(yesterday_datetime, yesterday_datetime)
+    })
   }
 
   getData = (start_date, end_date) => {
@@ -183,7 +190,9 @@ export default class PlatformDataComponent extends PureComponent {
                     <Text style={styles.detailDataHeaderTitle}>
                       {label}
                     </Text>
-                    <AntDesign name={'questioncircle'} color={colors.color999}
+                    <AntDesign name={'questioncircle'}
+                               color={colors.color999}
+                               style={{paddingLeft: 4}}
                                onPress={() => this.setModal(true, item.label, item.tip)}/>
                   </View>
                   <Text style={styles.detailDataText}>

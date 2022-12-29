@@ -84,9 +84,16 @@ export default class ProfitAndLossComponent extends PureComponent {
     profit_loss: []
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount() {
     const {yesterday_datetime} = this.state
-    this.getData(yesterday_datetime, yesterday_datetime)
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getDate(yesterday_datetime, yesterday_datetime)
+    })
   }
 
   getData = (start_date, end_date) => {
@@ -206,7 +213,9 @@ export default class ProfitAndLossComponent extends PureComponent {
               {platform_income_name}
             </Text>
             <If condition={platform_income_modify == 1}>
-              <AntDesign name={'questioncircle'} color={colors.color999}
+              <AntDesign name={'questioncircle'}
+                         color={colors.color999}
+                         style={{paddingLeft: 4}}
                          onPress={() => this.setModal(true, platform_income_name, platform_income_tip)}/>
             </If>
           </View>

@@ -1,15 +1,14 @@
 import React, {PureComponent} from "react";
-import {View, ScrollView, StyleSheet, TouchableOpacity, Text} from "react-native";
+import {View, ScrollView, StyleSheet, TouchableOpacity, Text, InteractionManager} from "react-native";
 import {connect} from "react-redux";
 import {SvgXml} from "react-native-svg";
-import {back, down, head_cross_icon} from "../../../../svg/svg";
+import {back, down} from "../../../../svg/svg";
 import colors from "../../../../pubilc/styles/colors";
-import TopSelectModal from "../../../../pubilc/component/TopSelectModal";
-import HttpUtils from "../../../../pubilc/util/http";
 import RevenueDataComponent from "./RevenueDataComponent";
 import DeliveryDataComponent from "./DeliveryDataComponent";
 import PlatformDataComponent from "./PlatformDataComponent";
 import ProfitAndLossComponent from "./ProfitAndLossComponent";
+import Config from "../../../../pubilc/common/config";
 
 const styles = StyleSheet.create({
   headerWrap: {
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
   },
   selectedCategoryText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.main_color,
     lineHeight: 20,
     paddingVertical: 8
@@ -79,52 +78,33 @@ const CATEGORY_LIST = [
 class BusinessDataScene extends PureComponent {
 
   state = {
-    selectStoreVisible: false,
     store_id: this.props.global?.store_id,
     store_name: this.props.global?.store_info?.name,
-    show_select_store: true,
-    store_list: [],
-    page: 1,
-    is_last_page: false,
-    page_size: 10,
     selectCategory: 0,
   }
 
-  componentWillUnmount() {
-    this.focus()
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
   }
-
-  componentDidMount() {
-    const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-      this.fetchData()
-      this.getStoreList()
-    })
-  }
-
   selectStore = () => {
-    let {show_select_store} = this.state;
-    if (show_select_store) {
-      this.setState({
-        selectStoreVisible: true
-      })
-    }
+    this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.setStoreInfo(item)})
+
   }
   renderHeader = () => {
-    let {store_name, show_select_store} = this.state;
+    let {store_name} = this.state;
     const {only_one_store} = this.props.global;
     return (
       <View style={styles.headerWrap}>
         <SvgXml height={32}
                 width={32}
                 onPress={() => this.props.navigation.goBack()}
-                xml={show_select_store ? back() : head_cross_icon()}/>
+                xml={back()}/>
         <If condition={!only_one_store}>
           <TouchableOpacity style={styles.headerTextWrap} onPress={() => this.selectStore()}>
             <Text style={styles.headerText}>{store_name}</Text>
-            <If condition={!only_one_store && show_select_store}>
-              <SvgXml xml={down(20, 20, colors.color333)}/>
-            </If>
+            <SvgXml xml={down(20, 20, colors.color333)}/>
           </TouchableOpacity>
         </If>
         <If condition={only_one_store}>
@@ -134,56 +114,9 @@ class BusinessDataScene extends PureComponent {
       </View>
     )
   }
-  fetchData = () => {
-
-  }
-  getStoreList = () => {
-    const {accessToken, only_one_store} = this.props.global;
-    const {page_size, page, store_list, is_last_page, show_select_store} = this.state
-    if (only_one_store || is_last_page || !show_select_store)
-      return
-    let params = {
-      page: page,
-      page_size: page_size
-    }
-    this.setState({refreshing: true})
-    const api = `/v4/wsb_store/listCanReadStore?access_token=${accessToken}`
-    HttpUtils.get(api, params).then(res => {
-      const {lists, page, isLastPage} = res
-      if (page === 1) {
-        lists.shift()
-      }
-      let list = page !== 1 ? store_list.concat(lists) : lists
-      this.setState({
-        store_list: list,
-        page: page + 1,
-        refreshing: false,
-        is_last_page: isLastPage
-      })
-    }).catch(() => {
-      this.setState({refreshing: false})
-    })
-  }
   setStoreInfo = (item) => {
     const {name, id} = item
-    this.setState({store_name: name, store_id: id, selectStoreVisible: false}, () => this.fetchData())
-  }
-  renderTopSelectStore = () => {
-    const {selectStoreVisible, refreshing, store_id, store_list = []} = this.state
-    return (
-      <TopSelectModal visible={selectStoreVisible}
-                      marTop={40}
-                      list={store_list}
-                      label_field={'name'}
-                      value_field={'id'}
-                      default_val={store_id}
-                      onEndReachedThreshold={0.3}
-                      onEndReached={this.getStoreList}
-                      refreshing={refreshing}
-                      initialNumToRender={10}
-                      onPress={(item) => this.setStoreInfo(item)}
-                      onClose={() => this.setState({selectStoreVisible: false})}/>
-    )
+    this.setState({store_name: name, store_id: id})
   }
 
   setCategory = (index) => {
@@ -220,13 +153,13 @@ class BusinessDataScene extends PureComponent {
         {this.renderCategory()}
         <ScrollView>
           <If condition={selectCategory === 0}>
-            <RevenueDataComponent store_id={store_id} accessToken={accessToken}/>
+            <RevenueDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
           </If>
           <If condition={selectCategory === 1}>
-            <DeliveryDataComponent store_id={store_id} accessToken={accessToken}/>
+            <DeliveryDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
           </If>
           <If condition={selectCategory === 2}>
-            <PlatformDataComponent store_id={store_id} accessToken={accessToken}/>
+            <PlatformDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
           </If>
           <If condition={selectCategory === 3}>
             <ProfitAndLossComponent store_id={store_id}
@@ -235,7 +168,6 @@ class BusinessDataScene extends PureComponent {
                                     navigation={navigation}/>
           </If>
         </ScrollView>
-        {this.renderTopSelectStore()}
       </>
     );
   }

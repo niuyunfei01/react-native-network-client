@@ -130,9 +130,16 @@ export default class DeliveryDataComponent extends PureComponent {
     custom_date_visible: false,
   }
 
+  componentWillUnmount() {
+    this.focus()
+  }
+
   componentDidMount() {
     const {current_datetime} = this.state
-    this.getData(current_datetime, current_datetime)
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getDate(current_datetime, current_datetime)
+    })
   }
 
   getData = (start_date, end_date) => {
@@ -229,7 +236,9 @@ export default class DeliveryDataComponent extends PureComponent {
                     <Text style={styles.detailDataHeaderTitle}>
                       {item.label}
                     </Text>
-                    <AntDesign name={'questioncircle'} color={colors.color999}
+                    <AntDesign name={'questioncircle'}
+                               color={colors.color999}
+                               style={{paddingLeft: 4}}
                                onPress={() => this.setModal(true, item.label, item.tip)}/>
                   </View>
                   <Text style={styles.detailDataText}>
