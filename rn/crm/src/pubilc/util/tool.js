@@ -551,9 +551,10 @@ function filtrationInput(str) {
 }
 
 export const mapImage = {
-  location: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
-  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_410.png',
-  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_410.png'
+  locations: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
+  location_customer: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_420.png',
+  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_420.png',
+  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_420.png'
 }
 export default {
   objectMap,

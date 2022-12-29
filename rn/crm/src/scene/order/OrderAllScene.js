@@ -627,9 +627,7 @@ class OrderAllScene extends Component {
         backgroundColor: colors.white,
         paddingHorizontal: 6,
       }}>
-        <SvgXml style={{marginRight: 4}} onPress={() => {
-          this.props.navigation.goBack()
-        }} xml={back()}/>
+        <SvgXml style={{marginRight: 4}} onPress={() => this.props.navigation.goBack()} xml={back()}/>
 
         <TouchableOpacity disabled={only_one_store} onPress={() => {
 
