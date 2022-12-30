@@ -250,8 +250,8 @@ const Page = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} options={{headerTitle: '发红包'}}
                       getComponent={() => require("../../scene/order/OrderSendMoney").default}/>
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderSurcharge").default}/>*/}
+        <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} options={{headerTitle: '订单补偿'}}
+                      getComponent={() => require("../../scene/order/OrderSurcharge").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderSearchScene").default}/>
         <Stack.Screen name={Config.ROUTE_SEARCH_ORDER} options={{headerShown: false}}

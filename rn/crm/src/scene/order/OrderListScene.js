@@ -130,25 +130,26 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
-    const {global, navigation, device} = this.props
+    const {navigation, device} = this.props
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {store_id, currentUser, accessToken} = global;
+    const {store_id, currentUser, accessToken, is_record_request_monitor} = this.props.global;
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderListScene"
-    timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = is_record_request_monitor
     calcMs(timeObj, accessToken)
     this.getVendor()
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
+    global.navigation = navigation
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

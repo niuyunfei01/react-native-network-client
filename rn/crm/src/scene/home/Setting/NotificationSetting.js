@@ -15,13 +15,12 @@ import {connect} from "react-redux";
 import {Switch} from "react-native-elements";
 import colors from "../../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
-import {right, close, rightCheck} from "../../../svg/svg";
+import {right, close, rightCheck, pencil} from "../../../svg/svg";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import HttpUtils from "../../../pubilc/util/http";
 import AlertModal from "../../../pubilc/component/AlertModal";
 import native from "../../../pubilc/util/native";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import JPush from "jpush-react-native";
 import {VolumeManager} from 'react-native-volume-manager';
 
@@ -456,9 +455,8 @@ class NotificationSetting extends PureComponent {
                                     <Text style={styles.setNotificationPhone}>
                                       {notify_mobile_label}{notify_mobile_value}
                                     </Text>
-                                    <AntDesign name={'edit'}
-                                               color={colors.color999}
-                                               onPress={() => this.setShowModalByType(true, btn_index, name, notify_mobile_value)}/>
+                                    <SvgXml xml={pencil(18, 18, colors.main_color)}
+                                            onPress={() => this.setShowModalByType(true, btn_index, name, notify_mobile_value)}/>
                                   </View>
                                 )
                               return (
