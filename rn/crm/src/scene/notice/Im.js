@@ -337,7 +337,7 @@ class NoticeList extends React.PureComponent {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           colors={['#47D763', '#26B942']}>
-          <Text style={styles.floatText}>旧版消息</Text>
+          <Text style={styles.floatText} allowFontScaling={false}>旧版消息</Text>
         </LinearGradient>
       </TouchableOpacity>
     )
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     right: 10
   },
   floatText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
     color: colors.white
   },

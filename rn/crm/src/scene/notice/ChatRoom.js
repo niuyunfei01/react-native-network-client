@@ -225,8 +225,8 @@ class ChatRoom extends React.PureComponent {
         </If>
         <If condition={userName !== '匿名'}>
           <View style={styles.headLeft}>
-            <Text style={styles.headLeftTitle}>{platform_name} #{order_id} </Text>
-            <Text style={styles.headLeftUser}>{userName} 尾号{real_mobile} </Text>
+            <Text style={styles.headLeftTitle}>{platform_name} {order_id !== '' ? `#${order_id}` : ''} </Text>
+            <Text style={styles.headLeftUser}>{userName} {real_mobile !== '' ? `尾号${real_mobile}` : ''} </Text>
           </View>
           <Text style={styles.headRightTitle} onPress={() => this.navigationToOrderDetail(order_id)}>{orderStatusName} </Text>
         </If>
@@ -323,7 +323,9 @@ class ChatRoom extends React.PureComponent {
                   <Image source={{uri: item.msg_content}} style={styles.imageBox}/>
                 </TouchableHighlight>
               </If>
-              <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
+              <If condition={item.platform === '1' || item.platform === '4'}>
+                <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
+              </If>
             </View>
             <View style={styles.merchantProfile}>
               <Text style={styles.merchantMsg}>商</Text>
@@ -359,11 +361,11 @@ class ChatRoom extends React.PureComponent {
 
   render() {
     let {messageInfo, showEmoji} = this.state;
-    let {userName = ''} = messageInfo
+    let {userName = '', orderMoney = '', orderTime = ''} = messageInfo
     return (
       <View style={styles.mainContainer}>
         {this.renderHead()}
-        <If condition={userName !== '匿名'}>
+        <If condition={userName !== '匿名' && orderMoney !== '' && orderTime !== ''}>
           {this.renderTab()}
         </If>
         {this.renderMessage()}

@@ -16,6 +16,7 @@ import {TextArea} from "../../weui";
 import AlertModal from "../../pubilc/component/AlertModal";
 import HttpUtils from "../../pubilc/util/http";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
+import {getStoreImConfig} from "../../reducers/im/imActions";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 const {width} = Dimensions.get("window");
@@ -26,11 +27,9 @@ class ImSetting extends React.PureComponent {
     let {im_config} = props.im
     this.state = {
       isLoading: false,
-      im_flag: true,
-      auto_response_flag: true,
-      autoInputVal: '',
       confirmModal: false,
-      store_im_config: im_config
+      store_im_config: im_config,
+      autoInputVal: im_config.im_auto_content
     }
   }
 
@@ -42,37 +41,31 @@ class ImSetting extends React.PureComponent {
 
   setConfig = (field, value) => {
     let {store_im_config} = this.state;
-    if (field === 'im_auto_reply_status' && !value) {
-      this.setState({
-        confirmModal: true
-      })
-      return
-    }
     store_im_config[field] = value
     this.setState({
       store_im_config
     })
     if (typeof (value) === 'boolean') {
-      value = value ? 1 : 0
+      value = value ? 1 : 2
     }
     tool.debounces(() => {
       const {store_id, accessToken} = this.props.global;
+      const {dispatch} = this.props;
       const api = `/api/im_save_config?access_token=${accessToken}`
       const params = {
         store_id: store_id,
-        field,
-        value
+        [field]: value
       }
       HttpUtils.post.bind(this.props)(api, params).then(() => {
         ToastShort("设置成功");
+        dispatch(getStoreImConfig(accessToken, store_id))
       }).catch(e => ToastShort(e.reason))
     })
   }
 
   closeModal = () => {
     this.setState({
-      confirmModal: false,
-      auto_response_flag: true
+      confirmModal: false
     })
   }
 
@@ -88,7 +81,7 @@ class ImSetting extends React.PureComponent {
   }
 
   renderImSetting = () => {
-    let {store_im_config} = this.state;
+    let {store_im_config, autoInputVal} = this.state;
     return (
       <View style={styles.content}>
         <TouchableOpacity style={[styles.itemRow, {borderColor: colors.f5, borderBottomWidth: 0.5}]}>
@@ -106,7 +99,15 @@ class ImSetting extends React.PureComponent {
             <Text style={styles.row_label}>自动回复设置 </Text>
             <Text style={styles.row_label_desc}>开启后，三分钟内未回复客户，系统自动回复 </Text>
           </View>
-          <Switch onValueChange={(val) => this.setConfig('im_auto_reply_status', val)}
+          <Switch onValueChange={(val) => {
+            if (!val) {
+              this.setState({
+                confirmModal: true
+              })
+            } else {
+              this.setConfig('im_auto_reply_status', 1)
+            }
+          }}
                   color={colors.main_color}
                   value={store_im_config.im_auto_reply_status == 1}
           />
@@ -121,11 +122,11 @@ class ImSetting extends React.PureComponent {
             placeholder={"当您在繁忙时可在这里填写自动回复信息安抚客户，最多不超过300字。"}
             placeholderTextColor={colors.color999}
             onChange={value => this.setState({autoInputVal: value})}
-            value={store_im_config.im_auto_content}
+            value={autoInputVal}
             underlineColorAndroid={"transparent"}
           />
           <Button title={'保存'}
-                  onPress={() => {}}
+                  onPress={() => this.setConfig('im_auto_content', autoInputVal)}
                   containerStyle={styles.autoBtn}
                   buttonStyle={{backgroundColor: colors.main_color}}
                   titleStyle={styles.autoBtnTitle}/>
@@ -141,7 +142,10 @@ class ImSetting extends React.PureComponent {
         visible={confirmModal}
         onClose={this.closeModal}
         onPressClose={this.closeModal}
-        onPress={() => {}}
+        onPress={() => {
+          this.closeModal()
+          this.setConfig('im_auto_reply_status', 2)
+        }}
         title={'关闭后，系统不再自动回复客户，确认关闭吗？'}
         actionText={'确认'}
         closeText={'取消'}/>
