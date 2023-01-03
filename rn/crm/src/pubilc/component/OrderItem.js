@@ -39,6 +39,9 @@ import JbbModal from "./JbbModal";
 import {getDeliveryList} from "../services/delivery";
 import {setCallDeliveryObj} from "../../reducers/global/globalActions";
 import JbbAlert from "./JbbAlert";
+import AgreeRefundModal from "./AgreeRefundModal";
+import RefundStatusModal from "./RefundStatusModal";
+import RefundReasonModal from "./RefundReasonModal";
 
 let width = Dimensions.get("window").width;
 
@@ -61,6 +64,7 @@ class OrderItem extends React.PureComponent {
     setState: PropTypes.func,
     openCancelDeliveryModal: PropTypes.func,
     openFinishDeliveryModal: PropTypes.func,
+    openRefundReasonModal: PropTypes.func,
     comesBackBtn: PropTypes.bool,
   };
   state = {
@@ -246,6 +250,7 @@ class OrderItem extends React.PureComponent {
             {this.renderGoods()}
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
+            {this.renderRefundDesc()}
             <If condition={item?.btn_list && item?.btn_list?.write_off}>
               {this.renderVerificationBtn()}
             </If>
@@ -676,6 +681,37 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  renderRefundDesc = () => {
+    let {item, accessToken, fetchData} = this.props;
+    if (!item?.refund_title) {
+      return null;
+    }
+    return (
+      <TouchableOpacity onPress={() => {
+        RefundStatusModal.getData(item?.id, item?.store_id, accessToken, fetchData)
+      }} style={[styles.contentHeader, {paddingTop: 12}]}>
+        <View style={{flex: 1}}>
+          <Text
+            style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.refund_title} </Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{
+              fontSize: 12,
+              color: colors.color666,
+              marginTop: 4,
+            }}>理由: </Text>
+            <Text style={{
+              flex: 1,
+              fontSize: 12,
+              color: colors.color666,
+              marginTop: 4,
+            }}>{item?.refund_reason} </Text>
+          </View>
+        </View>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+      </TouchableOpacity>
+    )
+  }
+
   renderDelivery = () => {
     let {item} = this.props;
     if (!item?.is_show_ship_worker) {
@@ -727,9 +763,9 @@ class OrderItem extends React.PureComponent {
                     this.mixpanel.track('订单列表页_忽略配送')
 
                     JbbAlert.show({
-                      title: '忽略配送会影响配送回传，确定要忽略吗？',
+                      title: '忽略订单将会把该订单置为已完成，请选择“忽略并上传”将会上传配送信息至平台，提升回传率，避免产生回传不达标造成管控',
                       actionText: '暂不',
-                      closeText: '忽略',
+                      closeText: '忽略并上传',
                       onPressClose: this.onOverlookDelivery,
                     })
 
@@ -872,6 +908,36 @@ class OrderItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_refund_reject}>
+          <Button title={'拒绝'}
+                  onPress={() => {
+                    RefundReasonModal.fetchRefundReasonList(item?.store_id, item?.id, this.props.accessToken, this.props.fetchData)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 0.5,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
+          />
+        </If>
+
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_refund_agree}>
+          <Button title={'同意'}
+                  onPress={() => {
+                    AgreeRefundModal.getInfo(item?.store_id, item?.id, this.props.accessToken, this.props.fetchData)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    width: width * btn_width,
+                    backgroundColor: colors.main_color
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
       </View>
     )
   }
