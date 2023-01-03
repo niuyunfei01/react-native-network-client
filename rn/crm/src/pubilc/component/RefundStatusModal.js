@@ -1,7 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import {ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
-import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {Button} from "react-native-elements";
@@ -10,7 +8,11 @@ import HttpUtils from "../util/http";
 import {cross_icon} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import AgreeRefundModal from "./AgreeRefundModal";
+import {ToastShort} from "../util/ToastUtils";
+import RefundReasonModal from "./RefundReasonModal";
+import Entypo from "react-native-vector-icons/Entypo";
 
+let _this = null;
 const {width, height} = Dimensions.get("window")
 const styles = StyleSheet.create({
   QrTitle: {
@@ -81,103 +83,78 @@ const styles = StyleSheet.create({
   }
 })
 
-class RefundStatusModal extends React.Component {
-  static propTypes = {
-    order_id: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ]),
-    store_id: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ]),
-    accessToken: PropTypes.string,
-    order_status: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ]),
-    show_modal: PropTypes.bool,
-    onClose: PropTypes.func,
-    onPress: PropTypes.func,
-    fetchData: PropTypes.func,
-    openAddTipModal: PropTypes.func,
-    openCancelDeliveryModal: PropTypes.func,
-    openFinishDeliveryModal: PropTypes.func,
-  }
-  state = {
-    show_modal: false,
-    is_loading: false,
-    order_platform_desc: '',
-    btn_list: {},
-    delivery_list: []
-  }
+class RefundStatusModal extends React.PureComponent {
 
   constructor(props) {
     super(props);
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const {accessToken, order_id, show_modal, order_status} = nextProps;
-    if (tool.length(order_id) <= 0 || Number(order_id) <= 0 || !show_modal || this.state.show_modal) {
-      return null;
-    }
-    this.state.show_modal = true
-    this.getInfo(accessToken, order_id, order_status)
-
-  }
-
-  getInfo = (accessToken, order_id, order_status) => {
-    const url = '/v4/wsb_delivery/deliveryRecord'
-    this.setState({
-      is_loading: true
-    })
-    const params = {access_token: accessToken, order_id: order_id, order_status: order_status}
-    HttpUtils.get.bind(this.props)(url, params).then(res => {
-      this.setState({
-        is_loading: false,
-        delivery_list: res?.do_list,
-        btn_list: res?.btn_list,
-      })
-    }, () => {
-      this.closeModal()
-    }).catch(() => {
-      this.closeModal()
-    })
-  }
-
-  closeModal = () => {
-    this.setState({
-      show_modal: false,
+    _this = this;
+    this.state = {
+      show: false,
       is_loading: false,
-      delivery_list: [],
+      order_id: 0,
+      store_id: 0,
+      access_token: '',
+      fetchData: undefined,
+      refund_btn: 0,
+      refund_list: []
+    };
+  }
+
+  static  getData = (order_id = 0, store_id = 0, access_token = '', fetchData = undefined) => {
+    _this.setState({
+      is_loading: true,
+      order_id,
+      store_id,
+      fetchData,
+      access_token,
       btn_list: {},
-    }, () => {
-      this.props.onClose();
+      refund_list: []
     })
+    const url = '/v4/wsb_refund/refund_info'
+    const params = {access_token, order_id: order_id, store_id: store_id}
+    HttpUtils.get.bind(_this.props)(url, params).then(res => {
+      _this.setState({
+        show: true,
+        is_loading: false,
+        refund_list: res?.list,
+        refund_btn: res?.refund_btn,
+      })
+    }, (res) => {
+      ToastShort(res?.reason)
+      _this.onClose()
+    }).catch((res) => {
+      ToastShort(res?.reason)
+      _this.onClose()
+    })
+  }
+
+  onClose = () => {
+    _this.setState({show: false})
   }
 
   downDeliveryInfo = (i) => {
-    let delivery_list = [...this.state.delivery_list]
-    delivery_list[i].default_show = !delivery_list[i].default_show
-    this.setState({delivery_list: delivery_list})
+    let refund_list = [...this.state.refund_list]
+    refund_list[i].default_show = !refund_list[i].default_show
+    this.setState({refund_list: refund_list})
   }
 
   render = () => {
-    let {show_modal, delivery_list, is_loading} = this.state;
-    if (!show_modal) {
+    let {show, refund_list, refund_btn, is_loading} = this.state;
+
+    if (!show) {
       return null;
     }
     return (
       <Modal hardwareAccelerated={true}
-             onRequestClose={this.closeModal}
+             onRequestClose={this.onClose}
              maskClosable transparent={true}
              animationType="slide"
-             visible={show_modal}>
+             visible={show}>
         <View style={[{
           backgroundColor: 'rgba(0,0,0,0.25)',
           flex: 1
         }]}>
-          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
+          <TouchableOpacity onPress={this.onClose} style={{flexGrow: 1}}/>
           <View style={[{
             backgroundColor: colors.white,
             maxHeight: height * 0.8,
@@ -200,29 +177,33 @@ class RefundStatusModal extends React.Component {
                   <View style={styles.flexC}>
                     <Text style={styles.f16}>退款跟踪 </Text>
                   </View>
-                  <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+                  <SvgXml onPress={this.onClose} xml={cross_icon()}/>
                 </View>
                 <ScrollView automaticallyAdjustContentInsets={false}
                             showsHorizontalScrollIndicator={false}
                             showsVerticalScrollIndicator={false}
                             style={{maxHeight: 350}}>
-                  <For index='index' each='info' of={delivery_list}>
-                    <TouchableOpacity style={styles.logItem} key={index} onPress={() => this.downDeliveryInfo(index)}>
-                      <Text style={{
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        color: colors.color333,
-                      }}>{info?.platform_desc} </Text>
-                      <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
-                              style={styles.IconShow}/>
-                    </TouchableOpacity>
-                    <If condition={info?.default_show}>
-                      {this.renderDeliveryStatus(info)}
-                      <View style={{height: 15}}/>
-                    </If>
-                  </For>
+                  <If condition={tool.length(refund_list) > 0}>
+                    <For index='index' each='info' of={refund_list}>
+                      <View key={index}>
+                        <TouchableOpacity style={styles.logItem} onPress={() => this.downDeliveryInfo(index)}>
+                          <Text style={{
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            color: colors.color333,
+                          }}>{info?.refund_title} </Text>
+                          <Entypo name={info?.default_show ? 'chevron-thin-up' : 'chevron-thin-down'}
+                                  style={styles.IconShow}/>
+                        </TouchableOpacity>
+                        <If condition={info?.default_show}>
+                          {this.renderDeliveryStatus(info)}
+                          <View style={{height: 15}}/>
+                        </If>
+                      </View>
+                    </For>
+                  </If>
                 </ScrollView>
-                {this.renderButton()}
+                {Number(refund_btn) === 1 ? this.renderButton() : null}
               </View>
             </If>
           </View>
@@ -233,20 +214,29 @@ class RefundStatusModal extends React.Component {
 
 
   renderDeliveryStatus = (info) => {
-    if (tool.length(info?.log_list) <= 0) {
+    if (tool.length(info?.refund_list) <= 0) {
       return null;
     }
     return (
-      <For each="log" index="index" of={info?.log_list}>
+      <For each="log" index="index" of={info?.refund_list}>
         <View style={styles.logBox} key={index}>
           <View style={{flexDirection: "row", marginBottom: 10}}>
             <View style={styles.flexC}>
               <View style={[styles.circle, {backgroundColor: log?.icon_color}]}/>
-              <If condition={index !== (tool.length(info?.log_list) - 1) || info?.do_btn_list?.add_tip}>
-                <View style={styles.line}/>
+              <If
+                condition={tool.length(info?.refund_list) === 1 || index !== (tool.length(info?.refund_list) - 1)}>
+                <View style={{
+                  width: 1,
+                  height: 60 + (tool.length(log?.goods_list) * 22),
+                  // borderStyle: 'dashed',
+                  borderWidth: 1,
+                  borderColor: colors.colorDDD,
+                  position: "relative",
+                  top: 8,
+                  left: 5
+                }}/>
               </If>
             </View>
-
             <View style={[styles.flexC, {marginLeft: 10, width: width * 0.82}]}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text
@@ -255,11 +245,11 @@ class RefundStatusModal extends React.Component {
                     fontWeight: 'bold',
                     color: colors.color333,
                   },
-                    log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.log_state_desc} </Text>
-                <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17}}>{log?.log_call_time} </Text>
+                    log?.icon_color === '#26B942' ? {color: colors.main_color} : {}]}>{log?.title} </Text>
+                <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17}}>{log?.title_time} </Text>
               </View>
 
-              <If condition={tool.length(log?.log_desc) > 0}>
+              <If condition={tool.length(log?.reason) > 0}>
                 <View style={{flexDirection: 'row', alignItems: 'flex-start', marginTop: 4}}>
                   <Text style={styles.desc}>理由： </Text>
                   <Text style={{
@@ -267,11 +257,11 @@ class RefundStatusModal extends React.Component {
                     fontWeight: '400',
                     color: colors.color666,
                     flex: 1
-                  }}>{log?.log_desc}</Text>
+                  }}>{log?.reason}</Text>
                 </View>
               </If>
 
-              <If condition={tool.length(log?.log_desc) > 0}>
+              <If condition={tool.length(log?.price) > 0}>
                 <View style={{flexDirection: 'row', alignItems: 'flex-start', marginTop: 4}}>
                   <Text style={styles.desc}>金额： </Text>
                   <Text style={{
@@ -279,25 +269,35 @@ class RefundStatusModal extends React.Component {
                     fontWeight: '400',
                     color: colors.color666,
                     flex: 1
-                  }}>{log?.log_desc}</Text>
+                  }}>{log?.price}</Text>
                 </View>
               </If>
 
-              <If condition={tool.length(log?.log_desc) > 0}>
+              <If condition={tool.length(log?.good_list) > 0}>
                 <View style={{flexDirection: 'row', alignItems: 'flex-start', marginVertical: 4}}>
                   <Text style={styles.desc}>商品： </Text>
                   <View style={{flex: 1}}>
-                    <For each='goods' index='key' of={[1, 2, 3]}>
-                      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <For each='goods' index='key' of={log?.good_list}>
+                      <View key={key} style={{flexDirection: 'row', alignItems: 'center'}}>
                         <Text
                           style={{
                             fontSize: 12,
                             color: colors.color666,
                             flex: 1
-                          }}>{tool.jbbsubstr('五花肉芒果榴莲蛋糕毛毛最爱…', 12)} </Text>
-                        <Text style={{fontSize: 12, color: colors.color666, width: 60, textAlign: 'center'}}> X1 </Text>
+                          }}>{tool.jbbsubstr(goods?.name, 12)} </Text>
+                        <Text style={{
+                          fontSize: 12,
+                          color: goods?.count > 1 ? '#FF8309' : colors.color666,
+                          width: 60,
+                          textAlign: 'center'
+                        }}> X{goods?.count} </Text>
                         <Text
-                          style={{fontSize: 12, color: colors.color666, width: 60, textAlign: 'right'}}> ¥1.35 </Text>
+                          style={{
+                            fontSize: 12,
+                            color: colors.color666,
+                            width: 60,
+                            textAlign: 'right'
+                          }}> ¥{goods?.price} </Text>
                       </View>
                     </For>
                   </View>
@@ -312,12 +312,8 @@ class RefundStatusModal extends React.Component {
   }
 
   renderButton = () => {
-    let {btn_list} = this.state;
-    let {order_id} = this.props;
-    let obj_num = 0
-    tool.objectMap(btn_list, (item, idx) => {
-      obj_num += Number(item)
-    })
+    let {order_id, store_id, access_token, fetchData} = this.state;
+    let obj_num = 2
     let btn_width = 0.83 / Number(obj_num)
     return (
       <View
@@ -327,42 +323,31 @@ class RefundStatusModal extends React.Component {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-        <If condition={!btn_list?.agree}>
-          <Button title={'拒绝'}
-                  onPress={() => {
-                    this.setState({
-                      show_modal: false,
-                      delivery_list: [],
-                      order_platform_desc: '',
-                      platform_dayId: '',
-                      expect_time_desc: '',
-                      driver_phone: '',
-                    }, () => {
-                      this.props.openCancelDeliveryModal(order_id)
-                    })
-                  }}
-                  buttonStyle={[styles.modalBtn, {
-                    backgroundColor: colors.white,
-                    borderColor: colors.colorCCC,
-                    borderWidth: 0.5,
-                    width: width * btn_width,
-                  }]}
-                  titleStyle={{color: colors.color666, fontSize: 16}}
-          />
-        </If>
+        <Button title={'拒绝'}
+                onPress={() => {
+                  this.onClose()
+                  RefundReasonModal.fetchRefundReasonList(store_id, order_id, access_token, fetchData)
+                }}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.white,
+                  borderColor: colors.colorCCC,
+                  borderWidth: 0.5,
+                  width: width * btn_width,
+                }]}
+                titleStyle={{color: colors.color666, fontSize: 16}}
+        />
 
-        <If condition={!btn_list?.agree}>
-          <Button title={'同意'}
-                  onPress={() => {
-                    AgreeRefundModal.getInfo(order_id, this.props.accessToken, this.props.fetchData)
-                  }}
-                  buttonStyle={[styles.modalBtn, {
-                    backgroundColor: colors.main_color,
-                    width: width * btn_width,
-                  }]}
-                  titleStyle={{color: colors.white, fontSize: 16}}
-          />
-        </If>
+        <Button title={'同意'}
+                onPress={() => {
+                  this.onClose()
+                  AgreeRefundModal.getInfo(store_id, order_id, access_token, fetchData)
+                }}
+                buttonStyle={[styles.modalBtn, {
+                  backgroundColor: colors.main_color,
+                  width: width * btn_width,
+                }]}
+                titleStyle={{color: colors.white, fontSize: 16}}
+        />
       </View>
     )
   }
