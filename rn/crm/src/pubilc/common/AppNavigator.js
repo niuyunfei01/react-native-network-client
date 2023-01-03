@@ -193,7 +193,7 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
         <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
                       getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
-        <Stack.Screen name={'Home'} options={{headerShown: false}}
+        <Stack.Screen name={'Home'} options={{headerTitle: '旧版消息'}}
                       getComponent={() => require("../../scene/notice/NoticeList").default}/>
         <Stack.Screen name={Config.ROUTE_CHAT_ROOM} options={{headerShown: false}}
                       getComponent={() => require("../../scene/notice/ChatRoom").default}/>
@@ -891,7 +891,7 @@ class AppNavigator extends PureComponent {
   startPolling = (global, im) => {
     this.dataPolling = setInterval(
       () => {
-        store.dispatch(getImRemindCount(global.accessToken, global.store_id, (ok, msg, obj) => {
+        store.dispatch(getImRemindCount(global.accessToken, global.store_id, im.im_config.im_url, (ok, msg, obj) => {
           if (ok) {
             hideModal()
             store.dispatch(setImRemindCount(obj.message_count))
@@ -926,7 +926,7 @@ class AppNavigator extends PureComponent {
     version_visible: false,
     desc: '',
     download_url: '',
-    appState: AppState.currentState
+    appState: 'active'
   }
 
   setModalStatus = (version_visible = false, desc = '', download_url = '') => {

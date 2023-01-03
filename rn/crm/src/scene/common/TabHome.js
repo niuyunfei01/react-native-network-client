@@ -45,14 +45,33 @@ class TabHome extends React.Component {
     this.state = {}
   }
 
+  imRemindBadge = () => {
+    let {im_remind_count} = this.props.im;
+    let option = {
+      tabBarBadge: im_remind_count > 99 ? '99+' : im_remind_count,
+      tabBarLabel: "消息",
+      tabBarIcon: ({focused}) => (
+        focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :
+          <SvgXml xml={bottom_tab_message()} width={24} height={24}/>
+      )
+    }
+    if (im_remind_count <= 0)
+      return option = {
+        tabBarLabel: "消息",
+        tabBarIcon: ({focused}) => (
+          focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :
+            <SvgXml xml={bottom_tab_message()} width={24} height={24}/>
+        )
+      }
+    return option
+  }
+
   render() {
-    let remind = this.props.remind?.remindNum;
     let {route} = this.props
     const initialRouteName = route.params?.initialRouteName ?? 'Login'
     const initTab = initialRouteName === "Tab" && (route.params?.initTab || "Orders") || initialRouteName
     let {menu_list} = this.props.global;
-    let {im_remind_count} = this.props.im;
-    let {news, product, work} = menu_list;
+    let {product, work} = menu_list;
     return (
       <Tab.Navigator
         initialRouteName={initTab}
@@ -118,16 +137,7 @@ class TabHome extends React.Component {
         <Tab.Screen
           name="IM"
           getComponent={() => require("../notice/Im").default}
-          options={
-            {
-              tabBarBadge: im_remind_count > 99 ? '99+' : im_remind_count,
-              tabBarLabel: "消息",
-              tabBarIcon: ({focused}) => (
-                focused ? <SvgXml xml={bottom_tab_message_check()} width={24} height={24}/> :
-                  <SvgXml xml={bottom_tab_message()} width={24} height={24}/>
-              )
-            }
-          }
+          options={this.imRemindBadge()}
         />
 
         <Tab.Screen

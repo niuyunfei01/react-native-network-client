@@ -3,7 +3,7 @@ import {
   Dimensions,
   InteractionManager, ScrollView,
   StyleSheet,
-  Text, TouchableOpacity,
+  Text, TextInput, TouchableOpacity,
   View
 } from "react-native";
 import colors from "../../pubilc/styles/colors";
@@ -29,7 +29,8 @@ class ImSetting extends React.PureComponent {
       isLoading: false,
       confirmModal: false,
       store_im_config: im_config,
-      autoInputVal: im_config.im_auto_content
+      autoInputVal: im_config.im_auto_content,
+      nickName: ''
     }
   }
 
@@ -81,7 +82,7 @@ class ImSetting extends React.PureComponent {
   }
 
   renderImSetting = () => {
-    let {store_im_config, autoInputVal} = this.state;
+    let {store_im_config, autoInputVal, nickName} = this.state;
     return (
       <View style={styles.content}>
         <TouchableOpacity style={[styles.itemRow, {borderColor: colors.f5, borderBottomWidth: 0.5}]}>
@@ -130,6 +131,19 @@ class ImSetting extends React.PureComponent {
                   containerStyle={styles.autoBtn}
                   buttonStyle={{backgroundColor: colors.main_color}}
                   titleStyle={styles.autoBtnTitle}/>
+        </View>
+        <View style={{paddingVertical: 15}}>
+          <Text style={styles.row_label}>显示客服昵称 </Text>
+          <TextInput
+            returnKeyType={'done'}
+            underlineColorAndroid="transparent"
+            style={styles.input}
+            placeholderTextColor={colors.color999}
+            placeholder={"请填写客服昵称"}
+            value={nickName}
+            onChangeText={text => this.setState({nickName: text})}
+          />
+          <Text style={styles.changeBtn} onPress={() => this.setConfig('im_nick_name', nickName)}>修改 </Text>
         </View>
       </View>
     )

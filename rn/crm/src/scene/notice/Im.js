@@ -17,6 +17,7 @@ import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
+import {getWithTplIm} from "../../pubilc/util/common";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -133,6 +134,7 @@ class NoticeList extends React.PureComponent {
 
   fetchData = (is_polling = false) => {
     const {accessToken, store_id} = this.props.global;
+    const {im} = this.props;
     const {query, isLastPage, selected, message} = this.state
     if (is_polling) this.setState({isLastPage: false})
     if (isLastPage)
@@ -143,17 +145,23 @@ class NoticeList extends React.PureComponent {
       status: selected
     }
     this.setState({refreshing: true})
-    const api = `/api/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
-    HttpUtils.get(api, params).then(res => {
-      const {lists, page, isLastPage} = res
-      let list = page !== 1 ? message.concat(lists) : lists
-      this.setState({
-        message: list,
-        refreshing: false,
-        isLastPage: isLastPage
-      })
-    }).catch(() => {
+    const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
+    getWithTplIm(api, params, im.im_config.im_url, (json) => {
+      if (json.ok) {
+        const {lists, page, isLastPage} = json.obj
+        let list = page !== 1 ? message.concat(lists) : lists
+        this.setState({
+          message: list,
+          refreshing: false,
+          isLastPage: isLastPage
+        })
+      } else {
+        ToastShort(`${json.reason}`)
+      }
+    }, (error) => {
       this.setState({refreshing: false})
+      let msg = "获取消息列表错误: " + error;
+      ToastShort(`${msg}`)
     })
   }
 
@@ -164,7 +172,7 @@ class NoticeList extends React.PureComponent {
       this.setState({
         isLastPage: false,
         query: query,
-        message: []
+        store_name: this.props.global.store_info?.name
       }, () => {
         this.fetchData()
       })
@@ -309,7 +317,7 @@ class NoticeList extends React.PureComponent {
           <View style={styles.isReadIcon}/>
         </If>
         <View style={styles.profile}>
-          <Text style={styles.profileName}>{item?.userName?.substring(0, 1)}</Text>
+          <Text style={styles.profileName}>{item?.userName !== '匿名' ? item?.userName?.substring(0, 1) : '匿名'}</Text>
         </View>
         <View>
           <View style={styles.userInfo}>

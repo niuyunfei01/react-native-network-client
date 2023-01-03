@@ -68,6 +68,42 @@ export default {
     });
   },
 
+  postJSONWithIm(action, data, host) {
+    const url = AppConfig.apiImUrl(action, host);
+    return fetch(url, {
+      credential: "include",
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        version: DeviceInfo.getVersion(),
+        build_number: DeviceInfo.getBuildNumber(),
+      },
+      body: JSON.stringify(data)
+    });
+  },
+
+  getWithIm(action, paras, host) {
+    let paramsArray = []
+    Object.keys(paras).forEach(key => paramsArray.push(key + '=' + paras[key]))
+    if (action.search(/\?/) === -1) {
+      action += '?' + paramsArray.join('&')
+    } else {
+      action += '&' + paramsArray.join('&')
+    }
+    let url = AppConfig.apiImUrl(action, host);
+    return fetch(url, {
+      credential: "include", //带上cookie发送请求请求
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        version: DeviceInfo.getVersion(),
+        build_number: DeviceInfo.getBuildNumber(),
+      }
+    });
+  },
+
   get(action, paras = "") {
     let url = AppConfig.apiUrl(action + (paras === "" ? "" : "?" + paras));
     return fetch(url, {

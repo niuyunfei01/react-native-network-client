@@ -556,10 +556,38 @@ export const mapImage = {
   location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_420.png',
   location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_420.png'
 }
+
+function _shortTimeIm(datetime) {
+  let dtMoment = dayjs(datetime);
+  const nowMoment = dayjs();
+  const dSeconds = nowMoment.unix() - dtMoment.unix();
+  const dYear = nowMoment.year() - dtMoment.year();
+
+  if (dSeconds >= 0 && dSeconds < 60) {
+    if (dSeconds < 10) {
+      return "刚刚";
+    } else {
+      return `${dSeconds}秒前`;
+    }
+  } else if (dSeconds >= 0 && dSeconds < 3600) {
+    return Math.floor(dSeconds / 60) + "分钟前";
+  } else if (dYear === 0) {
+    const dDay = dayjs().diff(datetime, 'day')
+    if (dDay <= 0 && dDay >= -1) {
+      return dtMoment.format("HH:mm");
+    } else {
+      return dtMoment.format("MM-DD HH:mm");
+    }
+  } else {
+    return dtMoment.format("YYYY-MM-DD HH:mm");
+  }
+}
+
 export default {
   objectMap,
   shortTimeDesc,
   shortTimestampDesc,
+  _shortTimeIm,
   shortOrderDay,
   fullDate,
   orderOrderTimeShort,
