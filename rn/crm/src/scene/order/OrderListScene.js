@@ -91,7 +91,7 @@ class OrderListScene extends Component {
         {tabname: '待取货', num: 0, status: 2},
         {tabname: '配送中', num: 0, status: 3},
         {tabname: '异常', num: 0, status: 8},
-        // {tabname: '退款', num: 0, status: 18},
+        {tabname: '退款', num: 0, status: 11},
       ],
       query: {
         listType: null,

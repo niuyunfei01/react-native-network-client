@@ -45,6 +45,8 @@ import {hideModal, ToastLong} from "../util/ToastUtils";
 
 import JbbAlert from "../component/JbbAlert";
 import {Synthesizer} from "../component/react-native-speech-iflytek";
+import RefundReasonModal from "../component/RefundReasonModal";
+import RefundStatusModal from "../component/RefundStatusModal";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -939,6 +941,8 @@ class AppNavigator extends PureComponent {
     return (
       <>
         <JbbAlert/>
+        <RefundReasonModal/>
+        <RefundStatusModal/>
         <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
           <>
             <ImageBackground style={styles.image} source={new_version_background_url}>
