@@ -79,8 +79,8 @@ export default class ProfitAndLossComponent extends PureComponent {
     title: '',
     desc: '',
     custom_date_visible: false,
-    start_date: tool.fullDay(this.time),
-    end_date: tool.fullDay(this.time),
+    start_date: tool.fullDay(this.time - 24 * 3600 * 1000),
+    end_date: tool.fullDay(this.time - 24 * 3600 * 1000),
     profit_loss: []
   }
 
@@ -88,11 +88,16 @@ export default class ProfitAndLossComponent extends PureComponent {
     this.focus()
   }
 
+  getInitData = () => {
+    const {start_date, end_date} = this.state
+    this.getData(start_date, end_date)
+  }
+
   componentDidMount() {
-    const {yesterday_datetime} = this.state
     const {navigation} = this.props
+    this.getInitData()
     this.focus = navigation.addListener('focus', () => {
-      this.getDate(yesterday_datetime, yesterday_datetime)
+      this.getInitData()
     })
   }
 
@@ -103,20 +108,24 @@ export default class ProfitAndLossComponent extends PureComponent {
     const url = `/v1/new_api/analysis/profit_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start_date, end_date: end_date}
     HttpUtils.get(url, params).then((res = []) => {
-      this.setState({profit_loss: res, custom_date_visible: false, start_date: start_date, end_date: end_date})
+      this.setState({profit_loss: res, custom_date_visible: false})
 
     })
   }
-
+  setTime = (start_date, end_date) => {
+    this.setState({start_date: start_date, end_date: end_date})
+  }
   setHeaderBtn = (index) => {
     const {selectDate, current_datetime, yesterday_datetime, week_datetime} = this.state
     if (selectDate === index)
       return
     switch (index) {
       case 0:
+        this.setTime(yesterday_datetime, yesterday_datetime)
         this.getData(yesterday_datetime, yesterday_datetime)
         break
       case 1:
+        this.setTime(week_datetime, current_datetime)
         this.getData(week_datetime, current_datetime)
         break
       case 2:
@@ -303,7 +312,10 @@ export default class ProfitAndLossComponent extends PureComponent {
     const {custom_date_visible} = this.state
     return (
       <CustomDateComponent visible={custom_date_visible}
-                           getData={(startTime, endTime) => this.getData(startTime, endTime)}
+                           getData={(startTime, endTime) => {
+                             this.setTime(startTime, endTime)
+                             this.getData(startTime, endTime)
+                           }}
                            onClose={() => this.setState({custom_date_visible: false})}/>
     )
   }
@@ -325,6 +337,7 @@ export default class ProfitAndLossComponent extends PureComponent {
                   onPress={() => this.setModal(false, '', '')}/>
     )
   }
+
   render() {
     return (
       <View style={{marginHorizontal: 12}}>

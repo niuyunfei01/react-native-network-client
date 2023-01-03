@@ -9,7 +9,7 @@ import {getTime} from "./TimeUtil";
 import store from "./configureStore";
 import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
-import {navigate} from "../../RootNavigation";
+import JbbAlert from "../component/JbbAlert";
 
 const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
@@ -22,7 +22,7 @@ const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
-let isRefrshToken = false
+let isRefrshToken = false, isLogout = false
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -99,6 +99,7 @@ class HttpUtils {
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
     if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
+      isRefrshToken = true
       this.refreshAccessToken()
     }
     return new Promise((resolve, reject) => {
@@ -134,7 +135,7 @@ class HttpUtils {
 
           this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
-            this.error(response);
+            this.error(response, props.navigation);
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -180,13 +181,11 @@ class HttpUtils {
     }
   }
 
-  static error(response) {
+  static error(response, navigation) {
     switch (response.error_code) {
       case 10001:
       case 21327:
-        isRefrshToken = true
-        // this.logout(navigation)
-        this.refreshAccessToken()
+        this.logout(navigation)
         break
       case 30001:
         ToastShort('客户端版本过低')
@@ -198,11 +197,15 @@ class HttpUtils {
     }
   }
 
-  static logout(navigation) {
-    native.logout().then()
-
-    if (navigation !== HttpUtils) {
-      if (navigation != null) {
+  static resetLogin = (navigation) => {
+    if (isLogout)
+      return
+    isLogout = true
+    JbbAlert.show({
+      title: '提醒',
+      desc: '登录信息过期，请重新登录',
+      actionText: '确定',
+      onPress: () => {
         const resetAction = CommonActions.reset({
           index: 0,
           routes: [
@@ -210,9 +213,25 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
-      } else {
-        ToastShort("导航目标未知")
+        isLogout = false
+      },
+    })
+
+  }
+
+  static logout(navigation) {
+    native.logout().then()
+
+    if (navigation !== HttpUtils) {
+      if (navigation != null) {
+        this.resetLogin(navigation)
+        return
       }
+      if (global.navigation) {
+        this.resetLogin(global.navigation)
+        return;
+      }
+      ToastShort("导航目标未知")
     }
   }
 

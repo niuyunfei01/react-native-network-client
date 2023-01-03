@@ -143,30 +143,35 @@ class BusinessDataScene extends PureComponent {
     )
   }
 
-  render() {
+  renderContent = () => {
     const {selectCategory, store_id, store_name} = this.state
     const {accessToken} = this.props.global
     const {navigation} = this.props
+    switch (selectCategory) {
+      case 0:
+        return <RevenueDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
+      case 1:
+        return <DeliveryDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
+      case 2:
+        return <PlatformDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
+      case 3:
+        return <ProfitAndLossComponent store_id={store_id}
+                                       accessToken={accessToken}
+                                       store_name={store_name}
+                                       navigation={navigation}/>
+      default:
+        return null
+    }
+  }
+
+  render() {
+
     return (
       <>
         {this.renderHeader()}
         {this.renderCategory()}
         <ScrollView>
-          <If condition={selectCategory === 0}>
-            <RevenueDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
-          </If>
-          <If condition={selectCategory === 1}>
-            <DeliveryDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
-          </If>
-          <If condition={selectCategory === 2}>
-            <PlatformDataComponent store_id={store_id} accessToken={accessToken} navigation={navigation}/>
-          </If>
-          <If condition={selectCategory === 3}>
-            <ProfitAndLossComponent store_id={store_id}
-                                    accessToken={accessToken}
-                                    store_name={store_name}
-                                    navigation={navigation}/>
-          </If>
+          {this.renderContent()}
         </ScrollView>
       </>
     );

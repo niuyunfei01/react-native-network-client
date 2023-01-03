@@ -117,29 +117,27 @@ const DATE_CATEGORY = [
 
 export default class DeliveryDataComponent extends PureComponent {
 
-  time = new Date()
-  state = {
-    selectDate: 0,
-    current_datetime: tool.fullDay(this.time),
-    yesterday_datetime: tool.fullDay(this.time - 24 * 3600 * 1000),
-    current_week_datetime: dayjs().day(1).add(8, 'h').toJSON().toString().substring(0, 10),
-    delivery_Data: [],
-    visible: false,
-    title: '',
-    desc: '',
-    custom_date_visible: false,
+  constructor(props) {
+    super(props);
+    const time = new Date()
+    this.state = {
+      selectDate: 0,
+      start_date: tool.fullDay(time),
+      end_date: tool.fullDay(time),
+      current_datetime: tool.fullDay(time),
+      yesterday_datetime: tool.fullDay(time - 24 * 3600 * 1000),
+      current_week_datetime: dayjs().day(1).add(8, 'h').toJSON().toString().substring(0, 10),
+      delivery_Data: [],
+      visible: false,
+      title: '',
+      desc: '',
+      custom_date_visible: false,
+    }
   }
+
 
   componentWillUnmount() {
     this.focus()
-  }
-
-  componentDidMount() {
-    const {current_datetime} = this.state
-    const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-      this.getDate(current_datetime, current_datetime)
-    })
   }
 
   getData = (start_date, end_date) => {
@@ -153,18 +151,37 @@ export default class DeliveryDataComponent extends PureComponent {
     })
   }
 
+  getInitData = () => {
+    const {start_date, end_date} = this.state
+    this.getData(start_date, end_date)
+  }
+
+  componentDidMount() {
+    const {navigation} = this.props
+    this.getInitData()
+    this.focus = navigation.addListener('focus', () => {
+      this.getInitData()
+    })
+  }
+
+  setTime = (start_date, end_date) => {
+    this.setState({start_date: start_date, end_date: end_date})
+  }
   setHeaderBtn = (index) => {
     const {selectDate, current_datetime, yesterday_datetime, current_week_datetime} = this.state
     if (selectDate === index)
       return
     switch (index) {
       case 0:
+        this.setTime(current_datetime, current_datetime)
         this.getData(current_datetime, current_datetime)
         break
       case 1:
+        this.setTime(yesterday_datetime, yesterday_datetime)
         this.getData(yesterday_datetime, yesterday_datetime)
         break
       case 2:
+        this.setTime(current_week_datetime, current_datetime)
         this.getData(current_week_datetime, current_datetime)
         break
       case 3:
@@ -325,7 +342,10 @@ export default class DeliveryDataComponent extends PureComponent {
     const {custom_date_visible} = this.state
     return (
       <CustomDateComponent visible={custom_date_visible}
-                           getData={(startTime, endTime) => this.getData(startTime, endTime)}
+                           getData={(startTime, endTime) => {
+                             this.setTime(startTime, endTime)
+                             this.getData(startTime, endTime)
+                           }}
                            onClose={() => this.setState({custom_date_visible: false})}/>
     )
   }
