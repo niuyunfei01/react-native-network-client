@@ -1084,11 +1084,11 @@ class OrderInfoNew extends PureComponent {
               <Text style={styles.cardTitleGoods}>
                 商品{order?.product_total_count}件
               </Text>
-              {/*<TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>*/}
-              {/*  <Text style={styles.refundText}>*/}
-              {/*    退款申请*/}
-              {/*  </Text>*/}
-              {/*</TouchableOpacity>*/}
+              <TouchableOpacity style={styles.refundWrap} onPress={this.touchRefundBtn}>
+                <Text style={styles.refundText}>
+                  退款申请
+                </Text>
+              </TouchableOpacity>
             </View>
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
