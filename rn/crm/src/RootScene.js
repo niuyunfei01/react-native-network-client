@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
+import {Appearance, LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
 import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
@@ -55,8 +55,7 @@ class RootScene extends PureComponent {
         printer_id: '0',
       },
       rehydrated: false,
-      onGettingCommonCfg: false,
-      bleStarted: false
+      status_bar_status: Appearance.getColorScheme() === 'dark' ? 'light-content' : 'dark-content'
     };
   }
 
@@ -94,6 +93,17 @@ class RootScene extends PureComponent {
 
   componentDidMount() {
     this.getInfo()
+    this.status_bar_listener = Appearance.addChangeListener(this.getStatusBarStatus)
+  }
+
+  getStatusBarStatus = ({colorScheme}) => {
+    this.setState({
+      status_bar_status: colorScheme === 'dark' ? 'light-content' : 'dark-content'
+    })
+  }
+
+  componentWillUnmount() {
+    this.status_bar_listener && this.status_bar_listener.remove()
   }
 
   render() {
@@ -134,8 +144,10 @@ class RootScene extends PureComponent {
               <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
             </SafeAreaView>
           </ErrorBoundary>
+
         </Provider>
       </RootSiblingParent>
+
     )
   }
 }

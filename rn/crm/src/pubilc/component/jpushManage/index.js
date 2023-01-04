@@ -1,13 +1,16 @@
 import JPush from 'jpush-react-native';
 import dayjs from "dayjs";
-import native from "../../util/native";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
 
 export const initJPush = () => {
 
   JPush.setLoggerEnable(false)
-  JPush.init()
+  JPush.init({
+    appKey: '30073ab80a50534d39c84d3c',
+    channel: 'app_store',
+    production: true,
+  })
 
 }
 
@@ -52,27 +55,27 @@ export const doJPushDeleteAlias = () => {
  // 省电模式：开启/未开启
  // [已重复] 语音播报是否开启：开启/未开启 (disable_sound_notify)
  // [已重复] 新订单通知：开启/未开启
- * @param accessToken
+ * @param global
  * @param data
  */
 
-export const sendDeviceStatus = (accessToken, data) => {
+export const sendDeviceStatus = (global, data) => {
+  const {accessToken, notification_status, volume, is_background_run} = global
+  const url = `/api/log_push_status/?access_token=${accessToken}`
 
+  const params = {
+    notificationEnabled: notification_status === 1,
+    brand: DeviceInfo.getBrand(),
+    UniqueID: DeviceInfo.getUniqueId(),
+    Appversion: DeviceInfo.getBuildNumber(),
+    disable_new_order_sound_notify: '未知',
+    disable_sound_notify: '未知',
+    Volume: volume > 0,
+    isRun: is_background_run,
+    btConnected: data.btConnected,
+    auto_print: data.auto_print
+  }
   //系统通知
-  JPush.isNotificationEnabled((enabled) => {
-    native.getSettings((ok, settings, msg) => {
-      //品牌 设备id
-      data.notificationEnabled = enabled
-      data.brand = DeviceInfo.getBrand();
-      data.UniqueID = DeviceInfo.getUniqueId()
-      data.Appversion = DeviceInfo.getBuildNumber()
-      data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
-      data.disable_sound_notify = settings.disabledSoundNotify;
-      data.Volume = settings.currentSoundVolume > 0
-      data.isRun = settings.isRunInBg;
-      data.isRinger = settings.isRinger
-      HttpUtils.post(`/api/log_push_status/?access_token=${accessToken}`, data).then()
-    }).then()
-  })
+  HttpUtils.post(url, params).then()
 
 }

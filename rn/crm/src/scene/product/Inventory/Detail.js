@@ -11,8 +11,7 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
-import MonthPicker from "react-native-month-year-picker";
-import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
 const {width} = Dimensions.get("window");
 
@@ -25,7 +24,7 @@ class Detail extends BaseComponent {
 
   constructor(props) {
     super(props)
-    const date=new Date()
+    const date = new Date()
     this.state = {
       page: 1,
       lists: [],
@@ -112,18 +111,19 @@ class Detail extends BaseComponent {
   }
 
   onConfirmDate = (event, date) => {
-    if (event === 'dismissedAction') {
-      this.setVisible(false)
-      return
+
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({
+        dateHtp: tool.fullMonth(date),
+        date: date,
+        start_day: tool.fullMonth(date),
+        visible: false
+      }, () => {
+        this.navigationOptions()
+        this.setState({page: 1}, () => this.fetchData())
+      })
     }
-    this.setState({
-      dateHtp: tool.fullMonth(date),
-      date: date,
-      start_day: tool.fullMonth(date)
-    }, () => {
-      this.navigationOptions()
-      this.setState({page: 1}, () => this.fetchData())
-    })
   }
 
   onEndReached = () => {
@@ -208,11 +208,15 @@ class Detail extends BaseComponent {
     )
   }
 
+  setVisible = (value) => {
+    this.setState({visible: value})
+  }
   renderModal = () => {
     let {start_day} = this.state;
     return (
-      <Text style={Styles.selectMonthText}> {start_day} <Entypo
-        name='chevron-thin-down' style={Styles.selectMonthIcon}/></Text>
+      <Text style={Styles.selectMonthText} onPress={() => this.setVisible(true)}>
+        {start_day} <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+      </Text>
     )
   }
 
@@ -227,16 +231,7 @@ class Detail extends BaseComponent {
         <If condition={!this.state.lists.length}>
           <EmptyData/>
         </If>
-        <CommonModal visible={visible} onRequestClose={() => this.onConfirmDate('dismissedAction')}>
-          <MonthPicker value={date}
-                       cancelButton={'取消'}
-                       okButton={'确定'}
-                       autoTheme={true}
-                       mode={'number'}
-                       onChange={(event, newDate) => this.onConfirmDate(event, newDate)}
-                       maximumDate={new Date()}
-                       minimumDate={new Date(2015, 8, 15)}/>
-        </CommonModal>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onConfirmDate(event, newDate)} date={date}/>
       </View>
     )
   }

@@ -12,6 +12,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import Dialog from "../../../common/component/Dialog";
 import pxToDp from "../../../../pubilc/util/pxToDp";
 import CustomDateComponent from "../../../../pubilc/component/CustomDateComponent";
+import {hideModal, showModal} from "../../../../pubilc/util/ToastUtils";
 
 const {height, width} = Dimensions.get('window')
 const styles = StyleSheet.create({
@@ -35,13 +36,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  selectBtnText: {fontSize: 14, fontWeight: '500', color: colors.white, lineHeight: 20},
+  selectBtnText: {fontSize: 14, fontWeight: 'bold', color: colors.white, lineHeight: 20},
   notSelectBtnText: {fontSize: 14, fontWeight: '400', color: colors.color666, lineHeight: 20},
   detailDataWrap: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
   detailDataHeaderTitle: {fontSize: 14, color: colors.color666},
   detailDataText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 25,
     paddingTop: 4,
@@ -146,9 +147,11 @@ export default class DeliveryDataComponent extends PureComponent {
     const {store_id, accessToken} = this.props
     const url = `/v1/new_api/analysis/delivery_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start_date, end_date: end_date}
+    showModal('加载数据中')
     HttpUtils.get(url, params).then((res = []) => {
+      hideModal()
       this.setState({delivery_Data: res, custom_date_visible: false})
-    })
+    }).catch(() => hideModal())
   }
 
   getInitData = () => {
@@ -256,7 +259,7 @@ export default class DeliveryDataComponent extends PureComponent {
                     <AntDesign name={'questioncircle'}
                                color={colors.color999}
                                style={{paddingLeft: 4}}
-                               onPress={() => this.setModal(true, item.label, item.tip)}/>
+                               onPress={() => this.setModal(true, item.title, item.tip)}/>
                   </View>
                   <Text style={styles.detailDataText}>
                     {item.value}

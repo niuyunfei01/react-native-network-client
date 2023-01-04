@@ -247,8 +247,10 @@ class StoreGoodsList extends Component {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
-    if (isRefreshItem)
-      params.pid = selectedProduct.id
+    if (isRefreshItem) {
+      params.pid = selectedProduct.id || goods[0]
+      params.page = 1
+    }
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const {lists = [], isLastPage = false} = res
@@ -292,6 +294,11 @@ class StoreGoodsList extends Component {
   }
 
   onRefresh = () => {
+    const status = global.currentRouteName !== 'Goods'
+    if (status) {
+      this.search(status ? 1 : 0, status)//如果global.currentRouteName的值不是当前页面，只刷新某一个值
+      return
+    }
     this.setState({page: 1}, () => {
       this.search()
     })
@@ -323,9 +330,10 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
-  gotoGoodDetail = (pid) => {
+  gotoGoodDetail = (item) => {
+    this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-      pid: pid,
+      pid: item.id,
       storeId: this.props.global.store_id,
       // updatedCallback: this.doneProdUpdate
     })
@@ -629,7 +637,7 @@ class StoreGoodsList extends Component {
             <AntDesign name={showMoreGoodsStatus ? 'up' : 'down'}
                        size={16}
                        color={colors.color999}
-                       style={{marginRight: 10}}
+                       style={{marginRight: 10, marginLeft: 4}}
                        onPress={() => this.setState({showMoreGoodsStatus: !showMoreGoodsStatus})}/>
           </If>
         </View>
@@ -637,7 +645,7 @@ class StoreGoodsList extends Component {
                         list={statusList}
                         initialNumToRender={10}
                         numColumns={4}
-                        marTop={66}
+                        marTop={78}
                         default_val={selectedStatus.value}
                         selectWrap={styles.selectShowMoreGoodsStatusWrap}
                         warp={styles.showMoreGoodsStatusWrap}
@@ -725,7 +733,7 @@ class StoreGoodsList extends Component {
         <If condition={onStrict}>
           <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
-                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+                              onPress={() => this.jumpToNewRetailPriceScene(item)}>
               <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
             </TouchableOpacity>
           </If>
@@ -739,7 +747,7 @@ class StoreGoodsList extends Component {
         <If condition={!onStrict}>
           <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
-                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+                              onPress={() => this.jumpToNewRetailPriceScene(item)}>
               <Text style={styles.goodsOperationBtn}>价格 </Text>
             </TouchableOpacity>
           </If>
@@ -778,13 +786,15 @@ class StoreGoodsList extends Component {
     })
 
   }
-  jumpToNewRetailPriceScene = (id) => {
+  jumpToNewRetailPriceScene = (item) => {
+    this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {
-      productId: id
+      productId: item.id
     })
   }
 
   gotoAddMissingPicture = (item) => {
+    this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
   renderItem = (order) => {
@@ -794,7 +804,7 @@ class StoreGoodsList extends Component {
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={item.id}
-                    onPressImg={() => this.gotoGoodDetail(item.id)}
+                    onPressImg={() => this.gotoGoodDetail(item)}
                     price_type={price_type}
                     opBar={this.opBar(onSale, onStrict, item, price_type)}
       />

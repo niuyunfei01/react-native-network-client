@@ -4,6 +4,7 @@ import HttpUtils from "../http";
 import BleManager from "react-native-ble-manager";
 import {fetchPrintHexStr} from "../../../reducers/order/orderActions";
 import tool from "../tool";
+import ESC from "./Ecs";
 
 const _ = require('lodash');
 const MAX_TITLE_PART = 16;
@@ -129,7 +130,28 @@ function printOrder(order) {
 
   return ECS.getByte();
 }
-
+ export const testPrintData = (data) => {
+  ESC.resetByte()
+  ESC.fontNormalHeightWidth();
+  ESC.alignLeft();
+  ESC.startLine(32);
+  ESC.fontHeightTimes();
+  ESC.text('   打印测试单');
+  ESC.printAndNewLine();
+  ESC.fontHeightTimes();
+  if (data)
+    ESC.text(`   ${data}`);
+  else
+    ESC.text("合计        X100");
+  ESC.printAndNewLine();
+  ESC.startLine(32);
+  ESC.fontNormalHeightWidth();
+  ESC.text('外送帮祝您生意兴隆！');
+  ESC.printAndNewLine();
+  ESC.hex("0D 0D 0D")
+  ESC.walkPaper(4)
+  return ESC.getByte()
+}
 function hexToBytes(hexStr) {
   ECS.resetByte();
   ECS.hex(hexStr);

@@ -1092,14 +1092,15 @@ class OrderInfoNew extends PureComponent {
             </View>
             <If condition={order?.items?.length >= 1}>
               <For index='index' each='info' of={order?.items}>
-                <TouchableOpacity style={styles.productInfo} key={index}
+                <TouchableOpacity style={styles.productInfo}
+                                  key={index}
                                   onPress={() => this.onPress(Config.ROUTE_GOOD_STORE_DETAIL, {
                                     pid: info?.product_id,
                                     storeId: store_id,
                                     item: info
                                   })}>
                   <FastImage
-                    source={{uri: info?.product_img !== '' ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
+                    source={{uri: info?.product_img ? info?.product_img : 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/%E6%9A%82%E6%97%A0%E5%9B%BE%E7%89%87%403x.png'}}
                     style={styles.productImage}
                     resizeMode={FastImage.resizeMode.contain}
                   />
@@ -1108,9 +1109,15 @@ class OrderInfoNew extends PureComponent {
                       <If condition={info?.shelf_no}>{info?.shelf_no} </If>
                       {info?.product_name}
                     </Text>
-                    <If condition={info?.product_id > 0}>
-                      <Text style={styles.productItemId}>#{info?.product_id} </Text>
-                    </If>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <If condition={info?.product_id > 0}>
+                        <Text style={styles.productItemId}>#{info?.product_id} </Text>
+                      </If>
+                      {
+                        info?.upc ? <Text style={[styles.productItemId, {paddingLeft: 10}]}>UPC：{info?.upc}</Text> :
+                          <Text style={[styles.productItemId, {paddingLeft: 10}]}>UPC：-</Text>
+                      }
+                    </View>
                     <View style={styles.productItemPrice}>
                       <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
                         <If condition={order?.is_fn_price_controlled}>
@@ -1638,8 +1645,8 @@ const styles = StyleSheet.create({
   orderCardContainer: {
     width: width * 0.92,
     backgroundColor: colors.white,
-    padding: 12,
-    paddingRight: 6
+    paddingHorizontal: 12,
+    paddingVertical: 15
   },
   cardTitleGoodsWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15},
   cardTitleGoods: {

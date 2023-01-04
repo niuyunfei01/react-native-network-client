@@ -15,7 +15,7 @@ import {
   View
 } from 'react-native';
 import * as globalActions from '../../../reducers/global/globalActions';
-import {logout} from '../../../reducers/global/globalActions';
+import {logout, setBackgroundStatus} from '../../../reducers/global/globalActions';
 import {Button, Switch} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -76,7 +76,6 @@ class SettingScene extends PureComponent {
       invoice_serial_font: '',
       use_real_weight: false,
       notificationEnabled: 1,
-      isRun: true,
       showAlertModal: false,
       showDeleteModal: false,
       shouldShowModal: false,
@@ -100,10 +99,12 @@ class SettingScene extends PureComponent {
   }
 
   onHeaderRefresh = async () => {
-    this.setState({isRefreshing: true});
+    const {dispatch} = this.props
     // this.get_store_settings();
     if (Platform.OS === 'android')
-      await native.isRunInBg((resp) => this.setState({isRun: resp === 1}))
+      await native.isRunInBg((resp) => {
+        dispatch(setBackgroundStatus(resp))
+      })
     await this.getConfig();
   }
 
@@ -112,6 +113,7 @@ class SettingScene extends PureComponent {
   }
 
   getConfig = async () => {
+    this.setState({isRefreshing: true});
     const {store_id, accessToken} = this.props.global;
     let show_update_version = false;
     let version_buile_number = DeviceInfo.getBuildNumber();
@@ -148,7 +150,7 @@ class SettingScene extends PureComponent {
         show_update_version: show_update_version || Number(res?.android) > version_buile_number,
         android_download_url: res?.download_url || '',
       })
-    })
+    }).catch(() => this.setState({isRefreshing: false}))
   }
 
 
@@ -276,8 +278,7 @@ class SettingScene extends PureComponent {
   }
 
   renderRemind = () => {
-    let {isRun} = this.state
-    const {currentUserProfile} = this.props.global
+    const {currentUserProfile, is_background_run} = this.props.global
     return (
       <If condition={currentUserProfile.mobilephone === '13010241740' || Platform.OS === 'android'}>
         <View style={styles.item_body}>
@@ -294,7 +295,7 @@ class SettingScene extends PureComponent {
               <TouchableOpacity onPress={this.openAndroidBackgroundRun} style={styles.item_row}>
                 <Text style={styles.row_label}>后台运行 </Text>
                 <Text style={styles.row_footer}>
-                  {isRun ? "已开启" : '未开启 - 去设置'}
+                  {is_background_run === 1 ? "已开启" : '未开启 - 去设置'}
                 </Text>
                 <Entypo name="chevron-thin-right" style={styles.row_right}/>
               </TouchableOpacity>

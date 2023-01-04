@@ -1,10 +1,9 @@
 package cn.cainiaoshicai.crm.support.react_native_iflytek;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -23,7 +22,15 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.SynthesizerListener;
 
-import javax.annotation.Nullable;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import cn.cainiaoshicai.crm.AppCache;
 
 /**
  * Created by cn_pa on 2016/11/25.
@@ -32,7 +39,7 @@ import javax.annotation.Nullable;
 
 public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
 
-    private final String TAG = SpeechSynthesizerModule.class.getSimpleName();
+    private final String TAG = "PushMessageReceiver";//SpeechSynthesizerModule.class.getSimpleName();
     private final String path = getReactApplicationContext().getFilesDir().getAbsolutePath() + "/";
     private final Context context;
 
@@ -43,7 +50,7 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
     private static long endTime;
     private String content;
     private String filename;
-
+    private List<String> playList;
 
     public SpeechSynthesizerModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -55,30 +62,39 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
         return "SpeechSynthesizerModule";
     }
 
-    private final InitListener myInitListener = new InitListener() {
-        @Override
-        public void onInit(int code) {
-            Log.d("mySynthesiezer:", "InitListener init() code = " + code);
-            if (code != ErrorCode.SUCCESS) {
-                Log.e(TAG, "初始化失败,错误码：" + code);
-            } else {
-                // 初始化成功，之后可以调用startSpeaking方法
-                // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
-                // 正确的做法是将onCreate中的startSpeaking调用移至这里
-            }
+    private final InitListener myInitListener = code -> {
+        if (code != ErrorCode.SUCCESS) {
+            Log.e(TAG, "初始化失败,错误码：" + code);
+        } else {
+            Log.e(TAG, "初始化成功：" + code);
+            // 初始化成功，之后可以调用startSpeaking方法
+            // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
+            // 正确的做法是将onCreate中的startSpeaking调用移至这里
         }
     };
 
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                String content = (String) msg.obj;
+                SpeechSynthesizerModule.this.start(content);
+            }
+
+        }
+    };
 
     @ReactMethod
     public void init(String AppId) {
+        Log.e(TAG, AppId);
         if (mTts != null) {
             return;
         }
 
-        SpeechUtility.createUtility(this.context, SpeechConstant.APPID + "=" + AppId);
+        SpeechUtility.createUtility(context, SpeechConstant.APPID + "=" + AppId);
 
-        mTts = SpeechSynthesizer.createSynthesizer(this.context, myInitListener);
+        mTts = SpeechSynthesizer.createSynthesizer(context, myInitListener);
         mTtsListener = new SynthesizerListener() {
 
             @Override
@@ -116,6 +132,13 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
             public void onCompleted(SpeechError speechError) {
                 // 播放完成
                 onTtsCompleted();
+                Log.e(TAG, "播放队列大小：" + playList.size());
+                if (playList.size() > 0) {
+                    String content = playList.get(0);
+                    playList.remove(0);
+                    start(content);
+                    Log.e(TAG, "播放队列的语音：" + content);
+                }
             }
 
             @Override
@@ -124,14 +147,18 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
             }
         };
         setTtsParam();
+        playList = new ArrayList<>();
+        AppCache.setHandler(handler);
     }
 
     @ReactMethod
     public void start(String content) {
         startTime = System.currentTimeMillis();
-
+        Log.e(TAG, "是否正在播放：" + mTts.isSpeaking());
         if (mTts.isSpeaking()) {
-            mTts.stopSpeaking();
+            Log.e(TAG, "正在播放，添加到播放队列：" + content);
+            playList.add(content);
+            return;
         }
 
         mTts.startSpeaking(content, mTtsListener);
@@ -228,15 +255,21 @@ public class SpeechSynthesizerModule extends ReactContextBaseJavaModule {
         onJSEvent(getReactApplicationContext(), "onSynthesizerSpeakCompletedEvent", params);
     }
 
-    private void showTip(final String str) {
-        Toast.makeText(this.context, str, Toast.LENGTH_SHORT).show();
-    }
-
     private void onJSEvent(ReactContext reactContext,
                            String eventName,
                            @Nullable WritableMap params) {
         reactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
+    }
+
+    @ReactMethod
+    public void addListener(String eventName) {
+        // Keep: Required for RN RCTEventEmitter class (iOS).
+    }
+
+    @ReactMethod
+    public void removeListeners(double count) {
+        // Keep: Required for RN RCTEventEmitter class (iOS).
     }
 }

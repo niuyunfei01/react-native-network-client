@@ -30,7 +30,7 @@ import WebView from "react-native-webview";
 import 'react-native-get-random-values';
 import {SvgXml} from "react-native-svg";
 import {back} from "../../../svg/svg";
-import MonthPicker from "react-native-month-year-picker";
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -170,16 +170,16 @@ class SettlementScene extends PureComponent {
   }
 
   onChange = (event, date) => {
-    if (event === 'dismissedAction') {
-      this.setState({visible: false})
-      return
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({
+        date: date,
+        dates: tool.fullMonth(date)
+      }, () => {
+        this.getSupplyList()
+      })
     }
-    this.setState({
-      date: date,
-      dates: tool.fullMonth(date)
-    }, () => {
-      this.getSupplyList()
-    })
+
   }
 
   closeAgreeModal = () => {
@@ -252,16 +252,7 @@ class SettlementScene extends PureComponent {
           {this.renderAgreementModal()}
           {this.renderPromptModal()}
         </ScrollView>
-        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
-          <MonthPicker value={date}
-                       cancelButton={'取消'}
-                       okButton={'确定'}
-                       autoTheme={true}
-                       mode={'number'}
-                       onChange={(event, newDate) => this.onChange(event, newDate)}
-                       maximumDate={new Date()}
-                       minimumDate={new Date(2015, 8, 15)}/>
-        </CommonModal>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onChange(event, newDate)} date={date}/>
       </View>
     );
   }
@@ -349,7 +340,7 @@ class SettlementScene extends PureComponent {
     return (
       <View style={styles.listWrap}>
         <View style={styles.listHeaderWrap}>
-          <Text style={styles.listDateText}>
+          <Text style={styles.listDateText} onPress={() => this.setState({visible: true})}>
             {dates}&nbsp;
             <Entypo name={"triangle-down"} color={colors.color999} size={20}/>
           </Text>
