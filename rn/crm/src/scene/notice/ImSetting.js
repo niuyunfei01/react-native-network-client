@@ -144,7 +144,7 @@ class ImSetting extends React.PureComponent {
             value={nickName}
             onChangeText={text => this.setState({nickName: text})}
           />
-          <Text style={styles.changeBtn} onPress={() => this.setConfig('im_nick_name', nickName)}>修改 </Text>
+          <Text style={styles.changeBtn} onPress={() => this.setConfig('im_nick_name', nickName)}>保存 </Text>
         </View>
       </View>
     )

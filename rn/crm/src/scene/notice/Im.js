@@ -10,13 +10,15 @@ import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {down, no_message, no_network, set} from "../../svg/svg";
 import tool from "../../pubilc/util/tool";
-import {ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import LinearGradient from "react-native-linear-gradient";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
 import {getWithTplIm} from "../../pubilc/util/common";
+import store from "../../pubilc/util/configureStore";
+import {getImRemindCount, setImRemindCount} from "../../reducers/im/imActions";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -76,6 +78,20 @@ class NoticeList extends React.PureComponent {
       clearInterval(this.dataPolling);
   }
 
+  fetchRemindCount = () => {
+    let {im_config} = this.props.im
+    const {accessToken, store_id} = this.props.global;
+    store.dispatch(getImRemindCount(accessToken, store_id, im_config.im_url, (ok, msg, obj) => {
+      if (ok) {
+        hideModal()
+        store.dispatch(setImRemindCount(obj.message_count))
+      } else {
+        ToastLong(msg);
+        hideModal()
+      }
+    }))
+  }
+
   startPollingList = (im_config) => {
     this.dataPolling = setInterval(
       () => {
@@ -119,12 +135,13 @@ class NoticeList extends React.PureComponent {
   }
 
   fetchData = (is_polling = false) => {
-    const {accessToken, store_id} = this.props.global;
+    const {accessToken} = this.props.global;
     const {im} = this.props;
-    const {query, isLastPage, selected, message} = this.state
-    if (is_polling) this.setState({isLastPage: false})
-    if (isLastPage)
-      return
+    const {query, isLastPage, selected, message, store_id} = this.state
+    if (is_polling) this.setState({isLastPage: false}, () => {
+      if (isLastPage)
+        return
+    })
     let params = {
       page: query.page,
       page_size: query.page_size,
@@ -152,13 +169,15 @@ class NoticeList extends React.PureComponent {
   }
 
   onRefresh = () => {
+    this.fetchRemindCount()
     tool.debounces(() => {
       let query = this.state.query;
       query.page = 1;
       this.setState({
         isLastPage: false,
         query: query,
-        store_name: this.props.global.store_info?.name
+        store_name: this.props.global.store_info?.name,
+        store_id: this.props.global.store_id
       }, () => {
         this.fetchData()
       })
@@ -216,7 +235,9 @@ class NoticeList extends React.PureComponent {
 
   setStoreInfo = (item) => {
     const {name, id} = item
-    this.setState({store_name: name, store_id: id, selectStoreVisible: false}, () => this.fetchData())
+    this.setState({
+      store_name: name, store_id: id, selectStoreVisible: false
+    }, () => this.fetchData(true))
   }
 
   navigationToChatRoom = (info) => {
@@ -346,7 +367,7 @@ class NoticeList extends React.PureComponent {
                       label_field={'name'}
                       value_field={'id'}
                       default_val={store_id}
-                      onEndReachedThreshold={0.3}
+                      onEndReachedThreshold={0.5}
                       onEndReached={this.getStoreList}
                       refreshing={refreshing}
                       initialNumToRender={10}

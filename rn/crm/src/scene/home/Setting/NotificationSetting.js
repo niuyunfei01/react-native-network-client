@@ -1,21 +1,22 @@
 import React, {PureComponent} from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Text,
-  TouchableOpacity,
+  AppState,
   Dimensions,
-  TextInput,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import {connect} from "react-redux";
 import {Switch} from "react-native-elements";
 import colors from "../../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
-import {right, close, rightCheck, pencil} from "../../../svg/svg";
+import {close, pencil, right, rightCheck} from "../../../svg/svg";
 import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import HttpUtils from "../../../pubilc/util/http";
 import AlertModal from "../../../pubilc/component/AlertModal";
@@ -151,6 +152,12 @@ const styles = StyleSheet.create({
   modalBalanceWrap: {marginLeft: 20, marginRight: 10, flexWrap: 'wrap', flexDirection: 'row'}
 })
 
+let isSettingVolume = false
+const type = Platform.select({
+  android: 'music',
+  ios: 'system'
+})
+
 class NotificationSetting extends PureComponent {
 
   state = {
@@ -176,21 +183,48 @@ class NotificationSetting extends PureComponent {
     menu_settings_child_balance_defect: {},
   }
 
-  async componentDidMount() {
-
+  componentDidMount() {
+    this.appStateEvent = AppState.addEventListener("change", this._handleAppStateChange);
     this.getNotificationSettingList()
-    await VolumeManager.showNativeVolumeUI({enabled: true})
-    this.volumeListener = VolumeManager.addVolumeListener((result) => {
-      this.volumeRef.setNativeProps({value: result.volume})
+    this.focus = this.props.navigation.addListener('focus', async () => {
+
+      await VolumeManager.showNativeVolumeUI({enabled: true})
+      this.volumeListener = VolumeManager.addVolumeListener((result) => {
+        this.volumeRef.setNativeProps({value: result.volume})
+      })
     })
+
+  }
+
+  _handleAppStateChange = async (nextAppState) => {
+    const {menu_settings_head} = this.state
+    if (nextAppState === 'active') {
+      // this.getNotificationSettingList()
+      if (Platform.OS === 'android') {
+        JPush.isNotificationEnabled(enabled => {
+          menu_settings_head.types[0].value = enabled ? 1 : 0
+          this.setState({menu_settings_head: {...menu_settings_head}})
+          setNotificationStatus(enabled ? 1 : 0)
+        })
+        return
+      }
+      if (Platform.OS === 'ios') {
+        const notification_status = await native.getNotificationStatus()
+        menu_settings_head.types[0].value = notification_status ? 1 : 0
+        this.setState({menu_settings_head: {...menu_settings_head}})
+        setNotificationStatus(notification_status ? 1 : 0)
+      }
+    }
+
   }
 
   componentWillUnmount() {
     this.volumeListener && this.volumeListener.remove()
+    this.focus()
+    this.appStateEvent && this.appStateEvent.remove()
   }
 
   getNotificationSettingList = () => {
-
     const {store_id, vendor_id, accessToken} = this.props.global
     const url = `/v4/wsb_notify/getNotifySettingList?access_token=${accessToken}`
     const params = {store_id: store_id, vendor_id: vendor_id}
@@ -242,18 +276,21 @@ class NotificationSetting extends PureComponent {
   }
 
   setVolume = async (value) => {
-    const {volume, isInitVolume} = this.state
-    if (volume === value)
+    if (isSettingVolume) {
       return
-    this.volumeRef.setNativeProps({value: value})
-    if (isInitVolume)
-      this.setState({isInitVolume: false})
-    else {
-      Platform.select({
-        ios: await VolumeManager.setVolume(value, {type: 'system', showUI: true}),
-        android: await VolumeManager.setVolume(value, {type: 'music', showUI: true})
+    }
+    isSettingVolume = true
+    const {isInitVolume} = this.state
+    if (isInitVolume) {
+      this.volumeRef.setNativeProps({value: value})
+      this.setState({isInitVolume: false}, () => {
+        isSettingVolume = false
       })
-
+    } else {
+      this.volumeRef.setNativeProps({value: value})
+      VolumeManager.setVolume(value, {type: type, showUI: true}).then(() => {
+        isSettingVolume = false
+      })
     }
   }
 
@@ -347,7 +384,7 @@ class NotificationSetting extends PureComponent {
                   style={{marginHorizontal: 15, paddingVertical: 28}}
                   minimumValue={0}
                   maximumValue={1}
-                  onValueChange={value => this.setVolume(value)}/>
+                  onSlidingComplete={value => this.setVolume(value)}/>
         </View>
 
       </>
