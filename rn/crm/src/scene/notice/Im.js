@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Dimensions, FlatList,
-  InteractionManager,
+  InteractionManager, Platform,
   StyleSheet,
   Text, TouchableOpacity,
   View
@@ -12,11 +12,11 @@ import {down, no_message, no_network, set} from "../../svg/svg";
 import tool from "../../pubilc/util/tool";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 import LinearGradient from "react-native-linear-gradient";
-import NetInfo from "@react-native-community/netinfo";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
+import {getWithTplIm} from "../../pubilc/util/common";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -50,7 +50,7 @@ class NoticeList extends React.PureComponent {
         page_size: 20
       },
       isLastPage: false,
-      netWorkStatus: 'offline',
+      netWorkStatus: props.global.net_info.isConnected,
       selectStoreVisible: false,
       storeList: [],
       page_size: 10,
@@ -67,14 +67,6 @@ class NoticeList extends React.PureComponent {
     let {im_config} = this.props.im
     this.fetchData()
     this.getStoreList()
-    NetInfo.fetch().then(state => {
-      this.setState({
-        netWorkStatus: state.isConnected
-      })
-    });
-    this.unsubscribe = NetInfo.addEventListener (state => {
-      this.handleFirstConnectivityChange(state)
-    })
     if (im_config.im_store_status == 1)
       this.startPollingList(im_config)
   }
@@ -82,7 +74,6 @@ class NoticeList extends React.PureComponent {
   componentWillUnmount() {
     if (this.dataPolling !== null)
       clearInterval(this.dataPolling);
-    this.unsubscribe()
   }
 
   startPollingList = (im_config) => {
@@ -91,10 +82,6 @@ class NoticeList extends React.PureComponent {
         this.fetchData(true)
       },
       im_config.im_list_second * 1000);
-  }
-
-  handleFirstConnectivityChange(netWorkStatus) {
-    this.setState(netWorkStatus)
   }
 
   onPress = (route, params) => {
@@ -133,6 +120,7 @@ class NoticeList extends React.PureComponent {
 
   fetchData = (is_polling = false) => {
     const {accessToken, store_id} = this.props.global;
+    const {im} = this.props;
     const {query, isLastPage, selected, message} = this.state
     if (is_polling) this.setState({isLastPage: false})
     if (isLastPage)
@@ -143,17 +131,23 @@ class NoticeList extends React.PureComponent {
       status: selected
     }
     this.setState({refreshing: true})
-    const api = `/api/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
-    HttpUtils.get(api, params).then(res => {
-      const {lists, page, isLastPage} = res
-      let list = page !== 1 ? message.concat(lists) : lists
-      this.setState({
-        message: list,
-        refreshing: false,
-        isLastPage: isLastPage
-      })
-    }).catch(() => {
+    const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
+    getWithTplIm(api, params, im.im_config.im_url, (json) => {
+      if (json.ok) {
+        const {lists, page, isLastPage} = json.obj
+        let list = page !== 1 ? message.concat(lists) : lists
+        this.setState({
+          message: list,
+          refreshing: false,
+          isLastPage: isLastPage
+        })
+      } else {
+        ToastShort(`${json.reason}`)
+      }
+    }, (error) => {
       this.setState({refreshing: false})
+      let msg = "获取消息列表错误: " + error;
+      ToastShort(`${msg}`)
     })
   }
 
@@ -164,7 +158,7 @@ class NoticeList extends React.PureComponent {
       this.setState({
         isLastPage: false,
         query: query,
-        message: []
+        store_name: this.props.global.store_info?.name
       }, () => {
         this.fetchData()
       })
@@ -304,12 +298,12 @@ class NoticeList extends React.PureComponent {
     let {message} = this.state
     let {item, index} = info
     return (
-      <TouchableOpacity style={[styles.messageItem, {borderBottomWidth: index == message.length - 1 ? 0 : 1, borderBottomColor: colors.e5}]} onPress={() => this.navigationToChatRoom(item)}>
+      <TouchableOpacity style={[styles.messageItem, {borderBottomWidth: index == message.length - 1 ? 0 : 0.5, borderBottomColor: colors.e5}]} onPress={() => this.navigationToChatRoom(item)}>
         <If condition={item?.is_read == '1'}>
           <View style={styles.isReadIcon}/>
         </If>
         <View style={styles.profile}>
-          <Text style={styles.profileName}>{item?.userName?.substring(0, 1)}</Text>
+          <Text style={styles.profileName}>{item?.userName !== '匿名' ? item?.userName?.substring(0, 1) : '匿名'}</Text>
         </View>
         <View>
           <View style={styles.userInfo}>
@@ -317,7 +311,7 @@ class NoticeList extends React.PureComponent {
             <Text style={styles.messageTime}>{item.send_time} </Text>
           </View>
           <Text style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
-          <Text style={styles.messageInfo}>{item.msg_type === '1' ? tool.jbbsubstr(item?.last_message, 20) : `[图片]`} </Text>
+          <Text style={styles.messageInfo}>{item.msg_type == '1' ? tool.jbbsubstr(item?.last_message, 20) : `[图片]`} </Text>
         </View>
       </TouchableOpacity>
     )
@@ -333,11 +327,11 @@ class NoticeList extends React.PureComponent {
     return (
       <TouchableOpacity style={styles.floatBox} onPress={() => this.onPress('Home')}>
         <LinearGradient
-          style={styles.floatIcon}
+          style={[styles.floatIcon, Platform.OS === 'ios' && {padding: 10}]}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           colors={['#47D763', '#26B942']}>
-          <Text style={styles.floatText}>旧版消息</Text>
+          <Text style={[styles.floatText, Platform.OS === 'android' && {width: 24}]} allowFontScaling={false}>旧版消息</Text>
         </LinearGradient>
       </TouchableOpacity>
     )
@@ -469,7 +463,7 @@ const styles = StyleSheet.create({
   storeInfo: {
     fontSize: 12,
     color: colors.color666,
-    marginTop: 5
+    marginTop: 2
   },
   messageInfo: {
     fontSize: 14,
@@ -485,7 +479,6 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    padding: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -500,7 +493,7 @@ const styles = StyleSheet.create({
     right: 10
   },
   floatText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
     color: colors.white
   },
@@ -508,7 +501,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    padding: 10,
+    justifyContent: "center",
     alignItems: "center"
   }
 });

@@ -30,10 +30,10 @@ export const setImRemindCount = (im_remind_count = 0) => {
 /**
  * 获取新版IM消息数角标
  */
-export function getImRemindCount(access_token, storeId, callback) {
+export function getImRemindCount(access_token, storeId, host, callback) {
   return dispatch => {
-    const url = `api/im_message_count?access_token=${access_token}&store_id=${storeId}`
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+    const url = `/im/im_message_count?access_token=${access_token}&store_id=${storeId}`
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.getWithIm(url, {}, host))
       .then(res => res.json())
       .then(json => {
         const ok = json.ok && json.obj;
@@ -52,19 +52,23 @@ export function getImRemindCount(access_token, storeId, callback) {
 /**
  * 轮询请求聊天室是否有新消息
  */
-export function im_message_refresh(access_token, storeId, last_msg_id, group_id, callback) {
+export function im_message_refresh(access_token, storeId, last_msg_id, group_id, host, callback) {
   return dispatch => {
-    const api = `api/im_message_detail_refresh?access_token=${access_token}&store_id=${storeId}&last_msg_id=${last_msg_id}&group_id=${group_id}`;
-    return getWithTpl(api, (response) => {
-      if (response.ok && response.obj?.length > 0) {
-        callback && callback(true, '获取新消息成功', response.obj)
-      } else {
-        callback && callback(false)
-      }
-    }, (error) => {
+    const api = `/im/im_message_detail_refresh?access_token=${access_token}&store_id=${storeId}&last_msg_id=${last_msg_id}&group_id=${group_id}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.getWithIm(api, {}, host))
+      .then(res => res.json())
+      .then(json => {
+        const ok = json.ok && json.obj;
+        if (ok && json.obj?.length > 0) {
+          callback && callback(true, '获取新消息成功', json.obj)
+        } else {
+          const error = json.reason ? json.reason : "返回数据错误";
+          callback && callback(ok, error)
+        }
+      }).catch((error) => {
       let msg = "暂无新消息: " + error;
       callback && callback(false, msg)
-    })
+    });
   }
 }
 

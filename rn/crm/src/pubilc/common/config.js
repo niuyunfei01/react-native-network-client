@@ -8,6 +8,10 @@ export function apiUrl(path) {
   return `https://${hp}/${path}`;
 }
 
+export function apiImUrl(path, host = '') {
+  return `https://${host}${path}`;
+}
+
 export function staticUrl(path) {
   if (path !== null) {
     let isFullUrl = path.indexOf("http");
@@ -289,6 +293,7 @@ const C = {
 
   serverUrl,
   apiUrl,
+  apiImUrl,
   staticUrl,
   hostPort,
   //配送类型

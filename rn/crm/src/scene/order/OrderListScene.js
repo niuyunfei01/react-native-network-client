@@ -43,8 +43,8 @@ import JbbAlert from "../../pubilc/component/JbbAlert";
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
-  const {global, device} = state;
-  return {global: global, device: device}
+  const {global, device, im} = state;
+  return {global: global, device: device, im: im}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -535,7 +535,7 @@ class OrderListScene extends Component {
 
   onCanChangeStore = (item) => {
     showModal("切换店铺中...")
-    const {dispatch, global} = this.props;
+    const {dispatch, global, im} = this.props;
     const {accessToken} = global;
     dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
       if (ok) {
@@ -549,7 +549,7 @@ class OrderListScene extends Component {
       }
     }));
     dispatch(getStoreImConfig(accessToken, item?.id));
-    dispatch(getImRemindCount(accessToken, item?.id, (ok, msg, obj) => {
+    dispatch(getImRemindCount(accessToken, item?.id, im.im_config.im_url, (ok, msg, obj) => {
       if (ok) {
         hideModal()
         dispatch(setImRemindCount(obj.message_count))

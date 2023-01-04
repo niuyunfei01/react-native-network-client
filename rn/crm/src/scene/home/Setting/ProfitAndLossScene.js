@@ -379,7 +379,7 @@ class ProfitAndLoss extends PureComponent {
           </View>
         </View>
         <View style={styles.cuttingLine}/>
-        <TouchableOpacity style={styles.orderCardContent} onPress={() => this.copyToClipboard(item?.platformId)}>
+        <TouchableOpacity style={styles.orderCardContent} onPress={() => this.copyToClipboard(item?.platform_oid)}>
           <View style={styles.flexRow1}>
             <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台单号：</Text>
             <Text style={styles.orderCardItemValue}>{item?.platform_oid} </Text>

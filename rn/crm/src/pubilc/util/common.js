@@ -49,6 +49,44 @@ export function getWithTpl(url, okFn, failFn, dispatch) {
 }
 
 /**
+ *  im固定域名请求get
+ * @param url
+ * @param okFn
+ * @param failFn
+ * @param dispatch
+ */
+export function getWithTplIm(url, params, host, okFn, failFn, dispatch) {
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.getWithIm(url, params, host))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json, dispatch);
+    })
+    .catch(error => {
+      failFn && failFn(error, dispatch);
+    });
+}
+
+/**
+ *
+ *  im固定域名请求post
+ * @param url
+ * @param data object (will be json.stringify)
+ * @param okFn
+ * @param failFn
+ * @param dispatch
+ */
+export function postWithTplIm(url, data, host, okFn, failFn, dispatch) {
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.postJSONWithIm(url, data, host))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json, dispatch);
+    })
+    .catch(error => {
+      dispatch ? failFn(error, dispatch) : failFn(error);
+    });
+}
+
+/**
  *
  *  请优先使用 jsonWithTpl2
  * @param url
@@ -131,6 +169,8 @@ export default {
     );
   },
   getWithTpl,
+  getWithTplIm,
+  postWithTplIm,
   postWithTpl
 };
 

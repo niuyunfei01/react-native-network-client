@@ -11,11 +11,11 @@ import {SvgXml} from "react-native-svg";
 import {back, emoji, meme, no_message} from "../../svg/svg";
 import {connect} from "react-redux";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
-import HttpUtils from "../../pubilc/util/http";
 import EmojiSelector, { Categories } from 'react-native-emoji-selector'
 import BigImage from "../common/component/BigImage";
 import {im_message_refresh} from "../../reducers/im/imActions";
 import tool from "../../pubilc/util/tool";
+import {getWithTplIm, postWithTplIm} from "../../pubilc/util/common";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 const {width, height} = Dimensions.get("window");
@@ -70,7 +70,7 @@ class ChatRoom extends React.PureComponent {
       () => {
         const {new_message_id, messageInfo} = this.state;
         const {group_id} = messageInfo
-        dispatch(im_message_refresh(accessToken, store_id, new_message_id, group_id, (ok, msg, obj) => {
+        dispatch(im_message_refresh(accessToken, store_id, new_message_id, group_id, im_config.im_url, (ok, msg, obj) => {
           if (ok) {
             this.addInitMessage(obj[0])
           }
@@ -82,14 +82,20 @@ class ChatRoom extends React.PureComponent {
   readMessage = () => {
     let {messageInfo} = this.state;
     const {accessToken} = this.props.global;
+    const {im} = this.props;
     let params = {
       es_id: messageInfo.es_id,
       group_id: messageInfo.group_id
     }
-    const api = `/api/im_message_read?access_token=${accessToken}`
-    HttpUtils.post(api, params).then(res => {
-    }).catch((error) => {
-      ToastShort(error.reason)
+    const api = `/im/im_message_read?access_token=${accessToken}`
+    postWithTplIm(api, params, im.im_config.im_url, (json) => {
+      if (!json.ok) {
+        ToastShort(`${json.reason}`)
+      }
+    }, (error) => {
+      this.setState({refreshing: false})
+      let msg = "获取消息列表错误: " + error;
+      ToastShort(`${msg}`)
     })
   }
 
@@ -105,6 +111,7 @@ class ChatRoom extends React.PureComponent {
 
   fetchData = () => {
     const {accessToken, store_id} = this.props.global;
+    const {im} = this.props;
     const {query, isLastPage, messages, messageInfo} = this.state
     if (isLastPage)
       return
@@ -114,18 +121,24 @@ class ChatRoom extends React.PureComponent {
       group_id: messageInfo.group_id
     }
     this.setState({refreshing: true})
-    const api = `/api/get_im_detail?store_id=${store_id}&access_token=${accessToken}`
-    HttpUtils.get(api, params).then(res => {
-      let {lists, page, isLastPage} = res
-      let list = page > 1 ? messages.concat(lists) : lists
-      if (page == 1) this.setState({new_message_id: list[0].id})
-      this.setState({
-        messages: list,
-        refreshing: false,
-        isLastPage: isLastPage
-      })
-    }).catch(() => {
+    const api = `/im/get_im_detail?store_id=${store_id}&access_token=${accessToken}`
+    getWithTplIm(api, params, im.im_config.im_url, (json) => {
+      if (json.ok) {
+        let {lists, page, isLastPage} = json.obj
+        let list = page > 1 ? messages.concat(lists) : lists
+        if (page == 1) this.setState({new_message_id: list[0].id})
+        this.setState({
+          messages: list,
+          refreshing: false,
+          isLastPage: isLastPage
+        })
+      } else {
+        ToastShort(`${json.reason}`)
+      }
+    }, (error) => {
       this.setState({refreshing: false})
+      let msg = "获取消息列表错误: " + error;
+      ToastShort(`${msg}`)
     })
   }
 
@@ -180,6 +193,7 @@ class ChatRoom extends React.PureComponent {
 
   sendMessage = () => {
     const {accessToken} = this.props.global;
+    const {im} = this.props;
     let {messageInfo} = this.state;
     let params = {
       es_id: messageInfo.es_id,
@@ -188,11 +202,17 @@ class ChatRoom extends React.PureComponent {
       msg_content: this.state.send_msg
     }
     this.setState({refreshing: true})
-    const api = `/api/im_send_message?access_token=${accessToken}`
-    HttpUtils.post(api, params).then(res => {
-      this.addInitMessage(res)
-    }).catch(() => {
+    const api = `/im/im_send_message?access_token=${accessToken}`
+    postWithTplIm(api, params, im.im_config.im_url, (json) => {
+      if (json.ok) {
+        this.addInitMessage(json.obj)
+      } else {
+        ToastShort(`${json.reason}`)
+      }
+    }, (error) => {
       this.setState({refreshing: false})
+      let msg = "获取消息列表错误: " + error;
+      ToastShort(`${msg}`)
     })
   }
 
@@ -214,7 +234,7 @@ class ChatRoom extends React.PureComponent {
 
   renderHead = () => {
     let {messageInfo} = this.state;
-    let {userName = '', order_id = '', platform_name = '', real_mobile = '', orderStatusName = ''} = messageInfo
+    let {userName = '', order_id = '', platform_name = '', real_mobile = '', orderStatusName = '', dayId = ''} = messageInfo
     return (
       <View style={styles.head}>
         <SvgXml onPress={() => this.props.navigation.goBack()} xml={back()}/>
@@ -225,8 +245,8 @@ class ChatRoom extends React.PureComponent {
         </If>
         <If condition={userName !== '匿名'}>
           <View style={styles.headLeft}>
-            <Text style={styles.headLeftTitle}>{platform_name} #{order_id} </Text>
-            <Text style={styles.headLeftUser}>{userName} 尾号{real_mobile} </Text>
+            <Text style={styles.headLeftTitle}>{platform_name} {dayId !== '' ? `#${dayId}` : ''} </Text>
+            <Text style={styles.headLeftUser}>{userName} {real_mobile !== '' ? `尾号${real_mobile}` : ''} </Text>
           </View>
           <Text style={styles.headRightTitle} onPress={() => this.navigationToOrderDetail(order_id)}>{orderStatusName} </Text>
         </If>
@@ -240,7 +260,7 @@ class ChatRoom extends React.PureComponent {
     return (
       <View style={styles.tab}>
         <SvgXml xml={meme()}/>
-        <Text style={styles.orderMoney}>下单金额 {orderMoney}</Text>
+        <Text style={styles.orderMoney}>下单金额 {orderMoney}元 </Text>
         <Text style={styles.orderMoney}>下单时间 {orderTime}</Text>
       </View>
     )
@@ -291,12 +311,12 @@ class ChatRoom extends React.PureComponent {
     return (
       <View style={styles.messageItem} key={index}>
         <View style={styles.messageTimeBox}>
-          <Text style={styles.messageTime}>{item.created_at} </Text>
+          <Text style={styles.messageTime}>{tool._shortTimeIm(item.created_at * 1000)} </Text>
         </View>
         <If condition={this.getVerification(item.msg_source, '2')}>
           <View style={{flexDirection: "row"}}>
             <View style={styles.userProfile}>
-              <Text style={styles.customerMsg}>{userName.substring(0, 1)}</Text>
+              <Text style={styles.customerMsg}>{userName !== '匿名' ? userName.substring(0, 1) : '匿名'}</Text>
             </View>
             <If condition={this.getVerification(item.msg_type, '1')}>
               <View style={styles.customerContent}>
@@ -323,7 +343,9 @@ class ChatRoom extends React.PureComponent {
                   <Image source={{uri: item.msg_content}} style={styles.imageBox}/>
                 </TouchableHighlight>
               </If>
-              <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
+              <If condition={item.platform == '1' || item.platform == '4'}>
+                <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
+              </If>
             </View>
             <View style={styles.merchantProfile}>
               <Text style={styles.merchantMsg}>商</Text>
@@ -359,11 +381,11 @@ class ChatRoom extends React.PureComponent {
 
   render() {
     let {messageInfo, showEmoji} = this.state;
-    let {userName = ''} = messageInfo
+    let {userName = '', orderMoney = '', orderTime = ''} = messageInfo
     return (
       <View style={styles.mainContainer}>
         {this.renderHead()}
-        <If condition={userName !== '匿名'}>
+        <If condition={userName !== '匿名' && orderMoney !== '' && orderTime !== ''}>
           {this.renderTab()}
         </If>
         {this.renderMessage()}
@@ -371,7 +393,13 @@ class ChatRoom extends React.PureComponent {
           {this.renderMsgCard()}
         </KeyboardAvoidingView>
         <If condition={showEmoji}>
-          <EmojiSelector onEmojiSelected={emoji => this.enterEmoji(emoji)} category={Categories.emotion} showSearchBar={false} columns={9}/>
+          <EmojiSelector
+            onEmojiSelected={emoji => this.enterEmoji(emoji)}
+            category={Categories.emotion}
+            showSearchBar={false}
+            showSectionTitles={false}
+            columns={9}
+          />
         </If>
         {this.renderModalImg()}
       </View>
@@ -395,7 +423,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: "center"
+    justifyContent: "center",
+    marginVertical: 2
   },
   headLeftTitle: {
     fontSize: 16,
