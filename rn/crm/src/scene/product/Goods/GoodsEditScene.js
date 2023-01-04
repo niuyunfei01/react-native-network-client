@@ -1068,8 +1068,8 @@ class GoodsEditScene extends PureComponent {
             style={styles.textInputStyle}
             onChangeText={text => this.onNameChanged(text)}
             placeholderTextColor={colors.color999}
-            maxLength={40}
-            placeholder={'不超过40个字符'}/>
+            maxLength={45}
+            placeholder={'不超过45个字符'}/>
           <If condition={name}>
             <Text style={styles.clearBtn} onPress={this.onNameClear}>
               清除
@@ -1645,7 +1645,7 @@ class GoodsEditScene extends PureComponent {
   renderOtherInfo = () => {
     const {fnProviding, provided, head_supplies} = this.state
     return (
-      <If condition={fnProviding && this.isStoreProdEditable()}>
+      <If condition={fnProviding}>
         <View style={Styles.zoneWrap}>
           <Text style={Styles.headerTitleText}>
             其他信息

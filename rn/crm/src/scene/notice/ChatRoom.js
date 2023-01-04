@@ -37,7 +37,8 @@ class ChatRoom extends React.PureComponent {
       showEmoji: false,
       modalImg: false,
       img_url: '',
-      new_message_id: ''
+      new_message_id: '',
+      inverted: true
     }
   }
 
@@ -128,9 +129,10 @@ class ChatRoom extends React.PureComponent {
         let list = page > 1 ? messages.concat(lists) : lists
         if (page == 1) this.setState({new_message_id: list[0].id})
         this.setState({
-          messages: list,
+          messages: list?.length > 5 ? list : list.reverse(),
           refreshing: false,
-          isLastPage: isLastPage
+          isLastPage: isLastPage,
+          inverted: list?.length > 5
         })
       } else {
         ToastShort(`${json.reason}`)
@@ -278,7 +280,7 @@ class ChatRoom extends React.PureComponent {
   }
 
   renderMessage = () => {
-    let {messages, isCanLoadMore, isLoading} = this.state;
+    let {messages, isCanLoadMore, isLoading, inverted} = this.state;
     return (
       <FlatList
         ref={(flatList)=>this._flatList = flatList}
@@ -294,7 +296,7 @@ class ChatRoom extends React.PureComponent {
             this.setState({isCanLoadMore: false})
           }
         }}
-        inverted={true}
+        inverted={inverted}
         onMomentumScrollBegin={this.onMomentumScrollBegin}
         refreshing={isLoading}
         keyExtractor={(item, index) => `${index}`}
@@ -308,15 +310,16 @@ class ChatRoom extends React.PureComponent {
     let {messageInfo} = this.state;
     let {userName = ''} = messageInfo
     let {item, index} = info
+    let {im_config} = this.props.im
     return (
       <View style={styles.messageItem} key={index}>
         <View style={styles.messageTimeBox}>
           <Text style={styles.messageTime}>{tool._shortTimeIm(item.created_at * 1000)} </Text>
         </View>
-        <If condition={this.getVerification(item.msg_source, '2')}>
+        <If condition={this.getVerification(item.msg_source, '2') || this.getVerification(item.msg_source, '4')}>
           <View style={{flexDirection: "row"}}>
             <View style={styles.userProfile}>
-              <Text style={styles.customerMsg}>{userName !== '匿名' ? userName.substring(0, 1) : '匿名'}</Text>
+              <Text style={styles.customerMsg}>{item.msg_source == '4' ? '骑手' : userName !== '匿名' ? userName.substring(0, 1) : '匿名'}</Text>
             </View>
             <If condition={this.getVerification(item.msg_type, '1')}>
               <View style={styles.customerContent}>
@@ -330,7 +333,7 @@ class ChatRoom extends React.PureComponent {
             </If>
           </View>
         </If>
-        <If condition={this.getVerification(item.msg_source, '1')}>
+        <If condition={this.getVerification(item.msg_source, '1') || this.getVerification(item.msg_source, '3')}>
           <View style={{flexDirection: "row", justifyContent: "flex-end"}}>
             <View style={{alignItems: "flex-end"}}>
               <If condition={this.getVerification(item.msg_type, '1')}>
@@ -348,7 +351,7 @@ class ChatRoom extends React.PureComponent {
               </If>
             </View>
             <View style={styles.merchantProfile}>
-              <Text style={styles.merchantMsg}>商</Text>
+              <Text style={styles.merchantMsg}>{item.msg_source == '3' ? '系统' : im_config?.im_nick_name ? im_config?.im_nick_name : '商'}</Text>
             </View>
           </View>
         </If>
