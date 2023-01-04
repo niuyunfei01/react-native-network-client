@@ -7,6 +7,7 @@ import HttpUtils from "../../../../pubilc/util/http";
 import tool from "../../../../pubilc/util/tool";
 import AlertModal from "../../../../pubilc/component/AlertModal";
 import LineChartTipModal from "../../../../pubilc/component/LineChartTipModal";
+import {hideModal, showModal} from "../../../../pubilc/util/ToastUtils";
 
 const {width} = Dimensions.get('window')
 
@@ -19,7 +20,7 @@ const today_styles = StyleSheet.create({
   detailDataHeaderTitle: {fontSize: 14, color: colors.color666, paddingLeft: 12},
   detailDataText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 25,
     paddingLeft: 12,
@@ -82,7 +83,7 @@ const history_styles = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 15,
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 25
   }
@@ -98,17 +99,17 @@ export default class RevenueDataComponent extends PureComponent {
     this.state = {
       selectHistory: 1,
       selectHistoryItem: 'gmv',
+      today_data: [],
+      yesterday_data: [],
+      yesterday_all: [],
       summary: [],
       history: [],
       history_data: {
-        show: {},
-        line_data: {
-          label: [],
-          touch_label: [],
-          value: []
-        }
+        label: [],
+        touch_label: [],
+        value: []
       },
-      start_date: time - 24 * 3600 * 1000,
+      start_date: time,
       end_date: time,
       current_datetime: time,
       yesterday_datetime: time - 24 * 3600 * 1000,
@@ -122,8 +123,9 @@ export default class RevenueDataComponent extends PureComponent {
   }
 
   getInitData = () => {
-    const {end_date, start_date, selectHistory, selectHistoryItem} = this.state
+    const {end_date, start_date, selectHistory, selectHistoryItem, yesterday_datetime} = this.state
     this.getData(start_date, end_date, selectHistory, selectHistoryItem)
+    this.getData(yesterday_datetime, yesterday_datetime, selectHistory, selectHistoryItem)
   }
 
   componentDidMount() {
@@ -143,58 +145,60 @@ export default class RevenueDataComponent extends PureComponent {
 
   getData = (start_date, end_date, selectHistory = 1, key = 'gmv') => {
     const {store_id, accessToken} = this.props
-
-    const time = end_date - start_date
+    const {current_datetime, yesterday_datetime} = this.state
     const url = `/v1/new_api/analysis/revenue_stat?access_token=${accessToken}`
 
     const params = {store_id: store_id, start_date: tool.fullDay(start_date), end_date: tool.fullDay(end_date)}
-
+    showModal('加载数据中')
     HttpUtils.get(url, params).then(({summary = [], history = []}) => {
-      const history_data = {show: {}, line_data: {label: [], value: [], touch_label: []}}
-      let sum = 0
-      switch (time) {
-        case 24 * 3600 * 1000:
-          history_data.show = history[0]
-          break
-        default:
-          history.map((item, index) => {
-            if (index !== history.length - 1) {
-              if (selectHistory === 30 && index % 5 === 0 || selectHistory === 7) {
-                history_data.line_data.label.push(item.date.substring(5))
-                history_data.line_data.value.push(item[key])
-              } else {
-                history_data.line_data.label.push('')
-                history_data.line_data.value.push(item[key])
-              }
-              history_data.line_data.touch_label.push(item.date.substring(5))
-            }
-          })
-
-          Object.keys(history[0]).map(attr => {
-            if (attr !== 'date') {
-              sum = 0
-
-              history.map((item, index) => {
-                if (index !== history.length - 1) {
-                  sum += item[attr]
-                }
-              })
-              if (`${sum}`.indexOf('.') !== -1) {
-                history_data.show[attr] = sum.toFixed(2)
-              } else
-                history_data.show[attr] = sum
-            }
-          })
-          break
+      hideModal()
+      if (start_date === current_datetime) {
+        const today = []
+        summary && summary.map((item) => {
+          if (item.key !== 'valid_user_num' && item.key !== 'user_paid') {
+            today.push(item)
+          }
+        })
+        this.setState({today_data: today})
+        return
       }
-
+      if (start_date === yesterday_datetime) {
+        const yesterday = []
+        summary && summary.map((item) => {
+          if (item.key !== 'shipping_order_num' && item.key !== 'arrived_order_num') {
+            yesterday.push(item)
+          }
+        })
+        this.setState({yesterday_data: yesterday, yesterday_all: summary})
+        return;
+      }
+      const history_data = {label: [], value: [], touch_label: []}
+      history && history.map((item, index) => {
+        if (index !== history.length - 1) {
+          if (selectHistory === 30 && index % 5 === 0 || selectHistory === 7) {
+            history_data.label.push(item.date.substring(5))
+            history_data.value.push(item[key])
+          } else {
+            history_data.label.push('')
+            history_data.value.push(item[key])
+          }
+          history_data.touch_label.push(item.date.substring(5))
+        }
+      })
+      const summary_part = []
+      summary && summary.map((item) => {
+        if (item.key !== 'shipping_order_num' && item.key !== 'arrived_order_num') {
+          summary_part.push(item)
+        }
+      })
       this.setState({
-        summary: summary,
+        summary: summary_part,
         history: history,
         history_data: history_data,
         selectHistoryItem: key
       })
-    })
+    }).catch(() => hideModal())
+
   }
 
 
@@ -207,8 +211,7 @@ export default class RevenueDataComponent extends PureComponent {
   }
 
   renderTodayRevenueData = () => {
-    const {summary, current_datetime, history} = this.state
-    const yesterday_data = history[history.length - 2]
+    const {today_data, yesterday_all, current_datetime} = this.state
     return (
       <View style={today_styles.zoneWrap} key={0}>
         <View style={today_styles.rowCenter}>
@@ -221,7 +224,9 @@ export default class RevenueDataComponent extends PureComponent {
         </View>
         <View style={today_styles.detailDataWrap}>
           {
-            summary && summary.map((item, index) => {
+            today_data && today_data.map((item, index) => {
+              const {value = ''} = yesterday_all && yesterday_all.filter(children => children.key === item.key)[0] || {}
+
               return (
                 <View key={index} style={{width: '50%'}}>
                   <View style={today_styles.rowCenter}>
@@ -231,13 +236,13 @@ export default class RevenueDataComponent extends PureComponent {
                     <AntDesign name={'questioncircle'}
                                color={colors.color999}
                                style={{paddingLeft: 4}}
-                               onPress={() => this.setModal(true, item.label, item.tip)}/>
+                               onPress={() => this.setModal(true, item.title, item.tip)}/>
                   </View>
                   <Text style={today_styles.detailDataText}>
                     {item.value}
                   </Text>
                   <Text style={today_styles.yesterdayData}>
-                    昨日{yesterday_data[item.key]}
+                    昨日{value}
                   </Text>
                 </View>
               )
@@ -249,35 +254,24 @@ export default class RevenueDataComponent extends PureComponent {
   }
 
   getItemByHistory = (key) => {
-    const {history, history_data, selectHistory} = this.state
-    let sum = 0
-    history_data.line_data = {label: [], value: [], touch_label: []}
+    let {history, history_data, selectHistory} = this.state
+    if (selectHistory === 1) {
+      this.setState({
+        selectHistoryItem: key
+      })
+      return
+    }
+    history_data = {label: [], value: [], touch_label: []}
     history.map((item, index) => {
       if (index !== history.length - 1) {
         if (selectHistory === 30 && index % 5 === 0 || selectHistory === 7) {
-          history_data.line_data.label.push(item.date.substring(5))
-          history_data.line_data.value.push(item[key])
+          history_data.label.push(item.date.substring(5))
+          history_data.value.push(item[key])
         } else {
-          history_data.line_data.label.push('')
-          history_data.line_data.value.push(item[key])
+          history_data.label.push('')
+          history_data.value.push(item[key])
         }
-        history_data.line_data.touch_label.push(item.date.substring(5))
-      }
-    })
-
-    Object.keys(history[0]).map(attr => {
-      if (attr !== 'date') {
-        sum = 0
-
-        history.map((item, index) => {
-          if (index !== history.length - 1) {
-            sum += item[attr]
-          }
-        })
-        if (`${sum}`.indexOf('.') !== -1) {
-          history_data.show[attr] = sum.toFixed(2)
-        } else
-          history_data.show[attr] = sum
+        history_data.touch_label.push(item.date.substring(5))
       }
     })
 
@@ -295,10 +289,11 @@ export default class RevenueDataComponent extends PureComponent {
   renderHistoryData = () => {
     const {
       selectHistory, selectHistoryItem, history_data, current_datetime, yesterday_datetime, week_datetime,
-      month_datetime
+      month_datetime, yesterday_data, summary
     } = this.state
-    const {show, line_data} = history_data
-    const decimalPlaces = line_data.value.filter(item => item > 10).length > 0 ? 0 : 2
+    const {value = [], label = []} = history_data
+    const decimalPlaces = value.filter(item => item > 10).length > 0 ? 0 : 2
+    const history_summary = selectHistory === 1 ? yesterday_data : summary
     return (
       <View style={today_styles.zoneWrap} key={1}>
         <View style={history_styles.headerWrap}>
@@ -306,7 +301,7 @@ export default class RevenueDataComponent extends PureComponent {
             历史数据
           </Text>
           <View style={today_styles.rowCenter}>
-            <TouchableOpacity onPress={() => this.getHistoryData(1, yesterday_datetime, current_datetime)}
+            <TouchableOpacity onPress={() => this.getHistoryData(1, yesterday_datetime, yesterday_datetime)}
                               style={selectHistory === 1 ? history_styles.selectHistoryBtn : history_styles.historyBtn}>
               <Text style={selectHistory === 1 ? history_styles.selectHistoryBtnText : history_styles.historyBtnText}>
                 昨日
@@ -328,75 +323,31 @@ export default class RevenueDataComponent extends PureComponent {
           </View>
         </View>
         <View style={[today_styles.detailDataWrap, selectHistory === 1 ? {marginBottom: 15} : {marginBottom: 0}]}>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('gmv')}
-            style={selectHistoryItem === 'gmv' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              营业额(元)
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.gmv}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('valid_order_num')}
-            style={selectHistoryItem === 'valid_order_num' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              有效订单
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.valid_order_num}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('cancel_order_num')}
-
-            style={selectHistoryItem === 'cancel_order_num' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              无效订单
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.cancel_order_num}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('avg_gmv')}
-            style={selectHistoryItem === 'avg_gmv' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              单均价(元)
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.avg_gmv}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('valid_user_num')}
-            style={selectHistoryItem === 'valid_user_num' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              交易用户数
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.valid_user_num}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => this.getItemByHistory('user_paid')}
-            style={selectHistoryItem === 'user_paid' ? history_styles.selectDetailWrap : history_styles.detailWrap}>
-            <Text style={history_styles.detailHeaderTitle}>
-              实付营业额
-            </Text>
-            <Text style={history_styles.detailDataText}>
-              {show.user_paid}
-            </Text>
-          </TouchableOpacity>
+          {
+            history_summary && history_summary.map((item, index) => {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => this.getItemByHistory(item.key)}
+                  style={selectHistoryItem === item.key ? history_styles.selectDetailWrap : history_styles.detailWrap}>
+                  <Text style={history_styles.detailHeaderTitle}>
+                    {item.label}
+                  </Text>
+                  <Text style={history_styles.detailDataText}>
+                    {item.value}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })
+          }
         </View>
-        <If condition={(selectHistory === 7 || selectHistory === 30) && line_data.label.length > 0}>
+        <If condition={(selectHistory === 7 || selectHistory === 30) && label.length > 0}>
           <LineChart
             data={{
-              labels: line_data.label,
+              labels: label,
               datasets: [
                 {
-                  data: line_data.value,
+                  data: value,
                   color: () => `rgba(38, 185, 66, 1)`,
                 }
               ]
@@ -415,15 +366,15 @@ export default class RevenueDataComponent extends PureComponent {
               decimalPlaces: decimalPlaces,
               useShadowColorFromDataset: false, // optional,
               propsForDots: {
-                r: "4",
-                strokeWidth: "2",
+                r: 3,
+                strokeWidth: "1",
                 stroke: colors.main_color
               },
               propsForBackgroundLines: {stroke: colors.colorEEE, strokeDasharray: ''},
 
             }}
             onDataPointClick={({index, x}) => this.setState({show_tips_visible: true, index: index, x: x})}
-            getDotColor={() => 'transparent'}
+            getDotColor={() => colors.white}
             fromZero={true}
             bezier={true}
             withDots={true}
@@ -467,8 +418,8 @@ export default class RevenueDataComponent extends PureComponent {
     return (
       <LineChartTipModal visible={show_tips_visible}
                          x={x}
-                         date={history_data.line_data.touch_label[index]}
-                         num={history_data.line_data.value[index]}
+                         date={history_data.touch_label[index]}
+                         num={history_data.value[index]}
                          name={name}
                          onClose={this.onClose}/>
     )

@@ -9,19 +9,9 @@
 
 import Config from '../../pubilc/common/config'
 import {Login, sendMobileCode} from '../../pubilc/services/account'
-import native from "../../pubilc/util/native";
 import {getWithTpl} from '../../pubilc/util/common'
-import {
-  addStores,
-  addStoresDelivery,
-  checkBindExt,
-  checkMessageCode,
-  getStoreDelivery,
-  unbindExt,
-  updateStoresDelivery
-} from "../../pubilc/services/global"
+import {addStores, checkBindExt,} from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
@@ -36,18 +26,15 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
-  SET_CURR_PROFILE,
   UPDATE_CONFIG,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
   BLE_STARTED,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_ORLDER_LIST_BY,
+  SET_ORDER_LIST_BY,
   SET_CALL_DELIVERY_OBJ,
-  SET_EXT_STORE,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
@@ -56,11 +43,33 @@ const {
   SET_VOLUME,
   SET_AUTO_PRINT,
   SET_INIT_JPUSH,
-  SET_NET_INFO_STATUS
+  SET_NET_INFO_STATUS,
+  SET_NOTIFICATION_STATUS,
+  SET_BACKGROUND_STATUS,
+  SET_JPush_STATUS
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
+}
+
+export const setJPushStatus = (value) => {
+  return {
+    type: SET_JPush_STATUS,
+    payload: value
+  }
+}
+export const setBackgroundStatus = (value) => {
+  return {
+    type: SET_BACKGROUND_STATUS,
+    payload: value
+  }
+}
+export const setNotificationStatus = (value) => {
+  return {
+    type: SET_NOTIFICATION_STATUS,
+    payload: value
+  }
 }
 
 export const setInitJpush = (value) => {
@@ -181,13 +190,6 @@ export function setFloatSerciceIcon(show) {
   }
 }
 
-export function setExtStore(list) {
-  return {
-    type: SET_EXT_STORE,
-    list: list
-  }
-}
-
 
 export function setUserCfg(info) {
   return {
@@ -199,7 +201,7 @@ export function setUserCfg(info) {
 
 export function setOrderListBy(info) {
   return {
-    type: SET_ORLDER_LIST_BY,
+    type: SET_ORDER_LIST_BY,
     val: info
   }
 }
@@ -223,21 +225,11 @@ export function setCallDeliveryObj(obj) {
 export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    native.logout().then();
     doJPushStop()
     doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();
     }
-  }
-}
-
-export function setCreateProductStoreId(storeId) {
-  return dispatch => {
-    dispatch({
-      type: UPDATE_EDIT_PRODUCT_STORE_ID,
-      storeId: storeId
-    })
   }
 }
 
@@ -282,28 +274,6 @@ export function getConfig(token, storeId, callback) {
       let msg = "获取服务器端配置错误: " + error;
       callback && callback(false, msg)
     })
-  }
-}
-
-
-/**
- *
- * @param token
- * @param storeId  current store id
- * @param callback  (ok, msg, profile) => {}
- */
-export function upCurrentProfile(token, storeId, callback) {
-  return dispatch => {
-    const url = `api/user_info2.json?access_token=${token}&_sid=${storeId}`;
-    getWithTpl(url, (json) => {
-        if (json.ok && json.obj) {
-          dispatch({type: SET_CURR_PROFILE, profile: json.obj});
-        }
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        callback(false, "网络错误, 请稍后重试")
-      }
-    )
   }
 }
 
@@ -367,68 +337,6 @@ export function doAuthLogin(access_token, expire, props, callback) {
       callback(false, "获取不到账户相关信息");
     }
   })
-}
-
-export function checkPhone(params, callback) {
-  return dispatch => {
-    return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
-      .then((response) => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, error.reason)
-      })
-  }
-}
-
-
-export function unBind(params, callback) {
-  return dispatch => {
-    return unbindExt(params)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        Alert.alert('当前版本不支持！', error.reason)
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
-}
-
-export function showStoreDelivery(ext_store_id, callback) {
-  return dispatch => {
-    return getStoreDelivery(ext_store_id)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
-}
-
-export function addDelivery(params, callback) {
-  return dispatch => {
-    return addStoresDelivery(params)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
-}
-
-export function updateStoresAutoDelivery(token, ext_store_id, params, callback) {
-  return dispatch => {
-    return updateStoresDelivery(token, ext_store_id, params)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
 }
 
 export function customerApply(params, callback, props) {

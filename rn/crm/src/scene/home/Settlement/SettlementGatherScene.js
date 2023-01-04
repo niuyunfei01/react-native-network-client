@@ -11,8 +11,7 @@ import tool from '../../../pubilc/util/tool.js'
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
-import MonthPicker from "react-native-month-year-picker";
-import CommonModal from "../../../pubilc/component/goods/CommonModal";
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -84,13 +83,12 @@ class SettlementGatherScene extends PureComponent {
   }
 
   onChange = (event, date) => {
-    if (event === 'dismissedAction') {
-      this.setState({visible: false})
-      return
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({dates: date, date: this.format(date)}, () => {
+        this.getDateilsList();
+      })
     }
-    this.setState({dates: date, date: this.format(date)}, () => {
-      this.getDateilsList();
-    })
   }
 
   format = (date) => {
@@ -104,8 +102,8 @@ class SettlementGatherScene extends PureComponent {
     return (
       <View style={header.box}>
         <View style={header.title}>
-          <Text style={header.time}>
-            {date} &nbsp;&nbsp;&nbsp;
+          <Text style={header.time} onPress={() => this.setState({visible: true})}>
+            {date} &nbsp;&nbsp;
             <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
           </Text>
         </View>
@@ -234,16 +232,8 @@ class SettlementGatherScene extends PureComponent {
             this.renderList()
           }
         </ScrollView>
-        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
-          <MonthPicker value={dates}
-                       cancelButton={'取消'}
-                       okButton={'确定'}
-                       autoTheme={true}
-                       mode={'number'}
-                       onChange={(event, newDate) => this.onChange(event, newDate)}
-                       maximumDate={new Date()}
-                       minimumDate={new Date(2015, 8, 15)}/>
-        </CommonModal>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onChange(event, newDate)} date={dates}/>
+
       </View>
     )
   }

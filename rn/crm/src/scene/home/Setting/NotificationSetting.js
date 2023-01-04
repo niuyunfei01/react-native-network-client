@@ -23,6 +23,8 @@ import native from "../../../pubilc/util/native";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import JPush from "jpush-react-native";
 import {VolumeManager} from 'react-native-volume-manager';
+import {setNotificationStatus} from "../../../reducers/global/globalActions";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get('window')
 const styles = StyleSheet.create({
@@ -214,6 +216,7 @@ class NotificationSetting extends PureComponent {
               value: menu_settings_child_balance_defect.types[menu_settings_child_balance_defect.checked_index].value
             }
           })
+          setNotificationStatus(enabled ? 1 : 0)
         })
         return
       }
@@ -233,6 +236,7 @@ class NotificationSetting extends PureComponent {
           value: menu_settings_child_balance_defect.types[menu_settings_child_balance_defect.checked_index].value
         }
       })
+      setNotificationStatus(notification_status ? 1 : 0)
     })
 
   }
@@ -350,12 +354,21 @@ class NotificationSetting extends PureComponent {
     )
   }
 
+  setShowJPushStatus = (jpush_status) => {
+    JbbAlert.show({
+      title: '消息推送状态',
+      desc: typeof jpush_status === 'string' ? `推送ID：${jpush_status}` : `错误代码：${jpush_status}`,
+      actionText: '确定',
+      onPress: () => JbbAlert.hide()
+    })
+  }
   renderNotification = () => {
+    const {jpush_status} = this.props.global
     const {menu_settings_body} = this.state
     const {name = '', types = []} = menu_settings_body
     return (
       <>
-        <Text style={styles.headerText}>
+        <Text style={styles.headerText} onPress={() => this.setShowJPushStatus(jpush_status)}>
           {name}
         </Text>
         <View style={styles.zoneWrap}>

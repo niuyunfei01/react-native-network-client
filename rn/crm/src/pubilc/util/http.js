@@ -57,27 +57,22 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    if (global.noLoginInfo.accessToken)
-      global.noLoginInfo.accessToken = '存在token'
-    if (global.noLoginInfo.refreshToken)
-      global.noLoginInfo.refreshToken = '存在refreshToken'
+    const noLoginInfo = global.noLoginInfo
+    if (noLoginInfo.accessToken)
+      noLoginInfo.accessToken = '存在token'
+    if (noLoginInfo.refreshToken)
+      noLoginInfo.refreshToken = '存在refreshToken'
     const report_params = {
-      APP_VERSION_CODE: DeviceInfo.getVersion(),
-      CUSTOM_DATA: {
-        'CURR-STORE': global.noLoginInfo.store_id,
-        'UID': global.noLoginInfo.currentUser
-      },
-      BRAND: DeviceInfo.getBrand(),
-      PHONE_MODEL: DeviceInfo.getModel(),
-      STACK_TRACE: {
-        error: error,
-        options: options,
-        url: url,
-        params: params,
-        method: method,
-        noLoginInfo: global.noLoginInfo,
-        currentRouteName: global.currentRouteName
-      }
+      app_version: DeviceInfo.getVersion(),
+      brand: DeviceInfo.getBrand(),
+      phone_mode: DeviceInfo.getModel(),
+      error: error,
+      options: options,
+      url: url,
+      params: params,
+      method: method,
+      noLoginInfo: noLoginInfo,
+      currentRouteName: global.currentRouteName
     };
     nrRecordMetric('app_url_request', report_params)
   }

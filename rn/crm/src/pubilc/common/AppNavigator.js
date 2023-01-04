@@ -21,7 +21,14 @@ import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setCheckVersionAt, setInitJpush, setNetInfo} from "../../reducers/global/globalActions";
+import {
+  setBackgroundStatus,
+  setCheckVersionAt,
+  setInitJpush,
+  setNetInfo,
+  setJPushStatus,
+  setNotificationStatus
+} from "../../reducers/global/globalActions";
 import {
   getImRemindCount,
   getStoreImConfig,
@@ -587,8 +594,8 @@ let notInit = true
 let ios_info = {}
 const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
-let isSunmiDevice = false
-let isHanlderTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
+let isSunmiDevice = false, RegistrationID = ''
+let isHandlerTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
 
 class AppNavigator extends PureComponent {
 
@@ -685,7 +692,7 @@ class AppNavigator extends PureComponent {
         navigate(Config.ROUTE_ORDER_NEW, {orderId: order_id})
         break
       case 'v4_order_refund'://用户申请退款
-        navigate(Config.ROUTE_ORDERS, {})
+        navigate(Config.ROUTE_ORDERS, {order_status: 11})
         break
       case 'v4_order_reminder'://顾客催单
         navigate(Config.ROUTE_ORDERS, {})
@@ -702,11 +709,11 @@ class AppNavigator extends PureComponent {
   }
 
   handlerMessage = async (type, order_id, speak_word, store_id, messageID) => {
-    isHanlderTask = true
+    isHandlerTask = true
     const {accessToken, autoBluetoothPrint} = this.props.global
 
     if (type !== 'new_order') {
-      sendDeviceStatus(accessToken, {
+      sendDeviceStatus(this.props.global, {
         msgId: messageID,
         listener_stores: store_id,
         orderId: order_id,
@@ -724,22 +731,17 @@ class AppNavigator extends PureComponent {
         await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
       }
     }
-    if (speak_word) {
-      // console.log('开始播放语音:', speak_word)
-      Synthesizer.start(speak_word);
-    }
+
     if (messageQueue.length > 0) {
       messageQueue.splice(0, 1)
-      // console.log('handlerMessage messageQueue', JSON.stringify(messageQueue))
-      await this.onSynthesizerResult()
+      // await this.onSynthesizerResult()
     }
 
   }
 
   onSynthesizerResult = async () => {
-    // console.log('onSynthesizerResult,messageQueue', JSON.stringify(messageQueue))
     if (messageQueue.length === 0) {
-      isHanlderTask = false
+      isHandlerTask = false
       return
     }
     const {type, order_id, speak_word, store_id, messageID} = messageQueue[0]
@@ -747,7 +749,9 @@ class AppNavigator extends PureComponent {
   }
 
   handleSpeechIflytek = () => {
-    Synthesizer.init("58b571b2")
+    if (Platform.OS === 'android') {
+      Synthesizer.init("58b571b2")
+    }
     const synthesizer = new NativeEventEmitter(Synthesizer);
     this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
   };
@@ -761,20 +765,23 @@ class AppNavigator extends PureComponent {
         doJPushSetAlias(currentUser);
     })
 
-    // JPush.getRegistrationID(({registerID}) => {
-    //     console.log("registerID:" + JSON.stringify(registerID))
-    //   }
-    // )
+    JPush.getRegistrationID(({registerID}) => {
+        RegistrationID = registerID
+
+      }
+    )
 
     //tag alias事件回调
     JPush.addTagAliasListener(({code}) => {
       // console.log("tagAliasListener:" + code)
-      if (0 == code) {
+      if (0 === code) {
         setAliasInterval && clearTimeout(setAliasInterval)
         setAliasInterval = null
         setAliasStatus = true
+        store.dispatch(setJPushStatus(RegistrationID))
         return
       }
+      store.dispatch(setJPushStatus(code))
       if (code && !setAliasStatus && JTCPStatus) {
         setAliasInterval = setTimeout(() => {
           // console.log("setAliasInterval:" + code)
@@ -785,15 +792,13 @@ class AppNavigator extends PureComponent {
     //通知回调
 
     JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
-      // console.log("notificationListener,extras:" + JSON.stringify(extras))
-      // console.log("notificationListener,notificationEventType:" + notificationEventType)
       const {type, order_id, speak_word, store_id} = extras
       if ('notificationArrived' === notificationEventType) {
         if (!speak_word) {
           return
         }
-        // console.log('收到极光消息,是否正在处理任务：', isHanlderTask)
-        if (!isHanlderTask) {
+
+        if (!isHandlerTask) {
           await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
           return
         }
@@ -804,16 +809,10 @@ class AppNavigator extends PureComponent {
           store_id: store_id,
           messageID: messageID
         })
-        // console.log('notificationArrived,messageQueue', JSON.stringify(messageQueue))
-        const isSpeaking = await Synthesizer.isSpeaking()
-        // console.log('isSpeaking', isSpeaking)
-        if (!isSpeaking)
-          await this.onSynthesizerResult()
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
-        Synthesizer.start(speak_word)
-        this.handleTouchNotification(type, order_id)
+        type && this.handleTouchNotification(type, order_id)
       }
     });
   }
@@ -837,6 +836,9 @@ class AppNavigator extends PureComponent {
           await native.isSunmiDevice((flag, isSunmi) => {
             isSunmiDevice = isSunmi
           })
+          await native.isRunInBg((resp) => {
+            store.dispatch(setBackgroundStatus(resp))
+          })
         }
         await initBlueTooth(global)
 
@@ -857,6 +859,17 @@ class AppNavigator extends PureComponent {
         store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
         if (im.im_config.im_store_status == 1 && this.state.appState === 'active')
           this.startPolling(global, im)
+        this.getNetInfo()
+        switch (Platform.OS) {
+          case "android":
+            JPush.isNotificationEnabled((enabled) => {
+              store.dispatch(setNotificationStatus(enabled ? 1 : 0))
+            })
+            break
+          case "ios":
+            store.dispatch(setNotificationStatus(await native.getNotificationStatus() ? 1 : 0))
+            break
+        }
       }
     })
   }
@@ -864,31 +877,29 @@ class AppNavigator extends PureComponent {
   componentDidMount() {
     this.whiteNoLoginInfo()
     this.getAppState()
-    this.getNetInfo()
+
   }
 
   componentWillUnmount() {
     setAliasInterval && clearTimeout(setAliasInterval)
     setAliasInterval = null
     this.unSubscribe()
-    //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
-    //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
     this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
-    this.dataPolling !== null && clearInterval(this.dataPolling);
-    AppState.removeEventListener("change", this._handleAppStateChange);
+    this.dataPolling && clearInterval(this.dataPolling);
+    this.appStateEvent && this.appStateEvent.remove()
     this.unsubscribe && this.unsubscribe()
   }
 
   getAppState = () => {
-    AppState.addEventListener("change", this._handleAppStateChange);
+    this.appStateEvent = AppState.addEventListener("change", this._handleAppStateChange);
   }
 
   getNetInfo = () => {
     NetInfo.fetch().then(state => {
       store.dispatch(setNetInfo(state))
     });
-    this.unsubscribe = NetInfo.addEventListener (state => {
+    this.unsubscribe = NetInfo.addEventListener(state => {
       store.dispatch(setNetInfo(state))
     })
   }
@@ -898,7 +909,7 @@ class AppNavigator extends PureComponent {
       appState: nextAppState
     })
     if (nextAppState === "background") {
-      this.dataPolling !== null && clearInterval(this.dataPolling);
+      this.dataPolling && clearInterval(this.dataPolling);
     }
   };
 
@@ -994,14 +1005,14 @@ const styles = StyleSheet.create({
   content: {borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginHorizontal: 27, backgroundColor: 'white'},
   image: {height: 148, marginHorizontal: 27, alignItems: 'center', justifyContent: 'center'},
   updateContentText: {fontSize: 14, color: '#333', lineHeight: 20, paddingHorizontal: 20, paddingTop: 10},
-  headerText: {fontWeight: '500', color: 'white', lineHeight: 30, fontSize: 22},
+  headerText: {fontWeight: 'bold', color: 'white', lineHeight: 30, fontSize: 22},
   btnWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20},
   cancelWrap: {backgroundColor: '#f5f5f5', borderRadius: 20},
-  cancelText: {fontSize: 16, fontWeight: '500', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
+  cancelText: {fontSize: 16, fontWeight: 'bold', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
   updateWrap: {backgroundColor: '#26B942', borderRadius: 20, marginLeft: 10},
   updateText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     paddingHorizontal: 36,
     paddingVertical: 9,
     color: 'white'

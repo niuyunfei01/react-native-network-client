@@ -9,6 +9,7 @@ import Config from "../../../../pubilc/common/config";
 import HttpUtils from "../../../../pubilc/util/http";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AlertModal from "../../../../pubilc/component/AlertModal";
+import {hideModal, showModal} from "../../../../pubilc/util/ToastUtils";
 
 const DATE_CATEGORY = [
 
@@ -46,21 +47,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 8
   },
-  selectBtnText: {fontSize: 14, fontWeight: '500', color: colors.white, lineHeight: 20},
+  selectBtnText: {fontSize: 14, fontWeight: 'bold', color: colors.white, lineHeight: 20},
   notSelectBtnText: {fontSize: 14, fontWeight: '400', color: colors.color666, lineHeight: 20},
   zoneWrap: {paddingHorizontal: 12, backgroundColor: colors.white, borderRadius: 6, marginBottom: 10},
   detailWrap: {flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center', width: width - 12 * 4},
-  detailItemValue: {paddingBottom: 15, fontSize: 16, fontWeight: '500', color: colors.color333, lineHeight: 22},
-  storeNameText: {
-    paddingBottom: 15,
+  detailItemValue: {
+    paddingBottom: 20,
+    paddingTop: 4,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  storeNameText: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 22,
     width: width * 0.54,
     paddingVertical: 15
   },
-  detailItemAllowModify: {fontSize: 12, color: colors.main_color, lineHeight: 17, paddingLeft: 4, paddingBottom: 15},
+  detailItemAllowModify: {fontSize: 12, color: colors.main_color, paddingLeft: 4, fontWeight: '400'},
   viewProfitDetail: {fontSize: 14, color: colors.main_color, lineHeight: 20},
   notHasMoreInfo: {marginBottom: 10, textAlign: 'center', fontSize: 14, color: colors.color999},
   itemWrap: {width: (width - 12 * 4) / 3,}
@@ -107,18 +113,17 @@ export default class ProfitAndLossComponent extends PureComponent {
     const {store_id, accessToken} = this.props
     const url = `/v1/new_api/analysis/profit_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start_date, end_date: end_date}
+    showModal('加载数据中')
     HttpUtils.get(url, params).then((res = []) => {
+      hideModal()
       this.setState({profit_loss: res, custom_date_visible: false})
-
-    })
+    }).catch(() => hideModal())
   }
   setTime = (start_date, end_date) => {
     this.setState({start_date: start_date, end_date: end_date})
   }
   setHeaderBtn = (index) => {
-    const {selectDate, current_datetime, yesterday_datetime, week_datetime} = this.state
-    if (selectDate === index)
-      return
+    const {current_datetime, yesterday_datetime, week_datetime} = this.state
     switch (index) {
       case 0:
         this.setTime(yesterday_datetime, yesterday_datetime)
@@ -170,94 +175,74 @@ export default class ProfitAndLossComponent extends PureComponent {
           <Text style={styles.notSelectBtnText}>
             {valid_order_num_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {valid_order_num}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {valid_order_num}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {good_profit_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {good_profit}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {good_profit}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {good_profit_rate_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {good_profit_rate}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {good_profit_rate}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {avg_gmv_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {avg_gmv}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {avg_gmv}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {supply_cost_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {supply_cost}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {supply_cost}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
-          <View style={styles.rowCenter}>
-            <Text style={styles.notSelectBtnText}>
-              {platform_income_name}
+          <Text style={styles.notSelectBtnText}>
+            {platform_income_name} <If condition={platform_income_modify == 1}>
+            <AntDesign name={'questioncircle'}
+                       color={colors.color999}
+                       style={{paddingLeft: 4}}
+                       onPress={() => this.setModal(true, platform_income_name, platform_income_tip)}/>
+          </If>
+          </Text>
+          <Text style={styles.detailItemValue}>
+            {platform_income}<If condition={platform_income_modify == 1}>
+            <Text style={styles.detailItemAllowModify} onPress={this.navigateToPlatformDetail}>
+              修改
             </Text>
-            <If condition={platform_income_modify == 1}>
-              <AntDesign name={'questioncircle'}
-                         color={colors.color999}
-                         style={{paddingLeft: 4}}
-                         onPress={() => this.setModal(true, platform_income_name, platform_income_tip)}/>
-            </If>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {platform_income}
-            </Text>
-            <If condition={platform_income_modify == 1}>
-              <Text style={styles.detailItemAllowModify} onPress={this.navigateToPlatformDetail}>
-                修改
-              </Text>
-            </If>
-          </View>
+          </If>
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {ship_outcome_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {ship_outcome}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {ship_outcome}
+          </Text>
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
             {loss_rate_name}
           </Text>
-          <View style={styles.rowCenter}>
-            <Text style={styles.detailItemValue}>
-              {loss_rate}
-            </Text>
-          </View>
+          <Text style={styles.detailItemValue}>
+            {loss_rate}
+          </Text>
         </View>
       </View>
     )

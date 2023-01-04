@@ -7,6 +7,7 @@ import HttpUtils from "../../../../pubilc/util/http";
 import tool from "../../../../pubilc/util/tool";
 import AlertModal from "../../../../pubilc/component/AlertModal";
 import CustomDateComponent from "../../../../pubilc/component/CustomDateComponent";
+import {hideModal, showModal} from "../../../../pubilc/util/ToastUtils";
 
 const {height, width} = Dimensions.get('window')
 const styles = StyleSheet.create({
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 8
   },
-  selectBtnText: {fontSize: 14, fontWeight: '500', color: colors.white, lineHeight: 20},
+  selectBtnText: {fontSize: 14, fontWeight: 'bold', color: colors.white, lineHeight: 20},
   notSelectBtnText: {fontSize: 14, fontWeight: '400', color: colors.color666, lineHeight: 20},
   zoneWrap: {paddingHorizontal: 12, backgroundColor: colors.white, borderRadius: 6, marginBottom: 10},
   platformIcon: {width: 30, height: 30, marginVertical: 15, marginRight: 6},
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
   detailDataHeaderTitle: {fontSize: 14, color: colors.color666},
   detailDataText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: colors.color333,
     lineHeight: 25,
     paddingTop: 4,
@@ -130,9 +131,11 @@ export default class PlatformDataComponent extends PureComponent {
     const {store_id, accessToken} = this.props
     const url = `/v1/new_api/analysis/platform_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start_date, end_date: end_date}
+    showModal('加载数据中')
     HttpUtils.get(url, params).then((res = []) => {
+      hideModal()
       this.setState({platform_data: res, custom_date_visible: false})
-    })
+    }).catch(() => hideModal())
   }
 
   setTime = (start_date, end_date) => {
@@ -206,7 +209,7 @@ export default class PlatformDataComponent extends PureComponent {
                     <AntDesign name={'questioncircle'}
                                color={colors.color999}
                                style={{paddingLeft: 4}}
-                               onPress={() => this.setModal(true, item.label, item.tip)}/>
+                               onPress={() => this.setModal(true, item.title, item.tip)}/>
                   </View>
                   <Text style={styles.detailDataText}>
                     {value}

@@ -21,7 +21,7 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_ORLDER_LIST_BY,
+  SET_ORDER_LIST_BY,
   SET_CALL_DELIVERY_OBJ,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
@@ -32,7 +32,10 @@ const {
   SET_AUTO_PRINT,
   SET_VOLUME,
   SET_INIT_JPUSH,
-  SET_NET_INFO_STATUS
+  SET_NET_INFO_STATUS,
+  SET_NOTIFICATION_STATUS,
+  SET_BACKGROUND_STATUS,
+  SET_JPush_STATUS
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -87,7 +90,10 @@ const initialState = {
   call_delivery_obj: {},
   volume: 0,
   not_init_jpush: true,
-  net_info: {}
+  net_info: {},
+  notification_status: 0,
+  is_background_run: 0,
+  jpush_status: null
 };
 
 /**
@@ -98,6 +104,22 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_JPush_STATUS:
+      return {
+        ...state,
+        jpush_status: action.payload
+      }
+    case SET_BACKGROUND_STATUS:
+      return {
+        ...state,
+        is_background_run: action.payload
+      }
+    case SET_NOTIFICATION_STATUS:
+      return {
+        ...state,
+        notification_status: action.payload
+      }
+
     case SET_INIT_JPUSH:
       return {
         ...state,
@@ -259,7 +281,7 @@ export default function globalReducer(state = initialState, action) {
     case SET_USER_CONFIG:
       return {...state, user_config: action.info}
 
-    case SET_ORLDER_LIST_BY:
+    case SET_ORDER_LIST_BY:
       return {...state, order_list_by: action.val}
 
     case SET_SHOW_FLOAT_SERVICE_ICON:

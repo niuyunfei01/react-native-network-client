@@ -48,6 +48,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.gusparis.monthpicker.RNMonthPickerPackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
@@ -356,7 +357,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNCMaskedViewPackage(),
                     new SpeechPackage(),
                     new VolumeManagerPackage(),
-                    new NetInfoPackage()
+                    new NetInfoPackage(),
+                    new RNMonthPickerPackage()
             );
         }
     };

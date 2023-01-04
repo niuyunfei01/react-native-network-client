@@ -3,11 +3,11 @@ import {errorPage} from "../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../styles/colors";
-import HttpUtils from "../util/http";
 import {connect} from "react-redux";
 import GlobalUtil from "../util/GlobalUtil";
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 import PropTypes from "prop-types";
+import {nrRecordMetric} from "../util/NewRelicRN";
 
 class ErrorBoundary extends React.Component {
   static propTypes = {
@@ -66,26 +66,26 @@ class ErrorBoundary extends React.Component {
   uploadData = () => {
     const {error, errorInfo} = this.state
     const {device} = this.props
-    const {store_id, currentUser} = this.props.global
-    const url = '/util/crm_error_report/1'
+    const noLoginInfo = global.noLoginInfo
+    if (noLoginInfo.accessToken)
+      noLoginInfo.accessToken = '存在token'
+    if (noLoginInfo.refreshToken)
+      noLoginInfo.refreshToken = '存在refreshToken'
     const params = {
-      APP_VERSION_CODE: device?.deviceInfo?.appVersion,
-      CUSTOM_DATA: {
-        'CURR-STORE': store_id,
-        'UID': currentUser
-      },
-      BRAND: device?.deviceInfo?.brand,
-      PHONE_MODEL: device?.deviceInfo?.device,
-      STACK_TRACE: {
-        error: `${error}`,
-        errorInfo: `${errorInfo}`,
-        noLoginInfo: global.noLoginInfo,
-        currentRouteName: global.currentRouteName
-      }
+
+      app_version: device?.deviceInfo?.appVersion,
+      brand: device?.deviceInfo?.brand,
+      phone_mode: device?.deviceInfo?.device,
+
+      noLoginInfo: noLoginInfo,
+      currentRouteName: global.currentRouteName,
+
+      error: `${error}`,
+      errorInfo: `${errorInfo}`,
     };
     if (`${error}`.indexOf('product_id') !== -1)
-      params.STACK_TRACE.product_id = global.product_id
-    HttpUtils.post(url, params).then()
+      params.product_id = global.product_id
+    nrRecordMetric('app_url_request', params)
   }
 
 

@@ -1,6 +1,9 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_JPush_STATUS: null,
+  SET_BACKGROUND_STATUS: null,
+  SET_NOTIFICATION_STATUS: null,
   SET_INIT_JPUSH: null,
   SET_VOLUME: null,
   SET_AUTO_PRINT: null,
@@ -29,7 +32,7 @@ export default keyMirror({
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
   SET_USER_CONFIG: null,
-  SET_ORLDER_LIST_BY: null,
+  SET_ORDER_LIST_BY: null,
   SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
 

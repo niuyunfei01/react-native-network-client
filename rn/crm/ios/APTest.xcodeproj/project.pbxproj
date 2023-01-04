@@ -38,8 +38,6 @@
 		84784A0328FF149F00D79AAC /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 847849FB28FF149F00D79AAC /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		84B93873286C231A00333FE1 /* RNZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B93872286C231A00333FE1 /* RNZipArchive.m */; };
 		AB8074FF287C1896004356ED /* RNViewShot.m in Sources */ = {isa = PBXBuildFile; fileRef = AB8074FE287C1896004356ED /* RNViewShot.m */; };
-		BC20F78429505DF7005AFE75 /* SpeechRecognizerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BC20F78029505DF7005AFE75 /* SpeechRecognizerModule.m */; };
-		BC20F78529505DF7005AFE75 /* SpeechConstantModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BC20F78129505DF7005AFE75 /* SpeechConstantModule.m */; };
 		BC20F78629505DF7005AFE75 /* SpeechSynthesizerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BC20F78229505DF7005AFE75 /* SpeechSynthesizerModule.m */; };
 		C76F37100B99F63F48FCD60A /* libPods-APTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6689F633F2AC34D8D88EBC6A /* libPods-APTest.a */; };
 		CDB5ED1956FB34736EA8E2B4 /* libPods-APTest-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6288F7C8F73629223DD02572 /* libPods-APTest-tvOS.a */; };
@@ -152,9 +150,6 @@
 		9784C2BCA26FA2C05918F2AF /* Pods-APTest-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-APTest-tvOSTests/Pods-APTest-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		AB8074FE287C1896004356ED /* RNViewShot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNViewShot.m; sourceTree = "<group>"; };
 		AB807500287C1905004356ED /* RNViewShot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNViewShot.h; sourceTree = "<group>"; };
-		BC20F77F29505DF7005AFE75 /* SpeechRecognizerModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpeechRecognizerModule.h; sourceTree = "<group>"; };
-		BC20F78029505DF7005AFE75 /* SpeechRecognizerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpeechRecognizerModule.m; sourceTree = "<group>"; };
-		BC20F78129505DF7005AFE75 /* SpeechConstantModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpeechConstantModule.m; sourceTree = "<group>"; };
 		BC20F78229505DF7005AFE75 /* SpeechSynthesizerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpeechSynthesizerModule.m; sourceTree = "<group>"; };
 		BC20F78329505DF7005AFE75 /* SpeechSynthesizerModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpeechSynthesizerModule.h; sourceTree = "<group>"; };
 		C10C26EC2F83F8423F2D87F5 /* Pods-APTest-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-APTest-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-APTest-tvOSTests/Pods-APTest-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -252,9 +247,6 @@
 		13B07FAE1A68108700A75B9A /* APTest */ = {
 			isa = PBXGroup;
 			children = (
-				BC20F78129505DF7005AFE75 /* SpeechConstantModule.m */,
-				BC20F77F29505DF7005AFE75 /* SpeechRecognizerModule.h */,
-				BC20F78029505DF7005AFE75 /* SpeechRecognizerModule.m */,
 				BC20F78329505DF7005AFE75 /* SpeechSynthesizerModule.h */,
 				BC20F78229505DF7005AFE75 /* SpeechSynthesizerModule.m */,
 				FE2239FA2747A68D00838E6E /* APTestRelease.entitlements */,
@@ -986,10 +978,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC20F78429505DF7005AFE75 /* SpeechRecognizerModule.m in Sources */,
 				08C1455926FCB9520031A0BC /* RCTQiniu.m in Sources */,
 				AB8074FF287C1896004356ED /* RNViewShot.m in Sources */,
-				BC20F78529505DF7005AFE75 /* SpeechConstantModule.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				08C1456026FCBA980031A0BC /* NewRelicModule.m in Sources */,
 				8452B372286C6561003F2D3D /* Restart.m in Sources */,

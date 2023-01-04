@@ -20,7 +20,6 @@ public class SpeechPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new SpeechRecognizerModule(reactContext));
         modules.add(new SpeechSynthesizerModule(reactContext));
         modules.add(new SpeechConstantModule(reactContext));
 

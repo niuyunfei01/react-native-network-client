@@ -26,7 +26,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SeparatedExpenseInfo extends PureComponent {
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
     this.state = {
       records: [],
@@ -36,8 +36,7 @@ class SeparatedExpenseInfo extends PureComponent {
       show_pay_notice: false
     }
 
-    let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
-    wsbShowBtn && this.navigationOptions(this.props)
+
   }
 
   navigationOptions = ({navigation}) => {
@@ -45,8 +44,8 @@ class SeparatedExpenseInfo extends PureComponent {
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
           <View style={{
-            width: pxToDp(96),
-            height: pxToDp(46),
+            width: 48,
+            height: 23,
             backgroundColor: colors.main_color,
             marginRight: 8,
             borderRadius: 10,
@@ -64,8 +63,10 @@ class SeparatedExpenseInfo extends PureComponent {
     return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.fetchExpenses()
+    const {params = {}} = this.props.route
+    params.showBtn === 1 && this.navigationOptions(this.props)
   }
 
   onItemClicked(item) {
@@ -76,11 +77,11 @@ class SeparatedExpenseInfo extends PureComponent {
 
   fetchExpenses() {
     showModal("加载中...")
-    const self = this;
-    const {global} = self.props;
-    const url = `api/new_store_separated_items/${global.store_id}/${self.props.route.params.day}?access_token=${global.accessToken}`;
+
+    const {global, route} = this.props;
+    const url = `api/new_store_separated_items/${global.store_id}/${route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({
+      this.setState({
         records: res.records,
         by_labels: res.by_labels,
         data_labels: res.data_labels,
@@ -96,7 +97,7 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   render() {
-    const {records} = this.state;
+    const {records, data_labels, show_pay_notice, platform_labels, by_labels} = this.state;
     if (records) hideModal()
     return (
       <ScrollView
@@ -106,7 +107,7 @@ class SeparatedExpenseInfo extends PureComponent {
         style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
-                return <If condition={this.state.show_pay_notice}>
+                return <If condition={show_pay_notice}>
                   <View style={{
                     flexDirection: 'row',
                     flex: 1,
@@ -124,55 +125,58 @@ class SeparatedExpenseInfo extends PureComponent {
                 </If>
               }}
         >
-          {records.map((item, idx) => {
-            return <List.Item arrow="horizontal"
-                              key={idx}
-                              multipleLine
-                              onClick={() => this.onItemClicked(item)}
-                              extra={
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                  <If condition={item.by === '-1-0'}>
-                                    <Text style={[{textAlign: 'right', marginLeft: 'auto', color: 'black'}]}>
-                                      {`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                    </Text>
-                                    <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text style={{color: 'black'}}>{this.state.by_labels[item.by]} </Text>
-                                    </List.Item.Brief>
-                                  </If>
+          {
+            records.map((item, idx) => {
+              return <List.Item arrow="horizontal"
+                                key={idx}
+                                multipleLine
+                                onClick={() => this.onItemClicked(item)}
+                                extra={
+                                  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <If condition={item.by === '-1-0'}>
+                                      <Text style={[{textAlign: 'right', marginLeft: 'auto', color: 'black'}]}>
+                                        {`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                      </Text>
+                                      <List.Item.Brief style={{textAlign: 'right'}}>
+                                        <Text style={{color: 'black'}}>{this.state.by_labels[item.by]} </Text>
+                                      </List.Item.Brief>
+                                    </If>
 
-                                  <If condition={item.by !== '-1-0'}>
-                                    <Text style={[{
-                                      textAlign: 'right',
-                                      marginLeft: 'auto',
-                                      fontWeight: "bold"
-                                    }, this.onItemAccountStyle(item)]}>
-                                      {`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                    </Text>
-                                    <Text style={[this.onItemAccountStyle(item), {
-                                      color: colors.color999,
-                                      fontSize: 13,
-                                      textAlign: 'right'
-                                    }]}>
-                                      余额：{item.left_balance}
-                                    </Text>
-                                  </If>
-                                </View>}>
-              <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
-                <Text style={{color: colors.color333, fontWeight: "bold"}}>{this.state.data_labels[item.wm_id]} </Text>
-                <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "bold"}}>
-                  {item.name}({this.state.platform_labels[item.wm_id]})
-                </Text>
-              </View>
-              <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
-                <Text style={{color: colors.color999, marginRight: 14}}>
-                  {item.hm}
-                </Text>
-                <Text style={[this.onItemAccountStyle(item), {fontSize: 13}]}>
-                  {this.state.by_labels[item.by]}
-                </Text>
-              </View>
-            </List.Item>
-          })}
+                                    <If condition={item.by !== '-1-0'}>
+                                      <Text style={[{
+                                        textAlign: 'right',
+                                        marginLeft: 'auto',
+                                        fontWeight: "bold"
+                                      }, this.onItemAccountStyle(item)]}>
+                                        {`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                      </Text>
+                                      <Text style={[this.onItemAccountStyle(item), {
+                                        color: colors.color999,
+                                        fontSize: 13,
+                                        textAlign: 'right'
+                                      }]}>
+                                        余额：{item.left_balance}
+                                      </Text>
+                                    </If>
+                                  </View>
+                                }>
+                <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
+                  <Text style={{color: colors.color333, fontWeight: "bold"}}>{data_labels[item.wm_id]} </Text>
+                  <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "bold"}}>
+                    {item.name}({platform_labels[item.wm_id]})
+                  </Text>
+                </View>
+                <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
+                  <Text style={{color: colors.color999, fontSize: 12, marginRight: 14}}>
+                    {item.hm}
+                  </Text>
+                  <Text style={[this.onItemAccountStyle(item), {fontSize: 13, color: colors.color333}]}>
+                    {by_labels[item.by]}
+                  </Text>
+                </View>
+              </List.Item>
+            })
+          }
         </List>
       </ScrollView>
     )

@@ -11,7 +11,7 @@ import ESC from "./Ecs";
 import tool from "../tool";
 import Config from "../../common/config";
 import {sendDeviceStatus} from "../../component/jpushManage";
-import {print_order_to_bt} from './OrderPrinter'
+import {print_order_to_bt, testPrintData} from './OrderPrinter'
 import {ToastShort} from "../ToastUtils";
 import {navigate} from "../../../RootNavigation";
 
@@ -172,28 +172,6 @@ export const unInitBlueTooth = () => {
 
 }
 
-const testPrintData = (data) => {
-  ESC.resetByte()
-  ESC.fontNormalHeightWidth();
-  ESC.alignLeft();
-  ESC.startLine(32);
-  ESC.fontHeightTimes();
-  ESC.text('   打印测试单');
-  ESC.printAndNewLine();
-  ESC.fontHeightTimes();
-  if (data)
-    ESC.text(`   ${data}`);
-  else
-    ESC.text("合计        X100");
-  ESC.printAndNewLine();
-  ESC.startLine(32);
-  ESC.fontNormalHeightWidth();
-  ESC.text('外送帮祝您生意兴隆！');
-  ESC.printAndNewLine();
-  ESC.hex("0D 0D 0D")
-  ESC.walkPaper(4)
-  return ESC.getByte()
-}
 
 export const testPrint = (peripheral, data = null) => {
   setTimeout(() => {
@@ -240,12 +218,12 @@ export const retrieveConnected = async () => {
 export const handlePrintOrder = async (props, obj) => {
   let {accessToken, printer_id, bleStarted, autoBluetoothPrint} = props.global;
   if (!autoBluetoothPrint) {
-    sendDeviceStatus(accessToken, {...obj, auto_print: autoBluetoothPrint})
+    sendDeviceStatus(props.global, {...obj, auto_print: autoBluetoothPrint})
     return;
   }
   if (printer_id && autoBluetoothPrint) {
     const clb = (msg, error) => {
-      sendDeviceStatus(accessToken, {
+      sendDeviceStatus(props.global, {
         ...obj,
         btConnected: `打印结果:${msg}-${error || ''}`,
         auto_print: autoBluetoothPrint
@@ -258,7 +236,7 @@ export const handlePrintOrder = async (props, obj) => {
     } catch (error) {
       //蓝牙尚未启动时，会导致App崩溃
       if (!bleStarted) {
-        sendDeviceStatus(accessToken, {...obj, btConnected: '蓝牙尚未启动', auto_print: autoBluetoothPrint})
+        sendDeviceStatus(props.global, {...obj, btConnected: '蓝牙尚未启动', auto_print: autoBluetoothPrint})
         return;
       }
       try {
@@ -266,7 +244,7 @@ export const handlePrintOrder = async (props, obj) => {
         const peripheral = await BleManager.retrieveServices(printer_id)
         print_order_to_bt(accessToken, peripheral, clb, obj.orderId, false, 1);
       } catch (error2) {
-        sendDeviceStatus(accessToken, {
+        sendDeviceStatus(props.global, {
           ...obj,
           btConnected: `已断开:error1-${error} error2-${error2}`,
           auto_print: autoBluetoothPrint
@@ -282,6 +260,6 @@ export const handlePrintOrder = async (props, obj) => {
     }
     return
   }
-  sendDeviceStatus(accessToken, {...obj, btConnected: '未连接或者未开启自动打印', auto_print: autoBluetoothPrint})
+  sendDeviceStatus(props.global, {...obj, btConnected: '未连接或者未开启自动打印', auto_print: autoBluetoothPrint})
 }
 

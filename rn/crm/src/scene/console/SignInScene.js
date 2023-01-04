@@ -5,9 +5,8 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
-import MonthPicker from 'react-native-month-year-picker';
 import tool from "../../pubilc/util/tool";
-import CommonModal from "../../pubilc/component/goods/CommonModal";
+import CustomMonthPicker from "../../pubilc/component/CustomMonthPicker";
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
@@ -337,13 +336,12 @@ class SignInScene extends PureComponent {
   }
 
   onChange = (event, date) => {
-    if (event === 'dismissedAction') {
-      this.setVisible(false)
-      return
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      const start_day = tool.fullMonth(date)
+      this.getLogList(start_day)
+      this.setState({start_day: start_day, selectDate: date, visible: false})
     }
-    const start_day = tool.fullMonth(date)
-    this.getLogList(start_day)
-    this.setState({start_day: start_day, selectDate: date, visible: false})
   }
 
   render() {
@@ -352,16 +350,9 @@ class SignInScene extends PureComponent {
       <>
         {this.renderMainZone()}
         {this.renderList()}
-        <CommonModal visible={visible} onRequestClose={() => this.onChange('dismissedAction')}>
-          <MonthPicker value={selectDate}
-                       cancelButton={'取消'}
-                       okButton={'确定'}
-                       autoTheme={true}
-                       mode={'number'}
-                       onChange={(event, newDate) => this.onChange(event, newDate)}
-                       maximumDate={new Date()}
-                       minimumDate={new Date(2015, 8, 15)}/>
-        </CommonModal>
+        <CustomMonthPicker visible={visible}
+                           onChange={(event, newDate) => this.onChange(event, newDate)}
+                           date={selectDate}/>
       </>
     )
   }
