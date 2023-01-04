@@ -343,7 +343,7 @@ class ChatRoom extends React.PureComponent {
                   <Image source={{uri: item.msg_content}} style={styles.imageBox}/>
                 </TouchableHighlight>
               </If>
-              <If condition={item.platform === '1' || item.platform === '4'}>
+              <If condition={item.platform == '1' || item.platform == '4'}>
                 <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
               </If>
             </View>

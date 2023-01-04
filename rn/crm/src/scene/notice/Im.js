@@ -311,7 +311,7 @@ class NoticeList extends React.PureComponent {
             <Text style={styles.messageTime}>{item.send_time} </Text>
           </View>
           <Text style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
-          <Text style={styles.messageInfo}>{item.msg_type === '1' ? tool.jbbsubstr(item?.last_message, 20) : `[图片]`} </Text>
+          <Text style={styles.messageInfo}>{item.msg_type == '1' ? tool.jbbsubstr(item?.last_message, 20) : `[图片]`} </Text>
         </View>
       </TouchableOpacity>
     )
