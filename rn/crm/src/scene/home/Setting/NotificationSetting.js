@@ -378,7 +378,6 @@ class NotificationSetting extends PureComponent {
         </Text>
         <View style={styles.zoneWrap}>
           <Slider value={volume}
-                  step={0.1}
                   ref={ref => this.volumeRef = ref}
                   minimumTrackTintColor={colors.main_color}
                   maximumTrackTintColor={colors.e5}
