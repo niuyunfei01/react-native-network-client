@@ -423,7 +423,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: "center"
+    justifyContent: "center",
+    marginVertical: 2
   },
   headLeftTitle: {
     fontSize: 16,

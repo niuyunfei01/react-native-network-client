@@ -31,7 +31,8 @@ const {
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_AUTO_PRINT,
   SET_VOLUME,
-  SET_INIT_JPUSH
+  SET_INIT_JPUSH,
+  SET_NET_INFO_STATUS
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -85,7 +86,8 @@ const initialState = {
   lastCheckVersion: 0,
   call_delivery_obj: {},
   volume: 0,
-  not_init_jpush: true
+  not_init_jpush: true,
+  net_info: {}
 };
 
 /**
@@ -105,6 +107,11 @@ export default function globalReducer(state = initialState, action) {
       return {
         ...state,
         volume: action.payload
+      }
+    case SET_NET_INFO_STATUS:
+      return {
+        ...state,
+        net_info: action.payload
       }
     case SET_AUTO_PRINT:
       return {

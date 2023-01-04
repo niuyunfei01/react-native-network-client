@@ -120,6 +120,7 @@ class ImSetting extends React.PureComponent {
             multiline={true}
             maxLength={300}
             numberOfLines={4}
+            textAlignVertical={'top'}
             placeholder={"当您在繁忙时可在这里填写自动回复信息安抚客户，最多不超过300字。"}
             placeholderTextColor={colors.color999}
             onChange={value => this.setState({autoInputVal: value})}
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
   inputArea: {
     width: width * 0.88,
     height: 117,
-    fontSize: 12,
+    fontSize: 14,
     padding: 10,
     borderRadius: 6,
     backgroundColor: colors.f5,
@@ -254,6 +255,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: 30,
     right: 60,
+    justifyContent: "center"
   },
   autoBtnTitle: {
     color: colors.white,

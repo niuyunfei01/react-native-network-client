@@ -21,7 +21,7 @@ import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setCheckVersionAt, setInitJpush} from "../../reducers/global/globalActions";
+import {setCheckVersionAt, setInitJpush, setNetInfo} from "../../reducers/global/globalActions";
 import {
   getImRemindCount,
   getStoreImConfig,
@@ -47,6 +47,7 @@ import JbbAlert from "../component/JbbAlert";
 import {Synthesizer} from "../component/react-native-speech-iflytek";
 import RefundReasonModal from "../component/RefundReasonModal";
 import RefundStatusModal from "../component/RefundStatusModal";
+import NetInfo from "@react-native-community/netinfo";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -863,6 +864,7 @@ class AppNavigator extends PureComponent {
   componentDidMount() {
     this.whiteNoLoginInfo()
     this.getAppState()
+    this.getNetInfo()
   }
 
   componentWillUnmount() {
@@ -875,10 +877,20 @@ class AppNavigator extends PureComponent {
     this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
     this.dataPolling !== null && clearInterval(this.dataPolling);
     AppState.removeEventListener("change", this._handleAppStateChange);
+    this.unsubscribe && this.unsubscribe()
   }
 
   getAppState = () => {
     AppState.addEventListener("change", this._handleAppStateChange);
+  }
+
+  getNetInfo = () => {
+    NetInfo.fetch().then(state => {
+      store.dispatch(setNetInfo(state))
+    });
+    this.unsubscribe = NetInfo.addEventListener (state => {
+      store.dispatch(setNetInfo(state))
+    })
   }
 
   _handleAppStateChange = nextAppState => {

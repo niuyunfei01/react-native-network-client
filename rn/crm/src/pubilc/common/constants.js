@@ -129,4 +129,5 @@ export default keyMirror({
   SET_IM_REMIND_COUNT: null,
 
   SET_CALL_DELIVERY_OBJ: null,
+  SET_NET_INFO_STATUS: null
 })

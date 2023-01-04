@@ -55,7 +55,8 @@ const {
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_VOLUME,
   SET_AUTO_PRINT,
-  SET_INIT_JPUSH
+  SET_INIT_JPUSH,
+  SET_NET_INFO_STATUS
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
@@ -71,6 +72,13 @@ export const setInitJpush = (value) => {
 export const setVolume = (value) => {
   return {
     type: SET_VOLUME,
+    payload: value
+  }
+}
+
+export const setNetInfo = (value) => {
+  return {
+    type: SET_NET_INFO_STATUS,
     payload: value
   }
 }
