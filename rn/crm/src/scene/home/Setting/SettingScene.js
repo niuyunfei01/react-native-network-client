@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
   Alert,
+  AppState,
   Dimensions,
   Linking,
   Platform,
@@ -40,7 +41,7 @@ import {PlayMusicComponent} from "../../../pubilc/component/PlayMusic";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
-const width = Dimensions.get("window").width;
+const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -75,7 +76,6 @@ class SettingScene extends PureComponent {
       show_remark_to_rider: true,
       invoice_serial_font: '',
       use_real_weight: false,
-      notificationEnabled: 1,
       showAlertModal: false,
       showDeleteModal: false,
       shouldShowModal: false,
@@ -109,7 +109,21 @@ class SettingScene extends PureComponent {
   }
 
   async componentDidMount() {
+    this.appStateEvent = AppState.addEventListener("change", this._handleAppStateChange);
     await this.onHeaderRefresh();
+  }
+
+  _handleAppStateChange = async (appState) => {
+    if ('active' === appState && Platform.OS === 'android') {
+      const {dispatch} = this.props
+      await native.isRunInBg((resp) => {
+        dispatch(setBackgroundStatus(resp))
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    this.appStateEvent && this.appStateEvent.remove()
   }
 
   getConfig = async () => {
@@ -308,12 +322,7 @@ class SettingScene extends PureComponent {
 
   openAndroidBackgroundRun = () => {
     Alert.alert('确认是否已开启', '', [
-      {
-        text: '去开启', onPress: async () => {
-          await native.toRunInBg()
-          await this.onHeaderRefresh();
-        }
-      },
+      {text: '去开启', onPress: async () => await native.toRunInBg()},
       {text: '确认', onPress: this.onHeaderRefresh}
     ])
   }
@@ -337,10 +346,7 @@ class SettingScene extends PureComponent {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {
-            let val = !show_remark_in_order_list
-            this.setConfig('show_remark_in_order_list', val)
-          }}
+          <TouchableOpacity onPress={() => this.setConfig('show_remark_in_order_list', !show_remark_in_order_list)}
                             style={styles.item_row}>
             <View style={{flex: 1}}>
               <Text style={styles.row_label}>展示订单备注 </Text>
@@ -363,7 +369,6 @@ class SettingScene extends PureComponent {
         <View style={styles.item_body}>
           <Text style={styles.item_title}>小票设置 </Text>
           <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-
             <TouchableOpacity onPress={() => this.setConfig('invoice_serial_font', 0)}
                               style={styles.item_row}>
               <View style={{flex: 1}}>
@@ -391,31 +396,29 @@ class SettingScene extends PureComponent {
   }
 
 
+  showServer = () => {
+    const {show_server} = this.state
+    if (show_server === 1) {
+      ToastShort('再点击三次展示服务器信息')
+    }
+    this.setState({
+      show_server: show_server + 1
+    })
+  }
+
   renderGoods = () => {
     let {
       hide_good_titles_to_shipper,
       use_real_weight,
       is_alone_pay_vendor,
       order_list_show_product,
-      show_server
     } = this.state
     return (
       <View style={styles.item_body}>
-        <Text style={styles.item_title} onPress={() => {
-          this.setState({
-            show_server: show_server + 1
-          }, () => {
-            if (show_server === 2) {
-              ToastShort('再点击三次展示服务器信息')
-            }
-          })
-        }}>商品 </Text>
+        <Text style={styles.item_title} onPress={() => this.showServer()}>商品 </Text>
 
         <View style={{backgroundColor: colors.white, borderRadius: 8, paddingHorizontal: 12}}>
-          <TouchableOpacity onPress={() => {
-            let val = !hide_good_titles_to_shipper;
-            this.setConfig('hide_good_titles_to_shipper', val)
-          }}
+          <TouchableOpacity onPress={() => this.setConfig('hide_good_titles_to_shipper', !hide_good_titles_to_shipper)}
                             style={styles.item_row}>
             <Text style={styles.row_label}>隐藏商品敏感信息 </Text>
             <Switch onValueChange={(val) => this.setConfig('hide_good_titles_to_shipper', val)}
@@ -425,10 +428,7 @@ class SettingScene extends PureComponent {
           </TouchableOpacity>
 
           <If condition={!is_alone_pay_vendor}>
-            <TouchableOpacity onPress={() => {
-              let val = !use_real_weight;
-              this.setConfig('use_real_weight', val)
-            }}
+            <TouchableOpacity onPress={() => this.setConfig('use_real_weight', !use_real_weight)}
                               style={styles.item_row}>
               <Text style={styles.row_label}>按照商品实际重量上传 </Text>
               <Switch onValueChange={(val) => this.setConfig('use_real_weight', val)}
@@ -439,10 +439,7 @@ class SettingScene extends PureComponent {
           </If>
 
 
-          <TouchableOpacity onPress={() => {
-            let val = !order_list_show_product;
-            this.setConfig('order_list_show_product', val)
-          }}
+          <TouchableOpacity onPress={() => this.setConfig('order_list_show_product', !order_list_show_product)}
                             style={styles.item_row}>
             <View style={{flex: 1}}>
               <Text style={styles.row_label}>订单列表页展示商品 </Text>
@@ -700,8 +697,7 @@ class SettingScene extends PureComponent {
             <Text style={{fontSize: 16, color: colors.color333, marginVertical: 12, lineHeight: 22}}>
               注销账号会清空所有信息和数据，请确认是否要注销？
             </Text>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Button title={'取消'}
                       onPress={this.closeModal}
                       containerStyle={{flex: 1, borderRadius: 20, length: 40, marginRight: 10}}
