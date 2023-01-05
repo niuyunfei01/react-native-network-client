@@ -95,14 +95,16 @@ class ChatRoom extends React.PureComponent {
       }
     }, (error) => {
       this.setState({refreshing: false})
-      let msg = "获取消息列表错误: " + error;
-      ToastShort(`${msg}`)
     })
   }
 
   addInitMessage = (res) => {
-    let {messages} = this.state;
-    messages.unshift(res)
+    let {messages, inverted} = this.state;
+    if (inverted) {
+      messages.unshift(res)
+    } else {
+      messages.push(res)
+    }
     this.setState({
       messages,
       send_msg: '',
@@ -139,8 +141,6 @@ class ChatRoom extends React.PureComponent {
       }
     }, (error) => {
       this.setState({refreshing: false})
-      let msg = "获取消息列表错误: " + error;
-      ToastShort(`${msg}`)
     })
   }
 
@@ -213,8 +213,6 @@ class ChatRoom extends React.PureComponent {
       }
     }, (error) => {
       this.setState({refreshing: false})
-      let msg = "获取消息列表错误: " + error;
-      ToastShort(`${msg}`)
     })
   }
 
@@ -351,7 +349,7 @@ class ChatRoom extends React.PureComponent {
               </If>
             </View>
             <View style={styles.merchantProfile}>
-              <Text style={styles.merchantMsg}>{item.msg_source == '3' ? '系统' : im_config?.im_nick_name ? im_config?.im_nick_name : '商'}</Text>
+              <Text style={styles.merchantMsg}>{item.msg_source == '3' ? '系统' : im_config?.im_nick_name ? tool.jbbsubstr(im_config?.im_nick_name, 1) : '商'}</Text>
             </View>
           </View>
         </If>
