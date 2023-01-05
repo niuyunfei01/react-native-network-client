@@ -11,6 +11,7 @@ import {SvgXml} from "react-native-svg";
 import {back, down, head_cross_icon} from "../../../svg/svg";
 import PropTypes from "prop-types";
 import tool from "../../../pubilc/util/tool";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 const {width} = Dimensions.get('window')
 
@@ -97,7 +98,9 @@ class DeliveryList extends PureComponent {
     this.setState({isLoading: true})
     const api = `/v4/wsb_delivery/getShopDelivery?access_token=${accessToken}`
     const params = {real_store_id: store_id, choose_v2_type: 0}
+    showModal('加载中')
     HttpUtils.get(api, params).then((res) => {
+      hideModal()
       const {
         in_review_deliveries = [], store_bind_deliveries = [], wsb_bind_deliveries = [], wsb_unbind_deliveries = []
       } = res
@@ -109,6 +112,7 @@ class DeliveryList extends PureComponent {
         isLoading: false
       })
     }).catch(() => {
+      hideModal()
       this.setState({isLoading: false})
     })
   }
