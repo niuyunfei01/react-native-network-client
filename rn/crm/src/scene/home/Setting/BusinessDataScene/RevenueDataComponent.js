@@ -307,14 +307,14 @@ export default class RevenueDataComponent extends PureComponent {
                 昨日
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.getHistoryData(7, week_datetime, current_datetime)}
+            <TouchableOpacity onPress={() => this.getHistoryData(7, week_datetime, yesterday_datetime)}
                               style={selectHistory === 7 ? history_styles.selectHistoryBtn : history_styles.historyBtn}>
               <Text style={selectHistory === 7 ? history_styles.selectHistoryBtnText : history_styles.historyBtnText}>
                 近7天
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.getHistoryData(30, month_datetime, current_datetime)}
+              onPress={() => this.getHistoryData(30, month_datetime, yesterday_datetime)}
               style={[selectHistory === 30 ? history_styles.selectHistoryBtn : history_styles.historyBtn, {marginRight: 12}]}>
               <Text style={selectHistory === 30 ? history_styles.selectHistoryBtnText : history_styles.historyBtnText}>
                 近30天
