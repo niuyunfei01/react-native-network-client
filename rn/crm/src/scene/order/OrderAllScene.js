@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Dimensions, FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {SvgXml} from "react-native-svg";
@@ -758,7 +758,11 @@ class OrderAllScene extends Component {
     }
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml xml={empty_data()}/>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
+          style={{width: 122, height: 64}}/>
+
         <Text style={styles.noOrderDesc}> 暂无订单 </Text>
       </View>
     )

@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {
   Dimensions,
-  FlatList,
+  FlatList, Image,
   InteractionManager,
   StatusBar,
   StyleSheet,
@@ -758,7 +758,11 @@ class OrderListScene extends Component {
     let {show_bind_button} = this.state;
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml xml={empty_data()}/>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
+          style={{width: 122, height: 64}}/>
+
         <If condition={!show_bind_button}>
           <Text style={styles.noOrderDesc}>暂无订单</Text>
         </If>
