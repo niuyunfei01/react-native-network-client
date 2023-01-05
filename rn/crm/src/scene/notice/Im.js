@@ -382,7 +382,7 @@ class NoticeList extends React.PureComponent {
         <Fetch navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         {this.renderHead()}
         {this.renderTab()}
-        {!net_info?.netWorkStatus ?
+        {net_info?.isConnected ?
           this.renderMessage() : this.networkEmptyComponent()
         }
         <If condition={isLastPage}>

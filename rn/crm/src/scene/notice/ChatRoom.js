@@ -99,8 +99,12 @@ class ChatRoom extends React.PureComponent {
   }
 
   addInitMessage = (res) => {
-    let {messages} = this.state;
-    messages.unshift(res)
+    let {messages, inverted} = this.state;
+    if (inverted) {
+      messages.unshift(res)
+    } else {
+      messages.push(res)
+    }
     this.setState({
       messages,
       send_msg: '',
