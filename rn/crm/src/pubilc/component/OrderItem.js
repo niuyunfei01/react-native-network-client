@@ -424,15 +424,19 @@ class OrderItem extends React.PureComponent {
   renderItemHeader = () => {
     let {item} = this.props;
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        height: 65,
-        borderTopLeftRadius: 6,
-        borderTopRightRadius: 6,
-        backgroundColor: colors.f9
-      }}>
+      <LinearGradient
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 12,
+          height: 65,
+          borderTopLeftRadius: 6,
+          borderTopRightRadius: 6,
+          backgroundColor: colors.f9
+        }}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        colors={['#F9F9F9', '#F5F5F5']}>
 
         <If condition={!item.is_right_once}>
           <View style={{
@@ -490,7 +494,7 @@ class OrderItem extends React.PureComponent {
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 
-      </View>
+      </LinearGradient>
     )
   }
 
@@ -722,7 +726,7 @@ class OrderItem extends React.PureComponent {
         <View style={{flex: 1}}>
           <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_platform_name} </Text>
+            <Text style={{fontSize: 14, color: colors.color666}}>{item?.ship_platform_name} </Text>
             <Text style={{
               fontSize: 14,
               color: colors.color666
@@ -973,11 +977,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     marginHorizontal: 12,
     borderRadius: 6,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.1,
-    elevation: 3,
-    shadowRadius: 8,
   },
   modalBtn: {
     flex: 1,

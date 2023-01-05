@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.main_color,
     position: 'absolute', bottom: 0
   },
-  orderListContent: {flex: 1, backgroundColor: colors.f5},
+  orderListContent: {flex: 1, backgroundColor: colors.ed},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   noOrderContent: {
     alignItems: 'center',
