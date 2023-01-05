@@ -406,7 +406,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     public void openAppSystemSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.setData(Uri.parse("package:" + reactContext.getPackageName()));
         if (intent.resolveActivity(reactContext.getPackageManager()) != null) {
             reactContext.startActivity(intent);

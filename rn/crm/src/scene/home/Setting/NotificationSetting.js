@@ -183,15 +183,12 @@ class NotificationSetting extends PureComponent {
     menu_settings_child_balance_defect: {},
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.appStateEvent = AppState.addEventListener("change", this._handleAppStateChange);
     this.getNotificationSettingList()
-    this.focus = this.props.navigation.addListener('focus', async () => {
-
-      await VolumeManager.showNativeVolumeUI({enabled: true})
-      this.volumeListener = VolumeManager.addVolumeListener((result) => {
-        this.volumeRef.setNativeProps({value: result.volume})
-      })
+    await VolumeManager.showNativeVolumeUI({enabled: true})
+    this.volumeListener = VolumeManager.addVolumeListener((result) => {
+      this.setState({volume: result.volume})
     })
 
   }
@@ -220,7 +217,6 @@ class NotificationSetting extends PureComponent {
 
   componentWillUnmount() {
     this.volumeListener && this.volumeListener.remove()
-    this.focus()
     this.appStateEvent && this.appStateEvent.remove()
   }
 
@@ -282,16 +278,14 @@ class NotificationSetting extends PureComponent {
     isSettingVolume = true
     const {isInitVolume} = this.state
     if (isInitVolume) {
-      this.volumeRef.setNativeProps({value: value})
       this.setState({isInitVolume: false}, () => {
         isSettingVolume = false
       })
-    } else {
-      this.volumeRef.setNativeProps({value: value})
-      VolumeManager.setVolume(value, {type: type, showUI: true}).then(() => {
-        isSettingVolume = false
-      })
+      return
     }
+    VolumeManager.setVolume(value, {type: type, showUI: true}).then(() => {
+      isSettingVolume = false
+    })
   }
 
   setStatus = async (notify_type, value) => {
@@ -370,7 +364,6 @@ class NotificationSetting extends PureComponent {
 
   renderVolume = () => {
     const {volume} = this.state
-
     return (
       <>
         <Text style={styles.headerText}>
@@ -378,13 +371,14 @@ class NotificationSetting extends PureComponent {
         </Text>
         <View style={styles.zoneWrap}>
           <Slider value={volume}
+                  step={0.001}
                   ref={ref => this.volumeRef = ref}
                   minimumTrackTintColor={colors.main_color}
                   maximumTrackTintColor={colors.e5}
                   style={{marginHorizontal: 15, paddingVertical: 28}}
                   minimumValue={0}
                   maximumValue={1}
-                  onSlidingComplete={value => this.setVolume(value)}/>
+                  onValueChange={value => this.setVolume(value)}/>
         </View>
 
       </>

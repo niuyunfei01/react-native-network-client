@@ -10,7 +10,14 @@
 import Config from '../../pubilc/common/config'
 import {Login, sendMobileCode} from '../../pubilc/services/account'
 import {getWithTpl} from '../../pubilc/util/common'
-import {addStores, checkBindExt,} from "../../pubilc/services/global"
+import {
+  addStores,
+  addStoresDelivery,
+  checkBindExt,
+  checkMessageCode,
+  getStoreDelivery,
+  updateStoresDelivery,
+} from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
@@ -358,4 +365,42 @@ export function customerApply(params, callback, props) {
       })
   }
 }
+
+
+export function showStoreDelivery(ext_store_id, callback) {
+  return dispatch => {
+    return getStoreDelivery(ext_store_id)
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
+  }
+}
+
+export function addDelivery(params, callback) {
+  return dispatch => {
+    return addStoresDelivery(params)
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
+  }
+}
+
+export function updateStoresAutoDelivery(token, ext_store_id, params, callback) {
+  return dispatch => {
+    return updateStoresDelivery(token, ext_store_id, params)
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
+  }
+}
+
 
