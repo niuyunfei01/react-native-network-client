@@ -16,7 +16,7 @@ import {
   checkBindExt,
   checkMessageCode,
   getStoreDelivery,
-  updateStoresDelivery,
+  updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
 import HttpUtils from "../../pubilc/util/http";
