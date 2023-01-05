@@ -42,6 +42,9 @@ class SettingDeliveryInfo extends PureComponent {
     };
   }
 
+  componentDidMount() {
+    this.getDeliveryConf()
+  }
 
   onHeaderRefresh = () => {
     this.getDeliveryConf();
@@ -506,8 +509,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 12,
-    paddingRight: 15,
+    paddingHorizontal: 12
   },
   btn_select: {
     marginRight: pxToDp(20),

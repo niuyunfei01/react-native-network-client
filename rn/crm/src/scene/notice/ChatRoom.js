@@ -216,7 +216,7 @@ class ChatRoom extends React.PureComponent {
     })
   }
 
-  getVerification = (field, value) => {
+  getVerification = (field, value = '') => {
     return field == value
   }
 
