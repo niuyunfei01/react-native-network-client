@@ -2,24 +2,18 @@ import React, {PureComponent} from "react";
 import {InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View,} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../../weui";
 import {Button, CheckBox} from 'react-native-elements'
-import * as globalActions from "../../../reducers/global/globalActions";
 import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import tool from "../../../pubilc/util/tool";
+import {showStoreDelivery} from "../../../reducers/global/globalActions";
 
 const mapStateToProps = state => {
   const {global} = state;
   return {global: global};
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
 }
 
 class PreferenceBillingSetting extends PureComponent {
@@ -63,7 +57,8 @@ class PreferenceBillingSetting extends PureComponent {
   }
 
   getDeliveryConf = () => {
-    this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+    const {dispatch, route} = this.props
+    dispatch(showStoreDelivery(route.params.ext_store_id, (success, response) => {
       let arr = [];
       if (response !== undefined && tool.length(response.menus) > 0) {
         for (let item of response.menus) {
@@ -79,7 +74,7 @@ class PreferenceBillingSetting extends PureComponent {
         menus: arr
       })
 
-    })
+    }))
   }
 
   _onToSetDeliveryWays = () => {
@@ -347,4 +342,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(PreferenceBillingSetting);
+export default connect(mapStateToProps)(PreferenceBillingSetting);

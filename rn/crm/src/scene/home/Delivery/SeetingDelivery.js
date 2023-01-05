@@ -11,10 +11,8 @@ import {
   View,
 } from "react-native";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {Cell, CellBody, CellFooter, Cells} from "../../../weui";
 import Entypo from "react-native-vector-icons/Entypo"
-import * as globalActions from "../../../reducers/global/globalActions";
 import {showError, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
 import native from "../../../pubilc/util/native";
@@ -23,16 +21,11 @@ import colors from "../../../pubilc/styles/colors";
 import config from "../../../pubilc/common/config";
 import {Button, Switch} from "react-native-elements";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import {showStoreDelivery, updateStoresAutoDelivery} from "../../../reducers/global/globalActions";
 
 const mapStateToProps = state => {
   const {global} = state;
   return {global: global};
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
 }
 
 function FetchView({navigation, onRefresh}) {
@@ -73,7 +66,6 @@ class SeetingDelivery extends PureComponent {
       isShowSettingText: false,
       showSetMeituanBtn: false,
     };
-    this.onBindDelivery = this.onBindDelivery.bind(this)
   }
 
   onHeaderRefresh = () => {
@@ -88,14 +80,13 @@ class SeetingDelivery extends PureComponent {
   }
 
   getDeliveryConf = () => {
-
-    if (tool.length(this.props.route.params.ext_store_id) <= 0) {
+    const {route, dispatch, navigation} = this.props
+    if (tool.length(route.params.ext_store_id) <= 0) {
       ToastLong('操作失败，请稍后重试')
-      return this.props.navigation.goBack();
+      return navigation.goBack();
     }
-
-    this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
-      let showBtn = this.props.route.params.showBtn;
+    dispatch(showStoreDelivery(route.params.ext_store_id, (success, response) => {
+      let {showBtn} = route.params;
       if (tool.length(response.bind_info) > 0) {
         showBtn = response.bind_info.rebind === 1 ? false : showBtn;
         this.setState({
@@ -130,7 +121,7 @@ class SeetingDelivery extends PureComponent {
         showSetMeituanBtn: response.platform === '3',
       })
 
-    })
+    }))
   }
 
   onBindDelivery = () => {
@@ -164,10 +155,11 @@ class SeetingDelivery extends PureComponent {
     }
 
     let {accessToken} = this.props.global;
+    const {dispatch, route} = this.props
     tool.debounces(() => {
-      this.props.actions.updateStoresAutoDelivery(
+      dispatch(updateStoresAutoDelivery(
         accessToken,
-        this.props.route.params.ext_store_id,
+        route.params.ext_store_id,
         {
           auto_call: auto_call ? 1 : 2,
           suspend_confirm_order: suspend_confirm_order ? "1" : "0",
@@ -185,7 +177,7 @@ class SeetingDelivery extends PureComponent {
             showError('配置失败');
           }
         }
-      )
+      ))
     }, 1000)
   }
 
@@ -554,4 +546,4 @@ const styles = StyleSheet.create({
   },
 });
 //make this component available to the app
-export default connect(mapStateToProps, mapDispatchToProps)(SeetingDelivery);
+export default connect(mapStateToProps)(SeetingDelivery);
