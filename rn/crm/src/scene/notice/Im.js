@@ -52,7 +52,6 @@ class NoticeList extends React.PureComponent {
         page_size: 20
       },
       isLastPage: false,
-      netWorkStatus: props.global.net_info.isConnected,
       selectStoreVisible: false,
       storeList: [],
       page_size: 10,
@@ -134,14 +133,14 @@ class NoticeList extends React.PureComponent {
     })
   }
 
-  fetchData = (is_polling = false) => {
+  fetchData = async (is_polling = false) => {
     const {accessToken} = this.props.global;
     const {im} = this.props;
     const {query, isLastPage, selected, message, store_id} = this.state
-    if (is_polling) this.setState({isLastPage: false}, () => {
-      if (isLastPage)
-        return
-    })
+    if (is_polling)
+      await this.setState({isLastPage: false, page: 1})
+    if (isLastPage)
+      return
     let params = {
       page: query.page,
       page_size: query.page_size,
@@ -163,8 +162,6 @@ class NoticeList extends React.PureComponent {
       }
     }, (error) => {
       this.setState({refreshing: false})
-      let msg = "获取消息列表错误: " + error;
-      ToastShort(`${msg}`)
     })
   }
 
@@ -187,7 +184,6 @@ class NoticeList extends React.PureComponent {
   onEndReached() {
     const {query, isLastPage} = this.state;
     if (isLastPage) {
-      ToastShort('没有更多数据了')
       return null
     }
     query.page += 1
@@ -299,7 +295,7 @@ class NoticeList extends React.PureComponent {
         showsHorizontalScrollIndicator={false}
         renderItem={this.renderList}
         onRefresh={this.onRefresh}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.3}
         onEndReached={() => {
           if (isCanLoadMore) {
             this.onEndReached();
@@ -332,7 +328,9 @@ class NoticeList extends React.PureComponent {
             <Text style={styles.messageTime}>{item.send_time} </Text>
           </View>
           <Text style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
-          <Text style={styles.messageInfo}>{item.msg_type == '1' ? tool.jbbsubstr(item?.last_message, 20) : `[图片]`} </Text>
+          <Text style={styles.messageInfo} numberOfLines={1} ellipsizeMode={'tail'}>
+            {item.msg_type == '1' ? item?.last_message : `[图片]`}
+          </Text>
         </View>
       </TouchableOpacity>
     )
@@ -377,13 +375,14 @@ class NoticeList extends React.PureComponent {
   }
 
   render() {
-    let {netWorkStatus, isLastPage} = this.state;
+    let {isLastPage} = this.state;
+    let {net_info} = this.props.global
     return (
       <View style={styles.mainContainer}>
         <Fetch navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         {this.renderHead()}
         {this.renderTab()}
-        {netWorkStatus ?
+        {!net_info?.netWorkStatus ?
           this.renderMessage() : this.networkEmptyComponent()
         }
         <If condition={isLastPage}>
@@ -489,7 +488,8 @@ const styles = StyleSheet.create({
   messageInfo: {
     fontSize: 14,
     color: colors.color999,
-    marginVertical: 10
+    marginVertical: 10,
+    width: width * 0.7
   },
   noMore: {
     fontSize: 14,

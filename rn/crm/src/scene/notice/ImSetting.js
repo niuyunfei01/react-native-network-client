@@ -9,14 +9,14 @@ import {
 import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {back} from "../../svg/svg";
-import tool from "../../pubilc/util/tool";
 import {connect} from "react-redux";
 import {Button, Switch} from "react-native-elements";
 import {TextArea} from "../../weui";
 import AlertModal from "../../pubilc/component/AlertModal";
 import HttpUtils from "../../pubilc/util/http";
-import {ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import {getStoreImConfig} from "../../reducers/im/imActions";
+import tool from "../../pubilc/util/tool";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 const {width} = Dimensions.get("window");
@@ -41,6 +41,11 @@ class ImSetting extends React.PureComponent {
   }
 
   setConfig = (field, value) => {
+    if (field === 'im_nick_name' && tool.length(value) > 5) {
+      this.nick_input.focus()
+      ToastShort('客服昵称最多不超过5位')
+      return
+    }
     let {store_im_config} = this.state;
     store_im_config[field] = value
     this.setState({
@@ -49,18 +54,21 @@ class ImSetting extends React.PureComponent {
     if (typeof (value) === 'boolean') {
       value = value ? 1 : 2
     }
-    tool.debounces(() => {
-      const {store_id, accessToken} = this.props.global;
-      const {dispatch} = this.props;
-      const api = `/api/im_save_config?access_token=${accessToken}`
-      const params = {
-        store_id: store_id,
-        [field]: value
-      }
-      HttpUtils.post.bind(this.props)(api, params).then(() => {
-        ToastShort("设置成功");
-        dispatch(getStoreImConfig(accessToken, store_id))
-      }).catch(e => ToastShort(e.reason))
+    showModal('设置中')
+    const {store_id, accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    const api = `/api/im_save_config?access_token=${accessToken}`
+    const params = {
+      store_id: store_id,
+      [field]: value
+    }
+    HttpUtils.post.bind(this.props)(api, params).then(() => {
+      hideModal()
+      ToastShort("设置成功");
+      dispatch(getStoreImConfig(accessToken, store_id))
+    }).catch(e => {
+      hideModal()
+      ToastShort(e.reason)
     })
   }
 
@@ -128,6 +136,7 @@ class ImSetting extends React.PureComponent {
             underlineColorAndroid={"transparent"}
           />
           <Button title={'保存'}
+                  disabled={autoInputVal === ''}
                   onPress={() => this.setConfig('im_auto_content', autoInputVal)}
                   containerStyle={styles.autoBtn}
                   buttonStyle={{backgroundColor: colors.main_color}}
@@ -136,6 +145,7 @@ class ImSetting extends React.PureComponent {
         <View style={{paddingVertical: 15}}>
           <Text style={styles.row_label}>显示客服昵称 </Text>
           <TextInput
+            ref={ref => this.nick_input = ref}
             returnKeyType={'done'}
             underlineColorAndroid="transparent"
             style={styles.input}
