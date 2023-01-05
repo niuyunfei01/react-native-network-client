@@ -781,7 +781,7 @@ class OrderAllScene extends Component {
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
-  orderListContent: {flex: 1, backgroundColor: colors.f5,},
+  orderListContent: {flex: 1, backgroundColor: colors.ed,},
   statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 48},
   noOrderContent: {
     alignItems: 'center',

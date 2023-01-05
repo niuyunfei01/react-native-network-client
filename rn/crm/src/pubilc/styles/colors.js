@@ -21,6 +21,7 @@ const colors = {
   f9: '#f9f9f9',
   fa: '#FAFAFA',
   e5: '#E5E5E5',
+  ed: '#EDEDED',
   default_theme: '#33A3F4',
   main_vice_color: '#006837',
   actionSecondSize: 28,
