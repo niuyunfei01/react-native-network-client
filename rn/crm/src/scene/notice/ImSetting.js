@@ -30,7 +30,7 @@ class ImSetting extends React.PureComponent {
       confirmModal: false,
       store_im_config: im_config,
       autoInputVal: im_config.im_auto_content,
-      nickName: ''
+      nickName: im_config.im_nick_name
     }
   }
 
@@ -40,7 +40,7 @@ class ImSetting extends React.PureComponent {
     });
   }
 
-  setConfig = (field, value) => {
+  setConfig = (field, value = '') => {
     if (field === 'im_nick_name' && tool.length(value) > 5) {
       this.nick_input.focus()
       ToastShort('客服昵称最多不超过5位')
