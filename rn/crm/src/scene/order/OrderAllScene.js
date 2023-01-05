@@ -12,7 +12,7 @@ import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import {back, empty_data, search_icon, this_down, this_up} from "../../svg/svg";
+import {back, search_icon, this_down, this_up} from "../../svg/svg";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
@@ -761,7 +761,7 @@ class OrderAllScene extends Component {
 
         <Image
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
-          style={{width: 122, height: 64}}/>
+          style={{width: 122, height: 93}}/>
 
         <Text style={styles.noOrderDesc}> 暂无订单 </Text>
       </View>

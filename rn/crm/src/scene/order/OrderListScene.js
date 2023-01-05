@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import {
   Dimensions,
-  FlatList, Image,
+  FlatList,
+  Image,
   InteractionManager,
   StatusBar,
   StyleSheet,
@@ -27,7 +28,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, down, empty_data, menu, menu_left, search_icon} from "../../svg/svg";
+import {cross_icon, down, menu, menu_left, search_icon} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -761,7 +762,7 @@ class OrderListScene extends Component {
 
         <Image
           source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
-          style={{width: 122, height: 64}}/>
+          style={{width: 122, height: 93}}/>
 
         <If condition={!show_bind_button}>
           <Text style={styles.noOrderDesc}>暂无订单</Text>
