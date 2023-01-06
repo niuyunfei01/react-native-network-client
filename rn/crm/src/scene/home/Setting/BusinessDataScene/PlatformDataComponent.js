@@ -142,9 +142,7 @@ export default class PlatformDataComponent extends PureComponent {
     this.setState({start_date: start_date, end_date: end_date})
   }
   setHeaderBtn = (index) => {
-    const {selectDate, yesterday_datetime, week_datetime} = this.state
-    if (selectDate === index)
-      return
+    const {yesterday_datetime, week_datetime} = this.state
     switch (index) {
       case 0:
         this.setTime(yesterday_datetime, yesterday_datetime)

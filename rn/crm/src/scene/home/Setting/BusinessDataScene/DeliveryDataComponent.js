@@ -171,9 +171,7 @@ export default class DeliveryDataComponent extends PureComponent {
     this.setState({start_date: start_date, end_date: end_date})
   }
   setHeaderBtn = (index) => {
-    const {selectDate, current_datetime, yesterday_datetime, current_week_datetime} = this.state
-    if (selectDate === index)
-      return
+    const {current_datetime, yesterday_datetime, current_week_datetime} = this.state
     switch (index) {
       case 0:
         this.setTime(current_datetime, current_datetime)
