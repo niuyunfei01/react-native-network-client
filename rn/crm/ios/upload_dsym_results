@@ -3,3 +3,13 @@ executing upload_map_file_to_new_relic
 New Relic: map file upload attempt #1 (of 3)
 Using URL: https://mobile-symbol-upload.newrelic.com
 New Relic: Successfully uploaded map files
+/Users/cnc/code/android-crm/rn/crm/ios/Pods/NewRelicAgent/NewRelic.xcframework/Resources/generateMap.py", line 260, in <module>
+    shutil.rmtree(workDir)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/shutil.py", line 709, in rmtree
+    onerror(os.lstat, path, sys.exc_info())
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/shutil.py", line 707, in rmtree
+    orig_st = os.lstat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/cnc/Library/Developer/Xcode/DerivedData/APTest-gzkznkssuajjigchjxdlrltzifzx/Build/Intermediates.noindex/APTest.build/Release-iphoneos/APTest.build/tmp'
+New Relic: map file upload attempt #2 (of 3)
+Using URL: https://mobile-symbol-upload.newrelic.com
+New Relic: Successfully uploaded map files
