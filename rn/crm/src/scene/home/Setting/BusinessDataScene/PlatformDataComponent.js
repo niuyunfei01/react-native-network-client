@@ -112,25 +112,23 @@ export default class PlatformDataComponent extends PureComponent {
     this.focus()
   }
 
-  getInitData = () => {
-    const {start_date, end_date} = this.state
-    this.getData(start_date, end_date)
-  }
-
   componentDidMount() {
     const {navigation} = this.props
-    this.getInitData()
+    this.getData()
     this.focus = navigation.addListener('focus', () => {
-      this.getInitData()
+      this.getData()
     })
   }
 
-  getData = (start_date, end_date) => {
-    if (!start_date || !end_date)
-      return
+  getData = (start = '', end = '') => {
+    const {start_date, end_date} = this.state
+    if (!start || !end) {
+      start = start_date
+      end = end_date
+    }
     const {store_id, accessToken} = this.props
     const url = `/v1/new_api/analysis/platform_stat?access_token=${accessToken}`
-    const params = {store_id: store_id, start_date: start_date, end_date: end_date}
+    const params = {store_id: store_id, start_date: start, end_date: end}
     showModal('加载数据中')
     HttpUtils.get(url, params).then((res = []) => {
       hideModal()
@@ -139,12 +137,10 @@ export default class PlatformDataComponent extends PureComponent {
   }
 
   setTime = (start_date, end_date) => {
-    this.setState({start_date: start_date, end_date: end_date})
+    this.setState({start_date: start_date, end_date: end_date, custom_date_visible: false})
   }
   setHeaderBtn = (index) => {
-    const {selectDate, yesterday_datetime, week_datetime} = this.state
-    if (selectDate === index)
-      return
+    const {yesterday_datetime, week_datetime} = this.state
     switch (index) {
       case 0:
         this.setTime(yesterday_datetime, yesterday_datetime)
@@ -291,15 +287,21 @@ export default class PlatformDataComponent extends PureComponent {
                   onPress={() => this.setModal(false, '', '')}/>
     )
   }
+
+  closeCustomDateComponent = () => {
+    this.setState({custom_date_visible: false})
+  }
+  getCustomData = async (startTime, endTime) => {
+    await this.setTime(startTime, endTime)
+    this.getData()
+  }
+
   renderCustomerDate = () => {
     const {custom_date_visible} = this.state
     return (
       <CustomDateComponent visible={custom_date_visible}
-                           getData={(startTime, endTime) => {
-                             this.setTime(startTime, endTime)
-                             this.getData(startTime, endTime)
-                           }}
-                           onClose={() => this.setState({custom_date_visible: false})}/>
+                           getData={(startTime, endTime) => this.getCustomData(startTime, endTime)}
+                           onClose={this.closeCustomDateComponent}/>
     )
   }
 

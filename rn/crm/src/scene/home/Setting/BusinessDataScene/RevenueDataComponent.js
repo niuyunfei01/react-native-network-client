@@ -288,8 +288,8 @@ export default class RevenueDataComponent extends PureComponent {
   }
   renderHistoryData = () => {
     const {
-      selectHistory, selectHistoryItem, history_data, current_datetime, yesterday_datetime, week_datetime,
-      month_datetime, yesterday_data, summary
+      selectHistory, selectHistoryItem, history_data, yesterday_datetime, week_datetime, month_datetime, yesterday_data,
+      summary
     } = this.state
     const {value = [], label = []} = history_data
     const decimalPlaces = value.filter(item => item > 10).length > 0 ? 0 : 2
