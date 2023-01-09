@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, ScrollView, StyleSheet, TouchableOpacity, Text, InteractionManager} from "react-native";
+import {View, ScrollView, StyleSheet, TouchableOpacity, Text} from "react-native";
 import {connect} from "react-redux";
 import {SvgXml} from "react-native-svg";
 import {back, down} from "../../../../svg/svg";
@@ -8,7 +8,8 @@ import RevenueDataComponent from "./RevenueDataComponent";
 import DeliveryDataComponent from "./DeliveryDataComponent";
 import PlatformDataComponent from "./PlatformDataComponent";
 import ProfitAndLossComponent from "./ProfitAndLossComponent";
-import Config from "../../../../pubilc/common/config";
+import TopSelectModal from "../../../../pubilc/component/TopSelectModal";
+import HttpUtils from "../../../../pubilc/util/http";
 
 const styles = StyleSheet.create({
   headerWrap: {
@@ -80,17 +81,60 @@ class BusinessDataScene extends PureComponent {
   state = {
     store_id: this.props.global?.store_id,
     store_name: this.props.global?.store_info?.name,
+    store_list: [],
+    page: 1,
+    is_last_page: false,
+    page_size: 10,
     selectCategory: 0,
+    selectStoreVisible: false,
+    show_select_store: true,
+  }
+  getStoreList = () => {
+    const {accessToken, only_one_store} = this.props.global;
+    const {page_size, page, store_list, is_last_page, show_select_store} = this.state
+    if (only_one_store || is_last_page || !show_select_store)
+      return
+    let params = {
+      page: page,
+      page_size: page_size
+    }
+    this.setState({refreshing: true})
+    const api = `/v4/wsb_store/listCanReadStore?access_token=${accessToken}`
+    HttpUtils.get(api, params).then(res => {
+      const {lists, page, isLastPage} = res
+      if (page === 1) {
+        lists.shift()
+      }
+      let list = page !== 1 ? store_list.concat(lists) : lists
+      this.setState({
+        store_list: list,
+        page: page + 1,
+        refreshing: false,
+        is_last_page: isLastPage
+      })
+    }).catch(() => {
+      this.setState({refreshing: false})
+    })
   }
 
-  onPress = (route, params) => {
-    InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.navigate(route, params);
-    });
+  componentWillUnmount() {
+    this.focus()
   }
+
+  componentDidMount() {
+    const {navigation} = this.props
+    this.focus = navigation.addListener('focus', () => {
+      this.getStoreList()
+    })
+  }
+
   selectStore = () => {
-    this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.setStoreInfo(item)})
-
+    let {show_select_store} = this.state;
+    if (show_select_store) {
+      this.setState({
+        selectStoreVisible: true
+      })
+    }
   }
   renderHeader = () => {
     let {store_name} = this.state;
@@ -116,7 +160,7 @@ class BusinessDataScene extends PureComponent {
   }
   setStoreInfo = (item) => {
     const {name, id} = item
-    this.setState({store_name: name, store_id: id})
+    this.setState({store_name: name, store_id: id, selectStoreVisible: false})
   }
 
   setCategory = (index) => {
@@ -163,6 +207,23 @@ class BusinessDataScene extends PureComponent {
         return null
     }
   }
+  renderTopSelectStore = () => {
+    const {selectStoreVisible, refreshing, store_id, store_list = []} = this.state
+    return (
+      <TopSelectModal visible={selectStoreVisible}
+                      marTop={40}
+                      list={store_list}
+                      label_field={'name'}
+                      value_field={'id'}
+                      default_val={store_id}
+                      onEndReachedThreshold={0.3}
+                      onEndReached={this.getStoreList}
+                      refreshing={refreshing}
+                      initialNumToRender={10}
+                      onPress={(item) => this.setStoreInfo(item)}
+                      onClose={() => this.setState({selectStoreVisible: false})}/>
+    )
+  }
 
   render() {
 
@@ -173,6 +234,7 @@ class BusinessDataScene extends PureComponent {
         <ScrollView>
           {this.renderContent()}
         </ScrollView>
+        {this.renderTopSelectStore()}
       </>
     );
   }

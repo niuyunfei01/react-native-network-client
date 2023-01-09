@@ -1,4 +1,4 @@
-import React, {PureComponent} from "react";
+import React, {Component} from "react";
 import {View, StyleSheet, TouchableOpacity, Text, Dimensions} from "react-native";
 import colors from "../../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -90,7 +90,7 @@ const history_styles = StyleSheet.create({
 })
 
 let name = ''
-export default class RevenueDataComponent extends PureComponent {
+export default class RevenueDataComponent extends Component {
 
   constructor(props) {
     super(props);
@@ -122,32 +122,31 @@ export default class RevenueDataComponent extends PureComponent {
     }
   }
 
-  getInitData = () => {
+  getInitData = (store_id) => {
     const {end_date, start_date, selectHistory, selectHistoryItem, yesterday_datetime} = this.state
-    this.getData(start_date, end_date, selectHistory, selectHistoryItem)
-    this.getData(yesterday_datetime, yesterday_datetime, selectHistory, selectHistoryItem)
+    this.getData(store_id, start_date, end_date, selectHistory, selectHistoryItem)
+    this.getData(store_id, yesterday_datetime, yesterday_datetime, selectHistory, selectHistoryItem)
+  }
+
+  shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): boolean {
+
+    const {store_id} = nextProps
+    if (this.props.store_id !== store_id) {
+      this.getInitData(store_id)
+    }
+    return true
   }
 
   componentDidMount() {
-    this.getInitData()
-
-    const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-
-      this.getInitData()
-    })
+    const {store_id} = this.props
+    this.getInitData(store_id)
 
   }
 
-  componentWillUnmount() {
-    this.focus()
-  }
-
-  getData = (start_date, end_date, selectHistory = 1, key = 'gmv') => {
-    const {store_id, accessToken} = this.props
+  getData = (store_id, start_date, end_date, selectHistory = 1, key = 'gmv') => {
+    const {accessToken} = this.props
     const {current_datetime, yesterday_datetime} = this.state
     const url = `/v1/new_api/analysis/revenue_stat?access_token=${accessToken}`
-
     const params = {store_id: store_id, start_date: tool.fullDay(start_date), end_date: tool.fullDay(end_date)}
     showModal('加载数据中')
     HttpUtils.get(url, params).then(({summary = [], history = []}) => {
@@ -283,7 +282,8 @@ export default class RevenueDataComponent extends PureComponent {
 
   getHistoryData = (selectHistory, start_date, end_date) => {
     const {selectHistoryItem} = this.state
-    this.getData(start_date, end_date, selectHistory, selectHistoryItem)
+    const {store_id} = this.props
+    this.getData(store_id, start_date, end_date, selectHistory, selectHistoryItem)
     this.setState({selectHistory: selectHistory, start_date: start_date, end_date: end_date})
   }
   renderHistoryData = () => {
