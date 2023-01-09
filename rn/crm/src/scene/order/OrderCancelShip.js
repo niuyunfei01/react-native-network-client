@@ -103,7 +103,6 @@ class OrderCancelShip extends Component {
     const self = this;
     dispatch(cancelShip(ship_id, reason_id, order_id, token, async (ok, reason) => {
       this.setState({upLoading: false});
-      hideModal()
       if (ok) {
         ToastLong('撤回成功, 即将返回 ');
         this.timeOutBack(300);

@@ -192,7 +192,6 @@ class ApplyScene extends PureComponent {
     })
     dispatch(logout());
     dispatch(customerApply(data, (success, msg, res) => {
-      hideModal();
       this.setState({doingApply: false})
       if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");

@@ -125,9 +125,9 @@ class ChatRoom extends React.PureComponent {
     }
     this.setState({refreshing: true})
     const api = `/im/get_im_detail?store_id=${store_id}&access_token=${accessToken}`
-    getWithTplIm(api, params, im.im_config.im_url, (json) => {
-      if (json.ok) {
-        let {lists, page, isLastPage} = json.obj
+    getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
+      if (ok) {
+        let {lists, page, isLastPage} = obj
         let list = page > 1 ? messages.concat(lists) : lists
         if (page == 1) this.setState({new_message_id: list[0].id})
         this.setState({
@@ -137,7 +137,7 @@ class ChatRoom extends React.PureComponent {
           inverted: list?.length > 5
         })
       } else {
-        ToastShort(`${json.reason}`)
+        ToastShort(`${reason}`)
       }
     }, (error) => {
       this.setState({refreshing: false})

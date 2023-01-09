@@ -46,15 +46,16 @@ class StoreSelect extends PureComponent {
     };
     this.clearHandle = this.clearHandle.bind(this)
     this.onCancel = this.onCancel.bind(this)
+    this.searchInput = undefined
   }
 
   componentDidMount() {
     this.fetchData()
     tool.debounces(() => {
-      this.searchInput.focus()
+      this.searchInput && this.searchInput.focus()
     }, 800)
   }
-
+  
   clearHandle = () => {
     this.setState({
       searchKeywords: '',

@@ -56,7 +56,6 @@ class AuditRefundScene extends Component {
     const {dispatch, global} = this.props;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
       0, (ok, msg, data) => {
-        hideModal();
         if (ok) {
           ToastLong('发送成功,即将返回上一页');
           this.setState({onSubmitting: false});
@@ -64,6 +63,7 @@ class AuditRefundScene extends Component {
             this.props.navigation.goBack()
           }, 1000)
         } else {
+          hideModal();
           this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
         }
       }));

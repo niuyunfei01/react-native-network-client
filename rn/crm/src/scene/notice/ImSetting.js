@@ -63,11 +63,9 @@ class ImSetting extends React.PureComponent {
       [field]: value
     }
     HttpUtils.post.bind(this.props)(api, params).then(() => {
-      hideModal()
       ToastShort("设置成功");
       dispatch(getStoreImConfig(accessToken, store_id))
     }).catch(e => {
-      hideModal()
       ToastShort(e.reason)
     })
   }

@@ -90,7 +90,6 @@ class SeparatedExpenseInfo extends PureComponent {
       })
     }).catch(() => {
       ToastLong("请求失败，请稍后再试")
-      hideModal()
       this.props.navigation.goBack()
     })
 
