@@ -1,6 +1,5 @@
 app_identifier("com.waisongbang.app") # The bundle identifier of your app
 apple_id("dingzhigang@cainiaomeishi.com") # Your Apple Developer Portal username
-apple_password("Hwcnc1019") # Your Apple Developer Portal username
 apple_specific_password("rcyf-hmko-mewi-rfni") # Your Apple Developer Portal username
 
 itc_team_id("118236456") # App Store Connect Team ID
