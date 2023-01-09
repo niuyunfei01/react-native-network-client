@@ -546,7 +546,6 @@ class OrderListScene extends Component {
         })
       } else {
         ToastLong(msg);
-        hideModal()
       }
     }));
     dispatch(getStoreImConfig(accessToken, item?.id));
@@ -556,7 +555,6 @@ class OrderListScene extends Component {
         dispatch(setImRemindCount(obj.message_count))
       } else {
         ToastLong(msg);
-        hideModal()
       }
     }))
   }

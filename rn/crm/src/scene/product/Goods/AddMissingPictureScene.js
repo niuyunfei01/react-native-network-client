@@ -137,7 +137,6 @@ class AddMissingPictureScene extends React.PureComponent {
           });
         }, () => {
           ToastLong("获取上传图片的地址失败");
-          hideModal()
           this.setState({
             isUploadImg: false
           });
