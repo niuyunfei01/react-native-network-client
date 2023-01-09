@@ -157,18 +157,14 @@ class SeparatedAccountFill extends PureComponent {
         ToastLong("请先安装支付宝应用")
       } else if (resule.resultStatus === "9000") {
         ToastShort("支付成功")
-        this.PayCallback()
+        this.fetchBalance();
       } else {
         ToastLong(`支付失败`);
-        this.PayCallback()
+        
       }
     }, () => {
       hideModal();
     })
-  }
-
-  PayCallback = () => {
-    this.props.navigation.goBack()
   }
 
   wechatPay = () => {
@@ -194,11 +190,11 @@ class SeparatedAccountFill extends PureComponent {
             wechat.pay(params).then((requestJson) => {
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                this.PayCallback()
+                this.fetchBalance();
               }
             }).catch(() => {
               ToastLong(`支付失败`);
-              this.PayCallback()
+
             });
           });
         } else {
