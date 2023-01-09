@@ -219,7 +219,7 @@ export default class ProfitAndLossComponent extends PureComponent {
           </If>
           </Text>
           <Text style={styles.detailItemValue}>
-            {platform_income}<If condition={platform_income_modify == 1}>
+            {platform_income} <If condition={platform_income_modify == 1}>
             <Text style={styles.detailItemAllowModify} onPress={this.navigateToPlatformDetail}>
               修改
             </Text>

@@ -18,7 +18,7 @@ import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import PropTypes from "prop-types";
@@ -781,7 +781,9 @@ class StoreGoodsList extends Component {
     let {navigation, global} = this.props;
     const {store_id, accessToken, vendor_id} = global
     const url = `/api/get_product_detail/${id}/${vendor_id}/${store_id}?access_token=${accessToken}`
+    showModal('加载中')
     HttpUtils.get.bind(this.props)(url).then(res => {
+      hideModal()
       navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'edit', product_detail: res});
     })
 

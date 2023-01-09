@@ -929,7 +929,6 @@ class GoodsEditScene extends PureComponent {
             this.setState({weight: weight})
         }
       } else {
-        hideModal()
         showError(`${desc}`)
       }
     }))
