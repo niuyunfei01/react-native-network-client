@@ -7,7 +7,6 @@ import {
   setIsScanningBlueTooth,
   setPrinterId
 } from "../../../reducers/global/globalActions";
-import ESC from "./Ecs";
 import tool from "../tool";
 import Config from "../../common/config";
 import {sendDeviceStatus} from "../../component/jpushManage";

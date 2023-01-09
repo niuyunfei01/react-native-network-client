@@ -20,7 +20,7 @@ import {
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
 import HttpUtils from "../../pubilc/util/http";
-import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
+import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
 
 /**
@@ -49,7 +49,6 @@ const {
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_VOLUME,
   SET_AUTO_PRINT,
-  SET_INIT_JPUSH,
   SET_NET_INFO_STATUS,
   SET_NOTIFICATION_STATUS,
   SET_BACKGROUND_STATUS,
@@ -79,12 +78,6 @@ export const setNotificationStatus = (value) => {
   }
 }
 
-export const setInitJpush = (value) => {
-  return {
-    type: SET_INIT_JPUSH,
-    payload: value
-  }
-}
 export const setVolume = (value) => {
   return {
     type: SET_VOLUME,
@@ -164,7 +157,6 @@ export function setUserProfile(profile) {
 /**
  *
  * @param store_id
- * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
  * @returns {{payload: {id: *}, type: *}}
  */
 export function setCurrentStore(store_id) {
@@ -232,7 +224,6 @@ export function setCallDeliveryObj(obj) {
 export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    doJPushStop()
     doJPushDeleteAlias()
     if (typeof callback === 'function') {
       callback();

@@ -2,22 +2,23 @@ import JPush from 'jpush-react-native';
 import dayjs from "dayjs";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
+import {Platform} from "react-native";
 
 export const initJPush = () => {
 
-  JPush.setLoggerEnable(false)
-  JPush.init({
-    appKey: '30073ab80a50534d39c84d3c',
-    channel: 'app_store',
-    production: true,
-  })
-
+  JPush.setLoggerEnable(__DEV__)
+  JPush.init(Platform.select({
+    ios: {appKey: '30073ab80a50534d39c84d3c', channel: 'app_store', production: true},
+    android: {appKey: '30073ab80a50534d39c84d3c', channel: 'developer-default', production: true}
+  }))
 }
 
+let sequence = null
 export const doJPushSetAlias = (currentUser) => {
   if (currentUser) {
-    const alias = `uid_${currentUser}`;
-    JPush.setAlias({alias: alias, sequence: dayjs().unix()})
+    sequence = dayjs().unix()
+    const params = {alias: `uid_${currentUser}`, sequence: sequence}
+    JPush.setAlias(params)
     JPush.isPushStopped((isStopped) => {
       if (isStopped) {
         JPush.resumePush();
@@ -32,7 +33,8 @@ export const doJPushStop = () => {
 }
 
 export const doJPushDeleteAlias = () => {
-  JPush.deleteAlias({sequence: dayjs().unix()})
+  if (sequence)
+    JPush.deleteAlias({sequence: sequence})
 }
 
 /**
@@ -64,6 +66,7 @@ export const sendDeviceStatus = (global, data) => {
   const url = `/api/log_push_status/?access_token=${accessToken}`
 
   const params = {
+    ...data,
     notificationEnabled: notification_status === 1,
     brand: DeviceInfo.getBrand(),
     UniqueID: DeviceInfo.getUniqueId(),
