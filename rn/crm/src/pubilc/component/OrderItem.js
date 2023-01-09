@@ -251,13 +251,7 @@ class OrderItem extends React.PureComponent {
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
             {this.renderRefundDesc()}
-            <If condition={item?.btn_list && item?.btn_list?.write_off}>
-              {this.renderVerificationBtn()}
-            </If>
-            <If condition={item?.btn_list && item?.btn_list?.btn_pick_type_complete_mt}>
-              {this.renderFulfilBtn()}
-            </If>
-            <If condition={Number(item.pickType) !== 1 && showBtn}>
+            <If condition={item?.btn_list && showBtn}>
               {this.renderButton()}
             </If>
           </View>
@@ -759,6 +753,42 @@ class OrderItem extends React.PureComponent {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
+
+        <If condition={item?.btn_list && item?.btn_list?.write_off}>
+          <Button title={'门店核销'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_到店核销')
+                    this.setState({
+                      verification_modal: true,
+                    })
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * 0.8,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_pick_type_complete_mt}>
+          <Button title={'自提完成'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_自提完成')
+                    JbbAlert.show({
+                      title: '确认完成当前订单吗？',
+                      actionText: '确定',
+                      closeText: '取消',
+                      onPress: this.onFulfilOrder
+                    })
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * 0.8,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 14}}
+          />
+        </If>
 
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
 
