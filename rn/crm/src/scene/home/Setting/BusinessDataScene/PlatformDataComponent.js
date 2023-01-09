@@ -1,4 +1,4 @@
-import React, {PureComponent} from "react";
+import React, {Component} from "react";
 import {View, StyleSheet, TouchableOpacity, Text, Dimensions} from "react-native";
 import colors from "../../../../pubilc/styles/colors"
 import FastImage from "react-native-fast-image";
@@ -91,7 +91,7 @@ const DATE_CATEGORY = [
     name: '自定义'
   },
 ]
-export default class PlatformDataComponent extends PureComponent {
+export default class PlatformDataComponent extends Component {
 
   time = new Date()
   state = {
@@ -108,25 +108,26 @@ export default class PlatformDataComponent extends PureComponent {
     custom_date_visible: false
   }
 
-  componentWillUnmount() {
-    this.focus()
-  }
 
   componentDidMount() {
-    const {navigation} = this.props
-    this.getData()
-    this.focus = navigation.addListener('focus', () => {
-      this.getData()
-    })
-  }
+    const {store_id} = this.props
+    this.getData(store_id)
 
-  getData = (start = '', end = '') => {
+  }
+  shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): boolean {
+    const {store_id} = nextProps
+    if (this.props.store_id !== store_id) {
+      this.getData(store_id)
+    }
+    return true
+  }
+  getData = (store_id, start = '', end = '') => {
     const {start_date, end_date} = this.state
     if (!start || !end) {
       start = start_date
       end = end_date
     }
-    const {store_id, accessToken} = this.props
+    const {accessToken} = this.props
     const url = `/v1/new_api/analysis/platform_stat?access_token=${accessToken}`
     const params = {store_id: store_id, start_date: start, end_date: end}
     showModal('加载数据中')
@@ -140,15 +141,16 @@ export default class PlatformDataComponent extends PureComponent {
     this.setState({start_date: start_date, end_date: end_date, custom_date_visible: false})
   }
   setHeaderBtn = (index) => {
+    const {store_id} = this.props
     const {yesterday_datetime, week_datetime} = this.state
     switch (index) {
       case 0:
         this.setTime(yesterday_datetime, yesterday_datetime)
-        this.getData(yesterday_datetime, yesterday_datetime)
+        this.getData(store_id, yesterday_datetime, yesterday_datetime)
         break
       case 1:
         this.setTime(week_datetime, yesterday_datetime)
-        this.getData(week_datetime, yesterday_datetime)
+        this.getData(store_id, week_datetime, yesterday_datetime)
         break
       case 2:
         this.setState({custom_date_visible: true})
@@ -293,7 +295,8 @@ export default class PlatformDataComponent extends PureComponent {
   }
   getCustomData = async (startTime, endTime) => {
     await this.setTime(startTime, endTime)
-    this.getData()
+    const {store_id} = this.props
+    this.getData(store_id)
   }
 
   renderCustomerDate = () => {
