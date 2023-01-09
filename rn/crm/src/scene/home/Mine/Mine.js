@@ -43,7 +43,7 @@ import {
   third_recharge,
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import tool from "../../../pubilc/util/tool";
+import tool, {resetNavStack, vendor} from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
@@ -134,7 +134,7 @@ class Mine extends PureComponent {
     let {
       currVendorId,
       currVersion,
-    } = tool.vendor(this.props.global);
+    } = vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       store_id: store_id,
@@ -367,10 +367,10 @@ class Mine extends PureComponent {
     });
   }
 
-  logout = () => {
+  logout = async () => {
     const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
-    this.logoutAccount()
+    await this.logoutAccount()
     const noLoginInfo = {
       accessToken: '',
       refreshToken: '',
@@ -387,30 +387,23 @@ class Mine extends PureComponent {
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
-    dispatch(logout(() => {
-      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
-    }));
+    dispatch(logout(() => resetNavStack(navigation, Config.ROUTE_LOGIN, {})));
   }
-  logoutAccount = () => {
+  logoutAccount = async () => {
     const {accessToken, store_id} = this.props.global
     const url = `/v4/wsb_user/logout?access_token=${accessToken}`
     const params = {store_id: store_id}
-    HttpUtils.get(url, params).then(() => {
-    })
+    await HttpUtils.get(url, params)
   }
   logOutAccount = () => {
+    JbbAlert.show({
+      title: '提醒',
+      desc: '确定要退出吗？',
+      actionText: '确定',
+      closeText: '取消',
+      onPress: this.logout,
+    })
 
-    Alert.alert('提醒', `确定要退出吗？`, [
-      {
-        text: '取消',
-        style: 'cancel'
-      },
-      {
-        text: '确定',
-        style: 'default',
-        onPress: this.logout
-      }
-    ]);
   }
 
   formatArr(arr) {

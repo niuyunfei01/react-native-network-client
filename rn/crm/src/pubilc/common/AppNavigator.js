@@ -24,7 +24,6 @@ import * as globalActions from "../../reducers/global/globalActions";
 import {
   setBackgroundStatus,
   setCheckVersionAt,
-  setInitJpush,
   setNetInfo,
   setJPushStatus,
   setNotificationStatus
@@ -596,6 +595,7 @@ const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
 let isSunmiDevice = false, RegistrationID = ''
 let isHandlerTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
+let connectListener = null, tagAliasListener = null, notificationListener = null
 
 class AppNavigator extends PureComponent {
 
@@ -677,6 +677,7 @@ class AppNavigator extends PureComponent {
       lastCheckVersion: reduxGlobal.lastCheckVersion
     }
     global.noLoginInfo = noLoginInfo
+    global.noLoginInfo.screen_name = reduxGlobal.currentUserProfile?.screen_name || ''
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
   }
@@ -758,24 +759,19 @@ class AppNavigator extends PureComponent {
 
   jpushListener = () => {
     const {currentUser} = this.props.global
-    JPush.addConnectEventListener(({connectEnable}) => {
+    connectListener = ({connectEnable}) => {
       JTCPStatus = connectEnable
-      // console.log("connectEnable:" + connectEnable)
       if (connectEnable)
         doJPushSetAlias(currentUser);
-    })
+    }
+    JPush.addConnectEventListener(connectListener);
 
     JPush.getRegistrationID(({registerID}) => {
-        RegistrationID = registerID
-
-      }
-    )
-
-    //tag alias事件回调
-    JPush.addTagAliasListener(({code}) => {
-      // console.log("tagAliasListener:" + code)
+      RegistrationID = registerID
+    })
+    tagAliasListener = ({code}) => {
       if (0 === code) {
-        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval && clearInterval(setAliasInterval)
         setAliasInterval = null
         setAliasStatus = true
         store.dispatch(setJPushStatus(RegistrationID))
@@ -783,15 +779,15 @@ class AppNavigator extends PureComponent {
       }
       store.dispatch(setJPushStatus(code))
       if (code && !setAliasStatus && JTCPStatus) {
-        setAliasInterval = setTimeout(() => {
-          // console.log("setAliasInterval:" + code)
+        setAliasInterval = setInterval(() => {
           doJPushSetAlias(currentUser)
         }, 21 * 1000)
       }
-    });
+    }
+    //tag alias事件回调
+    JPush.addTagAliasListener(tagAliasListener);
     //通知回调
-
-    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
+    notificationListener = async ({messageID, extras, notificationEventType}) => {
       const {type, order_id, speak_word, store_id} = extras
       if ('notificationArrived' === notificationEventType) {
         if (!speak_word) {
@@ -814,21 +810,20 @@ class AppNavigator extends PureComponent {
         JPush.setBadge({appBadge: 0, badge: 0})
         type && this.handleTouchNotification(type, order_id)
       }
-    });
+    }
+    JPush.addNotificationListener(notificationListener);
   }
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
       const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion, not_init_jpush} = global;
+      const {accessToken, lastCheckVersion} = global;
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
-        if (not_init_jpush) {
-          initJPush()
-          store.dispatch(setInitJpush(false))
-        }
         this.jpushListener()
+        initJPush()
+
         this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
@@ -881,7 +876,7 @@ class AppNavigator extends PureComponent {
   }
 
   componentWillUnmount() {
-    setAliasInterval && clearTimeout(setAliasInterval)
+    setAliasInterval && clearInterval(setAliasInterval)
     setAliasInterval = null
     this.unSubscribe()
     unInitBlueTooth()
@@ -889,6 +884,9 @@ class AppNavigator extends PureComponent {
     this.dataPolling && clearInterval(this.dataPolling);
     this.appStateEvent && this.appStateEvent.remove()
     this.unsubscribe && this.unsubscribe()
+    connectListener && JPush.removeListener(connectListener)
+    tagAliasListener && JPush.removeListener(tagAliasListener)
+    notificationListener && JPush.removeListener(notificationListener)
   }
 
   getAppState = () => {
@@ -910,6 +908,7 @@ class AppNavigator extends PureComponent {
     })
     if (nextAppState === "background") {
       this.dataPolling && clearInterval(this.dataPolling);
+      setAliasInterval && clearInterval(setAliasInterval)
     }
   };
 

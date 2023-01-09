@@ -31,7 +31,6 @@ const {
   SET_SCANNING_BLUETOOTH_DEVICE,
   SET_AUTO_PRINT,
   SET_VOLUME,
-  SET_INIT_JPUSH,
   SET_NET_INFO_STATUS,
   SET_NOTIFICATION_STATUS,
   SET_BACKGROUND_STATUS,
@@ -89,7 +88,6 @@ const initialState = {
   lastCheckVersion: 0,
   call_delivery_obj: {},
   volume: 0,
-  not_init_jpush: true,
   net_info: {},
   notification_status: 0,
   is_background_run: 0,
@@ -118,12 +116,6 @@ export default function globalReducer(state = initialState, action) {
       return {
         ...state,
         notification_status: action.payload
-      }
-
-    case SET_INIT_JPUSH:
-      return {
-        ...state,
-        not_init_jpush: action.payload
       }
     case SET_VOLUME:
       return {

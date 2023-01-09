@@ -177,7 +177,7 @@ class HttpUtils {
   }
 
   static error(response, navigation) {
-    switch (response.error_code) {
+    switch (parseInt(response.error_code)) {
       case 10001:
       case 21327:
         this.logout(navigation)
@@ -218,7 +218,7 @@ class HttpUtils {
     native.logout().then()
 
     if (navigation !== HttpUtils) {
-      if (navigation != null) {
+      if (navigation) {
         this.resetLogin(navigation)
         return
       }

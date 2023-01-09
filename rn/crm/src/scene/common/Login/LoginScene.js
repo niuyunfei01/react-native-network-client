@@ -6,7 +6,6 @@ import {
   logout,
   sendDverifyCode,
   setCurrentStore,
-  setInitJpush,
   signIn,
 } from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
@@ -25,7 +24,6 @@ import Entypo from "react-native-vector-icons/Entypo";
 import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import Validator from "../../../pubilc/util/Validator";
-import {doJPushSetAlias, initJPush} from "../../../pubilc/component/jpushManage";
 
 
 function mapStateToProps(state) {
@@ -79,12 +77,7 @@ class LoginScene extends PureComponent {
 
   componentDidMount() {
     global.isLoginToOrderList = true
-    const {dispatch} = this.props
-    const {not_init_jpush} = this.props.global
-    if (not_init_jpush) {
-      initJPush()
-      dispatch(setInitJpush(false))
-    }
+
   }
 
   componentWillUnmount = () => {
@@ -164,7 +157,6 @@ class LoginScene extends PureComponent {
     dispatch(signIn(mobile, password, this.props, (ok, msg, uid, id) => {
       if (ok && uid) {
         //防止退出登录，重新登录不推送的问题
-        doJPushSetAlias(id)
         this.queryConfig()
         this.mixpanel.getDistinctId().then(res => {
           if (res !== uid) {

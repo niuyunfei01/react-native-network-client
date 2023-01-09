@@ -162,11 +162,11 @@ class OpenDeliveryModal extends PureComponent {
       return
     }
     const params = {store_id: store_id, phone: mobile}
-    HttpUtils.post(`/v1/new_api/Delivery/get_gxd_code?access_token=${accessToken}`, params).then(res => {
-      ToastShort(res.desc, 1)
+    HttpUtils.post(`/v1/new_api/Delivery/get_gxd_code?access_token=${accessToken}`, params).then(() => {
+      ToastShort('发送成功', 1)
       this.startCountDown(60)
-    }).catch((reason) => {
-      ToastShort(reason.desc, 1)
+    }).catch((error) => {
+      ToastShort(error.desc, 1)
     })
   }
   getUUPTPhoneCode = () => {
@@ -181,11 +181,11 @@ class OpenDeliveryModal extends PureComponent {
       return
     }
     const params = {access_token: accessToken, vendorId: vendor_id}
-    HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(res => {
-      ToastShort(res.desc, 100)
+    HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(({return_msg}) => {
+      ToastShort(return_msg, 100)
       this.startCountDown(60)
-    }).catch((reason) => {
-      ToastShort(reason.desc, 100)
+    }).catch((error) => {
+      ToastShort(error.desc, 100)
     })
   }
   getVerificationCode = () => {
@@ -202,6 +202,10 @@ class OpenDeliveryModal extends PureComponent {
       count_down: count_down
     });
   }
+  componentWillUnmount() {
+    this.interval && clearInterval(this.interval)
+  }
+
   startCountDown = (code = 60) => {
     this.interval = setInterval(() => {
       code = code - 1
@@ -336,7 +340,7 @@ class OpenDeliveryModal extends PureComponent {
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
-      ToastShort(res.desc, 100)
+      ToastShort('绑定成功', 100)
 
     }).catch(async (reason) => {
       await this.closeModal()
@@ -364,7 +368,7 @@ class OpenDeliveryModal extends PureComponent {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
 
-      ToastShort(res.desc, 100)
+      ToastShort('绑定成功', 100)
     }).catch(async (reason) => {
       await this.closeModal()
       ToastShort(reason.desc, 100)

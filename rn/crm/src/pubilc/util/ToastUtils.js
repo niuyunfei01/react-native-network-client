@@ -48,7 +48,7 @@ export function showModal(content, icon = 'loading', timeOut = 6000, position = 
     }}>
       {icon === 'loading' ? <ActivityIndicator color='#fff' size={'large'}/> :
         <Icon name={icon} style={[styles.toastIcon]}/>}
-      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+      <Text style={{color: '#ffffff', fontSize: 16, marginTop: 12}}> {content} </Text>
     </View>, {
       duration: timeOut,
       position: position,
@@ -74,7 +74,7 @@ export function showSuccess(content, position = 0) {
       paddingHorizontal: 20
     }}>
       <Icon name={'success'} style={[styles.toastIcon]}/>
-      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+      <Text style={{color: '#ffffff', fontSize: 16, marginTop: 12}}> {content} </Text>
     </View>, {
       duration: Toast.durations.SHORT,
       position: position,
@@ -96,7 +96,7 @@ export function showError(content, position = 0) {
       paddingHorizontal: 20
     }}>
       <Icon name={'warn'} style={[styles.toastIcon]}/>
-      <Text style={{color: '#ffffff', fontSize: 22, marginTop: 12}}> {content} </Text>
+      <Text style={{color: '#ffffff', fontSize: 16, marginTop: 12}}> {content} </Text>
     </View>, {
       duration: Toast.durations.SHORT,
       position: position,
@@ -110,7 +110,7 @@ export function showError(content, position = 0) {
 const styles = StyleSheet.create({
   toastIcon: {
     color: '#fff',
-    fontSize: 55,
+    fontSize: 30,
     textAlign: 'center',
   },
 })
