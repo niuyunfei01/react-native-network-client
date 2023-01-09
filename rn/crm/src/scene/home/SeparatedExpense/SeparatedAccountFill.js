@@ -152,7 +152,6 @@ class SeparatedAccountFill extends PureComponent {
       payMoney = customMoney
     const url = `/api/gen_pay_app_order/${payMoney}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${store_id}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
-      hideModal();
       const resule = await Alipay.alipay(res.result);
       if (resule.resultStatus === '4000') {
         ToastLong("请先安装支付宝应用")

@@ -35,12 +35,11 @@ export function getImRemindCount(access_token, storeId, host, callback) {
     const url = `/im/im_message_count?access_token=${access_token}&store_id=${storeId}`
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.getWithIm(url, {}, host))
       .then(res => res.json())
-      .then(json => {
-        const ok = json.ok && json.obj;
+      .then(({ok , obj, reason}) => {
         if (ok) {
-          callback(true, 'successfully', json.obj)
+          callback(true, 'successfully', obj)
         } else {
-          const error = json.reason ? json.reason : "返回数据错误";
+          const error = reason ? reason : "返回数据错误";
           callback(ok, error)
         }
       }).catch((error) => {
@@ -57,12 +56,11 @@ export function im_message_refresh(access_token, storeId, last_msg_id, group_id,
     const api = `/im/im_message_detail_refresh?access_token=${access_token}&store_id=${storeId}&last_msg_id=${last_msg_id}&group_id=${group_id}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.getWithIm(api, {}, host))
       .then(res => res.json())
-      .then(json => {
-        const ok = json.ok && json.obj;
-        if (ok && json.obj?.length > 0) {
-          callback && callback(true, '获取新消息成功', json.obj)
+      .then(({ok, obj, reason}) => {
+        if (ok && obj?.length > 0) {
+          callback && callback(true, '获取新消息成功', obj)
         } else {
-          const error = json.reason ? json.reason : "返回数据错误";
+          const error = reason ? reason : "返回数据错误";
           callback && callback(ok, error)
         }
       }).catch((error) => {
@@ -79,11 +77,11 @@ export function getStoreImConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/im_store_config?access_token=${token}&store_id=${storeId}`;
     return getWithTpl(url, (json) => {
-      if (json.ok) {
+      if (json?.ok) {
         dispatch(setImConfig(json.obj));
         callback && callback(true, '获取IM配置成功', json.obj)
       } else {
-        callback && callback(false, json.reason)
+        callback && callback(false, json?.reason)
       }
     }, (error) => {
       let msg = "获取IM配置错误: " + error;
