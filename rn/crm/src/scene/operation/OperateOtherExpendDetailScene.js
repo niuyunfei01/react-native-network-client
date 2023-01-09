@@ -38,8 +38,8 @@ class OperateOtherExpendDetailScene extends PureComponent {
     const {dispatch} = this.props;
     let {id} = this.props.route.params;
     dispatch(fetchProfitOutcomeOtherItem(id, accessToken, async (ok, obj, desc) => {
-      hideModal()
       if (ok) {
+        hideModal()
         this.setState({item: obj});
         this.props.route.params.refresh()
       } else {

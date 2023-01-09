@@ -82,11 +82,9 @@ class NoticeList extends React.PureComponent {
     const {accessToken, store_id} = this.props.global;
     store.dispatch(getImRemindCount(accessToken, store_id, im_config.im_url, (ok, msg, obj) => {
       if (ok) {
-        hideModal()
         store.dispatch(setImRemindCount(obj.message_count))
       } else {
         ToastLong(msg);
-        hideModal()
       }
     }))
   }
@@ -148,9 +146,9 @@ class NoticeList extends React.PureComponent {
     }
     this.setState({refreshing: true})
     const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
-    getWithTplIm(api, params, im.im_config.im_url, (json) => {
-      if (json.ok) {
-        const {lists, page, isLastPage} = json.obj
+    getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
+      if (ok) {
+        const {lists, page, isLastPage} = obj
         let list = page !== 1 ? message.concat(lists) : lists
         this.setState({
           message: list,
@@ -158,7 +156,7 @@ class NoticeList extends React.PureComponent {
           isLastPage: isLastPage
         })
       } else {
-        ToastShort(`${json.reason}`)
+        ToastShort(`${reason}`)
       }
     }, (error) => {
       this.setState({refreshing: false})

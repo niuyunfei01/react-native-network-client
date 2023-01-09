@@ -83,7 +83,6 @@ class SettlementPlatform extends PureComponent {
       amount: platformMoney,
       remark: remark_input_value
     }).then(log_info => {
-      hideModal()
       ToastShort('操作成功')
       this.get_log()
     }).catch(error => {

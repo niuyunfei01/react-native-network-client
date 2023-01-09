@@ -8,7 +8,7 @@ import tool from "./tool";
 let show_toast = null;
 
 export function ToastShort(content, position = -100) {
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
   if (tool.length(content) > 0) {
     show_toast = Toast.show(content, {
       duration: Toast.durations.SHORT,
@@ -22,7 +22,7 @@ export function ToastShort(content, position = -100) {
 }
 
 export function ToastLong(content, position = -100) {
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
   if (tool.length(content) > 0) {
     show_toast = Toast.show(content, {
       duration: Toast.durations.LONG,
@@ -37,7 +37,7 @@ export function ToastLong(content, position = -100) {
 
 export function showModal(content, icon = 'loading', timeOut = 6000, position = 0) {
 
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
   show_toast = Toast.show(
     <View style={{
       alignItems: 'center',
@@ -60,11 +60,11 @@ export function showModal(content, icon = 'loading', timeOut = 6000, position = 
 }
 
 export function hideModal() {
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
 }
 
 export function showSuccess(content, position = 0) {
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
   show_toast = Toast.show(
     <View style={{
       alignItems: 'center',
@@ -86,7 +86,7 @@ export function showSuccess(content, position = 0) {
 }
 
 export function showError(content, position = 0) {
-  Toast.hide(show_toast)
+  show_toast && Toast.hide(show_toast)
   show_toast = Toast.show(
     <View style={{
       alignItems: 'center',

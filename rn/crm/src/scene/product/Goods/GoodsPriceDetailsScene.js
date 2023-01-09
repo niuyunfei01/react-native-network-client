@@ -88,9 +88,8 @@ class GoodsPriceDetails extends PureComponent {
     const {dispatch} = this.props;
     let _this = this;
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, async (ok, desc, obj) => {
-
-      hideModal()
       if (ok) {
+        hideModal()
         let {price, upper_limit, lower_limit} = obj.refer_info || {};
         await _this.setState({
           query: false,
@@ -109,7 +108,6 @@ class GoodsPriceDetails extends PureComponent {
         this.setState({query: false,});
         ToastLong(desc);
       }
-
     }));
   }
 
@@ -136,7 +134,6 @@ class GoodsPriceDetails extends PureComponent {
     const {dispatch} = this.props;
     dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, async (ok, desc, obj) => {
       this.setState({uploading: false});
-      hideModal()
       if (ok) {
         await this.getListStoresGoods();
         ToastLong('提交成功');
@@ -188,7 +185,6 @@ class GoodsPriceDetails extends PureComponent {
       const {accessToken} = this.props.global;
       const {dispatch} = this.props;
       dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
-        hideModal()
         this.setState({uploading: false});
         if (ok) {
           await this.getListStoresGoods();

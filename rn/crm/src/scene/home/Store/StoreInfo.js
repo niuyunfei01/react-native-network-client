@@ -349,7 +349,6 @@ class StoreInfo extends Component {
         isBd: res.is_bd
       })
     }).catch((res) => {
-      hideModal()
       ToastLong(res.reason)
     })
   }
