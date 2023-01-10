@@ -618,7 +618,12 @@ class StoreGoodsList extends Component {
     return (
       <>
         <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white,}}>
-          <ScrollView style={styles.headerGoodsStatusWrap} horizontal={true} ref={ref => this.scrollRef = ref}>
+          <ScrollView style={styles.headerGoodsStatusWrap}
+                      horizontal={true}
+                      ref={ref => this.scrollRef = ref}
+                      automaticallyAdjustContentInsets={false}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}>
             {
               statusList.map((item, index) => {
                 const isSelect = selectedStatus.value === item.value
