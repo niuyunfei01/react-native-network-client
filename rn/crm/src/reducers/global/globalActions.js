@@ -20,7 +20,7 @@ import {
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
 import HttpUtils from "../../pubilc/util/http";
-import {doJPushDeleteAlias} from "../../pubilc/component/jpushManage";
+import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
 
 /**
@@ -221,10 +221,15 @@ export function setCallDeliveryObj(obj) {
   }
 }
 
+export const resetRedux = () => {
+  return dispatch => dispatch({type: LOGOUT_SUCCESS});
+}
+
 export function logout(callback) {
-  return dispatch => {
+  return async (dispatch) => {
     dispatch({type: LOGOUT_SUCCESS});
-    doJPushDeleteAlias()
+    await doJPushDeleteAlias()
+    await doJPushStop()
     if (typeof callback === 'function') {
       callback();
     }

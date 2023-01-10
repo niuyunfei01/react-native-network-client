@@ -14,7 +14,7 @@ import {Button, Switch} from "react-native-elements";
 import {TextArea} from "../../weui";
 import AlertModal from "../../pubilc/component/AlertModal";
 import HttpUtils from "../../pubilc/util/http";
-import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
+import {showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import {getStoreImConfig} from "../../reducers/im/imActions";
 import tool from "../../pubilc/util/tool";
 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     backgroundColor: colors.f5,
     flex: 1,
-    alignItems :"center",
+    alignItems: "center",
     justifyContent: "center"
   },
   head: {
@@ -228,9 +228,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 15
   },
-  itemRowLeft: {
-
-  },
+  itemRowLeft: {},
   row_label: {
     color: colors.color333,
     fontSize: 15

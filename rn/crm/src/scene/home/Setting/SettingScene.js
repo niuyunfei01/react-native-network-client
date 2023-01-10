@@ -246,17 +246,21 @@ class SettingScene extends PureComponent {
   }
 
   _onLogout = () => {
-    const {dispatch, navigation, global} = this.props;
+    const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
     const noLoginInfo = {
       accessToken: '',
-      currentUser: 0,
+      refreshToken: '',
+      currentUser: '',
       store_id: 0,
-      host: '',
-      enabled_good_mgr: '',
-      currVendorId: '',
-      printer_id: global.printer_id || '0',
-      order_list_by: 'expectTime asc'
+      vendor_id: 0,
+      host: Config.defaultHost,
+      enabled_good_mgr: false,
+      autoBluetoothPrint: false,
+      expireTs: 0,
+      getTokenTs: 0,
+      order_list_by: 'expectTime asc',
+      printer_id: '0',
     }
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 

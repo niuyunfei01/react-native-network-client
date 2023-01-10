@@ -596,7 +596,8 @@ class StoreGoodsList extends Component {
 
   selectGoodsStatus = (item, index) => {
     const {statusList} = this.state
-    this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
+    if (index)
+      this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
     if (index > 3) {
 
       this.setState({selectedStatus: item, showStatusList: statusList.slice(3), showMoreGoodsStatus: false})
@@ -618,7 +619,12 @@ class StoreGoodsList extends Component {
     return (
       <>
         <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white,}}>
-          <ScrollView style={styles.headerGoodsStatusWrap} horizontal={true} ref={ref => this.scrollRef = ref}>
+          <ScrollView style={styles.headerGoodsStatusWrap}
+                      horizontal={true}
+                      ref={ref => this.scrollRef = ref}
+                      automaticallyAdjustContentInsets={false}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}>
             {
               statusList.map((item, index) => {
                 const isSelect = selectedStatus.value === item.value

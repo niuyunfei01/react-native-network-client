@@ -11,7 +11,7 @@ import {SvgXml} from "react-native-svg";
 import {back, emoji, meme, no_message} from "../../svg/svg";
 import {connect} from "react-redux";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
-import EmojiSelector, { Categories } from 'react-native-emoji-selector'
+import EmojiSelector, {Categories} from 'react-native-emoji-selector'
 import BigImage from "../common/component/BigImage";
 import {im_message_refresh} from "../../reducers/im/imActions";
 import tool from "../../pubilc/util/tool";
@@ -234,7 +234,14 @@ class ChatRoom extends React.PureComponent {
 
   renderHead = () => {
     let {messageInfo} = this.state;
-    let {userName = '', order_id = '', platform_name = '', real_mobile = '', orderStatusName = '', dayId = ''} = messageInfo
+    let {
+      userName = '',
+      order_id = '',
+      platform_name = '',
+      real_mobile = '',
+      orderStatusName = '',
+      dayId = ''
+    } = messageInfo
     return (
       <View style={styles.head}>
         <SvgXml onPress={() => this.props.navigation.goBack()} xml={back()}/>
@@ -248,7 +255,8 @@ class ChatRoom extends React.PureComponent {
             <Text style={styles.headLeftTitle}>{platform_name} {dayId !== '' ? `#${dayId}` : ''} </Text>
             <Text style={styles.headLeftUser}>{userName} {real_mobile !== '' ? `尾号${real_mobile}` : ''} </Text>
           </View>
-          <Text style={styles.headRightTitle} onPress={() => this.navigationToOrderDetail(order_id)}>{orderStatusName} </Text>
+          <Text style={styles.headRightTitle}
+                onPress={() => this.navigationToOrderDetail(order_id)}>{orderStatusName} </Text>
         </If>
       </View>
     )
@@ -281,7 +289,7 @@ class ChatRoom extends React.PureComponent {
     let {messages, isCanLoadMore, isLoading, inverted} = this.state;
     return (
       <FlatList
-        ref={(flatList)=>this._flatList = flatList}
+        ref={(flatList) => this._flatList = flatList}
         style={styles.message}
         data={messages}
         showsVerticalScrollIndicator={false}
@@ -317,7 +325,8 @@ class ChatRoom extends React.PureComponent {
         <If condition={this.getVerification(item.msg_source, '2') || this.getVerification(item.msg_source, '4')}>
           <View style={{flexDirection: "row"}}>
             <View style={styles.userProfile}>
-              <Text style={styles.customerMsg}>{item.msg_source == '4' ? '骑手' : userName !== '匿名' ? userName.substring(0, 1) : '匿名'}</Text>
+              <Text
+                style={styles.customerMsg}>{item.msg_source == '4' ? '骑手' : userName !== '匿名' ? userName.substring(0, 1) : '匿名'}</Text>
             </View>
             <If condition={this.getVerification(item.msg_type, '1')}>
               <View style={styles.customerContent}>
@@ -345,11 +354,15 @@ class ChatRoom extends React.PureComponent {
                 </TouchableHighlight>
               </If>
               <If condition={item.platform == '1' || item.platform == '4'}>
-                <Text style={styles.readStatus}>{this.getVerification(item.is_read, '1') ? '已读' : '未读'}</Text>
+                <Text style={styles.readStatus}>
+                  {this.getVerification(item.is_read, '1') ? '已读' : '未读'}
+                </Text>
               </If>
             </View>
             <View style={styles.merchantProfile}>
-              <Text style={styles.merchantMsg}>{item.msg_source == '3' ? '系统' : im_config?.im_nick_name ? tool.jbbsubstr(im_config?.im_nick_name, 1) : '商'}</Text>
+              <Text style={styles.merchantMsg}>
+                {item.msg_source == '3' ? '系统' : im_config?.im_nick_name ? tool.jbbsubstr(im_config?.im_nick_name.substring(0, 1), 1) : '商'}
+              </Text>
             </View>
           </View>
         </If>
@@ -373,7 +386,7 @@ class ChatRoom extends React.PureComponent {
           placeholder={'请在此输入内容回复客户'}
           onSubmitEditing={e => this.sendMessage()}
         />
-        <TouchableOpacity onPress={this.touchEmoji} style={{ flex: 1}}>
+        <TouchableOpacity onPress={this.touchEmoji} style={{flex: 1}}>
           <SvgXml xml={emoji(32, 32)} style={{marginLeft: 10}}/>
         </TouchableOpacity>
       </View>
@@ -390,7 +403,8 @@ class ChatRoom extends React.PureComponent {
           {this.renderTab()}
         </If>
         {this.renderMessage()}
-        <KeyboardAvoidingView behavior={Platform.select({android: 'height', ios: 'padding'})} keyboardVerticalOffset={50}>
+        <KeyboardAvoidingView behavior={Platform.select({android: 'height', ios: 'padding'})}
+                              keyboardVerticalOffset={50}>
           {this.renderMsgCard()}
         </KeyboardAvoidingView>
         <If condition={showEmoji}>
@@ -504,7 +518,13 @@ const styles = StyleSheet.create({
     color: colors.color333,
     fontSize: 16
   },
-  msgCard: {backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 6, flexDirection: "row", alignItems: "center"},
+  msgCard: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: "row",
+    alignItems: "center"
+  },
   msgCardInput: {flex: 5, padding: 8, backgroundColor: colors.f5, borderRadius: 18, fontSize: 16, paddingLeft: 20},
   modalWrap: {
     flexGrow: 1,
