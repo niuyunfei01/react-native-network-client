@@ -10,5 +10,8 @@ fastlane android beta
 echo "build test ios apk..."
 fastlane ios beta
 
+git add .
+git commit -m "bundle && update ios version"
+git push
 export BABEL_ENV=dev
 
