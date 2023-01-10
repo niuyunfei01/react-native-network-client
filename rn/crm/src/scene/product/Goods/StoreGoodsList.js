@@ -134,6 +134,7 @@ class StoreGoodsList extends Component {
     const {store_id, accessToken, vendor_id, vendor_info} = this.props.global;
     const {show_audit_prod} = vendor_info
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
+    const {selectedStatus} = this.state
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${store_id}?access_token=${accessToken}`,).then(res => {
       let newStatusList
       const {
@@ -171,10 +172,12 @@ class StoreGoodsList extends Component {
         newStatusList.push({label: '未通过 ' + no_pass_audit, value: 'no_pass_audit'})
         newStatusList.push({label: '失败 ' + fail_audit, value: 'fail_audit'})
       }
+      if (!selectedStatus) {
+        this.setState({selectedStatus: newStatusList[0]})
+      }
       this.setState({
         statusList: newStatusList,
         showStatusList: newStatusList.length > 4 ? newStatusList.slice(0, 4) : newStatusList,
-        selectedStatus: newStatusList[0],
         all_amount: res.all_amount,
         all_count: res.all_count,
         inventorySummary: res,
@@ -193,8 +196,8 @@ class StoreGoodsList extends Component {
 
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
-    const selectedStatus = this.state.selectedStatus.value
-    const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus}?access_token=${accessToken}`
+    const {selectedStatus = {}} = this.state
+    const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus.value}?access_token=${accessToken}`
     const params = {
       hideAreaHot: hideAreaHot,
       is_get_all: 1
@@ -243,6 +246,7 @@ class StoreGoodsList extends Component {
       pageSize: pageNum,
       storeId: store_id,
     }
+
     if (store_id) {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
