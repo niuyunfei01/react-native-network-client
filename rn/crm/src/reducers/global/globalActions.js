@@ -221,6 +221,10 @@ export function setCallDeliveryObj(obj) {
   }
 }
 
+export const resetRedux = () => {
+  return dispatch => dispatch({type: LOGOUT_SUCCESS});
+}
+
 export function logout(callback) {
   return async (dispatch) => {
     dispatch({type: LOGOUT_SUCCESS});

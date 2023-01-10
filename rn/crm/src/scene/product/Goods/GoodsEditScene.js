@@ -518,6 +518,15 @@ class GoodsEditScene extends PureComponent {
       supply_price: supply_price || ''
     });
     this.getBasicCategory(sg_tag_id)
+    this.getSaleStatus(id)
+  }
+
+  getSaleStatus = (id) => {
+    const {store_id, accessToken} = this.props.global
+    const url = `/api_products/get_prod_with_store_detail/${store_id}/${id}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(url).then(({sp = {}}) => {
+      this.setState({sale_status: Number(sp?.status) || 1})
+    })
   }
 
   onReloadUpc = (upc_data) => {
