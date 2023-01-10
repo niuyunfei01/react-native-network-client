@@ -173,16 +173,14 @@ export default class RevenueDataComponent extends Component {
       }
       const history_data = {label: [], value: [], touch_label: []}
       history && history.map((item, index) => {
-        if (index !== history.length - 1) {
-          if (selectHistory === 30 && index % 5 === 0 || selectHistory === 7) {
-            history_data.label.push(item.date.substring(5))
-            history_data.value.push(item[key])
-          } else {
-            history_data.label.push('')
-            history_data.value.push(item[key])
-          }
-          history_data.touch_label.push(item.date.substring(5))
+        if (selectHistory === 30 && index % 5 === 0 || selectHistory === 7) {
+          history_data.label.push(item.date.substring(5))
+          history_data.value.push(item[key])
+        } else {
+          history_data.label.push('')
+          history_data.value.push(item[key])
         }
+        history_data.touch_label.push(item.date.substring(5))
       })
       const summary_part = []
       summary && summary.map((item) => {

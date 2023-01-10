@@ -37,7 +37,12 @@ import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
-import {doJPushSetAlias, initJPush, sendDeviceStatus,} from "../component/jpushManage";
+import {
+  checkPushStatus,
+  doJPushSetAlias,
+  initJPush,
+  sendDeviceStatus,
+} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
 import GlobalUtil from "../util/GlobalUtil";
@@ -589,12 +594,12 @@ const Page = (props) => {
     </NavigationContainer>
   );
 }
-let notInit = true
+let notInit = true, jpushNotInit = true
 let ios_info = {}
 const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
 let isSunmiDevice = false, RegistrationID = ''
-let isHandlerTask = false, messageQueue = [], setAliasInterval = null, JTCPStatus = false, setAliasStatus = false
+let isHandlerTask = false, messageQueue = [], setAliasInterval = null
 let connectListener = null, tagAliasListener = null, notificationListener = null
 
 class AppNavigator extends PureComponent {
@@ -757,35 +762,39 @@ class AppNavigator extends PureComponent {
     this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
   };
 
-  jpushListener = () => {
-    const {currentUser} = this.props.global
-    connectListener = ({connectEnable}) => {
-      JTCPStatus = connectEnable
+  jpushListener = async (currentUser) => {
+    connectListener = async ({connectEnable}) => {
       if (connectEnable)
-        doJPushSetAlias(currentUser);
+        await doJPushSetAlias(currentUser);
     }
-    JPush.addConnectEventListener(connectListener);
+    await JPush.addConnectEventListener(connectListener);
 
-    JPush.getRegistrationID(({registerID}) => {
+    await JPush.getRegistrationID(({registerID}) => {
       RegistrationID = registerID
     })
     tagAliasListener = ({code}) => {
+
+      if (global.pushType !== 'set')
+        return;
       if (0 === code) {
-        setAliasInterval && clearInterval(setAliasInterval)
+        setAliasInterval && clearTimeout(setAliasInterval)
         setAliasInterval = null
-        setAliasStatus = true
         store.dispatch(setJPushStatus(RegistrationID))
+        this.uploadDeviceInfo(RegistrationID)
         return
       }
       store.dispatch(setJPushStatus(code))
-      if (code && !setAliasStatus && JTCPStatus) {
-        setAliasInterval = setInterval(() => {
-          doJPushSetAlias(currentUser)
-        }, 21 * 1000)
+      if (code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = setTimeout(async () => {
+          await doJPushSetAlias(currentUser)
+        }, 2 * 1000)
+
       }
     }
+
     //tag alias事件回调
-    JPush.addTagAliasListener(tagAliasListener);
+    await JPush.addTagAliasListener(tagAliasListener);
     //通知回调
     notificationListener = async ({messageID, extras, notificationEventType}) => {
       const {type, order_id, speak_word, store_id} = extras
@@ -811,19 +820,38 @@ class AppNavigator extends PureComponent {
         type && this.handleTouchNotification(type, order_id)
       }
     }
-    JPush.addNotificationListener(notificationListener);
+    await JPush.addNotificationListener(notificationListener);
   }
+  uploadDeviceInfo = (registration_id) => {
+    const {accessToken, currentUser, store_id} = this.props.global
+    const url = `/v4/wsb_user/recordDeviceInfo?access_token=${accessToken}`
+    const params = {
+      registration_id: registration_id,
+      device_id: DeviceInfo.getUniqueId(),
+      user_id: currentUser,
+      store_id: store_id
+    }
+
+    HttpUtils.post(url, params).then(() => {
+    }).catch(() => {
+    })
+  }
+
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
       const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion} = global;
+      const {accessToken, lastCheckVersion, currentUser} = global;
+      if (accessToken && currentUser && jpushNotInit) {
+        jpushNotInit = false
+        await checkPushStatus(async () => {
+          await this.jpushListener(currentUser)
+          await initJPush()
+        })
+      }
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
-        this.jpushListener()
-        initJPush()
-
         this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
@@ -876,7 +904,7 @@ class AppNavigator extends PureComponent {
   }
 
   componentWillUnmount() {
-    setAliasInterval && clearInterval(setAliasInterval)
+    setAliasInterval && clearTimeout(setAliasInterval)
     setAliasInterval = null
     this.unSubscribe()
     unInitBlueTooth()
@@ -908,7 +936,7 @@ class AppNavigator extends PureComponent {
     })
     if (nextAppState === "background") {
       this.dataPolling && clearInterval(this.dataPolling);
-      setAliasInterval && clearInterval(setAliasInterval)
+      setAliasInterval && clearTimeout(setAliasInterval)
     }
   };
 

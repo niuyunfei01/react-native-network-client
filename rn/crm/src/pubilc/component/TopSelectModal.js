@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomColor: colors.e5,
     borderBottomWidth: 0.5
-  }
+  },
+  item_text_style: {fontSize: 14}
 })
 
 export default class TopSelectModal extends React.Component {

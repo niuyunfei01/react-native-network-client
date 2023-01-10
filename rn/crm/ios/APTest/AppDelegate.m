@@ -49,17 +49,17 @@ static void InitializeFlipper(UIApplication *application) {
 //                        channel:@"app_store"
 //               apsForProduction:YES
 //          advertisingIdentifier:nil];
-//  JPUSHRegisterEntity *entity = [[JPUSHRegisterEntity alloc] init];
-//  if (@available(iOS 12.0, *)) {
-//    entity.types = JPAuthorizationOptionAlert | JPAuthorizationOptionBadge | JPAuthorizationOptionSound | JPAuthorizationOptionProvidesAppNotificationSettings;
-//  }
-//  [JPUSHService registerForRemoteNotificationConfig:entity delegate:self];
-//  [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+  JPUSHRegisterEntity *entity = [[JPUSHRegisterEntity alloc] init];
+  if (@available(iOS 12.0, *)) {
+    entity.types = JPAuthorizationOptionAlert | JPAuthorizationOptionBadge | JPAuthorizationOptionSound | JPAuthorizationOptionProvidesAppNotificationSettings;
+  }
+  [JPUSHService registerForRemoteNotificationConfig:entity delegate:self];
+  [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
 //
 //  // 自定义消息
-//  NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-//  [defaultCenter addObserver:self selector:@selector(networkDidReceiveMessage:) name:kJPFNetworkDidReceiveMessageNotification object:nil];
-//
+  NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+  [defaultCenter addObserver:self selector:@selector(networkDidReceiveMessage:) name:kJPFNetworkDidReceiveMessageNotification object:nil];
+
 //  [JPUSHService registrationIDCompletionHandler:^(int resCode, NSString *registrationID) {
 //    NSLog(@"resCode : %d,registrationID: %@", resCode, registrationID);
 //  }];

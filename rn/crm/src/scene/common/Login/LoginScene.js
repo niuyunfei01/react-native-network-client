@@ -24,6 +24,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import {check_icon} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import Validator from "../../../pubilc/util/Validator";
+import {reLogin} from "../../../pubilc/component/jpushManage";
 
 
 function mapStateToProps(state) {
@@ -130,7 +131,7 @@ class LoginScene extends PureComponent {
   }
 
   onLogin = () => {
-    tool.debounces(() => {
+    tool.debounces(async () => {
       let {authorization, mobile, verifyCode} = this.state;
       if (!authorization) {
         return ToastShort('请您阅读并勾选协议')
@@ -143,14 +144,15 @@ class LoginScene extends PureComponent {
       if (err_msg) {
         return ToastShort(err_msg)
       }
-      this._signIn(mobile, verifyCode);
+      await this._signIn(mobile, verifyCode);
     })
   }
 
-  _signIn = (mobile, password) => {
+  _signIn = async (mobile, password) => {
     showModal("正在登录...")
     const {dispatch} = this.props;
-    dispatch(logout());
+    // dispatch(logout());
+    await reLogin()
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })

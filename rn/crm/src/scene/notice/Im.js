@@ -10,7 +10,7 @@ import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {down, no_message, no_network, set} from "../../svg/svg";
 import tool from "../../pubilc/util/tool";
-import {hideModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import LinearGradient from "react-native-linear-gradient";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../pubilc/util/http";
@@ -244,7 +244,7 @@ class NoticeList extends React.PureComponent {
     return (
       <View style={styles.head}>
         <TouchableOpacity style={styles.headLeft}
-          onPress={() => this.selectStore()}
+                          onPress={() => this.selectStore()}
         >
           <Text style={styles.headLeftTitle}>{store_name} </Text>
           <If condition={!only_one_store && show_select_store}>
@@ -262,7 +262,10 @@ class NoticeList extends React.PureComponent {
       <View style={styles.tab}>
         <For of={tabOption} each="info" index="i">
           <TouchableOpacity
-            style={[styles.tabItem, {borderBottomWidth: selected === info.key ? 2 : 0, borderBottomColor: selected === info.key ? colors.main_color : colors.white}]}
+            style={[styles.tabItem, {
+              borderBottomWidth: selected === info.key ? 2 : 0,
+              borderBottomColor: selected === info.key ? colors.main_color : colors.white
+            }]}
             onPress={() => {
               let query = this.state.query;
               query.page = 1;
@@ -276,7 +279,10 @@ class NoticeList extends React.PureComponent {
             }}
             key={i}
           >
-            <Text style={{color: selected === info.key ? colors.main_color : colors.color333, fontWeight: selected === info.key ? "bold" : "400"}}>{info.label} </Text>
+            <Text style={{
+              color: selected === info.key ? colors.main_color : colors.color333,
+              fontWeight: selected === info.key ? "bold" : "400"
+            }}>{info.label} </Text>
           </TouchableOpacity>
         </For>
       </View>
@@ -313,7 +319,10 @@ class NoticeList extends React.PureComponent {
     let {message} = this.state
     let {item, index} = info
     return (
-      <TouchableOpacity style={[styles.messageItem, {borderBottomWidth: index == message.length - 1 ? 0 : 0.5, borderBottomColor: colors.e5}]} onPress={() => this.navigationToChatRoom(item)}>
+      <TouchableOpacity style={[styles.messageItem, {
+        borderBottomWidth: index == message.length - 1 ? 0 : 0.5,
+        borderBottomColor: colors.e5
+      }]} onPress={() => this.navigationToChatRoom(item)}>
         <If condition={item?.is_read == '1'}>
           <View style={styles.isReadIcon}/>
         </If>
@@ -325,7 +334,8 @@ class NoticeList extends React.PureComponent {
             <Text style={styles.userName}>{item?.userName} {item?.dayId !== '' ? `#${item?.dayId}` : ''} </Text>
             <Text style={styles.messageTime}>{item.send_time} </Text>
           </View>
-          <Text style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
+          <Text
+            style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
           <Text style={styles.messageInfo} numberOfLines={1} ellipsizeMode={'tail'}>
             {item.msg_type == '1' ? item?.last_message : `[图片]`}
           </Text>
@@ -348,7 +358,8 @@ class NoticeList extends React.PureComponent {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           colors={['#47D763', '#26B942']}>
-          <Text style={[styles.floatText, Platform.OS === 'android' && {width: 24}]} allowFontScaling={false}>旧版消息</Text>
+          <Text style={[styles.floatText, Platform.OS === 'android' && {width: 24}]}
+                allowFontScaling={false}>旧版消息</Text>
         </LinearGradient>
       </TouchableOpacity>
     )
@@ -373,7 +384,7 @@ class NoticeList extends React.PureComponent {
   }
 
   render() {
-    let {isLastPage} = this.state;
+    let {isLastPage, message = []} = this.state;
     let {net_info} = this.props.global
     return (
       <View style={styles.mainContainer}>
@@ -383,7 +394,7 @@ class NoticeList extends React.PureComponent {
         {net_info?.isConnected ?
           this.renderMessage() : this.networkEmptyComponent()
         }
-        <If condition={isLastPage}>
+        <If condition={isLastPage && message.length > 0}>
           {this.renderEmptyText()}
         </If>
         {this.renderFloatIcon()}
@@ -453,7 +464,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10
   },
-  isReadIcon: {width: 8, height: 8, backgroundColor: '#FF442F', borderRadius: 4, position: "absolute", top: 8, left: 40, zIndex: 999},
+  isReadIcon: {
+    width: 8,
+    height: 8,
+    backgroundColor: '#FF442F',
+    borderRadius: 4,
+    position: "absolute",
+    top: 8,
+    left: 40,
+    zIndex: 999
+  },
   profileName: {
     color: colors.main_color,
     fontSize: 15

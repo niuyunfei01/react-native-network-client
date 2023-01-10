@@ -42,8 +42,7 @@ export function getImRemindCount(access_token, storeId, host, callback) {
           const error = reason ? reason : "返回数据错误";
           callback(ok, error)
         }
-      }).catch((error) => {
-      callback(false, "网络错误, 请稍后重试")
+      }).catch(() => {
     });
   }
 }

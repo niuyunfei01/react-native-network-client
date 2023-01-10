@@ -4,38 +4,59 @@ import DeviceInfo from "react-native-device-info";
 import HttpUtils from "../../util/http";
 import {Platform} from "react-native";
 
-export const initJPush = () => {
+export const initJPush = async () => {
 
-  JPush.setLoggerEnable(__DEV__)
-  JPush.init(Platform.select({
+  await JPush.setLoggerEnable(__DEV__)
+  await JPush.init(Platform.select({
     ios: {appKey: '30073ab80a50534d39c84d3c', channel: 'app_store', production: true},
     android: {appKey: '30073ab80a50534d39c84d3c', channel: 'developer-default', production: true}
   }))
+ }
+
+export const reLogin = async () => {
+  await JPush.isPushStopped(async (isStopped) => {
+    if (isStopped) {
+      await JPush.resumePush();
+    }
+  })
 }
 
-let sequence = null
-export const doJPushSetAlias = (currentUser) => {
-  if (currentUser) {
-    sequence = dayjs().unix()
+export const checkPushStatus = async (callback = () => {
+}) => {
+  switch (Platform.OS) {
+    case "ios":
+      callback()
+      break
+    case "android":
+      await JPush.isPushStopped(async (isStopped) => {
+        if (isStopped) {
+          await JPush.resumePush();
+        }
+        callback()
+      })
+      break
+  }
+}
+
+export const doJPushSetAlias = async (currentUser) => {
+    if (currentUser) {
+    global.pushType = 'set'
+    const sequence = dayjs().valueOf()
     const params = {alias: `uid_${currentUser}`, sequence: sequence}
-    JPush.setAlias(params)
-    JPush.isPushStopped((isStopped) => {
-      if (isStopped) {
-        JPush.resumePush();
-      }
-    })
+    await JPush.setAlias(params)
 
   }
 }
 
-export const doJPushStop = () => {
-  JPush.stopPush()
+export const doJPushStop = async () => {
+  await JPush.stopPush()
 }
 
-export const doJPushDeleteAlias = () => {
-  if (sequence)
-    JPush.deleteAlias({sequence: sequence})
-}
+export const doJPushDeleteAlias = async () => {
+  global.pushType = 'delete'
+  const sequence = dayjs().valueOf()
+  await JPush.deleteAlias({sequence: sequence})
+  }
 
 /**
  Map<String, Object> deviceStatus = Maps.newHashMap();
