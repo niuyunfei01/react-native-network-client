@@ -255,30 +255,6 @@ export function orderUpdateRequest() {
   }
 }
 
-/**
- *
- */
-export function updateOrder(userId, username, email, sessionToken) {
-  return dispatch => {
-    dispatch(orderUpdateRequest())
-    return appAuthToken.getSessionToken(sessionToken)
-      .then((token) => {
-        return BackendFactory(token).updateProfile(userId,
-          {
-            username: username,
-            email: email
-          }
-        )
-      })
-      .then(() => {
-        dispatch(orderUpdateSuccess())
-        dispatch(getOrder())
-      })
-      .catch((error) => {
-        dispatch(orderUpdateFailure(error))
-      })
-  }
-}
 
 
 export function saveOrderDelayShip(data, token, callback) {
