@@ -1,0 +1,8 @@
+app_identifier("com.waisongbang.app") # The bundle identifier of your app
+itc_team_id("118236456") # App Store Connect Team ID
+team_id("YVB38MZTJM") # Developer Portal Team ID
+
+package_name("cn.cainiaoshicai.crm") # e.g. com.krausefx.app
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
