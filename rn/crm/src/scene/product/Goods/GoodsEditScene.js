@@ -486,7 +486,7 @@ class GoodsEditScene extends PureComponent {
         upload_files.push({
           id: img_id,
           name: mid_list_img[img_id].name,
-          url: mid_list_img[img_id].url,
+          url: mid_list_img[img_id]?.url,
           key: mid_list_img[img_id].name
         })
       }
@@ -1839,8 +1839,8 @@ class GoodsEditScene extends PureComponent {
                 <View/>
               </View>
               <View style={styles.modifyMainPic}>
-                <If condition={selectPreviewPic.url}>
-                  <FastImage source={{uri: selectPreviewPic.url}}
+                <If condition={selectPreviewPic?.url}>
+                  <FastImage source={{uri: selectPreviewPic?.url}}
                              resizeMode={FastImage.resizeMode.contain}
                              style={{height: 2.5 * height / 5.2}}/>
                 </If>
@@ -1901,7 +1901,7 @@ class GoodsEditScene extends PureComponent {
   onPressCell = (item) => {
     const {upload_files} = this.state
     const itemIndex = upload_files.findIndex(items => items.key === item.key)
-    this.setState({selectPreviewPic: {url: item.url, index: itemIndex, key: item.id}})
+    this.setState({selectPreviewPic: {url: item?.url, index: itemIndex, key: item?.id}})
   }
 
   closePicList = () => {
@@ -2097,7 +2097,7 @@ class GoodsEditScene extends PureComponent {
 
     [upload_files[0], upload_files[selectPreviewPic.index]] = [upload_files[selectPreviewPic.index], upload_files[0]]
 
-    selectPreviewPic = {index: 0, url: upload_files[0].url, key: upload_files[0].id}
+    selectPreviewPic = {index: 0, url: upload_files[0]?.url, key: upload_files[0].id}
 
     this.setState({upload_files: [...upload_files], selectPreviewPic: selectPreviewPic})
   }
@@ -2109,7 +2109,7 @@ class GoodsEditScene extends PureComponent {
     return (
       <View style={styles.hasImageList}>
         <FastImage style={selectPreviewPic.index === index ? styles.selectImage : styles.img_add}
-                   source={{uri: item.url}}
+                   source={{uri: item?.url}}
                    resizeMode={FastImage.resizeMode.contain}/>
         <If condition={!vendor_has && !store_has && this.isProdEditable()}>
           <TouchableOpacity style={styles.deleteUploadImageIcon}
@@ -2277,14 +2277,14 @@ class GoodsEditScene extends PureComponent {
     const nextImage = upload_files[selectPreviewPic.index]
     if (nextImage) {
       this.setState({
-        selectPreviewPic: {...selectPreviewPic, url: nextImage.url},
+        selectPreviewPic: {...selectPreviewPic, url: nextImage?.url},
         upload_files: [...upload_files]
       })
       return
     }
     if (upload_files[0]) {
       this.setState({
-        selectPreviewPic: {...selectPreviewPic, index: 0, url: upload_files[0].url},
+        selectPreviewPic: {...selectPreviewPic, index: 0, url: upload_files[0]?.url},
 
         upload_files: [...upload_files]
       })
@@ -2304,12 +2304,12 @@ class GoodsEditScene extends PureComponent {
           {
             upload_files.map((item, index) => {
               if (index === 0)
-                selectPreviewPic = {index: 0, url: item.url, key: item.id}
+                selectPreviewPic = {index: 0, url: item?.url, key: item.id}
               return (
                 <View key={index} style={styles.hasImageList}>
                   <TouchableOpacity
                     onPress={() => this.setState({dragPicVisible: true, selectPreviewPic: selectPreviewPic})}>
-                    <FastImage style={styles.img_add} source={{uri: item.url}}
+                    <FastImage style={styles.img_add} source={{uri: item?.url}}
                                resizeMode={FastImage.resizeMode.contain}/>
                   </TouchableOpacity>
                   <If condition={!vendor_has && !store_has && this.isProdEditable()}>

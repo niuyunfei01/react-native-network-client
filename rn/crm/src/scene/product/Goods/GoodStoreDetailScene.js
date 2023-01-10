@@ -81,7 +81,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, item} = (this.props.route.params || {});
+    let {pid = 0, storeId, item} = (this.props.route.params || {});
     let {is_service_mgr, is_helper, allow_merchants_edit_prod, currVendorId} = tool.vendor(this.props.global);
 
     this.state = {
