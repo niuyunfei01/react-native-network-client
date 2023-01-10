@@ -596,7 +596,8 @@ class StoreGoodsList extends Component {
 
   selectGoodsStatus = (item, index) => {
     const {statusList} = this.state
-    this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
+    if (index)
+      this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
     if (index > 3) {
 
       this.setState({selectedStatus: item, showStatusList: statusList.slice(3), showMoreGoodsStatus: false})
