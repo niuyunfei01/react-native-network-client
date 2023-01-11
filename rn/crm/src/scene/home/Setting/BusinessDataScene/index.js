@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, ScrollView, StyleSheet, TouchableOpacity, Text} from "react-native";
+import {View, ScrollView, StyleSheet, TouchableOpacity, Text, InteractionManager} from "react-native";
 import {connect} from "react-redux";
 import {SvgXml} from "react-native-svg";
 import {back, down} from "../../../../svg/svg";
@@ -10,6 +10,7 @@ import PlatformDataComponent from "./PlatformDataComponent";
 import ProfitAndLossComponent from "./ProfitAndLossComponent";
 import TopSelectModal from "../../../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../../../pubilc/util/http";
+import Config from "../../../../pubilc/common/config";
 
 const styles = StyleSheet.create({
   headerWrap: {
@@ -88,6 +89,9 @@ class BusinessDataScene extends PureComponent {
     selectCategory: 0,
     selectStoreVisible: false,
     show_select_store: true,
+    storeInfo: {
+      role_desc: ''
+    }
   }
   getStoreList = () => {
     const {accessToken, only_one_store} = this.props.global;
@@ -125,11 +129,33 @@ class BusinessDataScene extends PureComponent {
     const {navigation} = this.props
     this.focus = navigation.addListener('focus', () => {
       this.getStoreList()
+      this.fetchMineData()
     })
   }
 
+  fetchMineData = () => {
+    let {store_id} = this.state;
+    const {accessToken} = this.props.global
+    const api = `/v4/wsb_user/personalCenter`;
+    HttpUtils.get.bind(this.props)(api, {store_id: store_id, access_token: accessToken}).then(res => {
+      this.setState({
+        storeInfo: {
+          role_desc: res.role_desc,
+        }
+      })
+    })
+  }
+  onPress = (route, params) => {
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
+  }
   selectStore = () => {
-    let {show_select_store} = this.state;
+    let {show_select_store, storeInfo} = this.state;
+    if (storeInfo?.role_desc === '运营') {
+      this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.setStoreInfo(item)})
+      return
+    }
     if (show_select_store) {
       this.setState({
         selectStoreVisible: true
