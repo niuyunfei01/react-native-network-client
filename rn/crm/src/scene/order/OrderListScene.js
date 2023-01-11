@@ -542,6 +542,7 @@ class OrderListScene extends Component {
       if (ok) {
         tool.debounces(() => {
           hideModal()
+          this.getVendor()
           this.onRefresh(9)
         })
       } else {
