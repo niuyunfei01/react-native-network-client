@@ -135,29 +135,31 @@ class SelectCity extends Component {
 
   render() {
     let {allCityList, check_right} = this.state;
-    let {city = '北京'} = this.props.route.params;
+    let {city = ''} = this.props.route.params;
     return (
       <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={styles.contentWrap}>
         {/*定位当前城市*/}
-        <View style={styles.headerWrap}>
-          <Text style={styles.n1}>当前定位城市 </Text>
-          <View style={{
-            backgroundColor: colors.f5,
-            height: 28,
-            borderRadius: 14,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 4,
-          }}>
-            <Entypo name={'location-pin'} style={{
-              fontSize: 15,
-              color: colors.color666,
-              textAlignVertical: "center"
-            }}/>
-            <Text style={styles.n1}> {city} </Text>
+        <If condition={city !== '选择城市'}>
+          <View style={styles.headerWrap}>
+            <Text style={styles.n1}>当前定位城市 </Text>
+            <View style={{
+              backgroundColor: colors.f5,
+              height: 28,
+              borderRadius: 14,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 4,
+            }}>
+              <Entypo name={'location-pin'} style={{
+                fontSize: 15,
+                color: colors.color666,
+                textAlignVertical: "center"
+              }}/>
+              <Text style={styles.n1}> {city} </Text>
+            </View>
           </View>
-        </View>
+        </If>
         <ScrollView
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}

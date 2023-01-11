@@ -296,7 +296,7 @@ class SearchShop extends Component {
           <If condition={show_select_city}>
             <TouchableOpacity
               style={{
-                width: 66,
+                width: 86,
                 borderRightWidth: 1,
                 borderRightColor: colors.colorDDD,
                 flexDirection: 'row',
@@ -304,8 +304,12 @@ class SearchShop extends Component {
               }}
               onPress={() => this.goSelectCity()}
             >
-              <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-                {tool.jbbsubstr(city_name, 3)}
+              <Text style={{
+                textAlign: 'center',
+                fontSize: 14,
+                color: city_name === '选择城市' ? colors.color666 : colors.color333
+              }}>
+                {tool.jbbsubstr(city_name, 5)}
               </Text>
               <SvgXml xml={this_down()}/>
             </TouchableOpacity>
