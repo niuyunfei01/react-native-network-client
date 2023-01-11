@@ -10,7 +10,7 @@ import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {down, no_message, no_network, set} from "../../svg/svg";
 import tool from "../../pubilc/util/tool";
-import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import LinearGradient from "react-native-linear-gradient";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import HttpUtils from "../../pubilc/util/http";
@@ -19,6 +19,7 @@ import Config from "../../pubilc/common/config";
 import {getWithTplIm} from "../../pubilc/util/common";
 import store from "../../pubilc/util/configureStore";
 import {getImRemindCount, setImRemindCount} from "../../reducers/im/imActions";
+import {Badge} from "react-native-elements";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -79,7 +80,8 @@ class NoticeList extends React.PureComponent {
 
   fetchRemindCount = () => {
     let {im_config} = this.props.im
-    const {accessToken, store_id} = this.props.global;
+    const {accessToken} = this.props.global;
+    let {store_id} = this.state;
     store.dispatch(getImRemindCount(accessToken, store_id, im_config.im_url, (ok, msg, obj) => {
       if (ok) {
         store.dispatch(setImRemindCount(obj.message_count))
@@ -144,10 +146,12 @@ class NoticeList extends React.PureComponent {
       page_size: query.page_size,
       status: selected
     }
+    showModal('加载中')
     this.setState({refreshing: true})
     const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
     getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
       if (ok) {
+        hideModal()
         const {lists, page, isLastPage} = obj
         let list = page !== 1 ? message.concat(lists) : lists
         this.setState({
@@ -159,6 +163,7 @@ class NoticeList extends React.PureComponent {
         ToastShort(`${reason}`)
       }
     }, (error) => {
+      hideModal()
       this.setState({refreshing: false})
     })
   }
@@ -170,9 +175,7 @@ class NoticeList extends React.PureComponent {
       query.page = 1;
       this.setState({
         isLastPage: false,
-        query: query,
-        store_name: this.props.global.store_info?.name,
-        store_id: this.props.global.store_id
+        query: query
       }, () => {
         this.fetchData()
       })
@@ -230,8 +233,11 @@ class NoticeList extends React.PureComponent {
   setStoreInfo = (item) => {
     const {name, id} = item
     this.setState({
-      store_name: name, store_id: id, selectStoreVisible: false
-    }, () => this.fetchData(true))
+      store_name: name, store_id: id, selectStoreVisible: false, isLastPage: false
+    }, () => {
+      this.fetchRemindCount()
+      this.fetchData(true)
+    })
   }
 
   navigationToChatRoom = (info) => {
@@ -239,7 +245,7 @@ class NoticeList extends React.PureComponent {
   }
 
   renderHead = () => {
-    let {store_name, show_select_store} = this.state;
+    let {store_name, show_select_store, store_id} = this.state;
     const {only_one_store} = this.props.global;
     return (
       <View style={styles.head}>
@@ -251,7 +257,7 @@ class NoticeList extends React.PureComponent {
             <SvgXml xml={down(20, 20, colors.color666)}/>
           </If>
         </TouchableOpacity>
-        <SvgXml onPress={() => this.onPress(Config.ROUTE_IM_SETTING)} xml={set(34, 34, colors.white)}/>
+        <SvgXml onPress={() => this.onPress(Config.ROUTE_IM_SETTING, {es_id: store_id})} xml={set(34, 34, colors.white)}/>
       </View>
     )
   }
@@ -351,8 +357,19 @@ class NoticeList extends React.PureComponent {
   }
 
   renderFloatIcon = () => {
+    let {old_remind_count = {}} = this.props.im
+    let group_num = 0
+    Object.keys(old_remind_count?.group_type_num).map(key => {
+      group_num += Number(old_remind_count?.group_type_num[key])
+    })
     return (
       <TouchableOpacity style={styles.floatBox} onPress={() => this.onPress('Home')}>
+        <If condition={group_num > 0}>
+          <Badge
+            status="error"
+            value={group_num > 99 ? '99+' : group_num}
+            containerStyle={styles.statusTabBadge}/>
+        </If>
         <LinearGradient
           style={[styles.floatIcon, Platform.OS === 'ios' && {padding: 10}]}
           start={{x: 0, y: 0}}
@@ -542,6 +559,12 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center"
+  },
+  statusTabBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 99999
   }
 });
 
