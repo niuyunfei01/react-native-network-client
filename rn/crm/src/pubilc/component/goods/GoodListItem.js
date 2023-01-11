@@ -55,7 +55,14 @@ class GoodListItem extends React.PureComponent {
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
-
+        <If condition={false}>
+          <View style={styles.priceWrap}>
+            <Text style={styles.shan}>闪</Text>
+            <Text>饿</Text>
+            <Text>京</Text>
+            <Text>活</Text>
+          </View>
+        </If>
         <If condition={sp.applying_price}>
           <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
             审核中：{this.applyingPriceInYuan(product)}
@@ -175,6 +182,7 @@ class GoodListItem extends React.PureComponent {
 export default GoodListItem
 
 const styles = StyleSheet.create({
+  shan: {fontSize: 11, color: colors.color333, padding: 2, backgroundColor: '#ffd225', marginRight: 4},
   multiSpecName: {fontSize: 14, fontWeight: 'bold', color: colors.color333, paddingTop: 10},
   multiSpecStock: {fontSize: 12, color: colors.color999, paddingTop: 2},
   priceWrap: {flexDirection: "row", alignItems: 'center', paddingTop: 2},

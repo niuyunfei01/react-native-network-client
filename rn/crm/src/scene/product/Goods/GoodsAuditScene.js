@@ -1,8 +1,8 @@
 import React, {PureComponent} from "react";
-import {View, StyleSheet, Dimensions, TouchableOpacity, Text, FlatList} from 'react-native'
+import {View, StyleSheet, Dimensions, TouchableOpacity, Text, FlatList, RefreshControl} from 'react-native'
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
-import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
 import {Badge} from "react-native-elements";
 import FastImage from "react-native-fast-image";
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
 
-  selectTabText: {fontSize: 14, fontWeight: '500', color: colors.white, lineHeight: 20},
+  selectTabText: {fontSize: 14, fontWeight: 'bold', color: colors.white, lineHeight: 20},
   selectPlatformNotSale: {
     backgroundColor: colors.main_color,
     borderTopRightRadius: 18,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   tabText: {fontSize: 14, color: colors.color666, lineHeight: 20},
   selectHeaderWrap: {borderBottomColor: colors.main_color, borderBottomWidth: 2},
-  selectHeaderText: {fontSize: 14, fontWeight: '500', color: colors.main_color, paddingVertical: 10},
+  selectHeaderText: {fontSize: 14, fontWeight: 'bold', color: colors.main_color, paddingVertical: 10},
   headerWrap: {backgroundColor: colors.white, flexDirection: 'row', justifyContent: 'space-around'},
   headerText: {fontSize: 14, fontWeight: '400', color: colors.color666, paddingVertical: 10},
   itemWrap: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   itemBottomBtnWrap: {flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15},
   itemBtnWrap: {borderRadius: 18, borderWidth: 0.5, borderColor: colors.color999, marginLeft: 10},
   itemBtnText: {fontSize: 14, color: colors.color333, paddingHorizontal: 18, paddingVertical: 8},
-  itemProductName: {fontSize: 14, fontWeight: '500', color: colors.color333},
+  itemProductName: {fontSize: 14, fontWeight: 'bold', color: colors.color333, width: 0.637 * width},
   reviewProgressWrap: {flexDirection: 'row', backgroundColor: colors.f5, borderRadius: 4, padding: 10, marginTop: 10},
   failWrap: {backgroundColor: colors.f5, borderRadius: 4, padding: 10, marginTop: 10},
   childrenTabZoneWarp: {backgroundColor: colors.white, paddingVertical: 12},
@@ -138,23 +138,31 @@ class GoodsAuditScene extends PureComponent {
   }
 
   componentDidMount() {
+
     this.getBadge()
     this.getList()
   }
 
   getList = () => {
     const {accessToken, store_id} = this.props.global
-    const {selectTabKey, page, pageSize} = this.state
+    const {selectTabKey, page, pageSize, list} = this.state
+    showModal('加载中')
     const url = `v1/new_api/store_product/product_audit_list/${store_id}/${selectTabKey}/${page}/${pageSize}?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
-      const {lists = [], isLastPage = false} = res
+      hideModal()
+      const {lists = [], isLastPage} = res
       this.setState({
-        list: lists,
+        list: page === 1 ? lists : list.concat(lists),
         isLastPage: isLastPage,
+        isLoading: false,
         hasGoodsResult: !lists.length
       })
+    },error => {
+      hideModal()
+      this.setState({hasGoodsResult: true, isLoading: false})
     }).catch(() => {
-      this.setState({hasGoodsResult: true})
+      hideModal()
+      this.setState({hasGoodsResult: true, isLoading: false})
     })
   }
   getBadge = () => {
@@ -190,7 +198,7 @@ class GoodsAuditScene extends PureComponent {
   }
 
   setTab = (value) => {
-    this.setState({selectTabKey: value, page: 1}, () => {
+    this.setState({selectTabKey: value, page: 1, isCanLoadMore: false, isLoading: false}, () => {
       this.listRef.scrollToIndex({animated: true, index: 0})
       this.getList()
     })
@@ -209,7 +217,9 @@ class GoodsAuditScene extends PureComponent {
                 <Text style={isSelect ? styles.selectHeaderText : styles.headerText}>
                   {item.label}
                 </Text>
-                <Badge value={goods_status_number[item.value]} status="error" containerStyle={styles.statusTabBadge}/>
+                <If condition={item.label !== '已通过'}>
+                  <Badge value={goods_status_number[item.value]} status="error" containerStyle={styles.statusTabBadge}/>
+                </If>
               </TouchableOpacity>
             )
           })
@@ -223,9 +233,14 @@ class GoodsAuditScene extends PureComponent {
     const {store_id} = this.props.global
     const url = `/v1/new_api/store_product/del_store_pro/${store_id}/${id}`
     HttpUtils.get(url, {}, false, true).then((res) => {
-      showSuccess(`${res.reason}`)
+      showSuccess(`${res.reason}`, -100)
+      this.setModal(false, 0)
     }, error => {
-      showError(error.reason)
+      showError(error.reason, -100)
+      this.setModal(false, 0)
+    }).catch(error => {
+      showError(error.reason, -100)
+      this.setModal(false, 0)
     })
   }
 
@@ -306,7 +321,7 @@ class GoodsAuditScene extends PureComponent {
         <If condition={selectTabKey === 'no_pass_audit' || selectTabKey === 'no_sale' || selectTabKey === 'pass_audit'}>
           <View style={styles.reviewProgressWrap}>
             <Text style={{fontSize: 14, color: colors.color999}}>审核结果：</Text>
-            <Text style={{fontSize: 14, color: colors.color333}}>
+            <Text style={{fontSize: 14, color: colors.color333, width: 0.629 * width}}>
               {comment}
             </Text>
           </View>
@@ -314,14 +329,18 @@ class GoodsAuditScene extends PureComponent {
         <If condition={selectTabKey === 'fail_audit'}>
           <View style={styles.failWrap}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color999}}>失败原因：</Text>
-              <Text style={{fontSize: 14, color: colors.color333}}>
+              <Text style={{fontSize: 14, color: colors.color999, width: 0.186 * width, textAlign: 'right'}}>
+                失败原因：
+              </Text>
+              <Text style={{fontSize: 14, color: colors.color333, width: 0.629 * width}}>
                 {comment}
               </Text>
             </View>
             <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 10}}>
-              <Text style={{fontSize: 14, color: colors.color999}}>建议：</Text>
-              <Text style={{fontSize: 14, color: colors.color333}}>
+              <Text style={{fontSize: 14, color: colors.color999, width: 0.186 * width, textAlign: 'right'}}>
+                建议：
+              </Text>
+              <Text style={{fontSize: 14, color: colors.color333, width: 0.629 * width}}>
                 {suggest}
               </Text>
             </View>
@@ -361,13 +380,18 @@ class GoodsAuditScene extends PureComponent {
       this.setState({isCanLoadMore: false})
       return
     }
-    this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.search())
+    this.setState({page: page + 1, isLoading: true, isCanLoadMore: false}, () => this.getList())
   }
   renderList = () => {
-    const {list, hasGoodsResult} = this.state
+    const {list, hasGoodsResult, isRefreshing} = this.state
     if (list.length > 0)
       return (
         <FlatList data={list}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={isRefreshing}
+                      tintColor='gray'
+                    />}
                   ref={ref => this.listRef = ref}
                   renderItem={this.renderItem}
                   keyExtractor={(item, index) => `${index}`}
