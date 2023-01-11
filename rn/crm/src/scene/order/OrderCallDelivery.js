@@ -481,7 +481,7 @@ class OrderCallDelivery extends Component {
             }
           })
         }
-        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance1") {
+        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "fail-price-verification") {
           JbbAlert.show({
             title: '价格变更',
             desc: '价格有变更，点击查询最新计价',
