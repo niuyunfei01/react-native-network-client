@@ -2,7 +2,8 @@
 
 const {
   SET_IM_CONFIG,
-  SET_IM_REMIND_COUNT
+  SET_IM_REMIND_COUNT,
+  SET_OLD_REMIND_INFO
 } = require('../../pubilc/common/constants').default;
 
 /**
@@ -17,7 +18,8 @@ const initialState = {
     im_detail_second: 0,
     im_list_second: 0
   },
-  im_remind_count: 0
+  im_remind_count: 0,
+  old_remind_count: {}
 }
 
 export default function imReducer(state = initialState, action) {
@@ -31,6 +33,11 @@ export default function imReducer(state = initialState, action) {
       return {
         ...state,
         im_remind_count: action.payload
+      }
+    case SET_OLD_REMIND_INFO:
+      return {
+        ...state,
+        old_remind_count: action.payload
       }
     default:
       return state;

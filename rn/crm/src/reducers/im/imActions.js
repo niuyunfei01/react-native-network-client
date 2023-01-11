@@ -10,7 +10,8 @@ import {getWithTpl} from "../../pubilc/util/common";
  */
 const {
   SET_IM_CONFIG,
-  SET_IM_REMIND_COUNT
+  SET_IM_REMIND_COUNT,
+  SET_OLD_REMIND_INFO
 } = require('../../pubilc/common/constants').default;
 
 export const setImConfig = (im_config = {}) => {
@@ -24,6 +25,13 @@ export const setImRemindCount = (im_remind_count = 0) => {
   return {
     type: SET_IM_REMIND_COUNT,
     payload: im_remind_count
+  }
+}
+
+export const setOldRemindInfo = (old_remind_count = {}) => {
+  return {
+    type: SET_OLD_REMIND_INFO,
+    payload: old_remind_count
   }
 }
 
@@ -86,6 +94,28 @@ export function getStoreImConfig(token, storeId, callback) {
       let msg = "获取IM配置错误: " + error;
       callback && callback(false, msg)
     })
+  }
+}
+
+/**
+ * 获取旧版消息信息
+ */
+export function getOldRemindConfig(token, storeId, vendor_id, callback) {
+  return dispatch => {
+    let api = 'api/list_notice_count/' + vendor_id + '/' + storeId + '.json';
+    let params = 'access_token=' + token;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(api, params))
+      .then(res => res.json())
+      .then(({obj}) => {
+        if (obj?.length > 0) {
+          callback && callback(true, '获取旧版消息成功', obj)
+        } else {
+          callback && callback(false, '获取旧版消息错误', obj)
+        }
+      }).catch((error) => {
+      let msg = "网络错误: " + error;
+      callback && callback(false, msg)
+    });
   }
 }
 

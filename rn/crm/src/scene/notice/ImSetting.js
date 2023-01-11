@@ -28,16 +28,36 @@ class ImSetting extends React.PureComponent {
     this.state = {
       isLoading: false,
       confirmModal: false,
+      ex_store_id: props.route.params.es_id || props.global?.store_id,
       store_im_config: im_config,
-      autoInputVal: im_config.im_auto_content,
-      nickName: im_config.im_nick_name
+      autoInputVal: '',
+      nickName: ''
     }
+  }
+
+  UNSAFE_componentWillMount() {
+    let {ex_store_id} = this.state;
+    this.refreshConfig(ex_store_id)
   }
 
   onPress = (route, params) => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
+  }
+
+  refreshConfig = (store_id = 0) => {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(getStoreImConfig(accessToken, store_id, (ok, msg, obj) => {
+      if (ok) tool.debounces(() => {
+        this.setState({
+          store_im_config: obj,
+          autoInputVal: obj.im_auto_content,
+          nickName: obj.im_nick_name
+        })
+      }, 300)
+    }))
   }
 
   setConfig = (field, value = '') => {
@@ -55,16 +75,16 @@ class ImSetting extends React.PureComponent {
       value = value ? 1 : 2
     }
     showModal('设置中')
-    const {store_id, accessToken} = this.props.global;
-    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {ex_store_id} = this.state;
     const api = `/api/im_save_config?access_token=${accessToken}`
     const params = {
-      store_id: store_id,
+      store_id: ex_store_id,
       [field]: value
     }
     HttpUtils.post.bind(this.props)(api, params).then(() => {
       ToastShort("设置成功");
-      dispatch(getStoreImConfig(accessToken, store_id))
+      this.refreshConfig(ex_store_id)
     }).catch(e => {
       ToastShort(e.reason)
     })
