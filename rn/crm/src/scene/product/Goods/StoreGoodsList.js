@@ -8,7 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions
+  Dimensions,
+  Platform
 } from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
@@ -48,6 +49,8 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
+const marTop = Platform.select({android: 88, ios: 74})
 
 class StoreGoodsList extends Component {
 
@@ -125,7 +128,6 @@ class StoreGoodsList extends Component {
     if (GlobalUtil.getGoodsFresh() === 2) {
       GlobalUtil.setGoodsFresh(1)
       this.onRefresh()
-      return;
     }
     this.fetchGoodsCount()
   }
@@ -135,7 +137,8 @@ class StoreGoodsList extends Component {
     const {show_audit_prod} = vendor_info
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     const {selectedStatus} = this.state
-    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${store_id}?access_token=${accessToken}`,).then(res => {
+    const url = `/api/count_products_with_status/${store_id}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url,).then(res => {
       let newStatusList
       const {
         all = 0, in_stock = 0, out_of_stock = 0, in_stock_but_nil = 0, new_arrivals = 0, common_provided = 0,
@@ -655,7 +658,7 @@ class StoreGoodsList extends Component {
                         list={statusList}
                         initialNumToRender={10}
                         numColumns={4}
-                        marTop={78}
+                        marTop={marTop}
                         default_val={selectedStatus.value}
                         selectWrap={styles.selectShowMoreGoodsStatusWrap}
                         warp={styles.showMoreGoodsStatusWrap}
@@ -1005,7 +1008,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 8,
     marginRight: 4,
-    borderRadius: 2,
+    borderRadius: 4,
     flex: 1
   },
   activeCategoriesText: {

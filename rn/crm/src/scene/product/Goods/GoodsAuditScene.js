@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {View, StyleSheet, Dimensions, TouchableOpacity, Text, FlatList, ImageBackground} from 'react-native'
+import {View, StyleSheet, Dimensions, TouchableOpacity, Text, FlatList} from 'react-native'
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
@@ -320,7 +320,7 @@ class GoodsAuditScene extends PureComponent {
               </Text>
             </View>
             <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 10}}>
-              <Text style={{fontSize: 14, color: colors.color999}}>失败原因：</Text>
+              <Text style={{fontSize: 14, color: colors.color999}}>建议：</Text>
               <Text style={{fontSize: 14, color: colors.color333}}>
                 {suggest}
               </Text>

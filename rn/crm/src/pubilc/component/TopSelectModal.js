@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity} from 'react-native'
+import {FlatList, SafeAreaView, StyleSheet, Text, TouchableHighlight, TouchableOpacity} from 'react-native'
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import colors from "../styles/colors";
 
@@ -84,22 +84,24 @@ export default class TopSelectModal extends React.Component {
     } = this.props
     if (visible)
       return (
-        <TouchableOpacity onPress={this.props.onClose} style={[styles.modalWrap, {top: marTop}]}>
-          <TouchableHighlight>
-            <FlatList data={list}
-                      numColumns={numColumns}
-                      showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={false}
-                      style={[{maxHeight: height * 0.6, backgroundColor: colors.white}, modalStyle]}
-                      renderItem={selectWrap ? this.otherItem : this.renderItem}
-                      keyExtractor={(item, index) => `${index}`}
-                      onEndReachedThreshold={onEndReachedThreshold}
-                      onEndReached={onEndReached}
-                      refreshing={refreshing}
-                      initialNumToRender={initialNumToRender}/>
+        <SafeAreaView style={[styles.modalWrap, {top: marTop}]}>
+          <TouchableOpacity style={{flex: 1}} onPress={this.props.onClose}>
+            <TouchableHighlight>
+              <FlatList data={list}
+                        numColumns={numColumns}
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        style={[{maxHeight: height * 0.6, backgroundColor: colors.white}, modalStyle]}
+                        renderItem={selectWrap ? this.otherItem : this.renderItem}
+                        keyExtractor={(item, index) => `${index}`}
+                        onEndReachedThreshold={onEndReachedThreshold}
+                        onEndReached={onEndReached}
+                        refreshing={refreshing}
+                        initialNumToRender={initialNumToRender}/>
 
-          </TouchableHighlight>
-        </TouchableOpacity>
+            </TouchableHighlight>
+          </TouchableOpacity>
+        </SafeAreaView>
       )
     return null
   }

@@ -592,6 +592,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_NOTIFICATION_SETTING}
                       options={{headerTitle: '通知设置'}}
                       getComponent={() => require('../../scene/home/Setting/NotificationSetting').default}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_AUDIT}
+                      options={{headerTitle: '商品审核'}}
+                      getComponent={() => require('../../scene/product/Goods/GoodsAuditScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
