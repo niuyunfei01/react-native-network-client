@@ -21,7 +21,7 @@ import CommonModal from "../../../pubilc/component/goods/CommonModal";
 import HttpUtils from "../../../pubilc/util/http";
 import AlertModal from "../../../pubilc/component/AlertModal";
 import native from "../../../pubilc/util/native";
-import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import JPush from "jpush-react-native";
 import {VolumeManager} from 'react-native-volume-manager';
 import {setNotificationStatus} from "../../../reducers/global/globalActions";
@@ -224,7 +224,9 @@ class NotificationSetting extends PureComponent {
     const {store_id, vendor_id, accessToken} = this.props.global
     const url = `/v4/wsb_notify/getNotifySettingList?access_token=${accessToken}`
     const params = {store_id: store_id, vendor_id: vendor_id}
+    showModal('加载中')
     HttpUtils.get(url, params).then(async (res) => {
+      hideModal()
       const {
         menu_settings_head = {}, menu_settings_body = {}, menu_settings_tail = {},
         menu_settings_child_delivery_cancel = {}, menu_settings_child_balance_defect = {}
@@ -267,7 +269,7 @@ class NotificationSetting extends PureComponent {
         }
       })
       setNotificationStatus(notification_status ? 1 : 0)
-    })
+    }).catch(() => hideModal())
 
   }
 
@@ -652,7 +654,8 @@ class NotificationSetting extends PureComponent {
   }
 
   setBalanceText = (item) => {
-    if (item.value === '' || /^[1-9]\d*$/.test(item.value)) {
+    const reg = item.value === '' || /^[1-9]\d*$/.test(parseInt(item.value))
+    if (reg) {
       this.setState({select_balance: item})
       return
     }
@@ -672,7 +675,7 @@ class NotificationSetting extends PureComponent {
                 <TextInput style={[styles.customerInput, styles.notSelectBalanceText]}
                            key={key}
                            value={select_balance.is_input ? `${select_balance.value}` : ''}
-                           onChangeText={text => this.setBalanceText({index: index, value: text})}
+                           onChangeText={text => this.setBalanceText({index: index, value: text, is_input: true})}
                            keyboardType={'numeric'}
                            onFocus={() => this.setBalanceText({index: index, value: '', is_input: true})}
                            placeholderTextColor={colors.color999}

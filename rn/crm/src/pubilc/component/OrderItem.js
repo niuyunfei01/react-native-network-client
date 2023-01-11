@@ -447,7 +447,7 @@ class OrderItem extends React.PureComponent {
           </View>
         </If>
 
-        <FastImage source={{uri: item.platformIcon}}
+        <FastImage source={{uri: item?.platformIcon}}
                    resizeMode={FastImage.resizeMode.contain}
                    style={styles.platformIcon}/>
         <View style={{flex: 1, marginLeft: 10}}>
