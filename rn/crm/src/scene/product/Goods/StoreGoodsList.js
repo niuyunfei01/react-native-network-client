@@ -125,10 +125,7 @@ class StoreGoodsList extends Component {
   }
 
   restart() {
-    if (GlobalUtil.getGoodsFresh() === 2) {
-      GlobalUtil.setGoodsFresh(1)
-      this.onRefresh()
-    }
+    this.onRefresh()
     this.fetchGoodsCount()
   }
 
@@ -255,14 +252,14 @@ class StoreGoodsList extends Component {
       params['limit_status'] = (prod_status || []).join(",");
     }
     if (isRefreshItem) {
-      params.pid = selectedProduct.id || goods[0]
+      params.pid = selectedProduct?.id || goods[0]?.id
       params.page = 1
     }
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const {lists = [], isLastPage = false} = res
       if (isRefreshItem) {
-        const index = goods.findIndex(item => item.id === selectedProduct.id)
+        const index = goods.findIndex(item => item.id === params.pid)
         if (Array.isArray(lists) && lists.length > 0)
           goods[index] = lists[0]
         this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
@@ -337,8 +334,8 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
-  gotoGoodDetail = (item) => {
-    this.setState({selectedProduct: item})
+  gotoGoodDetail = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       pid: item.id,
       storeId: this.props.global.store_id,
@@ -493,9 +490,9 @@ class StoreGoodsList extends Component {
 
         <View style={{backgroundColor: colors.white}}>
           <TouchableOpacity style={styles.tipWrap} onPress={this.jumpToGoodsAudit}>
-            <Text style={{fontSize: 12, color: '#FF8309', lineHeight: 17}}>
+            <Text style={{fontSize: 12, color: '#FF8309', lineHeight: 17, width: 0.62 * width}}>
               有<If condition={no_pass_audit}>{no_pass_audit}个商品未通过，</If><If
-              condition={fail_audit}>{fail_audit}个商品失败</If>，请立即处理
+              condition={fail_audit}>有{fail_audit}个商品审核失败</If>，请立即处理
             </Text>
             <SvgXml xml={right(20, 20, '#FF8309')}/>
           </TouchableOpacity>
@@ -524,6 +521,7 @@ class StoreGoodsList extends Component {
             <View style={{flex: 1}}>
               {this.renderTip()}
               <FlatList
+                ref={ref => this.listRef = ref}
                 data={goods}
                 style={{flex: 1}}
                 legacyImplementation={false}
@@ -602,9 +600,11 @@ class StoreGoodsList extends Component {
   }
 
   selectGoodsStatus = (item, index) => {
-    const {statusList} = this.state
+    const {statusList, goods} = this.state
     if (index)
       this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
+    if (goods.length > 0)
+      this.listRef.scrollToIndex({index: 0, animated: true})
     if (index > 3) {
 
       this.setState({selectedStatus: item, showStatusList: statusList.slice(3), showMoreGoodsStatus: false})
@@ -781,7 +781,7 @@ class StoreGoodsList extends Component {
           </TouchableOpacity>
         </If>
         <If condition={vendor_info?.allow_merchants_edit_prod == 1}>
-          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToGoodsEditPage(item.id)}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToGoodsEditPage(item)}>
             <Text style={styles.goodsOperationBtn}>编辑</Text>
           </TouchableOpacity>
         </If>
@@ -790,10 +790,11 @@ class StoreGoodsList extends Component {
     )
   }
 
-  jumpToGoodsEditPage = (id) => {
+  jumpToGoodsEditPage = async (item) => {
+    await this.setState({selectedProduct: item})
     let {navigation, global} = this.props;
     const {store_id, accessToken, vendor_id} = global
-    const url = `/api/get_product_detail/${id}/${vendor_id}/${store_id}?access_token=${accessToken}`
+    const url = `/api/get_product_detail/${item.id}/${vendor_id}/${store_id}?access_token=${accessToken}`
     showModal('加载中')
     HttpUtils.get.bind(this.props)(url).then(res => {
       hideModal()
@@ -801,15 +802,15 @@ class StoreGoodsList extends Component {
     })
 
   }
-  jumpToNewRetailPriceScene = (item) => {
-    this.setState({selectedProduct: item})
+  jumpToNewRetailPriceScene = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {
       productId: item.id
     })
   }
 
-  gotoAddMissingPicture = (item) => {
-    this.setState({selectedProduct: item})
+  gotoAddMissingPicture = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
   renderItem = (order) => {
@@ -833,10 +834,11 @@ const styles = StyleSheet.create({
   tipWrap: {
     backgroundColor: '#FFEEDD',
     borderRadius: 4,
-    height: 30,
     marginLeft: 10,
-    marginRight: 10,
-    paddingHorizontal: 4,
+    marginRight: 12,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'

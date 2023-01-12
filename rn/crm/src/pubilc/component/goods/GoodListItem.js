@@ -57,10 +57,18 @@ class GoodListItem extends React.PureComponent {
         </Text>
         <If condition={false}>
           <View style={styles.priceWrap}>
-            <Text style={styles.shan}>闪</Text>
-            <Text>饿</Text>
-            <Text>京</Text>
-            <Text>活</Text>
+            <View style={[styles.huoWrap, styles.shanWrap]}>
+              <Text style={[styles.huo, styles.shan]}>闪&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap, styles.eleWrap]}>
+              <Text style={[styles.huo]}>饿&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap, styles.jingDongWrap]}>
+              <Text style={[styles.huo]}>京&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap]}>
+              <Text style={[styles.huo]}>活&nbsp;</Text>
+            </View>
           </View>
         </If>
         <If condition={sp.applying_price}>
@@ -110,7 +118,7 @@ class GoodListItem extends React.PureComponent {
                     </Text>
                   </If>
                   <If condition={fnProviding}>
-                    <Text style={[styles.multiSpecStock, offSaleTxtStyle]}>
+                    <Text style={[styles.n2grey6, offSaleTxtStyle]}>
                       库存：{left_since_last_stat} 件
                     </Text>
                   </If>
@@ -182,14 +190,27 @@ class GoodListItem extends React.PureComponent {
 export default GoodListItem
 
 const styles = StyleSheet.create({
-  shan: {fontSize: 11, color: colors.color333, padding: 2, backgroundColor: '#ffd225', marginRight: 4},
+  shanWrap: {backgroundColor: '#ffd225',},
+  shan: {color: colors.color333},
+  eleWrap: {backgroundColor: '#0292FE',},
+  jingDongWrap: {backgroundColor: colors.main_color},
+  huoWrap: {
+    backgroundColor: '#FF8309',
+    marginRight: 4,
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  huo: {fontSize: 11, color: colors.white},
   multiSpecName: {fontSize: 14, fontWeight: 'bold', color: colors.color333, paddingTop: 10},
-  multiSpecStock: {fontSize: 12, color: colors.color999, paddingTop: 2},
   priceWrap: {flexDirection: "row", alignItems: 'center', paddingTop: 2},
-  priceTextFlag: {fontSize: 12, color: colors.color333},
+  priceTextFlag: {fontSize: 12, color: colors.color666},
   priceText: {
     fontSize: 14,
     color: '#EE2626',
+    fontWeight: 'bold',
     lineHeight: 22
   },
   productRow: {
@@ -214,8 +235,9 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   n2grey6: {
-    color: colors.color333,
-    fontSize: 12
+    color: colors.color999,
+    fontSize: 12,
+    paddingTop: 4
   },
   n2b: {
     color: colors.color333,
