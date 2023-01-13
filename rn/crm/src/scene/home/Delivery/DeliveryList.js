@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   tipText: {fontSize: 12, color: '#FF862C', paddingLeft: 12, paddingVertical: 6},
   openDeliveryModalWrap: {backgroundColor: colors.white, borderTopLeftRadius: 10, borderTopRightRadius: 10},
   openDeliveryModalHeader: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
-  openDeliveryModalHeaderText: {fontSize: 16, fontWeight: '500', color: colors.color333, padding: 20},
+  openDeliveryModalHeaderText: {fontSize: 16, fontWeight: 'bold', color: colors.color333, padding: 20},
 
   wsbDeliveryWrap: {borderRadius: 6, borderColor: '#26B942', borderWidth: 1, marginHorizontal: 20, marginBottom: 10},
   wsbDeliverHeader: {
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   verificationCodeActiveText: {fontSize: 16, color: '#26B942', paddingRight: 12, paddingVertical: 13},
 
   openBtnWrap: {backgroundColor: '#26B942', borderRadius: 24, margin: 20, marginTop: 10},
-  openBtnText: {fontSize: 16, fontWeight: '500', color: colors.white, paddingVertical: 10, textAlign: 'center'},
+  openBtnText: {fontSize: 16, fontWeight: 'bold', color: colors.white, paddingVertical: 10, textAlign: 'center'},
 
   rightCheck: {
     position: 'absolute',

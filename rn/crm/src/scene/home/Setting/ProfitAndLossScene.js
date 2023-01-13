@@ -34,8 +34,8 @@ function mapStateToProps(state) {
 class ProfitAndLoss extends PureComponent {
   constructor(props) {
     super(props);
-    const {store_id} = this.props.global;
-    const {start_date, end_date} = this.props.route.params
+    // const {store_id} = this.props.global;
+    const {start_date, end_date, store_id} = this.props.route.params
     this.state = {
       storeId: store_id,
       ext_store_id: 0,

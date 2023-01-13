@@ -6,6 +6,8 @@
 
 'use strict';
 
+import C from "../../pubilc/common/config";
+
 const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
@@ -221,7 +223,7 @@ export default function globalReducer(state = initialState, action) {
         accessToken: '',
         store_id: 0,
         vendor_id: 0,
-        host: '',
+        host: C.defaultHost,
         printer_id: '0',
         autoBluetoothPrint: false,
         refreshToken: '',

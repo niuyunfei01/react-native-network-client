@@ -678,7 +678,9 @@ class Mine extends PureComponent {
   }
 
   renderSwiper = () => {
-    let {activity} = this.state
+    let {activity = []} = this.state
+    if (activity.length <= 0)
+      return null
     return (
       <Swiper
         showsButtons={false}

@@ -32,18 +32,23 @@ class JbbAlert extends PureComponent {
       desc: '',
       actionText: '',
       closeText: '',
+      descStyle: null,
+      titleStyle: null
     };
   }
 
   static show = (params) => {
     _this.setState({
+      descStyle: params?.descStyle || null,
+      titleStyle: params?.titleStyle || null,
       show: true,
       onPress: undefined,
       onPressClose: undefined,
       title: '',
       desc: '',
       actionText: '',
-      closeText: '', ...params
+      closeText: '',
+      ...params,
     })
   };
 
@@ -56,7 +61,7 @@ class JbbAlert extends PureComponent {
   }
 
   render() {
-    let {show, onPress, onPressClose, title, desc, actionText, closeText} = this.state;
+    let {show, onPress, onPressClose, title, desc, actionText, closeText, descStyle, titleStyle} = this.state;
     if (show) {
       return (
         <Modal hardwareAccelerated={true}
@@ -68,16 +73,14 @@ class JbbAlert extends PureComponent {
             <TouchableHighlight style={styles.touchWrap}>
               <View style={{padding: 20,}}>
 
-                <Text style={styles.title}>
+                <Text style={titleStyle || styles.title}>
                   {title}&nbsp;
                 </Text>
 
                 <If condition={desc}>
-                  <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                    <Text style={styles.desc}>
-                      {desc}&nbsp;
-                    </Text>
-                  </View>
+                  <Text style={descStyle || styles.desc}>
+                    {desc}&nbsp;
+                  </Text>
                 </If>
                 <View style={[styles.rowBetween, {marginTop: desc ? 0 : 20}]}>
                   <If condition={closeText}>
