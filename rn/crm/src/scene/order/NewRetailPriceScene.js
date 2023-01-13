@@ -20,6 +20,7 @@ import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
 import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const styles = StyleSheet.create({
   baseRowCenterWrap: {
@@ -139,21 +140,26 @@ const styles = StyleSheet.create({
   checkBoxWrap: {flexDirection: 'row', alignItems: 'center'},
   pageWrap: {marginBottom: 12},
   modalBottom: {paddingBottom: 24},
-  commodityNameWrap: {flexDirection: "row", alignItems: 'center'},
-  shanWrap: {backgroundColor: '#ffd225',},
-  shan: {color: colors.color333},
+
+  headerWrap: {padding: 12, flex: 1},
+  headerText: {fontSize: 15, fontWeight: 'bold', color: colors.color333,},
+  desc: {fontSize: 16, color: colors.color333, fontWeight: 'bold', marginVertical: 10},
+
+  shanWrap: {backgroundColor: '#FFD225'},
+  shanText: {color: colors.color333},
   eleWrap: {backgroundColor: '#0292FE',},
   jingDongWrap: {backgroundColor: colors.main_color},
-  huoWrap: {
+  normalWrap: {
     backgroundColor: '#FF8309',
-    marginLeft: 4,
     borderRadius: 2,
     width: 14,
     height: 14,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginRight: 4
   },
-  huo: {fontSize: 11, color: colors.white},
+  normalText: {fontSize: 11, color: colors.white},
+
 })
 
 class NewRetailPriceScene extends React.PureComponent {
@@ -221,29 +227,53 @@ class NewRetailPriceScene extends React.PureComponent {
     }).catch(error => showError(error.reason))
   }
 
+  renderHeaderProductionName = () => {
+    const {productInfo = {}, is_promotion = 1, act_plat_3 = 1, act_plat_7 = 1, act_plat_1 = 1} = this.state
+
+    return (
+      <Text numberOfLines={2} ellipsizeMode={'tail'} style={styles.headerText}>
+        {productInfo.p?.name}
+        <If condition={false}>
+          <If condition={Platform.OS === 'ios'}>
+            &nbsp;
+          </If>
+          <View style={styles.checkBoxWrap}>
+            <If condition={act_plat_3}>
+              <View style={[styles.normalWrap, styles.shanWrap]}>
+                <Text style={[styles.normalText, styles.shanText]}>闪</Text>
+              </View>
+            </If>
+            <If condition={act_plat_7}>
+              <View style={[styles.normalWrap, styles.eleWrap]}>
+                <Text style={styles.normalText}>饿</Text>
+              </View>
+            </If>
+            <If condition={act_plat_1}>
+              <View style={[styles.normalWrap, styles.jingDongWrap]}>
+                <Text style={styles.normalText}>京</Text>
+              </View>
+            </If>
+            <If condition={is_promotion}>
+              <View style={styles.normalWrap}>
+                <Text style={styles.normalText}>活</Text>
+              </View>
+            </If>
+          </View>
+        </If>
+
+      </Text>
+    )
+
+  }
   getHeader = () => {
-    const {productInfo = {}, skus = [], selectSku = {}} = this.state
+    const {
+      skus = [], selectSku = {},
+    } = this.state
     return (
       <View style={Styles.zoneWrap}>
-        <Text style={Styles.headerTitleText}>
-          {productInfo.p?.name}
-          <If condition={false}>
-            <View style={styles.commodityNameWrap}>
-              <View style={[styles.huoWrap, styles.shanWrap]}>
-                <Text style={[styles.huo, styles.shan]}>闪&nbsp;</Text>
-              </View>
-              <View style={[styles.huoWrap, styles.eleWrap]}>
-                <Text style={[styles.huo]}>饿&nbsp;</Text>
-              </View>
-              <View style={[styles.huoWrap, styles.jingDongWrap]}>
-                <Text style={[styles.huo]}>京&nbsp;</Text>
-              </View>
-              <View style={[styles.huoWrap]}>
-                <Text style={[styles.huo]}>活&nbsp;</Text>
-              </View>
-            </View>
-          </If>
-        </Text>
+        <View style={styles.headerWrap}>
+          {this.renderHeaderProductionName()}
+        </View>
         <LineView/>
         <TouchableOpacity style={styles.baseRowCenterWrap}
                           onPress={() => this.setState({modalVisible: true, openModalFrom: 'spec'})}>
@@ -451,6 +481,18 @@ class NewRetailPriceScene extends React.PureComponent {
   selectPriceType = type => {
     this.setState({selectPriceType: type})
   }
+
+  showTip = (platformName = '') => {
+    JbbAlert.show({
+      title: `当前商品正在参加【${platformName}】平台活动，无法修改价格信息`,
+      desc: '若需要修改价格，请先在平台处取消商品活动',
+      actionText: '知道了',
+      titleStyle: styles.desc,
+      descStyle: styles.desc,
+      onPress: () => JbbAlert.hide()
+    })
+  }
+
   submit = () => {
     const {
       openModalFrom,
@@ -463,6 +505,11 @@ class NewRetailPriceScene extends React.PureComponent {
       editAlonePrice
     } = this.state
     const {store_id, accessToken} = this.props.global
+    // if (false) {
+    //   this.setState({modalVisible: false, openModalFrom: ''}, () => this.showTip('美团闪购'))
+    //
+    //   return
+    // }
     let url = `new_api/store_product/set_store_price?access_token=${accessToken}`,
       params = {pid: selectSku.product_id, store_id: store_id, price: editPrice, type: 0, es_id: -1}
     switch (openModalFrom) {
@@ -615,7 +662,7 @@ class NewRetailPriceScene extends React.PureComponent {
   renderModal = () => {
     const {modalVisible, openModalFrom} = this.state
     return (
-      <CommonModal visible={modalVisible} position={'flex-end'}>
+      <CommonModal visible={modalVisible} position={'flex-end'} onRequestClose={this.closeModal}>
         <KeyboardAvoidingView style={styles.modalWrap} behavior={Platform.select({android: 'height', ios: 'padding'})}>
           <If condition={openModalFrom === 'spec'}>
             {this.renderSelectSpec()}

@@ -51,9 +51,8 @@ import GlobalUtil from "../util/GlobalUtil";
 import {setDeviceInfo} from "../../reducers/device/deviceActions";
 import {AMapSdk} from "react-native-amap3d";
 import DeviceInfo from "react-native-device-info";
-import {checkUpdate, downloadApk} from "rn-app-upgrade";
+import {checkUpdate} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
-import CommonModal from "../component/goods/CommonModal";
 import {hideModal, ToastLong} from "../util/ToastUtils";
 
 import JbbAlert from "../component/JbbAlert";
@@ -61,6 +60,8 @@ import {Synthesizer} from "../component/react-native-speech-iflytek";
 import RefundReasonModal from "../component/RefundReasonModal";
 import RefundStatusModal from "../component/RefundStatusModal";
 import NetInfo from "@react-native-community/netinfo";
+import UpdateAppComponent from "../component/UpdateAppComponent";
+import UpdateAppProcessComponent from "../component/UpdateAppProcessComponent";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -602,7 +603,6 @@ const Page = (props) => {
 let notInit = true, jpushNotInit = true
 let ios_info = {}
 const appid = '1587325388'
-const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
 let isSunmiDevice = false, RegistrationID = ''
 let isHandlerTask = false, messageQueue = [], setAliasInterval = null
 let connectListener = null, tagAliasListener = null, notificationListener = null
@@ -618,25 +618,11 @@ class AppNavigator extends PureComponent {
         }
         break
       case "android":
-        HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
-          if (res.yes) {
-            this.setModalStatus(true, res.desc, res.download_url)
+        HttpUtils.get('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(({yes, desc, download_url}) => {
+          if (yes) {
+            this.setModalStatus(true, desc, download_url)
           }
         })
-        break
-    }
-
-  }
-
-  updateAPP = async () => {
-    const {download_url} = this.state
-    switch (Platform.OS) {
-      case "android":
-        await downloadApk({interval: 250, apkUrl: download_url, downloadInstall: true})
-        break
-      case "ios":
-        this.setModalStatus()
-        await Linking.openURL(appUrl)
         break
     }
 
@@ -992,64 +978,23 @@ class AppNavigator extends PureComponent {
 
   render() {
     const {initialRouteName, initialRouteParams} = this.props;
-    const {version_visible, desc} = this.state
+    const {version_visible = false, desc = '', download_url = ''} = this.state
     return (
       <>
         <JbbAlert/>
         <RefundReasonModal/>
         <RefundStatusModal/>
-        <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
-          <>
-            <ImageBackground style={styles.image} source={new_version_background_url}>
-              <Text style={styles.headerText}>
-                新版本提示
-              </Text>
-            </ImageBackground>
-            <View style={styles.content}>
-              <Text style={styles.updateContentText}>
-                {desc}
-              </Text>
-              <View style={styles.btnWrap}>
-                <TouchableOpacity style={styles.cancelWrap} onPress={() => this.setModalStatus(false)}>
-                  <Text style={styles.cancelText}>
-                    暂不更新
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.updateWrap} onPress={this.updateAPP}>
-                  <Text style={styles.updateText}>
-                    立即更新
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </>
-        </CommonModal>
         <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
-
+        <UpdateAppComponent visible={version_visible}
+                            desc={desc}
+                            download_url={download_url}
+                            setModalStatus={this.setModalStatus}/>
+        <UpdateAppProcessComponent/>
       </>
     );
   }
 
 }
 
-const new_version_background_url = {uri: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/new_version_background%403x.png'}
-const styles = StyleSheet.create({
-  content: {borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginHorizontal: 27, backgroundColor: 'white'},
-  image: {height: 148, marginHorizontal: 27, alignItems: 'center', justifyContent: 'center'},
-  updateContentText: {fontSize: 14, color: '#333', lineHeight: 20, paddingHorizontal: 20, paddingTop: 10},
-  headerText: {fontWeight: 'bold', color: 'white', lineHeight: 30, fontSize: 22},
-  btnWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20},
-  cancelWrap: {backgroundColor: '#f5f5f5', borderRadius: 20},
-  cancelText: {fontSize: 16, fontWeight: 'bold', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
-  updateWrap: {backgroundColor: '#26B942', borderRadius: 20, marginLeft: 10},
-  updateText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingHorizontal: 36,
-    paddingVertical: 9,
-    color: 'white'
-  }
-
-})
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppNavigator);

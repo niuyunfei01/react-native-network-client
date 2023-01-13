@@ -1089,7 +1089,7 @@ class OrderInfoNew extends PureComponent {
                 style={styles.orderCardInfoBottom}>{tool.jbbsubstr(order?.ext_store_name, 18)} #{order?.dayId} </Text>
             </View>
           </View>
-          <If condition={Number(order?.pickType) === 1}>
+          <If condition={Number(order?.platform) === 6}>
             <Button title={'查看取货码'}
                     onPress={() => {
                       this.mixpanel.track('V4订单详情_查看取货码')

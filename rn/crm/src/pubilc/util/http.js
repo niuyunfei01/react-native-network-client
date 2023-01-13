@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
 import JbbAlert from "../component/JbbAlert";
 
-const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
+const {SESSION_TOKEN_SUCCESS, LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -92,6 +92,16 @@ class HttpUtils {
       }
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
+
+    const index_not_defined = uri.indexOf('access_token=undefined')
+    if (index_not_defined !== -1) {
+      uri = uri.substring(0, index_not_defined) + `access_token=${global.noLoginInfo.accessToken}` + uri.substring(index_not_defined + 22)
+    }
+    const index_empty = uri.indexOf(`access_token=&`)
+    if (index_empty !== -1) {
+      uri = uri.substring(0, index_empty) + `access_token=${global.noLoginInfo.accessToken}&` + uri.substring(index_empty + 14)
+    }
+
     if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
       isRefrshToken = true
       this.refreshAccessToken()
@@ -193,8 +203,9 @@ class HttpUtils {
     }
   }
 
-  static error(response, navigation) {
-    switch (parseInt(response.error_code)) {
+  static error({error_code, reason = ''}, navigation) {
+
+    switch (parseInt(error_code)) {
       case 10001:
       case 21327:
         this.logout(navigation)
@@ -204,7 +215,7 @@ class HttpUtils {
         break
       default:
 
-        ToastLong(response.reason.toString())
+        ToastLong(reason)
         break
     }
   }
@@ -225,6 +236,7 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
+        store.dispatch({type: LOGOUT_SUCCESS})
         isLogout = false
       },
     })
