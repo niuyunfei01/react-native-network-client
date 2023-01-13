@@ -776,6 +776,7 @@ class AppNavigator extends PureComponent {
 
     await JPush.getRegistrationID(({registerID}) => {
       RegistrationID = registerID
+      this.uploadDeviceInfo(registerID)
     })
     tagAliasListener = ({code}) => {
 
@@ -785,7 +786,6 @@ class AppNavigator extends PureComponent {
         setAliasInterval && clearTimeout(setAliasInterval)
         setAliasInterval = null
         store.dispatch(setJPushStatus(RegistrationID))
-        this.uploadDeviceInfo(RegistrationID)
         return
       }
       store.dispatch(setJPushStatus(code))
