@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   itemHeaderWrap: {flexDirection: 'row', alignItems: 'center'},
-  statusTabBadge: {position: 'absolute', top: 1, right: -20},
+  statusTabBadge: {position: 'absolute', top: 1, right: -14},
   childrenTabBadge: {position: 'absolute', top: 0, right: 40},
   imgWrap: {width: 80, height: 80, borderRadius: 4},
   saleWrap: {
@@ -98,7 +98,8 @@ const styles = StyleSheet.create({
     marginTop: 9,
     color: colors.color999
   },
-  notHasMoreInfo: {paddingVertical: 10, fontSize: 14, color: colors.color999, textAlign: 'center'}
+  notHasMoreInfo: {paddingVertical: 10, fontSize: 14, color: colors.color999, textAlign: 'center'},
+  platformStore: {fontSize: 12, color: colors.color666, lineHeight: 17, paddingTop: 4, width: 0.637 * width}
 })
 
 const HEADER_DATA = [
@@ -151,13 +152,14 @@ class GoodsAuditScene extends PureComponent {
     HttpUtils.get(url).then(res => {
       hideModal()
       const {lists = [], isLastPage} = res
+
       this.setState({
         list: page === 1 ? lists : list.concat(lists),
         isLastPage: isLastPage,
         isLoading: false,
         hasGoodsResult: !lists.length
       })
-    },error => {
+    }, error => {
       hideModal()
       this.setState({hasGoodsResult: true, isLoading: false})
     }).catch(() => {
@@ -198,8 +200,10 @@ class GoodsAuditScene extends PureComponent {
   }
 
   setTab = (value) => {
+    const {list} = this.state
+    this.listRef && this.listRef.scrollToIndex({animated: true, viewPosition: 0, index: list.length > 0 ? 0 : -1})
     this.setState({selectTabKey: value, page: 1, isCanLoadMore: false, isLoading: false}, () => {
-      this.listRef.scrollToIndex({animated: true, index: 0})
+
       this.getList()
     })
   }
@@ -217,7 +221,7 @@ class GoodsAuditScene extends PureComponent {
                 <Text style={isSelect ? styles.selectHeaderText : styles.headerText}>
                   {item.label}
                 </Text>
-                <If condition={item.label !== '已通过'}>
+                <If condition={item.label !== '已通过' && goods_status_number[item.value] > 0}>
                   <Badge value={goods_status_number[item.value]} status="error" containerStyle={styles.statusTabBadge}/>
                 </If>
               </TouchableOpacity>
@@ -296,7 +300,7 @@ class GoodsAuditScene extends PureComponent {
             <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17}}>
               审核时间：{utime}
             </Text>
-            <Text style={{fontSize: 12, color: colors.color666, lineHeight: 17, paddingTop: 4}}>
+            <Text style={styles.platformStore}>
               平台门店：[{platform}] {es_name}
             </Text>
           </View>
@@ -329,7 +333,7 @@ class GoodsAuditScene extends PureComponent {
         <If condition={selectTabKey === 'fail_audit'}>
           <View style={styles.failWrap}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 14, color: colors.color999, width: 0.186 * width, textAlign: 'right'}}>
+              <Text style={{fontSize: 14, color: colors.color999, textAlign: 'right'}}>
                 失败原因：
               </Text>
               <Text style={{fontSize: 14, color: colors.color333, width: 0.629 * width}}>
@@ -346,7 +350,8 @@ class GoodsAuditScene extends PureComponent {
             </View>
           </View>
         </If>
-        <If condition={selectTabKey === 'in_audit' || selectTabKey === 'no_pass_audit' || selectTabKey === 'no_sale'}>
+        <If
+          condition={selectTabKey === 'in_audit' || selectTabKey === 'no_pass_audit' || selectTabKey === 'no_sale' || selectTabKey === 'fail_audit'}>
           <View style={styles.itemBottomBtnWrap}>
             <TouchableOpacity style={styles.itemBtnWrap} onPress={() => this.setModal(true, id)}>
               <Text style={styles.itemBtnText}>
