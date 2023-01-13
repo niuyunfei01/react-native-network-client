@@ -10,7 +10,7 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text, 
+  Text,
   TextInput,
   TouchableOpacity,
   View
@@ -53,7 +53,7 @@ import {getDeliveryList} from "../../pubilc/services/delivery";
 import {setCallDeliveryObj} from "../../reducers/global/globalActions";
 import JbbAlert from "../../pubilc/component/JbbAlert";
 import RefundStatusModal from "../../pubilc/component/RefundStatusModal";
-import RefundReasonModal from "../../pubilc/component/RefundReasonModal";
+import ZsAlertModal from "../../pubilc/component/ZsAlertModal";
 
 const {width, height} = Dimensions.get("window")
 
@@ -86,6 +86,8 @@ function mapStateToProps(state) {
     device: state.device
   }
 }
+
+let interval = null;
 
 class OrderInfoNew extends PureComponent {
 
@@ -141,11 +143,14 @@ class OrderInfoNew extends PureComponent {
       err_msg: ''
     }
     this.marker = null
+    this.store_marker = null
   }
 
   componentWillUnmount() {
     this.focus()
     this.marker = false
+    this.store_marker = false
+    clearInterval(interval)
   }
 
   componentDidMount = () => {
@@ -278,6 +283,9 @@ class OrderInfoNew extends PureComponent {
       const {obj} = res
       this.handleTimeObj(api, res.executeStatus, res.startTime, res.endTime, 'fetchOrder', res.endTime - res.startTime)
       this.handleActionSheet(obj, parseInt(obj.allow_merchants_cancel_order) === 1)
+      if (obj?.zs_left_time > 0) {
+        interval = setInterval(this.timeOut, 1000)
+      }
       this.setState({
         order: obj,
         isFetching: false,
@@ -299,6 +307,21 @@ class OrderInfoNew extends PureComponent {
       this.setState({isFetching: false})
     })
   }
+
+
+  timeOut = () => {
+    let {order} = this.state;
+    let left_time = Number(order?.zs_left_time - 1)
+    let obj = {...order, zs_left_time: left_time}
+    this.setState({
+      order: obj
+    }, () => {
+      if (left_time <= 0) {
+        clearInterval(interval)
+      }
+    })
+  }
+
 
   navigateToOrderOperation = () => {
     this.mixpanel.track("订单操作页");
@@ -618,8 +641,20 @@ class OrderInfoNew extends PureComponent {
       dada_distance,
       ship_distance_destination,
       ship_distance_store,
-      pickType
+      pickType,
+      is_zs = 0,
+      zs_left_time = 0
     } = this.state.order;
+    let str = '00:00';
+
+    if (zs_left_time > 0 && zs_left_time < 60) {
+      str = '00:' + (zs_left_time >= 10 ? zs_left_time : '0' + zs_left_time)
+    } else if (zs_left_time >= 60) {
+      let m = Math.trunc(zs_left_time / 60)
+      let s = Math.trunc(zs_left_time - (m * 60))
+      str = (m >= 10 ? m : '0' + m) + ':' + (s >= 10 ? s : '0' + s)
+    }
+
     let {refund_title, isShowMap,} = this.state;
     if ((tool.length(refund_title) <= 0 && !isShowMap) || tool.length(loc_lat) <= 0 || tool.length(loc_lng) <= 0) {
       return <View/>
@@ -629,6 +664,10 @@ class OrderInfoNew extends PureComponent {
       aLon,
       aLat
     } = tool.getCenterLonLat(loc_lng, loc_lat, ship_distance_destination > 0 ? ship_worker_lng : store_loc_lng, ship_distance_destination > 0 ? ship_worker_lat : store_loc_lat)
+    if (Number(pickType) === 1 || is_zs === 1) {
+      aLon = store_loc_lng
+      aLat = store_loc_lat
+    }
     return (
       <View {...this._gestureHandlers.panHandlers} ref={ref => this.viewRef = ref} style={{height: 290}}>
         <MapView
@@ -644,19 +683,19 @@ class OrderInfoNew extends PureComponent {
             zoom: zoom
           }}>
           {/*门店定位*/}
-          <If condition={Number(pickType) === 1 || ship_distance_destination <= 0}>
+          <If condition={Number(pickType) === 1 || is_zs === 1 || ship_distance_destination <= 0}>
             <Marker
-              ref={(ref) => this.marker = ref}
+              ref={(ref) => this.store_marker = ref}
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
               icon={{uri: mapImage.location_store, width: 65, height: 40}}
             >
 
               <View style={{alignItems: 'center'}}>
-                <If condition={Number(pickType) === 1}>
+                <If condition={Number(pickType) === 1 || zs_left_time}>
                   <View style={styles.mapBox}>
                     <Text style={styles.markerText}>
-                      自提订单
+                      {Number(pickType) === 1 ? '自提订单' : '等待' + str}
                     </Text>
                   </View>
                   <Entypo name={'triangle-down'}
@@ -665,7 +704,7 @@ class OrderInfoNew extends PureComponent {
                 <FastImage source={{uri: mapImage.location_store}}
                            style={{width: 65, height: 40}}
                            onLoad={() => tool.debounces(() => {
-                             this.marker && this.marker.update()
+                             this.store_marker && this.store_marker.update()
                            }, 1000)}
                            resizeMode={FastImage.resizeMode.contain}/>
               </View>
@@ -715,7 +754,7 @@ class OrderInfoNew extends PureComponent {
           </If>
 
           <If
-            condition={Number(pickType) !== 1 && ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
+            condition={Number(pickType) !== 1 && zs_left_time <= 0 && ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
               ref={(ref) => this.marker = ref}
               draggable={false}
@@ -905,6 +944,7 @@ class OrderInfoNew extends PureComponent {
   renderOrderInfoHeaderButton = () => {
     let {order, isShowMap} = this.state;
     let btn_list = order?.btn_list;
+    const {accessToken} = this.props.global;
     return (
       <View style={isShowMap ? styles.orderInfoHeaderButton : styles.orderInfoHeaderButtonNoMap}>
         <If condition={btn_list && btn_list?.btn_print === 1}>
@@ -952,6 +992,13 @@ class OrderInfoNew extends PureComponent {
         <If condition={btn_list && btn_list?.btn_call_third_delivery === 1}>
           <Button title={'下配送单'}
                   onPress={() => {
+
+                    if (order?.is_zs) {
+                      return ZsAlertModal.checkZsOrderCallDelivery(order?.id, accessToken, () => {
+                        this.onCallThirdShips(order?.id, order?.store_id)
+                      });
+                    }
+
                     this.mixpanel.track('V4订单详情_下配送单')
                     this.onCallThirdShips(order?.id, order?.store_id)
                   }}

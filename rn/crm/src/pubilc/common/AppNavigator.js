@@ -62,6 +62,7 @@ import RefundStatusModal from "../component/RefundStatusModal";
 import NetInfo from "@react-native-community/netinfo";
 import UpdateAppComponent from "../component/UpdateAppComponent";
 import UpdateAppProcessComponent from "../component/UpdateAppProcessComponent";
+import ZsAlertModal from "../component/ZsAlertModal";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -984,6 +985,7 @@ class AppNavigator extends PureComponent {
         <JbbAlert/>
         <RefundReasonModal/>
         <RefundStatusModal/>
+        <ZsAlertModal/>
         <Page initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
         <UpdateAppComponent visible={version_visible}
                             desc={desc}

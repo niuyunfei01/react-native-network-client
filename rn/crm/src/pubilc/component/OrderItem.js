@@ -42,6 +42,7 @@ import JbbAlert from "./JbbAlert";
 import AgreeRefundModal from "./AgreeRefundModal";
 import RefundStatusModal from "./RefundStatusModal";
 import RefundReasonModal from "./RefundReasonModal";
+import ZsAlertModal from "./ZsAlertModal";
 
 let width = Dimensions.get("window").width;
 
@@ -106,16 +107,11 @@ class OrderItem extends React.PureComponent {
 
   onCallThirdShips = (order_id, store_id, is_addition = 0) => {
     let {accessToken, vendor_id} = this.props;
-    showModal('计价中')
-
     getDeliveryList(accessToken, order_id, store_id, vendor_id, is_addition).then(async res => {
-
       await this.props.dispatch(setCallDeliveryObj(res))
-
     }).catch(() => {
       ToastShort('获取失败，请重试')
     })
-
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
@@ -822,6 +818,11 @@ class OrderItem extends React.PureComponent {
         <If condition={item?.btn_list && item?.btn_list?.btn_call_third_delivery}>
           <Button title={order_status === 8 ? '重新下单' : '下配送单'}
                   onPress={() => {
+                    if (item?.is_zs) {
+                      return ZsAlertModal.checkZsOrderCallDelivery(item.id, this.props.accessToken, () => {
+                        this.onCallThirdShips(item.id, item.store_id)
+                      });
+                    }
                     this.onCallThirdShips(item.id, item.store_id)
                     this.mixpanel.track('V4订单列表_下配送单')
                   }}

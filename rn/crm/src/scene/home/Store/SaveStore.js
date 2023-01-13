@@ -116,7 +116,7 @@ class SaveStore extends PureComponent {
       show_time_modal: false,
       referrer_id: '',
       bd_name: '',
-      time_type: 2,
+      time_type: 1,
       business_licence: '',
       alipay_identity: '',
       open_start_time: '00:00',
