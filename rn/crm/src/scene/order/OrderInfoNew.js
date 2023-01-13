@@ -10,7 +10,8 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
+  Text, 
+  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -134,7 +135,10 @@ class OrderInfoNew extends PureComponent {
       show_cancel_delivery_modal: false,
       orders_add_tip: true,
       delivery_loading: false,
-      refund_title: ''
+      refund_title: '',
+      verification_modal: false,
+      pickupCode: '',
+      err_msg: ''
     }
     this.marker = null
   }
@@ -452,6 +456,7 @@ class OrderInfoNew extends PureComponent {
       show_cancel_delivery_modal: false,
       show_delivery_modal: false,
       showQrcode: false,
+      verification_modal: false,
     })
   }
 
@@ -613,6 +618,7 @@ class OrderInfoNew extends PureComponent {
       dada_distance,
       ship_distance_destination,
       ship_distance_store,
+      pickType
     } = this.state.order;
     let {refund_title, isShowMap,} = this.state;
     if ((tool.length(refund_title) <= 0 && !isShowMap) || tool.length(loc_lat) <= 0 || tool.length(loc_lng) <= 0) {
@@ -638,12 +644,33 @@ class OrderInfoNew extends PureComponent {
             zoom: zoom
           }}>
           {/*门店定位*/}
-          <If condition={ship_distance_destination <= 0}>
+          <If condition={Number(pickType) === 1 || ship_distance_destination <= 0}>
             <Marker
+              ref={(ref) => this.marker = ref}
               draggable={false}
               position={{latitude: Number(store_loc_lat), longitude: Number(store_loc_lng)}}
               icon={{uri: mapImage.location_store, width: 65, height: 40}}
-            />
+            >
+
+              <View style={{alignItems: 'center'}}>
+                <If condition={Number(pickType) === 1}>
+                  <View style={styles.mapBox}>
+                    <Text style={styles.markerText}>
+                      自提订单
+                    </Text>
+                  </View>
+                  <Entypo name={'triangle-down'}
+                          style={{color: colors.white, fontSize: 30, position: 'absolute', top: 20}}/>
+                </If>
+                <FastImage source={{uri: mapImage.location_store}}
+                           style={{width: 65, height: 40}}
+                           onLoad={() => tool.debounces(() => {
+                             this.marker && this.marker.update()
+                           }, 1000)}
+                           resizeMode={FastImage.resizeMode.contain}/>
+              </View>
+
+            </Marker>
           </If>
           {/*骑手位置*/}
           <If condition={ship_worker_lng !== '' && ship_worker_lat !== ''}>
@@ -687,7 +714,8 @@ class OrderInfoNew extends PureComponent {
             />
           </If>
 
-          <If condition={ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
+          <If
+            condition={Number(pickType) !== 1 && ship_distance_destination <= 0 && loc_lat && loc_lng && ship_distance_store <= 0}>
             <Marker
               ref={(ref) => this.marker = ref}
               draggable={false}
@@ -908,6 +936,19 @@ class OrderInfoNew extends PureComponent {
                   titleStyle={styles.orderInfoHeaderButtonTitleLeft}
           />
         </If>
+
+        <If condition={btn_list && btn_list?.write_off}>
+          <Button title={'门店核销'}
+                  onPress={() => {
+                    this.setState({
+                      verification_modal: true,
+                    })
+                  }}
+                  buttonStyle={styles.orderInfoHeaderButtonRight}
+                  titleStyle={styles.orderInfoHeaderButtonTitleRight}
+          />
+        </If>
+
         <If condition={btn_list && btn_list?.btn_call_third_delivery === 1}>
           <Button title={'下配送单'}
                   onPress={() => {
@@ -1424,6 +1465,96 @@ class OrderInfoNew extends PureComponent {
     )
   }
 
+
+  renderPickModal = () => {
+    let {verification_modal, pickupCode, err_msg} = this.state;
+    return (
+      <JbbModal visible={verification_modal} HighlightStyle={{padding: 0}}
+                onClose={this.closeModal}
+                modal_type={'center'}>
+        <View style={{paddingHorizontal: 12, paddingVertical: 15}}>
+          <View style={{
+            flexDirection: 'row',
+            paddingHorizontal: 8,
+            justifyContent: 'space-between',
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: 16, color: colors.color333, lineHeight: 30}}>
+              自提订单核销
+            </Text>
+            <SvgXml onPress={this.closeModal} xml={cross_icon()}/>
+          </View>
+          <View style={{paddingHorizontal: 8, paddingBottom: 5}}>
+            <View style={{
+              backgroundColor: colors.f5,
+              borderRadius: 4,
+              height: 48,
+              marginTop: 20,
+              marginBottom: tool.length(err_msg) > 0 ? 0 : 30
+            }}>
+              <TextInput placeholder={"请输入核销码"}
+                         onChangeText={(pickupCode) => {
+                           this.setState({
+                             pickupCode: pickupCode.replace(/[^\a-\z\A-\Z0-9]/g, ""),
+                             err_msg: /[^\a-\z\A-\Z0-9]+?$/g.test(pickupCode) ? '请输入正确的英文字符' : ''
+                           })
+                         }}
+                         maxLength={7}
+                         value={pickupCode}
+                         placeholderTextColor={colors.color999}
+                         style={{
+                           paddingHorizontal: 4,
+                           color: colors.color333,
+                           fontSize: 16,
+                           height: 48,
+                           borderRadius: 5,
+                         }}
+                         underlineColorAndroid="transparent"/>
+            </View>
+            <If condition={tool.length(err_msg) > 0}>
+              <View style={{
+                flexDirection: "row", alignItems: "center", height: 30
+              }}>
+                <Text style={{
+                  color: colors.warn_red,
+                  fontSize: 12,
+                  fontWeight: 'bold'
+                }}>{err_msg} </Text>
+              </View>
+            </If>
+            <Button title={'确 定'}
+                    onPress={this.goVeriFicationToShop}
+                    buttonStyle={[{
+                      backgroundColor: colors.main_color,
+                      borderRadius: 21,
+                      length: 42,
+                    }]}
+                    titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 16, lineHeight: 22}}/>
+          </View>
+
+        </View>
+      </JbbModal>
+    )
+  }
+
+
+  goVeriFicationToShop = () => {
+    let {accessToken} = this.props.global;
+    let {pickupCode, order} = this.state
+    const api = `/v1/new_api/orders/order_checkout/${order?.id}?access_token=${accessToken}&pick_up_code=${pickupCode}`;
+    HttpUtils.get(api).then(() => {
+      this.closeModal();
+      ToastShort(`核销成功，订单已完成`)
+    }, (res) => {
+      this.setState({
+        err_msg: res?.desc
+      })
+    }).catch((res) => {
+      this.setState({
+        err_msg: res?.desc
+      })
+    })
+  }
+
   renderNoInfo = () => {
     return (
       <View style={{flexGrow: 1}}>
@@ -1467,6 +1598,7 @@ class OrderInfoNew extends PureComponent {
         </ScrollView>
         {this.renderDeliveryModal()}
         {this.renderAddTipModal()}
+        {this.renderPickModal()}
 
         <CancelDeliveryModal
           order_id={order?.id}

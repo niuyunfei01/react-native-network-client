@@ -26,9 +26,9 @@ import {
 import HttpUtils from "../../../pubilc/util/http";
 import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
-import {Button} from "react-native-elements";
+import {Button, CheckBox} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {back, cross_icon, head_cross_icon} from "../../../svg/svg";
+import {back, check_circle_icon, cross_icon, head_cross_icon, radioUnSelected} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
@@ -39,6 +39,9 @@ import geolocation from "@react-native-community/geolocation";
 import {mergeMixpanelId} from "../../../pubilc/util/analytics";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import JbbAlert from "../../../pubilc/component/JbbAlert";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import DatePicker from "react-native-date-picker";
+import dayjs from "dayjs";
 
 const {width, height} = Dimensions.get("window");
 
@@ -97,6 +100,7 @@ class SaveStore extends PureComponent {
       lat: '',
       street_block: '',
       category_list: [],
+      bd_list: [],
       category_id: '',
       category_id_input_vlue: '',
       category_id_input_vlue_desc: '',
@@ -108,18 +112,34 @@ class SaveStore extends PureComponent {
       city: '选择城市',
       show_category_modal: false,
       show_placeholder: true,
-      referrer_id: ''
+      show_bd_modal: false,
+      show_time_modal: false,
+      referrer_id: '',
+      bd_name: '',
+      time_type: 2,
+      business_licence: '',
+      alipay_identity: '',
+      open_start_time: '00:00',
+      open_end_time: '23:59',
+      start_time: '00:00',
+      end_time: '23:59',
+      time_str: '0时0分',
+      show_business_licence_placeholder: true,
+      show_alipay_identity_placeholder: true,
+      start_date: new Date(new Date(new Date().toLocaleDateString()).getTime()),
+      end_date: new Date(new Date(new Date().toLocaleDateString()).getTime()),
     };
 
   }
 
   componentDidMount() {
-    let {type = 'add'} = this.state
+    let {type = 'add', show_store_info} = this.state
     this.fetchCategories()
     if (type === 'edit') {
       this.fetchData()
     } else {
       this.autoGetgeolocation()
+      show_store_info && this.getBdList()
     }
   }
 
@@ -153,6 +173,16 @@ class SaveStore extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         category_list: res
+      })
+    })
+  }
+
+  getBdList = () => {
+    const {accessToken = '', vendor_id} = this.props.global;
+    const api = `/v4/wsb_store/getVendorBd/${vendor_id}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        bd_list: res
       })
     })
   }
@@ -195,6 +225,8 @@ class SaveStore extends PureComponent {
   }
   closeModal = () => {
     this.setState({
+      show_bd_modal: false,
+      show_time_modal: false,
       show_category_modal: false,
     })
   }
@@ -249,12 +281,16 @@ class SaveStore extends PureComponent {
       type,
       mobile,
       referrer_id,
-      show_store_info
+      show_store_info,
+      business_licence,
+      alipay_identity,
+      start_time,
+      end_time
     } = this.state;
-
     if (loading) {
       return;
     }
+
     this.setState({loading: true});
     const {accessToken = '', vendor_id = ''} = this.props.global;
     let params = {
@@ -273,6 +309,9 @@ class SaveStore extends PureComponent {
       password: verify_code,
       vendor_id,
       referrer_id,
+      business_licence,
+      alipay_identity,
+      open_time_conf: start_time + '-' + end_time,
     }
     const validator = new Validator();
     validator.add(store_name, 'required', '请填写门店名称')
@@ -283,13 +322,15 @@ class SaveStore extends PureComponent {
     validator.add(contact_phone, 'required|equalLength:11|isMobile', '请输入正确的门店联系电话')
     if (show_store_info) {
       validator.add(mobile, 'required|equalLength:11|isMobile', '请输入正确的商户手机号')
+      validator.add(alipay_identity, 'required', '请填写支付宝收款账号')
+      validator.add(business_licence, 'required', '请填写营业执照商户名称')
     }
     const err_msg = validator.start();
-    if (err_msg) {
+    if (err_msg || Number(start_time.split(':').join("")) > Number(end_time.split(':').join(""))) {
       this.setState({
         loading: false
       })
-      return ToastShort(err_msg)
+      return ToastShort(tool.length(err_msg) > 0 ? err_msg : '开始时间不能晚于截止时间')
     }
 
     let api = `/v4/wsb_store/createStore?access_token=${accessToken}`
@@ -365,6 +406,8 @@ class SaveStore extends PureComponent {
           {this.renderBody()}
           {this.renderBtn()}
           {this.renderCategoriesModal()}
+          {this.renderBdListModal()}
+          {this.renderTimeModal()}
         </If>
       </View>
     )
@@ -431,6 +474,7 @@ class SaveStore extends PureComponent {
   }
 
   renderBody = () => {
+    let {vendor_info} = this.props.global;
     let {
       store_name,
       store_address,
@@ -442,7 +486,15 @@ class SaveStore extends PureComponent {
       type,
       mobile,
       referrer_id,
-      show_store_info
+      show_store_info,
+      bd_name,
+      time_type,
+      business_licence,
+      alipay_identity,
+      start_time,
+      end_time,
+      show_business_licence_placeholder,
+      show_alipay_identity_placeholder,
     } = this.state;
     return (
       <KeyboardAwareScrollView
@@ -639,31 +691,14 @@ class SaveStore extends PureComponent {
             borderRadius: 6,
             paddingHorizontal: 12,
           }}>
+
+
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
               borderColor: colors.e5,
               borderBottomWidth: 0.5,
-              height: 56
-            }}>
-              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商户名称 </Text>
-              <TextInput placeholder="请填写商户名称"
-                         underlineColorAndroid="transparent"
-                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
-                         placeholderTextColor={'#999'}
-                         maxLength={10}
-                         value={contact_name}
-                         onChangeText={contact_name => {
-                           this.setState({contact_name: tool.filtrationInput(contact_name)});
-                         }}
-              />
-            </View>
-
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
               height: 56
             }}>
               <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>商户账号 </Text>
@@ -680,7 +715,222 @@ class SaveStore extends PureComponent {
               />
             </View>
 
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>收款人 </Text>
+              <TextInput placeholder="请填写收款人称呼"
+                         underlineColorAndroid="transparent"
+                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={'#999'}
+                         maxLength={10}
+                         value={contact_name}
+                         onChangeText={contact_name => {
+                           this.setState({contact_name: tool.filtrationInput(contact_name)});
+                         }}
+              />
+            </View>
+
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>收款账户 </Text>
+              <TextInput placeholder="请填写支付宝收款账号"
+                         underlineColorAndroid="transparent"
+                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                         maxLength={50}
+                         placeholderTextColor={show_alipay_identity_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
+                         onBlur={() => {
+                           this.setState({
+                             show_alipay_identity_placeholder: true
+                           })
+                         }}
+                         onFocus={() => {
+                           this.setState({
+                             show_alipay_identity_placeholder: false
+                           })
+                         }}
+                         value={alipay_identity}
+                         onChangeText={alipay_identity => {
+                           this.setState({
+                             alipay_identity: alipay_identity.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s\\@]/g, ""),
+                             show_alipay_identity_placeholder: tool.length(alipay_identity) === 0
+                           });
+                         }}
+              />
+            </View>
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>营业执照名称 </Text>
+              <Entypo name='help-with-circle' size={14} color={colors.colorCCC} onPress={() => {
+                JbbAlert.show({
+                  title: '请您按照营业执照上的商户名称填写，仅用于代结算合规。',
+                  actionText: '知道了',
+                })
+              }}/>
+              <TextInput placeholder="请填写营业执照名称"
+                         underlineColorAndroid="transparent"
+                         style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
+                         placeholderTextColor={show_business_licence_placeholder ? colors.color999 : 'rgba(0,0,0,0)'}
+                         onBlur={() => {
+                           this.setState({
+                             show_business_licence_placeholder: true
+                           })
+                         }}
+                         onFocus={() => {
+                           this.setState({
+                             show_business_licence_placeholder: false
+                           })
+                         }}
+                         maxLength={30}
+                         value={business_licence}
+                         onChangeText={business_licence => {
+                           this.setState({
+                             business_licence: tool.filtrationInput(business_licence),
+                             show_business_licence_placeholder: tool.length(business_licence) === 0
+                           });
+                         }}
+              />
+            </View>
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                show_bd_modal: true
+              })
+            }} style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>归属BD </Text>
+              <Text style={{
+                flex: 1,
+                fontSize: 14,
+                color: tool.length(referrer_id) > 0 ? colors.color333 : colors.color999,
+                textAlign: 'right'
+              }}>
+                {tool.length(referrer_id) > 0 ? bd_name : '请选择BD'}
+              </Text>
+              <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+            </TouchableOpacity>
+
+            <View style={{
+              borderColor: colors.e5,
+              borderBottomWidth: 0.5,
+              height: 107
+            }}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: 56
+              }}>
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>营业时间 </Text>
+                <View style={{flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                  <View style={{flexDirection: 'row'}}>
+                    <CheckBox
+                      size={20}
+                      checkedIcon={<SvgXml xml={check_circle_icon()} width={20} height={20}/>}
+                      uncheckedIcon={<SvgXml xml={radioUnSelected()} width={20} height={20}/>}
+                      checkedColor={colors.main_color}
+                      containerStyle={{margin: 0, padding: 0}}
+                      checked={time_type === 1}
+                      disabled={time_type === 1}
+                      onPress={() => {
+                        this.setState({
+                          time_type: 1,
+                          start_time: '00:00',
+                          end_time: '23:59'
+                        })
+                      }}
+                    />
+                    <Text> 全天 </Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <CheckBox
+                      size={20}
+                      checkedIcon={<SvgXml xml={check_circle_icon()} width={20} height={20}/>}
+                      uncheckedIcon={<SvgXml xml={radioUnSelected()} width={20} height={20}/>}
+                      checkedColor={colors.main_color}
+                      containerStyle={{margin: 0, padding: 0}}
+                      checked={time_type === 2}
+                      disabled={time_type === 2}
+                      onPress={() => {
+                        this.setState({time_type: 2, start_time: '选择开始时间', end_time: '选择结束时间'})
+                      }}
+                    />
+                    <Text> 选择时间段 </Text>
+                  </View>
+                </View>
+              </View>
+              <TouchableOpacity disabled={time_type === 1} onPress={() => {
+                this.setState({
+                  show_time_modal: true
+                })
+              }} style={{
+                height: 40,
+                marginVertical: 5,
+                borderRadius: 4,
+                backgroundColor: colors.f5,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <Text style={{
+                  fontSize: 16,
+                  color: start_time !== '选择开始时间' ? colors.color333 : colors.color999,
+                  textAlign: 'center',
+                  flex: 1
+                }}> {start_time} </Text>
+                <Text style={{fontSize: 16, color: colors.color333}}> 至 </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: end_time !== '选择结束时间' ? colors.color333 : colors.color999,
+                    textAlign: 'center',
+                    flex: 1
+                  }}> {end_time} </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              height: 56
+            }}>
+              <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>服务扣点 </Text>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color999,
+                textAlign: 'right',
+                flex: 1
+              }}> 服务扣点: {vendor_info?.service_rate || 0} &nbsp;保险扣点:
+                {vendor_info?.insurance_rate || 0}&nbsp; 微信: {vendor_info?.wechat_rate || 0} </Text>
+            </View>
           </View>
+          <View style={{height: 120}}/>
         </If>
       </KeyboardAwareScrollView>
     )
@@ -688,10 +938,10 @@ class SaveStore extends PureComponent {
 
 
   renderBtn = () => {
-    let {type} = this.state;
+    let {type, show_store_info} = this.state;
     return (
       <View style={{backgroundColor: colors.white, paddingHorizontal: 20, paddingVertical: 10, height: 62}}>
-        <Button title={type === 'edit' ? '保存并同步' : '保 存'}
+        <Button title={type === 'edit' || show_store_info ? '保存并同步' : '保 存'}
                 onPress={this.submit}
                 buttonStyle={[{
                   backgroundColor: colors.main_color,
@@ -704,6 +954,194 @@ class SaveStore extends PureComponent {
     )
   }
 
+  renderBdListModal = () => {
+    let {show_bd_modal, bd_list, referrer_id} = this.state;
+    return (
+      <Modal hardwareAccelerated={true}
+             onRequestClose={this.closeModal}
+             maskClosable transparent={true}
+             animationType="slide"
+             visible={show_bd_modal}>
+        <View style={[{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}]}>
+          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
+          <View style={[{
+            backgroundColor: colors.white,
+            maxHeight: height * 0.8,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            padding: 20
+          }]}>
+
+            <View style={{marginBottom: 30,}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
+                <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+                  选择BD
+                </Text>
+                <SvgXml onPress={() => {
+                  this.closeModal()
+                }} xml={cross_icon()}/>
+              </View>
+
+              <ScrollView automaticallyAdjustContentInsets={false}
+                          showsHorizontalScrollIndicator={false}
+                          showsVerticalScrollIndicator={false}
+                          style={{maxHeight: 350}}>
+                <If condition={tool.length(bd_list) > 0}>
+                  <For each='item' index='idx' of={bd_list}>
+                    <TouchableOpacity onPress={() => {
+                      this.setState({
+                        show_bd_modal: false,
+                        referrer_id: item?.id,
+                        bd_name: item?.name,
+                      })
+                    }} key={idx} style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingVertical: 14,
+                      borderColor: colors.colorDDD,
+                      borderBottomWidth: 0.2
+                    }}>
+                      <View style={{flexDirection: 'row', alignItems: 'center',}}>
+                        <Text
+                          style={{fontSize: 14, color: colors.color333}}>{item?.name} </Text>
+                      </View>
+                      <If condition={referrer_id === item?.id}>
+                        <Entypo name={'check'} style={{fontSize: 22, color: colors.main_color}}/>
+                      </If>
+                    </TouchableOpacity>
+                  </For>
+                </If>
+              </ScrollView>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
+  renderTimeModal = () => {
+    let {show_time_modal, time_str, start_date, end_date, open_start_time, open_end_time} = this.state;
+    return (
+      <Modal hardwareAccelerated={true}
+             onRequestClose={this.closeModal}
+             maskClosable transparent={true}
+             animationType="slide"
+             visible={show_time_modal}>
+        <View style={[{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}]}>
+          <TouchableOpacity onPress={this.closeModal} style={{flexGrow: 1}}/>
+          <View style={[{
+            backgroundColor: colors.white,
+            maxHeight: height * 0.8,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+            padding: 20
+          }]}>
+
+            <View style={{marginBottom: 30,}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
+                <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>
+                  设置营业时间段
+                </Text>
+                <SvgXml onPress={() => {
+                  this.closeModal()
+                }} xml={cross_icon()}/>
+              </View>
+
+              <View style={{
+                width: width * 0.92,
+                height: 180,
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <DatePicker
+                  style={{flex: 1, height: 180, fontSize: 14, fontWeight: 'bold'}}
+                  mode={'time'}
+                  fadeToColor={'red'}
+                  textColor={colors.color666}
+                  date={start_date}
+                  maximumDate={new Date(new Date(new Date().toLocaleDateString()).getTime() + 84600000)}
+                  onDateChange={(date) => {
+
+                    let unix = dayjs(end_date).unix() - dayjs(date).unix()
+                    let str = '0时0分';
+                    if (unix > 0 && unix < 3600) {
+                      str = '0时' + Math.trunc(unix / 60) + '分'
+                    } else if (unix >= 3600) {
+                      let h = Math.trunc(unix / 3600)
+                      let m = Math.trunc((unix - (h * 3600)) / 60)
+                      str = h + '时' + m + '分'
+                    }
+
+                    this.setState({
+                      start_date: date,
+                      time_str: str,
+                      open_start_time: dayjs(date).format('HH:mm')
+                    })
+                  }}
+                />
+                <Text style={{fontSize: 16, color: colors.color333}}> 至 </Text>
+                <DatePicker
+                  style={{flex: 1, height: 180, fontSize: 14, fontWeight: 'bold'}}
+                  mode={'time'}
+                  textColor={colors.color333}
+                  date={end_date}
+                  onDateChange={(date) => {
+
+                    let unix = dayjs(date).unix() - dayjs(start_date).unix()
+                    let str = '0时0分';
+                    if (unix > 0 && unix < 3600) {
+                      str = '0时' + Math.trunc(unix / 60) + '分'
+                    } else if (unix >= 3600) {
+                      let h = Math.trunc(unix / 3600)
+                      let m = Math.trunc((unix - (h * 3600)) / 60)
+                      str = h + '时' + m + '分'
+                    }
+
+                    this.setState({
+                      end_date: date,
+                      time_str: str,
+                      open_end_time: dayjs(date).format('HH:mm')
+                    })
+                  }}
+                />
+              </View>
+              <View style={{
+                marginVertical: 20,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <Text style={{fontSize: 14, color: colors.color333}}>{open_start_time} 至 {open_end_time} </Text>
+                {dayjs(start_date).unix() > dayjs(end_date).unix() ?
+                  <Text style={{fontSize: 14, color: '#FF2200'}}> 截止时间不能早于开始时间 </Text>
+                  : <Text style={{fontSize: 14, color: colors.color333}}>共计营业时长{time_str} </Text>}
+              </View>
+              <Button title={'确 定'}
+                      onPress={() => {
+                        if (dayjs(start_date).unix() > dayjs(end_date).unix()) {
+                          return ToastShort('截止时间不能早于开始时间', 100)
+                        }
+
+                        this.setState({
+                          start_time: open_start_time,
+                          end_time: open_end_time,
+                          show_time_modal: false,
+                        })
+                      }}
+                      buttonStyle={[{
+                        backgroundColor: dayjs(start_date).unix() < dayjs(end_date).unix() ? colors.main_color : colors.fontGray,
+                        borderRadius: 24,
+                        marginHorizontal: 10,
+                        length: 42,
+                      }]}
+                      titleStyle={{color: colors.f7, fontWeight: 'bold', fontSize: 20, lineHeight: 28}}/>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
 
   renderCategoriesModal = () => {
     let {category_list, show_category_modal, category_id_input_vlue, category_id_input_vlue_desc} = this.state;
