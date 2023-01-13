@@ -129,6 +129,7 @@ class OrderCallDelivery extends Component {
       show_est_all_check: false,
       show_store_est_all_check: false,
       ship_id: 0,
+      onload: true,
     };
 
     this.mixpanel = MixpanelInstance;
@@ -138,7 +139,9 @@ class OrderCallDelivery extends Component {
   componentDidMount() {
     hideModal()
     this.unSubscribe = store.subscribe(() => {
-      this.setData(store.getState()?.global?.call_delivery_obj || [])
+      if(this.state.onload){
+        this.setData(store.getState()?.global?.call_delivery_obj || [])
+      }
     })
     this.onCreate().then()
   }
@@ -287,6 +290,7 @@ class OrderCallDelivery extends Component {
       }
     }
     this.setState({
+      onload: false,
       logistic_fee_map: logistic_fee_map,
       params_str: params_json_str,
       is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
