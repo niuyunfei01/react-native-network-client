@@ -17,6 +17,7 @@ import JbbButton from "../../common/component/JbbButton";
 import EmptyData from "../../common/component/EmptyData";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../../pubilc/styles/colors";
+import Synthesizer from "../../../pubilc/component/react-native-speech-iflytek";
 
 const CheckboxItem = Checkbox.CheckboxItem;
 
@@ -91,7 +92,7 @@ class StandardPutIn extends BaseComponent {
     const api = `api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res.id) {
-        native.speakText('未知标准品')
+        Synthesizer.start('未知标准品')
         ToastShort('未知标准品！')
         self.setState({upc: ''})
       } else {
@@ -220,7 +221,7 @@ class StandardPutIn extends BaseComponent {
     }
     this.listenScanUpc = DeviceEventEmitter.addListener(C.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
       if (self.state.upc) {
-        native.speakText('当前有未处理的标准品入库')
+        Synthesizer.start('当前有未处理的标准品入库')
         ToastShort('当前有未处理的标准品入库！')
         return
       }

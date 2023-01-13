@@ -2,20 +2,49 @@ import React, {PureComponent, useEffect, useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {navigationRef} from '../../RootNavigation';
+import {navigate, navigationRef} from '../../RootNavigation';
 import Config from "./config";
-import {Dimensions, Platform, View, Text, TouchableOpacity, StyleSheet, Linking, ImageBackground} from "react-native";
+import {
+  Dimensions,
+  Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+  ImageBackground,
+  NativeEventEmitter,
+  AppState
+} from "react-native";
 import TabHome from "../../scene/common/TabHome";
 import native from "../util/native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {setCheckVersionAt} from "../../reducers/global/globalActions";
+import {
+  setBackgroundStatus,
+  setCheckVersionAt,
+  setNetInfo,
+  setJPushStatus,
+  setNotificationStatus
+} from "../../reducers/global/globalActions";
+import {
+  getImRemindCount,
+  getOldRemindConfig,
+  getStoreImConfig,
+  setImRemindCount,
+  setOldRemindInfo
+} from "../../reducers/im/imActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
 import dayjs from "dayjs";
 import HttpUtils from "../util/http";
-import {doJPushSetAlias, sendDeviceStatus,} from "../component/jpushManage";
+import {
+  checkPushStatus,
+  doJPushSetAlias,
+  initJPush,
+  sendDeviceStatus,
+} from "../component/jpushManage";
 import {nrRecordMetric} from "../util/NewRelicRN";
 import {handlePrintOrder, initBlueTooth, unInitBlueTooth} from "../util/ble/handleBlueTooth";
 import GlobalUtil from "../util/GlobalUtil";
@@ -25,7 +54,13 @@ import DeviceInfo from "react-native-device-info";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
 import JPush from "jpush-react-native";
 import CommonModal from "../component/goods/CommonModal";
+import {hideModal, ToastLong} from "../util/ToastUtils";
 
+import JbbAlert from "../component/JbbAlert";
+import {Synthesizer} from "../component/react-native-speech-iflytek";
+import RefundReasonModal from "../component/RefundReasonModal";
+import RefundStatusModal from "../component/RefundStatusModal";
+import NetInfo from "@react-native-community/netinfo";
 
 let {width} = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
@@ -105,9 +140,6 @@ const Page = (props) => {
           //component={LoginScene}
                       getComponent={() => require('../../scene/common/Login/LoginScene').default}
                       initialParams={initialRouteParams}/>
-        {/*<Stack.Screen name="Order" options={{headerTitle: '订单详情'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderInfo").default}*/}
-        {/*              initialParams={initialRouteParams}/>*/}
         <Stack.Screen name="OrderNew" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../../scene/order/OrderInfoNew").default}
                       initialParams={initialRouteParams}/>
@@ -129,8 +161,8 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/order/OrderOperation").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" getComponent={() => require("./WebScene").default}/>
-        <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
-                      getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
+        {/*<Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}*/}
+        {/*              getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>*/}
         <Stack.Screen name="User" getComponent={() => require("../../scene/home/User/UserScene").default}/>
         <Stack.Screen name="UserAdd" getComponent={() => require("../../scene/home/User/UserAddScene").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerShown: false}}
@@ -148,9 +180,9 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
-        <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
-                      getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Delivery/ApplyDelivery").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../../scene/home/Delivery/SettingDeliveryInfo").default}
         />
@@ -177,15 +209,21 @@ const Page = (props) => {
                       getComponent={() => require("../../scene/home/Notice/HistoryNoticeScene").default}/>
         <Stack.Screen name={Config.ROUTE_DETAIL_NOTICE} options={{headerTitle: '公告详情'}}
                       getComponent={() => require("../../scene/home/Notice/DetailNoticeScene").default}/>
+        <Stack.Screen name={'Home'} options={{headerTitle: '旧版消息'}}
+                      getComponent={() => require("../../scene/notice/NoticeList").default}/>
+        <Stack.Screen name={Config.ROUTE_CHAT_ROOM} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ChatRoom").default}/>
+        <Stack.Screen name={Config.ROUTE_IM_SETTING} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/notice/ImSetting").default}/>
 
         <Stack.Screen name={Config.ROUTE_PRINTERS} options={{headerTitle: '打印设置'}}
                       getComponent={() => require("../../scene/home/Setting/PrinterSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}
-                      getComponent={() => require("../../scene/home/Setting/InfromSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_PUSH} options={{headerTitle: '推送通知'}}
-                      getComponent={() => require("../../scene/home/Setting/PushSetting").default}/>
-        <Stack.Screen name={Config.ROUTE_MSG_VOICE} options={{headerTitle: '消息铃声检测'}}
-                      getComponent={() => require("../../scene/home/Setting/MsgVoiceScene").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_INFORM} options={{headerTitle: '消息与铃声'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/InfromSetting").default}/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_PUSH} options={{headerTitle: '推送通知'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/PushSetting").default}/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_MSG_VOICE} options={{headerTitle: '消息铃声检测'}}*/}
+        {/*              getComponent={() => require("../../scene/home/Setting/MsgVoiceScene").default}/>*/}
         <Stack.Screen name={Config.ROUTE_GUIDE} options={{headerTitle: '设置提醒教程'}}
                       getComponent={() => require("../../scene/home/Setting/GuideScene").default}/>
         <Stack.Screen name={Config.DIY_PRINTER} options={{headerTitle: '小票设置'}}
@@ -213,14 +251,10 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} options={{headerTitle: '置为无效'}}
                       getComponent={() => require("../../scene/order/OrderToInvalidScene").default}
         />
-        {/*<Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}*/}
-        {/*              getComponent={() => require("../../scene/order/OrderTransferThird").default}*/}
-        {/*/>*/}
 
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_DELIVERY} options={{headerShown: false}}
                       getComponent={() => require("../../scene/order/OrderCallDelivery").default}
         />
-
         <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
                       getComponent={() => require("../../scene/order/OrderAinSend").default}
         />
@@ -247,26 +281,24 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} options={{headerTitle: '退单商品入库'}}
                       getComponent={() => require("../../scene/order/OrderCancelToEntry").default}
         />
-        <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}
-                      getComponent={() => require("../../scene/order/OrderExitLog").default}/>
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} options={{headerTitle: '订单出库详情'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderExitLog").default}/>*/}
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../../scene/order/_OrderScene/Complain").default}/>
 
 
-        <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
-                      getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}
-        />
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}
-                      getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
-        />
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}*/}
+        {/*              getComponent={() => require("../../scene/order/_GoodCoupon/SendRedeemCoupon").default}*/}
+        {/*/>*/}
+        {/*<Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '全部订单'}}*/}
+        {/*              getComponent={() => require("../../scene/order/OrderQueryResultScene").default}*/}
+        {/*/>*/}
         <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
                       getComponent={() => require("../../scene/order/OrderAddressBook").default}
         />
         <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
                       getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
         />
-        <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
-                      getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_LIST} options={{headerShown: false}}
                       getComponent={() => require("../../scene/home/Store/StoreList").default}/>
         <Stack.Screen name={Config.ROUTE_SAVE_STORE} options={{headerShown: false}}
@@ -351,6 +383,8 @@ const Page = (props) => {
         <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
                       getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_BUSINESS_DATA} options={{headerTitle: '经营数据', headerShown: false}}
+                      getComponent={() => require('../../scene/home/Setting/BusinessDataScene').default}/>
         <Stack.Screen name={Config.ROUTE_PROFITANDLOSS} options={{headerTitle: '盈亏明细'}}
                       getComponent={() => require('../../scene/home/Setting/ProfitAndLossScene').default}
         />
@@ -364,20 +398,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/product/Goods/GoodsRelateScene').default}/>
         <Stack.Screen name={Config.ROUTE_HELP} options={{headerTitle: '帮助'}}
                       getComponent={() => require('../../scene/home/Help/HelpScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} options={{headerTitle: '运营收益'}}
-                      getComponent={() => require('../../scene/operation/OperateProfitScene').default}/>
-        <Stack.Screen name={Config.ROUTE_OPERATE_DETAIL} options={{headerTitle: '运营明细'}}
-                      getComponent={() => require('../../scene/operation/OperateDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_INCOME_DETAIL} options={{headerTitle: '收入详情'}}
-                      getComponent={() => require('../../scene/operation/OperateIncomeDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_EXPEND_DETAIL}
-                      getComponent={() => require('../../scene/operation/OperateExpendDetailScene').default}
-        />
-        <Stack.Screen name={Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL} options={{headerTitle: '其他支出流水'}}
-                      getComponent={() => require('../../scene/operation/OperateOtherExpendDetailScene').default}
-        />
         <Stack.Screen name={Config.ROUTE_GOODS_COMMODITY_PRICING} options={{headerTitle: '商品调价信息'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsCommodityPricingScene').default}
         />
@@ -504,8 +524,6 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Worker/WorkerListScene').default}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}}
                       getComponent={() => require('../../scene/home/Worker/WorkerSchedule').default}/>
-        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
-                      getComponent={() => require('../../scene/order/Ziti/OrderPrint').default}/>
         <Stack.Screen name={Config.ROUTE_CONSOLE_STOCKING_TASKS} options={{headerTitle: '备货'}}
                       getComponent={() => require('../../scene/console/StockingTasks').default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_RETAIL_PRICE} options={{headerTitle: '零售价格'}}
@@ -571,14 +589,23 @@ const Page = (props) => {
                       getComponent={() => require('../../scene/home/Setting/EditAccount').default}/>
         <Stack.Screen name={Config.ROUTE_CHANGE_DELIVERY_ACCOUNT}
                       getComponent={() => require('../../scene/home/Delivery/ChangeDeliveryAccount').default}/>
+        <Stack.Screen name={Config.ROUTE_NOTIFICATION_SETTING}
+                      options={{headerTitle: '通知设置'}}
+                      getComponent={() => require('../../scene/home/Setting/NotificationSetting').default}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_AUDIT}
+                      options={{headerTitle: '商品审核'}}
+                      getComponent={() => require('../../scene/product/Goods/GoodsAuditScene').default}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-let notInit = true
+let notInit = true, jpushNotInit = true
 let ios_info = {}
 const appid = '1587325388'
 const appUrl = `https://itunes.apple.com/cn/app/id${appid}?ls=1&mt=8`
+let isSunmiDevice = false, RegistrationID = ''
+let isHandlerTask = false, messageQueue = [], setAliasInterval = null
+let connectListener = null, tagAliasListener = null, notificationListener = null
 
 class AppNavigator extends PureComponent {
 
@@ -660,70 +687,186 @@ class AppNavigator extends PureComponent {
       lastCheckVersion: reduxGlobal.lastCheckVersion
     }
     global.noLoginInfo = noLoginInfo
+    global.noLoginInfo.screen_name = reduxGlobal.currentUserProfile?.screen_name || ''
     setNoLoginInfo(JSON.stringify(noLoginInfo))
 
   }
 
+  handleTouchNotification = (type, order_id) => {
+    switch (type) {
+      case 'v4_order_new'://新订单
+      case 'v4_delivery_order_created'://配送下单
+      case 'v4_delivery_order_accept'://配送接单
+        navigate(Config.ROUTE_ORDERS)
+        break
+      case 'v4_cancel_order'://订单取消
+        navigate(Config.ROUTE_ORDER_NEW, {orderId: order_id})
+        break
+      case 'v4_order_refund'://用户申请退款
+        navigate(Config.ROUTE_ORDERS, {order_status: 11})
+        break
+      case 'v4_order_reminder'://顾客催单
+        navigate(Config.ROUTE_ORDERS, {})
+        break
 
-  initJPush = () => {
+      case 'v4_delivery_order_exception'://配送异常
+      case 'v4_order_cancel'://配送取消
+        navigate(Config.ROUTE_ORDERS, {order_status: 8})
+        break
+      case 'v4_delivery_order_auto_send_fail'://自动发单失败
+        break
 
-    JPush.setLoggerEnable(false)
-    JPush.init()
-    JPush.addConnectEventListener(({connectEnable}) => {
-      //console.log("connectEnable:" + connectEnable)
-      if (connectEnable)
-        doJPushSetAlias(currentUser);
-    })
+    }
+  }
 
-    // JPush.getRegistrationID(({registerID}) => {
-    //     console.log("registerID:" + JSON.stringify(registerID))
-    //   }
-    // )
-    const {accessToken, autoBluetoothPrint, currentUser, store_id} = this.props.global
-    //tag alias事件回调
-    JPush.addTagAliasListener(({code}) => {
-      //console.log("tagAliasListener:" + code)
-      if (code) {
-        doJPushSetAlias(currentUser)
+  handlerMessage = async (type, order_id, speak_word, store_id, messageID) => {
+    isHandlerTask = true
+    const {accessToken, autoBluetoothPrint} = this.props.global
+
+    if (type !== 'new_order') {
+      sendDeviceStatus(this.props.global, {
+        msgId: messageID,
+        listener_stores: store_id,
+        orderId: order_id,
+        btConnected: '收到极光推送，不是新订单不需要打印',
+        auto_print: autoBluetoothPrint
+      })
+
+    } else {
+      if (isSunmiDevice) {
+        const api = `/v4/wsb_order/order_detail/${order_id}?access_token=${accessToken}`
+        const order = await HttpUtils.get(api, {})
+        await native.printSmPrinter(order)
+
+      } else {
+        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
       }
-    });
-    //通知回调
+    }
 
-    JPush.addNotificationListener(async ({messageID, extras, notificationEventType}) => {
-      // console.log("notificationListener,extras:" + JSON.stringify(extras))
-      // console.log("notificationListener,notificationEventType:" + notificationEventType)
-      const {type, order_id} = extras
+    if (messageQueue.length > 0) {
+      messageQueue.splice(0, 1)
+      // await this.onSynthesizerResult()
+    }
+
+  }
+
+  onSynthesizerResult = async () => {
+    if (messageQueue.length === 0) {
+      isHandlerTask = false
+      return
+    }
+    const {type, order_id, speak_word, store_id, messageID} = messageQueue[0]
+    await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
+  }
+
+  handleSpeechIflytek = () => {
+    if (Platform.OS === 'android') {
+      Synthesizer.init("58b571b2")
+    }
+    const synthesizer = new NativeEventEmitter(Synthesizer);
+    this.synthesizerEventEmitter = synthesizer.addListener('onSynthesizerSpeakCompletedEvent', this.onSynthesizerResult);
+  };
+
+  jpushListener = async (currentUser) => {
+    connectListener = async ({connectEnable}) => {
+      if (connectEnable)
+        await doJPushSetAlias(currentUser);
+    }
+    await JPush.addConnectEventListener(connectListener);
+
+    await JPush.getRegistrationID(({registerID}) => {
+      RegistrationID = registerID
+      this.uploadDeviceInfo(registerID)
+    })
+    tagAliasListener = ({code}) => {
+
+      if (global.pushType !== 'set')
+        return;
+      if (0 === code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = null
+        store.dispatch(setJPushStatus(RegistrationID))
+        return
+      }
+      store.dispatch(setJPushStatus(code))
+      if (code) {
+        setAliasInterval && clearTimeout(setAliasInterval)
+        setAliasInterval = setTimeout(async () => {
+          await doJPushSetAlias(currentUser)
+        }, 2 * 1000)
+
+      }
+    }
+
+    //tag alias事件回调
+    await JPush.addTagAliasListener(tagAliasListener);
+    //通知回调
+    notificationListener = async ({messageID, extras, notificationEventType}) => {
+      const {type, order_id, speak_word, store_id} = extras
       if ('notificationArrived' === notificationEventType) {
-        if (type !== 'new_order') {
-          sendDeviceStatus(accessToken, {
-            msgId: messageID,
-            listener_stores: store_id,
-            orderId: order_id,
-            btConnected: '收到极光推送，不是新订单不需要打印',
-            auto_print: autoBluetoothPrint
-          })
+        if (!speak_word) {
           return
         }
-        await handlePrintOrder(this.props, {msgId: messageID, orderId: order_id, listener_stores: store_id})
+
+        if (!isHandlerTask) {
+          await this.handlerMessage(type, order_id, speak_word, store_id, messageID)
+          return
+        }
+        messageQueue.push({
+          type: type,
+          order_id: order_id,
+          speak_word: speak_word,
+          store_id: store_id,
+          messageID: messageID
+        })
       }
       if ('notificationOpened' === notificationEventType) {
         JPush.setBadge({appBadge: 0, badge: 0})
+        type && this.handleTouchNotification(type, order_id)
       }
-    });
+    }
+    await JPush.addNotificationListener(notificationListener);
+  }
+  uploadDeviceInfo = (registration_id) => {
+    const {accessToken, currentUser, store_id} = this.props.global
+    const url = `/v4/wsb_user/recordDeviceInfo?access_token=${accessToken}`
+    const params = {
+      registration_id: registration_id,
+      device_id: DeviceInfo.getUniqueId(),
+      user_id: currentUser,
+      store_id: store_id
+    }
+
+    HttpUtils.post(url, params).then(() => {
+    }).catch(() => {
+    })
   }
 
   whiteNoLoginInfo = () => {
     this.unSubscribe = store.subscribe(async () => {
-      const {global} = store.getState()
+      const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion} = global;
+      const {accessToken, lastCheckVersion, currentUser} = global;
+      if (accessToken && currentUser && jpushNotInit) {
+        jpushNotInit = false
+        await checkPushStatus(async () => {
+          await this.jpushListener(currentUser)
+          await initJPush()
+        })
+      }
       //如果登录了，才可以进行后续的初始化，并且只初始化一次
       if (accessToken && notInit) {
         notInit = false
-        this.initJPush()
+        this.handleSpeechIflytek()
         if (Platform.OS === 'android') {
           await native.xunfeiIdentily()
           await this.calcAppStartTime()
+          await native.isSunmiDevice((flag, isSunmi) => {
+            isSunmiDevice = isSunmi
+          })
+          await native.isRunInBg((resp) => {
+            store.dispatch(setBackgroundStatus(resp))
+          })
         }
         await initBlueTooth(global)
 
@@ -741,23 +884,82 @@ class AppNavigator extends PureComponent {
             ios: "48148de470831f4155abda953888a487",
           })
         );
-
+        store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
+        if (im.im_config.im_store_status == 1 && this.state.appState === 'active')
+          this.startPolling(global, im)
+        store.dispatch(getOldRemindConfig(global.accessToken, global.store_id, global.vendor_id, (ok, msg, obj) => store.dispatch(setOldRemindInfo(obj))))
+        this.getNetInfo()
+        switch (Platform.OS) {
+          case "android":
+            JPush.isNotificationEnabled((enabled) => {
+              store.dispatch(setNotificationStatus(enabled ? 1 : 0))
+            })
+            break
+          case "ios":
+            store.dispatch(setNotificationStatus(await native.getNotificationStatus() ? 1 : 0))
+            break
+        }
       }
     })
   }
 
   componentDidMount() {
     this.whiteNoLoginInfo()
+    this.getAppState()
 
   }
 
   componentWillUnmount() {
+    setAliasInterval && clearTimeout(setAliasInterval)
+    setAliasInterval = null
     this.unSubscribe()
-    //this.iosBluetoothPrintListener && this.iosBluetoothPrintListener.remove()
-    //this.androidBluetoothPrintListener && this.androidBluetoothPrintListener.remove()
     unInitBlueTooth()
+    this.synthesizerEventEmitter && this.synthesizerEventEmitter.remove()
+    this.dataPolling && clearInterval(this.dataPolling);
+    this.appStateEvent && this.appStateEvent.remove()
+    this.unsubscribe && this.unsubscribe()
+    connectListener && JPush.removeListener(connectListener)
+    tagAliasListener && JPush.removeListener(tagAliasListener)
+    notificationListener && JPush.removeListener(notificationListener)
   }
 
+  getAppState = () => {
+    this.appStateEvent = AppState.addEventListener("change", this._handleAppStateChange);
+  }
+
+  getNetInfo = () => {
+    NetInfo.fetch().then(state => {
+      store.dispatch(setNetInfo(state))
+    });
+    this.unsubscribe = NetInfo.addEventListener(state => {
+      store.dispatch(setNetInfo(state))
+    })
+  }
+
+  _handleAppStateChange = nextAppState => {
+    this.setState({
+      appState: nextAppState
+    })
+    if (nextAppState === "background") {
+      this.dataPolling && clearInterval(this.dataPolling);
+      setAliasInterval && clearTimeout(setAliasInterval)
+    }
+  };
+
+  startPolling = (global, im) => {
+    this.dataPolling = setInterval(
+      () => {
+        store.dispatch(getImRemindCount(global.accessToken, global.store_id, im.im_config.im_url, (ok, msg, obj) => {
+          if (ok) {
+            hideModal()
+            store.dispatch(setImRemindCount(obj.message_count))
+          } else {
+            ToastLong(msg);
+          }
+        }))
+      },
+      im.im_config.im_count_second * 1000);
+  }
 
   calcAppStartTime = async () => {
     await native.getStartAppTime((flag, startAppTime) => {
@@ -777,46 +979,11 @@ class AppNavigator extends PureComponent {
     })
   }
 
-  // printByBluetoothIOS = () => {
-  //   const {global} = this.props
-  //   let {accessToken, autoBluetoothPrint} = global;
-  //   //const iosEmitter = new NativeEventEmitter(NativeModules.IOSToReactNativeEventEmitter)
-  //   // this.iosBluetoothPrintListener = iosEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //   //   if (obj.order_type !== 'new_order') {
-  //   //     sendDeviceStatus(accessToken, {
-  //   //       ...obj,
-  //   //       btConnected: '收到极光推送，不是新订单不需要打印',
-  //   //       auto_print: autoBluetoothPrint
-  //   //     })
-  //   //     return
-  //   //   }
-  //   //   await handlePrintOrder(this.props, obj)
-  //   // })
-  // }
-
-
-  // printByBluetoothAndroid = () => {
-  //   this.androidBluetoothPrintListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, async (obj) => {
-  //     await handlePrintOrder(this.props, obj)
-  //
-  //   })
-  // }
-
-  // printByBluetooth = () => {
-  //   switch (Platform.OS) {
-  //     case "ios":
-  //       this.printByBluetoothIOS()
-  //       break
-  //     case "android":
-  //       this.printByBluetoothAndroid()
-  //       break
-  //   }
-  // }
-
   state = {
     version_visible: false,
     desc: '',
-    download_url: ''
+    download_url: '',
+    appState: 'active'
   }
 
   setModalStatus = (version_visible = false, desc = '', download_url = '') => {
@@ -828,6 +995,9 @@ class AppNavigator extends PureComponent {
     const {version_visible, desc} = this.state
     return (
       <>
+        <JbbAlert/>
+        <RefundReasonModal/>
+        <RefundStatusModal/>
         <CommonModal visible={version_visible} position={'center'} onRequestClose={this.setModalStatus}>
           <>
             <ImageBackground style={styles.image} source={new_version_background_url}>
@@ -867,14 +1037,14 @@ const styles = StyleSheet.create({
   content: {borderBottomLeftRadius: 10, borderBottomRightRadius: 10, marginHorizontal: 27, backgroundColor: 'white'},
   image: {height: 148, marginHorizontal: 27, alignItems: 'center', justifyContent: 'center'},
   updateContentText: {fontSize: 14, color: '#333', lineHeight: 20, paddingHorizontal: 20, paddingTop: 10},
-  headerText: {fontWeight: '500', color: 'white', lineHeight: 30, fontSize: 22},
+  headerText: {fontWeight: 'bold', color: 'white', lineHeight: 30, fontSize: 22},
   btnWrap: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20},
   cancelWrap: {backgroundColor: '#f5f5f5', borderRadius: 20},
-  cancelText: {fontSize: 16, fontWeight: '500', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
+  cancelText: {fontSize: 16, fontWeight: 'bold', paddingHorizontal: 36, paddingVertical: 9, color: '#666'},
   updateWrap: {backgroundColor: '#26B942', borderRadius: 20, marginLeft: 10},
   updateText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     paddingHorizontal: 36,
     paddingVertical: 9,
     color: 'white'

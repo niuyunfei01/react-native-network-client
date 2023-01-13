@@ -84,7 +84,6 @@ class OperateDetailScene extends PureComponent {
     let {type, remark, name, money} = this.state;
     if (!(type > 0 && money > 0 && tool.length(name) > 0)) {
       this.setState({uploading: false});
-      hideModal();
       ToastLong("请检查数据!");
     }
     let data = {
@@ -102,7 +101,6 @@ class OperateDetailScene extends PureComponent {
         accessToken,
         async (ok, obj, desc) => {
           await this.setState({uploading: false});
-          hideModal()
           if (ok) {
             ToastLong("提交成功");
             this.setState({

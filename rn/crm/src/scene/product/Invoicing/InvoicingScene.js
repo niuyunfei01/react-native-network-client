@@ -26,6 +26,8 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+const tabs_list = [{title: '采集中'}, {title: '调货单'}, {title: '订货单'}, {title: '已结算'}];
+
 class InvoicingScene extends PureComponent {
 
   constructor(props) {
@@ -33,7 +35,12 @@ class InvoicingScene extends PureComponent {
     this.state = {
       initPage: 0
     }
-    const {navigation} = props;
+
+  }
+
+  componentDidMount() {
+    const {navigation} = this.props;
+    const {initPage} = (this.props.route.params || {});
     navigation.setOptions(
       {
         headerRight: (() => (
@@ -51,23 +58,13 @@ class InvoicingScene extends PureComponent {
         )
       }
     );
-  }
-
-
-  UNSAFE_componentWillMount() {
-    const {navigation} = this.props;
-    const {initPage} = (this.props.route.params || {});
     if (initPage) {
       this.setState({initPage: initPage})
     }
   }
 
-  toDetail(router, params = {}) {
-    this.props.navigation.navigate(router, params)
-  }
-
   render() {
-    const tabs_list = [{title: '采集中'}, {title: '调货单'}, {title: '订货单'}, {title: '已结算'}];
+
     return (
       <Tabs tabs={tabs_list}>
         <InvoicingGatherScene tabLabel='采集中' navigation={this.props.navigation}/>

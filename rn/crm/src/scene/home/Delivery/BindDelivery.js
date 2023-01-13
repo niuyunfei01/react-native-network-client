@@ -1,8 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {ScrollView, Text, View,} from "react-native";
-import {bindActionCreators} from "redux";
-import * as globalActions from "../../../reducers/global/globalActions";
 import {connect} from "react-redux";
 
 import colors from "../../../pubilc/styles/colors";
@@ -12,16 +10,11 @@ import {Button, Input} from "react-native-elements";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import Entypo from "react-native-vector-icons/Entypo";
 import {SFCategory} from "../../../pubilc/util/tool";
+import {addDelivery} from "../../../reducers/global/globalActions";
 
 const mapStateToProps = state => {
   let {global} = state
   return {global: global}
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
 }
 
 
@@ -44,30 +37,32 @@ class BindDelivery extends PureComponent {
       this.setState({value});
     };
 
-    this.onBindDelivery = this.onBindDelivery.bind(this)
   }
 
-  onBindDelivery() {
+  onBindDelivery = () => {
     if (!this.state.shop_id) {
       ToastShort("请输入门店id")
       return;
     }
-    this.props.actions.addDelivery({
-      name: this.props.route.params.name,
-      type: this.props.route.params.id,
-      app_key: this.state.app_key,
-      value: this.state.value,
-      app_secret: this.state.app_secret,
-      shop_id: this.state.shop_id,
-      model_id: this.props.global.store_id,
-    }, (success) => {
-      if (success) {
-        ToastShort('绑定成功')
-      } else {
-        ToastShort('绑定失败')
-      }
-      this.props.navigation.goBack();
-    })
+    const {dispatch, route, global, navigation} = this.props
+    dispatch(
+      addDelivery({
+        name: route.params.name,
+        type: route.params.id,
+        app_key: this.state.app_key,
+        value: this.state.value,
+        app_secret: this.state.app_secret,
+        shop_id: this.state.shop_id,
+        model_id: global.store_id,
+      }, (success) => {
+        if (success) {
+          ToastShort('绑定成功')
+        } else {
+          ToastShort('绑定失败')
+        }
+        navigation.goBack();
+      })
+    )
   }
 
   render() {
@@ -97,9 +92,7 @@ class BindDelivery extends PureComponent {
           // justifyContent: 'center',
           alignItems: 'center',
         }}>
-          <Text style={{
-            fontSize: pxToDp(30),
-          }}>配送平台门店ID :</Text>
+          <Text style={{fontSize: pxToDp(30), color: colors.color333}}>配送平台门店ID :</Text>
           <Input
             onChangeText={(shop_id) => {
               shop_id = shop_id.replace(/[^\d]+/, '');
@@ -142,7 +135,7 @@ class BindDelivery extends PureComponent {
               marginLeft: 10
             }}>
               <View style={{flex: 1}}></View>
-              <Text style={{color: colors.color333, textAlign: 'right'}}>
+              <Text style={{fontSize: 12, color: colors.color333, textAlign: 'right'}}>
                 {this.state.value.label ? this.state.value.label : '请选择'}
               </Text>
               <View style={{flex: 1}}></View>
@@ -173,4 +166,4 @@ class BindDelivery extends PureComponent {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BindDelivery);
+export default connect(mapStateToProps)(BindDelivery);

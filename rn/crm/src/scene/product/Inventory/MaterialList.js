@@ -25,6 +25,7 @@ import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Synthesizer from "../../../pubilc/component/react-native-speech-iflytek";
 
 // import Entypo from "react-native-vector-icons/Entypo";
 
@@ -174,7 +175,7 @@ class MaterialList extends React.Component {
           reduceWeight: 0
         }).then(res => {
           let name = res.name ? res.name : '未知商品'
-          native.speakText(`收货${name}${res.weight}公斤`)
+          Synthesizer.start(`收货${name}${res.weight}公斤`)
           ToastShort(`成功收货${name}${res.weight}公斤`)
           self.onRefresh()
         }).catch(e => {

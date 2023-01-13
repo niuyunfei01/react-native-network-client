@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   InteractionManager,
+  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -42,7 +43,7 @@ import {
   third_recharge,
 } from "../../../svg/svg";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import tool from "../../../pubilc/util/tool";
+import tool, {resetNavStack, vendor} from "../../../pubilc/util/tool";
 import Config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";
 import GoodsIncrement from "../../common/component/GoodsIncrement";
@@ -50,8 +51,9 @@ import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swiper from 'react-native-swiper'
 import FastImage from "react-native-fast-image";
 import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
-import {logout} from "../../../reducers/global/globalActions";
-import AlertModal from "../../../pubilc/component/AlertModal";
+import {logout, setVolume} from "../../../reducers/global/globalActions";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
+import {VolumeManager} from 'react-native-volume-manager';
 
 const width = Dimensions.get("window").width;
 
@@ -132,7 +134,7 @@ class Mine extends PureComponent {
     let {
       currVendorId,
       currVersion,
-    } = tool.vendor(this.props.global);
+    } = vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       store_id: store_id,
@@ -157,7 +159,6 @@ class Mine extends PureComponent {
       menu_list: menu_list,
       activity: [],
       img: '',
-      show_freeze_balance_alert: false,
       showSettle: false
     }
   }
@@ -187,6 +188,21 @@ class Mine extends PureComponent {
   }
 
   onRefresh = () => {
+    const {dispatch} = this.props
+    switch (Platform.OS) {
+      case "ios":
+        VolumeManager.getVolume('system').then((result) => {
+          dispatch(setVolume(result))
+        })
+        break
+      case "android":
+        VolumeManager.getVolume('music').then((result) => {
+          dispatch(setVolume(result))
+        })
+        break
+    }
+
+
     this.fetchMineData()
     this.fetchWsbWallet()
     this.fetchShowSettleProtocol()
@@ -351,9 +367,10 @@ class Mine extends PureComponent {
     });
   }
 
-  logout = () => {
+  logout = async () => {
     const {dispatch, navigation} = this.props;
     this.mixpanel.reset();
+    await this.logoutAccount()
     const noLoginInfo = {
       accessToken: '',
       refreshToken: '',
@@ -370,23 +387,23 @@ class Mine extends PureComponent {
     }
     global.noLoginInfo = noLoginInfo
     setNoLoginInfo(JSON.stringify(noLoginInfo))
-    dispatch(logout(() => {
-      tool.resetNavStack(navigation, Config.ROUTE_LOGIN, {})
-    }));
+    dispatch(logout(() => resetNavStack(navigation, Config.ROUTE_LOGIN, {})));
+  }
+  logoutAccount = async () => {
+    const {accessToken, store_id} = this.props.global
+    const url = `/v4/wsb_user/logout?access_token=${accessToken}`
+    const params = {store_id: store_id}
+    await HttpUtils.get(url, params)
   }
   logOutAccount = () => {
+    JbbAlert.show({
+      title: '提醒',
+      desc: '确定要退出吗？',
+      actionText: '确定',
+      closeText: '取消',
+      onPress: this.logout,
+    })
 
-    Alert.alert('提醒', `确定要退出吗？`, [
-      {
-        text: '取消',
-        style: 'cancel'
-      },
-      {
-        text: '确定',
-        style: 'default',
-        onPress: this.logout
-      }
-    ]);
   }
 
   formatArr(arr) {
@@ -424,6 +441,12 @@ class Mine extends PureComponent {
           break
         case 'Settlement':
           this.navigateToSettle()
+          break
+        case 'PushSetting':
+          this.onPress(Config.ROUTE_NOTIFICATION_SETTING)
+          break
+        case 'DistributionAnalysis':
+          this.onPress(Config.ROUTE_BUSINESS_DATA)
           break
         default:
           this.onPress(info?.path)
@@ -522,7 +545,14 @@ class Mine extends PureComponent {
         </View>
 
         <View style={{paddingHorizontal: 14}}>
-          <Text style={styles.walletLabel} onPress={() => this.setState({show_freeze_balance_alert: true})}>
+
+          <Text style={styles.walletLabel} onPress={() => {
+            JbbAlert.show({
+              title: '预扣金额',
+              desc: balanceInfo?.freeze_notice,
+              actionText: '知道了',
+            })
+          }}>
             预扣金额(元) <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <Text style={styles.walletValue}>
@@ -538,26 +568,6 @@ class Mine extends PureComponent {
       </LinearGradient>
     )
   }
-
-  closeModal = () => {
-    this.setState({
-      show_freeze_balance_alert: false,
-    })
-  }
-
-  renderFreezeBalanceAlertModal = () => {
-    let {show_freeze_balance_alert, balanceInfo} = this.state;
-    return (
-      <AlertModal
-        visible={show_freeze_balance_alert}
-        onClose={this.closeModal}
-        onPress={() => this.closeModal()}
-        title={'预扣金额'}
-        desc={balanceInfo?.freeze_notice}
-        actionText={'知道了'}/>
-    )
-  }
-
 
   renderValueAdded = () => {
     const {navigation, global} = this.props
@@ -761,7 +771,6 @@ class Mine extends PureComponent {
           {this.renderStore()}
           <View style={{top: -53, paddingHorizontal: 12}}>
             {this.renderWallet()}
-            {this.renderFreezeBalanceAlertModal()}
             {this.renderValueAdded()}
             {this.renderBlock()}
             {this.renderSwiper()}

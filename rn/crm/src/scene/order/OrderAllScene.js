@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Dimensions, FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Dimensions, FlatList, Image, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {SvgXml} from "react-native-svg";
@@ -12,17 +12,17 @@ import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import {back, empty_data, search_icon, this_down, this_up} from "../../svg/svg";
+import {back, search_icon, this_down, this_up} from "../../svg/svg";
 import OrderItem from "../../pubilc/component/OrderItem";
 import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import AlertModal from "../../pubilc/component/AlertModal";
 import DatePicker from "react-native-date-picker";
 import dayjs from "dayjs";
 import TopSelectModal from "../../pubilc/component/TopSelectModal";
 import JbbModal from "../../pubilc/component/JbbModal";
+import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get("window");
 
@@ -99,7 +99,6 @@ class OrderAllScene extends Component {
       show_add_tip_modal: false,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_select_store_modal: false,
       show_condition_modal: 0,
       show_date_modal: false,
@@ -109,19 +108,18 @@ class OrderAllScene extends Component {
       fetch_store_page_size: 10,
       is_last_page: false
     }
+
+    this.list_ref = undefined;
   }
 
 
   componentWillUnmount() {
-    this.focus()
     this.blur()
   }
 
   componentDidMount() {
     const {navigation} = this.props
-    this.focus = navigation.addListener('focus', () => {
-      this.onRefresh()
-    })
+    this.onRefresh()
     this.blur = navigation.addListener('blur', () => {
       this.closeModal()
     })
@@ -151,6 +149,11 @@ class OrderAllScene extends Component {
 
   onRefresh = () => {
     const {query} = this.state
+
+    if (this.list_ref) {
+      this.list_ref.scrollToOffset({index: 0, viewPosition: 0, animated: true})
+    }
+
     this.setState({
         query: {...query, page: 1, is_add: true, page_size: 10},
       },
@@ -234,8 +237,15 @@ class OrderAllScene extends Component {
   openFinishDeliveryModal = (order_id) => {
     this.setState({
       order_id: order_id,
-      show_finish_delivery_modal: true,
       show_delivery_modal: false
+    }, () => {
+      JbbAlert.show({
+        title: '当前配送确认完成吗?',
+        desc: '订单送达后无法撤回，请确认顾客已收到货物',
+        actionText: '确定',
+        closeText: '再想想',
+        onPress: this.toSetOrderComplete,
+      })
     })
   }
 
@@ -245,7 +255,6 @@ class OrderAllScene extends Component {
       show_condition_modal: 0,
       show_delivery_modal: false,
       show_cancel_delivery_modal: false,
-      show_finish_delivery_modal: false,
       show_select_store_modal: false,
       show_date_modal: false,
     })
@@ -344,7 +353,6 @@ class OrderAllScene extends Component {
         {this.renderConditionTabs()}
         {this.renderContent()}
         {this.renderDateModal()}
-        {this.renderFinishDeliveryModal()}
 
         <TopSelectModal list={show_condition_modal > 0 ? check_list : store_list}
                         label_field={show_condition_modal > 0 ? undefined : 'name'}
@@ -609,23 +617,6 @@ class OrderAllScene extends Component {
     )
   }
 
-  renderFinishDeliveryModal = () => {
-    let {show_finish_delivery_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_finish_delivery_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => this.toSetOrderComplete()}
-          title={'当前配送确认完成吗?'}
-          desc={'订单送达后无法撤回，请确认顾客已收到货物'}
-          actionText={'确定'}
-          closeText={'再想想'}/>
-      </View>
-    )
-  }
-
   renderHead = () => {
     let {show_select_store_modal, store_list, only_one_store, search_store_name, search_store_id} = this.state;
     return (
@@ -636,9 +627,7 @@ class OrderAllScene extends Component {
         backgroundColor: colors.white,
         paddingHorizontal: 6,
       }}>
-        <SvgXml style={{marginRight: 4}} onPress={() => {
-          this.props.navigation.goBack()
-        }} xml={back()}/>
+        <SvgXml style={{marginRight: 4}} onPress={() => this.props.navigation.goBack()} xml={back()}/>
 
         <TouchableOpacity disabled={only_one_store} onPress={() => {
 
@@ -730,6 +719,9 @@ class OrderAllScene extends Component {
           renderItem={this.renderItem}
           onRefresh={this.onRefresh}
           refreshing={is_loading}
+          ref={(ref) => {
+            this.list_ref = ref
+          }}
           keyExtractor={(item, index) => `${index}`}
           shouldItemUpdate={this._shouldItemUpdate}
           ListEmptyComponent={this.renderNoOrder()}
@@ -742,10 +734,11 @@ class OrderAllScene extends Component {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}
@@ -765,7 +758,11 @@ class OrderAllScene extends Component {
     }
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml xml={empty_data()}/>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
+          style={{width: 122, height: 93}}/>
+
         <Text style={styles.noOrderDesc}> 暂无订单 </Text>
       </View>
     )
@@ -788,7 +785,7 @@ class OrderAllScene extends Component {
 
 const styles = StyleSheet.create({
   flex1: {flex: 1},
-  orderListContent: {flex: 1, backgroundColor: colors.f5,},
+  orderListContent: {flex: 1, backgroundColor: colors.ed,},
   statusTab: {flexDirection: 'row', backgroundColor: colors.white, height: 48},
   noOrderContent: {
     alignItems: 'center',

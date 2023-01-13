@@ -64,6 +64,7 @@ export default class GlobalUtil {
   }
 
   static getDeviceInfo = async () => {
+    const deviceId = DeviceInfo.getUniqueId()
     const fontScale = await DeviceInfo.getFontScale();
     const freeDiskStorage = await DeviceInfo.getFreeDiskStorage()
     const totalMemory = await DeviceInfo.getTotalMemory();
@@ -76,6 +77,7 @@ export default class GlobalUtil {
     const systemVersion = DeviceInfo.getSystemVersion();
     const version = DeviceInfo.getVersion();
     return {
+      deviceId: deviceId,
       fontScale: fontScale,
       freeDiskStorage: this.byteConvert(freeDiskStorage),
       totalMemory: this.byteConvert(totalMemory),

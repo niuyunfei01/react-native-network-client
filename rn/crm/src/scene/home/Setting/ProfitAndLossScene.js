@@ -35,7 +35,7 @@ class ProfitAndLoss extends PureComponent {
   constructor(props) {
     super(props);
     const {store_id} = this.props.global;
-    const params = this.props.route.params?.info
+    const {start_date, end_date} = this.props.route.params
     this.state = {
       storeId: store_id,
       ext_store_id: 0,
@@ -59,8 +59,8 @@ class ProfitAndLoss extends PureComponent {
       isLastPage: false,
       isCanLoadMore: false,
       isLoading: false,
-      startDate: tool.fullDay(params.start_time * 1000),
-      endDate: tool.fullDay(params.end_time * 1000),
+      startDate: start_date,
+      endDate: end_date,
       showDateModalStart: false,
       showDateModalEnd: false,
       showModal: false
@@ -379,7 +379,7 @@ class ProfitAndLoss extends PureComponent {
           </View>
         </View>
         <View style={styles.cuttingLine}/>
-        <TouchableOpacity style={styles.orderCardContent} onPress={() => this.copyToClipboard(item?.platformId)}>
+        <TouchableOpacity style={styles.orderCardContent} onPress={() => this.copyToClipboard(item?.platform_oid)}>
           <View style={styles.flexRow1}>
             <Text style={[styles.orderCardItemLabel, {marginVertical: 5}]}>平台单号：</Text>
             <Text style={styles.orderCardItemValue}>{item?.platform_oid} </Text>

@@ -211,25 +211,17 @@ class StoreGoodsSearch extends Component {
         </View>
       )
     }
+    const {vendor_info} = this.props.global
     return (
       <View style={[styles.row_center, styles.btnWrap]}>
 
-        {onSale ?
-          <TouchableOpacity style={[styles.toOnlineBtn]}
-                            onPress={() => this.onOpenModal('off_sale', product)}>
-            <Text style={{color: colors.color333}}>下架 </Text>
-          </TouchableOpacity> :
-          <TouchableOpacity style={[styles.toOnlineBtn]}
-                            onPress={() => this.onOpenModal('on_sale', product)}>
-            <Text style={{color: colors.color333}}>上架 </Text>
-          </TouchableOpacity>}
         <If condition={price_type}>
           {onStrict ?
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
               <Text style={{color: colors.color333}}>价格/库存 </Text>
             </TouchableOpacity> :
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.jumpToNewRetailPriceScene(product.id)}>
               <Text style={{color: colors.color333}}>价格 </Text>
             </TouchableOpacity>
@@ -237,19 +229,44 @@ class StoreGoodsSearch extends Component {
         </If>
         <If condition={!price_type}>
           {onStrict ?
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
               <Text style={{color: colors.color333}}>报价/库存 </Text>
             </TouchableOpacity> :
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+            <TouchableOpacity style={[styles.toOnlineBtn]}
                               onPress={() => this.onOpenModal('set_price', product)}>
               <Text style={{color: colors.color333}}>报价 </Text>
             </TouchableOpacity>
           }
         </If>
+        {
+          onSale ?
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('off_sale', product)}>
+              <Text style={{color: colors.color333}}>下架 </Text>
+            </TouchableOpacity> :
+            <TouchableOpacity style={[styles.toOnlineBtn]}
+                              onPress={() => this.onOpenModal('on_sale', product)}>
+              <Text style={{color: colors.color333}}>上架 </Text>
+            </TouchableOpacity>
+        }
+        <If condition={vendor_info?.allow_merchants_edit_prod == 1}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToGoodsEditPage(product.id)}>
+            <Text style={styles.goodsOperationBtn}>编辑</Text>
+          </TouchableOpacity>
+        </If>
 
       </View>
     )
+  }
+  jumpToGoodsEditPage = (id) => {
+    let {navigation, global} = this.props;
+    const {store_id, accessToken, vendor_id} = global
+    const url = `/api/get_product_detail/${id}/${vendor_id}/${store_id}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'edit', product_detail: res});
+    })
+
   }
   renderRow = ({item}) => {
     const {price_type} = this.props.global.vendor_info
@@ -400,11 +417,13 @@ const styles = StyleSheet.create({
     flex: 1
   },
   toOnlineBtn: {
-    padding: 8,
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.colorDDD,
+    borderWidth: 1,
+    borderColor: colors.colorCCC,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 8,
+    marginRight: 4,
+    borderRadius: 2,
     flex: 1
   },
   row_center: {

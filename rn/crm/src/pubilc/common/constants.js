@@ -1,6 +1,11 @@
 import keyMirror from 'key-mirror'
 
 export default keyMirror({
+  SET_JPush_STATUS: null,
+  SET_BACKGROUND_STATUS: null,
+  SET_NOTIFICATION_STATUS: null,
+  SET_INIT_JPUSH: null,
+  SET_VOLUME: null,
   SET_AUTO_PRINT: null,
   SET_SCANNING_BLUETOOTH_DEVICE: null,
   SET_NO_LOGIN_INFO: null,
@@ -27,7 +32,7 @@ export default keyMirror({
   SET_PRINTER_NAME: null,
   SET_EXT_STORE: null,
   SET_USER_CONFIG: null,
-  SET_ORLDER_LIST_BY: null,
+  SET_ORDER_LIST_BY: null,
   SET_SHOW_FLOAT_SERVICE_ICON: null,
   SET_RECORD_FLAG: null,
 
@@ -122,4 +127,11 @@ export default keyMirror({
   ACTIVITY_GOODS_LIST: null,
   GET_MANAGE_SELECT: null,
   ACTIVITY_MANAGER_REFRESH: null,
+
+  SET_IM_CONFIG: null,
+  SET_IM_REMIND_COUNT: null,
+  SET_OLD_REMIND_INFO: null,
+
+  SET_CALL_DELIVERY_OBJ: null,
+  SET_NET_INFO_STATUS: null
 })

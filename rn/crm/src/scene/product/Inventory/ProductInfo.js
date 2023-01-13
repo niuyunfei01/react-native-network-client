@@ -597,7 +597,7 @@ class ProductInfo extends React.Component {
       this.setState({shelf_no: text})
       return
     }
-    showError('输入有误，请重新输入', 1)
+    showError('输入有误，请重新输入', 100)
   }
 
   renderModal = () => {

@@ -18,10 +18,6 @@ export default class Dialog extends React.Component {
     align: 'left'
   }
 
-  onRequestClose() {
-
-  }
-
   render() {
     let containerStyle = {}
     if (this.props.align === 'center') {
@@ -33,6 +29,7 @@ export default class Dialog extends React.Component {
     return (
       <Modal
         visible={this.props.visible}
+        hardwareAccelerated={true}
         onRequestClose={() => this.props.onRequestClose()}
         animationType={'fade'}
         transparent={true}

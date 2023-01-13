@@ -7,7 +7,7 @@ import {
   check_is_bind_ext,
   customerApply,
   getConfig,
-  logout,
+  resetRedux,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 import stringEx from "../../../pubilc/util/stringEx"
@@ -190,9 +190,8 @@ class ApplyScene extends PureComponent {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
-    dispatch(logout());
+     dispatch(resetRedux());
     dispatch(customerApply(data, (success, msg, res) => {
-      hideModal();
       this.setState({doingApply: false})
       if (success && res?.user?.token && res?.user?.user_id) {
         ToastShort("注册成功");

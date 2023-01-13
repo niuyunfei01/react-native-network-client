@@ -40,8 +40,8 @@ class OperateIncomeItem extends PureComponent {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(changeProfitInvalidate(id, accessToken, async (ok, obj, desc) => {
-      hideModal()
       if (ok) {
+        hideModal()
         this.setState({upload: false,})
         await this.props.update(this.props.item.id);
       } else {

@@ -18,7 +18,7 @@ import {Checkbox} from "@ant-design/react-native";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
-import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
 
 const styles = StyleSheet.create({
@@ -138,7 +138,22 @@ const styles = StyleSheet.create({
   },
   checkBoxWrap: {flexDirection: 'row', alignItems: 'center'},
   pageWrap: {marginBottom: 12},
-  modalBottom: {paddingBottom: 24}
+  modalBottom: {paddingBottom: 24},
+  commodityNameWrap: {flexDirection: "row", alignItems: 'center'},
+  shanWrap: {backgroundColor: '#ffd225',},
+  shan: {color: colors.color333},
+  eleWrap: {backgroundColor: '#0292FE',},
+  jingDongWrap: {backgroundColor: colors.main_color},
+  huoWrap: {
+    backgroundColor: '#FF8309',
+    marginLeft: 4,
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  huo: {fontSize: 11, color: colors.white},
 })
 
 class NewRetailPriceScene extends React.PureComponent {
@@ -173,8 +188,10 @@ class NewRetailPriceScene extends React.PureComponent {
     const {productId} = this.props.route.params
 
     const {store_id, accessToken} = this.props.global
+    showModal('加载中')
     const url = `api_products/get_prod_with_store_detail/${store_id}/${productId}?access_token=${accessToken}`
     HttpUtils.get(url).then(res => {
+      hideModal()
       const {sp, p} = res
       let skus = [{
         product_id: sp.product_id,
@@ -201,15 +218,31 @@ class NewRetailPriceScene extends React.PureComponent {
         editCostPrice: `${parseFloat(selectSku.supply_price / 100).toFixed(2)}`,
         editStock: selectSku.left_since_last_stat,
       })
-    })
+    }).catch(error => showError(error.reason))
   }
 
   getHeader = () => {
-    const {productInfo, skus, selectSku} = this.state
+    const {productInfo = {}, skus = [], selectSku = {}} = this.state
     return (
       <View style={Styles.zoneWrap}>
         <Text style={Styles.headerTitleText}>
-          {productInfo.p.name}
+          {productInfo.p?.name}
+          <If condition={false}>
+            <View style={styles.commodityNameWrap}>
+              <View style={[styles.huoWrap, styles.shanWrap]}>
+                <Text style={[styles.huo, styles.shan]}>闪&nbsp;</Text>
+              </View>
+              <View style={[styles.huoWrap, styles.eleWrap]}>
+                <Text style={[styles.huo]}>饿&nbsp;</Text>
+              </View>
+              <View style={[styles.huoWrap, styles.jingDongWrap]}>
+                <Text style={[styles.huo]}>京&nbsp;</Text>
+              </View>
+              <View style={[styles.huoWrap]}>
+                <Text style={[styles.huo]}>活&nbsp;</Text>
+              </View>
+            </View>
+          </If>
         </Text>
         <LineView/>
         <TouchableOpacity style={styles.baseRowCenterWrap}

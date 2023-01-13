@@ -1,6 +1,5 @@
 import React, {PureComponent} from "react";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {
   InteractionManager,
   RefreshControl,
@@ -14,20 +13,15 @@ import {
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button, CheckBox, Switch} from "react-native-elements";
-import * as globalActions from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import tool from "../../../pubilc/util/tool";
+import {showStoreDelivery} from "../../../reducers/global/globalActions";
 
 const mapStateToProps = state => {
   const {global} = state;
   return {global: global};
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
 }
 const styles = StyleSheet.create({
   row: {
@@ -86,12 +80,13 @@ class SeetingMiniNumDelivery extends PureComponent {
   }
 
   getDeliveryConf() {
-    this.props.actions.showStoreDelivery(this.state.ext_store_id, (success, response) => {
+    const {dispatch} = this.props
+    dispatch(showStoreDelivery(this.state.ext_store_id, (success, response) => {
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
       })
-    })
+    }))
   }
 
   setMiniNumDelivery() {
@@ -333,4 +328,4 @@ class SeetingMiniNumDelivery extends PureComponent {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SeetingMiniNumDelivery);
+export default connect(mapStateToProps)(SeetingMiniNumDelivery);

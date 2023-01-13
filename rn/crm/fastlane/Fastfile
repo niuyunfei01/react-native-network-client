@@ -1,0 +1,46 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    increment_build_number(xcodeproj: "./ios/APTest.xcodeproj")
+    build_app(workspace: "./ios/APTest.xcworkspace", scheme: "APTest")
+
+    app_store_connect_api_key(
+      key_id: "56C3P92BLB",
+      issuer_id: "69a6de8c-9d0b-47e3-e053-5b8c7c11a4d1",
+      key_filepath: "./fastlane/56C3P92BLB.p8",
+      duration: 200,
+      in_house: true
+    )
+    upload_to_testflight
+  end
+end
+
+
+platform :android do
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    gradle(task: "clean assembleRelease",project_dir: './android/')
+    fir_cli api_token: "1e719010fa5ac71f804d17d83a872fc5",
+    specify_file_path: lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+    changelog: lane_context[SharedValues::FL_CHANGELOG]
+
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+end

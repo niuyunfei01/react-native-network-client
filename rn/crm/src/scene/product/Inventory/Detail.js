@@ -5,19 +5,15 @@ import {FlatList, StyleSheet, Text, View} from "react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import EmptyData from "../../common/component/EmptyData";
-import dayjs from "dayjs";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
-import PopPicker from "rmc-date-picker/lib/Popup";
-import DatePicker from "rmc-date-picker/lib/DatePicker";
-import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
-import styles from 'rmc-picker/lib/PopupStyles';
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
-const width = Dimensions.get("window").width;
+const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -28,44 +24,35 @@ class Detail extends BaseComponent {
 
   constructor(props) {
     super(props)
+    const date = new Date()
     this.state = {
       page: 1,
       lists: [],
       isLastPage: false,
       isLoading: false,
-      date: new Date(),
-      dateHtp: dayjs(new Date()).format('YYYY-MM'),
+      date: date,
+      dateHtp: tool.fullMonth(date),
       activity: 'specifications_one',
       rules: {
         sku_id: 0,
         sku_name: '全部规格'
       },
       rulesArray: [],
-      start_day: this.format(new Date()),
-      date_type: 1
+      start_day: tool.fullMonth(date),
+      date_type: 1,
+      visible: false
     }
 
-    this.navigationOptions(this.props)
   }
 
   onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
+    this.setState({date: date, start_day: tool.fullMonth(date)}, function () {
       if (this.state.choseTab === 1) {
         this.fetchExpenses();
       } else {
         this.fetchRechargeRecord();
       }
     })
-  }
-
-  onDismiss = () => {
-
-  }
-
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
   }
 
   navigationOptions = () => {
@@ -123,15 +110,20 @@ class Detail extends BaseComponent {
     }, () => this.fetchData())
   }
 
-  onConfirmDate = (date) => {
-    this.setState({
-      dateHtp: dayjs(date).format('YYYY-MM'),
-      date: date,
-      start_day: dayjs(date).format('YYYY-MM')
-    }, () => {
-      this.navigationOptions()
-      this.setState({page: 1}, () => this.fetchData())
-    })
+  onConfirmDate = (event, date) => {
+
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({
+        dateHtp: tool.fullMonth(date),
+        date: date,
+        start_day: tool.fullMonth(date),
+        visible: false
+      }, () => {
+        this.navigationOptions()
+        this.setState({page: 1}, () => this.fetchData())
+      })
+    }
   }
 
   onEndReached = () => {
@@ -216,38 +208,20 @@ class Detail extends BaseComponent {
     )
   }
 
+  setVisible = (value) => {
+    this.setState({visible: value})
+  }
   renderModal = () => {
-    let {date, start_day} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+    let {start_day} = this.state;
     return (
-      <PopPicker
-        datePicker={datePicker}
-        transitionName="rmc-picker-popup-slide-fade"
-        maskTransitionName="rmc-picker-popup-fade"
-        styles={styles}
-        title={'选择月份'}
-        okText={'确认'}
-        dismissText={'取消'}
-        date={date}
-        onDismiss={this.onDismiss}
-        onChange={this.onConfirmDate}
-      >
-        <Text style={Styles.selectMonthText}> {start_day} <Entypo
-          name='chevron-thin-down' style={Styles.selectMonthIcon}/></Text>
-      </PopPicker>
+      <Text style={Styles.selectMonthText} onPress={() => this.setVisible(true)}>
+        {start_day} <Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+      </Text>
     )
   }
 
   render() {
+    const {visible, date} = this.state
     return (
       <View style={{flex: 1}}>
         {this.renderSelectHeader()}
@@ -257,6 +231,7 @@ class Detail extends BaseComponent {
         <If condition={!this.state.lists.length}>
           <EmptyData/>
         </If>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onConfirmDate(event, newDate)} date={date}/>
       </View>
     )
   }

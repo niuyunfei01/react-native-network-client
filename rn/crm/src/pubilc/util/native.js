@@ -23,29 +23,6 @@ export default {
   },
 
   /**
-   *  volume: int 音量
-   */
-  setSoundVolume: async function (volume, callback = function (ok, msg) {
-  }) {
-    if (ActivityStarter) {
-      await ActivityStarter.setSoundVolume(volume, callback)
-    }
-  },
-
-  /**
-   *  currentVolume: int 音量; -1 未知
-   *  isRinger: -1 未知, 1 响铃, 0, 静音
-   *  maxVolume: 取不到为 -1
-   *  minVolume: Android 28以后才有，取不到则返回 -1
-   */
-  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {
-  }) {
-    if (ActivityStarter) {
-      await ActivityStarter.getSoundVolume(callback)
-    }
-  },
-
-  /**
    * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
    * @returns {Promise<void>}
    */
@@ -146,48 +123,6 @@ export default {
       ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
-  speakText: async function (text, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.speakText(text, callback))
-  },
-
-  setDisableSoundNotify: async function (disabled, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setDisableSoundNotify(disabled, callback))
-  },
-
-  getDisableSoundNotify: async function (callback = function (disabled, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getDisableSoundNotify(callback))
-  },
-
-  setDisabledNewOrderNotify: async function (disabled, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
-  },
-
-  getNewOrderNotifyDisabled: async function (callback = function (disabled, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getNewOrderNotifyDisabled(callback))
-  },
-
-  setAutoBluePrint: async function (auto, callback = function (ok, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.setAutoBluePrint(auto, callback))
-  },
-
-  getAutoBluePrint: async function (callback = function (auto, msg) {
-  }) {
-    await (ActivityStarter &&
-      ActivityStarter.getAutoBluePrint(callback))
-  },
-
   /**
    acceptNotifyNew
    host
@@ -226,5 +161,21 @@ export default {
   }) => {
     await (ActivityStarter &&
       ActivityStarter.checkCanRunInBg(callback))
+  },
+  getNotificationStatus: async function () {
+
+    switch (Platform.OS) {
+      case "ios":
+        return await ActivityStarter.getNotificationStatus()
+    }
+
+  },
+  isSunmiDevice: async (callback = function () {
+  }) => {
+    if (ActivityStarter)
+      await ActivityStarter.isSunmiDevice(callback)
+  },
+  openAppSystemSettings: async () => {
+    ActivityStarter && await ActivityStarter.openAppSystemSettings()
   }
 }

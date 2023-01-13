@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "RCTActivityStarterModule.h"
 #import <React/RCTLog.h>
+#import "JPUSHService.h"
 
 @implementation RCTActivityStarterModule
 
@@ -25,6 +26,16 @@ return [[UIDevice currentDevice] name];
 
 RCT_EXPORT_METHOD(navigateToGoods) {
   RCTLogInfo(@"navigateToGoods");
+}
+
+RCT_EXPORT_METHOD(getNotificationStatus:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+  
+  [JPUSHService requestNotificationAuthorization:^(JPAuthorizationStatus status) {
+    if(status==JPAuthorizationStatusAuthorized)
+      resolve([NSNumber numberWithBool:YES]);
+    else resolve([NSNumber numberWithBool:NO]);;
+   }];
+  
 }
 
 RCT_EXPORT_METHOD(logout) {
@@ -531,6 +542,9 @@ RCT_EXPORT_METHOD(showInputMethod) {
 //    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
   RCTLogInfo(@"showInputMethod");
 }
-
+RCT_EXPORT_METHOD(openAppSystemSettings){
+  NSURL * url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+  [[UIApplication sharedApplication]openURL:url options:@{} completionHandler:nil];
+}
 
 @end

@@ -1,23 +1,17 @@
 import React, {PureComponent} from "react";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import tool from "../../../pubilc/util/tool";
 import {Button, CheckBox, Switch} from "react-native-elements";
-import * as globalActions from "../../../reducers/global/globalActions";
 import {showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {showStoreDelivery, updateStoresAutoDelivery} from "../../../reducers/global/globalActions";
 
 const mapStateToProps = state => {
   const {global} = state;
   return {global: global};
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
 }
 
 class SettingDeliveryInfo extends PureComponent {
@@ -63,40 +57,47 @@ class SettingDeliveryInfo extends PureComponent {
   }
 
   getDeliveryConf = () => {
-    this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
-      let showBtn = this.props.route.params.showBtn;
-      if (tool.length(response.bind_info) > 0) {
-        showBtn = response.bind_info.rebind === 1 ? false : showBtn;
-        this.setState({
-          showBind: response.bind_info.rebind === 1,
-          bind_url: Config.apiUrl(response.bind_info.bind_url),
-          notice: response.bind_info.notice === 1,
-        })
-        if (tool.length(response.bind_info.notice_info) > 0) {
+    const {dispatch, route, navigation} = this.props
+    if (tool.length(route.params.ext_store_id) <= 0) {
+      ToastLong('操作失败，请稍后重试')
+      return navigation.goBack();
+    }
+    dispatch(
+      showStoreDelivery(route.params.ext_store_id, (success, response) => {
+        let {showBtn} = route.params;
+        if (tool.length(response.bind_info) > 0) {
+          showBtn = response.bind_info.rebind === 1 ? false : showBtn;
           this.setState({
-            alert_title: response.bind_info.notice_info.title,
-            alert_msg: response.bind_info.notice_info.body,
-            alert_mobile: response.bind_info.notice_info.mobile,
+            showBind: response.bind_info.rebind === 1,
+            bind_url: Config.apiUrl(response.bind_info.bind_url),
+            notice: response.bind_info.notice === 1,
           })
+          if (tool.length(response.bind_info.notice_info) > 0) {
+            this.setState({
+              alert_title: response.bind_info.notice_info.title,
+              alert_msg: response.bind_info.notice_info.body,
+              alert_mobile: response.bind_info.notice_info.mobile,
+            })
+          }
         }
-      }
-      this.setState({
-        isRefreshing: false,
-        menus: response.menus ? response.menus : [],
-        ship_ways: response.ship_ways ? response.ship_ways : [],
-        auto_call: !!(response.auto_call && response.auto_call === 1),
-        suspend_confirm_order: !!(response.suspend_confirm_order && response.suspend_confirm_order === "0"),
-        deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
-        max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
-        order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
-        default_str: response.default ? response.default : '',
-        zs_way: !!(response.zs_way && response.zs_way > 0),
-        show_auto_confirm_order: this.props.global?.vendor_info?.wsb_store_account === '1',
-        showBtn: showBtn
-      }, () => {
-        this.get_time_interval()
+        this.setState({
+          isRefreshing: false,
+          menus: response.menus ? response.menus : [],
+          ship_ways: response.ship_ways ? response.ship_ways : [],
+          auto_call: !!(response.auto_call && response.auto_call === 1),
+          suspend_confirm_order: !!(response.suspend_confirm_order && response.suspend_confirm_order === "0"),
+          deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
+          max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
+          order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
+          default_str: response.default ? response.default : '',
+          zs_way: !!(response.zs_way && response.zs_way > 0),
+          show_auto_confirm_order: this.props.global?.vendor_info?.wsb_store_account === '1',
+          showBtn: showBtn
+        }, () => {
+          this.get_time_interval()
+        })
       })
-    })
+    )
   }
 
   onBindDelivery = () => {
@@ -119,26 +120,28 @@ class SettingDeliveryInfo extends PureComponent {
       return;
     }
     let {accessToken} = this.props.global;
+    const {dispatch, route, navigation} = this.props
     tool.debounces(() => {
-      this.props.actions.updateStoresAutoDelivery(
-        accessToken,
-        this.props.route.params.ext_store_id,
-        {
-          auto_call: auto_call ? 1 : 2,
-          ship_ways,
-          default: default_str,
-          max_call_time,
-          deploy_time,
-          order_require_minutes,
-        },
-        (success) => {
-          this.setState({isRefreshing: false})
-          if (success) {
-            showSuccess('配置成功');
-            this.props.navigation.goBack();
+      dispatch(
+        updateStoresAutoDelivery(
+          accessToken,
+          route.params.ext_store_id,
+          {
+            auto_call: auto_call ? 1 : 2,
+            ship_ways,
+            default: default_str,
+            max_call_time,
+            deploy_time,
+            order_require_minutes,
+          },
+          (success) => {
+            this.setState({isRefreshing: false})
+            if (success) {
+              showSuccess('配置成功');
+              navigation.goBack();
+            }
           }
-        }
-      )
+        ))
     }, 1000)
   }
 
@@ -307,7 +310,9 @@ class SettingDeliveryInfo extends PureComponent {
               <Text style={styles.infoVal}>分钟 </Text>
             </View>
           </View>
-          <Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{order_require_minutes}分钟后自动呼叫骑手 </Text>
+          <Text style={{fontSize: 12, color: '#DD2525', marginTop: 10}}>
+            订单会在预计送达前{order_require_minutes}分钟后自动呼叫骑手&nbsp;
+          </Text>
         </View>
 
         <View style={styles.itemRowBox}>
@@ -328,7 +333,9 @@ class SettingDeliveryInfo extends PureComponent {
               <Text style={styles.infoVal}>分钟 </Text>
             </View>
           </View>
-          <Text style={{color: '#DD2525', marginTop: 10}}>订单在{max_call_time}分钟后最多呼叫{ship_ways.length}个配送 </Text>
+          <Text style={{fontSize: 12, color: '#DD2525', marginTop: 10}}>
+            订单在{max_call_time}分钟后最多呼叫{ship_ways.length}个配送&nbsp;
+          </Text>
         </View>
 
         <View style={styles.itemRowBox}>
@@ -338,10 +345,9 @@ class SettingDeliveryInfo extends PureComponent {
               <Text style={styles.infoVal}>{time_interval} </Text>
             </View>
           </View>
-          <Text style={{
-            color: '#DD2525',
-            marginTop: 10
-          }}>您{this.convertShowText(ship_ways.length)}配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟 </Text>
+          <Text style={{fontSize: 12, color: '#DD2525', marginTop: 10}}>
+            您{this.convertShowText(ship_ways.length)}配送，最长呼单时间为10分钟，发单时隔{time_interval}分钟&nbsp;
+          </Text>
         </View>
 
       </View>
@@ -349,10 +355,7 @@ class SettingDeliveryInfo extends PureComponent {
   }
 
   renderDeliveryWays = () => {
-    const {
-      menus,
-      ship_ways
-    } = this.state
+    const {menus, ship_ways} = this.state
     return (
       <View style={styles.areaWrap}>
         <View style={styles.shipWrap}>
@@ -361,7 +364,7 @@ class SettingDeliveryInfo extends PureComponent {
         <For index="idx" each='item' of={menus}>
           <View style={styles.itemWrap} key={idx}>
             {
-              item.is_preference && item.is_preference === true ?
+              item && item.is_preference === true ?
                 <View style={styles.flexRowCenter}>
                   <Text style={{fontSize: pxToDp(28)}}>{item.name} </Text>
                   <View style={styles.tagView}>
@@ -506,8 +509,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 12,
-    paddingRight: 15,
+    paddingHorizontal: 12
   },
   btn_select: {
     marginRight: pxToDp(20),
@@ -599,4 +601,4 @@ const styles = StyleSheet.create({
   infoVal: {color: colors.color333, fontSize: 14}
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingDeliveryInfo);
+export default connect(mapStateToProps)(SettingDeliveryInfo);

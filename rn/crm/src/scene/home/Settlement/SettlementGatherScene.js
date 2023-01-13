@@ -11,10 +11,7 @@ import tool from '../../../pubilc/util/tool.js'
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
-import DatePicker from "rmc-date-picker/lib/DatePicker";
-import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
-import PopPicker from "rmc-date-picker/lib/Popup";
-import styles from 'rmc-picker/lib/PopupStyles';
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -46,12 +43,13 @@ class SettlementGatherScene extends PureComponent {
       query: true,
       dataPicker: false,
       dateList: [],
+      visible: false
     }
-    this.renderList = this.renderList.bind(this)
+
     showModal('加载中')
   }
 
-  async UNSAFE_componentWillMount() {
+  async componentDidMount() {
     let {date} = this.props.route.params || {};
     await this.setState({date: date});
     this.getDateilsList();
@@ -63,6 +61,7 @@ class SettlementGatherScene extends PureComponent {
     let {store_id, accessToken} = global;
     dispatch(get_supply_items(store_id, date, 'month', accessToken, async (resp) => {
       if (resp.ok) {
+        hideModal()
         this.setState({
           list: resp.obj.goods_list,
           total_price: resp.obj.total_price,
@@ -71,7 +70,6 @@ class SettlementGatherScene extends PureComponent {
       } else {
         ToastLong(resp.desc)
       }
-      hideModal()
       this.setState({query: false})
     }));
   }
@@ -84,10 +82,13 @@ class SettlementGatherScene extends PureComponent {
     return num;
   }
 
-  onChange = (date) => {
-    this.setState({dates: date, date: this.format(date)}, () => {
-      this.getDateilsList();
-    })
+  onChange = (event, date) => {
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({dates: date, date: this.format(date)}, () => {
+        this.getDateilsList();
+      })
+    }
   }
 
   format = (date) => {
@@ -97,37 +98,14 @@ class SettlementGatherScene extends PureComponent {
   }
 
   renderHeader() {
-    let {date, dates, total_price, order_num} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={dates}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+    let {date, total_price, order_num} = this.state;
     return (
       <View style={header.box}>
         <View style={header.title}>
-          <PopPicker
-            datePicker={datePicker}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={styles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={dates}
-            onChange={this.onChange}
-          >
-            <Text style={header.time}>
-              {date} &nbsp;&nbsp;&nbsp;
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
-            </Text>
-          </PopPicker>
-
+          <Text style={header.time} onPress={() => this.setState({visible: true})}>
+            {date} &nbsp;&nbsp;
+            <Entypo name='chevron-thin-down' style={{fontSize: 14, color: colors.color333, marginLeft: 5}}/>
+          </Text>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
@@ -146,7 +124,7 @@ class SettlementGatherScene extends PureComponent {
     if (tool.length(list) > 0) {
       return (tool.objectMap(list, (item, key) => {
         return (
-          <View key={key} style={{}}>
+          <View key={key}>
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
@@ -232,6 +210,7 @@ class SettlementGatherScene extends PureComponent {
   }
 
   render() {
+    const {dates, visible} = this.state
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
@@ -253,6 +232,7 @@ class SettlementGatherScene extends PureComponent {
             this.renderList()
           }
         </ScrollView>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onChange(event, newDate)} date={dates}/>
 
       </View>
     )

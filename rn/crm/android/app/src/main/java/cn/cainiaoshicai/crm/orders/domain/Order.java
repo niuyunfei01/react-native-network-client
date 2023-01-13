@@ -24,9 +24,9 @@ public class Order implements Serializable {
     private double orderMoney;
     private double paid_by_user;
     private double supplyMoney = 0;
-    private Date expectTime;
-    private String expectTimeStr;
-    private Date orderTime;
+    private String expectTime;
+    private String expectTimeStrInList;
+    private String orderTime;
     private String remark;
     private int orderStatus;
     private int platform;
@@ -145,11 +145,11 @@ public class Order implements Serializable {
         this.mobile = mobile;
     }
 
-    public Date getExpectTime() {
+    public String getExpectTime() {
         return expectTime;
     }
 
-    public void setExpectTime(Date expectTime) {
+    public void setExpectTime(String expectTime) {
         this.expectTime = expectTime;
     }
 
@@ -165,11 +165,11 @@ public class Order implements Serializable {
         return orderMoney;
     }
 
-    public Date getOrderTime() {
+    public String getOrderTime() {
         return orderTime;
     }
 
-    public void setOrderTime(Date orderTime) {
+    public void setOrderTime(String orderTime) {
         this.orderTime = orderTime;
     }
 
@@ -238,11 +238,11 @@ public class Order implements Serializable {
     }
 
     public String getExpectTimeStr() {
-        return expectTimeStr;
+        return expectTimeStrInList;
     }
 
-    public void setExpectTimeStr(String expectTimeStr) {
-        this.expectTimeStr = expectTimeStr;
+    public void setExpectTimeStr(String expectTimeStrInList) {
+        this.expectTimeStrInList = expectTimeStrInList;
     }
 
     public String getShip_worker_name() {
@@ -266,7 +266,7 @@ public class Order implements Serializable {
     }
 
     public boolean isPaidDone() {
-        return this.paid_done == 1;
+        return this.paid_done == '1';
     }
 
     public int getReview_deliver() {
@@ -540,7 +540,7 @@ public class Order implements Serializable {
         supplyMoney = updatedO.supplyMoney;
         paid_by_user = updatedO.paid_by_user;
         expectTime = updatedO.expectTime;
-        expectTimeStr = updatedO.expectTimeStr;
+        expectTimeStrInList = updatedO.expectTimeStrInList;
         orderTime = updatedO.orderTime;
         remark = updatedO.remark;
         orderStatus = updatedO.orderStatus;
@@ -697,10 +697,6 @@ public class Order implements Serializable {
         return line_money_total;
     }
 
-    public void setLine_money_total(String line_money_total) {
-        this.line_money_total = line_money_total;
-    }
-
     public String getStore_name() {
         return store_name;
     }
@@ -756,5 +752,77 @@ public class Order implements Serializable {
 //    public void setExcepts(ArrayList<Except> excepts) {
 //        this.excepts = excepts;
 //    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", user_id=" + user_id +
+                ", gender=" + gender +
+                ", dayId='" + dayId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", address='" + address + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", orderMoney=" + orderMoney +
+                ", paid_by_user=" + paid_by_user +
+                ", supplyMoney=" + supplyMoney +
+                ", expectTime=" + expectTime +
+                ", expectTimeStrInList='" + expectTimeStrInList + '\'' +
+                ", orderTime=" + orderTime +
+                ", remark='" + remark + '\'' +
+                ", orderStatus=" + orderStatus +
+                ", platform=" + platform +
+                ", platform_oid='" + platform_oid + '\'' +
+                ", platform_dayId='" + platform_dayId + '\'' +
+                ", store_remark='" + store_remark + '\'' +
+                ", time_start_ship=" + time_start_ship +
+                ", time_ready=" + time_ready +
+                ", time_arrived=" + time_arrived +
+                ", review_deliver=" + review_deliver +
+                ", print_times=" + print_times +
+                ", store_id=" + store_id +
+                ", items=" + items +
+                ", ship_worker_name='" + ship_worker_name + '\'' +
+                ", ship_worker_id=" + ship_worker_id +
+                ", pack_operator=" + pack_operator +
+                ", pack_workers='" + pack_workers + '\'' +
+                ", pack_1st_worker='" + pack_1st_worker + '\'' +
+                ", order_times=" + order_times +
+                ", paid_done=" + paid_done +
+                ", readyLeftMin=" + readyLeftMin +
+                ", dada_status=" + dada_status +
+                ", dada_call_at=" + dada_call_at +
+                ", dada_distance=" + dada_distance +
+                ", dada_order_id='" + dada_order_id + '\'' +
+                ", dada_fee=" + dada_fee +
+                ", dada_mobile='" + dada_mobile + '\'' +
+                ", dada_dm_id=" + dada_dm_id +
+                ", dada_dm_name='" + dada_dm_name + '\'' +
+                ", auto_plat='" + auto_plat + '\'' +
+                ", ship_sch='" + ship_sch + '\'' +
+                ", ship_sch_desc='" + ship_sch_desc + '\'' +
+                ", source_ready=" + source_ready +
+                ", feedback=" + feedback +
+                ", direction='" + direction + '\'' +
+                ", additional_to_pay=" + additional_to_pay +
+                ", ship_worker_mobile='" + ship_worker_mobile + '\'' +
+                ", remark_warning=" + remark_warning +
+                ", fullStoreName='" + fullStoreName + '\'' +
+                ", store_name='" + store_name + '\'' +
+                ", printFooter1='" + printFooter1 + '\'' +
+                ", printFooter2='" + printFooter2 + '\'' +
+                ", printFooter3='" + printFooter3 + '\'' +
+                ", callWays=" + callWays +
+                ", selected_way=" + selected_way +
+                ", line_additional='" + line_additional + '\'' +
+                ", line_money_total='" + line_money_total + '\'' +
+                ", mobile_suffix='" + mobile_suffix + '\'' +
+                ", real_mobile='" + real_mobile + '\'' +
+                ", ele_id='" + ele_id + '\'' +
+                ", eb_order_from=" + eb_order_from +
+                ", es_mark_name='" + es_mark_name + '\'' +
+                ", pack_assign_name='" + pack_assign_name + '\'' +
+                '}';
+    }
 }
 

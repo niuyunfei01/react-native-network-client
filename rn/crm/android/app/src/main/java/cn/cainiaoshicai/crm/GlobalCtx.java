@@ -48,6 +48,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.gusparis.monthpicker.RNMonthPickerPackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
@@ -59,14 +60,20 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.reactnativerestart.RestartPackage;
+import com.reactnativevolumemanager.VolumeManagerPackage;
 import com.rnnewrelic.NewRelicPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.songlcy.rnupgrade.UpgradePackage;
+import com.sunmi.peripheral.printer.InnerPrinterCallback;
+import com.sunmi.peripheral.printer.InnerPrinterException;
+import com.sunmi.peripheral.printer.InnerPrinterManager;
+import com.sunmi.peripheral.printer.SunmiPrinterService;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -136,12 +143,12 @@ import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.react.ActivityStarterReactPackage;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
+import cn.cainiaoshicai.crm.support.react_native_iflytek.SpeechPackage;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
-import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
@@ -347,7 +354,11 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new FastImageViewPackage(),
                     new ReactSliderPackage(),
                     new CameraRollPackage(),
-                    new RNCMaskedViewPackage()
+                    new RNCMaskedViewPackage(),
+                    new SpeechPackage(),
+                    new VolumeManagerPackage(),
+                    new NetInfoPackage(),
+                    new RNMonthPickerPackage()
             );
         }
     };
@@ -416,11 +427,44 @@ public class GlobalCtx extends Application implements ReactApplication {
             startKeepAlive();
 
             SoLoader.init(this, /* native exopackage */ false);
-
+            initSunmiService();
 
         }
     }
+    private void initSunmiService() {
 
+        try {
+            InnerPrinterManager.getInstance().bindService(this, innerPrinterCallback);
+        } catch (InnerPrinterException e) {
+
+        }
+    }
+    InnerPrinterCallback innerPrinterCallback = new InnerPrinterCallback() {
+        @Override
+        protected void onConnected(SunmiPrinterService sunmiPrinterService) {
+
+            AppCache.setIsConnectedSunmi(true);
+            AppCache.setSunmiPrinterService(sunmiPrinterService);
+        }
+
+        @Override
+        protected void onDisconnected() {
+            AppCache.setIsConnectedSunmi(false);
+            AppCache.setSunmiPrinterService(null);
+        }
+    };
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        unInitSunmiService();
+    }
+    private void unInitSunmiService() {
+        try {
+            InnerPrinterManager.getInstance().unBindService(this, innerPrinterCallback);
+        } catch (InnerPrinterException e) {
+
+        }
+    }
     public static long startAppTime = 0;
 
     public void startKeepAlive() {
@@ -1355,11 +1399,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
     }
 
-    public static boolean smPrintIsEnable() {
-        return AidlUtil.getInstance().isConnect();
-    }
-
-
     public class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;
         private static final int NUMBER_SOUND_LENGTH = 1000;
@@ -1602,10 +1641,6 @@ public class GlobalCtx extends Application implements ReactApplication {
             return !check_disabled() && this.play_single_sound(this.dadaManualTimeoutSound);
         }
 
-        public boolean play_by_xunfei(String s) {
-            return !check_disabled() && AudioUtils.getInstance().speakText(s);
-        }
-
 
         public void play_warning_order() {
             try {
@@ -1617,10 +1652,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
             try {
                 for (int i = 0; i < notifyTimes; i++) {
-                    if (storeName != null && !storeName.isEmpty()) {
-                        GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
-                        Thread.sleep(1300);
-                    }
                     if (plat.equals("6")) {
                         GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
                     } else if (plat.equals("4")) {

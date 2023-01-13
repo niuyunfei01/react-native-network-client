@@ -329,7 +329,6 @@ class UserScene extends PureComponent {
     showModal('提交中')
     InteractionManager.runAfterInteractions(() => {
       dispatch(editWorkerStatus(data, accessToken, (resp) => {
-        hideModal();
         if (resp.ok) {
           let msg = '操作成功';
           ToastShort(msg);

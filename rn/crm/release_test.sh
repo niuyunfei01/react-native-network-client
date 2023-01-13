@@ -4,12 +4,11 @@ export BABEL_ENV=production
 
 ./release_rn.sh
 
-cd ./android
+echo "build test android apk..."
+fastlane android beta
 
-./gradlew clean
-
-echo "build android apk..."
-./gradlew assembleRelease
+echo "build test ios apk..."
+fastlane ios beta
 
 export BABEL_ENV=dev
 

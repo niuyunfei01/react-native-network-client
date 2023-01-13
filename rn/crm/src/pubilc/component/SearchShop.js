@@ -171,7 +171,7 @@ class SearchShop extends Component {
   }
 
   searchLngLat = () => {
-    let {location, page, page_size, is_add, shops, ret_list, location_name} = this.state;
+    let {location, page, page_size, is_add, shops, ret_list, location_name, keyword} = this.state;
     if (!is_add) {
       return;
     }
@@ -180,6 +180,7 @@ class SearchShop extends Component {
       const api = `/v4/wsb_map/getNearbyLocation`
       let params = {
         location: location?.location,
+        keyword: keyword,
         page,
         page_size
       }
@@ -195,8 +196,8 @@ class SearchShop extends Component {
         }
         this.setState({
           location_name,
-          keyword: '',
           page: page + 1,
+          keyword: '',
           shops: page === 1 ? res : shops.concat(res),
           ret_list: page === 1 ? res : ret_list.concat(res),
           loading: false,
@@ -295,7 +296,7 @@ class SearchShop extends Component {
           <If condition={show_select_city}>
             <TouchableOpacity
               style={{
-                width: 66,
+                width: 86,
                 borderRightWidth: 1,
                 borderRightColor: colors.colorDDD,
                 flexDirection: 'row',
@@ -303,8 +304,12 @@ class SearchShop extends Component {
               }}
               onPress={() => this.goSelectCity()}
             >
-              <Text style={{textAlign: 'center', fontSize: 14, color: colors.color333}}>
-                {tool.jbbsubstr(city_name, 3)}
+              <Text style={{
+                textAlign: 'center',
+                fontSize: 14,
+                color: city_name === '选择城市' ? colors.color666 : colors.color333
+              }}>
+                {tool.jbbsubstr(city_name, 5)}
               </Text>
               <SvgXml xml={this_down()}/>
             </TouchableOpacity>
@@ -530,7 +535,7 @@ class SearchShop extends Component {
               </View>
               <Entypo name={'triangle-down'}
                       style={{color: colors.white, fontSize: 30, position: 'absolute', top: 21}}/>
-              <FastImage source={{uri: mapImage.location}}
+              <FastImage source={{uri: mapImage.locations}}
                          style={{width: 26, height: 52}}
                          resizeMode={FastImage.resizeMode.contain}/>
             </View>

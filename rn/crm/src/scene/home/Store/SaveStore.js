@@ -2,10 +2,12 @@
 import React, {PureComponent} from "react";
 import {
   Dimensions,
+  Image,
   InteractionManager,
   Modal,
   Platform,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -26,17 +28,17 @@ import PropTypes from "prop-types";
 import colors from "../../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import {SvgXml} from "react-native-svg";
-import {back, cross_icon} from "../../../svg/svg";
+import {back, cross_icon, head_cross_icon} from "../../../svg/svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import Validator from "../../../pubilc/util/Validator";
-import AlertModal from "../../../pubilc/component/AlertModal";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import {AMapSdk} from "react-native-amap3d/lib/src/index";
 import geolocation from "@react-native-community/geolocation";
 import {mergeMixpanelId} from "../../../pubilc/util/analytics";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 const {width, height} = Dimensions.get("window");
 
@@ -80,7 +82,7 @@ class SaveStore extends PureComponent {
       mobile = this.props.global.store_info?.mobile
     }
 
-    if(store_id === 0){
+    if (store_id === 0) {
       store_id = this.props.global?.store_id
     }
 
@@ -103,8 +105,7 @@ class SaveStore extends PureComponent {
       contact_phone: '',
       mobile,
       verify_code: verify_code,
-      city: '',
-      show_back_modal: false,
+      city: '选择城市',
       show_category_modal: false,
       show_placeholder: true,
       referrer_id: ''
@@ -194,7 +195,6 @@ class SaveStore extends PureComponent {
   }
   closeModal = () => {
     this.setState({
-      show_back_modal: false,
       show_category_modal: false,
     })
   }
@@ -338,15 +338,14 @@ class SaveStore extends PureComponent {
   }
 
   queryConfig = (accessToken, store_id) => {
-    const {dispatch, navigation} = this.props;
+    const {dispatch} = this.props;
     dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
         dispatch(setCurrentStore(cfg?.store_id || store_id));
-        tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
-          initTab: Config.ROUTE_ORDERS,
-          initialRouteName: Config.ROUTE_ALERT
-        });
-        hideModal()
+        this.setState({
+          type: 'register_success'
+        }, () => hideModal())
+
       } else {
         ToastShort(err_msg, 0);
       }
@@ -355,19 +354,40 @@ class SaveStore extends PureComponent {
 
 
   render() {
+    let {type} = this.state;
     return (
       <View style={{flex: 1, backgroundColor: colors.f5}}>
         {this.renderHead()}
-        {this.renderBody()}
-        {this.renderBtn()}
-        {this.renderBackModal()}
-        {this.renderCategoriesModal()}
+        <If condition={type === 'register_success'}>
+          {this.renderRegisterSuccess()}
+        </If>
+        <If condition={type !== 'register_success'}>
+          {this.renderBody()}
+          {this.renderBtn()}
+          {this.renderCategoriesModal()}
+        </If>
       </View>
     )
   }
 
   renderHead = () => {
+    let {navigation} = this.props
     let {type} = this.state;
+    let head_text = '添加门店'
+    switch (type) {
+      case 'register':
+        head_text = '创建门店';
+        break;
+      case 'edit':
+        head_text = '编辑门店';
+        break;
+      case 'add':
+        head_text = '添加门店';
+        break;
+      case 'register_success':
+        head_text = '开通运力';
+        break;
+    }
     return (
       <View style={{
         flexDirection: 'row',
@@ -377,13 +397,26 @@ class SaveStore extends PureComponent {
         paddingHorizontal: 6,
       }}>
         <SvgXml style={{marginRight: 4}} onPress={() => {
+          if (type === 'register_success') {
+            return tool.resetNavStack(navigation, Config.ROUTE_ALERT, {
+              initTab: Config.ROUTE_ORDERS,
+              initialRouteName: Config.ROUTE_ALERT
+            });
+          }
           if (type === 'register') {
-            return this.setState({
-              show_back_modal: true,
+
+            return JbbAlert.show({
+              title: '确定要退出吗?',
+              actionText: '确定',
+              closeText: '暂不',
+              onPress: () => {
+                this.props.navigation.goBack()
+              },
             })
+
           }
           this.props.navigation.goBack()
-        }} xml={back()}/>
+        }} xml={type === 'register_success' ? head_cross_icon() : back()}/>
         <Text style={{
           color: colors.color333,
           fontSize: 17,
@@ -392,7 +425,7 @@ class SaveStore extends PureComponent {
           marginRight: 40,
           flex: 1,
           textAlign: 'center'
-        }}> {type === 'edit' ? '编辑门店' : type === 'register' ? '创建门店' : '添加门店'} </Text>
+        }}> {head_text} </Text>
       </View>
     )
   }
@@ -458,7 +491,7 @@ class SaveStore extends PureComponent {
                          // if (/^[a-zA-Z0-9\u4e00-\u9fa5\\(\\)\\（\\）]+?$/g.test(store_name)) {
                          //   this.setState({store_name});
                          // }
-                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\\(\\)\\（\\）]/g, "")});
+                         this.setState({store_name: store_name.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s\\(\\)\\（\\）]/g, "")});
                        }}
             />
           </View>
@@ -590,10 +623,9 @@ class SaveStore extends PureComponent {
                          underlineColorAndroid="transparent"
                          style={{height: 56, flex: 1, textAlign: 'right', color: colors.color333}}
                          placeholderTextColor={'#999'}
-                         keyboardType={'numeric'}
                          value={referrer_id}
                          onChangeText={value => {
-                           this.setState({referrer_id: value.replace(/[^0-9]/g, "")});
+                           this.setState({referrer_id: value.replace(/[^\a-\z\A-\Z0-9]/g, "")});
                          }}
               />
             </View>
@@ -672,25 +704,6 @@ class SaveStore extends PureComponent {
     )
   }
 
-  renderBackModal = () => {
-    let {show_back_modal} = this.state;
-    return (
-      <View>
-        <AlertModal
-          visible={show_back_modal}
-          onClose={this.closeModal}
-          onPressClose={this.closeModal}
-          onPress={() => {
-            this.closeModal()
-            this.props.navigation.goBack()
-          }}
-          title={'确定要退出吗?'}
-          desc={''}
-          actionText={'确定'}
-          closeText={'暂不'}/>
-      </View>
-    )
-  }
 
   renderCategoriesModal = () => {
     let {category_list, show_category_modal, category_id_input_vlue, category_id_input_vlue_desc} = this.state;
@@ -800,7 +813,46 @@ class SaveStore extends PureComponent {
       </Modal>
     )
   }
+
+  renderRegisterSuccess = () => {
+    return (
+      <View style={styles.noOrderContent}>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/create_delivery.png'}}
+          style={{width: 160, height: 138, marginVertical: 30}}/>
+
+        <Text style={styles.noOrderDesc}>已为您开通外送帮支持的聚合运力，您可以根据门店实际配送场景和诉求选择合适的配送商～ </Text>
+        <Text style={styles.noOrderDesc}>同时您也可以绑定自有账号，自有账号同步使用账号余额和优惠券，接单更快，免收服务费～ </Text>
+        <Button title={'去绑定自有账号'}
+                onPress={() => {
+                  this.onPress(Config.ROUTE_DELIVERY_LIST, {into_type: 'register', show_select_store: false})
+                }}
+                buttonStyle={[{
+                  marginTop: 20,
+                  backgroundColor: colors.main_color,
+                  borderRadius: 24,
+                  width: width * 0.6,
+                  length: 48,
+                }]}
+                titleStyle={{color: colors.white, fontWeight: 'bold', fontSize: 18, lineHeight: 25}}
+        />
+
+      </View>
+    )
+  }
 }
+
+const styles = StyleSheet.create({
+  noOrderContent: {
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: colors.white,
+    paddingHorizontal: 20,
+  },
+  noOrderDesc: {marginTop: 10, fontSize: 15, color: colors.color333, lineHeight: 21},
+});
+
 
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(SaveStore);

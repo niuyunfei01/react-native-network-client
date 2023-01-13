@@ -46,12 +46,13 @@ class StoreSelect extends PureComponent {
     };
     this.clearHandle = this.clearHandle.bind(this)
     this.onCancel = this.onCancel.bind(this)
+    this.searchInput = undefined
   }
 
   componentDidMount() {
     this.fetchData()
     tool.debounces(() => {
-      this.searchInput.focus()
+      this.searchInput && this.searchInput.focus()
     }, 800)
   }
 
@@ -75,11 +76,11 @@ class StoreSelect extends PureComponent {
   }
 
   fetchData = (options = {}) => {
-    const {query, access_token} = this.state
+    const {query, access_token, searchKeywords} = this.state
     let {page, page_size} = query
     const api = `/v1/new_api/stores/get_can_read_stores?access_token=${access_token}`;
     let params = {
-      keywords: this.state.searchKeywords,
+      keywords: searchKeywords,
       page: options.page ? options.page : page,
       page_size: page_size
     }

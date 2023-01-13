@@ -21,16 +21,20 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_ORLDER_LIST_BY,
-  // SET_CALL_DELIVERY_LIST,
-  SET_DEFAULT_ORDER_INFO,
+  SET_ORDER_LIST_BY,
+  SET_CALL_DELIVERY_OBJ,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_EXT_STORE,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT
+  SET_AUTO_PRINT,
+  SET_VOLUME,
+  SET_NET_INFO_STATUS,
+  SET_NOTIFICATION_STATUS,
+  SET_BACKGROUND_STATUS,
+  SET_JPush_STATUS
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
@@ -81,7 +85,13 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   getTokenTs: 0,
-  lastCheckVersion: 0
+  lastCheckVersion: 0,
+  call_delivery_obj: {},
+  volume: 0,
+  net_info: {},
+  notification_status: 0,
+  is_background_run: 0,
+  jpush_status: null
 };
 
 /**
@@ -92,6 +102,31 @@ const initialState = {
 export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
+    case SET_JPush_STATUS:
+      return {
+        ...state,
+        jpush_status: action.payload
+      }
+    case SET_BACKGROUND_STATUS:
+      return {
+        ...state,
+        is_background_run: action.payload
+      }
+    case SET_NOTIFICATION_STATUS:
+      return {
+        ...state,
+        notification_status: action.payload
+      }
+    case SET_VOLUME:
+      return {
+        ...state,
+        volume: action.payload
+      }
+    case SET_NET_INFO_STATUS:
+      return {
+        ...state,
+        net_info: action.payload
+      }
     case SET_AUTO_PRINT:
       return {
         ...state,
@@ -238,7 +273,7 @@ export default function globalReducer(state = initialState, action) {
     case SET_USER_CONFIG:
       return {...state, user_config: action.info}
 
-    case SET_ORLDER_LIST_BY:
+    case SET_ORDER_LIST_BY:
       return {...state, order_list_by: action.val}
 
     case SET_SHOW_FLOAT_SERVICE_ICON:
@@ -250,6 +285,10 @@ export default function globalReducer(state = initialState, action) {
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}
+
+    case SET_CALL_DELIVERY_OBJ:
+      return {...state, call_delivery_obj: action.obj}
+
   }
   return state
 }

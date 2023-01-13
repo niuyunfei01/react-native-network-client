@@ -21,14 +21,14 @@ export default class CommonModal extends PureComponent {
     visible: PropTypes.bool,
     onRequestClose: PropTypes.func,
     onShow: PropTypes.func,
-    children:PropTypes.element,
+    children: PropTypes.element,
     position: PropTypes.string,
     animationType: PropTypes.string
   }
 
   render() {
-    const {visible, children, position, onRequestClose, onShow, animationType = 'slide'} = this.props
-    const positionStyle = position && position === 'flex-end' ? styles.flexEnd : styles.center
+    const {visible, children, position = 'flex-end', onRequestClose, onShow, animationType = 'slide'} = this.props
+    const positionStyle = position === 'flex-end' ? styles.flexEnd : styles.center
     return (
       <Modal hardwareAccelerated={true}
              transparent={true}

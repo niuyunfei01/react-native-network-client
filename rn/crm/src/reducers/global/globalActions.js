@@ -9,7 +9,6 @@
 
 import Config from '../../pubilc/common/config'
 import {Login, sendMobileCode} from '../../pubilc/services/account'
-import native from "../../pubilc/util/native";
 import {getWithTpl} from '../../pubilc/util/common'
 import {
   addStores,
@@ -17,15 +16,12 @@ import {
   checkBindExt,
   checkMessageCode,
   getStoreDelivery,
-  unbindExt,
   updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import {Alert} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
-import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -37,27 +33,63 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
-  SET_CURR_PROFILE,
   UPDATE_CONFIG,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
   BLE_STARTED,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_USER_CONFIG,
-  SET_ORLDER_LIST_BY,
-  SET_EXT_STORE,
+  SET_ORDER_LIST_BY,
+  SET_CALL_DELIVERY_OBJ,
   SET_SHOW_FLOAT_SERVICE_ICON,
   SET_NO_LOGIN_INFO,
   SET_GOODS_SG_CATEGORY,
   SET_BLUETOOTH_DEVICE_LIST,
   SET_SCANNING_BLUETOOTH_DEVICE,
-  SET_AUTO_PRINT
+  SET_VOLUME,
+  SET_AUTO_PRINT,
+  SET_NET_INFO_STATUS,
+  SET_NOTIFICATION_STATUS,
+  SET_BACKGROUND_STATUS,
+  SET_JPush_STATUS
 } = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
+}
+
+export const setJPushStatus = (value) => {
+  return {
+    type: SET_JPush_STATUS,
+    payload: value
+  }
+}
+export const setBackgroundStatus = (value) => {
+  return {
+    type: SET_BACKGROUND_STATUS,
+    payload: value
+  }
+}
+export const setNotificationStatus = (value) => {
+  return {
+    type: SET_NOTIFICATION_STATUS,
+    payload: value
+  }
+}
+
+export const setVolume = (value) => {
+  return {
+    type: SET_VOLUME,
+    payload: value
+  }
+}
+
+export const setNetInfo = (value) => {
+  return {
+    type: SET_NET_INFO_STATUS,
+    payload: value
+  }
 }
 
 export const setAutoPrint = (autoBluetoothPrint) => {
@@ -87,25 +119,17 @@ export const setSGCategory = (basic_categories) => {
   }
 }
 
-export function setAccessToken(obj) {
+export function setAccessToken(obj = {}) {
   return {
     type: SESSION_TOKEN_SUCCESS,
-    payload: {
-      access_token: obj.access_token,
-      refresh_token: obj.refresh_token,
-      expires_in_ts: obj.expires_in_ts,
-      getTokenTs: dayjs().valueOf()
-    }
+    payload: obj
   }
 }
 
 export function setNoLoginInfo(info) {
   return {
     type: SET_NO_LOGIN_INFO,
-    payload: {
-      ...info,
-      getTokenTs: dayjs().valueOf()
-    }
+    payload: info
   }
 }
 
@@ -133,7 +157,6 @@ export function setUserProfile(profile) {
 /**
  *
  * @param store_id
- * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
  * @returns {{payload: {id: *}, type: *}}
  */
 export function setCurrentStore(store_id) {
@@ -166,13 +189,6 @@ export function setFloatSerciceIcon(show) {
   }
 }
 
-export function setExtStore(list) {
-  return {
-    type: SET_EXT_STORE,
-    list: list
-  }
-}
-
 
 export function setUserCfg(info) {
   return {
@@ -184,7 +200,7 @@ export function setUserCfg(info) {
 
 export function setOrderListBy(info) {
   return {
-    type: SET_ORLDER_LIST_BY,
+    type: SET_ORDER_LIST_BY,
     val: info
   }
 }
@@ -198,24 +214,25 @@ export function updateConfig(config) {
 }
 
 
-export function logout(callback) {
-  return dispatch => {
-    dispatch({type: LOGOUT_SUCCESS});
-    native.logout().then();
-    doJPushStop()
-    doJPushDeleteAlias()
-    if (typeof callback === 'function') {
-      callback();
-    }
+export function setCallDeliveryObj(obj) {
+  return {
+    type: SET_CALL_DELIVERY_OBJ,
+    obj: obj
   }
 }
 
-export function setCreateProductStoreId(storeId) {
-  return dispatch => {
-    dispatch({
-      type: UPDATE_EDIT_PRODUCT_STORE_ID,
-      storeId: storeId
-    })
+export const resetRedux = () => {
+  return dispatch => dispatch({type: LOGOUT_SUCCESS});
+}
+
+export function logout(callback) {
+  return async (dispatch) => {
+    dispatch({type: LOGOUT_SUCCESS});
+    await doJPushDeleteAlias()
+    await doJPushStop()
+    if (typeof callback === 'function') {
+      callback();
+    }
   }
 }
 
@@ -260,28 +277,6 @@ export function getConfig(token, storeId, callback) {
       let msg = "获取服务器端配置错误: " + error;
       callback && callback(false, msg)
     })
-  }
-}
-
-
-/**
- *
- * @param token
- * @param storeId  current store id
- * @param callback  (ok, msg, profile) => {}
- */
-export function upCurrentProfile(token, storeId, callback) {
-  return dispatch => {
-    const url = `api/user_info2.json?access_token=${token}&_sid=${storeId}`;
-    getWithTpl(url, (json) => {
-        if (json.ok && json.obj) {
-          dispatch({type: SET_CURR_PROFILE, profile: json.obj});
-        }
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        callback(false, "网络错误, 请稍后重试")
-      }
-    )
   }
 }
 
@@ -347,31 +342,26 @@ export function doAuthLogin(access_token, expire, props, callback) {
   })
 }
 
-export function checkPhone(params, callback) {
+export function customerApply(params, callback, props) {
   return dispatch => {
-    return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
+    return addStores({device_uuid: getDeviceUUID(), ...params})
       .then((response) => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        callback(false, error.reason)
+        callback(true, '成功', response)
+        const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
+        dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+        const authCallback = (ok, msg, profile) => {
+          if (ok) {
+            dispatch(setUserProfile(profile));
+          }
+        };
+        doAuthLogin(access_token, expire, props, authCallback)
+      }).catch((error) => {
+        callback(false, error.reason, [])
       })
   }
 }
 
-
-export function unBind(params, callback) {
-  return dispatch => {
-    return unbindExt(params)
-      .then(response => {
-        callback(true, response)
-      })
-      .catch((error) => {
-        Alert.alert('当前版本不支持！', error.reason)
-        callback(false, '网络错误，请检查您的网络连接')
-      })
-  }
-}
 
 export function showStoreDelivery(ext_store_id, callback) {
   return dispatch => {
@@ -409,23 +399,4 @@ export function updateStoresAutoDelivery(token, ext_store_id, params, callback) 
   }
 }
 
-export function customerApply(params, callback, props) {
-  return dispatch => {
-    return addStores({device_uuid: getDeviceUUID(), ...params})
-      .then((response) => {
-        callback(true, '成功', response)
-        const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
-        dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
-        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-        const authCallback = (ok, msg, profile) => {
-          if (ok) {
-            dispatch(setUserProfile(profile));
-          }
-        };
-        doAuthLogin(access_token, expire, props, authCallback)
-      }).catch((error) => {
-        callback(false, error.reason, [])
-      })
-  }
-}
 

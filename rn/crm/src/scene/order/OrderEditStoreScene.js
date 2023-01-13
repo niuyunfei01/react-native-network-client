@@ -44,7 +44,6 @@ class OrderEditStoreScene extends Component {
     if (order) {
       showModal('加载中')
       dispatch(orderChgStore(global.accessToken, order.id, store_id, order.store_id, why, (ok, msg) => {
-        hideModal();
         if (ok) {
           showSuccess("订单已修改")
           navigation.goBack();

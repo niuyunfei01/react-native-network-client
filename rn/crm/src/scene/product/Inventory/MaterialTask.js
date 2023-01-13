@@ -12,6 +12,7 @@ import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
+import Synthesizer from "../../../pubilc/component/react-native-speech-iflytek";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -65,7 +66,7 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
-    ToastShort('请求中', 3)
+    ToastShort('请求中')
     HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
@@ -73,7 +74,7 @@ class MaterialTask extends React.Component {
       ToastShort('提交成功')
       self.fetchData()
     }).catch(e => {
-      native.speakText(e.reason)
+      Synthesizer.start(e.reason)
     })
   }
 

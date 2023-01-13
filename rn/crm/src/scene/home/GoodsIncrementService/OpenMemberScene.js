@@ -20,7 +20,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
 import {getConfig} from "../../../reducers/global/globalActions";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
-import AlertModal from "../../../pubilc/component/AlertModal";
+import JbbAlert from "../../../pubilc/component/JbbAlert";
 
 const styles = StyleSheet.create({
   saveZoneWrap: {
@@ -134,7 +134,7 @@ class OpenMemberScene extends PureComponent {
     this.state = {
       selectedOpenMember: {pay_money_actual: '0', months: 0},
       agreementMember: false,
-      showRemind: {visible: false, desc: '', is_open_member: true, touch_text: ''}
+      is_open_member: true
     }
   }
 
@@ -195,16 +195,16 @@ class OpenMemberScene extends PureComponent {
     if (vip_info.exist_vip) {
       this.mixpanel.track('会员_立即续费')
     } else this.mixpanel.track('会员_立即开通')
-    this.setState({
-      showRemind: {
-        visible: true,
-        desc: `会员费${selectedOpenMember.pay_money_actual}元将在外送帮余额中扣除，是否继续开通？`,
-        is_open_member: true,
-        touch_text: '继续'
-      }
+    JbbAlert.show({
+      title: '提醒',
+      desc: `会员费${selectedOpenMember.pay_money_actual}元将在外送帮余额中扣除，是否继续开通？`,
+      actionText: '继续',
+      closeText: '取消',
+      onPress: this.touch,
+      onPressClose: this.closeModal,
     })
-
   }
+
   openMember = () => {
     const {store_id, accessToken, store_info, vendor_info} = this.props.global
     const {selectedOpenMember} = this.state
@@ -226,54 +226,45 @@ class OpenMemberScene extends PureComponent {
       }
 
       if (-1 === error.obj.error_code) {
-        this.setState({
-          showRemind: {
-            visible: true,
-            desc: `余额不足，确定充值吗？`,
-            is_open_member: false,
-            touch_text: '去充值'
-          }
+        return this.setState({
+          is_open_member: false,
+        }, () => {
+          JbbAlert.show({
+            title: '余额不足，确定充值吗?',
+            actionText: '去充值',
+            closeText: '取消',
+            onPress: this.touch,
+            onPressClose: this.closeModal,
+          })
         })
-        return
       }
       showError(error.reason)
     }).catch(() => {
     })
 
   }
+
   closeModal = () => {
-    const {showRemind} = this.state
-    this.setState({showRemind: {visible: false, desc: '', is_open_member: true, touch_text: ''}})
-    if (showRemind.is_open_member) {
+    const {is_open_member} = this.state
+    this.setState({is_open_member: true})
+    if (is_open_member) {
       this.mixpanel.track('会员_取消开通')
       return
     }
     this.mixpanel.track('会员_取消充值')
   }
+
   touch = () => {
-    const {showRemind} = this.state
-    this.setState({showRemind: {visible: false, desc: '', is_open_member: true, touch_text: ''}})
-    if (showRemind.is_open_member) {
+    const {is_open_member} = this.state
+    this.setState({is_open_member: true})
+    if (is_open_member) {
       this.openMember()
       return
     }
     this.mixpanel.track('会员_去充值')
     this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
   }
-  renderRemind = () => {
-    const {showRemind} = this.state
-    return (
-      <AlertModal
-        visible={showRemind.visible}
-        title={'提示'}
-        desc={showRemind.desc}
-        actionText={showRemind.touch_text}
-        closeText={'取消'}
-        onPress={this.touch}
-        onClose={this.closeModal}
-        onPressClose={this.closeModal}/>
-    )
-  }
+
   renderDescription = () => {
     const {store_info} = this.props.global
     const {vip_info = {}} = store_info
@@ -464,7 +455,6 @@ class OpenMemberScene extends PureComponent {
             </Text>
           </TouchableOpacity>
         </View>
-        {this.renderRemind()}
       </>
     )
   }

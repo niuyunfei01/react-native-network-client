@@ -6,7 +6,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {setAutoPrint, setPrinterName} from '../../../reducers/global/globalActions';
 
 import Config from "../../../pubilc/common/config";
-import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
@@ -38,7 +37,6 @@ class PrinterSetting extends PureComponent {
       isRefreshing: false,
       switch_val: false,
       enable_new_order_notify: true,
-      auto_blue_print: false,
       printer_status: '查看详情',
       printer_status_color: colors.main_color,
       customer_print_item: true,
@@ -72,14 +70,10 @@ class PrinterSetting extends PureComponent {
   }
 
   componentDidMount() {
-    const {navigation, global} = this.props
+    const {navigation} = this.props
     this.focus = navigation.addListener('focus', () => {
       this.check_printer_connected()
     })
-    const {autoBluetoothPrint} = global
-    native.getAutoBluePrint((auto, msg) => {
-      this.setState({auto_blue_print: auto})
-    }).then()
 
     this.onHeaderRefresh()
   }

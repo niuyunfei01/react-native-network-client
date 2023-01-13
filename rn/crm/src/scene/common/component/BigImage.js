@@ -8,7 +8,9 @@ export default class BigImage extends React.Component {
     visible: PropTypes.bool.isRequired,
     urls: PropTypes.array.isRequired,
     transparent: PropTypes.bool,
-    onClickModal: PropTypes.func.isRequired
+    onClickModal: PropTypes.func.isRequired,
+    saveBtnLabel: PropTypes.string,
+    cancelLabel: PropTypes.string
   }
 
   static defaultProps = {
@@ -29,6 +31,10 @@ export default class BigImage extends React.Component {
           imageUrls={this.props.urls}
           index={0}
           onClick={() => this.props.onClickModal()}
+          enableSwipeDown
+          enableImageZoom={true}
+          saveToLocalByLongPress={true}
+          menuContext={{ saveToLocal: this.props.saveBtnLabel, cancel: this.props.cancelLabel }}
         />
       </Modal>
     )

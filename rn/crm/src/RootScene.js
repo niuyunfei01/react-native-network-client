@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
+import {Appearance, LogBox, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, View} from "react-native";
 
 import {getConfig, setNoLoginInfo, setUserProfile} from "./reducers/global/globalActions";
 import Config from "./pubilc/common/config";
@@ -14,6 +14,7 @@ import store from "./pubilc/util/configureStore";
 import PropTypes from "prop-types";
 import HttpUtils from "./pubilc/util/http";
 import dayjs from "dayjs";
+import {RootSiblingParent} from 'react-native-root-siblings'
 
 LogBox.ignoreAllLogs(true)
 global.currentRouteName = ''
@@ -54,8 +55,7 @@ class RootScene extends PureComponent {
         printer_id: '0',
       },
       rehydrated: false,
-      onGettingCommonCfg: false,
-      bleStarted: false
+      status_bar_status: Appearance.getColorScheme() === 'dark' ? 'light-content' : 'dark-content'
     };
   }
 
@@ -93,6 +93,17 @@ class RootScene extends PureComponent {
 
   componentDidMount() {
     this.getInfo()
+    this.status_bar_listener = Appearance.addChangeListener(this.getStatusBarStatus)
+  }
+
+  getStatusBarStatus = ({colorScheme}) => {
+    this.setState({
+      status_bar_status: colorScheme === 'dark' ? 'light-content' : 'dark-content'
+    })
+  }
+
+  componentWillUnmount() {
+    this.status_bar_listener && this.status_bar_listener.remove()
   }
 
   render() {
@@ -106,7 +117,7 @@ class RootScene extends PureComponent {
   getRootView = () => {
     global.isLoginToOrderList = false
     let initialRouteName;
-    let initialRouteParams =  {};
+    let initialRouteParams = {};
     const {noLoginInfo} = this.state;
     global.noLoginInfo = noLoginInfo
 
@@ -123,16 +134,20 @@ class RootScene extends PureComponent {
       login_user: noLoginInfo.currentUser ?? '未登录'
     })
     return (
-      <Provider store={store}>
-        <ErrorBoundary>
-          <SafeAreaView style={styles.container}>
-            <View style={styles.statusBar}>
-              <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
-            </View>
-            <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
-          </SafeAreaView>
-        </ErrorBoundary>
-      </Provider>
+      <RootSiblingParent>
+        <Provider store={store}>
+          <ErrorBoundary>
+            <SafeAreaView style={styles.container}>
+              <View style={styles.statusBar}>
+                <StatusBar backgroundColor={"transparent"} translucent={true} barStyle={'dark-content'}/>
+              </View>
+              <AppNavigator initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}/>
+            </SafeAreaView>
+          </ErrorBoundary>
+
+        </Provider>
+      </RootSiblingParent>
+
     )
   }
 }

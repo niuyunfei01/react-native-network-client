@@ -121,21 +121,15 @@ public class OrderAdapter extends BaseAdapter {
 
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
-            Date expectTime = order.getExpectTime();
-            boolean notTimeToShip = expectTime != null && (expectTime.getTime() - System.currentTimeMillis() > 90 * 60 * 1000);
+            String expectTime = order.getExpectTime();
 
             viewMoreTimes.setTextColor(lightBlue);
 
-            String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr();
+            String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : expectTime) : order.getExpectTimeStr();
             expect_time.setText(expectTimeTxt);
 
-            if (notTimeToShip) {
-                expect_time.setBackgroundColor(ContextCompat.getColor(activity, R.color.green));
-                expect_time.setTextColor(ContextCompat.getColor(activity, R.color.white));
-            } else {
-                expect_time.setBackgroundColor(0);
-                expect_time.setTextColor(lightBlue);
-            }
+            expect_time.setBackgroundColor(ContextCompat.getColor(activity, R.color.green));
+            expect_time.setTextColor(ContextCompat.getColor(activity, R.color.white));
 
             if ((!TextUtils.isEmpty(order.getPack_assign_name()) || !TextUtils.isEmpty(order.getPack_1st_worker())) &&
                     (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP)) {
@@ -221,7 +215,7 @@ public class OrderAdapter extends BaseAdapter {
                 }
             });
 
-            orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
+            orderTime.setText(order.getOrderTime());
 
             if (isDirect) {
                 dayNo.setText("#" + order.getDayId());
@@ -285,8 +279,7 @@ public class OrderAdapter extends BaseAdapter {
 
                 if (order.getTime_arrived() != null && order.getTime_start_ship() != null) {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
-                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) / (60 * 1000));
-                    shipTimeCost.setText(String.valueOf(minutes));
+
 //                    int colorResource = minutes <= Cts.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
 //                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.app(), colorResource));
                     shipTimeCost.setVisibility(View.VISIBLE);

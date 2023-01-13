@@ -8,6 +8,8 @@ import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
 import store from "./configureStore";
 import dayjs from "dayjs";
+import {nrRecordMetric} from "./NewRelicRN";
+import JbbAlert from "../component/JbbAlert";
 
 const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
@@ -20,6 +22,7 @@ const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
+let isRefrshToken = false, isLogout = false
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -54,29 +57,24 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    const report_url = '/util/crm_error_report/1'
-    if (report_url === url)
-      return
+    const noLoginInfo = global.noLoginInfo
+    if (noLoginInfo.accessToken)
+      noLoginInfo.accessToken = '存在token'
+    if (noLoginInfo.refreshToken)
+      noLoginInfo.refreshToken = '存在refreshToken'
     const report_params = {
-      APP_VERSION_CODE: DeviceInfo.getVersion(),
-      CUSTOM_DATA: {
-        'CURR-STORE': global.noLoginInfo.store_id,
-        'UID': global.noLoginInfo.currentUser
-      },
-      BRAND: DeviceInfo.getBrand(),
-      PHONE_MODEL: DeviceInfo.getModel(),
-      STACK_TRACE: {
-        error: error,
-        uri: uri,
-        options: options,
-        url: url,
-        params: params,
-        method: method,
-        noLoginInfo: global.noLoginInfo,
-        currentRouteName: global.currentRouteName
-      }
+      app_version: DeviceInfo.getVersion(),
+      brand: DeviceInfo.getBrand(),
+      phone_mode: DeviceInfo.getModel(),
+      error: error,
+      options: options,
+      url: url,
+      params: params,
+      method: method,
+      noLoginInfo: noLoginInfo,
+      currentRouteName: global.currentRouteName
     };
-    HttpUtils.post(report_url, report_params).then()
+    nrRecordMetric('app_url_request', report_params)
   }
 
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
@@ -94,6 +92,10 @@ class HttpUtils {
         uri += '&'
       }
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
+    }
+    if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
+      isRefrshToken = true
+      this.refreshAccessToken()
     }
     return new Promise((resolve, reject) => {
       const startTime = getTime()
@@ -125,9 +127,10 @@ class HttpUtils {
             return;
           }
           hideModal()
+
           this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
-            this.error(response, method, url, params);
+            this.error(response, props.navigation);
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -149,61 +152,35 @@ class HttpUtils {
     })
   }
 
-  static requestUrl = (method, request_url, request_params, accessToken) => {
-    const tokenIndex = request_url.indexOf('access_token=')
-    if (tokenIndex !== -1) {
-      request_url = request_url.substring(0, tokenIndex + 14) + accessToken
-    }
-    if (request_params && request_params.accessToken) {
-      request_params.accessToken = accessToken
-    }
-    if (request_params && request_params.access_token) {
-      request_params.access_token = accessToken
-    }
-    if (method === 'GET') {
-      this.get(request_url, request_params)
-        .then(res => {
-        })
-        .catch(error => {
-        })
-      return
-    }
-    if (method === 'POST') {
-      this.post(request_url, request_params)
-        .then(res => {
-        })
-        .catch(error => {
-        })
-    }
-  }
+  static refreshAccessToken = () => {
 
-  static refreshAccessToken = (method, request_url, request_params) => {
-    const url = `/v4/WsbUser/refreshToken`
     if (global.noLoginInfo.refreshToken) {
+      const url = `/v4/WsbUser/refreshToken`
       const params = {refresh_token: global.noLoginInfo.refreshToken}
+      isRefrshToken = true
       this.post(url, params).then(res => {
-        const {access_token, refresh_token, expires_in: expires_in_ts} = res;
+        const {access_token, refresh_token, expires_in} = res;
+        const getTokenTs = dayjs().valueOf()
         store.dispatch({
           type: SESSION_TOKEN_SUCCESS,
           payload: {
             access_token: access_token,
             refresh_token: refresh_token,
-            expires_in_ts: expires_in_ts,
-            getTokenTs: dayjs().valueOf()
+            expires_in_ts: expires_in,
+            getTokenTs: getTokenTs
           }
         })
-        this.requestUrl(method, request_url, request_params, access_token)
+        global.noLoginInfo.getTokenTs = getTokenTs
+        isRefrshToken = false
       })
     }
   }
 
-  static error(response, method, url, params) {
-    switch (response.error_code) {
+  static error(response, navigation) {
+    switch (parseInt(response.error_code)) {
       case 10001:
       case 21327:
-        ToastLong('请确认信息是否正确，若不正确请重新操作')
-        // this.logout(navigation)
-        this.refreshAccessToken(method, url, params)
+        this.logout(navigation)
         break
       case 30001:
         ToastShort('客户端版本过低')
@@ -215,10 +192,15 @@ class HttpUtils {
     }
   }
 
-  static logout(navigation) {
-    native.logout().then()
-    if (navigation !== HttpUtils) {
-      if (navigation != null) {
+  static resetLogin = (navigation) => {
+    if (isLogout)
+      return
+    isLogout = true
+    JbbAlert.show({
+      title: '提醒',
+      desc: '登录信息过期，请重新登录',
+      actionText: '确定',
+      onPress: () => {
         const resetAction = CommonActions.reset({
           index: 0,
           routes: [
@@ -226,9 +208,25 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
-      } else {
-        ToastShort("导航目标未知")
+        isLogout = false
+      },
+    })
+
+  }
+
+  static logout(navigation) {
+    native.logout().then()
+
+    if (navigation !== HttpUtils) {
+      if (navigation) {
+        this.resetLogin(navigation)
+        return
       }
+      if (global.navigation) {
+        this.resetLogin(global.navigation)
+        return;
+      }
+      ToastShort("导航目标未知")
     }
   }
 
