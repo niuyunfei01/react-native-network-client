@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {
   Dimensions,
   FlatList,
+  Image,
   InteractionManager,
   StatusBar,
   StyleSheet,
@@ -17,6 +18,7 @@ import PropTypes from "prop-types";
 import ModalDropdown from "react-native-modal-dropdown";
 import * as globalActions from '../../reducers/global/globalActions'
 import {getConfig, setOrderListBy} from '../../reducers/global/globalActions'
+import {getImRemindCount, getStoreImConfig, setImRemindCount} from '../../reducers/im/imActions'
 
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
@@ -26,7 +28,7 @@ import pxToDp from '../../pubilc/util/pxToDp';
 import {MixpanelInstance} from '../../pubilc/util/analytics';
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {cross_icon, down, empty_data, menu, menu_left, search_icon} from "../../svg/svg";
+import {cross_icon, down, menu, menu_left, search_icon} from "../../svg/svg";
 import HotUpdateComponent from "../../pubilc/component/HotUpdateComponent";
 import RemindModal from "../../pubilc/component/remindModal";
 import {calcMs} from "../../pubilc/util/AppMonitorInfo";
@@ -37,14 +39,13 @@ import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
-import {doJPushSetAlias} from "../../pubilc/component/jpushManage";
 import JbbAlert from "../../pubilc/component/JbbAlert";
 
 const {width} = Dimensions.get("window");
 
 function mapStateToProps(state) {
-  const {global, device} = state;
-  return {global: global, device: device}
+  const {global, device, im} = state;
+  return {global: global, device: device, im: im}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -55,43 +56,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const initState = {
-  isLoading: false,
-  categoryLabels: [
-    {tabname: '新订单', num: 0, status: 9},
-    {tabname: '待接单', num: 0, status: 10},
-    {tabname: '待取货', num: 0, status: 2},
-    {tabname: '配送中', num: 0, status: 3},
-    {tabname: '异常', num: 0, status: 8},
-  ],
-  query: {
-    listType: null,
-    offset: 0,
-    page: 1,
-    limit: 10,
-    maxPastDays: 100,
-    is_add: true,
-  },
-  sort_list: [
-    {"label": '最新来单', 'value': 'orderTime desc'},
-    {"label": '最早来单', 'value': 'orderTime asc'},
-    {"label": '送达时间', 'value': 'expectTime asc'},
-  ],
-  ListData: [],
-  order_status: 9,
-  show_sort_modal: false,
-  show_bind_button: false,
-  orderNum: {},
-  is_can_load_more: false,
-  scanBoolean: false,
-  order_id: 0,
-  show_goods_list: false,
-  add_tip_id: 0,
-  show_add_tip_modal: false,
-  show_delivery_modal: false,
-  show_cancel_delivery_modal: false,
-  orders_add_tip: true,
-};
 const timeObj = {
   deviceInfo: {},
   currentStoreId: '',
@@ -106,7 +70,6 @@ class OrderListScene extends Component {
     dispatch: PropTypes.func,
     device: PropTypes.object,
   }
-  state = initState;
 
   constructor(props) {
     super(props);
@@ -120,41 +83,74 @@ class OrderListScene extends Component {
     this.mixpanel.track("订单列表页", {})
     GlobalUtil.setOrderFresh(1)
     this.list_ref = undefined;
+    const {order_status} = props.route.params || {}
+    this.state = {
+      isLoading: false,
+      categoryLabels: [
+        {tabname: '新订单', num: 0, status: 9},
+        {tabname: '待接单', num: 0, status: 10},
+        {tabname: '待取货', num: 0, status: 2},
+        {tabname: '配送中', num: 0, status: 3},
+        {tabname: '异常', num: 0, status: 8},
+        {tabname: '退款', num: 0, status: 11},
+      ],
+      query: {
+        listType: null,
+        offset: 0,
+        page: 1,
+        limit: 10,
+        maxPastDays: 100,
+        is_add: true,
+      },
+      sort_list: [
+        {"label": '最新来单', 'value': 'orderTime desc'},
+        {"label": '最早来单', 'value': 'orderTime asc'},
+        {"label": '送达时间', 'value': 'expectTime asc'},
+      ],
+      ListData: [],
+      order_status: order_status ?? 9,
+      show_sort_modal: false,
+      show_bind_button: false,
+      orderNum: {},
+      is_can_load_more: false,
+      scanBoolean: false,
+      order_id: 0,
+      show_goods_list: false,
+      add_tip_id: 0,
+      show_add_tip_modal: false,
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
+      show_finish_delivery_modal: false,
+      orders_add_tip: true,
+    };
   }
 
 
   componentWillUnmount() {
-
     this.focus()
   }
 
   componentDidMount() {
-
-    this.getVendor()
-    const {global, navigation, device} = this.props
-
+    const {navigation, device} = this.props
     timeObj.method[0].endTime = getTime()
     timeObj.method[0].executeTime = timeObj.method[0].endTime - timeObj.method[0].startTime
     timeObj.method[0].executeStatus = 'success'
     timeObj.method[0].interfaceName = ""
     timeObj.method[0].methodName = "componentDidMount"
-    const {store_id, currentUser, accessToken} = global;
-
-
+    const {store_id, currentUser, accessToken, is_record_request_monitor} = this.props.global;
     const {deviceInfo} = device
     timeObj['deviceInfo'] = deviceInfo
     timeObj.currentStoreId = store_id
     timeObj.currentUserId = currentUser
     timeObj['moduleName'] = "订单"
     timeObj['componentName'] = "OrderListScene"
-    timeObj['is_record_request_monitor'] = global?.is_record_request_monitor
+    timeObj['is_record_request_monitor'] = is_record_request_monitor
     calcMs(timeObj, accessToken)
-
+    this.getVendor()
     this.focus = navigation.addListener('focus', () => {
       this.onRefresh()
     })
-    //防止退出登录，重新登录不推送的问题
-    doJPushSetAlias(currentUser)
+    global.navigation = navigation
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -333,10 +329,6 @@ class OrderListScene extends Component {
     }
   }
 
-  onScanFail = () => {
-    ToastLong('编码不合法，请重新扫描')
-  }
-
   openAddTipModal = (add_tip_id, orders_add_tip = true) => {
     this.setState({
       add_tip_id: add_tip_id,
@@ -351,14 +343,16 @@ class OrderListScene extends Component {
     this.setState({
       order_id: order_id,
       show_cancel_delivery_modal: true,
-      show_delivery_modal: false
+      show_finish_delivery_modal: false,
+      show_delivery_modal: false,
     })
   }
 
   openFinishDeliveryModal = (order_id) => {
     this.setState({
       order_id: order_id,
-      show_delivery_modal: false
+      show_delivery_modal: false,
+      show_cancel_delivery_modal: false,
     }, () => {
       JbbAlert.show({
         title: '当前配送确认完成吗?',
@@ -369,6 +363,7 @@ class OrderListScene extends Component {
       })
     })
   }
+
 
   render() {
     const {store_id, accessToken} = this.props.global;
@@ -541,19 +536,37 @@ class OrderListScene extends Component {
 
   onCanChangeStore = (item) => {
     showModal("切换店铺中...")
-    tool.debounces(() => {
-      const {dispatch, global, navigation} = this.props;
-      const {accessToken} = global;
-      dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
-        if (ok) {
+    const {dispatch, global, im} = this.props;
+    const {accessToken} = global;
+    dispatch(getConfig(accessToken, item?.id, (ok, msg, obj) => {
+      if (ok) {
+        tool.debounces(() => {
           hideModal()
+          this.getVendor()
           this.onRefresh(9)
-        } else {
-          ToastLong(msg);
-          hideModal()
-        }
-      }));
-    })
+        })
+      } else {
+        ToastLong(msg);
+      }
+    }));
+    dispatch(getStoreImConfig(accessToken, item?.id));
+    dispatch(getImRemindCount(accessToken, item?.id, im.im_config.im_url, (ok, msg, obj) => {
+      if (ok) {
+        hideModal()
+        dispatch(setImRemindCount(obj.message_count))
+      } else {
+        ToastLong(msg);
+      }
+    }))
+  }
+
+  navigationToChangeStore = () => {
+    let {only_one_store} = this.props.global;
+    if (only_one_store) {
+      return;
+    }
+    GlobalUtil.setOrderFresh(2)
+    this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
   }
 
   renderHead = () => {
@@ -572,17 +585,11 @@ class OrderListScene extends Component {
         }}
                 xml={menu_left()}/>
 
-        <TouchableOpacity onPress={() => {
-          if (only_one_store) {
-            return;
-          }
-          this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
-        }} style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{
-            fontSize: 15,
-            color: colors.color333,
-            fontWeight: 'bold'
-          }}>{tool.jbbsubstr(store_info?.name, 12)} </Text>
+        <TouchableOpacity onPress={() => this.navigationToChangeStore()}
+                          style={{height: 44, flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={{fontSize: 15, color: colors.color333, fontWeight: 'bold'}}>
+            {tool.jbbsubstr(store_info?.name, 12)}&nbsp;
+          </Text>
           <If condition={!only_one_store}>
             <SvgXml xml={down(16, 16, colors.color333)}/>
           </If>
@@ -729,10 +736,11 @@ class OrderListScene extends Component {
   renderItem = (order) => {
     let {item, index} = order;
     let {order_status} = this.state;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}
@@ -750,7 +758,11 @@ class OrderListScene extends Component {
     let {show_bind_button} = this.state;
     return (
       <View style={styles.noOrderContent}>
-        <SvgXml xml={empty_data()}/>
+
+        <Image
+          source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/empty_data.png'}}
+          style={{width: 122, height: 93}}/>
+
         <If condition={!show_bind_button}>
           <Text style={styles.noOrderDesc}>暂无订单</Text>
         </If>
@@ -804,11 +816,11 @@ const styles = StyleSheet.create({
   },
   statusTabRight: {
     height: 2,
-    width: 48,
+    width: 42,
     backgroundColor: colors.main_color,
     position: 'absolute', bottom: 0
   },
-  orderListContent: {flex: 1, backgroundColor: colors.f5},
+  orderListContent: {flex: 1, backgroundColor: colors.ed},
   sortSelect: {fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white},
   noOrderContent: {
     alignItems: 'center',

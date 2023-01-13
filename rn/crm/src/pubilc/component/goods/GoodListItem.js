@@ -5,7 +5,6 @@ import FastImage from 'react-native-fast-image'
 import Config from "../../common/config";
 import colors from "../../styles/colors";
 import Cts from "../../common/Cts";
-import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../util/tool";
 import {SvgXml} from "react-native-svg";
@@ -42,9 +41,10 @@ class GoodListItem extends React.PureComponent {
 
   right = () => {
     const {product, fnProviding, price_type} = this.props;
-    const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    let {skus = [], sp = {}} = product
+    const onSale = sp.status === `${Cts.STORE_PROD_ON_SALE}`;
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-    let skus = product.skus || []
+
     const {showMore} = this.state
     return (
       <ScrollView
@@ -55,8 +55,23 @@ class GoodListItem extends React.PureComponent {
         <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>
           {product.name}{product.sku_name && `[${product.sku_name}]`}
         </Text>
-
-        <If condition={typeof product.sp.applying_price !== "undefined"}>
+        <If condition={false}>
+          <View style={styles.priceWrap}>
+            <View style={[styles.huoWrap, styles.shanWrap]}>
+              <Text style={[styles.huo, styles.shan]}>闪&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap, styles.eleWrap]}>
+              <Text style={[styles.huo]}>饿&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap, styles.jingDongWrap]}>
+              <Text style={[styles.huo]}>京&nbsp;</Text>
+            </View>
+            <View style={[styles.huoWrap]}>
+              <Text style={[styles.huo]}>活&nbsp;</Text>
+            </View>
+          </View>
+        </If>
+        <If condition={sp.applying_price}>
           <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
             审核中：{this.applyingPriceInYuan(product)}
           </Text>
@@ -66,10 +81,10 @@ class GoodListItem extends React.PureComponent {
         </If>
         <View style={{flexDirection: "row", alignItems: 'center'}}>
           <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
-            {price_type ? '零售价格' : '报价'}：
+            {price_type ? '零售价' : '报价'}：
           </Text>
           <Text style={[styles.priceText, offSaleTxtStyle]}>
-            ￥{price_type ? product?.sp?.show_price : parseFloat(product.sp.supply_price / 100).toFixed(2)}
+            ￥{price_type ? sp?.show_price : parseFloat(sp?.supply_price / 100).toFixed(2)}
           </Text>
         </View>
         <If condition={tool.length(skus) > 0}>
@@ -89,29 +104,36 @@ class GoodListItem extends React.PureComponent {
         </If>
 
         <If condition={tool.length(skus) > 0 && showMore}>
-          <For each="item" index="idx" of={skus}>
-            <View style={{flexDirection: "column"}} key={idx}>
-              <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}] </Text>
-              <If condition={typeof item.applying_price !== "undefined"}>
-                <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
-                  审核中：{parseFloat(item.applying_price / 100).toFixed(2)}
-                </Text>
-              </If>
-              <If condition={fnProviding}>
-                <Text style={[styles.n2grey6, offSaleTxtStyle]}>
-                  库存：{item.left_since_last_stat || 0} 件
-                </Text>
-              </If>
-              <View style={{flexDirection: "row", alignItems: 'center'}}>
-                <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
-                  {price_type ? '零售价格' : '报价'}：
-                </Text>
-                <Text style={[styles.priceText, offSaleTxtStyle, {color: colors.warn_red}]}>
-                  ￥{price_type ? item.show_price : parseFloat(item.supply_price / 100).toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          </For>
+          {
+            skus.map((item, index) => {
+              const {
+                sku_name = '', applying_price = 0, left_since_last_stat = 0, show_price, supply_price = '0'
+              } = item
+              return (
+                <View style={{flexDirection: "column"}} key={index}>
+                  <Text numberOfLines={2} style={[styles.multiSpecName, offSaleTxtStyle]}>[{sku_name}] </Text>
+                  <If condition={applying_price}>
+                    <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>
+                      审核中：{parseFloat(applying_price / 100).toFixed(2)}
+                    </Text>
+                  </If>
+                  <If condition={fnProviding}>
+                    <Text style={[styles.n2grey6, offSaleTxtStyle]}>
+                      库存：{left_since_last_stat} 件
+                    </Text>
+                  </If>
+                  <View style={styles.priceWrap}>
+                    <Text style={[styles.priceTextFlag, offSaleTxtStyle]}>
+                      {price_type ? '零售价' : '报价'}：
+                    </Text>
+                    <Text style={[styles.priceText, offSaleTxtStyle, {color: '#FF2200'}]}>
+                      ￥{price_type ? show_price : parseFloat(supply_price / 100).toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              )
+            })
+          }
         </If>
       </ScrollView>
     )
@@ -119,7 +141,8 @@ class GoodListItem extends React.PureComponent {
 
   render() {
     const {product, onPressImg, onPressRight, opBar} = this.props;
-    const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    let {sp = {}, audit_status = '', coverimg = ''} = product
+    const onSale = sp.status === `${Cts.STORE_PROD_ON_SALE}`;
     const bg = onSale ? colors.white : colors.colorDDD;
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
@@ -127,16 +150,23 @@ class GoodListItem extends React.PureComponent {
                              onPress={onPressImg}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <View>
-          <If condition={product.coverimg}>
-            <FastImage source={{uri: Config.staticUrl(product.coverimg)}}
+          <If condition={coverimg}>
+            <FastImage source={{uri: Config.staticUrl(coverimg)}}
                        style={[styles.listImageSize, offSaleImg]}
                        resizeMode={FastImage.resizeMode.contain}/>
+            <If condition={audit_status}>
+              <View style={[styles.center, styles.listImageSize, styles.goodsStatus, {position: 'absolute'}]}>
+                <Text style={{fontSize: 14, color: colors.white, opacity: 1}}>
+                  {audit_status}
+                </Text>
+              </View>
+            </If>
           </If>
-          <If condition={!product.coverimg}>
+          <If condition={!coverimg}>
             <SvgXml xml={noImage()} style={[styles.listImageSize, offSaleImg]}/>
           </If>
 
-          <If condition={!onSale}>
+          <If condition={!onSale && !audit_status}>
             <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>
               <Text style={{color: colors.white}}>暂 停</Text>
               <Text style={{color: colors.white}}>售 卖</Text>
@@ -160,15 +190,30 @@ class GoodListItem extends React.PureComponent {
 export default GoodListItem
 
 const styles = StyleSheet.create({
-  priceTextFlag: {fontSize: 16, color: colors.color333},
+  shanWrap: {backgroundColor: '#ffd225',},
+  shan: {color: colors.color333},
+  eleWrap: {backgroundColor: '#0292FE',},
+  jingDongWrap: {backgroundColor: colors.main_color},
+  huoWrap: {
+    backgroundColor: '#FF8309',
+    marginRight: 4,
+    borderRadius: 2,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  huo: {fontSize: 11, color: colors.white},
+  multiSpecName: {fontSize: 14, fontWeight: 'bold', color: colors.color333, paddingTop: 10},
+  priceWrap: {flexDirection: "row", alignItems: 'center', paddingTop: 2},
+  priceTextFlag: {fontSize: 12, color: colors.color666},
   priceText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#EE2626',
+    fontWeight: 'bold',
     lineHeight: 22
   },
   productRow: {
-    borderTopWidth: 1,
-    borderTopColor: colors.colorCCC,
     padding: 5,
     paddingLeft: 0,
     marginLeft: 2,
@@ -176,8 +221,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   listImageSize: {
-    width: pxToDp(150),
-    height: pxToDp(150)
+    width: 80,
+    height: 80,
+    borderRadius: 4
   },
   center: {
     justifyContent: "center",
@@ -189,12 +235,16 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   n2grey6: {
-    color: colors.color333,
-    fontSize: 12
+    color: colors.color999,
+    fontSize: 12,
+    paddingTop: 4
   },
   n2b: {
     color: colors.color333,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold"
   },
+  goodsStatus: {
+    backgroundColor: colors.color000, opacity: 0.5
+  }
 })

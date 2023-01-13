@@ -37,6 +37,9 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+
+const regStr = /[*]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig;
+
 const goods_price_list = [
   {label: '20元', value: 20},
   {label: '30元', value: 30},
@@ -177,9 +180,8 @@ class OrderSettingScene extends Component {
 
   timeOutBack = (time, callback) => {
     this.cancelData()
-    let _this = this;
+    this.props.navigation.goBack()
     setTimeout(() => {
-      _this.props.navigation.goBack()
       callback && callback()
     }, time)
   }
@@ -409,7 +411,7 @@ class OrderSettingScene extends Component {
                   <Text style={{
                     color: colors.color666,
                     fontSize: 12
-                  }}> {tool.jbbsubstr(store_address, -18)} </Text>
+                  }}> {tool.jbbsubstr(store_address, 20)} </Text>
                 </View>
               </View>
               <If condition={!only_one_store}>
@@ -433,6 +435,7 @@ class OrderSettingScene extends Component {
 
   renderUserFrom = () => {
     let {mobile, address, smartText, name, mobile_suffix, street_block, show_smart_input} = this.state;
+
     return (
       <View
         style={{
@@ -490,7 +493,7 @@ class OrderSettingScene extends Component {
                      placeholderTextColor={'#999'}
                      value={street_block}
                      onChangeText={street_block => {
-                       this.setState({street_block});
+                       this.setState({street_block: street_block.replace(regStr, '')});
                      }}
           />
         </View>
@@ -512,7 +515,7 @@ class OrderSettingScene extends Component {
                      maxLength={10}
                      value={name}
                      onChangeText={value => {
-                       this.setState({name: value});
+                       this.setState({name: value.replace(regStr, '')});
                      }}
           />
         </View>
@@ -581,11 +584,11 @@ class OrderSettingScene extends Component {
             }}
             multiline={true}
             numberOfLines={4}
-            placeholder={show_smart_input ? "将复制的收货人信息黏贴至此，系统可自动识别。姓名电话和地址，如：任志峰 13812345678，北京市朝阳区国贸大厦"
+            placeholder={show_smart_input ? "将复制的收货人信息黏贴至此，系统可自动识别。姓名电话和地址，如：张小虎 13812345678，北京市朝阳区国贸大厦"
               : "智能地址识别"}
             placeholderTextColor={colors.color999}
             onChange={value => {
-              this.setState({smartText: value, show_smart_input: tool.length(value) > 0});
+              this.setState({smartText: value.replace(regStr, ''), show_smart_input: tool.length(value) > 0});
             }}
             value={smartText}
             underlineColorAndroid={"transparent"}

@@ -81,7 +81,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, item} = (this.props.route.params || {});
+    let {pid = 0, storeId, item} = (this.props.route.params || {});
     let {is_service_mgr, is_helper, allow_merchants_edit_prod, currVendorId} = tool.vendor(this.props.global);
 
     this.state = {
@@ -178,37 +178,8 @@ class GoodStoreDetailScene extends PureComponent {
     }
   }
 
-  getproduct() {
-    const {accessToken} = this.props.global;
-    const {product_id, store_id, vendorId, allow_merchants_edit_prod} = this.state;
-    if (allow_merchants_edit_prod) {
-      const url = `/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(url).then(res => {
-        this.props.navigation.setOptions({
-          headerRight: () => this.headerRight(res)
-        })
-      })
-    }
-  }
-
-  headerRight = (res) => {
-    return (
-      <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          onPress={() => InteractionManager.runAfterInteractions(() => {
-            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-              type: 'edit',
-              product_detail: res,
-            });
-          })}>
-          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
   getStoreProdWithProd = () => {
-    this.getproduct()
+
     const {product_id, store_id} = this.state
     const {accessToken} = this.props.global;
     global.product_id = product_id

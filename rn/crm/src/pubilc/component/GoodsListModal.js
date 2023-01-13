@@ -163,7 +163,7 @@ class GoodsListModal extends React.Component {
                       this.closeModal()
                       onPress(Config.ROUTE_GOOD_STORE_DETAIL, {pid: item?.product_id, storeId: store_id, item: item})
                     }} style={Styles.ItemRowContent}>
-                      {tool.length(item.product_img) > 0 ?
+                      {tool.length(item?.product_img) > 0 ?
                         <Image
                           style={{
                             width: 60,
@@ -177,8 +177,8 @@ class GoodsListModal extends React.Component {
                       }
                       <View style={{height: 60, flex: 1}}>
                         <Text style={Styles.ContentText}>
-                          <If condition={item.shelf_no}>{item.shelf_no} </If>
-                          {tool.jbbsubstr(item.name, 21)}
+                          <If condition={item?.shelf_no}>{item.shelf_no} </If>
+                          {tool.jbbsubstr(item?.name, 21)}
                         </Text>
                         <Text style={Styles.productIdText}>
                           #{item.product_id}

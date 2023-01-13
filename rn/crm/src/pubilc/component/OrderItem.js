@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import PropType from "prop-types";
 import Config from "../common/config";
 import {bindActionCreators} from "redux";
 import {
@@ -37,7 +36,12 @@ import {call, cross_icon, locationIcon} from "../../svg/svg";
 import FastImage from "react-native-fast-image";
 import LinearGradient from "react-native-linear-gradient";
 import JbbModal from "./JbbModal";
+import {getDeliveryList} from "../services/delivery";
+import {setCallDeliveryObj} from "../../reducers/global/globalActions";
 import JbbAlert from "./JbbAlert";
+import AgreeRefundModal from "./AgreeRefundModal";
+import RefundStatusModal from "./RefundStatusModal";
+import RefundReasonModal from "./RefundReasonModal";
 
 let width = Dimensions.get("window").width;
 
@@ -53,13 +57,15 @@ class OrderItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     accessToken: PropTypes.string,
+    vendor_id: PropTypes.number,
     order_status: PropTypes.number,
     showBtn: PropTypes.bool,
-    fetchData: PropType.func,
-    setState: PropType.func,
-    openCancelDeliveryModal: PropType.func,
-    openFinishDeliveryModal: PropType.func,
-    comesBackBtn: PropType.bool,
+    fetchData: PropTypes.func,
+    setState: PropTypes.func,
+    openCancelDeliveryModal: PropTypes.func,
+    openFinishDeliveryModal: PropTypes.func,
+    openRefundReasonModal: PropTypes.func,
+    comesBackBtn: PropTypes.bool,
   };
   state = {
     verification_modal: false,
@@ -80,13 +86,12 @@ class OrderItem extends React.PureComponent {
   }
 
   onOverlookDelivery = () => {
-    let {item} = this.props;
     this.mixpanel.track('V4订单列表_忽略配送')
-    const self = this;
+    let {item, accessToken} = this.props;
     showModal("请求中")
     tool.debounces(() => {
-      const api = `/api/transfer_arrived/${item?.id}?access_token=${this.props.accessToken}`
-      HttpUtils.get.bind(self.props.navigation)(api, {
+      const api = `/api/transfer_arrived/${item?.id}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
         orderId: item?.id
       }).then(() => {
         this.closeModal()
@@ -99,11 +104,24 @@ class OrderItem extends React.PureComponent {
     }, 600)
   }
 
-  onCallThirdShips = (order_id, store_id, if_reship = 0) => {
+  onCallThirdShips = (order_id, store_id, is_addition = 0) => {
+    let {accessToken, vendor_id} = this.props;
+    showModal('计价中')
+
+    getDeliveryList(accessToken, order_id, store_id, vendor_id, is_addition).then(async res => {
+
+      await this.props.dispatch(setCallDeliveryObj(res))
+
+    }).catch(() => {
+      ToastShort('获取失败，请重试')
+    })
+
     this.onPress(Config.ROUTE_ORDER_CALL_DELIVERY, {
       order_id: order_id,
       store_id: store_id,
-      if_reship: if_reship,
+      is_addition: is_addition,
+      type: 'redux',
+      // delivery_obj: res,
       onBack: (res) => {
         if (res && res?.count >= 0) {
           ToastShort('发配送成功')
@@ -165,9 +183,9 @@ class OrderItem extends React.PureComponent {
   }
 
   goVeriFicationToShop = () => {
-    let {item} = this.props;
+    let {item, accessToken} = this.props;
     let {pickupCode} = this.state
-    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
+    const api = `/v1/new_api/orders/order_checkout/${item?.id}?access_token=${accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(() => {
       this.closeModal();
       ToastShort(`核销成功，订单已完成`)
@@ -196,10 +214,6 @@ class OrderItem extends React.PureComponent {
   touchLocation = () => {
     let {item} = this.props;
     this.onPress(Config.RIDER_TRSJECTORY, {delivery_id: 0, order_id: item?.id})
-
-    // this.mixpanel.track('订单列表页_点击位置')
-    // const path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
-    // this.onPress(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
   }
 
   routeOrder = () => {
@@ -215,15 +229,29 @@ class OrderItem extends React.PureComponent {
         <View style={styles.ItemContent}>
           {this.renderItemHeader()}
           <View style={{padding: 12}}>
+            <If condition={tool.length(item.mt_pick_type_desc) > 0}>
+              <View style={{
+                borderRadius: 4,
+                marginBottom: 12,
+                backgroundColor: '#FFF1E3',
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#FF8309',
+                  marginVertical: 7,
+                  paddingLeft: 10
+                }}>{item?.mt_pick_type_desc} </Text>
+              </View>
+            </If>
             {this.renderUser()}
             {this.renderRemark()}
             {this.renderGoods()}
             {this.renderDeliveryDesc()}
             {this.renderDelivery()}
-            <If condition={item?.btn_list && item?.btn_list?.write_off}>
-              {this.renderVerificationBtn()}
-            </If>
-            <If condition={Number(item.pickType) !== 1 && showBtn}>
+            {this.renderRefundDesc()}
+            <If condition={item?.btn_list && showBtn}>
               {this.renderButton()}
             </If>
           </View>
@@ -390,15 +418,19 @@ class OrderItem extends React.PureComponent {
   renderItemHeader = () => {
     let {item} = this.props;
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        height: 65,
-        borderTopLeftRadius: 6,
-        borderTopRightRadius: 6,
-        backgroundColor: colors.f9
-      }}>
+      <LinearGradient
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 12,
+          height: 65,
+          borderTopLeftRadius: 6,
+          borderTopRightRadius: 6,
+          backgroundColor: colors.f9
+        }}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        colors={['#F9F9F9', '#F5F5F5']}>
 
         <If condition={!item.is_right_once}>
           <View style={{
@@ -415,7 +447,7 @@ class OrderItem extends React.PureComponent {
           </View>
         </If>
 
-        <FastImage source={{uri: item.platformIcon}}
+        <FastImage source={{uri: item?.platformIcon}}
                    resizeMode={FastImage.resizeMode.contain}
                    style={styles.platformIcon}/>
         <View style={{flex: 1, marginLeft: 10}}>
@@ -456,36 +488,27 @@ class OrderItem extends React.PureComponent {
         </View>
         <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
 
-      </View>
+      </LinearGradient>
     )
   }
 
-
-  renderVerificationBtn = () => {
-    return (
-      <View style={{
-        paddingVertical: 10,
-        marginHorizontal: 4,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        borderTopWidth: 1,
-        borderColor: colors.colorEEE
-      }}>
-        <Button title={'门店核销'}
-                onPress={() => {
-                  this.mixpanel.track('V4订单列表_到店核销')
-                  this.setState({
-                    verification_modal: true,
-                  })
-                }}
-                buttonStyle={[styles.modalBtn, {
-                  backgroundColor: colors.main_color,
-                  width: width * 0.8,
-                }]}
-                titleStyle={{color: colors.white, fontSize: 16}}
-        />
-      </View>
-    )
+  onFulfilOrder = () => {
+    let {item, accessToken} = this.props;
+    showModal("请求中")
+    tool.debounces(() => {
+      const api = `/v4/wsb_order/order_complete_pick_type_mt?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api, {
+        order_id: item?.id,
+        store_id: item?.store_id,
+      }).then(() => {
+        this.closeModal()
+        ToastShort('已完成订单')
+        this.props.fetchData();
+      }).catch(e => {
+        this.closeModal()
+        ToastShort('完成失败' + e?.desc)
+      })
+    }, 600)
   }
 
   renderUser = () => {
@@ -497,12 +520,17 @@ class OrderItem extends React.PureComponent {
         alignItems: 'center',
       }}>
         <View style={{flex: 1}}>
-          <Text style={styles.userNameText}> {item.userName} &nbsp;&nbsp;{item.mobile_readable} </Text>
+          <Text style={styles.userNameText}> {item?.userName} &nbsp;&nbsp;(尾号{item?.mobile_suffix}) </Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.color666,
+            marginVertical: 2
+          }}> {item?.mobile_readable} </Text>
           <Text style={{
             color: colors.color333,
             fontSize: 14,
             fontWeight: 'bold'
-          }}> {tool.jbbsubstr(item.address, 16)} </Text>
+          }}> {tool.jbbsubstr(item?.address, 16)} </Text>
         </View>
 
         <TouchableOpacity style={{paddingHorizontal: 10}}
@@ -597,6 +625,37 @@ class OrderItem extends React.PureComponent {
     )
   }
 
+  renderRefundDesc = () => {
+    let {item, accessToken, fetchData} = this.props;
+    if (!item?.refund_title) {
+      return null;
+    }
+    return (
+      <TouchableOpacity onPress={() => {
+        RefundStatusModal.getData(item?.id, item?.store_id, accessToken, fetchData)
+      }} style={[styles.contentHeader, {paddingTop: 12}]}>
+        <View style={{flex: 1}}>
+          <Text
+            style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.refund_title} </Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{
+              fontSize: 12,
+              color: colors.color666,
+              marginTop: 4,
+            }}>理由: </Text>
+            <Text style={{
+              flex: 1,
+              fontSize: 12,
+              color: colors.color666,
+              marginTop: 4,
+            }}>{item?.refund_reason} </Text>
+          </View>
+        </View>
+        <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color999}}/>
+      </TouchableOpacity>
+    )
+  }
+
   renderDelivery = () => {
     let {item} = this.props;
     if (!item?.is_show_ship_worker) {
@@ -607,7 +666,7 @@ class OrderItem extends React.PureComponent {
         <View style={{flex: 1}}>
           <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_status} </Text>
           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-            <Text style={{fontWeight: 'bold', fontSize: 14, color: colors.color333}}>{item?.ship_platform_name} </Text>
+            <Text style={{fontSize: 14, color: colors.color666}}>{item?.ship_platform_name} </Text>
             <Text style={{
               fontSize: 14,
               color: colors.color666
@@ -641,6 +700,42 @@ class OrderItem extends React.PureComponent {
           justifyContent: 'center',
         }}>
 
+        <If condition={item?.btn_list && item?.btn_list?.write_off}>
+          <Button title={'门店核销'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_到店核销')
+                    this.setState({
+                      verification_modal: true,
+                    })
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * 0.8,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_pick_type_complete_mt}>
+          <Button title={'自提完成'}
+                  onPress={() => {
+                    this.mixpanel.track('V4订单列表_自提完成')
+                    JbbAlert.show({
+                      title: '确认完成当前订单吗？',
+                      actionText: '确定',
+                      closeText: '取消',
+                      onPress: this.onFulfilOrder
+                    })
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.main_color,
+                    width: width * 0.8,
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 14}}
+          />
+        </If>
+
         <If condition={item?.btn_list && item?.btn_list?.btn_ignore_delivery}>
 
           <Button title={'忽略配送'}
@@ -648,9 +743,9 @@ class OrderItem extends React.PureComponent {
                     this.mixpanel.track('订单列表页_忽略配送')
 
                     JbbAlert.show({
-                      title: '忽略配送会影响配送回传，确定要忽略吗？',
+                      title: '忽略订单将会把该订单置为已完成，请选择“忽略并上传”将会上传配送信息至平台，提升回传率，避免产生回传不达标造成管控',
                       actionText: '暂不',
-                      closeText: '忽略',
+                      closeText: '忽略并上传',
                       onPressClose: this.onOverlookDelivery,
                     })
 
@@ -742,7 +837,7 @@ class OrderItem extends React.PureComponent {
           <Button title={'追加配送'}
                   onPress={() => {
                     this.mixpanel.track('V4订单列表_追加配送')
-                    this.onCallThirdShips(item.id, item.store_id)
+                    this.onCallThirdShips(item.id, item.store_id, 1)
                   }}
                   buttonStyle={[styles.modalBtn, {
                     backgroundColor: colors.main_color,
@@ -793,6 +888,36 @@ class OrderItem extends React.PureComponent {
                   titleStyle={{color: colors.white, fontSize: 16}}
           />
         </If>
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_refund_reject}>
+          <Button title={'拒绝'}
+                  onPress={() => {
+                    RefundReasonModal.fetchRefundReasonList(item?.store_id, item?.id, this.props.accessToken, this.props.fetchData)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 0.5,
+                    width: width * btn_width,
+                  }]}
+                  titleStyle={{color: colors.color666, fontSize: 16}}
+          />
+        </If>
+
+
+        <If condition={item?.btn_list && item?.btn_list?.btn_refund_agree}>
+          <Button title={'同意'}
+                  onPress={() => {
+                    AgreeRefundModal.getInfo(item?.store_id, item?.id, this.props.accessToken, this.props.fetchData)
+                  }}
+                  buttonStyle={[styles.modalBtn, {
+                    width: width * btn_width,
+                    backgroundColor: colors.main_color
+                  }]}
+                  titleStyle={{color: colors.white, fontSize: 16}}
+          />
+        </If>
+
       </View>
     )
   }
@@ -821,7 +946,6 @@ const styles = StyleSheet.create({
   userNameText: {
     fontSize: 14,
     color: colors.color666,
-    marginBottom: 4
   },
   ItemContent: {
     flexDirection: "column",
@@ -829,11 +953,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     marginHorizontal: 12,
     borderRadius: 6,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.1,
-    elevation: 3,
-    shadowRadius: 8,
   },
   modalBtn: {
     flex: 1,

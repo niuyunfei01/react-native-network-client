@@ -88,6 +88,9 @@ export const fullDateOther = (dt) => {
 export const dateTime = (dt) => {
   return dayjs(dt).format('MM-DD HH:mm:ss')
 }
+export const dateTimeShort = (dt) => {
+  return dayjs(dt).format('MM-DD HH:mm')
+}
 
 export function fullDate(dt) {
   return dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
@@ -99,6 +102,10 @@ export function fullDay(dt) {
 
 export function fullMonth(dt) {
   return dayjs(dt).format("YYYY-MM");
+}
+
+export const simpleTime = (dt) => {
+  return dayjs(dt).format('HH:mm')
 }
 
 export function vendor(global) {
@@ -540,18 +547,47 @@ function filteremoji(str) {
 
 
 function filtrationInput(str) {
-  return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5]\s/g, "")
+  return str.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5\s]/g, "")
 }
 
 export const mapImage = {
-  location: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
-  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_410.png',
-  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_410.png'
+  locations: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_410.png',
+  location_customer: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_420.png',
+  location_store: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_store_420.png',
+  location_ship: 'https://cnsc-pics.cainiaoshicai.cn/WSB-V4.0/location_ship_420.png'
 }
+
+function _shortTimeIm(datetime) {
+  let dtMoment = dayjs(datetime);
+  const nowMoment = dayjs();
+  const dSeconds = nowMoment.unix() - dtMoment.unix();
+  const dYear = nowMoment.year() - dtMoment.year();
+
+  if (dSeconds >= 0 && dSeconds < 60) {
+    if (dSeconds < 10) {
+      return "刚刚";
+    } else {
+      return `${dSeconds}秒前`;
+    }
+  } else if (dSeconds >= 0 && dSeconds < 3600) {
+    return Math.floor(dSeconds / 60) + "分钟前";
+  } else if (dYear === 0) {
+    const dDay = dayjs().diff(datetime, 'day')
+    if (dDay <= 0 && dDay >= -1) {
+      return dtMoment.format("HH:mm");
+    } else {
+      return dtMoment.format("MM-DD HH:mm");
+    }
+  } else {
+    return dtMoment.format("YYYY-MM-DD HH:mm");
+  }
+}
+
 export default {
   objectMap,
   shortTimeDesc,
   shortTimestampDesc,
+  _shortTimeIm,
   shortOrderDay,
   fullDate,
   orderOrderTimeShort,
@@ -584,5 +620,7 @@ export default {
   jbbsubstr,
   filteremoji,
   filtrationInput,
-  fullMonth
+  fullMonth,
+  simpleTime,
+  dateTimeShort
 };

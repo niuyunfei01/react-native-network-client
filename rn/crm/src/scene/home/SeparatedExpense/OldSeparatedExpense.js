@@ -1,19 +1,17 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import styles from 'rmc-picker/lib/PopupStyles';
+import {FlatList, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {List} from '@ant-design/react-native';
 import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo";
+import tool from "../../../pubilc/util/tool";
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,51 +29,59 @@ function mapDispatchToProps(dispatch) {
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    const {navigation} = props;
-    let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
-    if (wsbShowBtn) {
-      navigation.setOptions(
-        {
-          headerRight: (() => (
-              <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                <View style={{
-                  width: pxToDp(96),
-                  height: pxToDp(46),
-                  backgroundColor: colors.main_color,
-                  marginRight: 8,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}>
-                  <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-                </View>
-              </TouchableOpacity>
-            )
-          )
-        }
-      );
-    }
+
+
     let date = new Date();
     this.state = {
       records: [],
       by_labels: [],
       data_labels: [],
       date: date,
-      start_day: this.format(date)
+      start_day: tool.fullMonth(date),
+      visible: false
     }
   }
 
-  UNSAFE_componentWillMount() {
+  headerRight = () => {
+    const {navigation} = this.props;
+    return (
+      <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+        <View style={{
+          width: pxToDp(96),
+          height: pxToDp(46),
+          backgroundColor: colors.main_color,
+          marginRight: 8,
+          borderRadius: 10,
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
+          <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  componentDidMount() {
     this.fetchExpenses()
+    const {navigation, route = {}} = this.props;
+    const {params = {}} = route
+    let wsbShowBtn = params.showBtn === 1
+    if (wsbShowBtn) {
+      navigation.setOptions({headerRight: this.headerRight}
+      );
+    }
   }
 
   fetchExpenses() {
-    const self = this;
     showModal('加载中')
-    const {global} = self.props;
+    const {global} = this.props;
     const url = `api/store_separated_items_statistics/${global.store_id}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels}, () => {
+      this.setState({
+        records: res.records,
+        by_labels: res.by_labels,
+        data_labels: res.data_labels
+      }, () => {
         hideModal()
       })
     }, () => {
@@ -83,171 +89,96 @@ class SeparatedExpense extends PureComponent {
     })
   }
 
-  onHeaderStyle(record) {
-    return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
+  onChange = (event, date) => {
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({date: date, start_day: tool.fullMonth(date)}, function () {
+        this.fetchExpenses();
+      })
+    }
   }
 
-  onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
-      this.fetchExpenses();
-    })
-
-  }
-
-  format = (date) => {
-    let mday = date.getDate();
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
-  }
-
-  onDismiss() {
-  }
-
-  onItemClicked(item) {
-    let _this = this;
-    let wsbShowBtn = _this.props.route.params.showBtn && _this.props.route.params.showBtn === 1
+  onItemClicked = (item) => {
+    const {params = {}} = this.props.route
     InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {
+      this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {
         day: item.day,
         total_balanced: item.total_balanced,
-        showBtn: wsbShowBtn
+        showBtn: params.showBtn === 1
       });
     });
   }
 
-  render() {
-    const props = this.props;
-    const {date, records} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
+  renderItem = ({item}) => {
     return (
-      <ScrollView
-        style={{flex: 1, backgroundColor: '#f5f5f9'}}
-      >
-        <List
-          style={{width: "100%"}}
-          renderHeader={() => {
-            return <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: "100%",
-              backgroundColor: colors.white,
-              borderBottomWidth: pxToDp(1),
-              borderColor: '#ccc',
-              paddingVertical: pxToDp(25),
-              paddingHorizontal: pxToDp(30),
-              zIndex: 999,
-            }}>
-              <Text style={{
-                color: colors.color111,
-                flex: 1,
-                fontSize: 16,
-                fontWeight: "bold",
-              }}> 请选择月份 </Text>
-              <PopPicker
-                datePicker={datePicker}
-                transitionName="rmc-picker-popup-slide-fade"
-                maskTransitionName="rmc-picker-popup-fade"
-                styles={styles}
-                title={'选择日期'}
-                okText={'确认'}
-                dismissText={'取消'}
-                date={date}
-                onDismiss={this.onDismiss}
-                onChange={this.onChange}
-              >
-                <Text style={{
-                  color: colors.color111,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  padding: 5,
-                  width: 200,
-                  textAlign: 'right'
-                }}>
-                  {this.state.start_day} &nbsp;&nbsp;&nbsp;
-                  <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
-                </Text>
-              </PopPicker>
-            </View>
-          }}>
-          {records && records.map((item, id) => {
-            return <List.Item
-              arrow="horizontal"
-              key={id}
-              onClick={() => this.onItemClicked(item)}
-              extra={<Text
-                style={{
-                  fontSize: pxToDp(36),
-                  fontWeight: 'bold'
-                }}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
+      <TouchableOpacity onPress={() => this.onItemClicked(item)} style={style.itemWrap}>
+        <Text style={{color: colors.color333, fontSize: 12}}> {item.day} </Text>
+        <View style={style.rightWrap}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.color333}}>
+            {`${item.day_balanced / 100}` || ''}
+          </Text>
+          <AntDesign name={'right'} size={16} color={colors.color666}/>
+        </View>
+      </TouchableOpacity>
+    )
+  }
 
-            >
-              <Text style={{color: colors.color333}}> {item.day} </Text>
-            </List.Item>
-          })}
-        </List>
-      </ScrollView>
+  render() {
+    const {date, records, visible, start_day} = this.state;
+    return (
+      <View style={{backgroundColor: colors.white}}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: colors.white,
+          borderBottomWidth: pxToDp(1),
+          borderColor: '#ccc',
+          paddingVertical: pxToDp(25),
+          paddingHorizontal: pxToDp(30),
+          zIndex: 999,
+        }}>
+          <Text style={{color: colors.color111, flex: 1, fontSize: 16, fontWeight: "bold"}}> 请选择月份 </Text>
+          <Text style={{color: colors.color111, fontSize: 16, fontWeight: 'bold', padding: 5, textAlign: 'right'}}
+                onPress={() => this.setState({visible: true})}>
+            {start_day}&nbsp;&nbsp;
+            <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
+          </Text>
+        </View>
+        <FlatList data={records}
+
+                  renderItem={this.renderItem}
+                  initialNumToRender={10}
+                  keyExtractor={(item, index) => `${index}`}
+                  ItemSeparatorComponent={ItemSeparatorComponent}/>
+
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onChange(event, newDate)} date={date}/>
+
+      </View>
     )
   }
 }
 
+const ItemSeparatorComponent = () => {
+  return (
+    <View style={style.line}/>
+  )
+}
 const style = StyleSheet.create({
-  popPicker: {},
   saAmountStyle: {
     color: colors.orange,
   },
   saAmountAddStyle: {
     color: colors.main_vice_color,
   },
-  right_btn: {
-    fontSize: pxToDp(40),
-    textAlign: "center",
-    color: colors.main_color
+  itemWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 12
   },
-  chevron_right: {
-    position: "absolute",
-    right: 0,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: pxToDp(60),
-    height: pxToDp(140)
-  },
-  status: {
-    borderWidth: pxToDp(1),
-    height: pxToDp(30),
-    borderRadius: pxToDp(20),
-    width: pxToDp(68),
-    fontSize: pxToDp(16),
-    textAlign: "center",
-    justifyContent: "center",
-    color: colors.fontGray,
-    borderColor: colors.fontGray,
-    lineHeight: pxToDp(28)
-  },
-  success: {
-    color: colors.main_color,
-    borderColor: colors.main_color
-  },
-  warn: {
-    color: colors.orange,
-    borderColor: colors.orange
-  },
-  detailBox: {
-    padding: pxToDp(40),
-    backgroundColor: '#fff'
-  },
-  remarkBox: {
-    flexDirection: 'row'
-  }
+  rightWrap: {flexDirection: 'row', alignItems: 'center',},
+  line: {borderBottomColor: colors.f5, borderBottomWidth: 0.5}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeparatedExpense);

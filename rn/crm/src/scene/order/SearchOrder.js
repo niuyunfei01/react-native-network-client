@@ -15,7 +15,6 @@ import GoodsListModal from "../../pubilc/component/GoodsListModal";
 import DeliveryStatusModal from "../../pubilc/component/DeliveryStatusModal";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import AddTipModal from "../../pubilc/component/AddTipModal";
-import AlertModal from "../../pubilc/component/AlertModal";
 import PropTypes from "prop-types";
 import JbbAlert from "../../pubilc/component/JbbAlert";
 
@@ -268,9 +267,7 @@ class SearchOrder extends PureComponent {
     return (
       <View style={{backgroundColor: colors.white}}>
         <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 6}}>
-          <SvgXml style={{marginHorizontal: 4}} onPress={() => {
-            this.props.navigation.goBack()
-          }} xml={back()}/>
+          <SvgXml style={{marginHorizontal: 4}} onPress={() => this.props.navigation.goBack()} xml={back()}/>
           <SearchBar
             inputStyle={{fontSize: 14, color: colors.color333}}
             leftIconContainerStyle={{
@@ -412,10 +409,11 @@ class SearchOrder extends PureComponent {
 
   renderItem = (order) => {
     let {item, index} = order;
-    let {accessToken} = this.props.global
+    let {accessToken, vendor_id} = this.props.global
     return (
       <OrderItem showBtn={item?.show_button_list}
                  key={index}
+                 vendor_id={vendor_id}
                  fetchData={() => this.onRefresh()}
                  item={item}
                  accessToken={accessToken}

@@ -1,5 +1,16 @@
 import React, {Component} from "react"
-import {Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native"
+import {
+  Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Dimensions,
+  Platform
+} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
@@ -8,17 +19,18 @@ import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import PropTypes from "prop-types";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Scanner from "../../../pubilc/component/Scanner";
-import {addGoods, scan, search} from "../../../svg/svg";
+import {addGoods, right, scan, search} from "../../../svg/svg";
 import {SvgXml} from "react-native-svg";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {setSGCategory} from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
+import TopSelectModal from "../../../pubilc/component/TopSelectModal";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -37,6 +49,8 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
+const marTop = Platform.select({android: 88, ios: 74})
 
 class StoreGoodsList extends Component {
 
@@ -82,6 +96,9 @@ class StoreGoodsList extends Component {
       onStrict: false,
       showScan: false,
       showScanType: 'add',//add-扫码新建，search-扫码搜索
+      in_audit: 0,
+      no_pass_audit: 0,
+      fail_audit: 0
     }
   }
 
@@ -108,53 +125,66 @@ class StoreGoodsList extends Component {
   }
 
   restart() {
-    if (GlobalUtil.getGoodsFresh() === 2) {
-      GlobalUtil.setGoodsFresh(1)
-      this.onRefresh()
-      return;
-    }
+    this.onRefresh()
     this.fetchGoodsCount()
   }
 
   fetchGoodsCount() {
-    const {store_id, accessToken, vendor_id} = this.props.global;
+    const {store_id, accessToken, vendor_id, vendor_info} = this.props.global;
+    const {show_audit_prod} = vendor_info
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${store_id}?access_token=${accessToken}`,).then(res => {
+    const {selectedStatus} = this.state
+    const url = `/api/count_products_with_status/${store_id}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url,).then(res => {
       let newStatusList
-      if (res.strict_providing === '1') {
+      const {
+        all = 0, in_stock = 0, out_of_stock = 0, in_stock_but_nil = 0, new_arrivals = 0, common_provided = 0,
+        self_provided = 0, no_img = 0, in_audit = 0, no_pass_audit = 0, fail_audit = 0, strict_providing = 0
+      } = res
+      if (strict_providing === '1') {
         newStatusList = [
-          {label: '全部 ' + res.all, value: 'all'},
-          {label: '上架 ' + res.in_stock, value: 'in_stock'},
-          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '售罄 ' + (res.in_stock_but_nil ?? '0'), value: 'in_stock_but_nil'},
-          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
-          {label: '总部供货 ' + res.common_provided, value: 'common_provided'},
-          {label: '门店自采 ' + res.self_provided, value: 'self_provided'},
+          {label: '全部 ' + all, value: 'all'},
+          {label: '上架 ' + in_stock, value: 'in_stock'},
+          {label: '下架 ' + out_of_stock, value: 'out_of_stock'},
+          {label: '售罄 ' + in_stock_but_nil, value: 'in_stock_but_nil'},
+          {label: '最近上新 ' + new_arrivals, value: 'new_arrivals'},
+          {label: '总部供货 ' + common_provided, value: 'common_provided'},
+          {label: '门店自采 ' + self_provided, value: 'self_provided'},
         ]
       } else {
         newStatusList = [
-          {label: '全部 ' + res.all, value: 'all'},
-          {label: '上架 ' + res.in_stock, value: 'in_stock'},
-          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'}
+          {label: '全部 ' + all, value: 'all'},
+          {label: '上架 ' + in_stock, value: 'in_stock'},
+          {label: '下架 ' + out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 ' + new_arrivals, value: 'new_arrivals'}
         ]
       }
-      if (114 === vendor_id && res.no_img)
+      if (114 === vendor_id && no_img)
         newStatusList = [
-          {label: '全部 ' + res.all, value: 'all'},
-          {label: '缺失图片 ' + (res.no_img ?? '0'), value: 'no_img'},
-          {label: '上架 ' + res.in_stock, value: 'in_stock'},
-          {label: '下架 ' + res.out_of_stock, value: 'out_of_stock'},
-          {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+          {label: '全部 ' + all, value: 'all'},
+          {label: '缺失图片 ' + no_img, value: 'no_img'},
+          {label: '上架 ' + in_stock, value: 'in_stock'},
+          {label: '下架 ' + out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 ' + new_arrivals, value: 'new_arrivals'},
         ]
+      if (show_audit_prod == 1) {
+        newStatusList.push({label: '审核中 ' + in_audit, value: 'in_audit'})
+        newStatusList.push({label: '未通过 ' + no_pass_audit, value: 'no_pass_audit'})
+        newStatusList.push({label: '失败 ' + fail_audit, value: 'fail_audit'})
+      }
+      if (!selectedStatus) {
+        this.setState({selectedStatus: newStatusList[0]})
+      }
       this.setState({
         statusList: newStatusList,
         showStatusList: newStatusList.length > 4 ? newStatusList.slice(0, 4) : newStatusList,
-        selectedStatus: newStatusList[0],
         all_amount: res.all_amount,
         all_count: res.all_count,
         inventorySummary: res,
-        onStrict: res.strict_providing === '1'
+        in_audit: in_audit,
+        no_pass_audit: no_pass_audit,
+        fail_audit: fail_audit,
+        onStrict: strict_providing === '1'
       }, () => {
         this.fetchCategories(store_id, prod_status, accessToken)
       })
@@ -166,8 +196,8 @@ class StoreGoodsList extends Component {
 
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
-    const selectedStatus = this.state.selectedStatus.value
-    const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus}?access_token=${accessToken}`
+    const {selectedStatus = {}} = this.state
+    const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus.value}?access_token=${accessToken}`
     const params = {
       hideAreaHot: hideAreaHot,
       is_get_all: 1
@@ -216,17 +246,20 @@ class StoreGoodsList extends Component {
       pageSize: pageNum,
       storeId: store_id,
     }
+
     if (store_id) {
       params['hideAreaHot'] = 1;
       params['limit_status'] = (prod_status || []).join(",");
     }
-    if (isRefreshItem)
-      params.pid = selectedProduct.id
+    if (isRefreshItem) {
+      params.pid = selectedProduct?.id || goods[0]?.id
+      params.page = 1
+    }
     const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       const {lists = [], isLastPage = false} = res
       if (isRefreshItem) {
-        const index = goods.findIndex(item => item.id === selectedProduct.id)
+        const index = goods.findIndex(item => item.id === params.pid)
         if (Array.isArray(lists) && lists.length > 0)
           goods[index] = lists[0]
         this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
@@ -265,6 +298,11 @@ class StoreGoodsList extends Component {
   }
 
   onRefresh = () => {
+    const status = global.currentRouteName !== 'Goods'
+    if (status) {
+      this.search(status ? 1 : 0, status)//如果global.currentRouteName的值不是当前页面，只刷新某一个值
+      return
+    }
     this.setState({page: 1}, () => {
       this.search()
     })
@@ -296,9 +334,10 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
-  gotoGoodDetail = (pid) => {
+  gotoGoodDetail = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-      pid: pid,
+      pid: item.id,
       storeId: this.props.global.store_id,
       // updatedCallback: this.doneProdUpdate
     })
@@ -441,6 +480,27 @@ class StoreGoodsList extends Component {
       )
   }
 
+  jumpToGoodsAudit = () => {
+    this.props.navigation.navigate(Config.ROUTE_GOODS_AUDIT)
+  }
+  renderTip = () => {
+    const {fail_audit, no_pass_audit} = this.state
+    if (fail_audit || no_pass_audit)
+      return (
+
+        <View style={{backgroundColor: colors.white}}>
+          <TouchableOpacity style={styles.tipWrap} onPress={this.jumpToGoodsAudit}>
+            <Text style={{fontSize: 12, color: '#FF8309', lineHeight: 17, width: 0.62 * width}}>
+              有<If condition={no_pass_audit}>{no_pass_audit}个商品未通过，</If><If
+              condition={fail_audit}>有{fail_audit}个商品审核失败</If>，请立即处理
+            </Text>
+            <SvgXml xml={right(20, 20, '#FF8309')}/>
+          </TouchableOpacity>
+        </View>
+      )
+    return null
+  }
+
   render() {
 
     const {accessToken, store_id, vendor_id} = this.props.global;
@@ -458,26 +518,31 @@ class StoreGoodsList extends Component {
                 {this.renderCategories()}
               </ScrollView>
             </View>
-            <FlatList
-              data={goods}
-              style={{flex: 1}}
-              legacyImplementation={false}
-              directionalLockEnabled={true}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              onEndReachedThreshold={0.5}
-              onEndReached={this.onEndReached}
-              onMomentumScrollBegin={this.onMomentumScrollBegin}
-              onTouchMove={(e) => this.onTouchMove(e)}
-              renderItem={this.renderItem}
-              onRefresh={this.onRefresh}
-              refreshing={false}
-              keyExtractor={this._keyExtractor}
-              shouldItemUpdate={this._shouldItemUpdate}
-              getItemLayout={this._getItemLayout}
-              initialNumToRender={5}
-              ListFooterComponent={this.listFooterComponent()}
-            />
+            <View style={{flex: 1}}>
+              {this.renderTip()}
+              <FlatList
+                ref={ref => this.listRef = ref}
+                data={goods}
+                style={{flex: 1}}
+                legacyImplementation={false}
+                directionalLockEnabled={true}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                onEndReachedThreshold={0.5}
+                onEndReached={this.onEndReached}
+                onMomentumScrollBegin={this.onMomentumScrollBegin}
+                onTouchMove={(e) => this.onTouchMove(e)}
+                renderItem={this.renderItem}
+                onRefresh={this.onRefresh}
+                refreshing={false}
+                keyExtractor={this._keyExtractor}
+                shouldItemUpdate={this._shouldItemUpdate}
+                getItemLayout={this._getItemLayout}
+                initialNumToRender={5}
+                ListFooterComponent={this.listFooterComponent()}
+              />
+            </View>
+
 
           </View>
           {this.getBottomButton()}
@@ -535,65 +600,72 @@ class StoreGoodsList extends Component {
   }
 
   selectGoodsStatus = (item, index) => {
-    const {statusList} = this.state
+    const {statusList, goods} = this.state
+    if (index)
+      this.scrollRef.scrollTo({x: index * 0.224 * width, y: 0, animated: true})
+    if (goods.length > 0)
+      this.listRef.scrollToIndex({index: 0, animated: true})
     if (index > 3) {
 
-      this.setState({selectedStatus: item, showStatusList: statusList.slice(3)})
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(3), showMoreGoodsStatus: false})
       this.onSelectStatus()
+
       return
     }
     if (index <= 3) {
-      this.setState({selectedStatus: item, showStatusList: statusList.slice(0, 4)})
+      this.setState({selectedStatus: item, showStatusList: statusList.slice(0, 4), showMoreGoodsStatus: false})
       this.onSelectStatus()
       return;
     }
-    this.setState({selectedStatus: item})
+    this.setState({selectedStatus: item, showMoreGoodsStatus: false})
     this.onSelectStatus()
   }
 
   renderGoodsStatus = () => {
-    const {statusList, showStatusList, selectedStatus, showMoreGoodsStatus} = this.state
+    const {statusList, selectedStatus, showMoreGoodsStatus} = this.state
     return (
       <>
-        <View style={styles.headerGoodsStatusWrap}>
-          {
-            showStatusList.map((item, index) => {
-              const isSelect = selectedStatus.value === item.value
-              return (
-                <View key={index} style={isSelect ? styles.selectGoodsStatusWrap : styles.goodsStatusWrap}>
-                  <Text onPress={() => this.selectGoodsStatus(item)}
-                        style={isSelect ? styles.selectGoodsStatusText : styles.goodsStatusText}>
-                    {item.label}
-                  </Text>
-                </View>
-              )
-            })}
-          <If condition={statusList.length > 4}>
-            <AntDesign name={showMoreGoodsStatus ? 'up' : 'down'}
-                       size={16}
-                       color={colors.color999}
-                       style={{marginRight: 10}}
-                       onPress={() => this.setState({showMoreGoodsStatus: !showMoreGoodsStatus})}/>
-          </If>
-        </View>
-        <If condition={showMoreGoodsStatus}>
-          <View style={styles.showMoreGoodsStatusZone}>
+        <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white,}}>
+          <ScrollView style={styles.headerGoodsStatusWrap}
+                      horizontal={true}
+                      ref={ref => this.scrollRef = ref}
+                      automaticallyAdjustContentInsets={false}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}>
             {
               statusList.map((item, index) => {
                 const isSelect = selectedStatus.value === item.value
                 return (
-                  <TouchableOpacity key={index}
-                                    style={isSelect ? styles.selectShowMoreGoodsStatusWrap : styles.showMoreGoodsStatusWrap}
-                                    onPress={() => this.selectGoodsStatus(item, index)}>
-                    <Text style={isSelect ? styles.selectShowMoreGoodsStatusText : styles.showMoreGoodsStatusText}>
+                  <View key={index} style={isSelect ? styles.selectGoodsStatusWrap : styles.goodsStatusWrap}>
+                    <Text onPress={() => this.selectGoodsStatus(item)}
+                          style={isSelect ? styles.selectGoodsStatusText : styles.goodsStatusText}>
                       {item.label}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                 )
-              })
-            }
-          </View>
-        </If>
+              })}
+
+          </ScrollView>
+          <If condition={statusList.length > 4}>
+            <AntDesign name={showMoreGoodsStatus ? 'up' : 'down'}
+                       size={16}
+                       color={colors.color999}
+                       style={{marginRight: 10, marginLeft: 4}}
+                       onPress={() => this.setState({showMoreGoodsStatus: !showMoreGoodsStatus})}/>
+          </If>
+        </View>
+        <TopSelectModal visible={showMoreGoodsStatus}
+                        list={statusList}
+                        initialNumToRender={10}
+                        numColumns={4}
+                        marTop={marTop}
+                        default_val={selectedStatus.value}
+                        selectWrap={styles.selectShowMoreGoodsStatusWrap}
+                        warp={styles.showMoreGoodsStatusWrap}
+                        selectTextStyle={styles.selectShowMoreGoodsStatusText}
+                        textStyle={styles.showMoreGoodsStatusText}
+                        onPress={(item, index) => this.selectGoodsStatus(item, index)}
+                        onClose={() => this.setState({showMoreGoodsStatus: !showMoreGoodsStatus})}/>
       </>
     )
   }
@@ -657,7 +729,7 @@ class StoreGoodsList extends Component {
   }
 
   opBar = (onSale, onStrict, item, price_type) => {
-
+    const {vendor_info} = this.props.global
     if ('' === item.coverimg) {
       return (
         <View style={[styles.row_center]}>
@@ -671,20 +743,10 @@ class StoreGoodsList extends Component {
 
     return (
       <View style={[styles.row_center]}>
-        <If condition={onSale}>
-          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', item)}>
-            <Text style={styles.goodsOperationBtn}>下架 </Text>
-          </TouchableOpacity>
-        </If>
-        <If condition={!onSale}>
-          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', item)}>
-            <Text style={styles.goodsOperationBtn}>上架 </Text>
-          </TouchableOpacity>
-        </If>
         <If condition={onStrict}>
           <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
-                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+                              onPress={() => this.jumpToNewRetailPriceScene(item)}>
               <Text style={styles.goodsOperationBtn}>价格/库存 </Text>
             </TouchableOpacity>
           </If>
@@ -698,7 +760,7 @@ class StoreGoodsList extends Component {
         <If condition={!onStrict}>
           <If condition={price_type}>
             <TouchableOpacity style={[styles.toOnlineBtn]}
-                              onPress={() => this.jumpToNewRetailPriceScene(item.id)}>
+                              onPress={() => this.jumpToNewRetailPriceScene(item)}>
               <Text style={styles.goodsOperationBtn}>价格 </Text>
             </TouchableOpacity>
           </If>
@@ -708,17 +770,47 @@ class StoreGoodsList extends Component {
             </TouchableOpacity>
           </If>
         </If>
+        <If condition={onSale}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', item)}>
+            <Text style={styles.goodsOperationBtn}>下架 </Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={!onSale}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', item)}>
+            <Text style={styles.goodsOperationBtn}>上架 </Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={vendor_info?.allow_merchants_edit_prod == 1}>
+          <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.jumpToGoodsEditPage(item)}>
+            <Text style={styles.goodsOperationBtn}>编辑</Text>
+          </TouchableOpacity>
+        </If>
+
       </View>
     )
   }
 
-  jumpToNewRetailPriceScene = (id) => {
+  jumpToGoodsEditPage = async (item) => {
+    await this.setState({selectedProduct: item})
+    let {navigation, global} = this.props;
+    const {store_id, accessToken, vendor_id} = global
+    const url = `/api/get_product_detail/${item.id}/${vendor_id}/${store_id}?access_token=${accessToken}`
+    showModal('加载中')
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      hideModal()
+      navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'edit', product_detail: res});
+    })
+
+  }
+  jumpToNewRetailPriceScene = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ORDER_RETAIL_PRICE_NEW, {
-      productId: id
+      productId: item.id
     })
   }
 
-  gotoAddMissingPicture = (item) => {
+  gotoAddMissingPicture = async (item) => {
+    await this.setState({selectedProduct: item})
     this.props.navigation.navigate(Config.ROUTE_ADD_MISSING_PICTURE, {goodsInfo: item})
   }
   renderItem = (order) => {
@@ -728,7 +820,7 @@ class StoreGoodsList extends Component {
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={item.id}
-                    onPressImg={() => this.gotoGoodDetail(item.id)}
+                    onPressImg={() => this.gotoGoodDetail(item)}
                     price_type={price_type}
                     opBar={this.opBar(onSale, onStrict, item, price_type)}
       />
@@ -737,25 +829,56 @@ class StoreGoodsList extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
-
+const {width, height} = Dimensions.get('window')
 const styles = StyleSheet.create({
-  showMoreGoodsStatusZone: {flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
+  tipWrap: {
+    backgroundColor: '#FFEEDD',
+    borderRadius: 4,
+    marginLeft: 10,
+    marginRight: 12,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  showMoreGoodsStatusZone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    backgroundColor: colors.white
+  },
   selectShowMoreGoodsStatusWrap: {
     backgroundColor: colors.main_color,
     borderRadius: 2,
-    width: 101,
-    marginLeft: 10,
-    marginBottom: 6
+    width: 0.224 * width,
+    height: 0.0369 * height,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginLeft: 7
   },
   showMoreGoodsStatusWrap: {
     backgroundColor: colors.colorEEE,
     borderRadius: 2,
-    width: 101,
-    marginLeft: 10,
-    marginBottom: 6
+    width: 0.224 * width,
+    height: 0.0369 * height,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginLeft: 7
   },
-  selectShowMoreGoodsStatusText: {color: colors.white, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
-  showMoreGoodsStatusText: {color: colors.color333, paddingVertical: 3, paddingHorizontal: 2, textAlign: 'center'},
+  selectShowMoreGoodsStatusText: {
+    fontSize: 12,
+    color: colors.white,
+    textAlign: 'center'
+  },
+  showMoreGoodsStatusText: {
+    fontSize: 12,
+    color: colors.color333,
+    textAlign: 'center'
+  },
   selectCategoryChildrenWrap: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -790,9 +913,7 @@ const styles = StyleSheet.create({
   page: {flex: 1},
   headerGoodsStatusWrap: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.white,
+
     paddingLeft: 10,
     paddingVertical: 8,
 
@@ -889,7 +1010,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 8,
     marginRight: 4,
-    borderRadius: 2,
+    borderRadius: 4,
     flex: 1
   },
   activeCategoriesText: {

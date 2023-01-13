@@ -33,6 +33,7 @@ import DatePicker from "react-native-date-picker";
 import {MixpanelInstance} from "../../pubilc/util/analytics";
 import CancelDeliveryModal from "../../pubilc/component/CancelDeliveryModal";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
+import store from "../../pubilc/util/configureStore";
 import JbbAlert from "../../pubilc/component/JbbAlert";
 // import {setCallDeliveryList} from "../../reducers/global/globalActions";
 
@@ -65,6 +66,7 @@ class OrderCallDelivery extends Component {
   constructor(props: Object) {
     super(props);
     let {order_id, store_id, if_reship, address_id} = this.props.route.params;
+    let is_addition = this.props.route.params?.is_addition || 0;
     // let {call_delivery_list} = this.props.global
     this.state = {
       loading: false,
@@ -72,6 +74,7 @@ class OrderCallDelivery extends Component {
       store_id: store_id,
       if_reship: if_reship,
       address_id: address_id,
+      is_addition: is_addition,
       store_est: [],
       est: [],
       exist_waiting_delivery: [],
@@ -132,16 +135,39 @@ class OrderCallDelivery extends Component {
 
   }
 
-  componentWillUnmount() {
-    this.focus()
+  componentDidMount() {
+    hideModal()
+    this.unSubscribe = store.subscribe(() => {
+      this.setData(store.getState()?.global?.call_delivery_obj || [])
+    })
+    this.onCreate().then()
   }
 
-  componentDidMount() {
+  componentWillUnmount() {
+    this.focus()
+    this.unSubscribe()
+  }
+
+  onCreate = async () => {
     this.fetchWorker();
+    let type = this.props.route.params?.type;
+    if (type === 'redux') {
+      await this.setState({
+        loading: true
+      })
+    }
+    // if (tool.length(delivery_obj) > 0) {
+    //   await this.setState({
+    //     loading: true
+    //   }, () => {
+    //     this.setData(delivery_obj)
+    //   })
+    // }
     this.focus = this.props.navigation.addListener('focus', () => {
       this.fetchData()
     })
   }
+
 
   fetchWorker() {
     const {store_id, accessToken} = this.props.global;
@@ -155,7 +181,7 @@ class OrderCallDelivery extends Component {
     })
   }
 
-  fetchData = () => {
+  fetchData = (refresh = false) => {
     let {
       order_id,
       weight,
@@ -165,6 +191,7 @@ class OrderCallDelivery extends Component {
       order_money,
       params_str,
       loading,
+      is_addition
     } = this.state;
     let {accessToken, vendor_id, store_id} = this.props.global;
     let params = {
@@ -175,10 +202,11 @@ class OrderCallDelivery extends Component {
       order_money,
       vendor_id,
       store_id,
+      is_addition
     }
 
     let params_json_str = JSON.stringify(params);
-    if (params_str === params_json_str || loading) {
+    if ((params_str === params_json_str || loading) && !refresh) {
       return;
     }
     this.setState({
@@ -191,16 +219,20 @@ class OrderCallDelivery extends Component {
   }
 
   setData = (obj, params_json_str = '{}') => {
+    if (tool.length(obj) <= 0) {
+      return this.fetchData(1);
+    }
     let {logistic_fee_map} = this.state;
     let store_est = obj?.store_est || [];
     let est = obj?.est || [];
     if (tool.length(logistic_fee_map) > 0 && (tool.length(est) > 0 || tool.length(store_est) > 0)) {
+
       let check = false
       for (let i in logistic_fee_map) {
         if (logistic_fee_map[i]?.paid_partner_id === 0 && tool.length(est) > 0) {
           for (let idx in est) {
             if (est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
-              est[idx].ischeck = true
+              est[idx].checked = true
               check = true
             }
           }
@@ -209,7 +241,7 @@ class OrderCallDelivery extends Component {
           for (let idx in store_est) {
             if (store_est[idx]?.logisticCode === logistic_fee_map[i]?.logistic_code) {
 
-              store_est[idx].ischeck = true
+              store_est[idx].checked = true
               check = true
             }
           }
@@ -218,8 +250,44 @@ class OrderCallDelivery extends Component {
           logistic_fee_map.splice(i, 1)
         }
       }
+    } else {
+      logistic_fee_map = [];
+
+      for (let idx in est) {
+        // est[idx].checked = true
+        if (est[idx]?.checked) {
+          let check_logistic = {
+            logistic_code: est[idx]?.logisticCode,
+            paid_partner_id: est[idx]?.fee_by
+          }
+          logistic_fee_map.push(check_logistic)
+        }
+      }
+
+      for (let idx in store_est) {
+        // store_est[idx].checked = true
+        if (store_est[idx]?.checked) {
+          for (let key in logistic_fee_map) {
+            if (logistic_fee_map[key]?.logistic_code === store_est[idx]?.logisticCode) {
+              for (let i in est) {
+                if (est[i]?.logisticCode === logistic_fee_map[key]?.logistic_code) {
+                  est[i].checked = false;
+                }
+              }
+              logistic_fee_map.splice(key, 1)
+            }
+          }
+
+          let check_logistic = {
+            logistic_code: store_est[idx]?.logisticCode,
+            paid_partner_id: store_est[idx]?.fee_by
+          }
+          logistic_fee_map.push(check_logistic)
+        }
+      }
     }
     this.setState({
+      logistic_fee_map: logistic_fee_map,
       params_str: params_json_str,
       is_only_show_self_delivery: Boolean(obj?.is_only_show_self_delivery),
       store_est: store_est,
@@ -263,7 +331,7 @@ class OrderCallDelivery extends Component {
     let show_store_est_all_check = false;
 
     for (let info of est) {
-      if (info?.ischeck) {
+      if (info?.checked) {
         wayNums += 1;
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
@@ -280,7 +348,7 @@ class OrderCallDelivery extends Component {
     }
 
     for (let info of store_est) {
-      if (info?.ischeck) {
+      if (info?.checked) {
         wayNums += 1;
         if (wayNums === 1) {
           minPrice = maxPrice = info?.delivery_fee
@@ -304,7 +372,7 @@ class OrderCallDelivery extends Component {
       store_est_all_check: store_est_all_check,
       show_est_all_check: show_est_all_check,
       show_store_est_all_check: show_store_est_all_check,
-    })
+    }, () => hideModal())
   }
 
   onPress = (route, params = {}) => {
@@ -413,7 +481,7 @@ class OrderCallDelivery extends Component {
             }
           })
         }
-        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "insufficient-balance1") {
+        if (tool.length(res?.obj?.fail_code) > 0 && res?.obj?.fail_code === "fail-price-verification") {
           JbbAlert.show({
             title: '价格变更',
             desc: '价格有变更，点击查询最新计价',
@@ -473,7 +541,7 @@ class OrderCallDelivery extends Component {
     let bool = type === 1 ? !est_all_check : !store_est_all_check;
     if (cancel === 1) bool = false;
     for (let i in list) {
-      list[i].ischeck = bool;
+      list[i].checked = bool;
     }
 
     let check = false
@@ -481,7 +549,7 @@ class OrderCallDelivery extends Component {
     for (let idx in list) {
       for (let i in lists) {
         if (lists[i]?.logisticCode === list[idx]?.logisticCode) {
-          lists[i].ischeck = false;
+          lists[i].checked = false;
         }
       }
       check = false
@@ -524,17 +592,17 @@ class OrderCallDelivery extends Component {
     }
     let list = type === 0 ? est : store_est;
     let lists = type === 0 ? store_est : est
-    item.ischeck = item?.ischeck !== undefined ? !item?.ischeck : true;
+    item.checked = item?.checked !== undefined ? !item?.checked : true;
     list[key] = item;
     let check = false
     for (let idx in logistic_fee_map) {
       if (logistic_fee_map[idx]?.logistic_code === item?.logisticCode) {
         check = true;
-        if (item.ischeck) {
+        if (item.checked) {
 
           for (let i in lists) {
             if (lists[i]?.logisticCode === item?.logisticCode) {
-              lists[i].ischeck = false;
+              lists[i].checked = false;
             }
           }
           logistic_fee_map[idx].paid_partner_id = item?.fee_by
@@ -608,9 +676,9 @@ class OrderCallDelivery extends Component {
             </If>
             <If condition={!is_only_show_self_delivery}>
               {this.renderCancelDelivery()}
+              {this.renderStoreDelivery()}
               {this.renderWsbDelivery()}
               {this.renderNoDelivery()}
-              {this.renderStoreDelivery()}
               {this.renderOwnDelivery()}
             </If>
           </If>
@@ -762,8 +830,8 @@ class OrderCallDelivery extends Component {
   }
 
   renderNoDelivery = () => {
-    let {store_est, est} = this.state
-    if (tool.length(est) > 0 || tool.length(store_est) > 0) {
+    let {store_est, est, exist_waiting_delivery} = this.state
+    if (tool.length(est) > 0 || tool.length(store_est) > 0 || tool.length(exist_waiting_delivery) > 0) {
       return;
     }
     return (
@@ -957,7 +1025,7 @@ class OrderCallDelivery extends Component {
                 top: 0,
                 position: 'relative',
               }}
-              checked={item?.ischeck}
+              checked={item?.checked}
               onPress={() => {
                 this.onSelectDelivey(item, key, type)
               }}
@@ -1041,6 +1109,16 @@ class OrderCallDelivery extends Component {
     )
   }
 
+  openAddTipModal = () => {
+    let {logistic_fee_map} = this.state;
+    if (tool.length(logistic_fee_map) === 1 && Number(logistic_fee_map[0]?.logistic_code) === 3) {
+      return ToastShort('美团快速达不支持加小费');
+    }
+
+    this.setState({
+      show_add_tip_modal: true
+    })
+  }
   renderBtn = () => {
     let {
       is_alone_pay_vendor,
@@ -1108,11 +1186,7 @@ class OrderCallDelivery extends Component {
               {order_money}元&nbsp;
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              show_add_tip_modal: true
-            })
-          }} style={{
+          <TouchableOpacity onPress={this.openAddTipModal} style={{
             height: iron_width,
             width: iron_width,
             borderRadius: 4,

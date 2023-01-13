@@ -152,24 +152,19 @@ class SeparatedAccountFill extends PureComponent {
       payMoney = customMoney
     const url = `/api/gen_pay_app_order/${payMoney}/alipay-app.json?access_token=${accessToken}&vendor_id=${vendor_id}&store_id=${store_id}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
-      hideModal();
       const resule = await Alipay.alipay(res.result);
       if (resule.resultStatus === '4000') {
         ToastLong("请先安装支付宝应用")
       } else if (resule.resultStatus === "9000") {
         ToastShort("支付成功")
-        this.PayCallback()
+        this.fetchBalance();
       } else {
         ToastLong(`支付失败`);
-        this.PayCallback()
+        
       }
     }, () => {
       hideModal();
     })
-  }
-
-  PayCallback = () => {
-    this.props.navigation.goBack()
   }
 
   wechatPay = () => {
@@ -195,11 +190,11 @@ class SeparatedAccountFill extends PureComponent {
             wechat.pay(params).then((requestJson) => {
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                this.PayCallback()
+                this.fetchBalance();
               }
             }).catch(() => {
               ToastLong(`支付失败`);
-              this.PayCallback()
+
             });
           });
         } else {

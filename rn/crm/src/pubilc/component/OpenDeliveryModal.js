@@ -1,12 +1,20 @@
 import React, {PureComponent} from "react";
-import {InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  InteractionManager,
+  KeyboardAvoidingView, Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import CommonModal from "./goods/CommonModal";
 import {connect} from "react-redux";
 import Config from "../common/config";
 import {SvgXml} from "react-native-svg";
 import {closeNew, rightCheck} from "../../svg/svg";
 import colors from "../styles/colors";
-import {showError, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import {showError, ToastLong, ToastShort} from "../util/ToastUtils";
 import HttpUtils from "../util/http";
 import {JumpMiniProgram} from "../util/WechatUtils";
 import tool from "../util/tool";
@@ -67,6 +75,7 @@ const styles = StyleSheet.create({
 })
 
 let bottomButton = '立即开通'
+const behavior = Platform.select({android: 'height', ios: 'padding'})
 
 class OpenDeliveryModal extends PureComponent {
 
@@ -74,11 +83,11 @@ class OpenDeliveryModal extends PureComponent {
     super(props);
     const {open_type} = props.delivery
     this.state = {
-      mobile: '',//手机号
+      mobile: null,//手机号
       verificationCode: '',//验证码
-      count_down: '',//倒计时
+      count_down: null,//倒计时
       selectGeneralDelivery: true,
-      selectAccountType: open_type === 3 || open_type === 1 ? 1 : open_type === 2 ? 2 : 0,//1-选择外送帮 2-选择自有
+      selectAccountType: open_type === 1 ? 1 : open_type === 3 || open_type === 2 ? 2 : 0,//1-选择外送帮 2-选择自有
       headerText: '开通运力'
     }
   }
@@ -142,33 +151,8 @@ class OpenDeliveryModal extends PureComponent {
 
   getGxdPhoneCode = () => {
     let {accessToken} = this.props.global
-    let {phone, count_down} = this.state
+    let {mobile, count_down} = this.state
     const {store_id} = this.props
-    if (count_down <= 0) {
-      HttpUtils.post(`/v1/new_api/Delivery/get_gxd_code?access_token=${accessToken}`, {
-        store_id: store_id,
-        phone: phone
-      }).then(res => {
-        ToastShort(res.desc, 100)
-      }).catch((reason) => {
-        ToastShort(reason.desc, 100)
-      })
-    }
-  }
-  getUUPTPhoneCode = () => {
-    let {accessToken, vendor_id} = this.props.global
-    let {mobile, count_down} = this.state;
-    if (count_down <= 0) {
-      const params = {access_token: accessToken, vendorId: vendor_id}
-      HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(res => {
-        ToastShort(res.desc, 100)
-      }).catch((reason) => {
-        ToastShort(reason.desc, 100)
-      })
-    }
-  }
-  getVerificationCode = () => {
-    const {mobile, deliveryType, count_down} = this.state
     if (!mobile) {
       ToastShort('请输入手机号', 100)
       return
@@ -177,18 +161,51 @@ class OpenDeliveryModal extends PureComponent {
       ToastShort('请稍后重试', 100)
       return
     }
-    showSuccess('验证码发送成功！', 100)
-    if (deliveryType === Config.UU_PAO_TUI)
+    const params = {store_id: store_id, phone: mobile}
+    HttpUtils.post(`/v1/new_api/Delivery/get_gxd_code?access_token=${accessToken}`, params).then(() => {
+      ToastShort('发送成功', 1)
+      this.startCountDown(60)
+    }).catch((error) => {
+      ToastShort(error.desc, 1)
+    })
+  }
+  getUUPTPhoneCode = () => {
+    let {accessToken, vendor_id} = this.props.global
+    let {mobile, count_down} = this.state;
+    if (!mobile) {
+      ToastShort('请输入手机号', 100)
+      return
+    }
+    if (count_down > 0) {
+      ToastShort('请稍后重试', 100)
+      return
+    }
+    const params = {access_token: accessToken, vendorId: vendor_id}
+    HttpUtils.get(`/uupt/message_authentication/${mobile}`, params).then(({return_msg}) => {
+      ToastShort(return_msg, 100)
+      this.startCountDown(60)
+    }).catch((error) => {
+      ToastShort(error.desc, 100)
+    })
+  }
+  getVerificationCode = () => {
+    const {deliveryType} = this.props
+    if (deliveryType == Config.UU_PAO_TUI) {
       this.getUUPTPhoneCode()
-    if (deliveryType === Config.GUO_XIAO_DI)
+      return
+    }
+    if (deliveryType == Config.GUO_XIAO_DI)
       this.getGxdPhoneCode()
-    this.startCountDown(60)
   }
   setCountdown = (count_down) => {
     this.setState({
       count_down: count_down
     });
   }
+  componentWillUnmount() {
+    this.interval && clearInterval(this.interval)
+  }
+
   startCountDown = (code = 60) => {
     this.interval = setInterval(() => {
       code = code - 1
@@ -248,17 +265,14 @@ class OpenDeliveryModal extends PureComponent {
     let data = {store_id: store_id, platform: v2_type, delivery_id: id}
     const url = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
     HttpUtils.post(url, data).then(async () => {
-      await this.closeModal()
-
       if (Config.FENG_NIAO_ZHONG_BAO == delivery.type)
         ToastShort('申请成功，审核中')
       else ToastShort('开通成功')
-
       refreshDeliveryList && refreshDeliveryList()
-    }, async (ret) => {
       await this.closeModal()
+    }, async (ret) => {
       ToastLong(ret.desc);
-
+      await this.closeModal()
     })
   }
   // 联系客服
@@ -326,7 +340,7 @@ class OpenDeliveryModal extends PureComponent {
     HttpUtils.post(api, params).then(async (res) => {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
-      ToastShort(res.desc, 100)
+      ToastShort('绑定成功', 100)
 
     }).catch(async (reason) => {
       await this.closeModal()
@@ -354,7 +368,7 @@ class OpenDeliveryModal extends PureComponent {
       await this.closeModal()
       refreshDeliveryList && refreshDeliveryList()
 
-      ToastShort(res.desc, 100)
+      ToastShort('绑定成功', 100)
     }).catch(async (reason) => {
       await this.closeModal()
       ToastShort(reason.desc, 100)
@@ -365,8 +379,6 @@ class OpenDeliveryModal extends PureComponent {
     const {delivery} = this.props
     switch (parseInt(delivery.type)) {
       case Config.MEI_TUAN_PEI_SONG:
-        // await this.closeModal()
-        // await this.jumpToServices()
         await this.requestUrl(delivery.type)
         break
       case Config.MEI_TUAN_KUAI_SU_DA://美团快速达
@@ -380,12 +392,7 @@ class OpenDeliveryModal extends PureComponent {
         }
         break
       case Config.SHUN_FENG_TONG_CHENG://顺丰同城
-        if (selectAccountType === 1) {
-          this.openWSBDelivery()
-        }
-        if (selectAccountType === 2)
-          await this.requestUrl(delivery.type)
-        break
+      case Config.SHUN_FENG_QI_YE_C://顺丰企业C
       case Config.SHUAN_SONG://闪送
       case Config.FENG_NIAO_ZHONG_BAO://蜂鸟众包
       case Config.DA_DA_JING_JI://达达经济
@@ -452,6 +459,7 @@ class OpenDeliveryModal extends PureComponent {
         bottomButton = selectAccountType === 2 ? '立即授权' : '立即开通'
         break
       case Config.SHUN_FENG_TONG_CHENG://顺丰同城
+      case Config.SHUN_FENG_QI_YE_C://顺丰企业C
       case Config.UU_PAO_TUI://UU跑腿
       case Config.GUO_XIAO_DI://裹小弟
         bottomButton = selectAccountType === 2 ? '立即绑定' : '立即开通'
@@ -459,7 +467,7 @@ class OpenDeliveryModal extends PureComponent {
     }
     return (
       <CommonModal visible={visible} position={'flex-end'} onRequestClose={this.closeModal}>
-        <View style={styles.openDeliveryModalWrap}>
+        <KeyboardAvoidingView style={styles.openDeliveryModalWrap} behavior={behavior}>
           <View style={styles.openDeliveryModalHeader}>
             <Text style={styles.openDeliveryModalHeaderText}>
               {headerText}
@@ -467,8 +475,8 @@ class OpenDeliveryModal extends PureComponent {
             <SvgXml xml={closeNew()} style={{marginRight: 12}} onPress={this.closeModal}/>
           </View>
           <If condition={selectGeneralDelivery}>
-            {this.renderWSBDelivery()}
             {this.renderStoreDelivery()}
+            {this.renderWSBDelivery()}
           </If>
           <If condition={!selectGeneralDelivery}>
             {this.renderUUOrGuoXiaoDi()}
@@ -478,7 +486,7 @@ class OpenDeliveryModal extends PureComponent {
               {bottomButton}
             </Text>
           </TouchableOpacity>
-        </View>
+        </KeyboardAvoidingView>
       </CommonModal>
     )
   }

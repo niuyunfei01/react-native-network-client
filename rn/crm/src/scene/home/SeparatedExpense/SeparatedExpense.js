@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import ReactNative, {InteractionManager, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -8,15 +7,13 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";
-import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
-import DatePicker from 'rmc-date-picker/lib/DatePicker';
-import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
 import {calcMs} from "../../../pubilc/util/AppMonitorInfo";
 import {getTime} from "../../../pubilc/util/TimeUtil";
 import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import tool from "../../../pubilc/util/tool";
+import CustomMonthPicker from "../../../pubilc/component/CustomMonthPicker";
 
 const {StyleSheet} = ReactNative
 
@@ -70,9 +67,10 @@ class SeparatedExpense extends PureComponent {
       data_labels: [],
       date: date,
       choseTab: 1,
-      start_day: this.format(date),
+      start_day: tool.fullMonth(date),
       service_msg: "",
-      show_service_msg: false
+      show_service_msg: false,
+      visible: false
     }
   }
 
@@ -209,24 +207,18 @@ class SeparatedExpense extends PureComponent {
   }
 
   // 切换费用账单 充值记录tab
-  onChange = (date) => {
-    this.setState({date: date, start_day: this.format(date)}, function () {
-      if (this.state.choseTab === 1) {
-        this.fetchExpenses();
-      } else {
-        this.fetchRechargeRecord();
-      }
-    })
-  }
+  onChange = (event, date) => {
+    this.setState({visible: false})
+    if (event === 'dateSetAction') {
+      this.setState({date: date, start_day: tool.fullMonth(date)}, function () {
+        if (this.state.choseTab === 1) {
+          this.fetchExpenses();
+        } else {
+          this.fetchRechargeRecord();
+        }
+      })
+    }
 
-  // 处理月份函数
-  format = (date) => {
-    let month = date.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-    return `${date.getFullYear()}-${month}`;
-  }
-
-  onDismiss() {
   }
 
   // 跳转到费用账单详情
@@ -251,6 +243,7 @@ class SeparatedExpense extends PureComponent {
   }
 
   render() {
+    const {visible, date, isRefreshing} = this.state
     return (
       <View style={Styles.containerContent}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
@@ -258,35 +251,38 @@ class SeparatedExpense extends PureComponent {
           automaticallyAdjustContentInsets={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={Styles.containerContent} refreshControl={
-          <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onRefresh()}
-                          tintColor='gray'/>
-        }>
+          style={Styles.containerContent}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => this.onRefresh()} tintColor='gray'/>
+          }>
           {this.renderWSBType()}
           {this.renderWSBContent()}
         </ScrollView>
+        <CustomMonthPicker visible={visible} onChange={(event, newDate) => this.onChange(event, newDate)} date={date}/>
+
       </View>
     )
   }
 
   renderWSBType = () => {
-    let choseTab = this.state.choseTab
+    let {choseTab, show_service_msg} = this.state
     return (
       <View style={Styles.WSBType}>
 
-        <TouchableOpacity style={this.state.show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn} onPress={() => {
-          this.setState({
-            choseTab: 1
-          })
-          this.fetchExpenses();
-        }}>
+        <TouchableOpacity style={show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn}
+                          onPress={() => {
+                            this.setState({
+                              choseTab: 1
+                            })
+                            this.fetchExpenses();
+                          }}>
           <View style={[choseTab === 1 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
             <Text style={[Styles.color333, Styles.fontSize16]}> 费用账单 </Text>
           </View>
         </TouchableOpacity>
 
 
-        <If condition={this.state.show_service_msg}>
+        <If condition={show_service_msg}>
           <TouchableOpacity style={Styles.WSBTypeBtn} onPress={() => this.serviceList()}>
             <View style={[choseTab === 3 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
               <Text style={[Styles.color333, Styles.fontSize16]}> 发单服务费 </Text>
@@ -294,7 +290,7 @@ class SeparatedExpense extends PureComponent {
           </TouchableOpacity>
         </If>
 
-        <TouchableOpacity style={this.state.show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn}
+        <TouchableOpacity style={show_service_msg ? Styles.WSBTypeBtn : Styles.WSBHeaderBtn}
                           onPress={() => this.rechargeRecord()}>
           <View style={[choseTab === 2 ? Styles.switchTypeLeft : Styles.switchTypeRight]}>
             <Text style={[Styles.color333, Styles.fontSize16]}> 充值记录 </Text>
@@ -328,81 +324,68 @@ class SeparatedExpense extends PureComponent {
   }
 
   renderWSBContent = () => {
-    const {date, records, records3, records2, choseTab} = this.state;
-    const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
-    );
-
+    const {records, records3, records2, choseTab, start_day} = this.state;
     return (
       <View>
 
         <View style={Styles.expensesHeader}>
-          <Text style={Styles.selectMonthLabel}> 请选择月份 </Text>
-          <PopPicker
-            datePicker={datePicker}
-            transitionName="rmc-picker-popup-slide-fade"
-            maskTransitionName="rmc-picker-popup-fade"
-            styles={styles}
-            title={'选择日期'}
-            okText={'确认'}
-            dismissText={'取消'}
-            date={date}
-            onDismiss={this.onDismiss}
-            onChange={this.onChange}
-          >
-            <Text style={Styles.selectMonthText}> {this.state.start_day} &nbsp; <Entypo
-              name='chevron-thin-down' style={Styles.selectMonthIcon}/></Text>
-          </PopPicker>
+          <Text style={Styles.selectMonthLabel}>请选择月份 </Text>
+          <Text style={Styles.selectMonthText} onPress={() => this.setState({visible: true})}>
+            {start_day}&nbsp;<Entypo name='chevron-thin-down' style={Styles.selectMonthIcon}/>
+          </Text>
         </View>
 
         <If condition={choseTab === 1}>
-          {records && records.map((item, id) => {
-            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
-              <Text style={Styles.recordsItemTime}>{item.day} </Text>
-              <View style={Styles.flex1}/>
-              <View>
-                <Text
-                  style={Styles.recordsItemBalanced}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-                </Text>
-                <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
-              </View>
-              <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-            </TouchableOpacity>
-          })}
+          {
+            records && records.map((item, id) => {
+              return (
+                <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.viewItemDetail(item)}>
+                  <Text style={Styles.recordsItemTime}>{item.day} </Text>
+                  <View style={Styles.flex1}/>
+                  <View>
+                    <Text style={Styles.recordsItemBalanced}>
+                      {`${item.day_balanced / 100}` || ''}
+                    </Text>
+                    <Text style={Styles.recordsItemDescTextRight}>金额: {item.total_balanced} </Text>
+                  </View>
+                  <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+                </TouchableOpacity>
+              )
+            })
+          }
         </If>
         <If condition={choseTab === 3}>
-          {records3 && records3.map((item, id) => {
-            return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked3(item)}>
-              <Text style={[Styles.recordsItemTime, Styles.flex1]}>{item.month}-{item.day} </Text>
-              <Text style={{fontSize: 16, color: colors.color999}}>{item.desc} </Text>
-              <Text
-                style={[Styles.recordsItemBalanced, {width: 50}]}>{item.total_fee}
-              </Text>
-              <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
-            </TouchableOpacity>
-          })}
+          {
+            records3 && records3.map((item, id) => {
+              return <TouchableOpacity key={id} style={Styles.recordsContent} onPress={() => this.onItemClicked3(item)}>
+                <Text style={[Styles.recordsItemTime, Styles.flex1]}>{item.month}-{item.day} </Text>
+                <Text style={{fontSize: 16, color: colors.color999}}>{item.desc} </Text>
+                <Text
+                  style={[Styles.recordsItemBalanced, {width: 50}]}>{item.total_fee}
+                </Text>
+                <Entypo name='chevron-thin-right' style={Styles.recordsItemIcon}/>
+              </TouchableOpacity>
+            })
+          }
         </If>
 
 
         <If condition={choseTab === 2}>
-          {records2 && records2.map((item, idx) => {
-            return <View key={idx} style={Styles.recordsContainer2}>
-              <View style={Styles.flex3}>
-                <Text style={Styles.fontBold}>{item.remark} </Text>
-                <Text style={Styles.recordsCreated2}>{item.created} </Text>
-              </View>
-              <View style={[Styles.flex1, Styles.fontBold]}>
-                <Text style={Styles.recordsFee2}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
-              </View>
-            </View>
-          })}
+          {
+            records2 && records2.map((item, idx) => {
+              return (
+                <View key={idx} style={Styles.recordsContainer2}>
+                  <View style={Styles.flex3}>
+                    <Text style={Styles.fontBold}>{item.remark} </Text>
+                    <Text style={Styles.recordsCreated2}>{item.created} </Text>
+                  </View>
+                  <View style={[Styles.flex1, Styles.fontBold]}>
+                    <Text style={Styles.recordsFee2}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
+                  </View>
+                </View>
+              )
+            })
+          }
         </If>
 
       </View>

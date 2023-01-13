@@ -98,9 +98,9 @@ class WorkerScene extends PureComponent {
     let _this = this;
     showModal('加载中')
     InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchWorkers(vendor_id, accessToken, (resp) => {
-        if (resp.ok) {
-          let {normal, forbidden, user_list} = resp.obj;
+      dispatch(fetchWorkers(vendor_id, accessToken, ({ok , obj}) => {
+        if (ok) {
+          let {normal, forbidden, user_list} = obj;
           let limit_store = 0;
           if (user_list[currentUser]) {
             limit_store = user_list[currentUser]['store_id'];
