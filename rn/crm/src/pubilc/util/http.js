@@ -185,8 +185,6 @@ class HttpUtils {
   }
 
   static resetLogin = (navigation) => {
-    if (isLogout)
-      return
     isLogout = true
     JbbAlert.show({
       title: '提醒',
