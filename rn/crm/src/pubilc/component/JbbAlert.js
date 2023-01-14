@@ -33,7 +33,8 @@ class JbbAlert extends PureComponent {
       actionText: '',
       closeText: '',
       descStyle: null,
-      titleStyle: null
+      titleStyle: null,
+      allowCloseModal: true
     };
   }
 
@@ -46,6 +47,7 @@ class JbbAlert extends PureComponent {
       onPressClose: undefined,
       title: '',
       desc: '',
+      allowCloseModal: params.allowCloseModal ?? true,
       actionText: '',
       closeText: '',
       ...params,
@@ -57,6 +59,12 @@ class JbbAlert extends PureComponent {
   };
 
   onClose = () => {
+    const {allowCloseModal} = this.state
+    if (allowCloseModal)
+      _this.setState({show: false})
+  }
+
+  touchClose=()=>{
     _this.setState({show: false})
   }
 
@@ -86,7 +94,7 @@ class JbbAlert extends PureComponent {
                   <If condition={closeText}>
                     <Button title={closeText}
                             onPress={() => {
-                              this.onClose();
+                              this.touchClose();
                               onPressClose && onPressClose()
                             }}
                             containerStyle={{flex: 1, borderRadius: 20, length: 40, marginRight: 10}}
@@ -95,7 +103,7 @@ class JbbAlert extends PureComponent {
                   </If>
                   <Button title={actionText}
                           onPress={() => {
-                            this.onClose();
+                            this.touchClose();
                             onPress && onPress()
                           }}
                           containerStyle={{flex: 1, borderRadius: 20, length: 40,}}
