@@ -66,7 +66,7 @@ class ErrorBoundary extends React.Component {
   uploadData = () => {
     const {error, errorInfo} = this.state
     const {device} = this.props
-    const noLoginInfo = global.noLoginInfo
+    const noLoginInfo = {...global.noLoginInfo}
     if (noLoginInfo.accessToken)
       noLoginInfo.accessToken = '存在token'
     if (noLoginInfo.refreshToken)

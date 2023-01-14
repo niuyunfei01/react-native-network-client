@@ -7,11 +7,10 @@ import tool from "./tool";
 import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
 import store from "./configureStore";
-import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
 import JbbAlert from "../component/JbbAlert";
 
-const {SESSION_TOKEN_SUCCESS, LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
+const {LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -22,7 +21,7 @@ const {SESSION_TOKEN_SUCCESS, LOGOUT_SUCCESS} = require('../../pubilc/common/con
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
-let isRefrshToken = false, isLogout = false, handleList = []
+let isLogout = false, handleList = []
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -57,11 +56,11 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    const noLoginInfo = global.noLoginInfo
-    if (noLoginInfo.accessToken)
-      noLoginInfo.accessToken = '存在token'
-    if (noLoginInfo.refreshToken)
-      noLoginInfo.refreshToken = '存在refreshToken'
+    const info = {...global.noLoginInfo}
+    if (info.accessToken)
+      info.accessToken = '存在token'
+    if (info.refreshToken)
+      info.refreshToken = '存在refreshToken'
     const report_params = {
       app_version: DeviceInfo.getVersion(),
       brand: DeviceInfo.getBrand(),
@@ -71,7 +70,7 @@ class HttpUtils {
       url: url,
       params: params,
       method: method,
-      noLoginInfo: noLoginInfo,
+      noLoginInfo: info,
       currentRouteName: global.currentRouteName
     };
     nrRecordMetric('app_url_request', report_params)
@@ -82,8 +81,18 @@ class HttpUtils {
     let options = this.getOptions(method, params)
     if (props && props.global) {
       const {vendor_id = 0, store_id = 0} = props.global
-      const storeId = Number(store_id) || global.noLoginInfo.store_id
-      const vendorId = Number(vendor_id) || global.noLoginInfo.vendor_id
+      const storeId = Number(store_id)
+      const vendorId = Number(vendor_id)
+      options.headers.store_id = storeId
+      options.headers.vendor_id = vendorId
+      options.headers.vendorId = vendorId
+      if (uri.substr(tool.length(uri) - 1) !== '&') {
+        uri += '&'
+      }
+      uri += `store_id=${storeId}&vendor_id=${vendorId}`
+    } else {
+      const storeId = global.noLoginInfo.store_id
+      const vendorId = global.noLoginInfo.vendor_id
       options.headers.store_id = storeId
       options.headers.vendor_id = vendorId
       options.headers.vendorId = vendorId
@@ -93,19 +102,22 @@ class HttpUtils {
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
 
-    const index_not_defined = uri.indexOf('access_token=undefined')
-    if (index_not_defined !== -1) {
-      uri = uri.substring(0, index_not_defined) + `access_token=${global.noLoginInfo.accessToken}` + uri.substring(index_not_defined + 22)
-    }
-    const index_empty = uri.indexOf(`access_token=&`)
-    if (index_empty !== -1) {
-      uri = uri.substring(0, index_empty) + `access_token=${global.noLoginInfo.accessToken}&` + uri.substring(index_empty + 14)
+    const token_position = uri.indexOf('access_token=')
+
+    if (token_position > -1) {
+      let contain_token_url = uri.substring(token_position)
+
+      const end = contain_token_url.indexOf('&')
+      if (end > -1) {
+
+        const token_only = contain_token_url.substring(13, end)
+        if (token_only.length !== 40) {
+          const tail_url = contain_token_url.substring(end)
+          uri = uri.substring(0, token_position) + 'access_token=' + global.noLoginInfo.accessToken + tail_url
+        }
+      }
     }
 
-    if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
-      isRefrshToken = true
-      this.refreshAccessToken()
-    }
     const sameHandle = handleList.find(
       (item) => {
         return item.uri === uri && JSON.stringify(item.body) === JSON.stringify(options?.body)
@@ -177,30 +189,6 @@ class HttpUtils {
     })
     handleList.push({uri, body: options?.body, handle})
     return handle
-  }
-
-  static refreshAccessToken = () => {
-
-    if (global.noLoginInfo.refreshToken) {
-      const url = `/v4/WsbUser/refreshToken`
-      const params = {refresh_token: global.noLoginInfo.refreshToken}
-      isRefrshToken = true
-      this.post(url, params).then(res => {
-        const {access_token, refresh_token, expires_in} = res;
-        const getTokenTs = dayjs().valueOf()
-        store.dispatch({
-          type: SESSION_TOKEN_SUCCESS,
-          payload: {
-            access_token: access_token,
-            refresh_token: refresh_token,
-            expires_in_ts: expires_in,
-            getTokenTs: getTokenTs
-          }
-        })
-        global.noLoginInfo.getTokenTs = getTokenTs
-        isRefrshToken = false
-      })
-    }
   }
 
   static error({error_code, reason = ''}, navigation) {
