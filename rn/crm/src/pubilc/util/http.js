@@ -7,11 +7,10 @@ import tool from "./tool";
 import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
 import store from "./configureStore";
-import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
 import JbbAlert from "../component/JbbAlert";
 
-const { LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
+const {LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -22,7 +21,7 @@ const { LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
-let  isLogout = false
+let isLogout = false
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -83,18 +82,8 @@ class HttpUtils {
 
     if (props && props.global) {
       const {vendor_id = 0, store_id = 0} = props.global
-      const storeId = Number(store_id)
-      const vendorId = Number(vendor_id)
-      options.headers.store_id = storeId
-      options.headers.vendor_id = vendorId
-      options.headers.vendorId = vendorId
-      if (uri.substr(tool.length(uri) - 1) !== '&') {
-        uri += '&'
-      }
-      uri += `store_id=${storeId}&vendor_id=${vendorId}`
-    } else {
-      const storeId = global.noLoginInfo.store_id
-      const vendorId = global.noLoginInfo.vendor_id
+      const storeId = Number(store_id) || global.noLoginInfo.store_id
+      const vendorId = Number(vendor_id) || global.noLoginInfo.vendor_id
       options.headers.store_id = storeId
       options.headers.vendor_id = vendorId
       options.headers.vendorId = vendorId
@@ -154,6 +143,8 @@ class HttpUtils {
           this.upLoadData(response, uri, url, options, params, method)
           if (showReason)
             this.error(response, props.navigation);
+          if (isLogout)
+            return;
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -200,7 +191,9 @@ class HttpUtils {
       title: '提醒',
       desc: '登录信息过期，请重新登录',
       actionText: '确定',
+      allowCloseModal: false,
       onPress: () => {
+        store.dispatch({type: LOGOUT_SUCCESS})
         const resetAction = CommonActions.reset({
           index: 0,
           routes: [
@@ -208,7 +201,7 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
-        store.dispatch({type: LOGOUT_SUCCESS})
+
         isLogout = false
       },
     })
