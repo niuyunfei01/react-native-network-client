@@ -126,10 +126,9 @@ class SaveStore extends PureComponent {
       time_str: '0时0分',
       show_business_licence_placeholder: true,
       show_alipay_identity_placeholder: true,
-      start_date: new Date(new Date(new Date().toLocaleDateString()).getTime()),
-      end_date: new Date(new Date(new Date().toLocaleDateString()).getTime()),
+      start_date: new Date(dayjs().format('YYYY-MM-DD')),
+      end_date: new Date(dayjs().format('YYYY-MM-DD')),
     };
-
   }
 
   componentDidMount() {
