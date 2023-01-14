@@ -58,16 +58,16 @@ class GoodListItem extends React.PureComponent {
         <If condition={false}>
           <View style={styles.priceWrap}>
             <View style={[styles.huoWrap, styles.shanWrap]}>
-              <Text style={[styles.huo, styles.shan]}>闪&nbsp;</Text>
+              <Text style={[styles.huo, styles.shan]}>闪</Text>
             </View>
             <View style={[styles.huoWrap, styles.eleWrap]}>
-              <Text style={[styles.huo]}>饿&nbsp;</Text>
+              <Text style={[styles.huo]}>饿</Text>
             </View>
             <View style={[styles.huoWrap, styles.jingDongWrap]}>
-              <Text style={[styles.huo]}>京&nbsp;</Text>
+              <Text style={[styles.huo]}>京</Text>
             </View>
             <View style={[styles.huoWrap]}>
-              <Text style={[styles.huo]}>活&nbsp;</Text>
+              <Text style={[styles.huo]}>活</Text>
             </View>
           </View>
         </If>

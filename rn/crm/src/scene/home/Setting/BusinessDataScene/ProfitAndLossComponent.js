@@ -251,8 +251,8 @@ export default class ProfitAndLossComponent extends Component {
 
   orderDetail = () => {
     const {start_date, end_date} = this.state
-    const {navigation} = this.props
-    navigation.navigate(Config.ROUTE_PROFITANDLOSS, {start_date: start_date, end_date: end_date})
+    const {navigation, store_id} = this.props
+    navigation.navigate(Config.ROUTE_PROFITANDLOSS, {start_date: start_date, end_date: end_date, store_id: store_id})
   }
 
   navigateToPlatformDetail = () => {

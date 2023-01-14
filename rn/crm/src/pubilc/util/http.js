@@ -7,11 +7,10 @@ import tool from "./tool";
 import stringEx from "./stringEx";
 import {getTime} from "./TimeUtil";
 import store from "./configureStore";
-import dayjs from "dayjs";
 import {nrRecordMetric} from "./NewRelicRN";
 import JbbAlert from "../component/JbbAlert";
 
-const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default;
+const {LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -22,7 +21,7 @@ const {SESSION_TOKEN_SUCCESS} = require('../../pubilc/common/constants').default
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
-let isRefrshToken = false, isLogout = false
+let isLogout = false
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -57,11 +56,11 @@ class HttpUtils {
   }
 
   static upLoadData = (error, uri = '', url = '', options = {}, params = {}, method = '') => {
-    const noLoginInfo = global.noLoginInfo
-    if (noLoginInfo.accessToken)
-      noLoginInfo.accessToken = '存在token'
-    if (noLoginInfo.refreshToken)
-      noLoginInfo.refreshToken = '存在refreshToken'
+    const info = {...global.noLoginInfo}
+    if (info.accessToken)
+      info.accessToken = '存在token'
+    if (info.refreshToken)
+      info.refreshToken = '存在refreshToken'
     const report_params = {
       app_version: DeviceInfo.getVersion(),
       brand: DeviceInfo.getBrand(),
@@ -71,7 +70,7 @@ class HttpUtils {
       url: url,
       params: params,
       method: method,
-      noLoginInfo: noLoginInfo,
+      noLoginInfo: info,
       currentRouteName: global.currentRouteName
     };
     nrRecordMetric('app_url_request', report_params)
@@ -93,10 +92,23 @@ class HttpUtils {
       }
       uri += `store_id=${storeId}&vendor_id=${vendorId}`
     }
-    if ((dayjs().valueOf() - global.noLoginInfo.getTokenTs < 24 * 60 * 60 * 1000) && !isRefrshToken) {
-      isRefrshToken = true
-      this.refreshAccessToken()
+
+    const token_position = uri.indexOf('access_token=')
+
+    if (token_position > -1) {
+      let contain_token_url = uri.substring(token_position)
+
+      const end = contain_token_url.indexOf('&')
+      if (end > -1) {
+
+        const token_only = contain_token_url.substring(13, end)
+        if (token_only.length !== 40) {
+          const tail_url = contain_token_url.substring(end)
+          uri = uri.substring(0, token_position) + 'access_token=' + global.noLoginInfo.accessToken + tail_url
+        }
+      }
     }
+
     return new Promise((resolve, reject) => {
       const startTime = getTime()
       fetch(uri, options)
@@ -129,8 +141,11 @@ class HttpUtils {
           hideModal()
 
           this.upLoadData(response, uri, url, options, params, method)
+          if (isLogout)
+            return;
           if (showReason)
             this.error(response, props.navigation);
+
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -152,32 +167,9 @@ class HttpUtils {
     })
   }
 
-  static refreshAccessToken = () => {
+  static error({error_code, reason = ''}, navigation) {
 
-    if (global.noLoginInfo.refreshToken) {
-      const url = `/v4/WsbUser/refreshToken`
-      const params = {refresh_token: global.noLoginInfo.refreshToken}
-      isRefrshToken = true
-      this.post(url, params).then(res => {
-        const {access_token, refresh_token, expires_in} = res;
-        const getTokenTs = dayjs().valueOf()
-        store.dispatch({
-          type: SESSION_TOKEN_SUCCESS,
-          payload: {
-            access_token: access_token,
-            refresh_token: refresh_token,
-            expires_in_ts: expires_in,
-            getTokenTs: getTokenTs
-          }
-        })
-        global.noLoginInfo.getTokenTs = getTokenTs
-        isRefrshToken = false
-      })
-    }
-  }
-
-  static error(response, navigation) {
-    switch (parseInt(response.error_code)) {
+    switch (parseInt(error_code)) {
       case 10001:
       case 21327:
         this.logout(navigation)
@@ -187,20 +179,20 @@ class HttpUtils {
         break
       default:
 
-        ToastLong(response.reason.toString())
+        ToastLong(reason)
         break
     }
   }
 
   static resetLogin = (navigation) => {
-    if (isLogout)
-      return
     isLogout = true
     JbbAlert.show({
       title: '提醒',
       desc: '登录信息过期，请重新登录',
       actionText: '确定',
+      allowCloseModal: false,
       onPress: () => {
+        store.dispatch({type: LOGOUT_SUCCESS})
         const resetAction = CommonActions.reset({
           index: 0,
           routes: [
@@ -208,6 +200,7 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
+
         isLogout = false
       },
     })
