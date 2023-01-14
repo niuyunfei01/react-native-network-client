@@ -141,10 +141,11 @@ class HttpUtils {
           hideModal()
 
           this.upLoadData(response, uri, url, options, params, method)
-          if (showReason)
-            this.error(response, props.navigation);
           if (isLogout)
             return;
+          if (showReason)
+            this.error(response, props.navigation);
+
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
