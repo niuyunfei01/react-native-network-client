@@ -130,7 +130,7 @@ export function setAccessToken(obj = {}) {
 }
 
 export function setNoLoginInfo(info = {}) {
-  if (!info.access_token)
+  if (!info.accessToken)
     nrRecordMetric('app_redux', {...info, setTokenName: 'setNoLoginInfo'})
   return {
     type: SET_NO_LOGIN_INFO,
