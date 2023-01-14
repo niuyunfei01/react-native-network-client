@@ -81,18 +81,8 @@ class HttpUtils {
     let options = this.getOptions(method, params)
     if (props && props.global) {
       const {vendor_id = 0, store_id = 0} = props.global
-      const storeId = Number(store_id)
-      const vendorId = Number(vendor_id)
-      options.headers.store_id = storeId
-      options.headers.vendor_id = vendorId
-      options.headers.vendorId = vendorId
-      if (uri.substr(tool.length(uri) - 1) !== '&') {
-        uri += '&'
-      }
-      uri += `store_id=${storeId}&vendor_id=${vendorId}`
-    } else {
-      const storeId = global.noLoginInfo.store_id
-      const vendorId = global.noLoginInfo.vendor_id
+      const storeId = Number(store_id) || global.noLoginInfo.store_id
+      const vendorId = Number(vendor_id) || global.noLoginInfo.vendor_id
       options.headers.store_id = storeId
       options.headers.vendor_id = vendorId
       options.headers.vendorId = vendorId
@@ -160,8 +150,11 @@ class HttpUtils {
           hideModal()
 
           this.upLoadData(response, uri, url, options, params, method)
+          if (isLogout)
+            return;
           if (showReason)
             this.error(response, props.navigation);
+
           if (getNetworkDelay) {
             const endTime = getTime();
             reject && reject({...response, startTime: startTime, endTime: endTime, executeStatus: 'error'})
@@ -209,14 +202,14 @@ class HttpUtils {
   }
 
   static resetLogin = (navigation) => {
-    if (isLogout)
-      return
     isLogout = true
     JbbAlert.show({
       title: '提醒',
       desc: '登录信息过期，请重新登录',
       actionText: '确定',
+      allowCloseModal: false,
       onPress: () => {
+        store.dispatch({type: LOGOUT_SUCCESS})
         const resetAction = CommonActions.reset({
           index: 0,
           routes: [
@@ -224,7 +217,7 @@ class HttpUtils {
           ]
         });
         navigation.dispatch(resetAction);
-        store.dispatch({type: LOGOUT_SUCCESS})
+
         isLogout = false
       },
     })
