@@ -1,13 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {
-  getConfig,
-  logout,
-  sendDverifyCode,
-  setCurrentStore,
-  signIn,
-} from '../../../reducers/global/globalActions'
+import {getConfig, logout, sendDverifyCode, setCurrentStore, signIn,} from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -156,10 +150,10 @@ class LoginScene extends PureComponent {
     GlobalUtil.getDeviceInfo().then(deviceInfo => {
       dispatch(setDeviceInfo(deviceInfo))
     })
-    dispatch(signIn(mobile, password, this.props, (ok, msg, uid, id) => {
+    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok && uid) {
         //防止退出登录，重新登录不推送的问题
-        this.queryConfig()
+        this.queryConfig(token)
         this.mixpanel.getDistinctId().then(res => {
           if (res !== uid) {
             mergeMixpanelId(res, uid);
@@ -179,8 +173,8 @@ class LoginScene extends PureComponent {
     }));
   }
 
-  queryConfig = () => {
-    let {accessToken, store_id} = this.props.global;
+  queryConfig = (accessToken) => {
+    let {store_id} = this.props.global;
     const {dispatch, navigation} = this.props;
     dispatch(getConfig(accessToken, store_id, (ok, err_msg, cfg) => {
       if (ok) {
