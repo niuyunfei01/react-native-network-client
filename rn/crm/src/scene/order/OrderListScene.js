@@ -146,8 +146,8 @@ class OrderListScene extends Component {
     timeObj['componentName'] = "OrderListScene"
     timeObj['is_record_request_monitor'] = is_record_request_monitor
     calcMs(timeObj, accessToken)
-    this.getVendor()
     this.focus = navigation.addListener('focus', () => {
+      this.fetchShowBindBtn()
       this.onRefresh()
     })
     global.navigation = navigation
@@ -171,13 +171,13 @@ class OrderListScene extends Component {
     }
   }
 
-  getVendor = () => {
+  fetchShowBindBtn = () => {
     const {accessToken, store_id} = this.props.global;
     if (store_id > 0) {
-      let api = `/api/get_store_business_status/${store_id}?access_token=${accessToken}`
+      let api = `/v4/wsb_store/getBindExtStatus?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         this.setState({
-          show_bind_button: tool.length(res.business_status) <= 0,
+          show_bind_button: Number(res?.has_ext_store_count) <= 0,
         })
       })
     }
@@ -542,7 +542,7 @@ class OrderListScene extends Component {
       if (ok) {
         tool.debounces(() => {
           hideModal()
-          this.getVendor()
+          this.fetchShowBindBtn()
           this.onRefresh(9)
         })
       } else {

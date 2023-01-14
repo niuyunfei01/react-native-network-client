@@ -21,7 +21,7 @@ const {LOGOUT_SUCCESS} = require('../../pubilc/common/constants').default;
  */
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
-let isLogout = false
+let isLogout = false, handleList = []
 
 class HttpUtils {
   static urlFormat(url, params = {}) {
@@ -79,7 +79,6 @@ class HttpUtils {
   static apiBase(method, url, params, props = this, getNetworkDelay = false, getMoreInfo = false, showReason = true) {
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
-
     if (props && props.global) {
       const {vendor_id = 0, store_id = 0} = props.global
       const storeId = Number(store_id) || global.noLoginInfo.store_id
@@ -109,7 +108,17 @@ class HttpUtils {
       }
     }
 
-    return new Promise((resolve, reject) => {
+    const sameHandle = handleList.find(
+      (item) => {
+        return item.uri === uri && JSON.stringify(item.body) === JSON.stringify(options?.body)
+      }
+    )
+    if (sameHandle) {
+      // 遇到相同请求直接返回之前请求的promise
+      return sameHandle.handle
+    }
+
+    const handle = new Promise((resolve, reject) => {
       const startTime = getTime()
       fetch(uri, options)
         .then((response) => {
@@ -163,8 +172,16 @@ class HttpUtils {
             return
           }
           reject && reject(error.message)
-        })
+        }).finally(() => {
+        // 无论请求结果如果，都需要把对应的请求移除掉
+        handleList = handleList.filter(
+          (item) =>
+            item.url !== url && JSON.stringify(item.body) !== JSON.stringify(options?.body)
+        )
+      })
     })
+    handleList.push({uri, body: options?.body, handle})
+    return handle
   }
 
   static error({error_code, reason = ''}, navigation) {
