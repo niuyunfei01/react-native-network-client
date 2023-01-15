@@ -14,7 +14,8 @@ const {
   GET_VENDOR_TAGS,
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT,
-  GET_SG_TAG_TREE,
+  GET_EB_TAG_TREE,
+  GET_JD_TAG_TREE,
 } = require("../../pubilc/common/constants").default;
 
 export function saveVendorTags(json) {
@@ -350,11 +351,24 @@ export function fetchListVendorTags(vendor_id, token, callback) {
   };
 }
 
-export function fetchSgTagTree(props, token, callback, errorCallback) {
+export function SetBdCategory (info) {
+  return {
+    type: GET_EB_TAG_TREE,
+    payload: info
+  }
+}
+
+export function SetJdCategory (info) {
+  return {
+    type: GET_JD_TAG_TREE,
+    payload: info
+  }
+}
+
+export function fetchCategoryTagTree(props, token, platform, callback, errorCallback) {
   return dispatch => {
-    let url = `/dataDictionary/get_sg_tags/key/text.json?access_token=${token}`;
+    let url = `/dataDictionary/get_${platform}_tags/key/text.json?access_token=${token}`;
     HttpUtils.get.bind(props)(url).then((tree) => {
-      dispatch({type: GET_SG_TAG_TREE, sg_tag_tree: tree, sg_tag_tree_at: dayjs().unix()})
       callback(tree)
     }, (ok, reason, obj) => {
       errorCallback(ok, reason, obj)

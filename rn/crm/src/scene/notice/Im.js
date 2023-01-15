@@ -18,8 +18,9 @@ import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
 import {getWithTplIm} from "../../pubilc/util/common";
 import store from "../../pubilc/util/configureStore";
-import {getImRemindCount, setImRemindCount} from "../../reducers/im/imActions";
+import {getImRemindCount, getOldRemindConfig, setImRemindCount, setOldRemindInfo} from "../../reducers/im/imActions";
 import {Badge} from "react-native-elements";
+import NetInfo from "@react-native-community/netinfo";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -61,21 +62,39 @@ class NoticeList extends React.PureComponent {
       refreshing: false,
       show_select_store: true,
       store_name: props.global?.store_info?.name,
-      store_id: props.global?.store_id
+      store_id: props.global?.store_id,
+      netInfoStatus: 'offline'
     }
   }
 
   componentDidMount() {
     let {im_config} = this.props.im
+    const {accessToken, store_id, vendor_id} = this.props.global;
     this.fetchData()
     this.getStoreList()
     if (im_config.im_store_status == 1)
       this.startPollingList(im_config)
+    store.dispatch(getOldRemindConfig(accessToken, store_id, vendor_id, (ok, msg, obj) => {
+      store.dispatch(setOldRemindInfo(obj))
+    }))
+    NetInfo.fetch().then(state => {
+      this.setState({
+        netInfoStatus: state.isConnected
+      })
+    });
+    this.unsubscribe = NetInfo.addEventListener(state => {
+      this.handleFirstConnectivityChange(state)
+    })
   }
 
   componentWillUnmount() {
     if (this.dataPolling !== null)
       clearInterval(this.dataPolling);
+    this.unsubscribe && this.unsubscribe()
+  }
+
+  handleFirstConnectivityChange(netWorkStatus) {
+    this.setState({netInfoStatus: netWorkStatus})
   }
 
   fetchRemindCount = () => {
@@ -146,12 +165,12 @@ class NoticeList extends React.PureComponent {
       page_size: query.page_size,
       status: selected
     }
-    showModal('加载中')
+    !is_polling && showModal('加载中')
     this.setState({refreshing: true})
     const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
     getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
       if (ok) {
-        hideModal()
+        !is_polling && hideModal()
         const {lists, page, isLastPage} = obj
         let list = page !== 1 ? message.concat(lists) : lists
         this.setState({
@@ -163,7 +182,7 @@ class NoticeList extends React.PureComponent {
         ToastShort(`${reason}`)
       }
     }, (error) => {
-      hideModal()
+      !is_polling && hideModal()
       this.setState({refreshing: false})
     })
   }
@@ -241,7 +260,8 @@ class NoticeList extends React.PureComponent {
   }
 
   navigationToChatRoom = (info) => {
-    this.onPress(Config.ROUTE_CHAT_ROOM, {info: info})
+    let {store_id} = this.state;
+    this.onPress(Config.ROUTE_CHAT_ROOM, {info: info, store_id: store_id})
   }
 
   renderHead = () => {
@@ -317,6 +337,7 @@ class NoticeList extends React.PureComponent {
         keyExtractor={(item, index) => `${index}`}
         ListEmptyComponent={this.listEmptyComponent()}
         initialNumToRender={7}
+        ListFooterComponent={this.renderNotMoreInfo()}
       />
     )
   }
@@ -350,16 +371,19 @@ class NoticeList extends React.PureComponent {
     )
   }
 
-  renderEmptyText = () => {
-    return (
-      <Text style={styles.noMore}>-没有更多消息啦- </Text>
-    )
+  renderNotMoreInfo = () => {
+    const {isLastPage, message = []} = this.state
+    if (isLastPage && message.length > 0)
+      return (
+        <Text style={styles.noMore}>-没有更多消息啦- </Text>
+      )
+    return null
   }
 
   renderFloatIcon = () => {
     let {old_remind_count = {}} = this.props.im
     let group_num = 0
-    Object.keys(old_remind_count?.group_type_num).map(key => {
+    old_remind_count?.group_type_num && Object.keys(old_remind_count?.group_type_num).map(key => {
       group_num += Number(old_remind_count?.group_type_num[key])
     })
     return (
@@ -401,19 +425,15 @@ class NoticeList extends React.PureComponent {
   }
 
   render() {
-    let {isLastPage, message = []} = this.state;
-    let {net_info} = this.props.global
+    let {netInfoStatus} = this.state;
     return (
       <View style={styles.mainContainer}>
         <Fetch navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         {this.renderHead()}
         {this.renderTab()}
-        {net_info?.isConnected ?
+        {netInfoStatus ?
           this.renderMessage() : this.networkEmptyComponent()
         }
-        <If condition={isLastPage && message.length > 0}>
-          {this.renderEmptyText()}
-        </If>
         {this.renderFloatIcon()}
         {this.renderSelectStore()}
       </View>
@@ -529,7 +549,8 @@ const styles = StyleSheet.create({
   noMore: {
     fontSize: 14,
     color: colors.color999,
-    marginBottom: 10
+    marginVertical: 10,
+    textAlign: 'center'
   },
   floatBox: {
     width: 52,

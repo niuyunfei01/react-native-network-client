@@ -184,10 +184,10 @@ class SettlementOrderScene extends PureComponent {
           <View key={key} style={styles.itemRow}>
             <View style={styles.item_title}>
               <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
-                <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+                <Text style={[styles.name, {color: item?.show_gray ? '#808080' : colors.main_color}]}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
               </TouchableOpacity>
-              <Text style={{color: colors.color333}}>商品数量:{total_goods_num} </Text>
-              <Text style={{color: colors.color333}}>金额:{tool.toFixed(total_supply_price)} </Text>
+              <Text style={{color: item?.show_gray ? '#808080' : colors.color333}}>商品数量:{total_goods_num} </Text>
+              <Text style={{color: item?.show_gray ? '#808080' : colors.color333}}>金额:{tool.toFixed(total_supply_price)} </Text>
               <TouchableOpacity onPress={() => this.toggleDropdown(key, 'orderList', item)}>
                 {self.renderDropdownImage(item)}
               </TouchableOpacity>
@@ -329,7 +329,6 @@ const styles = StyleSheet.create({
   name: {
     minWidth: pxToDp(200),
     fontSize: pxToDp(32),
-    color: colors.main_color,
     fontWeight: '900'
   },
   header: {

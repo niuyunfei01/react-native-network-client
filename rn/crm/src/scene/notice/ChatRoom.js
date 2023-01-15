@@ -38,7 +38,8 @@ class ChatRoom extends React.PureComponent {
       modalImg: false,
       img_url: '',
       new_message_id: '',
-      inverted: true
+      inverted: true,
+      store_id: props.route?.params?.store_id
     }
   }
 
@@ -65,7 +66,8 @@ class ChatRoom extends React.PureComponent {
   }
 
   startPolling = (im_config) => {
-    const {accessToken, store_id} = this.props.global
+    const {accessToken} = this.props.global
+    let {store_id} = this.state;
     const {dispatch} = this.props;
     this.dataPolling = setInterval(
       () => {
@@ -113,9 +115,9 @@ class ChatRoom extends React.PureComponent {
   }
 
   fetchData = () => {
-    const {accessToken, store_id} = this.props.global;
+    const {accessToken} = this.props.global;
     const {im} = this.props;
-    const {query, isLastPage, messages, messageInfo} = this.state
+    const {query, isLastPage, messages, messageInfo, store_id} = this.state
     if (isLastPage)
       return
     let params = {

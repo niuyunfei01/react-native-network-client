@@ -30,10 +30,8 @@ import {
 } from "../../reducers/global/globalActions";
 import {
   getImRemindCount,
-  getOldRemindConfig,
   getStoreImConfig,
-  setImRemindCount,
-  setOldRemindInfo
+  setImRemindCount
 } from "../../reducers/im/imActions";
 import store from "../util/configureStore";
 import {setNoLoginInfo} from "./noLoginInfo";
@@ -874,7 +872,6 @@ class AppNavigator extends PureComponent {
         store.dispatch(getStoreImConfig(global.accessToken, global.store_id))
         if (im.im_config.im_store_status == 1 && this.state.appState === 'active')
           this.startPolling(global, im)
-        store.dispatch(getOldRemindConfig(global.accessToken, global.store_id, global.vendor_id, (ok, msg, obj) => store.dispatch(setOldRemindInfo(obj))))
         this.getNetInfo()
         switch (Platform.OS) {
           case "android":

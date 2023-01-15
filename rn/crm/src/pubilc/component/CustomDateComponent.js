@@ -5,6 +5,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import colors from "../styles/colors";
 import PropTypes from "prop-types";
 import tool from "../util/tool";
+import dayjs from "dayjs";
 
 const styles = StyleSheet.create({
   modalCancel: {
@@ -49,13 +50,27 @@ export default class CustomDateComponent extends PureComponent {
     timeType: '',
     showDateModal: false
   }
+
   onConfirm = (date) => {
-    const {timeType} = this.state
+    const {timeType, startTime, endTime} = this.state
     if ('start' === timeType) {
       this.setState({startTime: tool.fullDay(date), showDateModal: false})
+      if (dayjs(endTime) < date) {
+        this.setState({
+          startTime: endTime,
+          endTime: tool.fullDay(date)
+        })
+      }
       return
     }
     this.setState({endTime: tool.fullDay(date), showDateModal: false})
+    if (dayjs(startTime) > date) {
+      this.setState({
+        endTime: startTime,
+        startTime: tool.fullDay(date)
+      })
+    }
+
   }
 
   render() {
