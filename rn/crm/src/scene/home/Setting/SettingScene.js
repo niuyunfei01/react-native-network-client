@@ -39,6 +39,7 @@ import {setNoLoginInfo} from "../../../pubilc/common/noLoginInfo";
 import DeviceInfo from "react-native-device-info";
 import {PlayMusicComponent} from "../../../pubilc/component/PlayMusic";
 import {checkUpdate, downloadApk} from "rn-app-upgrade";
+import UpdateAppProcessComponent from "../../../pubilc/component/UpdateAppProcessComponent";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const {width} = Dimensions.get("window");
@@ -536,9 +537,26 @@ class SettingScene extends PureComponent {
     if (!show_update_version) {
       return ToastShort('当前已是最新版本')
     }
+    UpdateAppProcessComponent.setShowStatus()
     switch (Platform.OS) {
       case "android":
-        await downloadApk({interval: 250, apkUrl: android_download_url, downloadInstall: true})
+        await downloadApk({
+          interval: 250,
+          apkUrl: android_download_url,
+          downloadInstall: true,
+          callback: {
+            onProgress: (received, total, percent) => {
+              if (UpdateAppProcessComponent.getShowStatus())
+                UpdateAppProcessComponent.show({process: percent, title: '版本更新中，请耐心等待'})
+            },
+            onFailure: (errorMessage) => {
+              UpdateAppProcessComponent.show({title: errorMessage})
+            },
+            onComplete() {
+              UpdateAppProcessComponent.hide()
+            }
+          }
+        })
         break
       case "ios":
         await Linking.openURL(appUrl)

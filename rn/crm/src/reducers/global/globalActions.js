@@ -22,6 +22,7 @@ import DeviceInfo from 'react-native-device-info';
 import HttpUtils from "../../pubilc/util/http";
 import {doJPushDeleteAlias, doJPushStop} from "../../pubilc/component/jpushManage";
 import tool from "../../pubilc/util/tool";
+import {nrRecordMetric} from "../../pubilc/util/NewRelicRN";
 
 /**
  * ## Imports
@@ -120,13 +121,17 @@ export const setSGCategory = (basic_categories) => {
 }
 
 export function setAccessToken(obj = {}) {
+  if (!obj.access_token)
+    nrRecordMetric('app_redux', {...obj, setTokenName: 'setAccessToken'})
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: obj
   }
 }
 
-export function setNoLoginInfo(info) {
+export function setNoLoginInfo(info = {}) {
+  if (!info.accessToken)
+    nrRecordMetric('app_redux', {...info, setTokenName: 'setNoLoginInfo'})
   return {
     type: SET_NO_LOGIN_INFO,
     payload: info
@@ -222,10 +227,12 @@ export function setCallDeliveryObj(obj) {
 }
 
 export const resetRedux = () => {
+  nrRecordMetric('app_redux', {setTokenName: 'resetRedux'})
   return dispatch => dispatch({type: LOGOUT_SUCCESS});
 }
 
 export function logout(callback) {
+  nrRecordMetric('app_redux', {setTokenName: 'logout'})
   return async (dispatch) => {
     dispatch({type: LOGOUT_SUCCESS});
     await doJPushDeleteAlias()
@@ -349,6 +356,8 @@ export function customerApply(params, callback, props) {
         callback(true, '成功', response)
         const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
         dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        if (!access_token)
+          nrRecordMetric('app_redux', {...response.user.token, setTokenName: 'SESSION_TOKEN_SUCCESS'})
         const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
         const authCallback = (ok, msg, profile) => {
           if (ok) {

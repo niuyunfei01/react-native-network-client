@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10
   },
-  selectBalanceText: {fontSize: 14, fontWeight: '500', color: colors.main_color, lineHeight: 20},
+  selectBalanceText: {fontSize: 14, fontWeight: 'bold', color: colors.main_color, lineHeight: 20},
   customerInput: {
     borderRadius: 4,
     borderWidth: 0.5,

@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
   storeDeliveryLeft: {color: '#FF862C'},
 
   openBtnWrap: {backgroundColor: '#26B942', borderRadius: 24, margin: 20, marginTop: 10},
-  openBtnText: {fontSize: 16, fontWeight: '500', color: colors.white, paddingVertical: 10, textAlign: 'center'},
+  openBtnText: {fontSize: 16, fontWeight: 'bold', color: colors.white, paddingVertical: 10, textAlign: 'center'},
 
   modalWrap: {backgroundColor: colors.white, borderTopLeftRadius: 10, borderTopRightRadius: 10},
   modalHeaderWrap: {

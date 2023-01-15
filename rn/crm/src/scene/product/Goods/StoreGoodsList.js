@@ -82,7 +82,7 @@ class StoreGoodsList extends Component {
       selectedTagId: '',
       isSelectedCategory: '',
       selectedChildTagId: '',
-      fnProviding: false,
+      fnProviding: Number(props.global?.store_info?.strict_providing) > 0,
       modalType: '',
       selectedStatus: '',
       selectedProduct: {},
@@ -104,8 +104,7 @@ class StoreGoodsList extends Component {
 
   componentDidMount() {
     const {global, navigation} = this.props
-    const {accessToken, store_id, store_info} = global;
-    this.setState({fnProviding: Number(store_info?.strict_providing) > 0})
+    const {accessToken, store_id} = global;
     this.fetchUnreadPriceAdjustment(store_id, accessToken)
     this.getSGCategory()
     this.focus = navigation.addListener('focus', () => this.restart());
@@ -125,8 +124,8 @@ class StoreGoodsList extends Component {
   }
 
   restart() {
-    this.onRefresh()
     this.fetchGoodsCount()
+    this.onRefresh()
   }
 
   fetchGoodsCount() {
@@ -186,7 +185,7 @@ class StoreGoodsList extends Component {
         fail_audit: fail_audit,
         onStrict: strict_providing === '1'
       }, () => {
-        this.fetchCategories(store_id, prod_status, accessToken)
+        this.fetchCategories(store_id, prod_status, accessToken, false)
       })
     }, (res) => {
       ToastLong('加载数量错误' + res.reason)
@@ -196,7 +195,7 @@ class StoreGoodsList extends Component {
 
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
-    const {selectedStatus = {}} = this.state
+    const {selectedStatus = {}, goods} = this.state
     const url = `/api/list_store_prod_tags/${storeId}/${selectedStatus.value}?access_token=${accessToken}`
     const params = {
       hideAreaHot: hideAreaHot,
@@ -210,7 +209,8 @@ class StoreGoodsList extends Component {
         isSelectedCategory: res[0] ? res[0].id : '',
         selectedChildTagId: res[0] && res[0].children && res[0].children.length > 0 ? res[0].children && res[0].children[0].id : ''
       }, () => {
-        this.search();
+        if (goods.length <= 0)
+          this.search();
       })
     }, () => {
       this.setState({loadingCategory: false})
@@ -297,8 +297,19 @@ class StoreGoodsList extends Component {
     this.setState({goods: goods})
   }
 
+  /*
+  * 如果是从商品列表页进入以下页面，只刷新某个点击的数据，不刷新整个列表
+  */
+
   onRefresh = () => {
-    const status = global.currentRouteName !== 'Goods'
+    const status = global.currentRouteName === Config.ROUTE_GOOD_STORE_DETAIL ||
+      global.currentRouteName === Config.ROUTE_GOODS_APPLY_RECORD ||
+      global.currentRouteName === Config.ROUTE_GOODS_AUDIT ||
+      global.currentRouteName === Config.ROUTE_GOODS_EDIT ||
+      global.currentRouteName === Config.ROUTE_NEW_GOODS_SEARCH ||
+      global.currentRouteName === Config.ROUTE_SEARCH_AND_CREATE_GOODS ||
+      global.currentRouteName === Config.ROUTE_ORDER_RETAIL_PRICE_NEW ||
+      global.currentRouteName === Config.ROUTE_ADD_MISSING_PICTURE
     if (status) {
       this.search(status ? 1 : 0, status)//如果global.currentRouteName的值不是当前页面，只刷新某一个值
       return
@@ -410,6 +421,7 @@ class StoreGoodsList extends Component {
       selectedTagId: '',
       isSelectedCategory: '',
       selectedChildTagId: '',
+      goods: []
     }, () => {
       const {accessToken, store_id} = this.props.global;
       const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};

@@ -76,6 +76,7 @@ class BindMeituan extends PureComponent {
 
   onPress(route, params = {}, callback = {}) {
     let _this = this;
+    this.closeModal()
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
