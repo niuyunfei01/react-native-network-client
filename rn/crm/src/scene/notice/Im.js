@@ -361,8 +361,8 @@ class NoticeList extends React.PureComponent {
             <Text style={styles.userName}>{item?.userName} {item?.dayId !== '' ? `#${item?.dayId}` : ''} </Text>
             <Text style={styles.messageTime}>{item.send_time} </Text>
           </View>
-          <Text
-            style={styles.storeInfo}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
+          <Text numberOfLines={1} ellipsizeMode={'tail'}
+            style={[styles.storeInfo, {width: width * 0.7}]}>{item.ext_store_name} {item?.platform_dayId !== '' ? `#${item?.platform_dayId}` : ''}</Text>
           <Text style={styles.messageInfo} numberOfLines={1} ellipsizeMode={'tail'}>
             {item.msg_type == '1' ? item?.last_message : `[图片]`}
           </Text>

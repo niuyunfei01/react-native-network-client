@@ -151,8 +151,12 @@ class GoodsEditScene extends PureComponent {
       basic_category_obj: {},
       basic_category: [],
       select_basic_categories: {},
+      select_basic_bd_categories: {},
+      select_basic_jd_categories: {},
       secondary_categories: [],
       select_secondary_categories: {},
+      select_secondary_bd_categories: {},
+      select_secondary_jd_categories: {},
       three_categories: [],
       sg_tag_id: '0',
       bd_tag_id: '0',
@@ -226,8 +230,10 @@ class GoodsEditScene extends PureComponent {
       box_num: 0,
       box_fee: 0,
       spread_all: false,
-      spread_all_category: false,
-      content: ''
+      spread_all_category: true,
+      content: '',
+      selectedBdCategory: {},
+      selectedJdCategory: {}
     };
 
   }
@@ -434,17 +440,37 @@ class GoodsEditScene extends PureComponent {
   }
 
   onClose = () => {
-    this.setState({
-      visible: false,
-      basic_category_obj: {},
-      sg_tag_id: '0',
-      buttonDisabled: true,
-      searchValue: '',
-      store_categories: [],
-      store_categories_obj: {},
-      searchCategoriesList: [],
-      searchCategoriesKey: ''
-    });
+    let {selectCategoryType} = this.state;
+    switch (selectCategoryType) {
+      case 'sg':
+        this.setState({
+          visible: false,
+          basic_category_obj: {},
+          sg_tag_id: '0',
+          buttonDisabled: true,
+          searchValue: '',
+          store_categories: [],
+          store_categories_obj: {},
+          searchCategoriesList: [],
+          searchCategoriesKey: ''
+        });
+        break
+      case 'jd':
+        this.setState({
+          visible: false,
+          buttonDisabled: true
+        })
+        break
+      case 'eb':
+        this.setState({
+          visible: false,
+          buttonDisabled: true
+        })
+        break
+      default:
+        break
+    }
+
   };
 
   initEmptyState(appendState) {
@@ -578,6 +604,10 @@ class GoodsEditScene extends PureComponent {
       upload_detail_files: upload_detail_files
     });
     this.getBasicCategory(sg_tag_id)
+    const {product} = this.props;
+    const {eb_tag_tree, jd_tag_tree} = product
+    this.getBasicCategoryBd(bd_tag_id, 'eb', eb_tag_tree)
+    this.getBasicCategoryBd(jd_tag_id, 'jd', jd_tag_tree)
     this.getSaleStatus(id)
   }
 
@@ -678,6 +708,44 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+  getBasicCategoryBd = (id, type = 'eb', data = []) => {
+    for (let firstIndex = 0, firstLength = data.length; firstIndex < firstLength; firstIndex++) {
+      const secondaryArray = data[firstIndex].children
+      if (secondaryArray) {
+        for (let secondaryIndex = 0, secondaryLength = secondaryArray.length; secondaryIndex < secondaryLength; secondaryIndex++) {
+          const threeArray = secondaryArray[secondaryIndex].children
+          if (threeArray) {
+            for (let threeIndex = 0, threeLength = threeArray.length; threeIndex < threeLength; threeIndex++) {
+              if (id == threeArray[threeIndex].key) {
+
+                this.setState({
+                  three_categories: threeArray,
+                  secondary_categories: secondaryArray,
+                  buttonDisabled: false
+                })
+                if (type === 'eb') {
+                  this.setState({
+                    selectedBdCategory: threeArray[threeIndex],
+                    bd_tag_id: threeArray[threeIndex].key,
+                    select_secondary_bd_categories: secondaryArray[secondaryIndex],
+                    select_basic_bd_categories: data[firstIndex]
+                  })
+                } else {
+                  this.setState({
+                    selectedJdCategory: threeArray[threeIndex],
+                    jd_tag_id: threeArray[threeIndex].key,
+                    select_secondary_jd_categories: secondaryArray[secondaryIndex],
+                    select_basic_jd_categories: data[firstIndex]
+                  })
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   onNameClear = () => {
     let {type} = this.props.route.params;
     if (type !== 'edit') {
@@ -768,7 +836,7 @@ class GoodsEditScene extends PureComponent {
     let {
       id, name, vendor_id, weight, sku_having_unit, sg_tag_id, store_categories, upload_files, supply_price,
       sale_status, provided, task_id, actualNum, selectWeight, upc, spec_type, multiSpecsList, price, fnProviding,
-      min_order_count, shelf_no, box_fee, box_num, promote_name, content, upload_detail_files
+      min_order_count, shelf_no, box_fee, box_num, promote_name, content, upload_detail_files, bd_tag_id, jd_tag_id
     } = this.state;
     if (!fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
@@ -783,6 +851,8 @@ class GoodsEditScene extends PureComponent {
       weight,
       sku_having_unit,
       sg_tag_id,
+      bd_tag_id,
+      jd_tag_id,
       store_categories,
       upload_files,
       upload_detail_files,
@@ -1169,7 +1239,9 @@ class GoodsEditScene extends PureComponent {
       allow_multi_spec,
       store_has,
       vendor_has,
-      spread_all_category
+      spread_all_category,
+      selectedBdCategory,
+      selectedJdCategory
     } = this.state
     return (
       <View style={Styles.zoneWrap}>
@@ -1242,7 +1314,7 @@ class GoodsEditScene extends PureComponent {
                 默认闪购类目为标准，展开后可选填其他渠道类目
               </Text>
               <TouchableOpacity style={styles.flexRow}
-                                onPress={() => this.setState({spread_all_category: spread_all_category})}
+                                onPress={() => this.setState({spread_all_category: !spread_all_category})}
               >
                 <Text style={styles.categoryTipFlag}>
                   {spread_all_category ? '收起' : '展开'}
@@ -1261,7 +1333,7 @@ class GoodsEditScene extends PureComponent {
                 </Text>
                 <View style={styles.textInputStyle}>
                   <Text style={styles.selectTipText}>
-                    {basic_category_obj.name_path ?? '请选择类目'}
+                    {selectedBdCategory?.fullname ?? '请选择类目'}
                   </Text>
                 </View>
                 <AntDesign name={'right'} style={styles.rightEmptyView} color={colors.colorCCC} size={16}/>
@@ -1274,7 +1346,7 @@ class GoodsEditScene extends PureComponent {
                 </Text>
                 <View style={styles.textInputStyle}>
                   <Text style={styles.selectTipText}>
-                    {basic_category_obj.name_path ?? '请选择类目'}
+                    {selectedJdCategory.fullname ?? '请选择类目'}
                   </Text>
                 </View>
                 <AntDesign name={'right'} style={styles.rightEmptyView} color={colors.colorCCC} size={16}/>
@@ -2189,6 +2261,8 @@ class GoodsEditScene extends PureComponent {
       searchValue, visible, buttonDisabled, selectHeaderText, dragPicVisible, upload_files, selectPreviewPic,
       vendor_has, store_has, selectCategoryType
     } = this.state
+    const {product} = this.props;
+    const {eb_tag_tree, jd_tag_tree} = product
     if (visible) {
       return (
         <CommonModal position={'flex-end'} visible={visible} animationType={'slide-up'} onRequestClose={this.onClose}>
@@ -2215,8 +2289,14 @@ class GoodsEditScene extends PureComponent {
                   </TouchableOpacity>
                 </View>
               </View>
+              {this.renderSelectSG()}
             </If>
-            {this.renderSelectSG()}
+            <If condition={selectCategoryType === 'eb'}>
+              {this.renderSelectEB(eb_tag_tree, selectCategoryType)}
+            </If>
+            <If condition={selectCategoryType === 'jd'}>
+              {this.renderSelectEB(jd_tag_tree, selectCategoryType)}
+            </If>
             <Button type={'primary'}
                     disabled={buttonDisabled}
                     style={styles.selectedCateStyle}
@@ -2585,27 +2665,64 @@ class GoodsEditScene extends PureComponent {
     })
   }
 
-  selectItem = (item, category) => {
+  selectItem = (item, category, type = 'sg') => {
+    console.log('item, category, type', item, category, type)
     switch (category) {
       case 1:
         this.setState({
           secondary_categories: item.children,
           three_categories: [],
-          select_basic_categories: item,
           buttonDisabled: true
         })
+        if (type === 'sg') {
+          this.setState({
+            select_basic_categories: item
+          })
+        } else if (type === 'bd') {
+          this.setState({
+            select_basic_bd_categories: item
+          })
+        } else {
+          this.setState({
+            select_basic_jd_categories: item
+          })
+        }
         break
       case 2:
         this.setState({
           three_categories: item.children,
-          select_secondary_categories: item,
-          buttonDisabled: true,
-          sg_tag_id: '0'
+          buttonDisabled: true
         })
+        if (type === 'sg') {
+          this.setState({
+            select_secondary_categories: item,
+            buttonDisabled: true,
+            sg_tag_id: '0'
+          })
+        } else if (type === 'bd') {
+          this.setState({
+            select_secondary_bd_categories: item,
+            buttonDisabled: true,
+            bd_tag_id: '0'
+          })
+        } else {
+          this.setState({
+            select_secondary_jd_categories: item,
+            buttonDisabled: true,
+            jd_tag_id: '0'
+          })
+        }
         break
       case 3:
-        this.setState({basic_category_obj: {...item}, sg_tag_id: item.id, buttonDisabled: false})
-        this.getCategoryIdBySGId(item.id)
+        this.setState({buttonDisabled: false})
+        if (type === 'sg') {
+          this.setState({basic_category_obj: {...item}, sg_tag_id: item.id})
+          this.getCategoryIdBySGId(item.id)
+        } else if (type === 'bd') {
+          this.setState({selectedBdCategory: {...item}, bd_tag_id: item.key})
+        } else {
+          this.setState({selectedJdCategory: {...item}, jd_tag_id: item.key})
+        }
         break
     }
   }
@@ -2616,7 +2733,7 @@ class GoodsEditScene extends PureComponent {
       return (
         <TouchableOpacity
           style={select_basic_categories.id === item.id || select_secondary_categories.id === item.id ? styles.selectItemWrap : styles.itemWrap}
-          onPress={() => this.selectItem(item, category)}>
+          onPress={() => this.selectItem(item, category, 'sg')}>
           <Text style={styles.itemText}>
             {item.name}
           </Text>
@@ -2627,7 +2744,7 @@ class GoodsEditScene extends PureComponent {
     }
     const {sg_tag_id} = this.state
     return (
-      <TouchableOpacity style={styles.itemWrap} onPress={() => this.selectItem(item, category)}>
+      <TouchableOpacity style={styles.itemWrap} onPress={() => this.selectItem(item, category, 'sg')}>
         <Text style={styles.itemText}>
           {item.nameShow ?? item.name}
         </Text>
@@ -2635,6 +2752,94 @@ class GoodsEditScene extends PureComponent {
           <AntDesign name={'check'} color={colors.main_color} size={14}/>
         </If>
       </TouchableOpacity>
+    )
+  }
+
+  renderBdCategories = ({item}, category) => {
+    if (item.children) {
+      const {select_basic_bd_categories, select_secondary_bd_categories} = this.state
+      return (
+        <TouchableOpacity
+          style={select_basic_bd_categories.key === item.key || select_secondary_bd_categories.key === item.key ? styles.selectItemWrap : styles.itemWrap}
+          onPress={() => this.selectItem(item, category, 'bd')}>
+          <Text style={styles.itemText}>
+            {item.text}
+          </Text>
+
+          <AntDesign name={'right'} color={colors.color999} size={14}/>
+        </TouchableOpacity>
+      )
+    }
+    const {bd_tag_id} = this.state
+    return (
+      <TouchableOpacity style={styles.itemWrap} onPress={() => this.selectItem(item, category, 'bd')}>
+        <Text style={styles.itemText}>
+          {item.nameShow ?? item.text}
+        </Text>
+        <If condition={item.key === bd_tag_id}>
+          <AntDesign name={'check'} color={colors.main_color} size={14}/>
+        </If>
+      </TouchableOpacity>
+    )
+  }
+
+  renderJdCategories = ({item}, category) => {
+    if (item.children) {
+      const {select_basic_jd_categories, select_secondary_jd_categories} = this.state
+      return (
+        <TouchableOpacity
+          style={select_basic_jd_categories.key === item.key || select_secondary_jd_categories.key === item.key ? styles.selectItemWrap : styles.itemWrap}
+          onPress={() => this.selectItem(item, category, 'jd')}>
+          <Text style={styles.itemText}>
+            {item.text}
+          </Text>
+
+          <AntDesign name={'right'} color={colors.color999} size={14}/>
+        </TouchableOpacity>
+      )
+    }
+    const {jd_tag_id} = this.state
+    return (
+      <TouchableOpacity style={styles.itemWrap} onPress={() => this.selectItem(item, category, 'jd')}>
+        <Text style={styles.itemText}>
+          {item.nameShow ?? item.text}
+        </Text>
+        <If condition={item.key === jd_tag_id}>
+          <AntDesign name={'check'} color={colors.main_color} size={14}/>
+        </If>
+      </TouchableOpacity>
+    )
+  }
+
+  renderSelectEB = (data = [], type = 'eb') => {
+    const {secondary_categories, three_categories} = this.state
+    return (
+      <View style={styles.modalStyle}>
+        <FlatList data={data}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  style={{flex: 1}}
+                  initialNumToRender={10}
+                  getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                  keyExtractor={(item, index) => `${index}`}
+                  renderItem={(item) => type === 'eb' ? this.renderBdCategories(item, 1) : this.renderJdCategories(item, 1)}/>
+        <FlatList data={secondary_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  style={{flex: 1}}
+                  initialNumToRender={10}
+                  getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                  keyExtractor={(item, index) => `${index}`}
+                  renderItem={(item) => type === 'eb' ? this.renderBdCategories(item, 2) : this.renderJdCategories(item, 2)}/>
+        <FlatList data={three_categories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  style={{flex: 1}}
+                  initialNumToRender={10}
+                  getItemLayout={(data, index) => this.getItemLayout(data, index)}
+                  keyExtractor={(item, index) => `${index}`}
+                  renderItem={(item) => type === 'eb' ? this.renderBdCategories(item, 3) : this.renderJdCategories(item, 3)}/>
+      </View>
     )
   }
 
