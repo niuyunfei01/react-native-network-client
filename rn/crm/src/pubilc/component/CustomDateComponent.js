@@ -50,10 +50,17 @@ export default class CustomDateComponent extends PureComponent {
     timeType: '',
     showDateModal: false
   }
+
   onConfirm = (date) => {
-    const {timeType, startTime} = this.state
+    const {timeType, startTime, endTime} = this.state
     if ('start' === timeType) {
       this.setState({startTime: tool.fullDay(date), showDateModal: false})
+      if (dayjs(endTime) < date) {
+        this.setState({
+          startTime: endTime,
+          endTime: tool.fullDay(date)
+        })
+      }
       return
     }
     this.setState({endTime: tool.fullDay(date), showDateModal: false})
@@ -63,6 +70,7 @@ export default class CustomDateComponent extends PureComponent {
         startTime: tool.fullDay(date)
       })
     }
+
   }
 
   render() {
