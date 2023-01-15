@@ -153,7 +153,6 @@ class ChatRoom extends React.PureComponent {
   onEndReached() {
     const {query, isLastPage} = this.state;
     if (isLastPage) {
-      ToastShort('没有更多消息了')
       return null
     }
     query.page += 1
