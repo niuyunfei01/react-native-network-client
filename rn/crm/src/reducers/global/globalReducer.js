@@ -40,7 +40,7 @@ const {
 } = require('../../pubilc/common/constants').default
 
 const initialState = {
-  currentUser: null,
+  currentUser: 0,
   currentNewProductStoreId: 0,
   expireTs: 0,
   currentUserProfile: {},

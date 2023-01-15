@@ -631,11 +631,12 @@ class AppNavigator extends PureComponent {
     if (reduxGlobal?.printer_id === '') {
       return;
     }
-    if (typeof reduxGlobal.store_id !== "number")
+
+    if (typeof parseInt(reduxGlobal.store_id) !== "number")
       return;
     if (typeof reduxGlobal.vendor_id !== "number")
       return;
-    if (typeof reduxGlobal.currentUser !== "number")
+    if (typeof parseInt(reduxGlobal.currentUser) !== "number")
       return;
     if (typeof reduxGlobal.accessToken !== 'string')
       return;
