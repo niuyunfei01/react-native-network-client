@@ -137,7 +137,7 @@ class SelectCity extends Component {
     let {allCityList, check_right} = this.state;
     let {city = ''} = this.props.route.params;
     return (
-      <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={styles.contentWrap}>
+      <View style={styles.contentWrap}>
         {/*定位当前城市*/}
         <If condition={city !== '选择城市'}>
           <View style={styles.headerWrap}>
@@ -239,7 +239,7 @@ class SelectCity extends Component {
             );
           })}
         </View>
-      </TouchableOpacity>
+      </View>
     );
   }
 }
