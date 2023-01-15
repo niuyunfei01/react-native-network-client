@@ -165,12 +165,12 @@ class NoticeList extends React.PureComponent {
       page_size: query.page_size,
       status: selected
     }
-    showModal('加载中')
+    !is_polling && showModal('加载中')
     this.setState({refreshing: true})
     const api = `/im/get_im_lists?store_id=${store_id}&access_token=${accessToken}`
     getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
       if (ok) {
-        hideModal()
+        !is_polling && hideModal()
         const {lists, page, isLastPage} = obj
         let list = page !== 1 ? message.concat(lists) : lists
         this.setState({
@@ -182,7 +182,7 @@ class NoticeList extends React.PureComponent {
         ToastShort(`${reason}`)
       }
     }, (error) => {
-      hideModal()
+      !is_polling && hideModal()
       this.setState({refreshing: false})
     })
   }
