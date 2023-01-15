@@ -13,6 +13,8 @@ const {
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT,
   GET_SG_TAG_TREE,
+  GET_EB_TAG_TREE,
+  GET_JD_TAG_TREE,
 } = require('../../pubilc/common/constants').default;
 
 const initialState = {
@@ -24,6 +26,8 @@ const initialState = {
   selectId: Cts.STORE_TYPE_SELF,
   selectPlatformId: Cts.WM_PLAT_ID_WX,
   sg_tag_tree: [],
+  eb_tag_tree: [],
+  jd_tag_tree: [],
   sg_tag_tree_at: 0
 };
 
@@ -74,6 +78,16 @@ export default function productReducer(state = initialState, action) {
         ...state,
         sg_tag_tree: action.sg_tag_tree,
         sg_tag_tree_at: action.sg_tag_tree_at
+      }
+    case GET_EB_TAG_TREE:
+      return {
+        ...state,
+        eb_tag_tree: action.payload
+      }
+    case GET_JD_TAG_TREE:
+      return {
+        ...state,
+        jd_tag_tree: action.payload
       }
     default:
       return state;

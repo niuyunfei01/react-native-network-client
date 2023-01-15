@@ -324,8 +324,8 @@ export function signIn(mobile, password, props, callback) {
           doAuthLogin(access_token, expire, props, authCallback)
 
         } else {
-          if (Number(json.desc) === 401)
-            return callback(false, Number(json.desc))
+          if (Number(json.error_code) === 401)
+            return callback(false, Number(json.error_code))
           //fixme: 需要给出明确提示
           callback(false, "验证码错误")
         }

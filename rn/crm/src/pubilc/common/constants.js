@@ -116,6 +116,8 @@ export default keyMirror({
 
   GET_VENDOR_TAGS: null,
   GET_SG_TAG_TREE: null,
+  GET_EB_TAG_TREE: null,
+  GET_JD_TAG_TREE: null,
 
   GET_USER_WAGE_DATA: null,
 

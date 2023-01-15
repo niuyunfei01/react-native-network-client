@@ -122,7 +122,7 @@ class HttpUtils {
       const startTime = getTime()
       fetch(uri, options)
         .then((response) => {
-          if (response.ok) {
+          if (response?.ok) {
             return response.json();
           } else {
             hideModal()
@@ -134,17 +134,17 @@ class HttpUtils {
             resolve(response)
             return
           }
-          if (response.ok) {
+          if (response?.ok) {
             if (getNetworkDelay) {
               const endTime = getTime();
-              resolve({obj: response.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
+              resolve({obj: response?.obj, startTime: startTime, endTime: endTime, executeStatus: 'success'})
               return;
             }
             if (getMoreInfo) {
               resolve(response)
               return;
             }
-            resolve(response.obj)
+            resolve(response?.obj)
             return;
           }
           hideModal()
@@ -163,15 +163,15 @@ class HttpUtils {
           reject && reject(response)
         })
         .catch((error) => {
-          this.upLoadData(error.message, uri, url, options, params, method)
+          this.upLoadData(error?.message, uri, url, options, params, method)
           hideModal()
-          ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
+          ToastShort(`服务器错误:${stringEx.formatException(error?.message)}`);
           if (getNetworkDelay) {
             const endTime = getTime();
-            reject && reject({message: error.message, startTime: startTime, endTime: endTime, executeStatus: 'error'})
+            reject && reject({message: error?.message, startTime: startTime, endTime: endTime, executeStatus: 'error'})
             return
           }
-          reject && reject(error.message)
+          reject && reject(error?.message)
         }).finally(() => {
         // 无论请求结果如果，都需要把对应的请求移除掉
         handleList = handleList.filter(
