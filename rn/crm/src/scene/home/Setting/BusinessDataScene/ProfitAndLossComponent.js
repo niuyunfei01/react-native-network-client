@@ -214,7 +214,7 @@ export default class ProfitAndLossComponent extends Component {
         </View>
         <View style={styles.itemWrap}>
           <Text style={styles.notSelectBtnText}>
-            {platform_income_name} <If condition={platform_income_modify == 1}>
+            {platform_income_name} <If condition={platform_income_tip}>
             <AntDesign name={'questioncircle'}
                        color={colors.color999}
                        style={{paddingLeft: 4}}
