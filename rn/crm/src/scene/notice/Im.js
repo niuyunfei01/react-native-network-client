@@ -21,6 +21,7 @@ import store from "../../pubilc/util/configureStore";
 import {getImRemindCount, getOldRemindConfig, setImRemindCount, setOldRemindInfo} from "../../reducers/im/imActions";
 import {Badge} from "react-native-elements";
 import NetInfo from "@react-native-community/netinfo";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 
 const mapStateToProps = ({global, im}) => ({global: global, im: im})
 
@@ -69,7 +70,8 @@ class NoticeList extends React.PureComponent {
 
   componentDidMount() {
     let {im_config} = this.props.im
-    const {accessToken, store_id, vendor_id} = this.props.global;
+    const {accessToken, vendor_id} = this.props.global;
+    let {store_id} = this.state;
     this.fetchData()
     this.getStoreList()
     if (im_config.im_store_status == 1)
@@ -188,6 +190,12 @@ class NoticeList extends React.PureComponent {
   }
 
   onRefresh = () => {
+    if (GlobalUtil.getImFresh() === 1) {
+      this.setState({
+        store_id: this.props.global?.store_id,
+        store_name: this.props.global?.store_info?.name
+      })
+    }
     this.fetchRemindCount()
     tool.debounces(() => {
       let query = this.state.query;
@@ -197,6 +205,7 @@ class NoticeList extends React.PureComponent {
         query: query
       }, () => {
         this.fetchData()
+        GlobalUtil.setImFresh(0)
       })
     }, 600)
   }

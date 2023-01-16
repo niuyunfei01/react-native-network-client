@@ -6,6 +6,7 @@ import DeviceInfo from "react-native-device-info";
 global.hostPort = '';
 global.isorderFresh = 1;
 global.isGoodsFresh = 1;
+global.isImFresh = 0;
 
 export default class GlobalUtil {
   /**
@@ -22,6 +23,19 @@ export default class GlobalUtil {
     return global.isorderFresh;
   }
 
+  /**
+   *
+   * 判断im列表店铺是否刷新 0为非 1为是
+   * 在切换门店使用
+   */
+  static setImFresh(isfresh) {
+    global.isImFresh = isfresh;
+  }
+
+
+  static getImFresh() {
+    return global.isImFresh;
+  }
 
   static getGoodsFresh() {
     return global.isGoodsFresh;
