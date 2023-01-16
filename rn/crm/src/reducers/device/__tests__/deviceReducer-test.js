@@ -22,7 +22,7 @@ jest.autoMockOff()
 const {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../../lib/constants').default
+} = require('../../../pubilc/common/constants').default
 
 /**
  * ## Class under test

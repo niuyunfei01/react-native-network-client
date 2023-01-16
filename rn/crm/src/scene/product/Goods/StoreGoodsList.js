@@ -503,8 +503,8 @@ class StoreGoodsList extends Component {
         <View style={{backgroundColor: colors.white}}>
           <TouchableOpacity style={styles.tipWrap} onPress={this.jumpToGoodsAudit}>
             <Text style={{fontSize: 12, color: '#FF8309', lineHeight: 17, width: 0.62 * width}}>
-              有<If condition={no_pass_audit}>{no_pass_audit}个商品未通过，</If><If
-              condition={fail_audit}>有{fail_audit}个商品审核失败</If>，请立即处理
+              <If condition={no_pass_audit}>有{no_pass_audit}个商品未通过，</If><If
+              condition={fail_audit}>有{fail_audit}个商品审核失败，</If>请立即处理
             </Text>
             <SvgXml xml={right(20, 20, '#FF8309')}/>
           </TouchableOpacity>
@@ -516,7 +516,7 @@ class StoreGoodsList extends Component {
   render() {
 
     const {accessToken, store_id, vendor_id} = this.props.global;
-    let {selectedProduct, goods, isLoading} = this.state;
+    let {selectedProduct, goods} = this.state;
     const {sp} = selectedProduct;
     return (
       <View style={styles.page}>

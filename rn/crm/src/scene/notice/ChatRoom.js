@@ -10,7 +10,7 @@ import colors from "../../pubilc/styles/colors";
 import {SvgXml} from "react-native-svg";
 import {back, emoji, meme, no_message} from "../../svg/svg";
 import {connect} from "react-redux";
-import {ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import EmojiSelector, {Categories} from 'react-native-emoji-selector'
 import BigImage from "../common/component/BigImage";
 import {im_message_refresh} from "../../reducers/im/imActions";
@@ -125,10 +125,12 @@ class ChatRoom extends React.PureComponent {
       page_size: query.page_size,
       group_id: messageInfo.group_id
     }
+    showModal('加载中')
     this.setState({refreshing: true})
     const api = `/im/get_im_detail?store_id=${store_id}&access_token=${accessToken}`
     getWithTplIm(api, params, im.im_config.im_url, ({ok, obj, reason}) => {
       if (ok) {
+        hideModal()
         let {lists, page, isLastPage} = obj
         let list = page > 1 ? messages.concat(lists) : lists
         if (page == 1) this.setState({new_message_id: list[0].id})
@@ -142,6 +144,7 @@ class ChatRoom extends React.PureComponent {
         ToastShort(`${reason}`)
       }
     }, (error) => {
+      hideModal()
       this.setState({refreshing: false})
     })
   }

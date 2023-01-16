@@ -14,8 +14,8 @@
  * the server
  *
  */
-jest.mock('../../../lib/AppAuthToken')
-jest.mock('../../../lib/BackendFactory')
+// jest.mock('../../../lib/AppAuthToken')
+// jest.mock('../../../lib/BackendFactory')
 
 /**
  * ## Class under test
@@ -31,7 +31,7 @@ var actions = require('../deviceActions')
 const {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../../lib/constants').default
+} = require('../../../pubilc/common/constants').default
 
 /**
  * ## Tests

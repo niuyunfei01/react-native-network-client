@@ -832,8 +832,8 @@ class AppNavigator extends PureComponent {
     this.unSubscribe = store.subscribe(async () => {
       const {global, im} = store.getState()
       this.handleNoLoginInfo(global)
-      const {accessToken, lastCheckVersion, currentUser} = global;
-      if (accessToken && currentUser && jpushNotInit) {
+      const {accessToken, lastCheckVersion, currentUser, store_id} = global;
+      if (accessToken && currentUser && store_id && jpushNotInit) {
         jpushNotInit = false
         await checkPushStatus(async () => {
           await this.jpushListener(currentUser)
@@ -857,7 +857,7 @@ class AppNavigator extends PureComponent {
         await initBlueTooth(global)
 
         const currentTs = dayjs().valueOf()
-        if (currentTs - lastCheckVersion > 8 * 3600) {
+        if (currentTs - lastCheckVersion > 8 * 3600 * 1000) {
           store.dispatch(setCheckVersionAt(currentTs))
           await this.checkVersion()
         }
