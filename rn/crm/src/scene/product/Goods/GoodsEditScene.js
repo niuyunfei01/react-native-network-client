@@ -226,9 +226,9 @@ class GoodsEditScene extends PureComponent {
       allow_switch_multi: true,
       selected_pids: [],
       shelf_no: '',
-      min_order_count: 0,
-      box_num: 0,
-      box_fee: 0,
+      min_order_count: '1',
+      box_num: '1',
+      box_fee: '0',
       spread_all: false,
       spread_all_category: true,
       content: '',
@@ -596,10 +596,10 @@ class GoodsEditScene extends PureComponent {
       actualNum: actualNum || '',
       price: price || '',
       supply_price: supply_price || '',
-      min_order_count: min_order_count || 0,
+      min_order_count: min_order_count || '1',
       shelf_no: shelf_no || '',
-      box_fee: box_fee || 0,
-      box_num: box_num || 0,
+      box_fee: box_fee || '0',
+      box_num: box_num || '1',
       content: content || '',
       upload_detail_files: upload_detail_files
     });
@@ -1770,10 +1770,10 @@ class GoodsEditScene extends PureComponent {
         store_id: store_id,
         skipCheckChange: 1
       },
-      box_fee: '',
-      box_num: '',
+      box_fee: '0',
+      box_num: '1',
       shelf_no: '',
-      min_order_count: ''
+      min_order_count: '1'
     }
     if (vendor_info.price_type)
       multiSpecsInfo.price = ''
@@ -1851,7 +1851,7 @@ class GoodsEditScene extends PureComponent {
     let {
       upc, weightList, weight, fnProviding, price, supply_price,
       selectWeight, actualNum, spec_type, store_has, vendor_has,
-      shelf_no, min_order_count, box_num, box_fee
+      shelf_no, min_order_count, box_num, box_fee, spread_all
     } = this.state
     const {price_type} = this.props.global.vendor_info
     return (
@@ -1969,78 +1969,80 @@ class GoodsEditScene extends PureComponent {
           </View>
           <LineView/>
         </If>
-        <View style={styles.specRowCenterWrap}>
-          <Text style={styles.leftText}>
-            包装费
-          </Text>
-          <View style={styles.flexRow}>
-            <Text style={styles.box_fee_label}>
-              每
+        <If condition={spread_all}>
+          <View style={styles.specRowCenterWrap}>
+            <Text style={styles.leftText}>
+              包装费
             </Text>
-            <TextInput
-              value={box_num}
-              onChangeText={value => this.setState({box_num: value})}
-              style={styles.boxFeeInput}
-              textAlign={'center'}
-              placeholderTextColor={colors.color999}
-              placeholder={'0'}/>
-            <Text style={{fontSize: 14, color: colors.color666}}>
-              份收取
-            </Text>
-            <TextInput
-              value={box_fee}
-              onChangeText={value => this.setState({box_fee: value})}
-              textAlign={'center'}
-              style={styles.boxFeeInput}
-              placeholderTextColor={colors.color999}
-              placeholder={'0'}/>
-            <Text style={{fontSize: 14, color: colors.color666}}>
-              元
-            </Text>
+            <View style={styles.flexRow}>
+              <Text style={styles.box_fee_label}>
+                每
+              </Text>
+              <TextInput
+                value={box_num}
+                onChangeText={value => this.setState({box_num: value})}
+                style={styles.boxFeeInput}
+                textAlign={'center'}
+                placeholderTextColor={colors.color999}
+                placeholder={'0'}/>
+              <Text style={{fontSize: 14, color: colors.color666}}>
+                份收取
+              </Text>
+              <TextInput
+                value={box_fee}
+                onChangeText={value => this.setState({box_fee: value})}
+                textAlign={'center'}
+                style={styles.boxFeeInput}
+                placeholderTextColor={colors.color999}
+                placeholder={'0'}/>
+              <Text style={{fontSize: 14, color: colors.color666}}>
+                元
+              </Text>
+            </View>
           </View>
-        </View>
-        <LineView/>
-        <View style={styles.specRowCenterWrap}>
-          <Text style={{
-            width: 90,
-            fontSize: 14,
-            fontWeight: '400',
-            color: colors.color333,
-            lineHeight: 20
-          }} onPress={() => {
-            JbbAlert.show({
-              title: tipInfo?.min_order_count.title,
-              desc: tipInfo?.min_order_count.desc,
-              actionText: '知道了',
-            })
-          }}>
-            最小购买量
-            <Text style={styles.leftFlag}>
-              *
+          <LineView/>
+          <View style={styles.specRowCenterWrap}>
+            <Text style={{
+              width: 90,
+              fontSize: 14,
+              fontWeight: '400',
+              color: colors.color333,
+              lineHeight: 20
+            }} onPress={() => {
+              JbbAlert.show({
+                title: tipInfo?.min_order_count.title,
+                desc: tipInfo?.min_order_count.desc,
+                actionText: '知道了',
+              })
+            }}>
+              最小购买量
+              <Text style={styles.leftFlag}>
+                *
+              </Text>
+              <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
             </Text>
-            <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
-          </Text>
-          <TextInput
-            value={min_order_count}
-            onChangeText={value => this.setState({min_order_count: value})}
-            style={styles.textInputStyle}
-            placeholderTextColor={colors.color999}
-            placeholder={'请输入最小购买量'}/>
-        </View>
-        <LineView/>
-        <View style={styles.specRowCenterWrap}>
-          <Text style={styles.leftText}>
-            库位码
-          </Text>
-          <TextInput
-            value={shelf_no}
-            onChangeText={value => this.setState({shelf_no: value})}
-            style={styles.textInputStyle}
-            placeholderTextColor={colors.color999}
-            placeholder={'请扫描或输入库位码'}/>
-          <Ionicons name={'scan-sharp'} style={styles.rightEmptyView} color={colors.color333} size={22}
-                    onPress={() => this.startScan(true, false, 'shelf_no')}/>
-        </View>
+            <TextInput
+              value={min_order_count}
+              onChangeText={value => this.setState({min_order_count: value})}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请输入最小购买量'}/>
+          </View>
+          <LineView/>
+          <View style={styles.specRowCenterWrap}>
+            <Text style={styles.leftText}>
+              库位码
+            </Text>
+            <TextInput
+              value={shelf_no}
+              onChangeText={value => this.setState({shelf_no: value})}
+              style={styles.textInputStyle}
+              placeholderTextColor={colors.color999}
+              placeholder={'请扫描或输入库位码'}/>
+            <Ionicons name={'scan-sharp'} style={styles.rightEmptyView} color={colors.color333} size={22}
+                      onPress={() => this.startScan(true, false, 'shelf_no')}/>
+          </View>
+        </If>
       </View>
     )
   }
@@ -2623,16 +2625,18 @@ class GoodsEditScene extends PureComponent {
               {this.renderMultiSpecs()}
             </If>
 
+            <If condition={spec_type !== 'spec_multi'}>
+              {this.renderSpecInfo()}
+            </If>
             <If condition={spread_all}>
-              <If condition={spec_type !== 'spec_multi'}>
-                {this.renderSpecInfo()}
-              </If>
               <If condition={!vendor_has && !store_has}>
                 {this.renderProDetail()}
               </If>
             </If>
             {this.renderSpreadBtn()}
-            {this.renderOtherInfo()}
+            <If condition={spread_all}>
+              {this.renderOtherInfo()}
+            </If>
           </View>
           {this.renderScanner()}
           {this.renderSuccessInfo()}
@@ -3273,7 +3277,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 5,
     width: 60,
-    height: 32
+    height: 40
   },
   saleStatusWrap: {
     flex: 1,

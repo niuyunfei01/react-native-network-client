@@ -566,6 +566,7 @@ class OrderListScene extends Component {
       return;
     }
     GlobalUtil.setOrderFresh(2)
+    GlobalUtil.setImFresh(1)
     this.onPress(Config.ROUTE_STORE_SELECT, {onBack: (item) => this.onCanChangeStore(item)})
   }
 
