@@ -1494,7 +1494,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderMultiSpecsInfo = (item, index, weightList, multiSpecsList, fnProviding, type, vendor_has, store_has) => {
-    const {inventory = {}, upc, weight, supply_price, price, sku_name, checked = false, shelf_no = '', min_order_count = 0, box_num = 0, box_fee = 0} = multiSpecsList[index]
+    const {inventory = {}, upc, weight, supply_price, price, sku_name, checked = false, shelf_no = '', min_order_count = '1', box_num = '1', box_fee = '0'} = multiSpecsList[index]
     const {actualNum = ''} = inventory
     const {price_type} = this.props.global.vendor_info;
     let {product_detail = {}} = this.props.route.params;
@@ -2070,9 +2070,6 @@ class GoodsEditScene extends PureComponent {
             })
           }}>
             商品卖点
-            <Text style={styles.leftFlag}>
-              *
-            </Text>
             <Entypo name='help-with-circle' size={14} color={colors.colorCCC}/>
           </Text>
           <TextInput
