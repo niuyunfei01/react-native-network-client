@@ -233,8 +233,9 @@ class GoodsAuditScene extends PureComponent {
 
   }
 
-  deleteGoods = (id) => {
+  deleteGoods = () => {
     const {store_id} = this.props.global
+    const {id} = this.state
     const url = `/v1/new_api/store_product/del_store_pro/${store_id}/${id}`
     HttpUtils.get(url, {}, false, true).then((res) => {
       showSuccess(`${res.reason}`, -100)
