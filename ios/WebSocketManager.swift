@@ -29,7 +29,7 @@ class WebSocketManager: NSObject {
         
         var request = URLRequest(url: url)
         var compressionHandler: CompressionHandler? = nil
-//        var clientCredential: URLCredential? = nil
+        var clientCredential: URLCredential? = nil
         var certPinner: FoundationSecurity? = nil
 
         let options = JSON(options)
@@ -57,7 +57,7 @@ class WebSocketManager: NSObject {
                 }
 
                 let (identity, certificate) = try Keychain.getClientIdentityAndCertificate(for: url.host!)!
-//                clientCredential = URLCredential(identity: identity, certificates: [certificate], persistence: URLCredential.Persistence.permanent)
+                clientCredential = URLCredential(identity: identity, certificates: [certificate], persistence: URLCredential.Persistence.permanent)
             }
             
             if options["enableCompression"].boolValue {
@@ -68,8 +68,8 @@ class WebSocketManager: NSObject {
                 certPinner = FoundationSecurity(allowSelfSigned: true)
             }
         }
-//        let webSocket = WebSocket(request: request, certPinner: certPinner, clientCredential: clientCredential, compressionHandler: compressionHandler)
-        let webSocket = WebSocket(request: request, certPinner: certPinner,  compressionHandler: compressionHandler)
+
+        let webSocket = WebSocket(request: request, certPinner: certPinner, clientCredential: clientCredential, compressionHandler: compressionHandler)
         webSocket.delegate = delegate
         
         webSockets[url] = webSocket

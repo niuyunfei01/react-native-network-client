@@ -263,7 +263,6 @@ const isValidBaseURL = (baseUrl: string) => {
         require_protocol: true,
         require_valid_protocol: true,
         require_host: true,
-        require_tld: false,
     });
 };
 

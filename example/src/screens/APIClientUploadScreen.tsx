@@ -185,6 +185,7 @@ const APIClientUploadScreen = () => {
         <SafeAreaView style={{ flex: 1 }}>
             <ScrollView testID="api_client_upload.scroll_view">
                 <Input
+                    autoCompleteType={undefined}
                     label="Endpoint"
                     placeholder="/upload"
                     value={state.endpoint}
@@ -217,6 +218,7 @@ const APIClientUploadScreen = () => {
                 {multipart && (
                     <>
                         <Input
+                            autoCompleteType={undefined}
                             label="Multi-part file key"
                             placeholder="file"
                             value={multipartFileKey}
