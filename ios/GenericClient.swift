@@ -21,7 +21,8 @@ class GenericClient: NSObject, NetworkClient {
 
     @objc(get:withOptions:withResolver:withRejecter:)
     func get(url: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: url, withMethod: .get, withSession: session, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+         let newUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: newUrl, withMethod: .get, withSession: session, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
 
     @objc(put:withOptions:withResolver:withRejecter:)
