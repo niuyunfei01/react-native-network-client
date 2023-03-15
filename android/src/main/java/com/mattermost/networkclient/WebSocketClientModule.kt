@@ -37,15 +37,15 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
 
     override fun invalidate() {
         super.invalidate()
-        clients.forEach {(_, value) ->
+        clients.forEach { (_, value) ->
             value.webSocket?.close(1000, null)
         }
     }
 
     @ReactMethod
     fun createClientFor(wsUrl: String, options: ReadableMap, promise: Promise) {
-        var wsUri: URI
-        var baseUrl: HttpUrl
+        val wsUri: URI
+        val baseUrl: HttpUrl
         try {
             wsUri = URI(wsUrl)
             baseUrl = httpUrlFromURI(wsUri)
@@ -53,12 +53,8 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
             return promise.reject(error)
         }
 
-        if (clients.containsKey(wsUri)) {
-            return promise.reject("already existing client for this websocket url");
-        }
-
         try {
-            clients[wsUri] = NetworkClient(wsUri, baseUrl, options)
+            clients[wsUri] = NetworkClient(wsUri, baseUrl, options, reactApplicationContext)
             promise.resolve(null)
         } catch (error: Exception) {
             promise.reject(error)
@@ -67,7 +63,7 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
 
     @ReactMethod
     fun invalidateClientFor(wsUrl: String, promise: Promise) {
-        var wsUri: URI
+        val wsUri: URI
         try {
             wsUri = URI(wsUrl)
         } catch (error: IllegalArgumentException) {
@@ -83,7 +79,7 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
 
     @ReactMethod
     fun connectFor(wsUrl: String, promise: Promise) {
-        var wsUri: URI
+        val wsUri: URI
         try {
             wsUri = URI(wsUrl)
         } catch (error: IllegalArgumentException) {
@@ -99,7 +95,7 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
 
     @ReactMethod
     fun disconnectFor(wsUrl: String, promise: Promise) {
-        var wsUri: URI
+        val wsUri: URI
         try {
             wsUri = URI(wsUrl)
         } catch (error: IllegalArgumentException) {
@@ -115,7 +111,7 @@ internal class WebSocketClientModule(reactContext: ReactApplicationContext) : Re
 
     @ReactMethod
     fun sendDataFor(wsUrl: String, data: String, promise: Promise) {
-        var wsUri: URI
+        val wsUri: URI
         try {
             wsUri = URI(wsUrl)
         } catch (error: IllegalArgumentException) {

@@ -10,7 +10,6 @@ import okhttp3.WebSocketListener
 import okio.EOFException
 import org.json.JSONObject
 import java.net.ConnectException
-import java.net.SocketException
 import java.net.URI
 
 class WebSocketEventListener(private val uri: URI) : WebSocketListener() {
@@ -42,7 +41,7 @@ class WebSocketEventListener(private val uri: URI) : WebSocketListener() {
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        if (t is EOFException || t is ConnectException || t is SocketException) {
+        if (t is EOFException || t is ConnectException) {
             webSocket.close(1001, "connection terminated")
             onClosed(webSocket, 1001, t.localizedMessage ?: "connection terminated")
             return
