@@ -210,32 +210,39 @@ class APIClient: RCTEventEmitter, NetworkClient {
 
     @objc(head:forEndpoint:withOptions:withResolver:withRejecter:)
     func head(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .head, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: endpoint, withEndpoint: newEndpoint, withMethod: .head, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
     
     @objc(get:forEndpoint:withOptions:withResolver:withRejecter:)
     func get(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .get, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+    
+        handleRequest(for: baseUrl, withEndpoint: newEndpoint, withMethod: .get, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
 
     @objc(put:forEndpoint:withOptions:withResolver:withRejecter:)
     func put(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .put, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: baseUrl, withEndpoint: newEndpoint, withMethod: .put, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
     
     @objc(post:forEndpoint:withOptions:withResolver:withRejecter:)
     func post(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .post, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: baseUrl, withEndpoint: newEndpoint, withMethod: .post, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
 
     @objc(patch:forEndpoint:withOptions:withResolver:withRejecter:)
     func patch(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .patch, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: baseUrl, withEndpoint: newEndpoint, withMethod: .patch, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
 
     @objc(delete:forEndpoint:withOptions:withResolver:withRejecter:)
     func delete(baseUrl: String, endpoint: String, options: Dictionary<String, Any>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        handleRequest(for: baseUrl, withEndpoint: endpoint, withMethod: .delete, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
+        let newEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        handleRequest(for: baseUrl, withEndpoint: newEndpoint, withMethod: .delete, withOptions: JSON(options), withResolver: resolve, withRejecter: reject)
     }
 
     @objc(upload:forEndpoint:withFileUrl:withTaskId:withOptions:withResolver:withRejecter:)
