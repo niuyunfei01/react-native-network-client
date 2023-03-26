@@ -17,7 +17,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 
-class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class APIClientModule(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
     override fun getName(): String {
         return "APIClient"
     }
@@ -62,14 +63,14 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         internal fun deleteValue(alias: String) {
             sharedPreferences.edit()
-                    .remove(alias)
-                    .apply()
+                .remove(alias)
+                .apply()
         }
 
         internal fun sendJSEvent(eventName: String, data: WritableMap?) {
             if (context.hasActiveReactInstance()) {
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                        .emit(eventName, data)
+                    .emit(eventName, data)
             }
         }
 
@@ -78,7 +79,8 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         private fun setSharedPreferences(reactContext: ReactApplicationContext) {
-            sharedPreferences = reactContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+            sharedPreferences =
+                reactContext.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         }
 
         private fun setCookieJar(reactContext: ReactApplicationContext) {
@@ -103,7 +105,7 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         try {
-            clients[url] = NetworkClient(url, options, cookieJar)
+            clients[url] = NetworkClient(url, options, cookieJar, reactApplicationContext)
             promise.resolve(null)
         } catch (error: Exception) {
             promise.reject(error)
@@ -204,7 +206,14 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun download(baseUrl: String, endpoint: String, filePath: String, taskId: String, options: ReadableMap?, promise: Promise) {
+    fun download(
+        baseUrl: String,
+        endpoint: String,
+        filePath: String,
+        taskId: String,
+        options: ReadableMap?,
+        promise: Promise
+    ) {
         var url: HttpUrl
         try {
             url = baseUrl.toHttpUrl()
@@ -271,7 +280,14 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun upload(baseUrl: String, endpoint: String, filePath: String, taskId: String, options: ReadableMap?, promise: Promise) {
+    fun upload(
+        baseUrl: String,
+        endpoint: String,
+        filePath: String,
+        taskId: String,
+        options: ReadableMap?,
+        promise: Promise
+    ) {
         var url: HttpUrl
         try {
             url = baseUrl.toHttpUrl()
@@ -343,7 +359,13 @@ class APIClientModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         return clients.containsKey(url)
     }
 
-    private fun request(method: String, baseUrl: String, endpoint: String, options: ReadableMap?, promise: Promise) {
+    private fun request(
+        method: String,
+        baseUrl: String,
+        endpoint: String,
+        options: ReadableMap?,
+        promise: Promise
+    ) {
         try {
             val url = baseUrl.toHttpUrl()
             val client = clients[url]!!
