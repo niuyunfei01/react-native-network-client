@@ -1,5 +1,6 @@
 package com.mattermost.networkclient
 
+import android.util.Log
 import com.facebook.react.bridge.*
 import okhttp3.Headers
 import okhttp3.Request
@@ -57,11 +58,15 @@ fun Response.toWritableMap(): WritableMap {
                     map.putMap("data", json.toWritableMap())
                 }
                 else -> {
-                    map.putString("data", bodyString)
+//                    map.putString("data", bodyString)
+                    map.putString("data", "服务器返回数据JSON错误")
+                    map.putBoolean("ok", false)
                 }
             }
         } catch (_: Exception) {
-            map.putString("data", bodyString)
+//            map.putString("data", bodyString)
+            map.putString("data", "服务器返回数据JSON错误")
+            map.putBoolean("ok", false)
         }
     }
 
@@ -100,7 +105,7 @@ fun Response.toDownloadMap(path: String): WritableMap {
  * @param headers ReadableMap of headers from the App
  */
 fun Request.Builder.applyHeaders(headers: ReadableMap?): Request.Builder {
-    if (headers != null){
+    if (headers != null) {
         for ((k, v) in headers.toHashMap()) {
             this.removeHeader(k)
             this.addHeader(k, v as String)
