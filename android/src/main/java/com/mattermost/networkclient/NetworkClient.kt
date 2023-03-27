@@ -146,7 +146,13 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
             }
 
             override fun onResponse(call: Call, response: Response) {
-                promise.resolve(response.toWritableMap())
+                val map = response.toWritableMap()
+                if (map.getBoolean("ok")) {
+                    promise.resolve(map)
+                    cleanUpAfter(response)
+                    return
+                }
+                promise.reject("10", map.getString("data"), map)
                 cleanUpAfter(response)
             }
         })
@@ -330,7 +336,7 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
         return multipartBody.build()
     }
 
-    private fun composeEndpointUrl(endpoint: String) : String {
+    private fun composeEndpointUrl(endpoint: String): String {
         if (baseUrl == null) {
             return endpoint
         }
