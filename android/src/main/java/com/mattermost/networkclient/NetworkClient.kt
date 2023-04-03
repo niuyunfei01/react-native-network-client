@@ -1,6 +1,7 @@
 package com.mattermost.networkclient
 
 import android.net.Uri
+import android.os.Build
 import android.webkit.CookieManager
 import com.facebook.react.bridge.*
 import com.mattermost.networkclient.enums.APIClientEvents
@@ -410,6 +411,8 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
         if (baseUrl == null)
             return null
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return null
         val (heldCertificate, intermediates) = KeyStoreHelper.getClientCertificates(P12_ALIAS)
 
         if (!trustSelfSignedServerCertificate && heldCertificate == null)
@@ -483,11 +486,11 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
 
         var retryMethods = RetryInterceptor.defaultRetryMethods
         if (request != null) {
-            retryMethods = setOf(request.method.toUpperCase(Locale.ENGLISH))
+            retryMethods = setOf(request.method.uppercase(Locale.ENGLISH))
         } else if (retryConfig.hasKey("retryMethods")) {
             retryMethods = retryConfig.getArray("retryMethods")!!
                     .toArrayList()
-                    .map { (it as String).toUpperCase(Locale.ENGLISH) }
+                    .map { (it as String).uppercase(Locale.ENGLISH) }
                     .toSet()
         }
 
