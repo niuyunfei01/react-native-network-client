@@ -1,9 +1,11 @@
 package com.mattermost.networkclient.helpers
 
 import android.content.Context
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.annotation.RequiresApi
 import com.mattermost.networkclient.APIClientModule
 import okhttp3.tls.HeldCertificate
 import java.io.FileInputStream
@@ -18,7 +20,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
-
+@RequiresApi(Build.VERSION_CODES.M)
 object KeyStoreHelper {
     private const val ANDROID_KEY_STORE_TYPE = "AndroidKeyStore"
     private const val ANDROID_KEY_ALIAS = "NetworkClientAndroidKeyStore"
@@ -33,11 +35,11 @@ object KeyStoreHelper {
             "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7
 
     private const val P12_KEY_ALIAS = "KEY"
-    private const val P12_CERTIFICATE_ALIAS= "CERTIFICATE"
+    private const val P12_CERTIFICATE_ALIAS = "CERTIFICATE"
 
     init {
-         loadAndroidKeyStore()
-         generateAndroidKeyIfNeeded()
+        loadAndroidKeyStore()
+        generateAndroidKeyIfNeeded()
     }
 
     fun encryptData(data: String): String {
