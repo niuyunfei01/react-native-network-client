@@ -153,8 +153,17 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
                     cleanUpAfter(response)
                     return
                 }
-                promise.reject("10", map.getString("data"), map)
-                cleanUpAfter(response)
+                if (response.code == 404) {
+                    promise.reject("", "访问地址不存在")
+                    cleanUpAfter(response)
+                    return
+                }
+                if (map.hasKey("data")) {
+
+                    promise.reject("10", map.getString("data"), map)
+                    cleanUpAfter(response)
+                }
+
             }
         })
     }
@@ -255,7 +264,9 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
         clearCookies()
         APIClientModule.deleteValue(TOKEN_ALIAS)
         APIClientModule.deleteValue(P12_ALIAS)
-        KeyStoreHelper.deleteClientCertificates(P12_ALIAS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            KeyStoreHelper.deleteClientCertificates(P12_ALIAS)
+        }
     }
 
     private fun applyGenericClientBuilderConfiguration() {
@@ -442,7 +453,9 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
     private fun importClientP12(p12FilePath: String, password: String) {
         val contentUri = Uri.parse(p12FilePath)
         val realPath = DocumentHelper.getRealPath(contentUri)
-        KeyStoreHelper.importClientCertificateFromP12(realPath, password, P12_ALIAS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            KeyStoreHelper.importClientCertificateFromP12(realPath, password, P12_ALIAS)
+        }
     }
 
     private fun setClientRetryInterceptor(options: ReadableMap?) {
