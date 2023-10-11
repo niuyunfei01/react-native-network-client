@@ -64,8 +64,7 @@ internal class NetworkClient(private val baseUrl: HttpUrl? = null, options: Read
         } else {
             applyClientBuilderConfiguration(options, cookieJar)
         }
-        okHttpClient = if (reactApplicationContext == null) builder.build()
-        else builder.dns(ApiDns(reactApplicationContext)).build()
+        okHttpClient = builder.build()
 
     }
 
